@@ -1,0 +1,48 @@
+{
+  "name": "textlane",
+  "version": "0.0.0",
+  "description": "Rust-native text processing pipeline — a unified replacement with native and JavaScript plugins",
+  "keywords": [
+    "ast",
+    "html",
+    "markdown",
+    "mdx",
+    "pipeline",
+    "unified"
+  ],
+  "homepage": "https://textlane.dev",
+  "license": "MIT",
+  "author": "Evgeny Karev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/datisthq/textlane.git",
+    "directory": "typescript"
+  },
+  "files": [
+    "build",
+    "skills"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": "./build/index.js",
+  "scripts": {
+    "build": "tsgo --project tsconfig.build.json",
+    "check:types": "tsgo --noEmit",
+    "measure:coverage": "vp test --run --coverage",
+    "pack:platforms": "node scripts/pack.ts",
+    "release": "node scripts/release.ts",
+    "test": "pnpm check:types && pnpm test:unit",
+    "test:unit": "vp test"
+  },
+  "devDependencies": {
+    "@types/node": "24.2.0",
+    "@typescript/native-preview": "7.0.0-dev.20260316.1",
+    "@vitest/coverage-v8": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

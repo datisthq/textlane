@@ -1,0 +1,19 @@
+{
+  "name": "textlane",
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "compatibility_date": "2026-04-01",
+  "preview_urls": true,
+  "workers_dev": true,
+  "build": {
+    "command": "pnpm build:docs",
+  },
+  "assets": {
+    "directory": ".livemark/build/client",
+  },
+  "routes": [
+    {
+      "pattern": "textlane.dev",
+      "custom_domain": true,
+    },
+  ],
+}

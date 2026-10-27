@@ -1,0 +1,19 @@
+{
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "package-name": "textlane",
+      "initial-version": "0.1.0",
+      "include-component-in-tag": false,
+      "extra-files": [
+        { "type": "toml", "path": "rust/Cargo.toml", "jsonpath": "$.package.version" },
+        { "type": "json", "path": "typescript/package.json", "jsonpath": "$.version" },
+        {
+          "type": "toml",
+          "path": "rust/Cargo.lock",
+          "jsonpath": "$.package[?(@.name.value=='textlane')].version"
+        }
+      ]
+    }
+  }
+}

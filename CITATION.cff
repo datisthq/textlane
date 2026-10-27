@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: Textlane
+abstract: Rust-native text processing pipeline — a unified replacement with native and JavaScript plugins, shipped to Rust, Node.js and Python.
+authors:
+  - family-names: Karev
+    given-names: Evgeny
+    email: evgeny.karev@datist.io
+url: "https://textlane.dev"
+repository-code: "https://github.com/datisthq/textlane"
+license: MIT
+keywords:
+  - ast
+  - html
+  - markdown
+  - mdx
+  - pipeline
+  - unified

@@ -1,0 +1,9 @@
+{
+  "name": "textlane-python",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bash scripts/copy-skills.sh && uvx maturin@1.15.0 build --release --out build",
+    "release": "uv publish build/*"
+  }
+}
