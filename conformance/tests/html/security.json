@@ -1,0 +1,81 @@
+[
+  {
+    "description": "hast-util-to-html security",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/security.js",
+      "license": "MIT"
+    },
+    "pipeline": [["html.stringify"]],
+    "tests": [
+      {
+        "description": "should make sure comments cannot break out of their context (safe)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "comment",
+              "value": "--><script>alert(1)</script><!--"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<!----&#x3E;<script>alert(1)</script>&#x3C;!---->"
+        }
+      },
+      {
+        "description": "should make sure scripts render (unsafe)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "script",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alert(1)"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<script>alert(1)</script>"
+        }
+      },
+      {
+        "description": "should make sure event attributes render (unsafe)",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "src": "x",
+            "onError": "alert(1)"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<img src=\"x\" onerror=\"alert(1)\">"
+        }
+      },
+      {
+        "description": "should make sure texts are encoded (safe)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "<script>alert(1)</script>"
+            }
+          ]
+        },
+        "expected": {
+          "html": "&#x3C;script>alert(1)&#x3C;/script>"
+        }
+      }
+    ]
+  }
+]

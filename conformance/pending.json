@@ -1,3 +1,4 @@
 {
-  "md/*": "md.parse, md.toHtml and html.stringify are not implemented yet"
+  "md/*": "md.parse, md.toHtml and html.stringify are not implemented yet",
+  "html/*": "html.stringify, html.parse and the other html plugins are not implemented yet"
 }

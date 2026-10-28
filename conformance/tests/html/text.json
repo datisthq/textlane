@@ -1,0 +1,85 @@
+[
+  {
+    "description": "hast-util-to-html text",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/text.js",
+      "license": "MIT"
+    },
+    "pipeline": [["html.stringify"]],
+    "tests": [
+      {
+        "description": "should serialize `text`s",
+        "tree": {
+          "type": "text",
+          "value": "alpha"
+        },
+        "expected": {
+          "html": "alpha"
+        }
+      },
+      {
+        "description": "should encode `text`s",
+        "tree": {
+          "type": "text",
+          "value": "3 < 5 & 7"
+        },
+        "expected": {
+          "html": "3 &#x3C; 5 &#x26; 7"
+        }
+      },
+      {
+        "description": "should not encode `text`s in `style`",
+        "tree": {
+          "type": "element",
+          "tagName": "style",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "*:before {content: \"3 < 5\"}"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<style>*:before {content: \"3 < 5\"}</style>"
+        }
+      },
+      {
+        "description": "should not encode `text`s in `script`",
+        "tree": {
+          "type": "element",
+          "tagName": "script",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "alert(\"3 < 5\")"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<script>alert(\"3 < 5\")</script>"
+        }
+      },
+      {
+        "description": "should encode `text`s in other nodes",
+        "tree": {
+          "type": "element",
+          "tagName": "b",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "3 < 5"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<b>3 &#x3C; 5</b>"
+        }
+      }
+    ]
+  }
+]

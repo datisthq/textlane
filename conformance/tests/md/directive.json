@@ -18902,6 +18902,37 @@
         }
       },
       {
+        "description": "should serialize a directive (text) w/ `attributes`",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a "
+            },
+            {
+              "type": "textDirective",
+              "name": "b",
+              "attributes": {
+                "c": "d",
+                "e": "f",
+                "g": "",
+                "h": null,
+                "j": 2
+              },
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " k."
+            }
+          ]
+        },
+        "expected": {
+          "md": "a :b{c=\"d\" e=\"f\" g j=\"2\"} k.\n"
+        }
+      },
+      {
         "description": "should serialize a directive (text) w/ `id`, `class` attributes",
         "tree": {
           "type": "paragraph",

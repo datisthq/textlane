@@ -1,0 +1,53 @@
+[
+  {
+    "description": "hast-util-to-html raw",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/raw.js",
+      "license": "MIT"
+    },
+    "pipeline": [["html.stringify"]],
+    "tests": [
+      {
+        "description": "should encode `raw`s",
+        "tree": {
+          "type": "raw",
+          "value": "<script>alert(\"XSS!\")</script>"
+        },
+        "expected": {
+          "html": "&#x3C;script>alert(\"XSS!\")&#x3C;/script>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html raw {\"allowDangerousHtml\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/raw.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should not encode `raw`s in `allowDangerousHtml` mode",
+        "tree": {
+          "type": "raw",
+          "value": "<script>alert(\"XSS!\")</script>"
+        },
+        "expected": {
+          "html": "<script>alert(\"XSS!\")</script>"
+        }
+      }
+    ]
+  }
+]

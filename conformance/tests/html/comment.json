@@ -1,0 +1,73 @@
+[
+  {
+    "description": "hast-util-to-html comment",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/comment.js",
+      "license": "MIT"
+    },
+    "pipeline": [["html.stringify"]],
+    "tests": [
+      {
+        "description": "should serialize `comment`s",
+        "tree": {
+          "type": "comment",
+          "value": "alpha"
+        },
+        "expected": {
+          "html": "<!--alpha-->"
+        }
+      },
+      {
+        "description": "should not encode `comment`s",
+        "tree": {
+          "type": "comment",
+          "value": "AT&T"
+        },
+        "expected": {
+          "html": "<!--AT&T-->"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html comment {\"bogusComments\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/comment.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "bogusComments": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should serialize bogus comments (`bogusComments`)",
+        "tree": {
+          "type": "comment",
+          "value": "asd"
+        },
+        "expected": {
+          "html": "<?asd>"
+        }
+      },
+      {
+        "description": "should prevent breaking out of bogus comments (`bogusComments`)",
+        "tree": {
+          "type": "comment",
+          "value": "a<s>d"
+        },
+        "expected": {
+          "html": "<?a<s&#x3E;d>"
+        }
+      }
+    ]
+  }
+]

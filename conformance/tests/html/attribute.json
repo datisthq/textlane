@@ -1,0 +1,1572 @@
+[
+  {
+    "description": "hast-util-to-html attribute",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/attribute.js",
+      "license": "MIT"
+    },
+    "pipeline": [["html.stringify"]],
+    "tests": [
+      {
+        "description": "should ignore unknowns set to `false`",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "unknown": false
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i></i>"
+        }
+      },
+      {
+        "description": "should ignore unknowns set to `null`",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "unknown": null
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i></i>"
+        }
+      },
+      {
+        "description": "should ignore unknowns set to `undefined`",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<i></i>"
+        }
+      },
+      {
+        "description": "should serialize unknowns set to `true` without value",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "unknown": true
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i unknown></i>"
+        }
+      },
+      {
+        "description": "should serialize unknowns set to their name as their name",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "unknown": "unknown"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i unknown=\"unknown\"></i>"
+        }
+      },
+      {
+        "description": "should serialize unknown lists as space-separated",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "unknown": ["a", "b"]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i unknown=\"a b\"></i>"
+        }
+      },
+      {
+        "description": "should serialize unknowns set to an integer as it’s string version",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "unknown": 1
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i unknown=\"1\"></i>"
+        }
+      },
+      {
+        "description": "should serialize unknowns set to `0`",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "unknown": 0
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i unknown=\"0\"></i>"
+        }
+      },
+      {
+        "description": "should ignore known booleans set to `false`",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "hidden": false
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i></i>"
+        }
+      },
+      {
+        "description": "should ignore falsey known booleans",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "hidden": 0
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i></i>"
+        }
+      },
+      {
+        "description": "should serialize known booleans set to `true` without value",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "hidden": true
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i hidden></i>"
+        }
+      },
+      {
+        "description": "should serialize known booleans set to their name without value",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "hidden": "hidden"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i hidden></i>"
+        }
+      },
+      {
+        "description": "should serialize truthy known booleans without value",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "hidden": 1
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i hidden></i>"
+        }
+      },
+      {
+        "description": "should serialize known booleans set to arbitrary strings with value",
+        "tree": {
+          "type": "element",
+          "tagName": "div",
+          "properties": {
+            "selected": "something"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<div selected=\"something\"></div>"
+        }
+      },
+      {
+        "description": "should serialize known booleans set to an empty string without value",
+        "tree": {
+          "type": "element",
+          "tagName": "div",
+          "properties": {
+            "selected": true
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<div selected></div>"
+        }
+      },
+      {
+        "description": "should serialize known overloaded booleans set to arbitrary strings with value",
+        "tree": {
+          "type": "element",
+          "tagName": "div",
+          "properties": {
+            "download": "something"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<div download=\"something\"></div>"
+        }
+      },
+      {
+        "description": "should ignore known overloaded booleans set to `false`",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "download": false
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<a></a>"
+        }
+      },
+      {
+        "description": "should ignore falsey known overloaded booleans",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "download": 0
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<a></a>"
+        }
+      },
+      {
+        "description": "should serialize known overloaded booleans set to `true` without value",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "download": true
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<a download></a>"
+        }
+      },
+      {
+        "description": "should serialize known overloaded booleans set to their name without value",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "download": "download"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<a download></a>"
+        }
+      },
+      {
+        "description": "should serialize known overloaded booleans set to an empty string without value",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "download": ""
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<a download></a>"
+        }
+      },
+      {
+        "description": "should serialize truthy known overloaded booleans without value",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "download": 1
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<a download></a>"
+        }
+      },
+      {
+        "description": "should serialize known overloaded booleans set to another string",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "download": "another"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<a download=\"another\"></a>"
+        }
+      },
+      {
+        "description": "should ignore known numbers set to `false`",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "cols": false
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i></i>"
+        }
+      },
+      {
+        "description": "should serialize known numbers set to `0`",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "cols": 0
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i cols=\"0\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known numbers set to `-1`",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "cols": -1
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i cols=\"-1\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known numbers set to `1`",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "cols": 1
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i cols=\"1\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known numbers set to `true` as without value",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "cols": true
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i cols></i>"
+        }
+      },
+      {
+        "description": "should serialize known numbers set to an empty string",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "cols": ""
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i cols=\"\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known numbers set to their name",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "cols": "cols"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i cols=\"cols\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known numbers set to a string",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "cols": "another"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i cols=\"another\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known numbers set to an array of strings",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "cols": ["a", "b"]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i cols=\"a b\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known numbers set to an array of numbers",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "cols": [0, 50]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i cols=\"0 50\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known numbers set to an array of booleans",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "cols": [true, false]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i cols=\"true false\"></i>"
+        }
+      },
+      {
+        "description": "should ignore known space-separated lists set to `false`",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "className": false
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i></i>"
+        }
+      },
+      {
+        "description": "should serialize known space-separated lists set to `0`",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "className": 0
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i class=\"0\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known space-separated lists set to `true` as without value",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "className": true
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i class></i>"
+        }
+      },
+      {
+        "description": "should serialize known space-separated lists set to an empty string",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "className": ""
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i class=\"\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known space-separated lists set to their attribute name",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "className": "class"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i class=\"class\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known space-separated lists set to their property name",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "className": "className"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i class=\"className\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known space-separated lists set to a string",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "className": "another"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i class=\"another\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known space-separated lists set to an array of strings",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "className": ["a", "b"]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i class=\"a b\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known space-separated lists set to an array of numbers",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "className": [0, 50]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i class=\"0 50\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known space-separated lists set to an array of booleans",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "className": [true, false]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i class=\"true false\"></i>"
+        }
+      },
+      {
+        "description": "should ignore known comma-separated lists set to `false`",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "accept": false
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i></i>"
+        }
+      },
+      {
+        "description": "should serialize known comma-separated lists set to `0`",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "accept": 0
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i accept=\"0\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known comma-separated lists set to `true` as without value",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "accept": true
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i accept></i>"
+        }
+      },
+      {
+        "description": "should serialize known comma-separated lists set to an empty string",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "accept": ""
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i accept=\"\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known comma-separated lists set to their name",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "accept": "accept"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i accept=\"accept\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known comma-separated lists set to a string",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "accept": "another"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i accept=\"another\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known comma-separated lists set to an array of strings",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "accept": ["a", "b"]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i accept=\"a, b\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known comma-separated lists set to an array of numbers",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "accept": [0, 50]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i accept=\"0, 50\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known comma-separated lists set to an array of booleans",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "accept": [true, false]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i accept=\"true, false\"></i>"
+        }
+      },
+      {
+        "description": "should ignore known normals set to `false`",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "id": false
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i></i>"
+        }
+      },
+      {
+        "description": "should serialize known normals set to `0`",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "id": 0
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i id=\"0\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known normals set to `true` as without value",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "id": true
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i id></i>"
+        }
+      },
+      {
+        "description": "should serialize known normals set to an empty string",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "id": ""
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i id=\"\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known normals set to their name",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "id": "id"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i id=\"id\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known normals set to a string",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "id": "another"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i id=\"another\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known normals set to an array of strings as a space-separated list",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "id": ["a", "b"]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i id=\"a b\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known normals set to an array of numbers as a space-separated list",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "id": [0, 50]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i id=\"0 50\"></i>"
+        }
+      },
+      {
+        "description": "should serialize known normals set to an array of booleans as a space-separated list",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "id": [true, false]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i id=\"true false\"></i>"
+        }
+      },
+      {
+        "description": "should ignore data properties set to `false`",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "dataId": false
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i></i>"
+        }
+      },
+      {
+        "description": "should serialize data properties set to `0`",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "dataId": 0
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i data-id=\"0\"></i>"
+        }
+      },
+      {
+        "description": "should serialize data properties set to `true` as without value",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "dataId": true
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i data-id></i>"
+        }
+      },
+      {
+        "description": "should serialize data properties set to an empty string",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "dataId": ""
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i data-id=\"\"></i>"
+        }
+      },
+      {
+        "description": "should serialize data properties set to their property name",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "dataId": "dataId"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i data-id=\"dataId\"></i>"
+        }
+      },
+      {
+        "description": "should serialize data properties set to their attribute name",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "dataId": "data-id"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i data-id=\"data-id\"></i>"
+        }
+      },
+      {
+        "description": "should serialize data properties set to a string",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "dataId": "another"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i data-id=\"another\"></i>"
+        }
+      },
+      {
+        "description": "should serialize numeric-first data properties set to a string",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "data123": "a"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i data-123=\"a\"></i>"
+        }
+      },
+      {
+        "description": "should serialize data properties set to an array of strings as a space-separated list",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "dataId": ["a", "b"]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i data-id=\"a b\"></i>"
+        }
+      },
+      {
+        "description": "should serialize data properties set to an array of numbers as a space-separated list",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "dataId": [0, 50]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i data-id=\"0 50\"></i>"
+        }
+      },
+      {
+        "description": "should serialize data properties set to an array of booleans as a space-separated list",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "dataId": [true, false]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i data-id=\"true false\"></i>"
+        }
+      },
+      {
+        "description": "should show empty string attributes",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "id": ""
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i id=\"\"></i>"
+        }
+      },
+      {
+        "description": "should serialize multiple properties",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "title": "a",
+            "id": "b"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i title=\"a\" id=\"b\"></i>"
+        }
+      },
+      {
+        "description": "should serialize comma-separated attributes",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "accept": ["a", "b"]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i accept=\"a, b\"></i>"
+        }
+      },
+      {
+        "description": "should quote attribute values with double quotes by default",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "title": "a"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i title=\"a\"></i>"
+        }
+      },
+      {
+        "description": "should encode entities in attribute names",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "3<5\u0000": "a"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i 3&#x3C;5&#x0;=\"a\"></i>"
+        }
+      },
+      {
+        "description": "should encode entities in attribute values",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "title": "3<5\u0000"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i title=\"3<5&#x0;\"></i>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html attribute {\"collapseEmptyAttributes\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/attribute.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "collapseEmptyAttributes": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should collapse empty string attributes in `collapseEmptyAttributes` mode",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "id": ""
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i id></i>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html attribute {\"tightAttributes\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/attribute.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "tightAttributes": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should serialize multiple properties tightly in `tightAttributes` mode",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "title": "a",
+            "id": "b"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i title=\"a\"id=\"b\"></i>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html attribute {\"tightCommaSeparatedLists\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/attribute.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "tightCommaSeparatedLists": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should serialize comma-separated attributes tighly in `tightCommaSeparatedLists` mode",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "accept": ["a", "b"]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i accept=\"a,b\"></i>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html attribute {\"quote\":\"'\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/attribute.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "quote": "'"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should quote attribute values with single quotes if `quote: '\\''`",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "title": "a"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i title='a'></i>"
+        }
+      },
+      {
+        "description": "should quote attribute values with single quotes if `quote: '\\''` even if they occur in value",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "title": "'a'"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i title='&#x27;a&#x27;'></i>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html attribute {\"quote\":\"\\\"\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/attribute.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "quote": "\""
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should quote attribute values with double quotes if `quote: '\\\"'`",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "title": "a"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i title=\"a\"></i>"
+        }
+      },
+      {
+        "description": "should quote attribute values with double quotes if `quote: '\\\"'` even if they occur in value",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "title": "\"a\""
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i title=\"&#x22;a&#x22;\"></i>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html attribute {\"allowDangerousCharacters\":true,\"quoteSmart\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/attribute.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "allowDangerousCharacters": true,
+          "quoteSmart": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should quote attribute values with primary quotes by default",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "title": "a"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i title=\"a\"></i>"
+        }
+      },
+      {
+        "description": "should quote attribute values with primary quotes if the alternative occurs",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "title": "'a'"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i title=\"'a'\"></i>"
+        }
+      },
+      {
+        "description": "should quote attribute values with primary quotes if they occur less than the alternative",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "title": "'\"a'"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i title=\"'&#x22;a'\"></i>"
+        }
+      },
+      {
+        "description": "should quote attribute values with primary quotes if they occur as much as alternatives (#1)",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "title": "\"a'"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i title=\"&#x22;a'\"></i>"
+        }
+      },
+      {
+        "description": "should quote attribute values with primary quotes if they occur as much as alternatives (#1) (2)",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "title": "\"'a'\""
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i title=\"&#x22;'a'&#x22;\"></i>"
+        }
+      },
+      {
+        "description": "should quote attribute values with alternative quotes if the primary occurs",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "title": "\"a\""
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i title='\"a\"'></i>"
+        }
+      },
+      {
+        "description": "should quote attribute values with alternative quotes if they occur less than the primary",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "title": "\"'a\""
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i title='\"&#x27;a\"'></i>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html attribute {\"preferUnquoted\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/attribute.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "preferUnquoted": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should omit quotes in `preferUnquoted`",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "id": "a"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i id=a></i>"
+        }
+      },
+      {
+        "description": "should keep quotes in `preferUnquoted` and impossible",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "id": "a b"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i id=\"a b\"></i>"
+        }
+      },
+      {
+        "description": "should not add `=` when omitting quotes on empty values",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "id": ""
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i id></i>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html attribute {\"allowParseErrors\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/attribute.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "allowParseErrors": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should not encode characters in attribute names which cause parse errors, but work, in `allowParseErrors` mode",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "3=5\u0000": "a"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i 3&#x3D;5\u0000=\"a\"></i>"
+        }
+      },
+      {
+        "description": "should not encode characters in attribute values which cause parse errors, but work, in `allowParseErrors` mode",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "title": "3=5\u0000"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i title=\"3=5\u0000\"></i>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html attribute {\"allowDangerousCharacters\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/attribute.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "allowDangerousCharacters": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should not encode characters which cause XSS issues in older browsers, in `allowDangerousCharacters` mode",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "title": "3'5"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<i title=\"3'5\"></i>"
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,79 @@
+[
+  {
+    "description": "hast-util-to-html doctype",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/doctype.js",
+      "license": "MIT"
+    },
+    "pipeline": [["html.stringify"]],
+    "tests": [
+      {
+        "description": "should serialize doctypes",
+        "tree": {
+          "type": "doctype"
+        },
+        "expected": {
+          "html": "<!doctype html>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html doctype {\"tightDoctype\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/doctype.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "tightDoctype": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should serialize doctypes tightly in `tightDoctype` mode",
+        "tree": {
+          "type": "doctype"
+        },
+        "expected": {
+          "html": "<!doctypehtml>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html doctype {\"upperDoctype\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/doctype.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "upperDoctype": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should serialize uppercase doctypes in `upperDoctype` mode",
+        "tree": {
+          "type": "doctype"
+        },
+        "expected": {
+          "html": "<!DOCTYPE html>"
+        }
+      }
+    ]
+  }
+]

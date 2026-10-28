@@ -1,0 +1,287 @@
+[
+  {
+    "description": "hast-util-to-html element",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/element.js",
+      "license": "MIT"
+    },
+    "pipeline": [["html.stringify"]],
+    "tests": [
+      {
+        "description": "should serialize `element`s",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "bravo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<i>bravo</i>"
+        }
+      },
+      {
+        "description": "should serialize unknown `element`s",
+        "tree": {
+          "type": "element",
+          "tagName": "foo",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<foo></foo>"
+        }
+      },
+      {
+        "description": "should serialize void `element`s",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<img>"
+        }
+      },
+      {
+        "description": "should support `<template>`s content",
+        "tree": {
+          "type": "element",
+          "tagName": "template",
+          "properties": {},
+          "children": [],
+          "content": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "b",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Bold"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": " and "
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "i",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "italic"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": "."
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "expected": {
+          "html": "<template><p><b>Bold</b> and <i>italic</i>.</p></template>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html element {\"voids\":[\"foo\"]}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/element.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "voids": ["foo"]
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should serialize given void `element`s",
+        "tree": {
+          "type": "element",
+          "tagName": "foo",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<foo>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html element {\"closeSelfClosing\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/element.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "closeSelfClosing": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should serialize with ` /` in `closeSelfClosing` mode",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<img />"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html element {\"closeSelfClosing\":true,\"tightSelfClosing\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/element.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "closeSelfClosing": true,
+          "tightSelfClosing": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should serialize voids with `/` in `closeSelfClosing` and `tightSelfClosing` mode",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<img/>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html element {\"preferUnquoted\":true,\"tightSelfClosing\":true,\"closeSelfClosing\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/element.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "preferUnquoted": true,
+          "tightSelfClosing": true,
+          "closeSelfClosing": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should serialize voids with `/` in `closeSelfClosing` and `tightSelfClosing` mode, w/ space after an unquoted attribute (1)",
+        "tree": {
+          "type": "element",
+          "tagName": "input",
+          "properties": {
+            "type": "checkbox"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<input type=checkbox />"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html element {\"preferUnquoted\":true,\"closeSelfClosing\":true,\"tightSelfClosing\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/element.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "preferUnquoted": true,
+          "closeSelfClosing": true,
+          "tightSelfClosing": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should serialize voids with `/` in `closeSelfClosing` and `tightSelfClosing` mode, w/ space after an unquoted attribute (2)",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "src": "index.jpg"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<img src=index.jpg />"
+        }
+      },
+      {
+        "description": "should serialize voids with a ` /` in if an unquoted attribute ends with `/`",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "title": "/"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<img title=/ />"
+        }
+      }
+    ]
+  }
+]

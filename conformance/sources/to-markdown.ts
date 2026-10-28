@@ -105,6 +105,9 @@ function readCase(props: {
   const [subject, rawOptions] = props.call.arguments
   const options = rawOptions ? evaluateNode(rawOptions, props.constants) : undefined
   const markdown = evaluateNode(props.expected, props.constants)
+  // to-markdown's nested serializer extensions are its plugin mechanism, not a textlane option
+  if (isObject(options) && "extensions" in options)
+    return countSkip("nested to-markdown extensions")
   if ((rawOptions && !isObject(options)) || typeof markdown !== "string") {
     return countSkip("options or output not statically evaluable (functions, extensions)")
   }

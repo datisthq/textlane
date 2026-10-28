@@ -1,0 +1,53 @@
+[
+  {
+    "description": "hast-util-to-html root",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/root.js",
+      "license": "MIT"
+    },
+    "pipeline": [["html.stringify"]],
+    "tests": [
+      {
+        "description": "should serialize `root`s",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "alpha "
+            },
+            {
+              "type": "element",
+              "tagName": "i",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "bravo"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": " charlie"
+            }
+          ]
+        },
+        "expected": {
+          "html": "alpha <i>bravo</i> charlie"
+        }
+      },
+      {
+        "description": "should serialize `root`s w/o children",
+        "tree": {
+          "type": "root"
+        },
+        "expected": {
+          "html": ""
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,2657 @@
+[
+  {
+    "description": "hast-util-to-html omission-closing-body {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-closing-body.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should omit tag without following",
+        "tree": {
+          "type": "element",
+          "tagName": "body",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "should not omit tag if followed by `comment`",
+        "tree": {
+          "type": "element",
+          "tagName": "html",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "body",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "alpha"
+            }
+          ]
+        },
+        "expected": {
+          "html": "</body><!--alpha-->"
+        }
+      },
+      {
+        "description": "should omit tag if not followed by `comment`",
+        "tree": {
+          "type": "element",
+          "tagName": "html",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "body",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "alpha"
+            }
+          ]
+        },
+        "expected": {
+          "html": "alpha"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission-closing-caption {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-closing-caption.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should not omit tag without children",
+        "tree": {
+          "type": "element",
+          "tagName": "caption",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<caption>"
+        }
+      },
+      {
+        "description": "should omit tag without following",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "caption",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><caption></table>"
+        }
+      },
+      {
+        "description": "should not omit tag followed by `comment`",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "caption",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "alpha"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><caption></caption><!--alpha--></table>"
+        }
+      },
+      {
+        "description": "should not omit tag followed by whitespace",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "caption",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " alpha"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><caption></caption> alpha</table>"
+        }
+      },
+      {
+        "description": "should omit tag followed by others",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "caption",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "tr",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><caption><tr></table>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission-closing-colgroup {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-closing-colgroup.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should not omit tag without children",
+        "tree": {
+          "type": "element",
+          "tagName": "colgroup",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<colgroup>"
+        }
+      },
+      {
+        "description": "should omit tag if head is `col`",
+        "tree": {
+          "type": "element",
+          "tagName": "colgroup",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "col",
+              "properties": {
+                "span": 2
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<col span=\"2\">"
+        }
+      },
+      {
+        "description": "should not omit tag if head is not `col`",
+        "tree": {
+          "type": "element",
+          "tagName": "colgroup",
+          "properties": {},
+          "children": [
+            {
+              "type": "comment",
+              "value": "alpha"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<colgroup><!--alpha-->"
+        }
+      },
+      {
+        "description": "should not omit tag if previous is `colgroup` whose closing tag is omitted",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "colgroup",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "col",
+                  "properties": {
+                    "span": 2
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "element",
+              "tagName": "colgroup",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "col",
+                  "properties": {
+                    "span": 3
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><col span=\"2\"><colgroup><col span=\"3\"></table>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission-closing-dd {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-closing-dd.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should omit tag without parent",
+        "tree": {
+          "type": "element",
+          "tagName": "dd",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<dd>"
+        }
+      },
+      {
+        "description": "should omit tag without following",
+        "tree": {
+          "type": "element",
+          "tagName": "dl",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dd",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dl><dd></dl>"
+        }
+      },
+      {
+        "description": "should omit tag followed by `dd`",
+        "tree": {
+          "type": "element",
+          "tagName": "dl",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dd",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "dd",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dl><dd><dd></dl>"
+        }
+      },
+      {
+        "description": "should omit tag followed by `dt`",
+        "tree": {
+          "type": "element",
+          "tagName": "dl",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dd",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "dt",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dl><dd><dt></dt></dl>"
+        }
+      },
+      {
+        "description": "should not omit tag followed by others",
+        "tree": {
+          "type": "element",
+          "tagName": "dl",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dd",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dl><dd></dd><p></dl>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission-closing-dt {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-closing-dt.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should not omit tag without parent",
+        "tree": {
+          "type": "element",
+          "tagName": "dt",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<dt></dt>"
+        }
+      },
+      {
+        "description": "should not omit tag without following",
+        "tree": {
+          "type": "element",
+          "tagName": "dl",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dt",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dl><dt></dt></dl>"
+        }
+      },
+      {
+        "description": "should omit tag followed by `dt`",
+        "tree": {
+          "type": "element",
+          "tagName": "dl",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dt",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "dt",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dl><dt><dt></dt></dl>"
+        }
+      },
+      {
+        "description": "should omit tag followed by `dd`",
+        "tree": {
+          "type": "element",
+          "tagName": "dl",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dt",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "dd",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dl><dt><dd></dl>"
+        }
+      },
+      {
+        "description": "should not omit tag followed by others",
+        "tree": {
+          "type": "element",
+          "tagName": "dl",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dt",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dl><dt></dt><p></dl>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission-closing-head {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-closing-head.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should omit tag without following",
+        "tree": {
+          "type": "element",
+          "tagName": "head",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "should not omit tag if followed by `comment`",
+        "tree": {
+          "type": "element",
+          "tagName": "html",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "head",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "alpha"
+            }
+          ]
+        },
+        "expected": {
+          "html": "</head><!--alpha-->"
+        }
+      },
+      {
+        "description": "should not omit tag if the next sibling starts with whitespace",
+        "tree": {
+          "type": "element",
+          "tagName": "html",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "head",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " alpha"
+            }
+          ]
+        },
+        "expected": {
+          "html": "</head> alpha"
+        }
+      },
+      {
+        "description": "should omit tag if not followed by `comment`",
+        "tree": {
+          "type": "element",
+          "tagName": "html",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "head",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "alpha"
+            }
+          ]
+        },
+        "expected": {
+          "html": "alpha"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission-closing-html {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-closing-html.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should omit tag without following",
+        "tree": {
+          "type": "element",
+          "tagName": "html",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "should not omit tag if followed by `comment`",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "html",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "alpha"
+            }
+          ]
+        },
+        "expected": {
+          "html": "</html><!--alpha-->"
+        }
+      },
+      {
+        "description": "should omit tag if not followed by `comment`",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "html",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "alpha"
+            }
+          ]
+        },
+        "expected": {
+          "html": "alpha"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission-closing-li {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-closing-li.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should omit tag without parent",
+        "tree": {
+          "type": "element",
+          "tagName": "li",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<li>"
+        }
+      },
+      {
+        "description": "should omit tag without following",
+        "tree": {
+          "type": "element",
+          "tagName": "ol",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<ol><li></ol>"
+        }
+      },
+      {
+        "description": "should omit tag followed by `li`",
+        "tree": {
+          "type": "element",
+          "tagName": "ol",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<ol><li><li></ol>"
+        }
+      },
+      {
+        "description": "should not omit tag followed by others",
+        "tree": {
+          "type": "element",
+          "tagName": "ol",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<ol><li></li><p></ol>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission-closing-menuitem {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-closing-menuitem.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should omit tag without parent",
+        "tree": {
+          "type": "element",
+          "tagName": "menuitem",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "alpha"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<menuitem>alpha</menuitem>"
+        }
+      },
+      {
+        "description": "should omit tag without following",
+        "tree": {
+          "type": "element",
+          "tagName": "menu",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "menuitem",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<menu><menuitem>alpha</menuitem></menu>"
+        }
+      },
+      {
+        "description": "should omit tag followed by `menuitem`",
+        "tree": {
+          "type": "element",
+          "tagName": "menu",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "menuitem",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "menuitem",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<menu><menuitem></menuitem><menuitem></menuitem></menu>"
+        }
+      },
+      {
+        "description": "should omit tag followed by `hr`",
+        "tree": {
+          "type": "element",
+          "tagName": "menu",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "menuitem",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "type": "element",
+              "tagName": "hr",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<menu><menuitem>alpha</menuitem><hr></menu>"
+        }
+      },
+      {
+        "description": "should omit tag followed by `menu`",
+        "tree": {
+          "type": "element",
+          "tagName": "menu",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "menuitem",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "type": "element",
+              "tagName": "menu",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<menu><menuitem>alpha</menuitem><menu></menu></menu>"
+        }
+      },
+      {
+        "description": "should not omit tag followed by others",
+        "tree": {
+          "type": "element",
+          "tagName": "menu",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "menuitem",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<menu><menuitem>alpha</menuitem><p></menu>"
+        }
+      },
+      {
+        "description": "should omit tag when without children",
+        "tree": {
+          "type": "element",
+          "tagName": "menu",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "menuitem",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<menu><menuitem></menuitem><p></menu>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission-closing-optgroup {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-closing-optgroup.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should omit tag without parent",
+        "tree": {
+          "type": "element",
+          "tagName": "optgroup",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<optgroup>"
+        }
+      },
+      {
+        "description": "should omit tag without following",
+        "tree": {
+          "type": "element",
+          "tagName": "select",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "optgroup",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<select><optgroup></select>"
+        }
+      },
+      {
+        "description": "should omit tag followed by `optgroup`",
+        "tree": {
+          "type": "element",
+          "tagName": "select",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "optgroup",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "optgroup",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<select><optgroup><optgroup></select>"
+        }
+      },
+      {
+        "description": "should not omit tag followed by others",
+        "tree": {
+          "type": "element",
+          "tagName": "select",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "optgroup",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<select><optgroup></optgroup><p></select>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission-closing-option {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-closing-option.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should omit tag without parent",
+        "tree": {
+          "type": "element",
+          "tagName": "option",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<option>"
+        }
+      },
+      {
+        "description": "should omit tag without following",
+        "tree": {
+          "type": "element",
+          "tagName": "select",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "option",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<select><option></select>"
+        }
+      },
+      {
+        "description": "should omit tag followed by `option`",
+        "tree": {
+          "type": "element",
+          "tagName": "select",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "option",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "option",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<select><option><option></select>"
+        }
+      },
+      {
+        "description": "should omit tag followed by `optgroup`",
+        "tree": {
+          "type": "element",
+          "tagName": "select",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "option",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "optgroup",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<select><option><optgroup></select>"
+        }
+      },
+      {
+        "description": "should not omit tag followed by others",
+        "tree": {
+          "type": "element",
+          "tagName": "select",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "option",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<select><option></option><p></select>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission-closing-p {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-closing-p.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should omit tag without following",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p>"
+        }
+      },
+      {
+        "description": "should omit tag if followed by `address`",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "address",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><address></address>"
+        }
+      },
+      {
+        "description": "should omit tag if followed by `ul`",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "ul",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><ul></ul>"
+        }
+      },
+      {
+        "description": "should not omit tag if followed by `a`",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "a",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p></p><a></a>"
+        }
+      },
+      {
+        "description": "should not omit tag if followed by `xmp`",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "xmp",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p></p><xmp></xmp>"
+        }
+      },
+      {
+        "description": "should omit tag without parent",
+        "tree": {
+          "type": "element",
+          "tagName": "p",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<p>"
+        }
+      },
+      {
+        "description": "should not omit tag if parent is `a`",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<a><p></p></a>"
+        }
+      },
+      {
+        "description": "should not omit tag if parented by `video`",
+        "tree": {
+          "type": "element",
+          "tagName": "video",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<video><p></p></video>"
+        }
+      },
+      {
+        "description": "should not omit tag if parent is `article`",
+        "tree": {
+          "type": "element",
+          "tagName": "article",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<article><p></article>"
+        }
+      },
+      {
+        "description": "should not omit tag if parented by `section`",
+        "tree": {
+          "type": "element",
+          "tagName": "section",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<section><p></section>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission-closing-tbody {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-closing-tbody.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should omit tag without siblings",
+        "tree": {
+          "type": "element",
+          "tagName": "tbody",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<tbody>"
+        }
+      },
+      {
+        "description": "should omit tag without following",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><tbody></table>"
+        }
+      },
+      {
+        "description": "should omit tag followed by `tbody`",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><tbody><tbody></table>"
+        }
+      },
+      {
+        "description": "should omit tag followed by `tfoot`",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "tfoot",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><tbody><tfoot></table>"
+        }
+      },
+      {
+        "description": "should not omit tag followed by others",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "tr",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><tbody></tbody><tr></table>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission-closing-tfoot {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-closing-tfoot.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should omit tag without siblings",
+        "tree": {
+          "type": "element",
+          "tagName": "tfoot",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<tfoot>"
+        }
+      },
+      {
+        "description": "should omit tag without following",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tfoot",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><tfoot></table>"
+        }
+      },
+      {
+        "description": "should not omit tag followed by others",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tfoot",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "tr",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><tfoot></tfoot><tr></table>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission-closing-thead {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-closing-thead.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should not omit tag without siblings",
+        "tree": {
+          "type": "element",
+          "tagName": "thead",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<thead></thead>"
+        }
+      },
+      {
+        "description": "should not omit tag without following",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "thead",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><thead></thead></table>"
+        }
+      },
+      {
+        "description": "should omit tag followed by `tbody`",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "thead",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><thead><tbody></table>"
+        }
+      },
+      {
+        "description": "should omit tag followed by `tfoot`",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "thead",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "tfoot",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><thead><tfoot></table>"
+        }
+      },
+      {
+        "description": "should not omit tag followed by others",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "thead",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "tr",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><thead></thead><tr></table>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission-closing-tr {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-closing-tr.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should omit tag without siblings",
+        "tree": {
+          "type": "element",
+          "tagName": "tr",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<tr>"
+        }
+      },
+      {
+        "description": "should omit tag without following",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tr",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><tr></table>"
+        }
+      },
+      {
+        "description": "should not omit tag followed by others",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tr",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><tr></tr><tbody></table>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission-opening-body {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-opening-body.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should omit tag without children",
+        "tree": {
+          "type": "element",
+          "tagName": "body",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "should not omit tag if the head is a `comment`",
+        "tree": {
+          "type": "element",
+          "tagName": "body",
+          "properties": {},
+          "children": [
+            {
+              "type": "comment",
+              "value": "alpha"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<body><!--alpha-->"
+        }
+      },
+      {
+        "description": "should not omit tag if the head starts with whitespace",
+        "tree": {
+          "type": "element",
+          "tagName": "body",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": " alpha"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<body> alpha"
+        }
+      },
+      {
+        "description": "should not omit tag if head is `meta`",
+        "tree": {
+          "type": "element",
+          "tagName": "body",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "meta",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<body><meta>"
+        }
+      },
+      {
+        "description": "should not omit tag if head is `link`",
+        "tree": {
+          "type": "element",
+          "tagName": "body",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "link",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<body><link>"
+        }
+      },
+      {
+        "description": "should not omit tag if head is `script`",
+        "tree": {
+          "type": "element",
+          "tagName": "body",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "script",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<body><script></script>"
+        }
+      },
+      {
+        "description": "should not omit tag if head is `style`",
+        "tree": {
+          "type": "element",
+          "tagName": "body",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "style",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<body><style></style>"
+        }
+      },
+      {
+        "description": "should not omit tag if head is `template`",
+        "tree": {
+          "type": "element",
+          "tagName": "body",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "template",
+              "properties": {},
+              "children": [],
+              "content": {
+                "type": "root",
+                "children": []
+              }
+            }
+          ]
+        },
+        "expected": {
+          "html": "<body><template></template>"
+        }
+      },
+      {
+        "description": "should omit tag if head is something else",
+        "tree": {
+          "type": "element",
+          "tagName": "body",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "div",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<div></div>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission-opening-colgroup {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-opening-colgroup.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should not omit tag without children",
+        "tree": {
+          "type": "element",
+          "tagName": "colgroup",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<colgroup>"
+        }
+      },
+      {
+        "description": "should omit tag with `col` child",
+        "tree": {
+          "type": "element",
+          "tagName": "colgroup",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<colgroup>"
+        }
+      },
+      {
+        "description": "should omit tag without following",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "colgroup",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><colgroup></table>"
+        }
+      },
+      {
+        "description": "should not omit tag followed by `comment`",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "colgroup",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "alpha"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><colgroup></colgroup><!--alpha--></table>"
+        }
+      },
+      {
+        "description": "should not omit tag followed by whitespace",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "colgroup",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " alpha"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><colgroup></colgroup> alpha</table>"
+        }
+      },
+      {
+        "description": "should omit tag followed by others",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "colgroup",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "tr",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><colgroup><tr></table>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission-opening-head {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-opening-head.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should omit tag with children",
+        "tree": {
+          "type": "element",
+          "tagName": "head",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "meta",
+              "properties": {
+                "charSet": "utf8"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<meta charset=\"utf8\">"
+        }
+      },
+      {
+        "description": "should omit tag without children (could be fine in `srcdoc`)",
+        "tree": {
+          "type": "element",
+          "tagName": "head",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "should omit tag with `title`",
+        "tree": {
+          "type": "element",
+          "tagName": "head",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "title",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<title>alpha</title>"
+        }
+      },
+      {
+        "description": "should omit tag with `base`",
+        "tree": {
+          "type": "element",
+          "tagName": "head",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "base",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<base>"
+        }
+      },
+      {
+        "description": "should not omit tag with multiple `title`s",
+        "tree": {
+          "type": "element",
+          "tagName": "head",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "title",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "title",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<head><title></title><title></title>"
+        }
+      },
+      {
+        "description": "should not omit tag with multiple `base`s",
+        "tree": {
+          "type": "element",
+          "tagName": "head",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "base",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "base",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<head><base><base>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission-opening-html {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-opening-html.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should omit tag without first child",
+        "tree": {
+          "type": "element",
+          "tagName": "html",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "should not omit tag if head is `comment`",
+        "tree": {
+          "type": "element",
+          "tagName": "html",
+          "properties": {},
+          "children": [
+            {
+              "type": "comment",
+              "value": "alpha"
+            },
+            {
+              "type": "text",
+              "value": "bravo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<html><!--alpha-->bravo"
+        }
+      },
+      {
+        "description": "should omit tag if head is not `comment`",
+        "tree": {
+          "type": "element",
+          "tagName": "html",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "bravo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "bravo"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission-opening-tbody {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission-opening-tbody.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should not omit tag without children",
+        "tree": {
+          "type": "element",
+          "tagName": "tbody",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<tbody>"
+        }
+      },
+      {
+        "description": "should omit tag if head is `tr`",
+        "tree": {
+          "type": "element",
+          "tagName": "tbody",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tr",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tr>"
+        }
+      },
+      {
+        "description": "should not omit tag preceded by an omitted `thead` closing tag",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "thead",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "tr",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "tr",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><thead><tr><tbody><tr></table>"
+        }
+      },
+      {
+        "description": "should not omit tag preceded by an omitted `tbody` closing tag",
+        "tree": {
+          "type": "element",
+          "tagName": "table",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "tr",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "tr",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><tr><tbody><tr></table>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html omission {\"omitOptionalTags\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/omission.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should omit opening and closing tags",
+        "tree": {
+          "type": "element",
+          "tagName": "html",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "should not omit opening tags with attributes",
+        "tree": {
+          "type": "element",
+          "tagName": "html",
+          "properties": {
+            "lang": "en"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<html lang=\"en\">"
+        }
+      },
+      {
+        "description": "should ignore whitespace when determining whether tags can be omitted (#1)",
+        "tree": {
+          "type": "element",
+          "tagName": "ol",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "bravo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<ol><li>alpha<li>bravo</ol>"
+        }
+      },
+      {
+        "description": "should ignore whitespace when determining whether tags can be omitted (#2)",
+        "tree": {
+          "type": "element",
+          "tagName": "ol",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": " "
+            },
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "bravo"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "\t"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<ol><li>alpha <li>bravo\t</ol>"
+        }
+      }
+    ]
+  }
+]

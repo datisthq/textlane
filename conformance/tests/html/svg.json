@@ -1,0 +1,1023 @@
+[
+  {
+    "description": "hast-util-to-html svg {\"space\":\"svg\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/svg.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "space": "svg"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should serialize `element`s",
+        "tree": {
+          "type": "element",
+          "tagName": "path",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<path></path>"
+        }
+      },
+      {
+        "description": "should serialize unknown `element`s",
+        "tree": {
+          "type": "element",
+          "tagName": "foo",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<foo></foo>"
+        }
+      },
+      {
+        "description": "should serialize `element`s with content",
+        "tree": {
+          "type": "element",
+          "tagName": "g",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "circle",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<g><circle></circle></g>"
+        }
+      },
+      {
+        "description": "should serialize special properties",
+        "tree": {
+          "type": "element",
+          "tagName": "text",
+          "properties": {
+            "className": ["alpha"]
+          },
+          "children": [
+            {
+              "type": "text",
+              "value": "bravo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<text class=\"alpha\">bravo</text>"
+        }
+      },
+      {
+        "description": "should serialize multiple properties",
+        "tree": {
+          "type": "element",
+          "tagName": "text",
+          "properties": {
+            "className": ["a", "b"],
+            "title": "c d"
+          },
+          "children": [
+            {
+              "type": "text",
+              "value": "bravo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<text class=\"a b\" title=\"c d\">bravo</text>"
+        }
+      },
+      {
+        "description": "should serialize space-separated attributes",
+        "tree": {
+          "type": "element",
+          "tagName": "text",
+          "properties": {
+            "className": ["alpha", "charlie"]
+          },
+          "children": [
+            {
+              "type": "text",
+              "value": "bravo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<text class=\"alpha charlie\">bravo</text>"
+        }
+      },
+      {
+        "description": "should serialize comma-separated attributes",
+        "tree": {
+          "type": "element",
+          "tagName": "glyph",
+          "properties": {
+            "glyphName": ["foo", "bar"]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<glyph glyph-name=\"foo, bar\"></glyph>"
+        }
+      },
+      {
+        "description": "should serialize unknown lists as space-separated",
+        "tree": {
+          "type": "element",
+          "tagName": "circle",
+          "properties": {
+            "unknown": ["alpha", "bravo"]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<circle unknown=\"alpha bravo\"></circle>"
+        }
+      },
+      {
+        "description": "should serialize known boolean attributes set to `true`",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "download": true
+          },
+          "children": [
+            {
+              "type": "text",
+              "value": "bravo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<a download>bravo</a>"
+        }
+      },
+      {
+        "description": "should ignore known boolean attributes set to `false`",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "download": false
+          },
+          "children": [
+            {
+              "type": "text",
+              "value": "bravo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<a>bravo</a>"
+        }
+      },
+      {
+        "description": "should serialize truthy known boolean attributes",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "download": 1
+          },
+          "children": [
+            {
+              "type": "text",
+              "value": "bravo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<a download>bravo</a>"
+        }
+      },
+      {
+        "description": "should ignore falsey known boolean attributes",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "download": 0
+          },
+          "children": [
+            {
+              "type": "text",
+              "value": "bravo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<a>bravo</a>"
+        }
+      },
+      {
+        "description": "should ignore unknown attributes set to `false`",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "unknown": false
+          },
+          "children": [
+            {
+              "type": "text",
+              "value": "bravo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<a>bravo</a>"
+        }
+      },
+      {
+        "description": "should serialize unknown attributes set to `true`",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "unknown": true
+          },
+          "children": [
+            {
+              "type": "text",
+              "value": "bravo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<a unknown>bravo</a>"
+        }
+      },
+      {
+        "description": "should serialize positive known numeric attributes",
+        "tree": {
+          "type": "element",
+          "tagName": "path",
+          "properties": {
+            "strokeOpacity": 0.7
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<path stroke-opacity=\"0.7\"></path>"
+        }
+      },
+      {
+        "description": "should serialize negative known numeric attributes",
+        "tree": {
+          "type": "element",
+          "tagName": "path",
+          "properties": {
+            "strokeMiterLimit": -1
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<path stroke-miterlimit=\"-1\"></path>"
+        }
+      },
+      {
+        "description": "should serialize known numeric attributes set to `0`",
+        "tree": {
+          "type": "element",
+          "tagName": "path",
+          "properties": {
+            "strokeOpacity": 0
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<path stroke-opacity=\"0\"></path>"
+        }
+      },
+      {
+        "description": "should serialize other attributes",
+        "tree": {
+          "type": "element",
+          "tagName": "svg",
+          "properties": {
+            "viewBox": "0 0 10 10"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<svg viewBox=\"0 0 10 10\"></svg>"
+        }
+      },
+      {
+        "description": "should serialize other falsey attributes",
+        "tree": {
+          "type": "element",
+          "tagName": "svg",
+          "properties": {
+            "viewBox": ""
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<svg viewBox=\"\"></svg>"
+        }
+      },
+      {
+        "description": "should serialize other non-string attributes",
+        "tree": {
+          "type": "element",
+          "tagName": "i",
+          "properties": {
+            "id": true
+          },
+          "children": [
+            {
+              "type": "text",
+              "value": "bravo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<i id>bravo</i>"
+        }
+      },
+      {
+        "description": "should encode entities in attribute names",
+        "tree": {
+          "type": "element",
+          "tagName": "circle",
+          "properties": {
+            "3<5\u0000": "alpha"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<circle 3&#x3C;5&#x0;=\"alpha\"></circle>"
+        }
+      },
+      {
+        "description": "should encode entities in attribute values",
+        "tree": {
+          "type": "element",
+          "tagName": "circle",
+          "properties": {
+            "title": "3<5\u0000"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<circle title=\"3<5&#x0;\"></circle>"
+        }
+      },
+      {
+        "description": "should serialize an SVG tree",
+        "tree": {
+          "type": "element",
+          "tagName": "svg",
+          "properties": {
+            "xlmns": "http://www.w3.org/2000/svg",
+            "xmlnsXLink": "http://www.w3.org/1999/xlink",
+            "width": 500,
+            "height": 500,
+            "viewBox": [0, 0, 500, 500]
+          },
+          "children": [
+            {
+              "type": "element",
+              "tagName": "title",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "SVG `<circle>` element"
+                }
+              ]
+            },
+            {
+              "type": "element",
+              "tagName": "circle",
+              "properties": {
+                "cx": 120,
+                "cy": 120,
+                "r": 100
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<svg xlmns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"500\" height=\"500\" viewBox=\"0 0 500 500\"><title>SVG `&#x3C;circle>` element</title><circle cx=\"120\" cy=\"120\" r=\"100\"></circle></svg>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html svg {\"space\":\"svg\",\"closeEmptyElements\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/svg.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "space": "svg",
+          "closeEmptyElements": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should serialize with ` /` in `closeEmptyElements` mode",
+        "tree": {
+          "type": "element",
+          "tagName": "circle",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<circle />"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html svg {\"space\":\"svg\",\"closeEmptyElements\":true,\"tightSelfClosing\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/svg.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "space": "svg",
+          "closeEmptyElements": true,
+          "tightSelfClosing": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should serialize empties with `/` in `closeEmptyElements` and `tightSelfClosing` mode",
+        "tree": {
+          "type": "element",
+          "tagName": "circle",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<circle/>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html svg {\"preferUnquoted\":true,\"closeEmptyElements\":true,\"tightSelfClosing\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/svg.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "preferUnquoted": true,
+          "closeEmptyElements": true,
+          "tightSelfClosing": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should serialize empties with `/` in `closeEmptyElements` and `tightSelfClosing` mode, *with* a space after an unquoted attribute",
+        "tree": {
+          "type": "element",
+          "tagName": "svg",
+          "properties": {
+            "viewBox": "0 0 4 4"
+          },
+          "children": [
+            {
+              "type": "element",
+              "tagName": "circle",
+              "properties": {
+                "cx": 2,
+                "cy": 2,
+                "r": 1
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<svg viewBox=\"0 0 4 4\"><circle cx=2 cy=2 r=1 /></svg>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html svg",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/svg.js",
+      "license": "MIT"
+    },
+    "pipeline": [["html.stringify"]],
+    "tests": [
+      {
+        "description": "should serialize properties",
+        "tree": {
+          "type": "element",
+          "tagName": "text",
+          "properties": {
+            "dataFoo": "alpha"
+          },
+          "children": [
+            {
+              "type": "text",
+              "value": "bravo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<text data-foo=\"alpha\">bravo</text>"
+        }
+      },
+      {
+        "description": "should ignore attributes set to `null`",
+        "tree": {
+          "type": "element",
+          "tagName": "circle",
+          "properties": {
+            "id": null
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<circle></circle>"
+        }
+      },
+      {
+        "description": "should ignore attributes set to `undefined`",
+        "tree": {
+          "type": "element",
+          "tagName": "circle",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<circle></circle>"
+        }
+      },
+      {
+        "description": "should serialize SVG props on an `svg` element in HTML",
+        "tree": {
+          "type": "element",
+          "tagName": "div",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "svg",
+              "properties": {
+                "xlmns": "http://www.w3.org/2000/svg",
+                "strokeLineCap": "round",
+                "strokeLineJoin": "round",
+                "viewBox": [0, 0, 8, 8]
+              },
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "path",
+                  "properties": {
+                    "stroke": "blue",
+                    "d": "M0 6V3h1l1 1v2"
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<div><svg xlmns=\"http://www.w3.org/2000/svg\" stroke-linecap=\"round\" stroke-linejoin=\"round\" viewBox=\"0 0 8 8\"><path stroke=\"blue\" d=\"M0 6V3h1l1 1v2\"></path></svg></div>"
+        }
+      },
+      {
+        "description": "should serialize an HTML tree with embedded HTML",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "doctype"
+            },
+            {
+              "type": "element",
+              "tagName": "head",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "title",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "The SVG `<circle>` element"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "element",
+              "tagName": "body",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "svg",
+                  "properties": {
+                    "xlmns": "http://www.w3.org/2000/svg",
+                    "viewBox": [0, 0, 500, 500]
+                  },
+                  "children": [
+                    {
+                      "type": "element",
+                      "tagName": "circle",
+                      "properties": {
+                        "cx": 120,
+                        "cy": 120,
+                        "r": 100
+                      },
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<!doctype html><head><title>The SVG `&#x3C;circle>` element</title></head><body><svg xlmns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 500 500\"><circle cx=\"120\" cy=\"120\" r=\"100\"></circle></svg></body>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html svg {\"space\":\"svg\",\"collapseEmptyAttributes\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/svg.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "space": "svg",
+          "collapseEmptyAttributes": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should collapse empty string attributes in `collapseEmptyAttributes` mode",
+        "tree": {
+          "type": "element",
+          "tagName": "circle",
+          "properties": {
+            "title": ""
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<circle title></circle>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html svg {\"space\":\"svg\",\"tightAttributes\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/svg.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "space": "svg",
+          "tightAttributes": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should serialize multiple properties tightly in `tightAttributes` mode",
+        "tree": {
+          "type": "element",
+          "tagName": "text",
+          "properties": {
+            "className": ["a", "b"],
+            "title": "c d"
+          },
+          "children": [
+            {
+              "type": "text",
+              "value": "bravo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<text class=\"a b\"title=\"c d\">bravo</text>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html svg {\"tightCommaSeparatedLists\":true,\"space\":\"svg\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/svg.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "tightCommaSeparatedLists": true,
+          "space": "svg"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should serialize comma-separated attributes tighly in `tightCommaSeparatedLists` mode",
+        "tree": {
+          "type": "element",
+          "tagName": "glyph",
+          "properties": {
+            "glyphName": ["foo", "bar"]
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<glyph glyph-name=\"foo,bar\"></glyph>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html svg {\"space\":\"svg\",\"quote\":\"'\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/svg.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "space": "svg",
+          "quote": "'"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should quote attribute values with single quotes if `quote: \"'\"`",
+        "tree": {
+          "type": "element",
+          "tagName": "svg",
+          "properties": {
+            "viewBox": "0 0 10 10"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<svg viewBox='0 0 10 10'></svg>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html svg {\"space\":\"svg\",\"quote\":\"\\\"\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/svg.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "space": "svg",
+          "quote": "\""
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should quote attribute values with double quotes if `quote: '\"'`",
+        "tree": {
+          "type": "element",
+          "tagName": "svg",
+          "properties": {
+            "viewBox": "0 0 10 10"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<svg viewBox=\"0 0 10 10\"></svg>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html svg {\"space\":\"svg\",\"quote\":\"\\\"\",\"quoteSmart\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/svg.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "space": "svg",
+          "quote": "\"",
+          "quoteSmart": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should quote smartly if the other quote is less prominent (#1)",
+        "tree": {
+          "type": "element",
+          "tagName": "circle",
+          "properties": {
+            "title": "\"some ' stuff\""
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<circle title='&#x22;some &#x27; stuff&#x22;'></circle>"
+        }
+      },
+      {
+        "description": "should quote smartly if the other quote is less prominent (#2)",
+        "tree": {
+          "type": "element",
+          "tagName": "circle",
+          "properties": {
+            "title": "'some \" stuff'"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<circle title=\"&#x27;some &#x22; stuff&#x27;\"></circle>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html svg {\"space\":\"svg\",\"preferUnquoted\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/svg.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "space": "svg",
+          "preferUnquoted": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should omit quotes in `preferUnquoted`",
+        "tree": {
+          "type": "element",
+          "tagName": "circle",
+          "properties": {
+            "cx": 2
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<circle cx=2></circle>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html svg {\"space\":\"svg\",\"allowParseErrors\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/svg.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "space": "svg",
+          "allowParseErrors": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should encode characters in attribute names which cause parse errors, work, even though `allowParseErrors` mode is on",
+        "tree": {
+          "type": "element",
+          "tagName": "circle",
+          "properties": {
+            "3=5\u0000": "alpha"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<circle 3&#x3D;5&#x0;=\"alpha\"></circle>"
+        }
+      },
+      {
+        "description": "should encode characters in attribute values which cause parse errors, work, even though `allowParseErrors` mode is on",
+        "tree": {
+          "type": "element",
+          "tagName": "circle",
+          "properties": {
+            "title": "3\"5\u0000"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<circle title=\"3&#x22;5&#x0;\"></circle>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-to-html svg {\"space\":\"svg\",\"allowDangerousCharacters\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/svg.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "space": "svg",
+          "allowDangerousCharacters": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should not encode characters which cause XSS issues in older browsers, in `allowDangerousCharacters` mode",
+        "tree": {
+          "type": "element",
+          "tagName": "circle",
+          "properties": {
+            "title": "3'5"
+          },
+          "children": []
+        },
+        "expected": {
+          "html": "<circle title=\"3'5\"></circle>"
+        }
+      }
+    ]
+  }
+]

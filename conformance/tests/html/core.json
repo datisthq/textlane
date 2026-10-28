@@ -1,0 +1,26 @@
+[
+  {
+    "description": "hast-util-to-html core",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-html",
+      "commit": "d115f5beab200c819699e1db9d7eb7b5b1009a21",
+      "path": "test/core.js",
+      "license": "MIT"
+    },
+    "pipeline": [["html.stringify"]],
+    "tests": [
+      {
+        "description": "should support a node",
+        "tree": {
+          "type": "element",
+          "tagName": "div",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "html": "<div></div>"
+        }
+      }
+    ]
+  }
+]
