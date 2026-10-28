@@ -4,6 +4,7 @@ use crate::actions::character_escape::tokenize::tokenize_character_escape;
 use crate::actions::character_reference::tokenize::tokenize_character_reference;
 use crate::actions::code_text::tokenize::tokenize_code_text;
 use crate::actions::data::tokenize::tokenize_data;
+use crate::actions::directive_text::tokenize::tokenize_directive_text;
 use crate::actions::gfm_autolink_literal::tokenize::tokenize_gfm_autolink_literal;
 use crate::actions::gfm_footnote_call::tokenize::tokenize_gfm_footnote_call;
 use crate::actions::gfm_potential_footnote_call::tokenize::tokenize_gfm_potential_footnote_call;
@@ -14,6 +15,7 @@ use crate::actions::html_text::tokenize::tokenize_html_text;
 use crate::actions::label_end::tokenize::tokenize_label_end;
 use crate::actions::label_start_image::tokenize::tokenize_label_start_image;
 use crate::actions::label_start_link::tokenize::tokenize_label_start_link;
+use crate::actions::math_text::tokenize::tokenize_math_text;
 use crate::helpers::literal::can_start_literal;
 use crate::models::construct::{Resolver, State};
 use crate::utils::tokenizer::driver::Tokenizer;
@@ -21,12 +23,20 @@ use crate::utils::tokenizer::driver::Tokenizer;
 // Bytes that may start a text construct, where data stops to let one try
 const MARKERS: [u8; 9] = *b"!&*<[\\]_`";
 const MARKERS_GFM: [u8; 10] = *b"!&*<[\\]_`~";
+const MARKERS_DIRECTIVE: [u8; 10] = *b"!&*:<[\\]_`";
+const MARKERS_GFM_DIRECTIVE: [u8; 11] = *b"!&*:<[\\]_`~";
 
 /// The text content type: phrasing, such as the inside of a paragraph or heading.
 pub(crate) fn tokenize_text(tokenizer: &mut Tokenizer) -> State {
     let gfm = tokenizer.parse_state.gfm.is_some();
-    tokenizer.tokenize_state.markers = if gfm { &MARKERS_GFM } else { &MARKERS };
+    tokenizer.tokenize_state.markers = match (gfm, tokenizer.parse_state.directive) {
+        (false, false) => &MARKERS,
+        (true, false) => &MARKERS_GFM,
+        (false, true) => &MARKERS_DIRECTIVE,
+        (true, true) => &MARKERS_GFM_DIRECTIVE,
+    };
     tokenizer.tokenize_state.literal_autolinks = gfm;
+    tokenizer.tokenize_state.math_text = tokenizer.parse_state.math.is_some();
     State::Retry(before)
 }
 
@@ -78,6 +88,10 @@ fn before_construct(tokenizer: &mut Tokenizer) -> State {
             tokenizer.attempt(State::Next(before), State::Next(before_data));
             State::Retry(tokenize_character_reference)
         }
+        Some(b':') if tokenizer.parse_state.directive => {
+            tokenizer.attempt(State::Next(before), State::Next(before_data));
+            State::Retry(tokenize_directive_text)
+        }
         Some(b'*' | b'_') => {
             tokenizer.attempt(State::Next(before), State::Next(before_data));
             State::Retry(tokenize_attention)
@@ -89,6 +103,10 @@ fn before_construct(tokenizer: &mut Tokenizer) -> State {
         Some(b'`') => {
             tokenizer.attempt(State::Next(before), State::Next(before_data));
             State::Retry(tokenize_code_text)
+        }
+        Some(b'$') if tokenizer.tokenize_state.math_text => {
+            tokenizer.attempt(State::Next(before), State::Next(before_data));
+            State::Retry(tokenize_math_text)
         }
         Some(b'\\') => {
             tokenizer.attempt(State::Next(before), State::Next(before_hard_break_escape));

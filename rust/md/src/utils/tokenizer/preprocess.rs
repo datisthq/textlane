@@ -1,4 +1,4 @@
-use crate::models::options::GfmOptions;
+use crate::models::options::{GfmOptions, MathOptions, Matter};
 use std::cell::{OnceCell, RefCell};
 use std::collections::HashSet;
 
@@ -25,10 +25,21 @@ pub(crate) struct ParseState<'a> {
     pub(crate) prefixes: RefCell<Vec<(usize, usize)>>,
     /// GFM's options, when its constructs are on.
     pub(crate) gfm: Option<GfmOptions>,
+    /// Whether definition lists are on.
+    pub(crate) definition_list: bool,
     /// The normalized labels of GFM footnote definitions, all found before any text.
     pub(crate) gfm_footnote_definitions: HashSet<String>,
     /// The most characters a footnote definition's label has.
     pub(crate) gfm_footnote_chars_max: usize,
+    /// Math's options, when its constructs are on.
+    pub(crate) math: Option<MathOptions>,
+    /// Whether directives are on.
+    pub(crate) directive: bool,
+    /// Prefixes of lines inside container directives, found after the document's own:
+    /// merged into `prefixes` at the end.
+    pub(crate) prefixes_nested: RefCell<Vec<(usize, usize)>>,
+    /// The kinds of frontmatter `md.frontmatter` adds, in order.
+    pub(crate) frontmatter: Vec<Matter>,
 }
 
 impl ParseState<'_> {
@@ -114,6 +125,10 @@ impl ParseState<'_> {
 pub(crate) fn tokenize_input(
     value: &str,
     gfm: Option<&GfmOptions>,
+    math: Option<&MathOptions>,
+    directive: bool,
+    frontmatter: &[Matter],
+    definition_list: bool,
 ) -> (Vec<Event>, Vec<(usize, usize)>) {
     let mut parse_state = ParseState {
         bytes: value.as_bytes(),
@@ -122,8 +137,13 @@ pub(crate) fn tokenize_input(
         next_non_whitespace: OnceCell::new(),
         prefixes: RefCell::new(vec![]),
         gfm: gfm.cloned(),
+        definition_list,
         gfm_footnote_definitions: HashSet::new(),
         gfm_footnote_chars_max: 0,
+        math: math.cloned(),
+        directive,
+        prefixes_nested: RefCell::new(vec![]),
+        frontmatter: frontmatter.to_vec(),
     };
     let start = Point {
         line: 1,
@@ -152,8 +172,28 @@ pub(crate) fn tokenize_input(
     loop {
         parse_state.add_definitions(std::mem::take(&mut result.definitions));
         if result.done {
-            return (events, parse_state.prefixes.take());
+            return (events, merge_prefixes(&parse_state));
         }
         result = subtokenize(&mut events, &parse_state, None);
     }
+}
+
+// A line inside a container directive has the document's prefix and its content's: the
+// longer one ends where the line's content starts
+fn merge_prefixes(parse_state: &ParseState) -> Vec<(usize, usize)> {
+    let mut prefixes = parse_state.prefixes.take();
+    let nested = parse_state.prefixes_nested.take();
+    if nested.is_empty() {
+        return prefixes;
+    }
+    prefixes.extend(nested);
+    prefixes.sort_unstable();
+    let mut merged: Vec<(usize, usize)> = Vec::with_capacity(prefixes.len());
+    for (line_start, content_start) in prefixes {
+        match merged.last_mut() {
+            Some(last) if last.0 == line_start => last.1 = last.1.max(content_start),
+            _ => merged.push((line_start, content_start)),
+        }
+    }
+    merged
 }

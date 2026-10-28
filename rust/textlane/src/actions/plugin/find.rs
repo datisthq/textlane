@@ -12,7 +12,19 @@ pub(crate) fn find_plugin(name: &str) -> Option<BuildPlugin> {
             |_, options| Ok(Box::new(textlane_md::parse(read_options(options)?)))
         }
         #[cfg(feature = "md")]
+        "md.directive" => {
+            |_, options| Ok(Box::new(textlane_md::directive(read_options(options)?)))
+        }
+        #[cfg(feature = "md")]
         "md.gfm" => |_, options| Ok(Box::new(textlane_md::gfm(read_options(options)?))),
+        #[cfg(feature = "md")]
+        "md.definitionList" => |_, _| Ok(Box::new(textlane_md::definition_list())),
+        #[cfg(feature = "md")]
+        "md.math" => |_, options| Ok(Box::new(textlane_md::math(read_options(options)?))),
+        #[cfg(feature = "md")]
+        "md.frontmatter" => {
+            |_, options| Ok(Box::new(textlane_md::frontmatter(read_options(options)?)))
+        }
         #[cfg(feature = "md")]
         "md.gemoji" => |_, _| Ok(Box::new(textlane_md::gemoji())),
         #[cfg(feature = "md")]

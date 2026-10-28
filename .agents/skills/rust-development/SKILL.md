@@ -143,6 +143,20 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   on only with it. A GFM table is tried after each first byte's own flow constructs, as
   micromark tries constructs keyed on `null`, and a row's indent sits before the row token.
   At `[`, text tries the footnote call, then the task list check, then a link
+- `md.frontmatter` appends its matters to `FrontmatterSlot` the same way. Each flow line tries
+  them before any built-in construct, as micromark puts extensions first; an unclosed matter
+  scans to the end with the lines `concrete` and then rewinds, so `---\n- a` is a break and a
+  paragraph, as upstream. Events carry no matter, so the compiler takes the first whose fences
+  and place match; a matter that found no closing fence remembers where, so `anywhere` stays
+  linear. Custom types are `Literal` nodes, as is any unknown JSON node with a `value`
+- `md.math`, `md.directive` and `md.definitionList` use slots the same way, and each adds a
+  flag to `tokenize_input` and `parse_markdown_with`, in that order after `frontmatter`.
+  Math nodes carry their hast in unist `data`, which `utils/converter/unknown.rs` applies as
+  mdast-util-to-hast's unknown handler does. A container directive is a concrete flow
+  construct whose lines are a nested document (`ContentType::Document`), not a document
+  container. A definition description is a document container (`Container::DefList`): its
+  check closes the flow even when no list opens, and `Resolver::DefList` splits the
+  paragraph above into terms, as micromark-extension-definition-list does
 - `md` names entities by syntax construct or mdast node and verbs by layer: `tokenize` and
   `resolve` (micromark), `compile` (from-markdown), `stringify` (to-markdown), `convert`
   (to-hast), so `actions/heading/compile.rs` exports `compile_heading`. No file named after

@@ -32,7 +32,17 @@ pub(crate) fn stringify_inline_code(state: &mut Serializer, code: &InlineCode) {
     {
         value = format!(" {value} ");
     }
-    // A line ending that would start a block construct inside the span becomes a space
+    value = replace_at_breaks(state, value);
+    // A pipe would end the cell, as GFM splits rows before code spans
+    if state.in_construct(Construct::TableCell) {
+        value = value.replace('|', "\\|");
+    }
+    let fence = "`".repeat(size);
+    state.write(&format!("{fence}{value}{fence}"));
+}
+
+/// Turn each line ending that would start a block construct inside a span into a space.
+pub(crate) fn replace_at_breaks(state: &Serializer, mut value: String) -> String {
     for pattern in state.patterns.iter().filter(|pattern| pattern.at_break) {
         if !value.contains(pattern.character.as_str()) {
             continue;
@@ -57,10 +67,5 @@ pub(crate) fn stringify_inline_code(state: &mut Serializer, code: &InlineCode) {
         output.push_str(&value[copied.min(value.len())..]);
         value = output;
     }
-    // A pipe would end the cell, as GFM splits rows before code spans
-    if state.in_construct(Construct::TableCell) {
-        value = value.replace('|', "\\|");
-    }
-    let fence = "`".repeat(size);
-    state.write(&format!("{fence}{value}{fence}"));
+    value
 }

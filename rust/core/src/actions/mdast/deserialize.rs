@@ -1,15 +1,18 @@
 use serde_json::Value;
 
+use crate::actions::hast::deserialize::deserialize_data;
 use crate::actions::mdast::serialize::MAX_JSON_DEPTH;
 use crate::actions::position::deserialize::deserialize_position;
 use crate::models::error::Error;
 use crate::models::mdast::{
-    AlignKind, Blockquote, Break, Code, Definition, Delete, Emphasis, FootnoteDefinition,
-    FootnoteReference, Heading, Html, Image, ImageReference, InlineCode, Link,
-    LinkReference, List, ListItem, Node, Paragraph, ReferenceType, Root, Strong, Table,
-    TableCell, TableRow, Text, ThematicBreak,
+    AlignKind, Blockquote, Break, Code, ContainerDirective, DefList, DefListDescription,
+    DefListTerm, Definition, Delete, DirectiveAttributes, Emphasis, FootnoteDefinition,
+    FootnoteReference, Heading, Html, Image, ImageReference, InlineCode, InlineMath,
+    LeafDirective, Link, LinkReference, List, ListItem, Literal, Math, Node, Paragraph,
+    ReferenceType, Root, Strong, Table, TableCell, TableRow, Text, TextDirective,
+    ThematicBreak, Toml, Yaml,
 };
-use crate::{Allocator, ArenaVec};
+use crate::{Allocator, ArenaVec, Data};
 
 /// Read an mdast node from unified's JSON into the arena.
 pub fn deserialize_mdast<'a>(
@@ -152,11 +155,46 @@ fn deserialize_node<'a>(
             label: read_optional_str(value, "label", alloc),
             position,
         }),
+        "containerDirective" => Node::ContainerDirective(ContainerDirective {
+            name: read_optional_str(value, "name", alloc).unwrap_or_default(),
+            attributes: read_attributes(value, alloc),
+            label: read_directive_label(value),
+            children: deserialize_children(value, alloc, depth)?,
+            position,
+        }),
+        "leafDirective" => Node::LeafDirective(LeafDirective {
+            name: read_optional_str(value, "name", alloc).unwrap_or_default(),
+            attributes: read_attributes(value, alloc),
+            children: deserialize_children(value, alloc, depth)?,
+            position,
+        }),
+        "textDirective" => Node::TextDirective(TextDirective {
+            name: read_optional_str(value, "name", alloc).unwrap_or_default(),
+            attributes: read_attributes(value, alloc),
+            children: deserialize_children(value, alloc, depth)?,
+            position,
+        }),
         "tableRow" => Node::TableRow(TableRow {
             children: deserialize_children(value, alloc, depth)?,
             position,
         }),
         "tableCell" => Node::TableCell(TableCell {
+            children: deserialize_children(value, alloc, depth)?,
+            position,
+        }),
+        "defList" => Node::DefList(DefList {
+            children: deserialize_children(value, alloc, depth)?,
+            position,
+        }),
+        "defListTerm" => Node::DefListTerm(DefListTerm {
+            children: deserialize_children(value, alloc, depth)?,
+            position,
+        }),
+        "defListDescription" => Node::DefListDescription(DefListDescription {
+            spread: value
+                .get("spread")
+                .and_then(Value::as_bool)
+                .unwrap_or(false),
             children: deserialize_children(value, alloc, depth)?,
             position,
         }),
@@ -167,6 +205,17 @@ fn deserialize_node<'a>(
         "inlineCode" => Node::InlineCode(InlineCode {
             value: read_optional_str(value, "value", alloc).unwrap_or_default(),
             position,
+        }),
+        "math" => Node::Math(Math {
+            meta: read_optional_str(value, "meta", alloc),
+            value: read_optional_str(value, "value", alloc).unwrap_or_default(),
+            position,
+            data: read_data(value, alloc, depth)?,
+        }),
+        "inlineMath" => Node::InlineMath(InlineMath {
+            value: read_optional_str(value, "value", alloc).unwrap_or_default(),
+            position,
+            data: read_data(value, alloc, depth)?,
         }),
         "emphasis" => Node::Emphasis(Emphasis {
             children: deserialize_children(value, alloc, depth)?,
@@ -181,6 +230,24 @@ fn deserialize_node<'a>(
                 .alloc_str(value.get("value").and_then(Value::as_str).unwrap_or("")),
             position,
         }),
+        "yaml" => Node::Yaml(Yaml {
+            value: read_optional_str(value, "value", alloc).unwrap_or_default(),
+            position,
+        }),
+        "toml" => Node::Toml(Toml {
+            value: read_optional_str(value, "value", alloc).unwrap_or_default(),
+            position,
+        }),
+        _ if !kind.is_empty()
+            && value.get("children").is_none()
+            && let Some(text) = value.get("value").and_then(Value::as_str) =>
+        {
+            Node::Literal(Literal {
+                kind: alloc.alloc_str(kind),
+                value: alloc.alloc_str(text),
+                position,
+            })
+        }
         _ => {
             return Err(Error::new(
                 "unsupported-node",
@@ -205,6 +272,21 @@ fn deserialize_children<'a>(
         children.push(deserialize_node(child, alloc, depth + 1)?);
     }
     Ok(children)
+}
+
+fn read_data<'a>(
+    value: &Value,
+    alloc: &'a Allocator,
+    depth: usize,
+) -> Result<Option<&'a Data<'a>>, Error> {
+    match value.get("data") {
+        Some(data) => Ok(Some(&*alloc.alloc(deserialize_data(
+            data,
+            alloc,
+            depth + 1,
+        )?))),
+        None => Ok(None),
+    }
 }
 
 fn read_optional_str<'a>(
@@ -233,4 +315,42 @@ fn read_reference_type(value: &Value) -> ReferenceType {
         Some("full") => ReferenceType::Full,
         _ => ReferenceType::Collapsed,
     }
+}
+
+// mdast-util-directive writes each value through `String()` and skips null ones
+fn read_attributes<'a>(value: &Value, alloc: &'a Allocator) -> DirectiveAttributes<'a> {
+    let mut attributes = ArenaVec::new_in(alloc);
+    for (key, item) in value
+        .get("attributes")
+        .and_then(Value::as_object)
+        .into_iter()
+        .flatten()
+    {
+        let text = match item {
+            Value::String(text) => text.clone(),
+            Value::Bool(flag) => flag.to_string(),
+            Value::Number(number) => match number.as_f64() {
+                Some(float) if float.fract() == 0.0 && float.abs() < 1e21 => {
+                    format!("{float:.0}")
+                }
+                _ => number.to_string(),
+            },
+            _ => continue,
+        };
+        attributes.push((&*alloc.alloc_str(key), &*alloc.alloc_str(&text)));
+    }
+    attributes
+}
+
+fn read_directive_label(value: &Value) -> bool {
+    value
+        .get("children")
+        .and_then(Value::as_array)
+        .and_then(|children| children.first())
+        .is_some_and(|head| {
+            head.get("type").and_then(Value::as_str) == Some("paragraph")
+                && head.pointer("/data/directiveLabel").is_some_and(|label| {
+                    !matches!(label, Value::Null | Value::Bool(false))
+                })
+        })
 }

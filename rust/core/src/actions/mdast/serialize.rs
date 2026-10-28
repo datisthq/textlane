@@ -1,6 +1,8 @@
 use serde_json::{Map, Value};
 
+use crate::actions::hast::serialize::serialize_data;
 use crate::actions::position::serialize::serialize_position;
+use crate::models::data::Data;
 use crate::models::error::Error;
 use crate::models::lines::Lines;
 use crate::models::mdast::AlignKind;
@@ -139,15 +141,83 @@ fn serialize_node(
             object.insert("label".into(), reference.label.into());
             "footnoteReference"
         }
+        Node::DefList(_) => "defList",
+        Node::DefListTerm(_) => "defListTerm",
+        Node::DefListDescription(description) => {
+            object.insert("spread".into(), description.spread.into());
+            "defListDescription"
+        }
+        Node::Math(math) => {
+            object.insert("meta".into(), math.meta.into());
+            object.insert("value".into(), math.value.into());
+            insert_data(&mut object, math.data);
+            "math"
+        }
+        Node::InlineMath(math) => {
+            object.insert("value".into(), math.value.into());
+            insert_data(&mut object, math.data);
+            "inlineMath"
+        }
+        Node::ContainerDirective(directive) => {
+            insert_directive(&mut object, directive.name, &directive.attributes);
+            "containerDirective"
+        }
+        Node::LeafDirective(directive) => {
+            insert_directive(&mut object, directive.name, &directive.attributes);
+            "leafDirective"
+        }
+        Node::TextDirective(directive) => {
+            insert_directive(&mut object, directive.name, &directive.attributes);
+            "textDirective"
+        }
+        Node::Yaml(yaml) => {
+            object.insert("value".into(), yaml.value.into());
+            "yaml"
+        }
+        Node::Toml(toml) => {
+            object.insert("value".into(), toml.value.into());
+            "toml"
+        }
+        Node::Literal(literal) => {
+            object.insert("value".into(), literal.value.into());
+            literal.kind
+        }
     };
     object.insert("type".into(), kind.into());
     if let Some(children) = node.children() {
-        let children = children
+        let mut children: Vec<Value> = children
             .iter()
             .map(|child| serialize_node(child, lines, depth + 1))
             .collect::<Result<_, _>>()?;
+        if let Node::ContainerDirective(directive) = node
+            && directive.label
+            && let Some(Value::Object(label)) = children.first_mut()
+        {
+            let mut data = Map::new();
+            data.insert("directiveLabel".into(), true.into());
+            label.insert("data".into(), Value::Object(data));
+        }
         object.insert("children".into(), Value::Array(children));
     }
     serialize_position(&mut object, node.position(), lines);
     Ok(Value::Object(object))
+}
+
+fn insert_data(object: &mut Map<String, Value>, data: Option<&Data<'_>>) {
+    if let Some(data) = data {
+        object.insert("data".into(), serialize_data(data));
+    }
+}
+
+fn insert_directive(
+    object: &mut Map<String, Value>,
+    name: &str,
+    attributes: &[(&str, &str)],
+) {
+    object.insert("name".into(), name.into());
+    let mut map = Map::new();
+    for (key, value) in attributes {
+        map.insert((*key).into(), (*value).into());
+    }
+    object.insert("attributes".into(), Value::Object(map));
 }

@@ -3,6 +3,7 @@ use textlane_core::mdast::Node;
 use crate::utils::serializer::format::{
     format_code_as_indented, format_heading_as_setext, read_html_kind,
 };
+use crate::utils::serializer::settings::Settings;
 use crate::utils::serializer::state::{Parent, Serializer};
 
 /// What goes between two flow siblings, as mdast-util-to-markdown's `join` rules decide:
@@ -16,6 +17,9 @@ pub(crate) fn join_siblings(
     let mut rules: Vec<Option<Join>> = vec![join_defaults(state, left, right, parent)];
     if state.settings.tight_definitions {
         rules.push(join_definition(left, right));
+    }
+    if state.settings.definition_list {
+        rules.push(join_def_list(left, right, parent));
     }
     match rules.into_iter().rev().flatten().next() {
         Some(Join::Lines(0)) => "\n",
@@ -38,6 +42,50 @@ fn join_definition(left: &Node, right: &Node) -> Option<Join> {
         .then_some(Join::Lines(0))
 }
 
+// In a definition list, a blank line before a term after a description or before a
+// spread description, none otherwise
+fn join_def_list(left: &Node, right: &Node, parent: Parent) -> Option<Join> {
+    if !matches!(parent.node, Some(Node::DefList(_))) {
+        return None;
+    }
+    let blank = match right {
+        Node::DefListTerm(_) => matches!(left, Node::DefListDescription(_)),
+        Node::DefListDescription(description) => description.spread,
+        _ => false,
+    };
+    Some(Join::Lines(u8::from(blank)))
+}
+
+// mdast-util-to-markdown's defaults inside any parent with a boolean `spread`
+fn join_spread(
+    left: &Node,
+    right: &Node,
+    spread: bool,
+    settings: &Settings,
+) -> Option<Join> {
+    if matches!(left, Node::Paragraph(_))
+        && match right {
+            Node::Definition(_) | Node::Paragraph(_) => true,
+            Node::Heading(heading) => format_heading_as_setext(heading, settings),
+            _ => false,
+        }
+    {
+        return None;
+    }
+    if let Node::Html(html) = left
+        && matches!(read_html_kind(html.value), None | Some(6 | 7))
+    {
+        return Some(Join::Lines(1));
+    }
+    if matches!(left, Node::Paragraph(_))
+        && let Node::Html(html) = right
+        && matches!(read_html_kind(html.value), None | Some(7))
+    {
+        return Some(Join::Lines(1));
+    }
+    Some(Join::Lines(u8::from(spread)))
+}
+
 fn join_defaults(
     state: &Serializer,
     left: &Node,
@@ -54,6 +102,9 @@ fn join_defaults(
     let spread = match parent.node {
         Some(Node::List(list)) => list.spread?,
         Some(Node::ListItem(item)) => item.spread?,
+        Some(Node::DefListDescription(description)) => {
+            return join_spread(left, right, description.spread, settings);
+        }
         _ => return None,
     };
     if spread {

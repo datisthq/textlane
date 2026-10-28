@@ -6,6 +6,7 @@ use std::collections::HashSet;
 use crate::helpers::slice::Slice;
 use crate::helpers::spread::{find_loose, find_trailing_line_endings};
 use crate::models::event::{self, Event};
+use crate::models::options::Matter;
 use crate::models::token::Name;
 
 /// What a link or image is, worked out as its label and what follows it compile.
@@ -53,10 +54,14 @@ pub(crate) struct Compiler<'a, 'e> {
     /// Whether a GFM task list check is in the open paragraph, whose first text then
     /// loses the space after it.
     pub(crate) task_list_check_seen: bool,
+    /// The attributes of the directive being compiled, as name and decoded value.
+    pub(crate) directive_attributes: Vec<(&'a str, String)>,
     // The first line ending of the trailing lines before each event, without and with
     // block quote prefixes
     trailing_line_endings: [Vec<Option<usize>>; 2],
     stack: Vec<Node<'a>>,
+    /// The kinds of frontmatter the parser recognizes, to tell which one a token is.
+    pub(crate) frontmatter: &'e [Matter],
 }
 
 impl<'a, 'e> Compiler<'a, 'e> {
@@ -90,11 +95,13 @@ impl<'a, 'e> Compiler<'a, 'e> {
             heading_setext_text_after: false,
             loose: find_loose(events),
             task_list_check_seen: false,
+            directive_attributes: vec![],
             trailing_line_endings: [
                 find_trailing_line_endings(events, false),
                 find_trailing_line_endings(events, true),
             ],
             stack: vec![root],
+            frontmatter: &[],
         }
     }
 
@@ -311,6 +318,8 @@ impl<'a, 'e> Compiler<'a, 'e> {
                 Node::Text(text) => Some(text.value),
                 Node::InlineCode(code) => Some(code.value),
                 Node::Code(code) => Some(code.value),
+                Node::Math(math) => Some(math.value),
+                Node::InlineMath(math) => Some(math.value),
                 Node::Image(image) => image.alt,
                 Node::ImageReference(image) => image.alt,
                 _ => None,

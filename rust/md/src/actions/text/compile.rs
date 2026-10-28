@@ -21,6 +21,7 @@ pub(crate) fn compile_text(compiler: &mut Compiler, name: Name, kind: Kind) {
                     | Node::Paragraph(_)
                     | Node::Emphasis(_)
                     | Node::Strong(_)
+                    | Node::TextDirective(_)
             ) {
                 compiler.index -= 1;
                 enter_text(compiler);

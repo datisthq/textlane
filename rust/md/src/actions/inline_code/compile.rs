@@ -28,7 +28,7 @@ pub(crate) fn compile_inline_code(compiler: &mut Compiler, kind: Kind) {
 
 // As micromark's code text resolver: padding goes when both sides have it and the code is
 // not only padding
-fn strip_padding(value: &str) -> &str {
+pub(crate) fn strip_padding(value: &str) -> &str {
     let is_padding = |c: char| matches!(c, ' ' | '\n' | '\r');
     if value.chars().all(is_padding) {
         return value;

@@ -1,6 +1,8 @@
 use textlane_core::Error;
 
-use crate::models::options::{GfmOptions, StringifyOptions};
+use crate::models::options::{
+    DirectiveOptions, GfmOptions, MathOptions, Matter, StringifyOptions,
+};
 
 /// `md::stringify`'s options, checked once, with their defaults filled in.
 #[derive(Clone, Debug)]
@@ -24,6 +26,15 @@ pub(crate) struct Settings {
     pub(crate) tight_definitions: bool,
     /// GFM's options, when `md::gfm` is used: its handlers, unsafe patterns and joins.
     pub(crate) gfm: Option<GfmOptions>,
+    /// Whether `md::definition_list` is used: its handlers, unsafe pattern and join.
+    pub(crate) definition_list: bool,
+    /// Math's options, when `md::math` is used: its handlers and unsafe patterns.
+    pub(crate) math: Option<MathOptions>,
+    /// Directives' options, when `md::directive` is used: their handlers and unsafe
+    /// patterns.
+    pub(crate) directive: Option<DirectiveOptions>,
+    /// `md.frontmatter`'s matters, whose nodes it writes.
+    pub(crate) frontmatter: Vec<Matter>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -130,6 +141,10 @@ impl Settings {
             })?,
             tight_definitions: options.tight_definitions,
             gfm: None,
+            definition_list: false,
+            math: None,
+            directive: None,
+            frontmatter: vec![],
         })
     }
 }

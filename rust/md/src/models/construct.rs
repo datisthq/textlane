@@ -21,6 +21,8 @@ pub(crate) enum Resolver {
     Attention,
     Content,
     Data,
+    DefList,
+    DirectiveContainer,
     GfmTable,
     GfmStrikethrough,
     HeadingAtx,

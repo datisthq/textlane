@@ -23,7 +23,7 @@ fn at_break(tokenizer: &mut Tokenizer) -> State {
             // so an empty list item cannot start on the next line
             tokenizer.interrupt = true;
             tokenizer.attempt(State::Next(at_break), State::Next(after));
-            State::Retry(further_start)
+            State::Retry(further_line_ending)
         }
         _ => {
             tokenizer.enter(Name::CODE_FLOW_CHUNK);
@@ -49,6 +49,18 @@ fn after(tokenizer: &mut Tokenizer) -> State {
     tokenizer.exit(Name::CODE_INDENTED);
     tokenizer.interrupt = false;
     State::Ok
+}
+
+// The code's own line ending: micromark ends code on a lazy line here, but a container
+// that opened on this line does not end it, as piercing would
+fn further_line_ending(tokenizer: &mut Tokenizer) -> State {
+    if tokenizer.lazy {
+        return State::Nok;
+    }
+    tokenizer.enter(Name::LINE_ENDING);
+    tokenizer.consume();
+    tokenizer.exit(Name::LINE_ENDING);
+    State::Next(further_start)
 }
 
 fn further_start(tokenizer: &mut Tokenizer) -> State {

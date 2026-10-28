@@ -1,9 +1,15 @@
 use textlane_core::{Attach, Compiler, Error, File, Plugin, Tree, TreeKind};
 
+use crate::actions::frontmatter::stringify::create_frontmatter_patterns;
 use crate::actions::markdown::stringify::serialize_tree;
-use crate::models::options::{GfmSlot, StringifyOptions};
+use crate::models::options::{
+    DefinitionListSlot, DirectiveSlot, FrontmatterSlot, GfmSlot, MathSlot,
+    StringifyOptions,
+};
 use crate::utils::serializer::settings::Settings;
-use crate::utils::serializer::unsafe_patterns::{Pattern, compile_patterns};
+use crate::utils::serializer::unsafe_patterns::{
+    Pattern, compile_patterns, create_def_list_pattern,
+};
 
 /// `md.stringify`: mdast into Markdown.
 #[derive(Clone, Debug, Default)]
@@ -19,16 +25,32 @@ pub fn stringify(options: StringifyOptions) -> Stringify {
 impl Plugin for Stringify {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
         let settings = Settings::from_options(&self.options)?;
-        let patterns = compile_patterns(false, &self.options.unsafe_patterns)?;
-        let gfm_patterns = compile_patterns(true, &self.options.unsafe_patterns)?;
+        // A bad pattern must fail at `use`, not later when the pipeline freezes
+        compile_patterns(false, None, false, &self.options.unsafe_patterns)?;
+        let unsafe_patterns = self.options.unsafe_patterns.clone();
         context.set_compiler(move |slots| {
             let mut settings = settings;
             settings.gfm = slots.get::<GfmSlot>().and_then(|slot| slot.0.clone());
-            let patterns = if settings.gfm.is_some() {
-                gfm_patterns
-            } else {
-                patterns
-            };
+            settings.math = slots.get::<MathSlot>().and_then(|slot| slot.0.clone());
+            settings.directive =
+                slots.get::<DirectiveSlot>().and_then(|slot| slot.0.clone());
+            if let Some(slot) = slots.get::<FrontmatterSlot>() {
+                settings.frontmatter = slot.0.clone();
+            }
+            settings.definition_list =
+                slots.get::<DefinitionListSlot>().is_some_and(|slot| slot.0);
+            // Extensions' patterns come before the options' own, as upstream configures them
+            let mut extra = create_frontmatter_patterns(&settings.frontmatter);
+            if settings.definition_list {
+                extra.push(create_def_list_pattern());
+            }
+            extra.extend(unsafe_patterns.iter().cloned());
+            let patterns = compile_patterns(
+                settings.gfm.is_some(),
+                settings.math.as_ref(),
+                settings.directive.is_some(),
+                &extra,
+            )?;
             Ok(Box::new(MarkdownCompiler { settings, patterns }) as Box<dyn Compiler>)
         });
         Ok(())

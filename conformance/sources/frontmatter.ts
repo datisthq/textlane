@@ -88,7 +88,8 @@ function importFrontmatter() {
   ] as const) {
     for (const found of extractErrorCases(parseFile(repository, path))) {
       add({
-        description: `${repository.url.split("/").pop()} invalid options`,
+        // Each throw has its own options, so its own pipeline and group
+        description: `${repository.url.split("/").pop()} invalid options ${JSON.stringify(found.options)}`,
         source: source(repository, path),
         pipeline: [["md.parse"], ["md.frontmatter", found.options]],
         test: {

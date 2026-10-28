@@ -24,6 +24,10 @@ pub(crate) enum ContentType {
     Content,
     String,
     Text,
+    /// Text whose trailing whitespace stays, as in a directive's label.
+    TextTrailing,
+    /// A document of its own, as a container directive's content.
+    Document,
 }
 
 /// Links a token to the previous and next chunk of the same content.

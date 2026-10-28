@@ -43,6 +43,12 @@ impl Name {
     pub(crate) const CODE_TEXT_SEQUENCE: Name = Name("codeTextSequence");
     pub(crate) const CONTENT: Name = Name("content");
     pub(crate) const DATA: Name = Name("data");
+    pub(crate) const DEF_LIST: Name = Name("defList");
+    pub(crate) const DEF_LIST_DESCRIPTION: Name = Name("defListDescription");
+    pub(crate) const DEF_LIST_DESCRIPTION_MARKER: Name = Name("defListDescriptionMarker");
+    pub(crate) const DEF_LIST_DESCRIPTION_PREFIX: Name = Name("defListDescriptionPrefix");
+    pub(crate) const DEF_LIST_DESCRIPTION_SPREAD: Name = Name("defListDescriptionSpread");
+    pub(crate) const DEF_LIST_TERM: Name = Name("defListTerm");
     pub(crate) const DEFINITION: Name = Name("definition");
     pub(crate) const DEFINITION_DESTINATION: Name = Name("definitionDestination");
     pub(crate) const DEFINITION_DESTINATION_LITERAL: Name =
@@ -62,6 +68,10 @@ impl Name {
     pub(crate) const EMPHASIS: Name = Name("emphasis");
     pub(crate) const EMPHASIS_SEQUENCE: Name = Name("emphasisSequence");
     pub(crate) const EMPHASIS_TEXT: Name = Name("emphasisText");
+    pub(crate) const FRONTMATTER: Name = Name("frontmatter");
+    pub(crate) const FRONTMATTER_FENCE: Name = Name("frontmatterFence");
+    pub(crate) const FRONTMATTER_SEQUENCE: Name = Name("frontmatterFenceSequence");
+    pub(crate) const FRONTMATTER_VALUE: Name = Name("frontmatterValue");
     pub(crate) const GFM_FOOTNOTE_CALL: Name = Name("gfmFootnoteCall");
     pub(crate) const GFM_FOOTNOTE_CALL_LABEL_MARKER: Name =
         Name("gfmFootnoteCallLabelMarker");
@@ -123,6 +133,14 @@ impl Name {
     pub(crate) const LITERAL_AUTOLINK_EMAIL: Name = Name("literalAutolinkEmail");
     pub(crate) const LITERAL_AUTOLINK_HTTP: Name = Name("literalAutolinkHttp");
     pub(crate) const LITERAL_AUTOLINK_WWW: Name = Name("literalAutolinkWww");
+    pub(crate) const MATH_FLOW: Name = Name("mathFlow");
+    pub(crate) const MATH_FLOW_FENCE: Name = Name("mathFlowFence");
+    pub(crate) const MATH_FLOW_FENCE_META: Name = Name("mathFlowFenceMeta");
+    pub(crate) const MATH_FLOW_FENCE_SEQUENCE: Name = Name("mathFlowFenceSequence");
+    pub(crate) const MATH_FLOW_VALUE: Name = Name("mathFlowValue");
+    pub(crate) const MATH_TEXT: Name = Name("mathText");
+    pub(crate) const MATH_TEXT_DATA: Name = Name("mathTextData");
+    pub(crate) const MATH_TEXT_SEQUENCE: Name = Name("mathTextSequence");
     pub(crate) const PARAGRAPH: Name = Name("paragraph");
     pub(crate) const REFERENCE: Name = Name("reference");
     pub(crate) const REFERENCE_MARKER: Name = Name("referenceMarker");

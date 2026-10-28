@@ -6,6 +6,9 @@ use textlane_core::{Allocator, ArenaString, ArenaVec, Position};
 
 use crate::actions::blockquote::convert::convert_blockquote;
 use crate::actions::code::convert::convert_code;
+use crate::actions::def_list::convert::convert_def_list;
+use crate::actions::def_list_description::convert::convert_def_list_description;
+use crate::actions::def_list_term::convert::convert_def_list_term;
 use crate::actions::delete::convert::convert_delete;
 use crate::actions::emphasis::convert::convert_emphasis;
 use crate::actions::footnote_reference::convert::convert_footnote_reference;
@@ -15,10 +18,13 @@ use crate::actions::html::convert::convert_html;
 use crate::actions::image::convert::convert_image;
 use crate::actions::image_reference::convert::convert_image_reference;
 use crate::actions::inline_code::convert::convert_inline_code;
+use crate::actions::inline_math::convert::convert_inline_math;
 use crate::actions::link::convert::convert_link;
 use crate::actions::link_reference::convert::convert_link_reference;
 use crate::actions::list::convert::convert_list;
 use crate::actions::list_item::convert::{convert_list_item, is_list_loose};
+use crate::actions::literal::convert::convert_literal;
+use crate::actions::math::convert::convert_math;
 use crate::actions::paragraph::convert::convert_paragraph;
 use crate::actions::root::convert::convert_root;
 use crate::actions::strong::convert::convert_strong;
@@ -139,6 +145,11 @@ impl<'a> Converter<'a, '_> {
             mdast::Node::FootnoteReference(node) => {
                 results.push(convert_footnote_reference(self, node));
             }
+            mdast::Node::Math(node) => results.push(convert_math(self, node)),
+            mdast::Node::InlineMath(node) => {
+                results.push(convert_inline_math(self, node))
+            }
+            mdast::Node::Literal(node) => results.push(convert_literal(node)),
             _ => {}
         }
         if trim && let Some(first) = results.get_mut(start) {
@@ -180,6 +191,11 @@ impl<'a> Converter<'a, '_> {
                 convert_table_row(self, row, node, parent, children)
             }
             mdast::Node::TableCell(cell) => convert_table_cell(self, cell, children),
+            mdast::Node::DefList(list) => convert_def_list(self, list, children),
+            mdast::Node::DefListTerm(term) => convert_def_list_term(self, term, children),
+            mdast::Node::DefListDescription(description) => {
+                convert_def_list_description(self, description, children)
+            }
             mdast::Node::LinkReference(reference) => {
                 convert_link_reference(self, reference, children, results);
                 return;

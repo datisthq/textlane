@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
 use crate::models::construct::{Resolver, State, StateFn};
+use crate::models::def_list::DefListTrack;
+use crate::models::directive::DirectiveState;
 use crate::models::event::{ContentType, Event, Kind, Link, Point};
 use crate::models::token::Name;
 use crate::utils::tokenizer::edit_map::EditMap;
@@ -14,6 +16,7 @@ const TAB_SIZE: usize = 4;
 #[derive(Debug, PartialEq, Eq)]
 pub(crate) enum Container {
     BlockQuote,
+    DefList,
     GfmFootnoteDefinition,
     ListItem,
 }
@@ -25,6 +28,10 @@ pub(crate) struct ContainerState {
     pub(crate) blank_initial: bool,
     /// How far a list item's content is indented.
     pub(crate) size: usize,
+    /// Whether a definition description started blank and a blank line followed.
+    pub(crate) blank_further: bool,
+    /// Whether the line before was blank inside this definition description.
+    pub(crate) blank_last: bool,
 }
 
 /// Whether a label start opens a link or an image.
@@ -98,6 +105,7 @@ pub(crate) struct TokenizeState<'a> {
     /// For each open container, the first at or after it that an empty line does not
     /// simply continue; cleared whenever the containers change.
     pub(crate) document_blank_ends: Option<Vec<usize>>,
+    pub(crate) def_list: DefListTrack,
     pub(crate) space_or_tab_connect: bool,
     pub(crate) space_or_tab_content: Option<ContentType>,
     pub(crate) space_or_tab_min: usize,
@@ -159,6 +167,23 @@ pub(crate) struct TokenizeState<'a> {
     /// Whether this text starts the first paragraph of a list item, where a GFM task list
     /// check may be.
     pub(crate) task_list_check_allowed: bool,
+    /// Whether math may start in this text, so data stops at `$`.
+    pub(crate) math_text: bool,
+    /// The last start of a dollar run of each length, as math in text scans for closers.
+    pub(crate) math_text_runs: HashMap<usize, usize>,
+    /// Whether math in text scanned to the end of the content without closing.
+    pub(crate) math_text_scanned: bool,
+    /// What the directive constructs share.
+    pub(crate) directive: DirectiveState,
+    /// Whether this text keeps its trailing whitespace, as a directive's label does.
+    pub(crate) text_trailing: bool,
+    /// The frontmatter matter being tried, where it started, and how much of a fence
+    /// matched.
+    pub(crate) frontmatter_index: usize,
+    pub(crate) frontmatter_start: usize,
+    pub(crate) frontmatter_fence: usize,
+    /// For each matter, where the first one that found no closing fence started.
+    pub(crate) frontmatter_failed: Vec<Option<usize>>,
 }
 
 /// Feeds bytes to state functions and records the events they emit.
@@ -233,7 +258,10 @@ impl<'a> Tokenizer<'a> {
 
     fn account_for_potential_skip(&mut self) {
         let at = self.point.line - self.first_line;
-        if self.point.column == 1 && at != self.column_start.len() {
+        // A container directive's content starts mid-line, so its first line starts there
+        let untouched =
+            at == 0 && self.events.is_empty() && self.point == self.line_start;
+        if (self.point.column == 1 || untouched) && at != self.column_start.len() {
             self.move_to(self.column_start[at]);
         }
     }

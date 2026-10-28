@@ -5,6 +5,8 @@ mod plugin;
 mod models {
     pub(crate) mod code;
     pub(crate) mod construct;
+    pub(crate) mod def_list;
+    pub(crate) mod directive;
     pub(crate) mod event;
     pub(crate) mod options;
     pub(crate) mod token;
@@ -17,6 +19,7 @@ mod utils {
     pub(crate) mod converter {
         pub(crate) mod footnote;
         pub(crate) mod state;
+        pub(crate) mod unknown;
     }
     pub(crate) mod serializer {
         pub(crate) mod construct;
@@ -90,6 +93,23 @@ mod actions {
         pub(crate) mod resolve;
         pub(crate) mod tokenize;
     }
+    pub(crate) mod def_list {
+        pub(crate) mod check;
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod resolve;
+        pub(crate) mod stringify;
+        pub(crate) mod tokenize;
+        pub(crate) mod track;
+    }
+    pub(crate) mod def_list_description {
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
+    }
+    pub(crate) mod def_list_term {
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
+    }
     pub(crate) mod definition {
         pub(crate) mod compile;
         pub(crate) mod convert;
@@ -102,6 +122,29 @@ mod actions {
         pub(crate) mod stringify;
     }
     pub(crate) mod destination {
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod directive {
+        pub(crate) mod compile;
+        pub(crate) mod stringify;
+    }
+    pub(crate) mod directive_attributes {
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod directive_container {
+        pub(crate) mod resolve;
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod directive_label {
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod directive_leaf {
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod directive_name {
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod directive_text {
         pub(crate) mod tokenize;
     }
     pub(crate) mod emphasis {
@@ -117,6 +160,11 @@ mod actions {
         pub(crate) mod compile;
         pub(crate) mod convert;
         pub(crate) mod stringify;
+    }
+    pub(crate) mod frontmatter {
+        pub(crate) mod compile;
+        pub(crate) mod stringify;
+        pub(crate) mod tokenize;
     }
     pub(crate) mod gfm_autolink_literal {
         pub(crate) mod compile;
@@ -190,6 +238,11 @@ mod actions {
         pub(crate) mod convert;
         pub(crate) mod stringify;
     }
+    pub(crate) mod inline_math {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
+    }
     pub(crate) mod label {
         pub(crate) mod tokenize;
     }
@@ -221,6 +274,9 @@ mod actions {
         pub(crate) mod convert;
         pub(crate) mod stringify;
     }
+    pub(crate) mod literal {
+        pub(crate) mod convert;
+    }
     pub(crate) mod list_item {
         pub(crate) mod compile;
         pub(crate) mod convert;
@@ -231,6 +287,17 @@ mod actions {
     pub(crate) mod markdown {
         pub(crate) mod parse;
         pub(crate) mod stringify;
+    }
+    pub(crate) mod math {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
+    }
+    pub(crate) mod math_flow {
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod math_text {
+        pub(crate) mod tokenize;
     }
     pub(crate) mod mdast {
         pub(crate) mod convert;
@@ -294,12 +361,15 @@ mod actions {
     }
 }
 mod helpers {
+    pub(crate) mod attribute;
     pub(crate) mod character;
     pub(crate) mod decode;
     pub(crate) mod entities;
     pub(crate) mod html;
     pub(crate) mod identifier;
+    pub(crate) mod indent;
     pub(crate) mod literal;
+    pub(crate) mod math;
     pub(crate) mod position;
     pub(crate) mod reference;
     pub(crate) mod skip;
@@ -355,8 +425,9 @@ mod plugins {
 
 // models
 pub use models::options::{
-    GfmOptions, GfmSlot, Names, ParseOptions, StringifyOptions, ToHtmlOptions,
-    UnsafePattern,
+    DefinitionListSlot, DirectiveOptions, DirectiveSlot, FrontmatterOptions,
+    FrontmatterSlot, GfmOptions, GfmSlot, MathOptions, MathSlot, Matter, Names,
+    ParseOptions, StringifyOptions, ToHtmlOptions, UnsafePattern,
 };
 
 // actions
@@ -365,8 +436,12 @@ pub use actions::markdown::stringify::stringify_markdown;
 pub use actions::mdast::convert::convert_mdast;
 
 // plugins
+pub use plugins::definition_list::plugin::{DefinitionList, definition_list};
+pub use plugins::directive::plugin::{Directive, directive};
+pub use plugins::frontmatter::plugin::{Frontmatter, frontmatter};
 pub use plugins::gemoji::plugin::{Gemoji, gemoji};
 pub use plugins::gfm::plugin::{Gfm, gfm};
+pub use plugins::math::plugin::{Math, math};
 pub use plugins::parse::plugin::{Parse, parse};
 pub use plugins::stringify::plugin::{Stringify, stringify};
 pub use plugins::to_html::plugin::{ToHtml, to_html};

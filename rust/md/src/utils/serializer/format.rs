@@ -127,6 +127,7 @@ pub(crate) fn is_phrasing(node: &Node) -> bool {
             | Node::LinkReference(_)
             | Node::Strong(_)
             | Node::Text(_)
+            | Node::TextDirective(_)
     )
 }
 

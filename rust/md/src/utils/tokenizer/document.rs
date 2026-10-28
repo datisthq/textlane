@@ -1,11 +1,15 @@
 use crate::actions::block_quote::tokenize::{continue_block_quote, tokenize_block_quote};
 use crate::actions::bom::tokenize::tokenize_bom;
+use crate::actions::def_list::check::{DefListCheck, check_def_list, confirm_def_list};
+use crate::actions::def_list::tokenize::{continue_def_list, tokenize_def_list};
+use crate::actions::def_list::track::track_def_list;
 use crate::actions::gfm_footnote_definition::tokenize::{
     continue_gfm_footnote_definition, tokenize_gfm_footnote_definition,
 };
 use crate::actions::list_item::tokenize::{continue_list_item, tokenize_list_item};
 use crate::helpers::skip::{skip_opt_back, skip_to};
-use crate::models::construct::State;
+use crate::models::construct::{Resolver, State};
+use crate::models::directive::CHUNK_DOCUMENT;
 use crate::models::event::{ContentType, Event, Kind, Link};
 use crate::models::token::Name;
 use crate::utils::tokenizer::driver::{
@@ -28,6 +32,10 @@ pub(crate) fn tokenize_document(tokenizer: &mut Tokenizer) -> State {
         tokenizer.point.clone(),
         tokenizer.parse_state,
     )));
+    // A container directive's content is a document too, with no byte order mark
+    if tokenizer.point.index > 0 {
+        return State::Retry(container_existing_before);
+    }
     tokenizer.attempt(
         State::Next(container_existing_before),
         State::Next(container_existing_before),
@@ -50,9 +58,11 @@ fn container_existing_before(tokenizer: &mut Tokenizer) -> State {
     };
     let continuation = match container.kind {
         Container::BlockQuote => continue_block_quote,
+        Container::DefList => continue_def_list,
         Container::GfmFootnoteDefinition => continue_gfm_footnote_definition,
         Container::ListItem => continue_list_item,
     };
+    tokenizer.tokenize_state.def_list.events_before = tokenizer.events.len();
     tokenizer.attempt(
         State::Next(container_existing_after),
         State::Next(container_new_before),
@@ -61,6 +71,17 @@ fn container_existing_before(tokenizer: &mut Tokenizer) -> State {
 }
 
 fn container_existing_after(tokenizer: &mut Tokenizer) -> State {
+    let state = &mut tokenizer.tokenize_state;
+    // micromark's definition lists see a list item's or footnote's indent as a boundary
+    if let Some(container) = state.document_container_stack.get(state.document_continued)
+        && matches!(
+            container.kind,
+            Container::ListItem | Container::GfmFootnoteDefinition
+        )
+        && tokenizer.events.len() > state.def_list.events_before
+    {
+        state.def_list.line_boundary = true;
+    }
     tokenizer.tokenize_state.document_continued += 1;
     State::Retry(container_existing_before)
 }
@@ -117,6 +138,41 @@ fn container_new_before_not_gfm_footnote_definition(tokenizer: &mut Tokenizer) -
         .tokenize_state
         .document_container_stack
         .swap_remove(continued);
+    match check_def_list(tokenizer) {
+        DefListCheck::No => State::Retry(containers_after),
+        DefListCheck::Sibling => State::Retry(def_list_before),
+        // micromark's check passed: the flow and the containers that did not continue close
+        // whether or not a list opens
+        DefListCheck::New {
+            closing,
+            block_quote,
+        } => {
+            exit_containers(tokenizer, &Phase::Prefix);
+            if let Some(child) = tokenizer.tokenize_state.document_child.as_mut() {
+                child.pierce = true;
+                child.interrupt = false;
+            }
+            if confirm_def_list(tokenizer, closing, block_quote) {
+                State::Retry(def_list_before)
+            } else {
+                State::Retry(containers_after)
+            }
+        }
+    }
+}
+
+fn def_list_before(tokenizer: &mut Tokenizer) -> State {
+    push_container(tokenizer, Container::DefList);
+    tokenizer.attempt(State::Next(container_new_after), State::Next(def_list_nok));
+    State::Retry(tokenize_def_list)
+}
+
+fn def_list_nok(tokenizer: &mut Tokenizer) -> State {
+    let continued = tokenizer.tokenize_state.document_continued;
+    tokenizer
+        .tokenize_state
+        .document_container_stack
+        .swap_remove(continued);
     State::Retry(containers_after)
 }
 
@@ -142,6 +198,7 @@ fn container_new_after(tokenizer: &mut Tokenizer) -> State {
         .push(container);
     tokenizer.tokenize_state.document_continued += 1;
     tokenizer.tokenize_state.document_opened = true;
+    tokenizer.tokenize_state.def_list.line_boundary = true;
     State::Retry(container_new_before)
 }
 
@@ -163,7 +220,7 @@ fn find_blank_end(state: &mut TokenizeState, from: usize) -> usize {
         for index in (0..stack.len()).rev() {
             let container = &stack[index];
             let free = match container.kind {
-                Container::BlockQuote => false,
+                Container::BlockQuote | Container::DefList => false,
                 Container::GfmFootnoteDefinition => true,
                 Container::ListItem => !container.blank_initial,
             };
@@ -179,6 +236,8 @@ fn new_container(kind: Container) -> ContainerState {
         kind,
         blank_initial: false,
         size: 0,
+        blank_further: false,
+        blank_last: false,
     }
 }
 
@@ -193,10 +252,14 @@ fn containers_after(tokenizer: &mut Tokenizer) -> State {
         let mut prefixes = tokenizer.parse_state.prefixes.borrow_mut();
         if prefixes.last().is_none_or(|last| last.0 < line_start) {
             prefixes.push((line_start, point.index));
+        } else if tokenizer.parse_state.directive {
+            let mut nested = tokenizer.parse_state.prefixes_nested.borrow_mut();
+            nested.push((line_start, point.index));
         }
     }
     let lazy = tokenizer.tokenize_state.document_continued
         != tokenizer.tokenize_state.document_container_stack.len();
+    track_def_list(tokenizer, lazy);
     if let Some(child) = tokenizer.tokenize_state.document_child.as_mut() {
         child.lazy = lazy;
         child.define_skip(point);
@@ -242,7 +305,14 @@ fn flow_inside(tokenizer: &mut Tokenizer) -> State {
 }
 
 fn flow_end(tokenizer: &mut Tokenizer) -> State {
-    let to = (tokenizer.point.index, tokenizer.point.vs);
+    // The line ends with its flow chunk: in a container directive's content, the next
+    // chunk starts past that line's prefix, which is not this line's flow
+    let to = match tokenizer.events.last() {
+        Some(event) if event.kind == Kind::Exit && event.name == Name::DATA => {
+            (event.point.index, event.point.vs)
+        }
+        _ => (tokenizer.point.index, tokenizer.point.vs),
+    };
     let state = tokenizer
         .tokenize_state
         .document_child_state
@@ -261,7 +331,7 @@ fn flow_end(tokenizer: &mut Tokenizer) -> State {
                 .any(|container| match container.kind {
                     Container::BlockQuote => true,
                     Container::ListItem => container.blank_initial,
-                    Container::GfmFootnoteDefinition => false,
+                    Container::DefList | Container::GfmFootnoteDefinition => false,
                 })
         });
     let Some(child) = tokenizer.tokenize_state.document_child.as_mut() else {
@@ -346,6 +416,17 @@ fn exit_containers(tokenizer: &mut Tokenizer, phase: &Phase) {
         .document_container_stack
         .split_off(continued);
     tokenizer.tokenize_state.document_blank_ends = None;
+    if !stack_close.is_empty() {
+        let track = &mut tokenizer.tokenize_state.def_list;
+        // Exits after a line come before it: it starts the runs that terms come from
+        if *phase == Phase::After {
+            track.run_start = track.line_start;
+            track.pure_start = track.line_start;
+        } else {
+            track.line_boundary = true;
+            track.line_exits = true;
+        }
+    }
     if *phase != Phase::After {
         let state = tokenizer
             .tokenize_state
@@ -363,6 +444,7 @@ fn exit_containers(tokenizer: &mut Tokenizer, phase: &Phase) {
         while let Some(container) = stack_close.pop() {
             let name = match container.kind {
                 Container::BlockQuote => Name::BLOCK_QUOTE,
+                Container::DefList => Name::DEF_LIST_DESCRIPTION,
                 Container::GfmFootnoteDefinition => Name::GFM_FOOTNOTE_DEFINITION,
                 Container::ListItem => Name::LIST_ITEM,
             };
@@ -422,6 +504,26 @@ fn resolve(tokenizer: &mut Tokenizer) {
                 child.map.add(inject_index, 0, exits);
             }
             line += 1;
+        } else if is_chunk_line(tokenizer.parse_state.bytes, event) {
+            let mut point = event.point.clone();
+            while child_index + 1 < child.events.len()
+                && child.events[child_index + 1].kind == Kind::Exit
+            {
+                child_index += 1;
+                point = child.events[child_index].point.clone();
+            }
+            if let Some(Some(mut exits)) = tokenizer
+                .tokenize_state
+                .document_exits
+                .get_mut(line)
+                .map(Option::take)
+            {
+                for exit in &mut exits {
+                    exit.point = point.clone();
+                }
+                child.map.add(child_index + 1, 0, exits);
+            }
+            line += 1;
         }
         child_index += 1;
     }
@@ -459,8 +561,20 @@ fn resolve(tokenizer: &mut Tokenizer) {
     tokenizer
         .resolvers
         .append(&mut child.resolvers.split_off(0));
+    // Terms are paragraph lines, so they are found once content is tokenized
+    if !tokenizer.tokenize_state.def_list.starts.is_empty() {
+        tokenizer.register_resolver(Resolver::DefList);
+    }
     tokenizer
         .tokenize_state
         .definitions
         .append(&mut child.tokenize_state.definitions.split_off(0));
+}
+
+// A container directive's content line holds its line ending, as no token of its own
+fn is_chunk_line(bytes: &[u8], event: &Event) -> bool {
+    event.kind == Kind::Exit
+        && event.name == CHUNK_DOCUMENT
+        && event.point.index > 0
+        && matches!(bytes.get(event.point.index - 1), Some(b'\n' | b'\r'))
 }

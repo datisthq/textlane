@@ -57,7 +57,7 @@ fn empty_code<'a>() -> Node<'a> {
 }
 
 // The line ending after the opening fence and the one before the end are not code
-fn trim_line_endings(value: &str, start: bool) -> &str {
+pub(crate) fn trim_line_endings(value: &str, start: bool) -> &str {
     let value = if start {
         value
             .strip_prefix("\r\n")

@@ -3,23 +3,30 @@ use textlane_core::mdast::{Emphasis, Node, Strong};
 
 use crate::actions::blockquote::stringify::stringify_blockquote;
 use crate::actions::code::stringify::stringify_code;
+use crate::actions::def_list::stringify::stringify_def_list;
+use crate::actions::def_list_description::stringify::stringify_def_list_description;
+use crate::actions::def_list_term::stringify::stringify_def_list_term;
 use crate::actions::definition::stringify::stringify_definition;
 use crate::actions::delete::stringify::{create_delete_attention, stringify_delete};
+use crate::actions::directive::stringify::stringify_directive;
 use crate::actions::emphasis::stringify::{
     create_emphasis_attention, stringify_emphasis,
 };
 use crate::actions::footnote_definition::stringify::stringify_footnote_definition;
 use crate::actions::footnote_reference::stringify::stringify_footnote_reference;
+use crate::actions::frontmatter::stringify::stringify_frontmatter;
 use crate::actions::hard_break::stringify::stringify_hard_break;
 use crate::actions::heading::stringify::stringify_heading;
 use crate::actions::html::stringify::stringify_html;
 use crate::actions::image::stringify::stringify_image;
 use crate::actions::image_reference::stringify::stringify_image_reference;
 use crate::actions::inline_code::stringify::stringify_inline_code;
+use crate::actions::inline_math::stringify::stringify_inline_math;
 use crate::actions::link::stringify::stringify_link;
 use crate::actions::link_reference::stringify::stringify_link_reference;
 use crate::actions::list::stringify::stringify_list;
 use crate::actions::list_item::stringify::stringify_list_item;
+use crate::actions::math::stringify::stringify_math;
 use crate::actions::paragraph::stringify::stringify_paragraph;
 use crate::actions::root::stringify::stringify_root;
 use crate::actions::strong::stringify::{create_strong_attention, stringify_strong};
@@ -225,13 +232,50 @@ impl<'c> Serializer<'c> {
             Node::Delete(_) if self.settings.gfm.is_some() => {
                 stringify_delete(self, Parent::of(node), info)
             }
+            Node::DefList(_) if self.settings.definition_list => {
+                stringify_def_list(self, Parent::of(node))
+            }
+            Node::DefListTerm(_) if self.settings.definition_list => {
+                stringify_def_list_term(self, Parent::of(node))
+            }
+            Node::DefListDescription(_) if self.settings.definition_list => {
+                stringify_def_list_description(self, Parent::of(node))
+            }
+            Node::Math(math) if self.settings.math.is_some() => {
+                stringify_math(self, math);
+                Ok(())
+            }
+            Node::InlineMath(math) if self.settings.math.is_some() => {
+                stringify_inline_math(self, math);
+                Ok(())
+            }
+            Node::ContainerDirective(_)
+            | Node::LeafDirective(_)
+            | Node::TextDirective(_)
+                if self.settings.directive.is_some() =>
+            {
+                stringify_directive(self, node, info)
+            }
+            Node::Yaml(yaml) => stringify_frontmatter(self, "yaml", yaml.value),
+            Node::Toml(toml) => stringify_frontmatter(self, "toml", toml.value),
+            Node::Literal(literal) => {
+                stringify_frontmatter(self, literal.kind, literal.value)
+            }
             // GFM's nodes need `md.gfm`'s handlers, which mdast-util-to-markdown lacks too
-            Node::Delete(_)
+            Node::ContainerDirective(_)
+            | Node::LeafDirective(_)
+            | Node::TextDirective(_)
+            | Node::Delete(_)
             | Node::Table(_)
             | Node::TableRow(_)
             | Node::TableCell(_)
             | Node::FootnoteDefinition(_)
-            | Node::FootnoteReference(_) => Err(Error::new(
+            | Node::FootnoteReference(_)
+            | Node::DefList(_)
+            | Node::DefListTerm(_)
+            | Node::DefListDescription(_)
+            | Node::Math(_)
+            | Node::InlineMath(_) => Err(Error::new(
                 "unknown-node",
                 format!("Cannot handle unknown node `{}`", read_node_type(node)),
             )),
@@ -409,12 +453,14 @@ impl<'c> Serializer<'c> {
             Node::Html(_) => Some('<'),
             Node::Image(_) | Node::ImageReference(_) => Some('!'),
             Node::InlineCode(_) => Some('`'),
+            Node::InlineMath(_) if self.settings.math.is_some() => Some('$'),
             Node::Link(link) => Some(if format_link_as_autolink(link, self.settings) {
                 '<'
             } else {
                 '['
             }),
             Node::LinkReference(_) | Node::FootnoteReference(_) => Some('['),
+            Node::TextDirective(_) if self.settings.directive.is_some() => Some(':'),
             _ => None,
         };
         if let Some(character) = character {
@@ -465,7 +511,7 @@ pub(crate) fn encode_character_reference(character: char) -> String {
 }
 
 /// The `type` unist gives `node`.
-pub(crate) fn read_node_type(node: &Node) -> &'static str {
+pub(crate) fn read_node_type<'a>(node: &Node<'a>) -> &'a str {
     match node {
         Node::Root(_) => "root",
         Node::Paragraph(_) => "paragraph",
@@ -492,5 +538,16 @@ pub(crate) fn read_node_type(node: &Node) -> &'static str {
         Node::TableCell(_) => "tableCell",
         Node::FootnoteDefinition(_) => "footnoteDefinition",
         Node::FootnoteReference(_) => "footnoteReference",
+        Node::DefList(_) => "defList",
+        Node::DefListTerm(_) => "defListTerm",
+        Node::DefListDescription(_) => "defListDescription",
+        Node::Math(_) => "math",
+        Node::InlineMath(_) => "inlineMath",
+        Node::ContainerDirective(_) => "containerDirective",
+        Node::LeafDirective(_) => "leafDirective",
+        Node::TextDirective(_) => "textDirective",
+        Node::Yaml(_) => "yaml",
+        Node::Toml(_) => "toml",
+        Node::Literal(literal) => literal.kind,
     }
 }

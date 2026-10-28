@@ -170,6 +170,57 @@ fn resolves_hostile_footnotes_in_linear_time() -> Result<(), Error> {
     Ok(())
 }
 
+fn render_def_list(input: &str) -> Result<String, Error> {
+    let processor = Processor::new()
+        .with(textlane_md::parse(Default::default()))
+        .with(textlane_md::gfm(Default::default()))
+        .with(textlane_md::definition_list())
+        .with(textlane_md::to_html(Default::default()))
+        .with(textlane_html::stringify(Default::default()))
+        .freeze()?;
+    Ok(processor.process(input)?.value)
+}
+
+fn format_def_list(input: &str) -> Result<String, Error> {
+    let processor = Processor::new()
+        .with(textlane_md::parse(Default::default()))
+        .with(textlane_md::definition_list())
+        .with(textlane_md::stringify(Default::default()))
+        .freeze()?;
+    Ok(processor.process(input)?.value)
+}
+
+#[test]
+fn renders_definition_lists() -> Result<(), Error> {
+    let html = "<dl>\n<dt>a</dt>\n<dd>b\n</dd>\n</dl>";
+    assert_eq!(render_def_list("a\n: b")?, html);
+    assert_eq!(format_def_list("a\n: b")?, "a\n:   b\n");
+    Ok(())
+}
+
+#[test]
+fn resolves_hostile_definition_lists_in_linear_time() -> Result<(), Error> {
+    for input in [
+        "a\n: b\n".repeat(10_000),
+        "a\n".repeat(20_000) + ": b\n",
+        "[x]: y\n".repeat(10_000) + &": b\n".repeat(10_000),
+        "[x]: y\n: b\n\n".repeat(10_000),
+        "# h\n: b\n".repeat(10_000),
+        "> a\n: b\n".repeat(10_000),
+        "> a\n".to_string() + &"b\n".repeat(20_000) + ": c\n",
+        "a\n".to_string() + &"===\n".repeat(20_000) + ": b\n",
+        "a\n:\n\n".repeat(10_000),
+        "| a |\n| - |\n".to_string() + &"b\n: c\n".repeat(10_000),
+    ] {
+        let started = std::time::Instant::now();
+        render_def_list(&input)?;
+        format_def_list(&input)?;
+        let took = started.elapsed();
+        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+    }
+    Ok(())
+}
+
 #[test]
 fn rejects_hostile_html_in_linear_time() -> Result<(), Error> {
     for input in [
@@ -440,6 +491,38 @@ fn handles_hostile_gfm_in_linear_time() -> Result<(), Error> {
         "- ".to_string() + &"[a]: b\n  ".repeat(20_000) + "[x] c",
         "- [x] a\n\n  b\n".repeat(20_000),
         "[ ] ".repeat(30_000),
+    ] {
+        for processor in [&render, &format] {
+            let started = std::time::Instant::now();
+            processor.process(&input)?;
+            let took = started.elapsed();
+            assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+        }
+    }
+    Ok(())
+}
+
+#[test]
+fn handles_hostile_math_in_linear_time() -> Result<(), Error> {
+    let math = || textlane_md::math(Default::default());
+    let render = Processor::new()
+        .with(textlane_md::parse(Default::default()))
+        .with(math())
+        .with(textlane_md::to_html(Default::default()))
+        .with(textlane_html::stringify(Default::default()))
+        .freeze()?;
+    let format = Processor::new()
+        .with(textlane_md::parse(Default::default()))
+        .with(math())
+        .with(textlane_md::stringify(Default::default()))
+        .freeze()?;
+    for input in [
+        (1..=1_000).map(|size| "$".repeat(size) + "a").collect(),
+        "$".repeat(100_000),
+        "$a ".repeat(50_000),
+        "\\$$".repeat(30_000),
+        "$$\n".repeat(30_000),
+        "$$ $".repeat(30_000),
     ] {
         for processor in [&render, &format] {
             let started = std::time::Instant::now();

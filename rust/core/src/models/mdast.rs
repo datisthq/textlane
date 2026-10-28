@@ -1,4 +1,5 @@
 use crate::ArenaVec;
+use crate::models::data::Data;
 use crate::models::position::Position;
 
 /// An mdast node.
@@ -29,6 +30,17 @@ pub enum Node<'a> {
     TableCell(TableCell<'a>),
     FootnoteDefinition(FootnoteDefinition<'a>),
     FootnoteReference(FootnoteReference<'a>),
+    Math(Math<'a>),
+    InlineMath(InlineMath<'a>),
+    ContainerDirective(ContainerDirective<'a>),
+    LeafDirective(LeafDirective<'a>),
+    TextDirective(TextDirective<'a>),
+    Yaml(Yaml<'a>),
+    Toml(Toml<'a>),
+    Literal(Literal<'a>),
+    DefList(DefList<'a>),
+    DefListTerm(DefListTerm<'a>),
+    DefListDescription(DefListDescription<'a>),
 }
 
 /// The document.
@@ -244,6 +256,79 @@ pub struct FootnoteReference<'a> {
     pub position: Option<Position<'a>>,
 }
 
+/// Math as a block, `$$`; `data` holds the hast `md.toHtml` renders it as.
+#[derive(Debug, PartialEq)]
+pub struct Math<'a> {
+    pub meta: Option<&'a str>,
+    pub value: &'a str,
+    pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
+}
+
+/// Math in text, `$a$`; `data` holds the hast `md.toHtml` renders it as.
+#[derive(Debug, PartialEq)]
+pub struct InlineMath<'a> {
+    pub value: &'a str,
+    pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
+}
+
+/// A directive's attributes, `{#a .b c=d}`, as name and value pairs in order.
+pub type DirectiveAttributes<'a> = ArenaVec<'a, (&'a str, &'a str)>;
+
+/// A container directive, `:::name` … `:::`; `label` is set when the first child is its
+/// label, a paragraph marked `data.directiveLabel`.
+#[derive(Debug, PartialEq)]
+pub struct ContainerDirective<'a> {
+    pub name: &'a str,
+    pub attributes: DirectiveAttributes<'a>,
+    pub label: bool,
+    pub children: ArenaVec<'a, Node<'a>>,
+    pub position: Option<Position<'a>>,
+}
+
+/// A leaf directive, `::name[label]{attributes}`, its label as its children.
+#[derive(Debug, PartialEq)]
+pub struct LeafDirective<'a> {
+    pub name: &'a str,
+    pub attributes: DirectiveAttributes<'a>,
+    pub children: ArenaVec<'a, Node<'a>>,
+    pub position: Option<Position<'a>>,
+}
+
+/// A text directive, `:name[label]{attributes}`, its label as its children.
+#[derive(Debug, PartialEq)]
+pub struct TextDirective<'a> {
+    pub name: &'a str,
+    pub attributes: DirectiveAttributes<'a>,
+    pub children: ArenaVec<'a, Node<'a>>,
+    pub position: Option<Position<'a>>,
+}
+
+/// A definition list: its terms and their descriptions, in order.
+#[derive(Debug, PartialEq)]
+pub struct DefList<'a> {
+    pub children: ArenaVec<'a, Node<'a>>,
+    pub position: Option<Position<'a>>,
+}
+
+/// A term of a definition list.
+#[derive(Debug, PartialEq)]
+pub struct DefListTerm<'a> {
+    pub children: ArenaVec<'a, Node<'a>>,
+    pub position: Option<Position<'a>>,
+}
+
+/// A description of a definition list; `spread` when a blank line comes before it.
+#[derive(Debug, PartialEq)]
+pub struct DefListDescription<'a> {
+    pub spread: bool,
+    pub children: ArenaVec<'a, Node<'a>>,
+    pub position: Option<Position<'a>>,
+}
+
 /// Raw HTML.
 #[derive(Debug, PartialEq)]
 pub struct Html<'a> {
@@ -254,6 +339,29 @@ pub struct Html<'a> {
 /// Plain text.
 #[derive(Debug, PartialEq)]
 pub struct Text<'a> {
+    pub value: &'a str,
+    pub position: Option<Position<'a>>,
+}
+
+/// YAML frontmatter, without its fences.
+#[derive(Debug, PartialEq)]
+pub struct Yaml<'a> {
+    pub value: &'a str,
+    pub position: Option<Position<'a>>,
+}
+
+/// TOML frontmatter, without its fences.
+#[derive(Debug, PartialEq)]
+pub struct Toml<'a> {
+    pub value: &'a str,
+    pub position: Option<Position<'a>>,
+}
+
+/// A node of a type mdast does not define, holding a value: custom frontmatter, say.
+#[derive(Debug, PartialEq)]
+pub struct Literal<'a> {
+    /// The node's `type`.
+    pub kind: &'a str,
     pub value: &'a str,
     pub position: Option<Position<'a>>,
 }
@@ -277,6 +385,12 @@ impl<'a> Node<'a> {
             Node::TableRow(node) => Some(&node.children),
             Node::TableCell(node) => Some(&node.children),
             Node::FootnoteDefinition(node) => Some(&node.children),
+            Node::ContainerDirective(node) => Some(&node.children),
+            Node::LeafDirective(node) => Some(&node.children),
+            Node::TextDirective(node) => Some(&node.children),
+            Node::DefList(node) => Some(&node.children),
+            Node::DefListTerm(node) => Some(&node.children),
+            Node::DefListDescription(node) => Some(&node.children),
             Node::ThematicBreak(_)
             | Node::FootnoteReference(_)
             | Node::Text(_)
@@ -286,7 +400,12 @@ impl<'a> Node<'a> {
             | Node::Image(_)
             | Node::ImageReference(_)
             | Node::Definition(_)
-            | Node::Html(_) => None,
+            | Node::Html(_)
+            | Node::Math(_)
+            | Node::InlineMath(_)
+            | Node::Yaml(_)
+            | Node::Toml(_)
+            | Node::Literal(_) => None,
         }
     }
 
@@ -308,6 +427,12 @@ impl<'a> Node<'a> {
             Node::TableRow(node) => Some(&mut node.children),
             Node::TableCell(node) => Some(&mut node.children),
             Node::FootnoteDefinition(node) => Some(&mut node.children),
+            Node::ContainerDirective(node) => Some(&mut node.children),
+            Node::LeafDirective(node) => Some(&mut node.children),
+            Node::TextDirective(node) => Some(&mut node.children),
+            Node::DefList(node) => Some(&mut node.children),
+            Node::DefListTerm(node) => Some(&mut node.children),
+            Node::DefListDescription(node) => Some(&mut node.children),
             Node::ThematicBreak(_)
             | Node::FootnoteReference(_)
             | Node::Text(_)
@@ -317,7 +442,12 @@ impl<'a> Node<'a> {
             | Node::Image(_)
             | Node::ImageReference(_)
             | Node::Definition(_)
-            | Node::Html(_) => None,
+            | Node::Html(_)
+            | Node::Math(_)
+            | Node::InlineMath(_)
+            | Node::Yaml(_)
+            | Node::Toml(_)
+            | Node::Literal(_) => None,
         }
     }
 
@@ -348,6 +478,17 @@ impl<'a> Node<'a> {
             Node::TableCell(node) => node.position.as_ref(),
             Node::FootnoteDefinition(node) => node.position.as_ref(),
             Node::FootnoteReference(node) => node.position.as_ref(),
+            Node::Math(node) => node.position.as_ref(),
+            Node::InlineMath(node) => node.position.as_ref(),
+            Node::ContainerDirective(node) => node.position.as_ref(),
+            Node::LeafDirective(node) => node.position.as_ref(),
+            Node::TextDirective(node) => node.position.as_ref(),
+            Node::Yaml(node) => node.position.as_ref(),
+            Node::Toml(node) => node.position.as_ref(),
+            Node::Literal(node) => node.position.as_ref(),
+            Node::DefList(node) => node.position.as_ref(),
+            Node::DefListTerm(node) => node.position.as_ref(),
+            Node::DefListDescription(node) => node.position.as_ref(),
         }
     }
 
@@ -378,6 +519,17 @@ impl<'a> Node<'a> {
             Node::TableCell(node) => &mut node.position,
             Node::FootnoteDefinition(node) => &mut node.position,
             Node::FootnoteReference(node) => &mut node.position,
+            Node::Math(node) => &mut node.position,
+            Node::InlineMath(node) => &mut node.position,
+            Node::ContainerDirective(node) => &mut node.position,
+            Node::LeafDirective(node) => &mut node.position,
+            Node::TextDirective(node) => &mut node.position,
+            Node::Yaml(node) => &mut node.position,
+            Node::Toml(node) => &mut node.position,
+            Node::Literal(node) => &mut node.position,
+            Node::DefList(node) => &mut node.position,
+            Node::DefListTerm(node) => &mut node.position,
+            Node::DefListDescription(node) => &mut node.position,
         }
     }
 }

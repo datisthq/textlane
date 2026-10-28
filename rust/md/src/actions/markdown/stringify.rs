@@ -14,7 +14,7 @@ pub fn stringify_markdown(
     options: &StringifyOptions,
 ) -> Result<String, Error> {
     let settings = Settings::from_options(options)?;
-    let patterns = compile_patterns(false, &options.unsafe_patterns)?;
+    let patterns = compile_patterns(false, None, false, &options.unsafe_patterns)?;
     serialize_tree(tree, &settings, &patterns)
 }
 

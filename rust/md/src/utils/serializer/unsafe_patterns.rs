@@ -1,7 +1,7 @@
 use regex::bytes::{Regex, RegexBuilder};
 use textlane_core::Error;
 
-use crate::models::options::{Names, UnsafePattern};
+use crate::models::options::{MathOptions, Names, UnsafePattern};
 use crate::utils::serializer::construct::Construct;
 
 /// An unsafe pattern, compiled as mdast-util-to-markdown's `compilePattern` does.
@@ -41,17 +41,27 @@ const CODE_FENCED_INFO: &[&str] = &[
     "headingAtx",
 ];
 
-/// The built-in patterns, GFM's when `gfm` is set, then `extra`, in the order upstream
-/// checks them.
+/// The built-in patterns, GFM's when `gfm` is set, math's with `math` and directives' when
+/// `directive` is, then `extra`, in the order upstream checks them.
 pub(crate) fn compile_patterns(
     gfm: bool,
+    math: Option<&MathOptions>,
+    directive: bool,
     extra: &[UnsafePattern],
 ) -> Result<Vec<Pattern>, Error> {
     let mut patterns = Vec::new();
     let gfm_patterns = if gfm { create_gfm_patterns() } else { vec![] };
+    let math_patterns = math.map(create_math_patterns).unwrap_or_default();
+    let directive_patterns = if directive {
+        create_directive_patterns()
+    } else {
+        vec![]
+    };
     for pattern in create_default_patterns()
         .iter()
         .chain(&gfm_patterns)
+        .chain(&math_patterns)
+        .chain(&directive_patterns)
         .chain(extra)
     {
         patterns.push(compile_pattern(pattern)?);
@@ -90,6 +100,49 @@ fn create_gfm_patterns() -> Vec<UnsafePattern> {
         create_at_break(':', None, Some("-")),
         create_at_break('-', None, Some("[:|-]")),
         create_at_break('-', None, Some("[:|-]")),
+    ]
+}
+
+// As mdast-util-math: a single dollar is escaped in phrasing unless single dollars do not
+// form math
+fn create_math_patterns(options: &MathOptions) -> Vec<UnsafePattern> {
+    let meta = Some(&["mathFlowMeta"][..]);
+    let after = if options.single_dollar_text_math {
+        None
+    } else {
+        Some("\\$")
+    };
+    vec![
+        create('\r', None, None, meta, None),
+        create('\n', None, None, meta, None),
+        create('$', None, after, Some(&["phrasing"]), None),
+        create('$', None, None, meta, None),
+        create_at_break('$', None, Some("\\$")),
+    ]
+}
+
+// mdast-util-directive's: line endings in flow labels, and colons that would start one
+fn create_directive_patterns() -> Vec<UnsafePattern> {
+    let labels = Some(&["leafDirectiveLabel", "containerDirectiveLabel"][..]);
+    let phrasing = Some(&["phrasing"][..]);
+    vec![
+        create('\r', None, None, labels, None),
+        create('\n', None, None, labels, None),
+        UnsafePattern {
+            unicode: true,
+            ..create(
+                ':',
+                Some("[^:]"),
+                Some("[^\\s\\p{P}\\p{S}]"),
+                phrasing,
+                None,
+            )
+        },
+        UnsafePattern {
+            after_node: Some(Names::One("textDirective".into())),
+            ..create(':', None, None, phrasing, None)
+        },
+        create_at_break(':', Some(":+"), None),
     ]
 }
 
@@ -182,6 +235,11 @@ fn create_default_patterns() -> Vec<UnsafePattern> {
         ));
     }
     patterns
+}
+
+/// mdast-util-definition-list's pattern: a `:` at a break would start a description.
+pub(crate) fn create_def_list_pattern() -> UnsafePattern {
+    create_at_break(':', None, Some("(?:[ \t\r\n])"))
 }
 
 fn create(

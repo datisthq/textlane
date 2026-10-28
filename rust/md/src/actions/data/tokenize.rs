@@ -46,6 +46,7 @@ fn inside(tokenizer: &mut Tokenizer) -> State {
 // GFM's literal autolinks start at letters too, but only where their previous byte allows
 fn is_marker(tokenizer: &Tokenizer, byte: u8) -> bool {
     tokenizer.tokenize_state.markers.contains(&byte)
+        || (tokenizer.tokenize_state.math_text && byte == b'$')
         || (tokenizer.tokenize_state.literal_autolinks
             && can_start_literal(tokenizer.previous, byte))
 }

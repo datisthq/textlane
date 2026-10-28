@@ -1,5 +1,7 @@
 use crate::actions::attention::resolve::resolve_attention;
 use crate::actions::data::resolve::resolve_data;
+use crate::actions::def_list::resolve::resolve_def_list;
+use crate::actions::directive_container::resolve::resolve_directive_container;
 use crate::actions::gfm_strikethrough::resolve::resolve_gfm_strikethrough;
 use crate::actions::gfm_table::resolve::resolve_gfm_table;
 use crate::actions::heading_atx::resolve::resolve_heading_atx;
@@ -25,6 +27,14 @@ pub(crate) fn call_resolver(
         Resolver::Content => Some(resolve_content(tokenizer)),
         Resolver::Data => {
             resolve_data(tokenizer);
+            None
+        }
+        Resolver::DefList => {
+            resolve_def_list(tokenizer);
+            None
+        }
+        Resolver::DirectiveContainer => {
+            resolve_directive_container(tokenizer);
             None
         }
         Resolver::GfmTable => {
@@ -54,7 +64,8 @@ pub(crate) fn call_resolver(
         // micromark trims whitespace around line endings in text only, never in strings
         Resolver::String => None,
         Resolver::Text => {
-            resolve_whitespace(tokenizer, true, true);
+            let trim_whole = !tokenizer.tokenize_state.text_trailing;
+            resolve_whitespace(tokenizer, true, trim_whole);
             None
         }
     }

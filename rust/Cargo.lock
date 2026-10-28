@@ -734,6 +734,7 @@ dependencies = [
  "bumpalo",
  "regex",
  "serde",
+ "serde_json",
  "stacker",
  "textlane-core",
 ]

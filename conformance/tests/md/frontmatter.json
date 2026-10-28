@@ -320,7 +320,7 @@
     ]
   },
   {
-    "description": "micromark-extension-frontmatter invalid options",
+    "description": "micromark-extension-frontmatter invalid options [1]",
     "source": {
       "repository": "https://github.com/micromark/micromark-extension-frontmatter",
       "commit": "f05bf24461d31041f37f4562fd48877af4dcc67b",
@@ -338,7 +338,19 @@
             "message": "Expected matter to be an object, not `1`"
           }
         }
-      },
+      }
+    ]
+  },
+  {
+    "description": "micromark-extension-frontmatter invalid options \"jsonml\"",
+    "source": {
+      "repository": "https://github.com/micromark/micromark-extension-frontmatter",
+      "commit": "f05bf24461d31041f37f4562fd48877af4dcc67b",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.frontmatter", "jsonml"]],
+    "tests": [
       {
         "description": "should throw if given an unknown preset",
         "input": "",
@@ -348,7 +360,27 @@
             "message": "Missing matter definition for `jsonml`"
           }
         }
-      },
+      }
+    ]
+  },
+  {
+    "description": "micromark-extension-frontmatter invalid options {\"marker\":\"*\"}",
+    "source": {
+      "repository": "https://github.com/micromark/micromark-extension-frontmatter",
+      "commit": "f05bf24461d31041f37f4562fd48877af4dcc67b",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        {
+          "marker": "*"
+        }
+      ]
+    ],
+    "tests": [
       {
         "description": "should throw if given a matter without `type`",
         "input": "",
@@ -358,7 +390,27 @@
             "message": "Missing `type` in matter `{\"marker\":\"*\"}`"
           }
         }
-      },
+      }
+    ]
+  },
+  {
+    "description": "micromark-extension-frontmatter invalid options {\"type\":\"jsonml\"}",
+    "source": {
+      "repository": "https://github.com/micromark/micromark-extension-frontmatter",
+      "commit": "f05bf24461d31041f37f4562fd48877af4dcc67b",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        {
+          "type": "jsonml"
+        }
+      ]
+    ],
+    "tests": [
       {
         "description": "should throw if given a matter without `marker`",
         "input": "",
@@ -578,7 +630,7 @@
     ]
   },
   {
-    "description": "remark-frontmatter invalid options",
+    "description": "remark-frontmatter invalid options [\"jsonml\"]",
     "source": {
       "repository": "https://github.com/remarkjs/remark-frontmatter",
       "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
@@ -596,7 +648,29 @@
             "message": "Missing matter definition for `jsonml`"
           }
         }
-      },
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter invalid options [{\"marker\":\"*\"}]",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        [
+          {
+            "marker": "*"
+          }
+        ]
+      ]
+    ],
+    "tests": [
       {
         "description": "should throw if given a matter without `type`",
         "input": "",
@@ -606,7 +680,29 @@
             "message": "Missing `type` in matter `{\"marker\":\"*\"}`"
           }
         }
-      },
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter invalid options [{\"type\":\"jsonml\"}]",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        [
+          {
+            "type": "jsonml"
+          }
+        ]
+      ]
+    ],
+    "tests": [
       {
         "description": "should throw if given a matter without `marker`",
         "input": "",

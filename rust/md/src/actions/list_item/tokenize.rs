@@ -1,6 +1,7 @@
 use crate::actions::blank_line::tokenize::tokenize_blank_line;
 use crate::actions::space_or_tab::tokenize::tokenize_space_or_tab;
 use crate::actions::thematic_break::tokenize::tokenize_thematic_break;
+use crate::helpers::indent::read_def_list_indent;
 use crate::models::construct::{Resolver, State};
 use crate::models::token::Name;
 use crate::utils::tokenizer::driver::Tokenizer;
@@ -132,6 +133,7 @@ fn after(tokenizer: &mut Tokenizer) -> State {
     if blank {
         prefix += 1;
     }
+    prefix += read_def_list_indent(tokenizer, start);
     let continued = tokenizer.tokenize_state.document_continued;
     if let Some(container) = tokenizer
         .tokenize_state

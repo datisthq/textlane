@@ -1,5 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
+use crate::models::directive::{DIRECTIVE_CONTAINER, DIRECTIVE_CONTAINER_CONTENT};
 use crate::models::event::{Event, Kind};
 use crate::models::token::Name;
 
@@ -44,7 +45,12 @@ pub(crate) fn find_loose(events: &[Event]) -> HashSet<usize> {
         if event.name != Name::BLANK_LINE_ENDING {
             continue;
         }
-        let Some(&parent) = open.last() else {
+        // A container directive is not a container to lists, so its blank lines are their
+        // items' own
+        let Some(&parent) = open.iter().rev().find(|enter| {
+            let name = events[**enter].name;
+            name != DIRECTIVE_CONTAINER && name != DIRECTIVE_CONTAINER_CONTENT
+        }) else {
             continue;
         };
         let parent_name = events[parent].name;

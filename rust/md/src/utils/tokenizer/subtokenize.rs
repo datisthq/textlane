@@ -3,6 +3,7 @@ use crate::models::construct::State;
 use crate::models::event::{ContentType, Event, Kind};
 use crate::models::token::Name;
 use crate::utils::tokenizer::content::tokenize_content_definition_before;
+use crate::utils::tokenizer::document::tokenize_document;
 use crate::utils::tokenizer::driver::Tokenizer;
 use crate::utils::tokenizer::edit_map::EditMap;
 use crate::utils::tokenizer::preprocess::ParseState;
@@ -53,8 +54,11 @@ pub(crate) fn subtokenize(
             let mut state = State::Next(match link.content {
                 ContentType::Content => tokenize_content_definition_before,
                 ContentType::String => tokenize_string,
+                ContentType::Document => tokenize_document,
                 _ => tokenize_text,
             });
+            tokenizer.tokenize_state.text_trailing =
+                link.content == ContentType::TextTrailing;
             tokenizer.tokenize_state.task_list_check_allowed =
                 parse_state.gfm.is_some() && starts_list_item(events, index);
             let mut link_index = Some(index);

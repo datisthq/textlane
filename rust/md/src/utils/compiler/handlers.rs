@@ -1,20 +1,25 @@
 use crate::actions::blockquote::compile::compile_blockquote;
 use crate::actions::character_reference::compile::compile_character_reference;
 use crate::actions::code::compile::compile_code;
+use crate::actions::def_list::compile::compile_def_list;
 use crate::actions::definition::compile::compile_definition;
 use crate::actions::delete::compile::compile_delete;
+use crate::actions::directive::compile::compile_directive;
 use crate::actions::emphasis::compile::compile_emphasis;
 use crate::actions::footnote_definition::compile::compile_footnote_definition;
 use crate::actions::footnote_reference::compile::compile_footnote_reference;
+use crate::actions::frontmatter::compile::compile_frontmatter;
 use crate::actions::gfm_autolink_literal::compile::compile_gfm_autolink_literal;
 use crate::actions::gfm_task_list_item_check::compile::compile_gfm_task_list_item_check;
 use crate::actions::hard_break::compile::compile_hard_break;
 use crate::actions::heading::compile::compile_heading;
 use crate::actions::html::compile::compile_html;
 use crate::actions::inline_code::compile::compile_inline_code;
+use crate::actions::inline_math::compile::compile_inline_math;
 use crate::actions::link::compile::compile_link;
 use crate::actions::list::compile::compile_list;
 use crate::actions::list_item::compile::compile_list_item;
+use crate::actions::math::compile::compile_math;
 use crate::actions::paragraph::compile::compile_paragraph;
 use crate::actions::strong::compile::compile_strong;
 use crate::actions::table::compile::compile_table;
@@ -78,6 +83,8 @@ pub(crate) fn compile_event(compiler: &mut Compiler) {
             compile_footnote_reference(compiler, name, kind)
         }
         Name::HTML_FLOW | Name::HTML_TEXT => compile_html(compiler, kind),
+        Name::FRONTMATTER => compile_frontmatter(compiler, name, kind),
+        Name::FRONTMATTER_VALUE => compile_text(compiler, name, kind),
         Name::HTML_FLOW_DATA | Name::HTML_TEXT_DATA => compile_text(compiler, name, kind),
         Name::EMPHASIS => compile_emphasis(compiler, kind),
         Name::HARD_BREAK_ESCAPE | Name::HARD_BREAK_TRAILING => {
@@ -91,6 +98,9 @@ pub(crate) fn compile_event(compiler: &mut Compiler) {
             compile_heading(compiler, name, kind)
         }
         Name::PARAGRAPH => compile_paragraph(compiler, kind),
+        Name::DEF_LIST | Name::DEF_LIST_TERM | Name::DEF_LIST_DESCRIPTION => {
+            compile_def_list(compiler, name, kind);
+        }
         Name::STRONG => compile_strong(compiler, kind),
         Name::THEMATIC_BREAK => compile_thematic_break(compiler, kind),
         Name::GFM_TABLE | Name::GFM_TABLE_ROW | Name::GFM_TABLE_CELL => {
@@ -103,9 +113,17 @@ pub(crate) fn compile_event(compiler: &mut Compiler) {
             compile_gfm_autolink_literal(compiler, name, kind)
         }
         Name::STRIKETHROUGH => compile_delete(compiler, kind),
+        Name::MATH_FLOW | Name::MATH_FLOW_FENCE | Name::MATH_FLOW_FENCE_META => {
+            compile_math(compiler, name, kind)
+        }
+        Name::MATH_FLOW_VALUE | Name::MATH_TEXT_DATA => {
+            compile_text(compiler, name, kind)
+        }
+        Name::MATH_TEXT => compile_inline_math(compiler, kind),
         Name::TASK_LIST_CHECK_VALUE_CHECKED | Name::TASK_LIST_CHECK_VALUE_UNCHECKED => {
             compile_gfm_task_list_item_check(compiler, name, kind)
         }
+        _ if name.0.starts_with("directive") => compile_directive(compiler, name, kind),
         _ => {}
     }
 }

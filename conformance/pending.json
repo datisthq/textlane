@@ -1,11 +1,8 @@
 {
-  "md/definition-list": "the md constructs and plugins this needs are not implemented yet",
-  "md/directive": "the md constructs and plugins this needs are not implemented yet",
   "md/document#mdast-util-to-hast core": "the md constructs and plugins this needs are not implemented yet",
   "md/document#mdast-util-to-hast core {\"passThrough\":[\"alpha\",\"bravo\"]}": "the md constructs and plugins this needs are not implemented yet",
   "md/document#mdast-util-to-hast root": "the md constructs and plugins this needs are not implemented yet",
-  "md/frontmatter": "the md constructs and plugins this needs are not implemented yet",
-  "md/math": "the md constructs and plugins this needs are not implemented yet",
+  "md/frontmatter#mdast-util-frontmatter stringify {\"type\":\"custom\",\"marker\":{\"open\":\"<\",\"close\":\">\"}}": "upstream expects the blank line in a root's text unencoded; the pinned mdast-util-to-markdown 2.2.0 and textlane write it as `&#xA;&#xA;`",
   "md/mdx": "the md constructs and plugins this needs are not implemented yet",
   "md/text#mdast-util-to-hast text": "the md constructs and plugins this needs are not implemented yet",
   "md/to-prose": "the md constructs and plugins this needs are not implemented yet",
