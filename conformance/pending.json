@@ -1,4 +1,11 @@
 {
   "md/*": "md.parse, md.toHtml and html.stringify are not implemented yet",
-  "html/*": "html.stringify, html.parse and the other html plugins are not implemented yet"
+  "html/*": "html.stringify, html.parse and the other html plugins are not implemented yet",
+  "core/use": "the processor and its test plugins are not implemented yet",
+  "core/freeze": "the processor and its test plugins are not implemented yet",
+  "core/data": "the processor and its test plugins are not implemented yet",
+  "core/parse": "the processor and its test plugins are not implemented yet",
+  "core/stringify": "the processor and its test plugins are not implemented yet",
+  "core/run": "the processor and its test plugins are not implemented yet",
+  "core/process": "the processor and its test plugins are not implemented yet"
 }

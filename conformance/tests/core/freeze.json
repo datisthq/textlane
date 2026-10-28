@@ -1,0 +1,152 @@
+[
+  {
+    "description": "freeze: frozen processors",
+    "source": {
+      "repository": "https://github.com/unifiedjs/unified",
+      "commit": "dfaf172e8be10a021e375ab05acf595f65f5acf0",
+      "path": "test/freeze.js",
+      "license": "MIT"
+    },
+    "pipeline": [],
+    "tests": [
+      {
+        "description": "use after freeze",
+        "comment": "unified test: should throw when calling `use` on a frozen processor",
+        "operations": [["freeze"], ["use", "test.noop"]],
+        "expected": {
+          "error": {
+            "code": "frozen-processor",
+            "message": "Cannot call `use` on a frozen processor.\nCreate a new processor first, by calling it: use `processor()` instead of `processor`."
+          }
+        }
+      },
+      {
+        "description": "setting data after freeze",
+        "comment": "unified test: should throw when setting data on a frozen processor",
+        "operations": [["freeze"], ["data", "alpha", 1]],
+        "expected": {
+          "error": {
+            "code": "frozen-processor",
+            "message": "Cannot call `data` on a frozen processor.\nCreate a new processor first, by calling it: use `processor()` instead of `processor`."
+          }
+        }
+      },
+      {
+        "description": "getting data after freeze",
+        "comment": "unified test: should support getting data on a frozen processor",
+        "operations": [
+          [
+            "use",
+            "test.setData",
+            {
+              "key": "alpha",
+              "value": 1
+            }
+          ],
+          ["freeze"],
+          ["data"]
+        ],
+        "expected": {
+          "data": {
+            "alpha": 1
+          }
+        }
+      },
+      {
+        "description": "parse freezes the processor",
+        "comment": "unified test: should freeze when parsing",
+        "operations": [
+          ["use", "test.parseText"],
+          ["parse", "a"],
+          ["use", "test.noop"]
+        ],
+        "expected": {
+          "error": {
+            "code": "frozen-processor",
+            "message": "Cannot call `use` on a frozen processor.\nCreate a new processor first, by calling it: use `processor()` instead of `processor`."
+          }
+        }
+      },
+      {
+        "description": "process freezes the processor",
+        "comment": "unified test: should freeze when processing",
+        "operations": [
+          ["use", "test.parseText"],
+          ["use", "test.compileValue"],
+          [
+            "process",
+            "a",
+            {
+              "api": "sync"
+            }
+          ],
+          ["use", "test.noop"]
+        ],
+        "expected": {
+          "error": {
+            "code": "frozen-processor",
+            "message": "Cannot call `use` on a frozen processor.\nCreate a new processor first, by calling it: use `processor()` instead of `processor`."
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "freeze: attaching",
+    "source": {
+      "repository": "https://github.com/unifiedjs/unified",
+      "commit": "dfaf172e8be10a021e375ab05acf595f65f5acf0",
+      "path": "test/freeze.js",
+      "license": "MIT"
+    },
+    "pipeline": [],
+    "tests": [
+      {
+        "description": "freezing twice attaches once",
+        "comment": "unified test: should attach plugins once",
+        "operations": [
+          [
+            "use",
+            "test.recordOptions",
+            {
+              "a": 1
+            }
+          ],
+          ["freeze"],
+          ["freeze"]
+        ],
+        "expected": {
+          "data": {
+            "recorded": [
+              {
+                "a": 1
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "plugins attach in the order they were used",
+        "comment": "unified test: should attach plugins in order",
+        "operations": [
+          [
+            "use",
+            "test.setData",
+            {
+              "key": "first",
+              "value": 1
+            }
+          ],
+          ["use", "test.recordOptions", "second"],
+          ["freeze"]
+        ],
+        "expected": {
+          "data": {
+            "first": 1,
+            "recorded": ["second"]
+          }
+        }
+      }
+    ]
+  }
+]

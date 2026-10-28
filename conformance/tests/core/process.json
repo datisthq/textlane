@@ -1,0 +1,417 @@
+[
+  {
+    "description": "process (sync)",
+    "source": {
+      "repository": "https://github.com/unifiedjs/unified",
+      "commit": "dfaf172e8be10a021e375ab05acf595f65f5acf0",
+      "path": "test/process.js",
+      "license": "MIT"
+    },
+    "pipeline": [],
+    "tests": [
+      {
+        "description": "no parser",
+        "comment": "unified test: should throw w/o `parser`",
+        "operations": [
+          ["use", "test.compileValue"],
+          [
+            "process",
+            "alpha",
+            {
+              "api": "sync"
+            }
+          ]
+        ],
+        "expected": {
+          "error": {
+            "code": "missing-parser",
+            "message": "Cannot `processSync` without `parser`"
+          }
+        }
+      },
+      {
+        "description": "no compiler",
+        "comment": "unified test: should throw w/o `compiler`",
+        "operations": [
+          ["use", "test.parseText"],
+          [
+            "process",
+            "alpha",
+            {
+              "api": "sync"
+            }
+          ]
+        ],
+        "expected": {
+          "error": {
+            "code": "missing-compiler",
+            "message": "Cannot `processSync` without `compiler`"
+          }
+        }
+      },
+      {
+        "description": "parse then compile",
+        "comment": "unified test: should support a parser and a compiler",
+        "operations": [
+          ["use", "test.parseText"],
+          ["use", "test.compileValue"],
+          [
+            "process",
+            "alpha",
+            {
+              "api": "sync"
+            }
+          ]
+        ],
+        "expected": {
+          "txt": "alpha"
+        }
+      },
+      {
+        "description": "a stage changes the output",
+        "comment": "unified test: should run transformers",
+        "operations": [
+          ["use", "test.parseText"],
+          [
+            "use",
+            "test.replaceTree",
+            {
+              "tree": {
+                "type": "text",
+                "value": "bravo"
+              }
+            }
+          ],
+          ["use", "test.compileValue"],
+          [
+            "process",
+            "alpha",
+            {
+              "api": "sync"
+            }
+          ]
+        ],
+        "expected": {
+          "txt": "bravo"
+        }
+      },
+      {
+        "description": "stages run in order",
+        "comment": "unified test: should run transformers in order",
+        "operations": [
+          ["use", "test.parseText"],
+          ["use", "test.trace:a"],
+          ["use", "test.trace:b"],
+          ["use", "test.compileValue"],
+          [
+            "process",
+            "alpha",
+            {
+              "api": "sync"
+            }
+          ]
+        ],
+        "expected": {
+          "trace": ["a", "b"]
+        }
+      },
+      {
+        "description": "a failing stage",
+        "comment": "unified test: should fail when a transformer fails",
+        "operations": [
+          ["use", "test.parseText"],
+          [
+            "use",
+            "test.fail",
+            {
+              "message": "alpha"
+            }
+          ],
+          ["use", "test.compileValue"],
+          [
+            "process",
+            "alpha",
+            {
+              "api": "sync"
+            }
+          ]
+        ],
+        "expected": {
+          "error": {
+            "code": "plugin-failed",
+            "message": "alpha"
+          }
+        }
+      },
+      {
+        "description": "messages reach the file",
+        "comment": "unified test: should support messages",
+        "operations": [
+          ["use", "test.parseText"],
+          [
+            "use",
+            "test.message",
+            {
+              "reason": "alpha",
+              "ruleId": "bravo",
+              "source": "charlie"
+            }
+          ],
+          ["use", "test.compileValue"],
+          [
+            "process",
+            "alpha",
+            {
+              "api": "sync"
+            }
+          ]
+        ],
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "bravo",
+              "source": "charlie",
+              "place": null
+            }
+          ]
+        }
+      },
+      {
+        "description": "an async stage under the sync API",
+        "comment": "unified test: should throw when `processSync` finishes async",
+        "operations": [
+          ["use", "test.parseText"],
+          [
+            "use",
+            "test.noop",
+            {
+              "mode": "async"
+            }
+          ],
+          ["use", "test.compileValue"],
+          [
+            "process",
+            "alpha",
+            {
+              "api": "sync"
+            }
+          ]
+        ],
+        "expected": {
+          "error": {
+            "code": "async-in-sync",
+            "message": "`processSync` finished async. Use `process` instead"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "process (async)",
+    "source": {
+      "repository": "https://github.com/unifiedjs/unified",
+      "commit": "dfaf172e8be10a021e375ab05acf595f65f5acf0",
+      "path": "test/process.js",
+      "license": "MIT"
+    },
+    "pipeline": [],
+    "tests": [
+      {
+        "description": "no parser",
+        "comment": "unified test: should throw w/o `parser`",
+        "operations": [
+          ["use", "test.compileValue"],
+          [
+            "process",
+            "alpha",
+            {
+              "api": "async"
+            }
+          ]
+        ],
+        "expected": {
+          "error": {
+            "code": "missing-parser",
+            "message": "Cannot `process` without `parser`"
+          }
+        }
+      },
+      {
+        "description": "no compiler",
+        "comment": "unified test: should throw w/o `compiler`",
+        "operations": [
+          ["use", "test.parseText"],
+          [
+            "process",
+            "alpha",
+            {
+              "api": "async"
+            }
+          ]
+        ],
+        "expected": {
+          "error": {
+            "code": "missing-compiler",
+            "message": "Cannot `process` without `compiler`"
+          }
+        }
+      },
+      {
+        "description": "parse then compile",
+        "comment": "unified test: should support a parser and a compiler",
+        "operations": [
+          ["use", "test.parseText"],
+          ["use", "test.compileValue"],
+          [
+            "process",
+            "alpha",
+            {
+              "api": "async"
+            }
+          ]
+        ],
+        "expected": {
+          "txt": "alpha"
+        }
+      },
+      {
+        "description": "a stage changes the output",
+        "comment": "unified test: should run transformers",
+        "operations": [
+          ["use", "test.parseText"],
+          [
+            "use",
+            "test.replaceTree",
+            {
+              "tree": {
+                "type": "text",
+                "value": "bravo"
+              }
+            }
+          ],
+          ["use", "test.compileValue"],
+          [
+            "process",
+            "alpha",
+            {
+              "api": "async"
+            }
+          ]
+        ],
+        "expected": {
+          "txt": "bravo"
+        }
+      },
+      {
+        "description": "stages run in order",
+        "comment": "unified test: should run transformers in order",
+        "operations": [
+          ["use", "test.parseText"],
+          ["use", "test.trace:a"],
+          ["use", "test.trace:b"],
+          ["use", "test.compileValue"],
+          [
+            "process",
+            "alpha",
+            {
+              "api": "async"
+            }
+          ]
+        ],
+        "expected": {
+          "trace": ["a", "b"]
+        }
+      },
+      {
+        "description": "a failing stage",
+        "comment": "unified test: should fail when a transformer fails",
+        "operations": [
+          ["use", "test.parseText"],
+          [
+            "use",
+            "test.fail",
+            {
+              "message": "alpha"
+            }
+          ],
+          ["use", "test.compileValue"],
+          [
+            "process",
+            "alpha",
+            {
+              "api": "async"
+            }
+          ]
+        ],
+        "expected": {
+          "error": {
+            "code": "plugin-failed",
+            "message": "alpha"
+          }
+        }
+      },
+      {
+        "description": "messages reach the file",
+        "comment": "unified test: should support messages",
+        "operations": [
+          ["use", "test.parseText"],
+          [
+            "use",
+            "test.message",
+            {
+              "reason": "alpha",
+              "ruleId": "bravo",
+              "source": "charlie"
+            }
+          ],
+          ["use", "test.compileValue"],
+          [
+            "process",
+            "alpha",
+            {
+              "api": "async"
+            }
+          ]
+        ],
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "bravo",
+              "source": "charlie",
+              "place": null
+            }
+          ]
+        }
+      },
+      {
+        "description": "an async stage under the async API",
+        "comment": "unified test: should support async transformers",
+        "operations": [
+          ["use", "test.parseText"],
+          [
+            "use",
+            "test.replaceTree",
+            {
+              "tree": {
+                "type": "text",
+                "value": "bravo"
+              },
+              "mode": "async"
+            }
+          ],
+          ["use", "test.compileValue"],
+          [
+            "process",
+            "alpha",
+            {
+              "api": "async"
+            }
+          ]
+        ],
+        "expected": {
+          "txt": "bravo"
+        }
+      }
+    ]
+  }
+]

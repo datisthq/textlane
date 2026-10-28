@@ -74,6 +74,15 @@ a test's `comment` only where it means something different.
 - `actions/node/scope.ts` resolves an identifier in its test's own function before the module, so
   one test's `const value` never leaks into another's case.
 
+## Core cases
+
+unified's tests call inline JavaScript plugins, so `sources/unified.ts` holds the core cases as
+data, each citing the unified test it ports, and computes every expectation by running its
+`operations` through the pinned unified with JavaScript versions of the test plugins. Never write
+an expected outcome by hand: add the case, rerun `pnpm -C conformance import:unified`, read what
+unified did. The crate's test plugins must behave as those JavaScript ones do; the stub answers
+`unsupported-operations` until the processor exists.
+
 ## Errors
 
 An invalid plugin option is `expected.error` with the code `invalid-options`, shared by every

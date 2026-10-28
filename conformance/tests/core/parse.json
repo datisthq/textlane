@@ -1,0 +1,77 @@
+[
+  {
+    "description": "parse",
+    "source": {
+      "repository": "https://github.com/unifiedjs/unified",
+      "commit": "dfaf172e8be10a021e375ab05acf595f65f5acf0",
+      "path": "test/parse.js",
+      "license": "MIT"
+    },
+    "pipeline": [],
+    "tests": [
+      {
+        "description": "no parser",
+        "comment": "unified test: should throw w/o `parser`",
+        "operations": [["parse", "alpha"]],
+        "expected": {
+          "error": {
+            "code": "missing-parser",
+            "message": "Cannot `parse` without `parser`"
+          }
+        }
+      },
+      {
+        "description": "a parser yields a tree",
+        "comment": "unified test: should support `parser`",
+        "operations": [
+          ["use", "test.parseText"],
+          ["parse", "alpha"]
+        ],
+        "expected": {
+          "tree": {
+            "type": "text",
+            "value": "alpha"
+          }
+        }
+      },
+      {
+        "description": "an empty document",
+        "comment": "unified test: should support `parser`",
+        "operations": [
+          ["use", "test.parseText"],
+          ["parse", ""]
+        ],
+        "expected": {
+          "tree": {
+            "type": "text",
+            "value": ""
+          }
+        }
+      },
+      {
+        "description": "parse runs no transformer",
+        "comment": "unified test: should not run transformers",
+        "operations": [
+          ["use", "test.parseText"],
+          [
+            "use",
+            "test.replaceTree",
+            {
+              "tree": {
+                "type": "root",
+                "children": []
+              }
+            }
+          ],
+          ["parse", "alpha"]
+        ],
+        "expected": {
+          "tree": {
+            "type": "text",
+            "value": "alpha"
+          }
+        }
+      }
+    ]
+  }
+]

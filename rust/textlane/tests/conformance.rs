@@ -70,7 +70,7 @@ fn run_group(group: &Value, group_id: &str, entry: Option<&String>, report: &mut
     }
     for test in group["tests"].as_array().into_iter().flatten() {
         let mut case = json!({ "pipeline": group["pipeline"] });
-        for key in ["input", "tree"] {
+        for key in ["input", "tree", "operations"] {
             if let Some(value) = test.get(key) {
                 case[key] = value.clone();
             }
@@ -106,17 +106,22 @@ fn strip_positions(value: &mut Value) {
     }
 }
 
-// An expected error matches on its code, and on its message only as a substring
+// A run may report several outcomes; the one `expected` names is compared, and an unexpected
+// error always fails. An expected error matches on its code, its message only as a substring
 fn matches_expected(actual: &Value, expected: &Value) -> bool {
-    match (expected.get("error"), actual.get("error")) {
-        (Some(want), Some(got)) => {
+    let Some((key, want)) = expected.as_object().and_then(|map| map.iter().next()) else {
+        return false;
+    };
+    match (key.as_str(), actual.get("error")) {
+        ("error", Some(got)) => {
             let message = got["message"].as_str().unwrap_or_default();
             want["code"] == got["code"]
                 && want["message"]
                     .as_str()
                     .is_none_or(|part| message.contains(part))
         }
-        _ => actual == expected,
+        (_, Some(_)) | ("error", None) => false,
+        _ => actual.get(key) == Some(want),
     }
 }
 

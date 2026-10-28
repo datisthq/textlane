@@ -1,0 +1,101 @@
+[
+  {
+    "description": "stringify",
+    "source": {
+      "repository": "https://github.com/unifiedjs/unified",
+      "commit": "dfaf172e8be10a021e375ab05acf595f65f5acf0",
+      "path": "test/stringify.js",
+      "license": "MIT"
+    },
+    "pipeline": [],
+    "tests": [
+      {
+        "description": "no compiler",
+        "comment": "unified test: should throw w/o `compiler`",
+        "operations": [
+          [
+            "stringify",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            }
+          ]
+        ],
+        "expected": {
+          "error": {
+            "code": "missing-compiler",
+            "message": "Cannot `stringify` without `compiler`"
+          }
+        }
+      },
+      {
+        "description": "a compiler yields text",
+        "comment": "unified test: should support `compiler`",
+        "operations": [
+          ["use", "test.compileValue"],
+          [
+            "stringify",
+            {
+              "type": "text",
+              "value": "alpha"
+            }
+          ]
+        ],
+        "expected": {
+          "txt": "alpha"
+        }
+      },
+      {
+        "description": "a node without a value",
+        "comment": "unified test: should support `compiler`",
+        "operations": [
+          ["use", "test.compileValue"],
+          [
+            "stringify",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            }
+          ]
+        ],
+        "expected": {
+          "txt": ""
+        }
+      },
+      {
+        "description": "stringify runs no transformer",
+        "comment": "unified test: should not run transformers",
+        "operations": [
+          ["use", "test.compileValue"],
+          [
+            "use",
+            "test.fail",
+            {
+              "message": "never"
+            }
+          ],
+          [
+            "stringify",
+            {
+              "type": "text",
+              "value": "alpha"
+            }
+          ]
+        ],
+        "expected": {
+          "txt": "alpha"
+        }
+      }
+    ]
+  }
+]

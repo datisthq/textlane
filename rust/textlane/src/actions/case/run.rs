@@ -22,6 +22,12 @@ fn run_pipeline(case: &Value) -> Result<Value, Failure> {
                 "a case needs a `pipeline` array".to_string(),
             )
         })?;
+    if case.get("operations").is_some() {
+        return Err((
+            "unsupported-operations",
+            "the stub runs pipelines, not operations".into(),
+        ));
+    }
     let mut state = match (case.get("input"), case.get("tree")) {
         (Some(Value::String(text)), None) => State::Text(text.clone()),
         (None, Some(tree)) => State::Tree(tree.clone()),

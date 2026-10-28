@@ -15,13 +15,13 @@
 
 <htmlpress-grid cols="3">
   <htmlpress-card>
-    <h3>21 decided</h3>
+    <h3>23 decided</h3>
     <p>
       <htmlpress-badge type="success">decided</htmlpress-badge> settled by the maintainer
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>19 agent's calls</h3>
+    <h3>20 agent's calls</h3>
     <p>
       <htmlpress-badge type="warning">my call</htmlpress-badge> settled by the agent, open
       to change
@@ -304,6 +304,33 @@
     </p>
   </dd>
   <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Core lifecycle cases use an
+    <code>operations</code> format and test plugins; transformer modes reduce to
+    <code>sync</code> and <code>async</code>
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> JavaScript's callback, deferred and promise styles are calling
+      conventions; sync versus async is all a Rust or Python pipeline can observe, and the
+      sync API rejecting an async stage is the one async rule the corpus fixes.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Porting every unified transformer style; leaving
+      lifecycle to unit tests.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> vfile's path API and the
+    unist utilities stay out of the corpus
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> They are library functions, not pipeline behaviour; crate unit
+      tests cover them.
+    </p>
+    <p><strong>Rejected.</strong> Porting them as test-plugin cases.</p>
+  </dd>
+  <dt>
     <htmlpress-badge type="success">decided</htmlpress-badge> The corpus is filled before
     the implementation; <code>conformance/pending.json</code> marks what the crate does
     not pass yet
@@ -538,6 +565,19 @@
       own.
     </p>
     <p><strong>Rejected.</strong> Generated loops in the corpus.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Core cases are authored as
+    data with expectations computed by running them through the pinned unified;
+    <code>test.trace:&lt;label&gt;</code> names one plugin per label
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> unified's tests are inline JavaScript plugins no importer can
+      read; running real unified keeps every expectation upstream's. A plugin used twice
+      is one plugin reconfigured, so stage order needs distinct plugins.
+    </p>
+    <p><strong>Rejected.</strong> Hand-writing expected outcomes.</p>
   </dd>
   <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge> Each runner skips only

@@ -181,18 +181,16 @@ the reference unified pipeline (`remark-parse` → `remark-rehype` → `rehype-s
 
 ### Test plugins (core only)
 
-The unified core tests are about lifecycle. They become data once the suite defines built-in
-test plugins, written once in Rust in `textlane` behind its `testing` feature (my call): every
-runner reaches the same code, the Node and Python runners through an addon built with
-`--features node,testing` (`TEXTLANE_ADDON`) or `python,testing`, and nothing ships them. The
-host-plugin bridge is tested separately, by host-language cases added with the bridge:
-`test.parseText`, `test.compileValue`, `test.recordOptions`, `test.replaceTree`,
-`test.fail`, `test.noop`, `test.appendNode`, `test.message`, `test.setData`, `test.trace`,
-each with a `mode` (sync, `next`, deferred, async, promise) where it applies. Core cases add an
-`operations` list (`use`, `freeze`, `data`, `parse`, `run`, `process`, with `api: sync |
-async`) in place of a single pipeline. The processor's async model (runtime, awaiting a JS
-promise through napi, asyncio) is the processor phase's design; until then a runner skips the
-modes it cannot express (my call).
+Decided: core lifecycle cases carry `operations` (`use`, `freeze`, `data`, `parse`, `run`,
+`stringify`, `process`, the last three with `api: sync | async`) on a processor holding the
+group's pipeline, and `expected` names the last step's outcome (`data`, `trace`, `messages`,
+`tree`, `txt` or `error`). Transformer modes reduce to `sync` and `async`: unified's callback,
+deferred and promise styles are JavaScript calling conventions, and the sync API rejecting an
+async stage (`async-in-sync`) is the one async rule the corpus fixes. The test plugins, behind
+the crate's `testing` feature: `test.parseText`, `test.compileValue`, `test.recordOptions`,
+`test.setData`, `test.replaceTree`, `test.appendNode`, `test.fail`, `test.message`, `test.noop`
+and `test.trace:<label>`. vfile's path API and the unist utilities are crate unit tests, not
+corpus cases.
 
 ### Runners
 

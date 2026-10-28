@@ -18,9 +18,11 @@
     "import:to-hast": "node sources/to-hast.ts && vp fmt tests",
     "import:to-html": "node sources/to-html.ts && vp fmt tests",
     "import:to-markdown": "node sources/to-markdown.ts && vp fmt tests",
+    "import:unified": "node sources/unified.ts && vp fmt tests",
     "import:wpt": "node sources/wpt.ts && vp fmt tests"
   },
   "devDependencies": {
+    "@types/unist": "3.0.3",
     "acorn": "8.19.0",
     "acorn-walk": "8.3.5",
     "commonmark.json": "0.31.0",
@@ -48,6 +50,7 @@
     "remark-stringify": "11.0.0",
     "unified": "11.0.5",
     "unist-builder": "4.0.0",
+    "vfile": "6.0.3",
     "vite-plus": "catalog:"
   }
 }

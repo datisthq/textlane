@@ -24,7 +24,13 @@ const LIBRARY_NAMES: Record<string, string> = {
 }
 
 type Expected = { error?: { code: string; message?: string } } & Record<string, unknown>
-type Test = { description: string; input?: string; tree?: object; expected: Expected }
+type Test = {
+  description: string
+  input?: string
+  tree?: object
+  operations?: unknown[]
+  expected: Expected
+}
 type Group = {
   description: string
   pipeline: unknown[]
@@ -84,6 +90,7 @@ describe("conformance", () => {
                   pipeline: group.pipeline,
                   input: test.input,
                   tree: test.tree,
+                  operations: test.operations,
                 }),
               ),
             )
@@ -120,9 +127,14 @@ function matchesEntry(entry: string, fileId: string, groupId: string) {
   return entry === fileId || entry === groupId
 }
 
-// An expected error matches on its code, and on its message only as a substring
+// A run may report several outcomes; the one `expected` names is compared, and an unexpected
+// error always fails. An expected error matches on its code, its message only as a substring
 function expectOutcome(actual: Expected, expected: Expected) {
-  if (!expected.error) return expect(actual).toEqual(expected)
+  if (!expected.error) {
+    expect(actual.error).toBeUndefined()
+    for (const key of Object.keys(expected)) expect(actual[key]).toEqual(expected[key])
+    return
+  }
   expect(actual.error?.code).toBe(expected.error.code)
   if (expected.error.message)
     expect(actual.error?.message).toContain(expected.error.message)

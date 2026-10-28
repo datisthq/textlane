@@ -1,0 +1,97 @@
+[
+  {
+    "description": "data",
+    "source": {
+      "repository": "https://github.com/unifiedjs/unified",
+      "commit": "dfaf172e8be10a021e375ab05acf595f65f5acf0",
+      "path": "test/data.js",
+      "license": "MIT"
+    },
+    "pipeline": [],
+    "tests": [
+      {
+        "description": "set then read data",
+        "comment": "unified test: should set data",
+        "operations": [["data", "alpha", "bravo"], ["data"]],
+        "expected": {
+          "data": {
+            "alpha": "bravo"
+          }
+        }
+      },
+      {
+        "description": "set a nested value",
+        "comment": "unified test: should set data",
+        "operations": [
+          [
+            "data",
+            "alpha",
+            {
+              "bravo": [1, 2]
+            }
+          ],
+          ["data"]
+        ],
+        "expected": {
+          "data": {
+            "alpha": {
+              "bravo": [1, 2]
+            }
+          }
+        }
+      },
+      {
+        "description": "a later set overwrites",
+        "comment": "unified test: should overwrite data",
+        "operations": [["data", "alpha", 1], ["data", "alpha", 2], ["data"]],
+        "expected": {
+          "data": {
+            "alpha": 2
+          }
+        }
+      },
+      {
+        "description": "settings live in data",
+        "comment": "unified test: should support settings",
+        "operations": [
+          [
+            "data",
+            "settings",
+            {
+              "alpha": true
+            }
+          ],
+          ["data"]
+        ],
+        "expected": {
+          "data": {
+            "settings": {
+              "alpha": true
+            }
+          }
+        }
+      },
+      {
+        "description": "a plugin sets data when it attaches",
+        "comment": "unified test: should support data from plugins",
+        "operations": [
+          [
+            "use",
+            "test.setData",
+            {
+              "key": "alpha",
+              "value": true
+            }
+          ],
+          ["freeze"],
+          ["data"]
+        ],
+        "expected": {
+          "data": {
+            "alpha": true
+          }
+        }
+      }
+    ]
+  }
+]

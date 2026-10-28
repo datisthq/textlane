@@ -110,6 +110,9 @@
         },
         {
           "required": ["tree"]
+        },
+        {
+          "required": ["operations"]
         }
       ],
       "properties": {
@@ -134,6 +137,20 @@
         },
         "expected": {
           "$ref": "#/$defs/expected"
+        },
+        "operations": {
+          "description": "Lifecycle steps run in order on a processor holding the group's pipeline; expected describes the last step's outcome",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "prefixItems": [
+              {
+                "enum": ["use", "freeze", "data", "parse", "run", "stringify", "process"]
+              }
+            ]
+          }
         }
       }
     },
@@ -197,6 +214,17 @@
                 "type": ["object", "null"]
               }
             }
+          }
+        },
+        "data": {
+          "description": "The processor's data after the last operation",
+          "type": "object"
+        },
+        "trace": {
+          "description": "Labels test.trace stages appended to the file, in the order they ran",
+          "type": "array",
+          "items": {
+            "type": "string"
           }
         }
       }

@@ -43,9 +43,19 @@ A file is an array of groups. A group fixes the pipeline; its tests vary only th
   says `positions: false`); `messages` compare on `ruleId`, `source` and `place`; an `error`
   matches on its `code` and on `message` only as a substring.
 - `status: "deviation"` marks a deliberate difference from upstream, explained in `comment`.
+- Core lifecycle cases carry `operations` instead of an input: steps run in order on a processor
+  holding the group's pipeline (`["use", plugin, options?]`, `["freeze"]`, `["data", key?, value?]`,
+  `["parse", text]`, `["run", tree, {api}]`, `["stringify", tree]`, `["process", text, {api}]`,
+  `api` being `sync` or `async`). `expected` names the outcome of the last step: `data` (the
+  processor's data), `trace`, `messages`, `tree`, `txt` or `error`. A run may report several; the
+  named one is compared, and an unexpected error always fails.
 
-`test.*` plugins exist only in builds with the crate's `testing` feature; they let a suite
-case exercise the pipeline itself.
+`test.*` plugins exist only in builds with the crate's `testing` feature; they let a suite case
+exercise the pipeline itself: `test.parseText` and `test.compileValue` (text to a text node and
+back), `test.recordOptions` (records its options in `data.recorded`), `test.setData`,
+`test.replaceTree`, `test.appendNode`, `test.fail`, `test.message`, `test.noop`, and
+`test.trace:<label>` (appends its label to the trace; one plugin per label, since a plugin used
+twice is one plugin reconfigured). Transformers take `mode: "sync" | "async"`.
 
 ## Runners
 
@@ -89,6 +99,7 @@ release; importers are run deliberately and their output committed, never run in
 | `rehype`          | rehype's fixtures and parse errors, hast-util-from-html                         | 153 `html.parse` tree and output cases and 59 parse-error cases (`expected.messages`)                                                                                   |
 | `html-transforms` | hast-util-raw, hast-util-sanitize, rehype-sanitize, rehype-slug, github-slugger | 222 `html.raw`, `html.sanitize` (each URL vector a literal case) and `html.slug` cases                                                                                  |
 | `wpt`             | web-platform-tests tree construction, sparse checkout                           | 1,738 `html.parse` cases, trees without positions (`positions: false`); fragment and scripting-off cases skipped                                                        |
+| `unified`         | unified's test files, as operations                                             | 82 core lifecycle cases authored as data, each citing the unified test it ports; expectations from running them through the pinned unified with JavaScript test plugins |
 
 A file holds one construct (`md/heading-atx`), named as micromark names its test files, with a
 group per source: the spec section, then each upstream test file. An importer replaces only its

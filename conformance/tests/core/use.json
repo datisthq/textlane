@@ -1,0 +1,618 @@
+[
+  {
+    "description": "use: ignored values",
+    "source": {
+      "repository": "https://github.com/unifiedjs/unified",
+      "commit": "dfaf172e8be10a021e375ab05acf595f65f5acf0",
+      "path": "test/use.js",
+      "license": "MIT"
+    },
+    "pipeline": [],
+    "tests": [
+      {
+        "description": "null is ignored",
+        "comment": "unified test: should ignore missing values",
+        "operations": [["use", null], ["freeze"]],
+        "expected": {
+          "data": {}
+        }
+      },
+      {
+        "description": "an empty list is ignored",
+        "comment": "unified test: should ignore missing values",
+        "operations": [["use", []], ["freeze"]],
+        "expected": {
+          "data": {}
+        }
+      }
+    ]
+  },
+  {
+    "description": "use: invalid values",
+    "source": {
+      "repository": "https://github.com/unifiedjs/unified",
+      "commit": "dfaf172e8be10a021e375ab05acf595f65f5acf0",
+      "path": "test/use.js",
+      "license": "MIT"
+    },
+    "pipeline": [],
+    "tests": [
+      {
+        "description": "false",
+        "comment": "unified test: should throw when given invalid values (`false`)",
+        "operations": [["use", false]],
+        "expected": {
+          "error": {
+            "code": "invalid-plugin"
+          }
+        }
+      },
+      {
+        "description": "true",
+        "comment": "unified test: should throw when given invalid values (`true`)",
+        "operations": [["use", true]],
+        "expected": {
+          "error": {
+            "code": "invalid-plugin"
+          }
+        }
+      },
+      {
+        "description": "a number",
+        "comment": "unified test: should throw when given invalid values (`1`)",
+        "operations": [["use", 1]],
+        "expected": {
+          "error": {
+            "code": "invalid-plugin"
+          }
+        }
+      },
+      {
+        "description": "an empty preset",
+        "comment": "unified test: should throw when given an empty preset",
+        "operations": [["use", {}]],
+        "expected": {
+          "error": {
+            "code": "invalid-plugin"
+          }
+        }
+      },
+      {
+        "description": "an unknown plugin name",
+        "comment": "unified test: should throw when given invalid values",
+        "operations": [["use", "test.missing"]],
+        "expected": {
+          "error": {
+            "code": "unknown-plugin",
+            "message": "no plugin named `test.missing`"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "use: plugins",
+    "source": {
+      "repository": "https://github.com/unifiedjs/unified",
+      "commit": "dfaf172e8be10a021e375ab05acf595f65f5acf0",
+      "path": "test/use.js",
+      "license": "MIT"
+    },
+    "pipeline": [],
+    "tests": [
+      {
+        "description": "a plugin attaches with its options on freeze",
+        "comment": "unified test: should support a plugin",
+        "operations": [
+          [
+            "use",
+            "test.recordOptions",
+            {
+              "alpha": true
+            }
+          ],
+          ["freeze"]
+        ],
+        "expected": {
+          "data": {
+            "recorded": [
+              {
+                "alpha": true
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a plugin without options",
+        "comment": "unified test: should support a plugin w/o options",
+        "operations": [["use", "test.recordOptions"], ["freeze"]],
+        "expected": {
+          "data": {
+            "recorded": [null]
+          }
+        }
+      },
+      {
+        "description": "a list of plugins",
+        "comment": "unified test: should support a list of plugins",
+        "operations": [
+          [
+            "use",
+            [
+              [
+                "test.recordOptions",
+                {
+                  "a": 1
+                }
+              ],
+              [
+                "test.setData",
+                {
+                  "key": "b",
+                  "value": 2
+                }
+              ]
+            ]
+          ],
+          ["freeze"]
+        ],
+        "expected": {
+          "data": {
+            "recorded": [
+              {
+                "a": 1
+              }
+            ],
+            "b": 2
+          }
+        }
+      },
+      {
+        "description": "a list of plugins with options",
+        "comment": "unified test: should support a list of tuples",
+        "operations": [
+          [
+            "use",
+            [
+              [
+                "test.setData",
+                {
+                  "key": "b",
+                  "value": [1, 2]
+                }
+              ],
+              [
+                "test.setData",
+                {
+                  "key": "b",
+                  "value": [1, 2]
+                }
+              ]
+            ]
+          ],
+          ["freeze"]
+        ],
+        "expected": {
+          "data": {
+            "b": [1, 2]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "use: presets",
+    "source": {
+      "repository": "https://github.com/unifiedjs/unified",
+      "commit": "dfaf172e8be10a021e375ab05acf595f65f5acf0",
+      "path": "test/use.js",
+      "license": "MIT"
+    },
+    "pipeline": [],
+    "tests": [
+      {
+        "description": "a preset with plugins",
+        "comment": "unified test: should support presets with plugins",
+        "operations": [
+          [
+            "use",
+            {
+              "plugins": [
+                [
+                  "test.recordOptions",
+                  {
+                    "a": 1
+                  }
+                ]
+              ]
+            }
+          ],
+          ["freeze"]
+        ],
+        "expected": {
+          "data": {
+            "recorded": [
+              {
+                "a": 1
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a preset with settings",
+        "comment": "unified test: should support presets with settings",
+        "operations": [
+          [
+            "use",
+            {
+              "settings": {
+                "alpha": true
+              }
+            }
+          ],
+          ["freeze"]
+        ],
+        "expected": {
+          "data": {
+            "settings": {
+              "alpha": true
+            }
+          }
+        }
+      },
+      {
+        "description": "settings from two presets merge",
+        "comment": "unified test: should support presets with settings",
+        "operations": [
+          [
+            "use",
+            {
+              "settings": {
+                "alpha": true
+              }
+            }
+          ],
+          [
+            "use",
+            {
+              "settings": {
+                "bravo": 1
+              }
+            }
+          ],
+          ["freeze"]
+        ],
+        "expected": {
+          "data": {
+            "settings": {
+              "alpha": true,
+              "bravo": 1
+            }
+          }
+        }
+      },
+      {
+        "description": "a preset with plugins and settings",
+        "comment": "unified test: should support presets with plugins and settings",
+        "operations": [
+          [
+            "use",
+            {
+              "plugins": [
+                [
+                  "test.setData",
+                  {
+                    "key": "a",
+                    "value": 1
+                  }
+                ]
+              ],
+              "settings": {
+                "alpha": true
+              }
+            }
+          ],
+          ["freeze"]
+        ],
+        "expected": {
+          "data": {
+            "settings": {
+              "alpha": true
+            },
+            "a": 1
+          }
+        }
+      },
+      {
+        "description": "a preset inside a preset",
+        "comment": "unified test: should support nested presets",
+        "operations": [
+          [
+            "use",
+            {
+              "plugins": [
+                {
+                  "plugins": [
+                    [
+                      "test.recordOptions",
+                      {
+                        "nested": true
+                      }
+                    ]
+                  ]
+                }
+              ]
+            }
+          ],
+          ["freeze"]
+        ],
+        "expected": {
+          "data": {
+            "recorded": [
+              {
+                "nested": true
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "use: reconfigure",
+    "source": {
+      "repository": "https://github.com/unifiedjs/unified",
+      "commit": "dfaf172e8be10a021e375ab05acf595f65f5acf0",
+      "path": "test/use.js",
+      "license": "MIT"
+    },
+    "pipeline": [],
+    "tests": [
+      {
+        "description": "object options merge, the later winning",
+        "comment": "unified test: should reconfigure objects",
+        "operations": [
+          [
+            "use",
+            "test.recordOptions",
+            {
+              "a": 1,
+              "b": 2,
+              "c": 2
+            }
+          ],
+          [
+            "use",
+            "test.recordOptions",
+            {
+              "b": 2,
+              "c": 2
+            }
+          ],
+          ["freeze"]
+        ],
+        "expected": {
+          "data": {
+            "recorded": [
+              {
+                "a": 1,
+                "b": 2,
+                "c": 2
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a plugin used twice attaches once",
+        "comment": "unified test: should reconfigure objects",
+        "operations": [
+          [
+            "use",
+            "test.recordOptions",
+            {
+              "a": 2
+            }
+          ],
+          [
+            "use",
+            "test.recordOptions",
+            {
+              "a": 2
+            }
+          ],
+          ["freeze"]
+        ],
+        "expected": {
+          "data": {
+            "recorded": [
+              {
+                "a": 2
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a scalar replaces object options",
+        "comment": "unified test: should reconfigure to non-objects",
+        "operations": [
+          [
+            "use",
+            "test.recordOptions",
+            {
+              "a": 1
+            }
+          ],
+          ["use", "test.recordOptions", 1],
+          ["freeze"]
+        ],
+        "expected": {
+          "data": {
+            "recorded": [1]
+          }
+        }
+      },
+      {
+        "description": "object options replace a scalar",
+        "comment": "unified test: should reconfigure from non-objects",
+        "operations": [
+          ["use", "test.recordOptions", 1],
+          [
+            "use",
+            "test.recordOptions",
+            {
+              "a": 1
+            }
+          ],
+          ["freeze"]
+        ],
+        "expected": {
+          "data": {
+            "recorded": [
+              {
+                "a": 1
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "true re-enables a plugin, without options",
+        "comment": "unified test: should reconfigure to `true`",
+        "operations": [
+          [
+            "use",
+            "test.recordOptions",
+            {
+              "a": 1
+            }
+          ],
+          ["use", "test.recordOptions", true],
+          ["freeze"]
+        ],
+        "expected": {
+          "data": {
+            "recorded": [null]
+          }
+        }
+      },
+      {
+        "description": "false turns a plugin off",
+        "comment": "unified test: should reconfigure to `false`",
+        "operations": [
+          [
+            "use",
+            "test.recordOptions",
+            {
+              "a": 1
+            }
+          ],
+          ["use", "test.recordOptions", false],
+          ["freeze"]
+        ],
+        "expected": {
+          "data": {}
+        }
+      },
+      {
+        "description": "options turn a disabled plugin back on",
+        "comment": "unified test: should reconfigure from `false`",
+        "operations": [
+          ["use", "test.recordOptions", false],
+          [
+            "use",
+            "test.recordOptions",
+            {
+              "a": 1
+            }
+          ],
+          ["freeze"]
+        ],
+        "expected": {
+          "data": {
+            "recorded": [
+              {
+                "a": 1
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a preset reconfigures a plugin used before it",
+        "comment": "unified test: should reconfigure presets",
+        "operations": [
+          [
+            "use",
+            "test.recordOptions",
+            {
+              "a": 1,
+              "b": 2
+            }
+          ],
+          [
+            "use",
+            {
+              "plugins": [
+                [
+                  "test.recordOptions",
+                  {
+                    "b": 2
+                  }
+                ]
+              ]
+            }
+          ],
+          ["freeze"]
+        ],
+        "expected": {
+          "data": {
+            "recorded": [
+              {
+                "a": 1,
+                "b": 2
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a list reconfigures a plugin used before it",
+        "comment": "unified test: should reconfigure lists",
+        "operations": [
+          [
+            "use",
+            "test.recordOptions",
+            {
+              "a": 2
+            }
+          ],
+          [
+            "use",
+            [
+              [
+                "test.recordOptions",
+                {
+                  "a": 2
+                }
+              ]
+            ]
+          ],
+          ["freeze"]
+        ],
+        "expected": {
+          "data": {
+            "recorded": [
+              {
+                "a": 2
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+]

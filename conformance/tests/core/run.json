@@ -1,0 +1,768 @@
+[
+  {
+    "description": "run (sync)",
+    "source": {
+      "repository": "https://github.com/unifiedjs/unified",
+      "commit": "dfaf172e8be10a021e375ab05acf595f65f5acf0",
+      "path": "test/run.js",
+      "license": "MIT"
+    },
+    "pipeline": [],
+    "tests": [
+      {
+        "description": "no transformer keeps the tree",
+        "comment": "unified test: should pass through trees w/o transformers",
+        "operations": [
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "sync"
+            }
+          ]
+        ],
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "alpha"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a sync transformer replaces the tree",
+        "comment": "unified test: should support a sync transformer returning a tree",
+        "operations": [
+          [
+            "use",
+            "test.replaceTree",
+            {
+              "tree": {
+                "type": "root",
+                "children": []
+              }
+            }
+          ],
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "sync"
+            }
+          ]
+        ],
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "a sync transformer changes the tree",
+        "comment": "unified test: should support a sync transformer modifying the tree",
+        "operations": [
+          [
+            "use",
+            "test.appendNode",
+            {
+              "node": {
+                "type": "text",
+                "value": "bravo"
+              }
+            }
+          ],
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "sync"
+            }
+          ]
+        ],
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "alpha"
+              },
+              {
+                "type": "text",
+                "value": "bravo"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a sync transformer fails",
+        "comment": "unified test: should support a sync transformer throwing",
+        "operations": [
+          [
+            "use",
+            "test.fail",
+            {
+              "message": "alpha"
+            }
+          ],
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "sync"
+            }
+          ]
+        ],
+        "expected": {
+          "error": {
+            "code": "plugin-failed",
+            "message": "alpha"
+          }
+        }
+      },
+      {
+        "description": "stages run in the order they were used",
+        "comment": "unified test: should run transformers in order",
+        "operations": [
+          ["use", "test.trace:a"],
+          ["use", "test.trace:b"],
+          ["use", "test.trace:c"],
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "sync"
+            }
+          ]
+        ],
+        "expected": {
+          "trace": ["a", "b", "c"]
+        }
+      },
+      {
+        "description": "the same stage used twice runs once",
+        "comment": "unified test: should attach a plugin once",
+        "operations": [
+          ["use", "test.trace:a"],
+          ["use", "test.trace:a"],
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "sync"
+            }
+          ]
+        ],
+        "expected": {
+          "trace": ["a"]
+        }
+      },
+      {
+        "description": "a failure stops later stages",
+        "comment": "unified test: should stop at the first failing transformer",
+        "operations": [
+          [
+            "use",
+            "test.fail",
+            {
+              "message": "second"
+            }
+          ],
+          [
+            "use",
+            "test.fail",
+            {
+              "message": "second"
+            }
+          ],
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "sync"
+            }
+          ]
+        ],
+        "expected": {
+          "error": {
+            "code": "plugin-failed",
+            "message": "second"
+          }
+        }
+      },
+      {
+        "description": "a stage adds a message",
+        "comment": "unified test: should support messages",
+        "operations": [
+          [
+            "use",
+            "test.message",
+            {
+              "reason": "alpha",
+              "ruleId": "bravo",
+              "source": "charlie"
+            }
+          ],
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "sync"
+            }
+          ]
+        ],
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "bravo",
+              "source": "charlie",
+              "place": null
+            }
+          ]
+        }
+      },
+      {
+        "description": "an async stage under the sync API",
+        "comment": "unified test: should throw when `runSync` finishes async",
+        "operations": [
+          [
+            "use",
+            "test.noop",
+            {
+              "mode": "async"
+            }
+          ],
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "sync"
+            }
+          ]
+        ],
+        "expected": {
+          "error": {
+            "code": "async-in-sync",
+            "message": "`runSync` finished async. Use `run` instead"
+          }
+        }
+      },
+      {
+        "description": "an async replacement under the sync API",
+        "comment": "unified test: should throw when `runSync` finishes async",
+        "operations": [
+          [
+            "use",
+            "test.replaceTree",
+            {
+              "tree": {
+                "type": "root",
+                "children": []
+              },
+              "mode": "async"
+            }
+          ],
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "sync"
+            }
+          ]
+        ],
+        "expected": {
+          "error": {
+            "code": "async-in-sync",
+            "message": "`runSync` finished async. Use `run` instead"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "run (async)",
+    "source": {
+      "repository": "https://github.com/unifiedjs/unified",
+      "commit": "dfaf172e8be10a021e375ab05acf595f65f5acf0",
+      "path": "test/run.js",
+      "license": "MIT"
+    },
+    "pipeline": [],
+    "tests": [
+      {
+        "description": "no transformer keeps the tree",
+        "comment": "unified test: should pass through trees w/o transformers",
+        "operations": [
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "async"
+            }
+          ]
+        ],
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "alpha"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a sync transformer replaces the tree",
+        "comment": "unified test: should support a sync transformer returning a tree",
+        "operations": [
+          [
+            "use",
+            "test.replaceTree",
+            {
+              "tree": {
+                "type": "root",
+                "children": []
+              }
+            }
+          ],
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "async"
+            }
+          ]
+        ],
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "a sync transformer changes the tree",
+        "comment": "unified test: should support a sync transformer modifying the tree",
+        "operations": [
+          [
+            "use",
+            "test.appendNode",
+            {
+              "node": {
+                "type": "text",
+                "value": "bravo"
+              }
+            }
+          ],
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "async"
+            }
+          ]
+        ],
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "alpha"
+              },
+              {
+                "type": "text",
+                "value": "bravo"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a sync transformer fails",
+        "comment": "unified test: should support a sync transformer throwing",
+        "operations": [
+          [
+            "use",
+            "test.fail",
+            {
+              "message": "alpha"
+            }
+          ],
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "async"
+            }
+          ]
+        ],
+        "expected": {
+          "error": {
+            "code": "plugin-failed",
+            "message": "alpha"
+          }
+        }
+      },
+      {
+        "description": "stages run in the order they were used",
+        "comment": "unified test: should run transformers in order",
+        "operations": [
+          ["use", "test.trace:a"],
+          ["use", "test.trace:b"],
+          ["use", "test.trace:c"],
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "async"
+            }
+          ]
+        ],
+        "expected": {
+          "trace": ["a", "b", "c"]
+        }
+      },
+      {
+        "description": "the same stage used twice runs once",
+        "comment": "unified test: should attach a plugin once",
+        "operations": [
+          ["use", "test.trace:a"],
+          ["use", "test.trace:a"],
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "async"
+            }
+          ]
+        ],
+        "expected": {
+          "trace": ["a"]
+        }
+      },
+      {
+        "description": "a failure stops later stages",
+        "comment": "unified test: should stop at the first failing transformer",
+        "operations": [
+          [
+            "use",
+            "test.fail",
+            {
+              "message": "second"
+            }
+          ],
+          [
+            "use",
+            "test.fail",
+            {
+              "message": "second"
+            }
+          ],
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "async"
+            }
+          ]
+        ],
+        "expected": {
+          "error": {
+            "code": "plugin-failed",
+            "message": "second"
+          }
+        }
+      },
+      {
+        "description": "a stage adds a message",
+        "comment": "unified test: should support messages",
+        "operations": [
+          [
+            "use",
+            "test.message",
+            {
+              "reason": "alpha",
+              "ruleId": "bravo",
+              "source": "charlie"
+            }
+          ],
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "async"
+            }
+          ]
+        ],
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "bravo",
+              "source": "charlie",
+              "place": null
+            }
+          ]
+        }
+      },
+      {
+        "description": "an async transformer replaces the tree",
+        "comment": "unified test: should support an async transformer returning a tree",
+        "operations": [
+          [
+            "use",
+            "test.replaceTree",
+            {
+              "tree": {
+                "type": "root",
+                "children": []
+              },
+              "mode": "async"
+            }
+          ],
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "async"
+            }
+          ]
+        ],
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "an async transformer fails",
+        "comment": "unified test: should support an async transformer rejecting",
+        "operations": [
+          [
+            "use",
+            "test.fail",
+            {
+              "message": "alpha",
+              "mode": "async"
+            }
+          ],
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "async"
+            }
+          ]
+        ],
+        "expected": {
+          "error": {
+            "code": "plugin-failed",
+            "message": "alpha"
+          }
+        }
+      },
+      {
+        "description": "sync and async stages keep their order",
+        "comment": "unified test: should run sync and async transformers in order",
+        "operations": [
+          ["use", "test.trace:a"],
+          [
+            "use",
+            "test.trace:b",
+            {
+              "mode": "async"
+            }
+          ],
+          ["use", "test.trace:c"],
+          [
+            "run",
+            {
+              "type": "root",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            },
+            {
+              "api": "async"
+            }
+          ]
+        ],
+        "expected": {
+          "trace": ["a", "b", "c"]
+        }
+      }
+    ]
+  }
+]

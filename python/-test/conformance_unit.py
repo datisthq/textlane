@@ -39,7 +39,7 @@ def collect_cases():
 @pytest.mark.parametrize("group,test,entry", list(collect_cases()))
 def test_conformance(group, test, entry):
     case = {"pipeline": group["pipeline"]}
-    for key in ("input", "tree"):
+    for key in ("input", "tree", "operations"):
         if key in test:
             case[key] = test[key]
     actual = json.loads(textlane.run_case(json.dumps(case)))
@@ -69,10 +69,13 @@ def test_pending_lists_only_failing_cases():
 
 
 def assert_outcome(actual, expected):
-    # An expected error matches on its code, and on its message only as a substring
+    # A run may report several outcomes; the one `expected` names is compared, and an unexpected
+    # error always fails. An expected error matches on its code, its message only as a substring
     if "error" in expected:
         error = actual.get("error", {})
         assert error.get("code") == expected["error"]["code"]
         assert expected["error"].get("message", "") in error.get("message", "")
     else:
-        assert actual == expected
+        assert "error" not in actual
+        for key, value in expected.items():
+            assert actual.get(key) == value

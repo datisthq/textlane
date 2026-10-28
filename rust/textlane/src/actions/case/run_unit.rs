@@ -39,3 +39,9 @@ fn run_case_rejects_a_case_without_input() {
     let case = json!({ "pipeline": [] });
     assert_eq!(run_case(&case)["error"]["code"], "invalid-case");
 }
+
+#[test]
+fn run_case_reports_operations_as_unsupported() {
+    let case = json!({ "pipeline": [], "operations": [["freeze"]] });
+    assert_eq!(run_case(&case)["error"]["code"], "unsupported-operations");
+}
