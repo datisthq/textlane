@@ -15,13 +15,13 @@
 
 <htmlpress-grid cols="3">
   <htmlpress-card>
-    <h3>23 decided</h3>
+    <h3>24 decided</h3>
     <p>
       <htmlpress-badge type="success">decided</htmlpress-badge> settled by the maintainer
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>23 agent's calls</h3>
+    <h3>25 agent's calls</h3>
     <p>
       <htmlpress-badge type="warning">my call</htmlpress-badge> settled by the agent, open
       to change
@@ -331,6 +331,22 @@
     <p><strong>Rejected.</strong> Porting them as test-plugin cases.</p>
   </dd>
   <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge>
+    <code>html.highlight</code> is native, on giallo (as in htmlpress), judged against
+    Shiki
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> giallo highlights with Shiki's own TextMate grammars and
+      themes on Oniguruma, producing VS Code's output; the corpus's expected HTML is
+      @shikijs/rehype's.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Keeping Shiki through the bridge; syntect or tree-sitter,
+      whose tokens differ.
+    </p>
+  </dd>
+  <dt>
     <htmlpress-badge type="success">decided</htmlpress-badge> The corpus is filled before
     the implementation; <code>conformance/pending.json</code> marks what the crate does
     not pass yet
@@ -623,6 +639,35 @@
     </p>
   </dd>
   <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> The highlight corpus is
+    every grammar sample giallo tests (first 30 lines) under livemark's default themes, a
+    four-pair theme matrix and the language fallbacks; Twoslash stays JavaScript through
+    the bridge
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Full grammar coverage at about 2 MB; Twoslash runs the
+      TypeScript compiler.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Whole samples (about 12 MB); a livemark-only language
+      list.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> The host-plugin bridge
+    batches contiguous JavaScript plugins into one crossing each way and moves trees as
+    JSON; a benchmark of livemark's real pages (unified, textlane, textlane without JS
+    plugins) comes with it
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Crossings cost tree size, not plugin count; V8's JSON.parse
+      beats building objects through napi; port plugins only where the profile says so.
+    </p>
+    <p><strong>Rejected.</strong> A crossing per plugin; deciding ports by guess.</p>
+  </dd>
+  <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge> Each runner skips only
     through a <code>KNOWN_DIVERGENCES</code> map of group to open issue, as fairspec's do
   </dt>
@@ -663,11 +708,14 @@
     </p>
   </dd>
   <dt>
-    <htmlpress-badge type="danger">open</htmlpress-badge> Code highlighting: Shiki through
-    the bridge, or a Rust TextMate engine such as syntaxmate or syntect
+    <htmlpress-badge type="danger">open</htmlpress-badge> giallo depends on a fork of
+    rust-onig, not on crates.io under that name
   </dt>
   <dd>
-    <p>Decides whether a <code>textlane-code</code> crate exists.</p>
+    <p>
+      crates.io rejects git dependencies, so textlane cannot publish on giallo until the
+      fork's change is released or vendored.
+    </p>
   </dd>
 </dl>
 

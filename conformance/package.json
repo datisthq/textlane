@@ -11,6 +11,7 @@
     "import:gemoji": "node sources/gemoji.ts && vp fmt tests",
     "import:gfm": "node sources/gfm.ts && vp fmt tests",
     "import:gfm-mdast": "node sources/gfm-mdast.ts && vp fmt tests",
+    "import:highlight": "node sources/highlight.ts && vp fmt tests",
     "import:html-convert": "node sources/html-convert.ts && vp fmt tests",
     "import:html-transforms": "node sources/html-transforms.ts && vp fmt tests",
     "import:math": "node sources/math.ts && vp fmt tests",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@mdx-js/mdx": "3.1.1",
+    "@shikijs/rehype": "4.5.0",
     "@types/unist": "3.0.3",
     "acorn": "8.19.0",
     "acorn-walk": "8.3.5",
@@ -73,6 +75,7 @@
     "retext-sentence-spacing": "6.0.0",
     "retext-smartypants": "6.2.0",
     "retext-stringify": "4.0.0",
+    "shiki": "4.5.0",
     "unified": "11.0.5",
     "unist-builder": "4.0.0",
     "vfile": "6.0.3",
