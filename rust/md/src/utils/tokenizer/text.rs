@@ -1,9 +1,13 @@
+use crate::actions::attention::tokenize::tokenize_attention;
+use crate::actions::character_escape::tokenize::tokenize_character_escape;
+use crate::actions::character_reference::tokenize::tokenize_character_reference;
 use crate::actions::data::tokenize::tokenize_data;
+use crate::actions::hard_break_escape::tokenize::tokenize_hard_break_escape;
 use crate::models::construct::{Resolver, State};
 use crate::utils::tokenizer::driver::Tokenizer;
 
 // Bytes that may start a text construct, where data stops to let one try
-const MARKERS: [u8; 0] = [];
+const MARKERS: [u8; 4] = *b"&*\\_";
 
 /// The text content type: phrasing, such as the inside of a paragraph or heading.
 pub(crate) fn tokenize_text(tokenizer: &mut Tokenizer) -> State {
@@ -18,8 +22,25 @@ fn before(tokenizer: &mut Tokenizer) -> State {
             tokenizer.register_resolver(Resolver::Text);
             State::Ok
         }
+        Some(b'&') => {
+            tokenizer.attempt(State::Next(before), State::Next(before_data));
+            State::Retry(tokenize_character_reference)
+        }
+        Some(b'*' | b'_') => {
+            tokenizer.attempt(State::Next(before), State::Next(before_data));
+            State::Retry(tokenize_attention)
+        }
+        Some(b'\\') => {
+            tokenizer.attempt(State::Next(before), State::Next(before_hard_break_escape));
+            State::Retry(tokenize_character_escape)
+        }
         _ => State::Retry(before_data),
     }
+}
+
+fn before_hard_break_escape(tokenizer: &mut Tokenizer) -> State {
+    tokenizer.attempt(State::Next(before), State::Next(before_data));
+    State::Retry(tokenize_hard_break_escape)
 }
 
 fn before_data(tokenizer: &mut Tokenizer) -> State {

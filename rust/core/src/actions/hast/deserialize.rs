@@ -1,5 +1,6 @@
 use serde_json::Value;
 
+use crate::actions::mdast::serialize::MAX_JSON_DEPTH;
 use crate::actions::position::deserialize::deserialize_position;
 use crate::models::error::Error;
 use crate::models::hast::{
@@ -12,6 +13,20 @@ pub fn deserialize_hast<'a>(
     value: &Value,
     alloc: &'a Allocator,
 ) -> Result<Node<'a>, Error> {
+    deserialize_node(value, alloc, 0)
+}
+
+fn deserialize_node<'a>(
+    value: &Value,
+    alloc: &'a Allocator,
+    depth: usize,
+) -> Result<Node<'a>, Error> {
+    if depth > MAX_JSON_DEPTH {
+        return Err(Error::new(
+            "tree-too-deep",
+            format!("trees nest at most {MAX_JSON_DEPTH} levels in JSON"),
+        ));
+    }
     let position = deserialize_position(value, alloc)?;
     let kind = value
         .get("type")
@@ -21,13 +36,13 @@ pub fn deserialize_hast<'a>(
         |key: &str| alloc.alloc_str(value.get(key).and_then(Value::as_str).unwrap_or(""));
     Ok(match kind {
         "root" => Node::Root(Root {
-            children: deserialize_children(value, alloc)?,
+            children: deserialize_children(value, alloc, depth)?,
             position,
         }),
         "element" => Node::Element(Element {
             tag_name: read_str("tagName"),
             properties: deserialize_properties(value, alloc)?,
-            children: deserialize_children(value, alloc)?,
+            children: deserialize_children(value, alloc, depth)?,
             position,
         }),
         "text" => Node::Text(Text {
@@ -51,6 +66,7 @@ pub fn deserialize_hast<'a>(
 fn deserialize_children<'a>(
     value: &Value,
     alloc: &'a Allocator,
+    depth: usize,
 ) -> Result<ArenaVec<'a, Node<'a>>, Error> {
     let mut children = ArenaVec::new_in(alloc);
     for child in value
@@ -59,7 +75,7 @@ fn deserialize_children<'a>(
         .into_iter()
         .flatten()
     {
-        children.push(deserialize_hast(child, alloc)?);
+        children.push(deserialize_node(child, alloc, depth + 1)?);
     }
     Ok(children)
 }

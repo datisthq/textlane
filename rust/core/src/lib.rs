@@ -3,6 +3,7 @@
 
 mod plugin;
 mod models {
+    pub(crate) mod arena;
     pub(crate) mod error;
     pub(crate) mod file;
     pub(crate) mod hast;
@@ -46,6 +47,7 @@ pub mod hast {
 }
 
 // models
+pub use models::arena::ArenaVec;
 pub use models::error::Error;
 pub use models::file::{File, Message};
 pub use models::lines::Lines;
@@ -55,7 +57,5 @@ pub use plugin::{Attach, Compiler, Parser, Plugin, Slots, Transform};
 
 /// The arena every node of one document is allocated in.
 pub use bumpalo::Bump as Allocator;
-/// A vector allocated in a document's arena.
-pub type ArenaVec<'a, T> = bumpalo::collections::Vec<'a, T>;
 /// A string allocated in a document's arena, while it is being built.
 pub type ArenaString<'a> = bumpalo::collections::String<'a>;

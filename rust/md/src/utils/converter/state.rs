@@ -1,10 +1,13 @@
 use textlane_core::hast::{self, Element};
 use textlane_core::mdast;
-use textlane_core::{Allocator, ArenaVec};
+use textlane_core::{Allocator, ArenaVec, Position};
 
+use crate::actions::emphasis::convert::convert_emphasis;
+use crate::actions::hard_break::convert::convert_hard_break;
 use crate::actions::heading::convert::convert_heading;
 use crate::actions::paragraph::convert::convert_paragraph;
 use crate::actions::root::convert::convert_root;
+use crate::actions::strong::convert::convert_strong;
 use crate::actions::text::convert::convert_text;
 use crate::actions::thematic_break::convert::convert_thematic_break;
 use crate::models::options::ToHtmlOptions;
@@ -17,30 +20,107 @@ pub(crate) struct Converter<'a, 'o> {
     pub(crate) options: &'o ToHtmlOptions,
 }
 
+// A parent whose children are being converted
+struct Frame<'n, 'a> {
+    node: &'n mdast::Node<'a>,
+    next: usize,
+    start: usize,
+    trim: bool,
+}
+
 impl<'a> Converter<'a, '_> {
-    /// Convert one node, or nothing when it has no HTML.
-    pub(crate) fn one(&mut self, node: &mdast::Node<'a>) -> Option<hast::Node<'a>> {
+    /// Convert a node into none, one or several hast nodes.
+    ///
+    /// Walks with an explicit stack instead of recursing, so a deeply nested tree cannot
+    /// overflow the call stack.
+    pub(crate) fn convert(
+        &mut self,
+        node: &mdast::Node<'a>,
+    ) -> ArenaVec<'a, hast::Node<'a>> {
+        let mut results: Vec<hast::Node<'a>> = vec![];
+        let mut stack: Vec<Frame<'_, 'a>> = vec![];
+        self.enter(node, false, &mut results, &mut stack);
+        while let Some(frame) = stack.last_mut() {
+            let parent = frame.node;
+            let children = parent.children().map_or(&[][..], |children| &children[..]);
+            if frame.next < children.len() {
+                let index = frame.next;
+                frame.next += 1;
+                // Text right after a break loses its leading spaces
+                let trim =
+                    index > 0 && matches!(children[index - 1], mdast::Node::Break(_));
+                self.enter(&children[index], trim, &mut results, &mut stack);
+                continue;
+            }
+            let Some(frame) = stack.pop() else {
+                break;
+            };
+            let mut converted =
+                ArenaVec::with_capacity_in(results.len() - frame.start, self.alloc);
+            converted.extend(results.drain(frame.start..));
+            let start = results.len();
+            results.push(self.exit(frame.node, converted));
+            if frame.trim {
+                trim_start(&mut results[start]);
+            }
+        }
+        let mut nodes = ArenaVec::with_capacity_in(results.len(), self.alloc);
+        nodes.extend(results);
+        nodes
+    }
+
+    fn enter<'n>(
+        &mut self,
+        node: &'n mdast::Node<'a>,
+        trim: bool,
+        results: &mut Vec<hast::Node<'a>>,
+        stack: &mut Vec<Frame<'n, 'a>>,
+    ) {
+        let start = results.len();
+        if node.children().is_some() {
+            stack.push(Frame {
+                node,
+                next: 0,
+                start,
+                trim,
+            });
+            return;
+        }
         match node {
-            mdast::Node::Root(root) => Some(convert_root(self, root)),
-            mdast::Node::Paragraph(paragraph) => Some(convert_paragraph(self, paragraph)),
-            mdast::Node::Heading(heading) => Some(convert_heading(self, heading)),
-            mdast::Node::ThematicBreak(node) => Some(convert_thematic_break(self, node)),
-            mdast::Node::Text(text) => Some(convert_text(self, text)),
+            mdast::Node::Text(text) => results.push(convert_text(self, text)),
+            mdast::Node::ThematicBreak(node) => {
+                results.push(convert_thematic_break(self, node))
+            }
+            mdast::Node::Break(node) => {
+                results.push(convert_hard_break(self, node));
+                results.push(line_ending());
+            }
+            _ => {}
+        }
+        if trim && let Some(first) = results.get_mut(start) {
+            trim_start(first);
         }
     }
 
-    /// Convert every child of a parent.
-    pub(crate) fn all(
+    fn exit(
         &mut self,
-        children: &[mdast::Node<'a>],
-    ) -> ArenaVec<'a, hast::Node<'a>> {
-        let mut values = ArenaVec::new_in(self.alloc);
-        for child in children {
-            if let Some(value) = self.one(child) {
-                values.push(value);
+        node: &mdast::Node<'a>,
+        children: ArenaVec<'a, hast::Node<'a>>,
+    ) -> hast::Node<'a> {
+        match node {
+            mdast::Node::Root(root) => convert_root(self, root, children),
+            mdast::Node::Heading(heading) => convert_heading(self, heading, children),
+            mdast::Node::Emphasis(emphasis) => convert_emphasis(self, emphasis, children),
+            mdast::Node::Strong(strong) => convert_strong(self, strong, children),
+            mdast::Node::Paragraph(paragraph) => {
+                convert_paragraph(self, paragraph, children)
+            }
+            mdast::Node::ThematicBreak(_)
+            | mdast::Node::Text(_)
+            | mdast::Node::Break(_) => {
+                unreachable!("leaves convert on enter")
             }
         }
-        values
     }
 
     /// Put a line ending between nodes, and around them when `loose`.
@@ -71,7 +151,7 @@ impl<'a> Converter<'a, '_> {
         &self,
         tag_name: &'a str,
         children: ArenaVec<'a, hast::Node<'a>>,
-        position: Option<textlane_core::Position<'a>>,
+        position: Option<Position<'a>>,
     ) -> hast::Node<'a> {
         hast::Node::Element(Element {
             tag_name,
@@ -79,6 +159,21 @@ impl<'a> Converter<'a, '_> {
             children,
             position,
         })
+    }
+}
+
+// As trimMarkdownSpaceStart does, on a text node or the first child of an element
+fn trim_start(node: &mut hast::Node<'_>) {
+    let text = match node {
+        hast::Node::Text(text) => Some(text),
+        hast::Node::Element(element) => match element.children.first_mut() {
+            Some(hast::Node::Text(text)) => Some(text),
+            _ => None,
+        },
+        _ => None,
+    };
+    if let Some(text) = text {
+        text.value = text.value.trim_start_matches([' ', '\t']);
     }
 }
 

@@ -1,3 +1,5 @@
+use crate::actions::character_escape::tokenize::tokenize_character_escape;
+use crate::actions::character_reference::tokenize::tokenize_character_reference;
 use crate::actions::data::tokenize::tokenize_data;
 use crate::models::construct::{Resolver, State};
 use crate::utils::tokenizer::driver::Tokenizer;
@@ -17,6 +19,14 @@ fn before(tokenizer: &mut Tokenizer) -> State {
             tokenizer.register_resolver(Resolver::Data);
             tokenizer.register_resolver(Resolver::String);
             State::Ok
+        }
+        Some(b'&') => {
+            tokenizer.attempt(State::Next(before), State::Next(before_data));
+            State::Retry(tokenize_character_reference)
+        }
+        Some(b'\\') => {
+            tokenizer.attempt(State::Next(before), State::Next(before_data));
+            State::Retry(tokenize_character_escape)
         }
         _ => State::Retry(before_data),
     }

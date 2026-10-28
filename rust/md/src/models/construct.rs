@@ -18,6 +18,7 @@ pub(crate) enum State {
 /// A pass over the events once a content type is tokenized.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum Resolver {
+    Attention,
     Content,
     Data,
     HeadingAtx,

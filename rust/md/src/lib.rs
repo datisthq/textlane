@@ -63,6 +63,7 @@ mod actions {
         pub(crate) mod tokenize;
     }
     pub(crate) mod character_reference {
+        pub(crate) mod compile;
         pub(crate) mod tokenize;
     }
     pub(crate) mod code {
@@ -236,6 +237,7 @@ mod helpers {
     pub(crate) mod reference;
     pub(crate) mod skip;
     pub(crate) mod slice;
+    pub(crate) mod unicode;
     pub(crate) mod uri;
 }
 mod plugins {

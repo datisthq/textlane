@@ -1,76 +1,103 @@
+use std::collections::HashMap;
+
 use crate::models::event::Event;
 
 /// Edits to an event list, collected and then applied in one pass, keeping links valid.
 #[derive(Debug, Default)]
 pub(crate) struct EditMap {
-    map: Vec<(usize, usize, Vec<Event>)>,
+    map: Vec<Edit>,
+    // Where each index's edit is in `map`, so adding stays constant time
+    entries: HashMap<usize, usize>,
+}
+
+#[derive(Debug)]
+struct Edit {
+    at: usize,
+    remove: usize,
+    // Chunks added before, latest first once reversed: prepending in place would copy
+    before: Vec<Vec<Event>>,
+    after: Vec<Event>,
 }
 
 impl EditMap {
     pub(crate) fn new() -> EditMap {
-        EditMap { map: vec![] }
+        EditMap::default()
     }
 
     /// At `index`, remove `remove` events and add `add` after what is already added there.
-    pub(crate) fn add(&mut self, index: usize, remove: usize, add: Vec<Event>) {
-        self.add_impl(index, remove, add, false);
+    pub(crate) fn add(&mut self, index: usize, remove: usize, mut add: Vec<Event>) {
+        if let Some(edit) = self.edit_mut(index, remove, add.is_empty()) {
+            edit.remove += remove;
+            edit.after.append(&mut add);
+        }
     }
 
-    // Used by resolvers that wrap tokens, such as attention, once they exist
-    #[allow(dead_code)]
     /// At `index`, remove `remove` events and add `add` before what is already added there.
     pub(crate) fn add_before(&mut self, index: usize, remove: usize, add: Vec<Event>) {
-        self.add_impl(index, remove, add, true);
+        if let Some(edit) = self.edit_mut(index, remove, add.is_empty()) {
+            edit.remove += remove;
+            edit.before.push(add);
+        }
     }
 
-    fn add_impl(&mut self, at: usize, remove: usize, mut add: Vec<Event>, before: bool) {
-        if remove == 0 && add.is_empty() {
-            return;
+    fn edit_mut(&mut self, at: usize, remove: usize, empty: bool) -> Option<&mut Edit> {
+        if remove == 0 && empty {
+            return None;
         }
-        for entry in &mut self.map {
-            if entry.0 == at {
-                entry.1 += remove;
-                if before {
-                    add.append(&mut entry.2);
-                    entry.2 = add;
-                } else {
-                    entry.2.append(&mut add);
-                }
-                return;
-            }
+        let next = self.map.len();
+        let index = *self.entries.entry(at).or_insert(next);
+        if index == next {
+            self.map.push(Edit {
+                at,
+                remove: 0,
+                before: vec![],
+                after: vec![],
+            });
         }
-        self.map.push((at, remove, add));
+        self.map.get_mut(index)
     }
 
     pub(crate) fn consume(&mut self, events: &mut Vec<Event>) {
-        self.map.sort_unstable_by_key(|entry| entry.0);
         if self.map.is_empty() {
             return;
         }
-        let mut jumps = Vec::with_capacity(self.map.len());
+        self.map.sort_unstable_by_key(|edit| edit.at);
+        let mut map: Vec<(usize, usize, Vec<Event>)> = self
+            .map
+            .drain(..)
+            .map(|mut edit| {
+                let mut add = vec![];
+                while let Some(mut chunk) = edit.before.pop() {
+                    add.append(&mut chunk);
+                }
+                add.append(&mut edit.after);
+                (edit.at, edit.remove, add)
+            })
+            .collect();
+        self.entries.clear();
+        let mut jumps = Vec::with_capacity(map.len());
         let mut add_acc = 0;
         let mut remove_acc = 0;
-        for (at, remove, add) in &self.map {
+        for (at, remove, add) in &map {
             remove_acc += remove;
             add_acc += add.len();
             jumps.push((*at, remove_acc, add_acc));
         }
         shift_links(events, &jumps);
         let len_before = events.len();
-        let mut index = self.map.len();
+        let mut index = map.len();
         let mut vecs = Vec::with_capacity(index * 2 + 1);
         while index > 0 {
             index -= 1;
-            vecs.push(events.split_off(self.map[index].0 + self.map[index].1));
-            vecs.push(self.map[index].2.split_off(0));
-            events.truncate(self.map[index].0);
+            vecs.push(events.split_off(map[index].0 + map[index].1));
+            vecs.push(map[index].2.split_off(0));
+            events.truncate(map[index].0);
         }
         vecs.push(events.split_off(0));
         events.reserve(len_before + add_acc - remove_acc);
         while let Some(mut slice) = vecs.pop() {
             events.append(&mut slice);
         }
-        self.map.clear();
     }
 }
 

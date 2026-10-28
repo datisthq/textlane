@@ -10,20 +10,45 @@ const VOID_ELEMENTS: [&str; 20] = [
 ];
 
 /// Serialize hast as HTML, as hast-util-to-html does.
+///
+/// Walks with an explicit stack instead of recursing, so a deeply nested tree cannot
+/// overflow the call stack.
 pub fn stringify_hast(node: &Node<'_>, options: &StringifyOptions) -> String {
     let mut output = String::new();
-    write_node(&mut output, node, options);
+    let mut stack = vec![Step::Open(node)];
+    while let Some(step) = stack.pop() {
+        match step {
+            Step::Open(node) => write_open(&mut output, node, &mut stack, options),
+            Step::Close(tag_name) => {
+                output.push_str("</");
+                output.push_str(tag_name);
+                output.push('>');
+            }
+        }
+    }
     output
 }
 
-fn write_node(output: &mut String, node: &Node<'_>, options: &StringifyOptions) {
+enum Step<'n, 'a> {
+    Open(&'n Node<'a>),
+    Close(&'a str),
+}
+
+fn write_open<'n, 'a>(
+    output: &mut String,
+    node: &'n Node<'a>,
+    stack: &mut Vec<Step<'n, 'a>>,
+    _options: &StringifyOptions,
+) {
     match node {
-        Node::Root(root) => {
-            for child in &root.children {
-                write_node(output, child, options);
+        Node::Root(root) => stack.extend(root.children.iter().rev().map(Step::Open)),
+        Node::Element(element) => {
+            write_start_tag(output, element);
+            if !VOID_ELEMENTS.contains(&element.tag_name) {
+                stack.push(Step::Close(element.tag_name));
+                stack.extend(element.children.iter().rev().map(Step::Open));
             }
         }
-        Node::Element(element) => write_element(output, element, options),
         Node::Text(text) => write_escaped(output, text.value, &['<', '&']),
         Node::Comment(comment) => {
             output.push_str("<!--");
@@ -34,21 +59,12 @@ fn write_node(output: &mut String, node: &Node<'_>, options: &StringifyOptions) 
     }
 }
 
-fn write_element(output: &mut String, element: &Element<'_>, options: &StringifyOptions) {
+fn write_start_tag(output: &mut String, element: &Element<'_>) {
     output.push('<');
     output.push_str(element.tag_name);
     for property in &element.properties {
         write_attribute(output, property.name, &property.value);
     }
-    output.push('>');
-    if VOID_ELEMENTS.contains(&element.tag_name) {
-        return;
-    }
-    for child in &element.children {
-        write_node(output, child, options);
-    }
-    output.push_str("</");
-    output.push_str(element.tag_name);
     output.push('>');
 }
 

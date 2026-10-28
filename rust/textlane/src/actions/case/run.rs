@@ -128,7 +128,7 @@ fn run_processor(case: &Value, pipeline: &[Value]) -> Result<Value, Error> {
             let value = processor.stringify(&tree, &mut file)?;
             Ok(json!({ extension: value }))
         }
-        None => Ok(json!({ "tree": write_tree(&tree, lines.as_ref()) })),
+        None => Ok(json!({ "tree": write_tree(&tree, lines.as_ref())? })),
     }
 }
 
@@ -180,7 +180,7 @@ fn read_tree<'a>(
     }
 }
 
-fn write_tree(tree: &Tree<'_>, lines: Option<&Lines<'_>>) -> Value {
+fn write_tree(tree: &Tree<'_>, lines: Option<&Lines<'_>>) -> Result<Value, Error> {
     match tree {
         Tree::Mdast(node) => textlane_core::mdast::serialize_mdast(node, lines),
         Tree::Hast(node) => textlane_core::hast::serialize_hast(node, lines),

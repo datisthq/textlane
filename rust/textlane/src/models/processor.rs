@@ -135,3 +135,7 @@ fn check_kind(actual: Option<TreeKind>, expected: TreeKind) -> Result<(), Error>
         _ => Ok(()),
     }
 }
+
+#[cfg(all(test, feature = "md", feature = "html"))]
+#[path = "processor_unit.rs"]
+mod unit;

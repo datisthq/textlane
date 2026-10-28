@@ -3,12 +3,29 @@
 pub(crate) struct Name(pub(crate) &'static str);
 
 impl Name {
+    pub(crate) const ATTENTION_SEQUENCE: Name = Name("attentionSequence");
     pub(crate) const BLANK_LINE_ENDING: Name = Name("blankLineEnding");
     pub(crate) const BLOCK_QUOTE_MARKER: Name = Name("blockQuoteMarker");
     pub(crate) const BLOCK_QUOTE_PREFIX: Name = Name("blockQuotePrefix");
     pub(crate) const BYTE_ORDER_MARK: Name = Name("byteOrderMark");
+    pub(crate) const CHARACTER_ESCAPE: Name = Name("characterEscape");
+    pub(crate) const CHARACTER_ESCAPE_MARKER: Name = Name("characterEscapeMarker");
+    pub(crate) const CHARACTER_ESCAPE_VALUE: Name = Name("characterEscapeValue");
+    pub(crate) const CHARACTER_REFERENCE: Name = Name("characterReference");
+    pub(crate) const CHARACTER_REFERENCE_MARKER: Name = Name("characterReferenceMarker");
+    pub(crate) const CHARACTER_REFERENCE_MARKER_HEXADECIMAL: Name =
+        Name("characterReferenceMarkerHexadecimal");
+    pub(crate) const CHARACTER_REFERENCE_MARKER_NUMERIC: Name =
+        Name("characterReferenceMarkerNumeric");
+    pub(crate) const CHARACTER_REFERENCE_MARKER_SEMI: Name =
+        Name("characterReferenceMarkerSemi");
+    pub(crate) const CHARACTER_REFERENCE_VALUE: Name = Name("characterReferenceValue");
     pub(crate) const CONTENT: Name = Name("content");
     pub(crate) const DATA: Name = Name("data");
+    pub(crate) const EMPHASIS: Name = Name("emphasis");
+    pub(crate) const EMPHASIS_SEQUENCE: Name = Name("emphasisSequence");
+    pub(crate) const EMPHASIS_TEXT: Name = Name("emphasisText");
+    pub(crate) const HARD_BREAK_ESCAPE: Name = Name("hardBreakEscape");
     pub(crate) const HARD_BREAK_TRAILING: Name = Name("hardBreakTrailing");
     pub(crate) const HEADING_ATX: Name = Name("headingAtx");
     pub(crate) const HEADING_ATX_SEQUENCE: Name = Name("headingAtxSequence");
@@ -17,6 +34,9 @@ impl Name {
     pub(crate) const LINE_ENDING: Name = Name("lineEnding");
     pub(crate) const PARAGRAPH: Name = Name("paragraph");
     pub(crate) const SPACE_OR_TAB: Name = Name("spaceOrTab");
+    pub(crate) const STRONG: Name = Name("strong");
+    pub(crate) const STRONG_SEQUENCE: Name = Name("strongSequence");
+    pub(crate) const STRONG_TEXT: Name = Name("strongText");
     pub(crate) const THEMATIC_BREAK: Name = Name("thematicBreak");
     pub(crate) const THEMATIC_BREAK_SEQUENCE: Name = Name("thematicBreakSequence");
 }

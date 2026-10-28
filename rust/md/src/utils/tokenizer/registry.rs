@@ -1,3 +1,4 @@
+use crate::actions::attention::resolve::resolve_attention;
 use crate::actions::data::resolve::resolve_data;
 use crate::actions::heading_atx::resolve::resolve_heading_atx;
 use crate::actions::whitespace::resolve::resolve_whitespace;
@@ -12,6 +13,10 @@ pub(crate) fn call_resolver(
     resolver: Resolver,
 ) -> Option<Subresult> {
     match resolver {
+        Resolver::Attention => {
+            resolve_attention(tokenizer);
+            None
+        }
         Resolver::Content => Some(resolve_content(tokenizer)),
         Resolver::Data => {
             resolve_data(tokenizer);

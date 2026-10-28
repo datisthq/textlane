@@ -4,24 +4,39 @@ use crate::models::event::Kind;
 use crate::models::token::Name;
 use crate::utils::compiler::stack::Compiler;
 
-/// Data becomes text, merged into the text before it; a line ending inside phrasing joins it.
+/// Data and escaped characters become text, merged into the text before them; a line ending
+/// inside phrasing joins it, or the hard break before it.
 pub(crate) fn compile_text(compiler: &mut Compiler, name: Name, kind: Kind) {
     match (name, kind) {
-        (Name::DATA, Kind::Enter) => enter_data(compiler),
-        (Name::DATA, Kind::Exit) => exit_data(compiler),
         (Name::LINE_ENDING, Kind::Exit) => {
-            if matches!(compiler.tail_mut(), Node::Heading(_) | Node::Paragraph(_)) {
+            if compiler.hard_break_after {
+                compiler.extend_last_child();
+                compiler.hard_break_after = false;
+            } else if matches!(
+                compiler.tail_mut(),
+                Node::Heading(_)
+                    | Node::Paragraph(_)
+                    | Node::Emphasis(_)
+                    | Node::Strong(_)
+            ) {
                 compiler.index -= 1;
-                enter_data(compiler);
+                enter_text(compiler);
                 compiler.index += 1;
-                exit_data(compiler);
+                let value = compiler.slice();
+                exit_text(compiler, value);
             }
         }
-        _ => {}
+        (Name::LINE_ENDING, Kind::Enter) => {}
+        (_, Kind::Enter) => enter_text(compiler),
+        (_, Kind::Exit) => {
+            let value = compiler.slice();
+            exit_text(compiler, value);
+        }
     }
 }
 
-fn enter_data(compiler: &mut Compiler) {
+/// Open a text node, or reopen the one right before.
+pub(crate) fn enter_text(compiler: &mut Compiler) {
     let after_text = compiler
         .tail_mut()
         .children()
@@ -37,8 +52,14 @@ fn enter_data(compiler: &mut Compiler) {
     }
 }
 
-fn exit_data(compiler: &mut Compiler) {
-    let addition = compiler.slice();
+/// Append `addition` to the open text node and close it.
+pub(crate) fn exit_text<'a>(compiler: &mut Compiler<'a, '_>, addition: &'a str) {
+    append_text(compiler, addition);
+    compiler.tail_pop();
+}
+
+/// Append `addition` to the open text node.
+pub(crate) fn append_text<'a>(compiler: &mut Compiler<'a, '_>, addition: &'a str) {
     let value = match compiler.tail_mut() {
         Node::Text(text) => text.value,
         _ => return,
@@ -47,5 +68,4 @@ fn exit_data(compiler: &mut Compiler) {
     if let Node::Text(text) = compiler.tail_mut() {
         text.value = joined;
     }
-    compiler.tail_pop();
 }
