@@ -8,5 +8,6 @@
   "core/stringify": "the processor and its test plugins are not implemented yet",
   "core/run": "the processor and its test plugins are not implemented yet",
   "core/process": "the processor and its test plugins are not implemented yet",
-  "prose/*": "prose.parse, prose.stringify and the prose plugins are not implemented yet"
+  "prose/*": "prose.parse, prose.stringify and the prose plugins are not implemented yet",
+  "mdx/*": "mdx.compile is not implemented yet"
 }

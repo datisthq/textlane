@@ -7,6 +7,7 @@ import remarkFrontmatter from "remark-frontmatter"
 import type { Options as FrontmatterOptions } from "remark-frontmatter"
 import remarkGfm from "remark-gfm"
 import remarkMath from "remark-math"
+import remarkMdx from "remark-mdx"
 import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
 import remarkStringify from "remark-stringify"
@@ -74,6 +75,7 @@ export type Extensions = {
   directive?: Record<string, unknown>
   math?: Record<string, unknown>
   frontmatter?: FrontmatterOptions | null
+  mdx?: Record<string, unknown>
 }
 
 /** Parse Markdown to mdast, with positions, through the pinned remark-parse and extensions. */
@@ -88,7 +90,12 @@ export function parseMarkdown(markdown: string, extensions: Extensions = {}): ob
         ? [[remarkFrontmatter, extensions.frontmatter ?? undefined]]
         : [],
     )
-  return JSON.parse(JSON.stringify(processor.parse(markdown)))
+    .use(extensions.mdx ? [[remarkMdx, extensions.mdx]] : [])
+  // textlane keeps MDX's JavaScript as source strings, so the ESTree remark-mdx attaches is dropped
+  const tree = processor.parse(markdown)
+  return JSON.parse(
+    JSON.stringify(tree, (key, value) => (key === "estree" ? undefined : value)),
+  )
 }
 
 /** Serialize mdast to Markdown through the pinned remark-stringify and extensions. */
@@ -104,6 +111,7 @@ export function stringifyTree(
         ? [[remarkFrontmatter, props.frontmatter ?? undefined]]
         : [],
     )
+    .use(props.mdx ? [[remarkMdx, props.mdx]] : [])
   // remark-directive takes no options, so its serializer is registered here with them
   if (props.directive) {
     const extensions = processor.data("toMarkdownExtensions") ?? []

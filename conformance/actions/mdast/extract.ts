@@ -91,7 +91,12 @@ function readCall(props: {
     if (typeof input !== "string") return props.countSkip("not statically evaluable")
     if (typeof options === "string") return props.countSkip(options)
     if (isStressInput(input)) return props.countSkip("a stress test")
-    const tree = parseMarkdown(input, toExtensions(props.syntax, options.plugin))
+    let tree: object
+    try {
+      tree = parseMarkdown(input, toExtensions(props.syntax, options.plugin))
+    } catch {
+      return props.countSkip("an input the reference parser rejects")
+    }
     return { kind: "tree" as const, options, test: { input, expected: { tree } } }
   }
   if (!isCallTo(props.call, "toMarkdown")) return undefined

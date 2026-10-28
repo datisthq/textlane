@@ -1,0 +1,1033 @@
+[
+  {
+    "description": "@mdx-js/mdx compile {\"jsxRuntime\":\"classic\"}",
+    "source": {
+      "repository": "https://github.com/mdx-js/mdx",
+      "commit": "52285a6758fa078ec57f3d4bd8803d9cbfb12065",
+      "path": "packages/mdx/test/compile.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.mdx"],
+      ["md.toHtml"],
+      [
+        "mdx.compile",
+        {
+          "jsxRuntime": "classic"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "\"# hi!\"",
+        "input": "# hi!",
+        "expected": {
+          "js": "import React from \"react\";\nfunction _createMdxContent(props) {\n  const _components = {\n    h1: \"h1\",\n    ...props.components\n  };\n  return React.createElement(_components.h1, null, \"hi!\");\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? React.createElement(MDXLayout, {\n    ...props\n  }, React.createElement(_createMdxContent, {\n    ...props\n  })) : _createMdxContent(props);\n}\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "@mdx-js/mdx compile",
+    "source": {
+      "repository": "https://github.com/mdx-js/mdx",
+      "commit": "52285a6758fa078ec57f3d4bd8803d9cbfb12065",
+      "path": "packages/mdx/test/compile.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.mdx"], ["md.toHtml"], ["mdx.compile"]],
+    "tests": [
+      {
+        "description": "\"# hi!\"",
+        "input": "# hi!",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    h1: \"h1\",\n    ...props.components\n  };\n  return _jsx(_components.h1, {\n    children: \"hi!\"\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"\"",
+        "input": "",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  return _jsx(_Fragment, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"<X />\"",
+        "input": "<X />",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const {X} = props.components || ({});\n  if (!X) _missingMdxReference(\"X\", true);\n  return _jsx(X, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\nfunction _missingMdxReference(id, component) {\n  throw new Error(\"Expected \" + (component ? \"component\" : \"object\") + \" `\" + id + \"` to be defined: you likely forgot to import, pass, or provide it.\");\n}\n"
+        }
+      },
+      {
+        "description": "\"<x.y />\"",
+        "input": "<x.y />",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const {x} = props.components || ({});\n  if (!x) _missingMdxReference(\"x\", false);\n  if (!x.y) _missingMdxReference(\"x.y\", true);\n  return _jsx(x.y, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\nfunction _missingMdxReference(id, component) {\n  throw new Error(\"Expected \" + (component ? \"component\" : \"object\") + \" `\" + id + \"` to be defined: you likely forgot to import, pass, or provide it.\");\n}\n"
+        }
+      },
+      {
+        "description": "\"<X /> and <X.Y />\"",
+        "input": "<X /> and <X.Y />",
+        "expected": {
+          "js": "import {jsx as _jsx, jsxs as _jsxs} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  }, {X} = _components;\n  if (!X) _missingMdxReference(\"X\", true);\n  if (!X.Y) _missingMdxReference(\"X.Y\", true);\n  return _jsxs(_components.p, {\n    children: [_jsx(X, {}), \" and \", _jsx(X.Y, {})]\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\nfunction _missingMdxReference(id, component) {\n  throw new Error(\"Expected \" + (component ? \"component\" : \"object\") + \" `\" + id + \"` to be defined: you likely forgot to import, pass, or provide it.\");\n}\n"
+        }
+      },
+      {
+        "description": "\"*a*\"",
+        "input": "*a*",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    em: \"em\",\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: _jsx(_components.em, {\n      children: \"a\"\n    })\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"export function X() { return <em>a</em> }\\n\\n*a*, <X>b</X>\"",
+        "input": "export function X() { return <em>a</em> }\n\n*a*, <X>b</X>",
+        "expected": {
+          "js": "import {jsx as _jsx, jsxs as _jsxs} from \"react/jsx-runtime\";\nexport function X() {\n  return _jsx(\"em\", {\n    children: \"a\"\n  });\n}\nfunction _createMdxContent(props) {\n  const _components = {\n    em: \"em\",\n    p: \"p\",\n    ...props.components\n  };\n  return _jsxs(_components.p, {\n    children: [_jsx(_components.em, {\n      children: \"a\"\n    }), \", \", _jsx(X, {\n      children: \"b\"\n    })]\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"export function X() { return <Y /> }\\n\\n<X />\"",
+        "input": "export function X() { return <Y /> }\n\n<X />",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nexport function X() {\n  return _jsx(Y, {});\n}\nfunction _createMdxContent(props) {\n  return _jsx(X, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"export function Foo({Box = \\\"div\\\"}) { return <Box>a</Bo…",
+        "input": "export function Foo({Box = \"div\"}) { return <Box>a</Box>; }\n\n<Foo />",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nexport function Foo({Box = \"div\"}) {\n  return _jsx(Box, {\n    children: \"a\"\n  });\n}\nfunction _createMdxContent(props) {\n  return _jsx(Foo, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"a\"",
+        "input": "a",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: \"a\"\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"import React from \\\"react\\\"\\nexport default class extend…",
+        "input": "import React from \"react\"\nexport default class extends React.Component { render() { return this.props.children } }\n\na",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nimport React from \"react\";\nconst MDXLayout = class extends React.Component {\n  render() {\n    return this.props.children;\n  }\n};\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: \"a\"\n  });\n}\nexport default function MDXContent(props = {}) {\n  return _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  });\n}\n"
+        }
+      },
+      {
+        "description": "\"export default function Layout({components, ...propertie…",
+        "input": "export default function Layout({components, ...properties}) { return <section {...properties} /> }\n\na",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nconst MDXLayout = function Layout({components, ...properties}) {\n  return _jsx(\"section\", {\n    ...properties\n  });\n};\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: \"a\"\n  });\n}\nexport default function MDXContent(props = {}) {\n  return _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  });\n}\n"
+        }
+      },
+      {
+        "description": "\"export default function a() {}\\n\\nexport default functio…",
+        "input": "export default function a() {}\n\nexport default function b() {}\n\n.",
+        "expected": {
+          "error": {
+            "code": "recma-document:duplicate-layout",
+            "message": "Unexpected duplicate layout, expected a single layout (previous: 1:1-1:31)"
+          }
+        }
+      },
+      {
+        "description": "\"export default function a() {}\\n\\nexport {Layout as defa…",
+        "input": "export default function a() {}\n\nexport {Layout as default} from \"./components.js\"\n\n.",
+        "expected": {
+          "error": {
+            "code": "recma-document:duplicate-layout",
+            "message": "Unexpected duplicate layout, expected a single layout (previous: 1:1-1:31)"
+          }
+        }
+      },
+      {
+        "description": "\"export default a\"",
+        "input": "export default a",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx} from \"react/jsx-runtime\";\nconst MDXLayout = a;\nfunction _createMdxContent(props) {\n  return _jsx(_Fragment, {});\n}\nexport default function MDXContent(props = {}) {\n  return _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  });\n}\n"
+        }
+      },
+      {
+        "description": "\"<a.b />\"",
+        "input": "<a.b />",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const {a} = props.components || ({});\n  if (!a) _missingMdxReference(\"a\", false);\n  if (!a.b) _missingMdxReference(\"a.b\", true);\n  return _jsx(a.b, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\nfunction _missingMdxReference(id, component) {\n  throw new Error(\"Expected \" + (component ? \"component\" : \"object\") + \" `\" + id + \"` to be defined: you likely forgot to import, pass, or provide it.\");\n}\n"
+        }
+      },
+      {
+        "description": "\"export const a = {}\\n\\n<a.b />\"",
+        "input": "export const a = {}\n\n<a.b />",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nexport const a = {};\nfunction _createMdxContent(props) {\n  if (!a) _missingMdxReference(\"a\", false);\n  if (!a.b) _missingMdxReference(\"a.b\", true);\n  return _jsx(a.b, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\nfunction _missingMdxReference(id, component) {\n  throw new Error(\"Expected \" + (component ? \"component\" : \"object\") + \" `\" + id + \"` to be defined: you likely forgot to import, pass, or provide it.\");\n}\n"
+        }
+      },
+      {
+        "description": "\"<a render={function () { return <x.y /> }} />\"",
+        "input": "<a render={function () { return <x.y /> }} />",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const {x} = props.components || ({});\n  if (!x) _missingMdxReference(\"x\", false);\n  if (!x.y) _missingMdxReference(\"x.y\", true);\n  return _jsx(\"a\", {\n    render: function () {\n      return _jsx(x.y, {});\n    }\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\nfunction _missingMdxReference(id, component) {\n  throw new Error(\"Expected \" + (component ? \"component\" : \"object\") + \" `\" + id + \"` to be defined: you likely forgot to import, pass, or provide it.\");\n}\n"
+        }
+      },
+      {
+        "description": "\"<a render={function (x) { return <x.y /> }} />\"",
+        "input": "<a render={function (x) { return <x.y /> }} />",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  return _jsx(\"a\", {\n    render: function (x) {\n      return _jsx(x.y, {});\n    }\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"{await Promise.resolve(42)}\"",
+        "input": "{await Promise.resolve(42)}",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx} from \"react/jsx-runtime\";\nasync function _createMdxContent(props) {\n  return _jsx(_Fragment, {\n    children: await Promise.resolve(42)\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"[a](b)\"",
+        "input": "[a](b)",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    a: \"a\",\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: _jsx(_components.a, {\n      href: \"b\",\n      children: \"a\"\n    })\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"[a]: b\\n[a]\"",
+        "input": "[a]: b\n[a]",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    a: \"a\",\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: _jsx(_components.a, {\n      href: \"b\",\n      children: \"a\"\n    })\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"<http://a>\"",
+        "input": "<http://a>",
+        "expected": {
+          "error": {
+            "code": "micromark-extension-mdx-jsx:unexpected-character",
+            "message": "Unexpected character `/` (U+002F) before local name, expected a character that can start a name, such as a letter, `$`, or `_` (note: to create a link in MDX, use `[text](url)`)"
+          }
+        }
+      },
+      {
+        "description": "\"> a\"",
+        "input": "> a",
+        "expected": {
+          "js": "import {jsx as _jsx, jsxs as _jsxs} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    blockquote: \"blockquote\",\n    p: \"p\",\n    ...props.components\n  };\n  return _jsxs(_components.blockquote, {\n    children: [\"\\n\", _jsx(_components.p, {\n      children: \"a\"\n    }), \"\\n\"]\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"\\\\*a*\"",
+        "input": "\\*a*",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: \"*a*\"\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"&lt;\"",
+        "input": "&lt;",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: \"<\"\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"```\\na\"",
+        "input": "```\na",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    code: \"code\",\n    pre: \"pre\",\n    ...props.components\n  };\n  return _jsx(_components.pre, {\n    children: _jsx(_components.code, {\n      children: \"a\\n\"\n    })\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"    a\"",
+        "input": "    a",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: \"a\"\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"`a`\"",
+        "input": "`a`",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    code: \"code\",\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: _jsx(_components.code, {\n      children: \"a\"\n    })\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"a\\\\\\nb\"",
+        "input": "a\\\nb",
+        "expected": {
+          "js": "import {jsx as _jsx, jsxs as _jsxs} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    br: \"br\",\n    p: \"p\",\n    ...props.components\n  };\n  return _jsxs(_components.p, {\n    children: [\"a\", _jsx(_components.br, {}), \"\\n\", \"b\"]\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"a  \\nb\"",
+        "input": "a  \nb",
+        "expected": {
+          "js": "import {jsx as _jsx, jsxs as _jsxs} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    br: \"br\",\n    p: \"p\",\n    ...props.components\n  };\n  return _jsxs(_components.p, {\n    children: [\"a\", _jsx(_components.br, {}), \"\\n\", \"b\"]\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"#\"",
+        "input": "#",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    h1: \"h1\",\n    ...props.components\n  };\n  return _jsx(_components.h1, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"a\\n=\"",
+        "input": "a\n=",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    h1: \"h1\",\n    ...props.components\n  };\n  return _jsx(_components.h1, {\n    children: \"a\"\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"1.\"",
+        "input": "1.",
+        "expected": {
+          "js": "import {jsx as _jsx, jsxs as _jsxs} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    li: \"li\",\n    ol: \"ol\",\n    ...props.components\n  };\n  return _jsxs(_components.ol, {\n    children: [\"\\n\", _jsx(_components.li, {}), \"\\n\"]\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"*\"",
+        "input": "*",
+        "expected": {
+          "js": "import {jsx as _jsx, jsxs as _jsxs} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    li: \"li\",\n    ul: \"ul\",\n    ...props.components\n  };\n  return _jsxs(_components.ul, {\n    children: [\"\\n\", _jsx(_components.li, {}), \"\\n\"]\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"**a**\"",
+        "input": "**a**",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    strong: \"strong\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: _jsx(_components.strong, {\n      children: \"a\"\n    })\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"***\"",
+        "input": "***",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    hr: \"hr\",\n    ...props.components\n  };\n  return _jsx(_components.hr, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"a <s>b</s>\"",
+        "input": "a <s>b</s>",
+        "expected": {
+          "js": "import {jsx as _jsx, jsxs as _jsxs} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsxs(_components.p, {\n    children: [\"a \", _jsx(\"s\", {\n      children: \"b\"\n    })]\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"<div>\\n  b\\n</div>\"",
+        "input": "<div>\n  b\n</div>",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(\"div\", {\n    children: _jsx(_components.p, {\n      children: \"b\"\n    })\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"<h1>b</h1>\"",
+        "input": "<h1>b</h1>",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  return _jsx(\"h1\", {\n    children: \"b\"\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"<a>b</a><b>c</b>\"",
+        "input": "<a>b</a><b>c</b>",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx, jsxs as _jsxs} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  return _jsxs(_Fragment, {\n    children: [_jsx(\"a\", {\n      children: \"b\"\n    }), \"\\n\", _jsx(\"b\", {\n      children: \"c\"\n    })]\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"<a>b</a>\\t<b>c</b>\"",
+        "input": "<a>b</a>\t<b>c</b>",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx, jsxs as _jsxs} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  return _jsxs(_Fragment, {\n    children: [_jsx(\"a\", {\n      children: \"b\"\n    }), \"\\n\", _jsx(\"b\", {\n      children: \"c\"\n    })]\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"{1}\"",
+        "input": "{1}",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  return _jsx(_Fragment, {\n    children: 1\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"{1}{2}\"",
+        "input": "{1}{2}",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx, jsxs as _jsxs} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  return _jsxs(_Fragment, {\n    children: [1, \"\\n\", 2]\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"{1}\\n{2}\"",
+        "input": "{1}\n{2}",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx, jsxs as _jsxs} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  return _jsxs(_Fragment, {\n    children: [1, \"\\n\", 2]\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"a <>b</>\"",
+        "input": "a <>b</>",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx, jsxs as _jsxs} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsxs(_components.p, {\n    children: [\"a \", _jsx(_Fragment, {\n      children: \"b\"\n    })]\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"<>\\n  b\\n</>\"",
+        "input": "<>\n  b\n</>",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_Fragment, {\n    children: _jsx(_Fragment, {\n      children: _jsx(_components.p, {\n        children: \"b\"\n      })\n    })\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"a <x:y>b</x:y>\"",
+        "input": "a <x:y>b</x:y>",
+        "expected": {
+          "js": "import {jsx as _jsx, jsxs as _jsxs} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsxs(_components.p, {\n    children: [\"a \", _jsx(\"x:y\", {\n      children: \"b\"\n    })]\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"export const a = 1\\n\\na {a}\"",
+        "input": "export const a = 1\n\na {a}",
+        "expected": {
+          "js": "import {jsx as _jsx, jsxs as _jsxs} from \"react/jsx-runtime\";\nexport const a = 1;\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsxs(_components.p, {\n    children: [\"a \", a]\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"{\\n  1 + 1\\n}\"",
+        "input": "{\n  1 + 1\n}",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  return _jsx(_Fragment, {\n    children: 1 + 1\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"{/*!*/}\"",
+        "input": "{/*!*/}",
+        "expected": {
+          "js": "/*!*/\nimport {Fragment as _Fragment, jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  return _jsx(_Fragment, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"<x a=\\\"1\\\" b:c=\\\"1\\\" hidden />\"",
+        "input": "<x a=\"1\" b:c=\"1\" hidden />",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  return _jsx(\"x\", {\n    a: \"1\",\n    \"b:c\": \"1\",\n    hidden: true\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"<x y=\\\"1\\\" z='w' style={{color: \\\"red\\\"}} />\"",
+        "input": "<x y=\"1\" z='w' style={{color: \"red\"}} />",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  return _jsx(\"x\", {\n    y: \"1\",\n    z: \"w\",\n    style: {\n      color: \"red\"\n    }\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"<x {...{a: 1}} />\"",
+        "input": "<x {...{a: 1}} />",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  return _jsx(\"x\", {\n    a: 1\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"{<i>the sum of one and one is: {1 + 1}</i>}\"",
+        "input": "{<i>the sum of one and one is: {1 + 1}</i>}",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx, jsxs as _jsxs} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  return _jsx(_Fragment, {\n    children: _jsxs(\"i\", {\n      children: [\"the sum of one and one is: \", 1 + 1]\n    })\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"<table>\\n  <thead>\\n    <tr>\\n      <th>a</th>\\n      <t…",
+        "input": "<table>\n  <thead>\n    <tr>\n      <th>a</th>\n      <th>b</th>\n    </tr>\n  </thead>\n</table>",
+        "expected": {
+          "js": "import {jsx as _jsx, jsxs as _jsxs} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  return _jsx(\"table\", {\n    children: _jsx(\"thead\", {\n      children: _jsxs(\"tr\", {\n        children: [_jsx(\"th\", {\n          children: \"a\"\n        }), _jsx(\"th\", {\n          children: \"b\"\n        })]\n      })\n    })\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"import {Pill} from \\\"./components.js\\\"\\n\\n<Pill>!</Pill>\"",
+        "input": "import {Pill} from \"./components.js\"\n\n<Pill>!</Pill>",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nimport {Pill} from \"./components.js\";\nfunction _createMdxContent(props) {\n  return _jsx(Pill, {\n    children: \"!\"\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"import {number} from \\\"./data.js\\\"\\n\\n{number}\"",
+        "input": "import {number} from \"./data.js\"\n\n{number}",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx} from \"react/jsx-runtime\";\nimport {number} from \"./data.js\";\nfunction _createMdxContent(props) {\n  return _jsx(_Fragment, {\n    children: number\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"export const number = Math.PI\"",
+        "input": "export const number = Math.PI",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx} from \"react/jsx-runtime\";\nexport const number = Math.PI;\nfunction _createMdxContent(props) {\n  return _jsx(_Fragment, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"export var a\"",
+        "input": "export var a",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx} from \"react/jsx-runtime\";\nexport var a;\nfunction _createMdxContent(props) {\n  return _jsx(_Fragment, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"import {object} from \\\"./data.js\\\"\\nexport var {a} = obj…",
+        "input": "import {object} from \"./data.js\"\nexport var {a} = object",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx} from \"react/jsx-runtime\";\nimport {object} from \"./data.js\";\nexport var {a} = object;\nfunction _createMdxContent(props) {\n  return _jsx(_Fragment, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"import {object} from \\\"./data.js\\\"\\nexport var {a, ...re…",
+        "input": "import {object} from \"./data.js\"\nexport var {a, ...rest} = object",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx} from \"react/jsx-runtime\";\nimport {object} from \"./data.js\";\nexport var {a, ...rest} = object;\nfunction _createMdxContent(props) {\n  return _jsx(_Fragment, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"import {object} from \\\"./data.js\\\"\\nexport var {c = 3} =…",
+        "input": "import {object} from \"./data.js\"\nexport var {c = 3} = object",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx} from \"react/jsx-runtime\";\nimport {object} from \"./data.js\";\nexport var {c = 3} = object;\nfunction _createMdxContent(props) {\n  return _jsx(_Fragment, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"import {array} from \\\"./data.js\\\"\\nexport var [a] = array\"",
+        "input": "import {array} from \"./data.js\"\nexport var [a] = array",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx} from \"react/jsx-runtime\";\nimport {array} from \"./data.js\";\nexport var [a] = array;\nfunction _createMdxContent(props) {\n  return _jsx(_Fragment, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"export const number = Math.PI\\nexport {number as pi}\"",
+        "input": "export const number = Math.PI\nexport {number as pi}",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx} from \"react/jsx-runtime\";\nexport const number = Math.PI;\nexport {number as pi};\nfunction _createMdxContent(props) {\n  return _jsx(_Fragment, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"export default function Layout(props) { return <div {...…",
+        "input": "export default function Layout(props) { return <div {...props} /> }\n\na",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nconst MDXLayout = function Layout(props) {\n  return _jsx(\"div\", {\n    ...props\n  });\n};\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: \"a\"\n  });\n}\nexport default function MDXContent(props = {}) {\n  return _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  });\n}\n"
+        }
+      },
+      {
+        "description": "\"export {Layout as default} from \\\"./components.js\\\"\\n\\na\"",
+        "input": "export {Layout as default} from \"./components.js\"\n\na",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nimport {Layout as MDXLayout} from \"./components.js\";\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: \"a\"\n  });\n}\nexport default function MDXContent(props = {}) {\n  return _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  });\n}\n"
+        }
+      },
+      {
+        "description": "\"export {default} from \\\"./components.js\\\"\\n\\na\"",
+        "input": "export {default} from \"./components.js\"\n\na",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nimport MDXLayout from \"./components.js\";\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: \"a\"\n  });\n}\nexport default function MDXContent(props = {}) {\n  return _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  });\n}\n"
+        }
+      },
+      {
+        "description": "\"export {default, Pill} from \\\"./components.js\\\"\\n\\na\"",
+        "input": "export {default, Pill} from \"./components.js\"\n\na",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nimport MDXLayout from \"./components.js\";\nexport {Pill} from \"./components.js\";\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: \"a\"\n  });\n}\nexport default function MDXContent(props = {}) {\n  return _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  });\n}\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "@mdx-js/mdx compile {\"jsxRuntime\":\"automatic\"}",
+    "source": {
+      "repository": "https://github.com/mdx-js/mdx",
+      "commit": "52285a6758fa078ec57f3d4bd8803d9cbfb12065",
+      "path": "packages/mdx/test/compile.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.mdx"],
+      ["md.toHtml"],
+      [
+        "mdx.compile",
+        {
+          "jsxRuntime": "automatic"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "\"!\"",
+        "input": "!",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: \"!\"\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "@mdx-js/mdx compile {\"jsxImportSource\":\"react\"}",
+    "source": {
+      "repository": "https://github.com/mdx-js/mdx",
+      "commit": "52285a6758fa078ec57f3d4bd8803d9cbfb12065",
+      "path": "packages/mdx/test/compile.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.mdx"],
+      ["md.toHtml"],
+      [
+        "mdx.compile",
+        {
+          "jsxImportSource": "react"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "\"?\"",
+        "input": "?",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: \"?\"\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "@mdx-js/mdx compile {\"jsxRuntime\":\"classic\",\"pragma\":\"React.createElement\",\"pragmaFrag\":\"React.Fragment\",\"pragmaImportSource\":\"react\"}",
+    "source": {
+      "repository": "https://github.com/mdx-js/mdx",
+      "commit": "52285a6758fa078ec57f3d4bd8803d9cbfb12065",
+      "path": "packages/mdx/test/compile.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.mdx"],
+      ["md.toHtml"],
+      [
+        "mdx.compile",
+        {
+          "jsxRuntime": "classic",
+          "pragma": "React.createElement",
+          "pragmaFrag": "React.Fragment",
+          "pragmaImportSource": "react"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "\"<>%</>\"",
+        "input": "<>%</>",
+        "expected": {
+          "js": "import React from \"react\";\nfunction _createMdxContent(props) {\n  return React.createElement(React.Fragment, null, React.createElement(React.Fragment, null, \"%\"));\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? React.createElement(MDXLayout, {\n    ...props\n  }, React.createElement(_createMdxContent, {\n    ...props\n  })) : _createMdxContent(props);\n}\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "@mdx-js/mdx compile {\"jsxRuntime\":\"classic\",\"pragmaImportSource\":\"react\",\"pragma\":\"\"}",
+    "source": {
+      "repository": "https://github.com/mdx-js/mdx",
+      "commit": "52285a6758fa078ec57f3d4bd8803d9cbfb12065",
+      "path": "packages/mdx/test/compile.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.mdx"],
+      ["md.toHtml"],
+      [
+        "mdx.compile",
+        {
+          "jsxRuntime": "classic",
+          "pragmaImportSource": "react",
+          "pragma": ""
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "\"import React from \\\"react\\\"\\n\\n.\"",
+        "input": "import React from \"react\"\n\n.",
+        "expected": {
+          "error": {
+            "code": "mdx-failed",
+            "message": "Missing `pragma` in classic runtime with `pragmaImportSource`"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "@mdx-js/mdx compile {\"providerImportSource\":\"@mdx-js/react\"}",
+    "source": {
+      "repository": "https://github.com/mdx-js/mdx",
+      "commit": "52285a6758fa078ec57f3d4bd8803d9cbfb12065",
+      "path": "packages/mdx/test/compile.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.mdx"],
+      ["md.toHtml"],
+      [
+        "mdx.compile",
+        {
+          "providerImportSource": "@mdx-js/react"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "\"export function X() { return <Y /> }\\n\\n<X />\"",
+        "input": "export function X() { return <Y /> }\n\n<X />",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nimport {useMDXComponents as _provideComponents} from \"@mdx-js/react\";\nexport function X() {\n  const {Y} = _provideComponents() || ({});\n  if (!Y) _missingMdxReference(\"Y\", true);\n  return _jsx(Y, {});\n}\nfunction _createMdxContent(props) {\n  return _jsx(X, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = {\n    ..._provideComponents(),\n    ...props.components\n  };\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\nfunction _missingMdxReference(id, component) {\n  throw new Error(\"Expected \" + (component ? \"component\" : \"object\") + \" `\" + id + \"` to be defined: you likely forgot to import, pass, or provide it.\");\n}\n"
+        }
+      },
+      {
+        "description": "\"export const X = () => <Y />\\n\\n<X />\"",
+        "input": "export const X = () => <Y />\n\n<X />",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nimport {useMDXComponents as _provideComponents} from \"@mdx-js/react\";\nexport const X = () => {\n  const {Y} = _provideComponents() || ({});\n  if (!Y) _missingMdxReference(\"Y\", true);\n  return _jsx(Y, {});\n};\nfunction _createMdxContent(props) {\n  return _jsx(X, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = {\n    ..._provideComponents(),\n    ...props.components\n  };\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\nfunction _missingMdxReference(id, component) {\n  throw new Error(\"Expected \" + (component ? \"component\" : \"object\") + \" `\" + id + \"` to be defined: you likely forgot to import, pass, or provide it.\");\n}\n"
+        }
+      },
+      {
+        "description": "\"export function X() { return <y.z /> }\\n\\n<X />\"",
+        "input": "export function X() { return <y.z /> }\n\n<X />",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nimport {useMDXComponents as _provideComponents} from \"@mdx-js/react\";\nexport function X() {\n  const {y} = _provideComponents() || ({});\n  if (!y) _missingMdxReference(\"y\", false);\n  if (!y.z) _missingMdxReference(\"y.z\", true);\n  return _jsx(y.z, {});\n}\nfunction _createMdxContent(props) {\n  return _jsx(X, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = {\n    ..._provideComponents(),\n    ...props.components\n  };\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\nfunction _missingMdxReference(id, component) {\n  throw new Error(\"Expected \" + (component ? \"component\" : \"object\") + \" `\" + id + \"` to be defined: you likely forgot to import, pass, or provide it.\");\n}\n"
+        }
+      },
+      {
+        "description": "\"*z*\"",
+        "input": "*z*",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nimport {useMDXComponents as _provideComponents} from \"@mdx-js/react\";\nfunction _createMdxContent(props) {\n  const _components = {\n    em: \"em\",\n    p: \"p\",\n    ..._provideComponents(),\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: _jsx(_components.em, {\n      children: \"z\"\n    })\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = {\n    ..._provideComponents(),\n    ...props.components\n  };\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"<X />\"",
+        "input": "<X />",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nimport {useMDXComponents as _provideComponents} from \"@mdx-js/react\";\nfunction _createMdxContent(props) {\n  const {X} = {\n    ..._provideComponents(),\n    ...props.components\n  };\n  if (!X) _missingMdxReference(\"X\", true);\n  return _jsx(X, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = {\n    ..._provideComponents(),\n    ...props.components\n  };\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\nfunction _missingMdxReference(id, component) {\n  throw new Error(\"Expected \" + (component ? \"component\" : \"object\") + \" `\" + id + \"` to be defined: you likely forgot to import, pass, or provide it.\");\n}\n"
+        }
+      },
+      {
+        "description": "\"export function A() { return <span /> }\\n\\nexport class …",
+        "input": "export function A() { return <span /> }\n\nexport class B { render() { return <div /> } }",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx} from \"react/jsx-runtime\";\nimport {useMDXComponents as _provideComponents} from \"@mdx-js/react\";\nexport function A() {\n  return _jsx(\"span\", {});\n}\nexport class B {\n  render() {\n    return _jsx(\"div\", {});\n  }\n}\nfunction _createMdxContent(props) {\n  return _jsx(_Fragment, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = {\n    ..._provideComponents(),\n    ...props.components\n  };\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"{ <span /> }\\n\\nAnd also { <div /> }.\"",
+        "input": "{ <span /> }\n\nAnd also { <div /> }.",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx, jsxs as _jsxs} from \"react/jsx-runtime\";\nimport {useMDXComponents as _provideComponents} from \"@mdx-js/react\";\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ..._provideComponents(),\n    ...props.components\n  };\n  return _jsxs(_Fragment, {\n    children: [_jsx(\"span\", {}), \"\\n\", _jsxs(_components.p, {\n      children: [\"And also \", _jsx(\"div\", {}), \".\"]\n    })]\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = {\n    ..._provideComponents(),\n    ...props.components\n  };\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "@mdx-js/mdx compile {\"jsx\":true}",
+    "source": {
+      "repository": "https://github.com/mdx-js/mdx",
+      "commit": "52285a6758fa078ec57f3d4bd8803d9cbfb12065",
+      "path": "packages/mdx/test/compile.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.mdx"],
+      ["md.toHtml"],
+      [
+        "mdx.compile",
+        {
+          "jsx": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "\"*a*\"",
+        "input": "*a*",
+        "expected": {
+          "js": "/*@jsxRuntime automatic*/\n/*@jsxImportSource react*/\nfunction _createMdxContent(props) {\n  const _components = {\n    em: \"em\",\n    p: \"p\",\n    ...props.components\n  };\n  return <_components.p><_components.em>{\"a\"}</_components.em></_components.p>;\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props} /></MDXLayout> : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"<a {...b} c d=\\\"1\\\" e={1} />\"",
+        "input": "<a {...b} c d=\"1\" e={1} />",
+        "expected": {
+          "js": "/*@jsxRuntime automatic*/\n/*@jsxImportSource react*/\nfunction _createMdxContent(props) {\n  return <a {...b} c d=\"1\" e={1} />;\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props} /></MDXLayout> : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"<><a:b /><c.d/></>\"",
+        "input": "<><a:b /><c.d/></>",
+        "expected": {
+          "js": "/*@jsxRuntime automatic*/\n/*@jsxImportSource react*/\nfunction _createMdxContent(props) {\n  const {c} = props.components || ({});\n  if (!c) _missingMdxReference(\"c\", false);\n  if (!c.d) _missingMdxReference(\"c.d\", true);\n  return <><><a:b /><c.d /></></>;\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props} /></MDXLayout> : _createMdxContent(props);\n}\nfunction _missingMdxReference(id, component) {\n  throw new Error(\"Expected \" + (component ? \"component\" : \"object\") + \" `\" + id + \"` to be defined: you likely forgot to import, pass, or provide it.\");\n}\n"
+        }
+      },
+      {
+        "description": "\"<>a {/* 1 */} b</>\"",
+        "input": "<>a {/* 1 */} b</>",
+        "expected": {
+          "js": "/*@jsxRuntime automatic*/\n/*@jsxImportSource react*/\n/*1*/\nfunction _createMdxContent(props) {\n  return <><>{\"a \"}{}{\" b\"}</></>;\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props} /></MDXLayout> : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"{<a-b></a-b>}\"",
+        "input": "{<a-b></a-b>}",
+        "expected": {
+          "js": "/*@jsxRuntime automatic*/\n/*@jsxImportSource react*/\nfunction _createMdxContent(props) {\n  return <>{<a-b></a-b>}</>;\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props} /></MDXLayout> : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"Hello {props.name}\"",
+        "input": "Hello {props.name}",
+        "expected": {
+          "js": "/*@jsxRuntime automatic*/\n/*@jsxImportSource react*/\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return <_components.p>{\"Hello \"}{props.name}</_components.p>;\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props} /></MDXLayout> : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"export default function Layout({components, ...props}) {…",
+        "input": "export default function Layout({components, ...props}) { return <section {...props} /> }\n\na",
+        "expected": {
+          "js": "/*@jsxRuntime automatic*/\n/*@jsxImportSource react*/\nconst MDXLayout = function Layout({components, ...props}) {\n  return <section {...props} />;\n};\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return <_components.p>{\"a\"}</_components.p>;\n}\nexport default function MDXContent(props = {}) {\n  return <MDXLayout {...props}><_createMdxContent {...props} /></MDXLayout>;\n}\n"
+        }
+      },
+      {
+        "description": "\"{<w x='y \\\" z' />}\"",
+        "input": "{<w x='y \" z' />}",
+        "expected": {
+          "js": "/*@jsxRuntime automatic*/\n/*@jsxImportSource react*/\nfunction _createMdxContent(props) {\n  return <>{<w x=\"y &quot; z\" />}</>;\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props} /></MDXLayout> : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"{<>a &amp; b &#123; c &lt; d</>}\"",
+        "input": "{<>a &amp; b &#123; c &lt; d</>}",
+        "expected": {
+          "js": "/*@jsxRuntime automatic*/\n/*@jsxImportSource react*/\nfunction _createMdxContent(props) {\n  return <>{<>a & b &#123; c &lt; d</>}</>;\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props} /></MDXLayout> : _createMdxContent(props);\n}\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "@mdx-js/mdx compile {\"jsx\":true,\"providerImportSource\":\"@mdx-js/react\"}",
+    "source": {
+      "repository": "https://github.com/mdx-js/mdx",
+      "commit": "52285a6758fa078ec57f3d4bd8803d9cbfb12065",
+      "path": "packages/mdx/test/compile.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.mdx"],
+      ["md.toHtml"],
+      [
+        "mdx.compile",
+        {
+          "jsx": true,
+          "providerImportSource": "@mdx-js/react"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "\"a\"",
+        "input": "a",
+        "expected": {
+          "js": "/*@jsxRuntime automatic*/\n/*@jsxImportSource react*/\nimport {useMDXComponents as _provideComponents} from \"@mdx-js/react\";\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ..._provideComponents(),\n    ...props.components\n  };\n  return <_components.p>{\"a\"}</_components.p>;\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = {\n    ..._provideComponents(),\n    ...props.components\n  };\n  return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props} /></MDXLayout> : _createMdxContent(props);\n}\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "@mdx-js/mdx compile {\"tableCellAlignToStyle\":true,\"jsx\":true} with md.gfm",
+    "source": {
+      "repository": "https://github.com/mdx-js/mdx",
+      "commit": "52285a6758fa078ec57f3d4bd8803d9cbfb12065",
+      "path": "packages/mdx/test/compile.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.mdx"],
+      ["md.gfm"],
+      ["md.toHtml"],
+      [
+        "mdx.compile",
+        {
+          "tableCellAlignToStyle": true,
+          "jsx": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "\"| a |\\n| :- |\"",
+        "input": "| a |\n| :- |",
+        "expected": {
+          "js": "/*@jsxRuntime automatic*/\n/*@jsxImportSource react*/\nfunction _createMdxContent(props) {\n  const _components = {\n    table: \"table\",\n    th: \"th\",\n    thead: \"thead\",\n    tr: \"tr\",\n    ...props.components\n  };\n  return <_components.table><_components.thead><_components.tr><_components.th style={{\n    textAlign: \"left\"\n  }}>{\"a\"}</_components.th></_components.tr></_components.thead></_components.table>;\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props} /></MDXLayout> : _createMdxContent(props);\n}\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "@mdx-js/mdx compile {\"tableCellAlignToStyle\":false,\"jsx\":true} with md.gfm",
+    "source": {
+      "repository": "https://github.com/mdx-js/mdx",
+      "commit": "52285a6758fa078ec57f3d4bd8803d9cbfb12065",
+      "path": "packages/mdx/test/compile.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.mdx"],
+      ["md.gfm"],
+      ["md.toHtml"],
+      [
+        "mdx.compile",
+        {
+          "tableCellAlignToStyle": false,
+          "jsx": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "\"| a |\\n| :- |\"",
+        "input": "| a |\n| :- |",
+        "expected": {
+          "js": "/*@jsxRuntime automatic*/\n/*@jsxImportSource react*/\nfunction _createMdxContent(props) {\n  const _components = {\n    table: \"table\",\n    th: \"th\",\n    thead: \"thead\",\n    tr: \"tr\",\n    ...props.components\n  };\n  return <_components.table><_components.thead><_components.tr><_components.th align=\"left\">{\"a\"}</_components.th></_components.tr></_components.thead></_components.table>;\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? <MDXLayout {...props}><_createMdxContent {...props} /></MDXLayout> : _createMdxContent(props);\n}\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "@mdx-js/mdx compile with md.gfm",
+    "source": {
+      "repository": "https://github.com/mdx-js/mdx",
+      "commit": "52285a6758fa078ec57f3d4bd8803d9cbfb12065",
+      "path": "packages/mdx/test/syntax.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.mdx"], ["md.gfm"], ["md.toHtml"], ["mdx.compile"]],
+    "tests": [
+      {
+        "description": "\"http://a\"",
+        "input": "http://a",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    a: \"a\",\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: _jsx(_components.a, {\n      href: \"http://a\",\n      children: \"http://a\"\n    })\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"[^a]\\n[^a]: b\"",
+        "input": "[^a]\n[^a]: b",
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx, jsxs as _jsxs} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    a: \"a\",\n    h2: \"h2\",\n    li: \"li\",\n    ol: \"ol\",\n    p: \"p\",\n    section: \"section\",\n    sup: \"sup\",\n    ...props.components\n  };\n  return _jsxs(_Fragment, {\n    children: [_jsx(_components.p, {\n      children: _jsx(_components.sup, {\n        children: _jsx(_components.a, {\n          href: \"#user-content-fn-a\",\n          id: \"user-content-fnref-a\",\n          \"data-footnote-ref\": true,\n          \"aria-describedby\": \"footnote-label\",\n          children: \"1\"\n        })\n      })\n    }), \"\\n\", _jsxs(_components.section, {\n      \"data-footnotes\": true,\n      className: \"footnotes\",\n      children: [_jsx(_components.h2, {\n        className: \"sr-only\",\n        id: \"footnote-label\",\n        children: \"Footnotes\"\n      }), \"\\n\", _jsxs(_components.ol, {\n        children: [\"\\n\", _jsxs(_components.li, {\n          id: \"user-content-fn-a\",\n          children: [\"\\n\", _jsxs(_components.p, {\n            children: [\"b \", _jsx(_components.a, {\n              href: \"#user-content-fnref-a\",\n              \"data-footnote-backref\": \"\",\n              \"aria-label\": \"Back to reference 1\",\n              className: \"data-footnote-backref\",\n              children: \"↩\"\n            })]\n          }), \"\\n\"]\n        }), \"\\n\"]\n      }), \"\\n\"]\n    })]\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"| a |\\n| - |\"",
+        "input": "| a |\n| - |",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    table: \"table\",\n    th: \"th\",\n    thead: \"thead\",\n    tr: \"tr\",\n    ...props.components\n  };\n  return _jsx(_components.table, {\n    children: _jsx(_components.thead, {\n      children: _jsx(_components.tr, {\n        children: _jsx(_components.th, {\n          children: \"a\"\n        })\n      })\n    })\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"* [x] a\\n* [ ] b\"",
+        "input": "* [x] a\n* [ ] b",
+        "expected": {
+          "js": "import {jsx as _jsx, jsxs as _jsxs} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    input: \"input\",\n    li: \"li\",\n    ul: \"ul\",\n    ...props.components\n  };\n  return _jsxs(_components.ul, {\n    className: \"contains-task-list\",\n    children: [\"\\n\", _jsxs(_components.li, {\n      className: \"task-list-item\",\n      children: [_jsx(_components.input, {\n        type: \"checkbox\",\n        checked: true,\n        disabled: true\n      }), \" \", \"a\"]\n    }), \"\\n\", _jsxs(_components.li, {\n      className: \"task-list-item\",\n      children: [_jsx(_components.input, {\n        type: \"checkbox\",\n        disabled: true\n      }), \" \", \"b\"]\n    }), \"\\n\"]\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "\"~a~\"",
+        "input": "~a~",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    del: \"del\",\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: _jsx(_components.del, {\n      children: \"a\"\n    })\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "@mdx-js/mdx compile with md.frontmatter",
+    "source": {
+      "repository": "https://github.com/mdx-js/mdx",
+      "commit": "52285a6758fa078ec57f3d4bd8803d9cbfb12065",
+      "path": "packages/mdx/test/syntax.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.mdx"],
+      ["md.frontmatter"],
+      ["md.toHtml"],
+      ["mdx.compile"]
+    ],
+    "tests": [
+      {
+        "description": "\"---\\na: b\\n---\\nc\"",
+        "input": "---\na: b\n---\nc",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: \"c\"\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "@mdx-js/mdx compile with md.frontmatter \"toml\"",
+    "source": {
+      "repository": "https://github.com/mdx-js/mdx",
+      "commit": "52285a6758fa078ec57f3d4bd8803d9cbfb12065",
+      "path": "packages/mdx/test/syntax.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.mdx"],
+      ["md.frontmatter", "toml"],
+      ["md.toHtml"],
+      ["mdx.compile"]
+    ],
+    "tests": [
+      {
+        "description": "\"+++\\na: b\\n+++\\nc\"",
+        "input": "+++\na: b\n+++\nc",
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: \"c\"\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "@mdx-js/mdx compile {\"outputFormat\":\"function-body\"}",
+    "source": {
+      "repository": "https://github.com/mdx-js/mdx",
+      "commit": "52285a6758fa078ec57f3d4bd8803d9cbfb12065",
+      "path": "packages/mdx/test/syntax.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.mdx"],
+      ["md.toHtml"],
+      [
+        "mdx.compile",
+        {
+          "outputFormat": "function-body"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "\"# hi\"",
+        "input": "# hi",
+        "expected": {
+          "js": "\"use strict\";\nconst {jsx: _jsx} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = {\n    h1: \"h1\",\n    ...props.components\n  };\n  return _jsx(_components.h1, {\n    children: \"hi\"\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\n"
+        }
+      }
+    ]
+  }
+]

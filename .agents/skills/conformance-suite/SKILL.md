@@ -85,6 +85,7 @@ unified did. The crate's test plugins must behave as those JavaScript ones do; t
 
 ## Errors
 
+A syntax error carries the VFileMessage's `source:ruleId` as its code (`micromark-extension-mdx-jsx:unexpected-eof`).
 An invalid plugin option is `expected.error` with the code `invalid-options`, shared by every
 plugin, and upstream's message (from its `assert.throws` pattern, `^Error: ` and escapes dropped)
 as the substring a runner matches. Error codes are public API: add a new one only for a new kind

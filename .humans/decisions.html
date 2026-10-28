@@ -21,7 +21,7 @@
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>22 agent's calls</h3>
+    <h3>23 agent's calls</h3>
     <p>
       <htmlpress-badge type="warning">my call</htmlpress-badge> settled by the agent, open
       to change
@@ -605,6 +605,22 @@
       suggestion ranking; it returns once textlane has a dictionary story.
     </p>
     <p><strong>Rejected.</strong> Vendoring dictionary-en into the corpus.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> <code>mdx.compile</code> is
+    compared on its exact JavaScript (<code>expected.js</code>) from the pinned
+    @mdx-js/mdx; MDX syntax errors take <code>source:ruleId</code> as their code;
+    <code>md.mdx</code> trees drop <code>data.estree</code>
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> astring's output is deterministic, and rendering the module to
+      HTML needs a JavaScript runtime the Rust and Python runners lack; textlane keeps
+      embedded JavaScript as source strings.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Compile-then-render to HTML; comparing normalized ESTree.
+    </p>
   </dd>
   <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge> Each runner skips only
