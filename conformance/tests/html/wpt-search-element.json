@@ -1,0 +1,585 @@
+[
+  {
+    "description": "WPT search-element.dat",
+    "source": {
+      "repository": "https://github.com/web-platform-tests/wpt",
+      "commit": "07ce6e987a1606aec4dc84ef80062d9797330e0b",
+      "path": "html/syntax/parsing/resources/search-element.dat",
+      "license": "BSD-3-Clause"
+    },
+    "pipeline": [["html.parse"]],
+    "positions": false,
+    "tests": [
+      {
+        "description": "case 1",
+        "input": "",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": []
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 2",
+        "input": "<!doctype html><p>foo<search>bar<p>baz",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "p",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "foo"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "search",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "bar"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "p",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "baz"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 3",
+        "input": "<!doctype html><search><p>foo</search>bar",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "search",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "p",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "foo"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "text",
+                        "value": "bar"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 4",
+        "input": "<!DOCTYPE html>xxx<svg><x><g><a><search><b>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "xxx"
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "x",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "g",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "a",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "element",
+                                        "tagName": "search",
+                                        "properties": {},
+                                        "children": []
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "b",
+                        "properties": {},
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 5",
+        "input": "<!doctype html><a><search>x</a>y",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "a",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "search",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "x"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "text",
+                        "value": "y"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 6",
+        "input": "<!doctype html><a><search>x<p>y<a>z",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "a",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "search",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "x"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "p",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "a",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "y"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "a",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "z"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 7",
+        "input": "<!doctype html><li>a<search><li>b",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "li",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "search",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "li",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "b"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 8",
+        "input": "<!doctype html><dd>a<search><dt>b",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "dd",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "search",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "dt",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "b"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 9",
+        "input": "<!doctype html><x><search></x>y",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "x",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "search",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "type": "text",
+                        "value": "y"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      }
+    ]
+  }
+]

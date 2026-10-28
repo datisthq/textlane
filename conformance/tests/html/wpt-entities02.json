@@ -1,0 +1,1128 @@
+[
+  {
+    "description": "WPT entities02.dat",
+    "source": {
+      "repository": "https://github.com/web-platform-tests/wpt",
+      "commit": "07ce6e987a1606aec4dc84ef80062d9797330e0b",
+      "path": "html/syntax/parsing/resources/entities02.dat",
+      "license": "BSD-3-Clause"
+    },
+    "pipeline": [["html.parse"]],
+    "positions": false,
+    "tests": [
+      {
+        "description": "case 1",
+        "input": "<div bar=\"ZZ&gt;YY\"></div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {
+                          "bar": "ZZ>YY"
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 2",
+        "input": "<div bar=\"ZZ&\"></div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {
+                          "bar": "ZZ&"
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 3",
+        "input": "<div bar='ZZ&'></div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {
+                          "bar": "ZZ&"
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 4",
+        "input": "<div bar=ZZ&></div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {
+                          "bar": "ZZ&"
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 5",
+        "input": "<div bar=\"ZZ&gt=YY\"></div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {
+                          "bar": "ZZ&gt=YY"
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 6",
+        "input": "<div bar=\"ZZ&gt0YY\"></div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {
+                          "bar": "ZZ&gt0YY"
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 7",
+        "input": "<div bar=\"ZZ&gt9YY\"></div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {
+                          "bar": "ZZ&gt9YY"
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 8",
+        "input": "<div bar=\"ZZ&gtaYY\"></div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {
+                          "bar": "ZZ&gtaYY"
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 9",
+        "input": "<div bar=\"ZZ&gtZYY\"></div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {
+                          "bar": "ZZ&gtZYY"
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 10",
+        "input": "<div bar=\"ZZ&gt YY\"></div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {
+                          "bar": "ZZ> YY"
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 11",
+        "input": "<div bar=\"ZZ&gt\"></div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {
+                          "bar": "ZZ>"
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 12",
+        "input": "<div bar='ZZ&gt'></div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {
+                          "bar": "ZZ>"
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 13",
+        "input": "<div bar=ZZ&gt></div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {
+                          "bar": "ZZ>"
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 14",
+        "input": "<div bar=\"ZZ&pound_id=23\"></div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {
+                          "bar": "ZZ£_id=23"
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 15",
+        "input": "<div bar=\"ZZ&prod_id=23\"></div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {
+                          "bar": "ZZ&prod_id=23"
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 16",
+        "input": "<div bar=\"ZZ&pound;_id=23\"></div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {
+                          "bar": "ZZ£_id=23"
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 17",
+        "input": "<div bar=\"ZZ&prod;_id=23\"></div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {
+                          "bar": "ZZ∏_id=23"
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 18",
+        "input": "<div bar=\"ZZ&pound=23\"></div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {
+                          "bar": "ZZ&pound=23"
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 19",
+        "input": "<div bar=\"ZZ&prod=23\"></div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {
+                          "bar": "ZZ&prod=23"
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 20",
+        "input": "<div>ZZ&pound_id=23</div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "ZZ£_id=23"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 21",
+        "input": "<div>ZZ&prod_id=23</div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "ZZ&prod_id=23"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 22",
+        "input": "<div>ZZ&pound;_id=23</div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "ZZ£_id=23"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 23",
+        "input": "<div>ZZ&prod;_id=23</div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "ZZ∏_id=23"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 24",
+        "input": "<div>ZZ&pound=23</div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "ZZ£=23"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 25",
+        "input": "<div>ZZ&prod=23</div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "ZZ&prod=23"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 26",
+        "input": "<div>ZZ&AElig=</div>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "ZZÆ="
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      }
+    ]
+  }
+]

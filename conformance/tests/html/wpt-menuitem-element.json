@@ -1,0 +1,977 @@
+[
+  {
+    "description": "WPT menuitem-element.dat",
+    "source": {
+      "repository": "https://github.com/web-platform-tests/wpt",
+      "commit": "07ce6e987a1606aec4dc84ef80062d9797330e0b",
+      "path": "html/syntax/parsing/resources/menuitem-element.dat",
+      "license": "BSD-3-Clause"
+    },
+    "pipeline": [["html.parse"]],
+    "positions": false,
+    "tests": [
+      {
+        "description": "case 1",
+        "input": "<menuitem>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "menuitem",
+                        "properties": {},
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 2",
+        "input": "</menuitem>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": []
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 3",
+        "input": "<!DOCTYPE html><body><menuitem>A",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "menuitem",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "A"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 4",
+        "input": "<!DOCTYPE html><body><menuitem>A<menuitem>B",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "menuitem",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "A"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "menuitem",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "B"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 5",
+        "input": "<!DOCTYPE html><body><menuitem>A<menu>B</menu>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "menuitem",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "A"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "menu",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "B"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 6",
+        "input": "<!DOCTYPE html><body><menuitem>A<hr>B",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "menuitem",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "A"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "hr",
+                            "properties": {},
+                            "children": []
+                          },
+                          {
+                            "type": "text",
+                            "value": "B"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 7",
+        "input": "<!DOCTYPE html><li><menuitem><li>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "li",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "menuitem",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "li",
+                        "properties": {},
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 8",
+        "input": "<!DOCTYPE html><menuitem><p></menuitem>x",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "menuitem",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "p",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "x"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 9",
+        "input": "<!DOCTYPE html><p><b></p><menuitem>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "p",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "b",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "b",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "menuitem",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 10",
+        "input": "<!DOCTYPE html><menuitem><asdf></menuitem>x",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "menuitem",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "asdf",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "type": "text",
+                        "value": "x"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 11",
+        "input": "<!DOCTYPE html></menuitem>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": []
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 12",
+        "input": "<!DOCTYPE html><html></menuitem>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": []
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 13",
+        "input": "<!DOCTYPE html><head></menuitem>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": []
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 14",
+        "input": "<!DOCTYPE html><select><menuitem></select>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "select",
+                        "properties": {},
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 15",
+        "input": "<!DOCTYPE html><option><menuitem>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "option",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "menuitem",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 16",
+        "input": "<!DOCTYPE html><menuitem><option>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "menuitem",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "option",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 17",
+        "input": "<!DOCTYPE html><menuitem></body>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "menuitem",
+                        "properties": {},
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 18",
+        "input": "<!DOCTYPE html><menuitem></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "menuitem",
+                        "properties": {},
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 19",
+        "input": "<!DOCTYPE html><menuitem><p>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "menuitem",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "p",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 20",
+        "input": "<!DOCTYPE html><menuitem><li>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "menuitem",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "li",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      }
+    ]
+  }
+]

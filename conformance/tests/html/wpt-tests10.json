@@ -1,0 +1,3554 @@
+[
+  {
+    "description": "WPT tests10.dat",
+    "source": {
+      "repository": "https://github.com/web-platform-tests/wpt",
+      "commit": "07ce6e987a1606aec4dc84ef80062d9797330e0b",
+      "path": "html/syntax/parsing/resources/tests10.dat",
+      "license": "BSD-3-Clause"
+    },
+    "pipeline": [["html.parse"]],
+    "positions": false,
+    "tests": [
+      {
+        "description": "case 1",
+        "input": "<!DOCTYPE html><svg></svg>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {},
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 2",
+        "input": "<!DOCTYPE html><svg></svg><![CDATA[a]]>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {},
+                        "children": []
+                      },
+                      {
+                        "type": "comment",
+                        "value": "[CDATA[a]]"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 3",
+        "input": "<!DOCTYPE html><body><svg></svg>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {},
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 4",
+        "input": "<!DOCTYPE html><body><select><svg></svg></select>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "select",
+                        "properties": {},
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 5",
+        "input": "<!DOCTYPE html><body><select><option><svg></svg></option></select>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "select",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "option",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 6",
+        "input": "<!DOCTYPE html><body><table><svg></svg></table>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {},
+                        "children": []
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "table",
+                        "properties": {},
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 7",
+        "input": "<!DOCTYPE html><body><table><svg><g>foo</g></svg></table>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "g",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "foo"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "table",
+                        "properties": {},
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 8",
+        "input": "<!DOCTYPE html><body><table><svg><g>foo</g><g>bar</g></svg></table>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "g",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "foo"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "g",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "bar"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "table",
+                        "properties": {},
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 9",
+        "input": "<!DOCTYPE html><body><table><tbody><svg><g>foo</g><g>bar</g></svg></tbody></table>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "g",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "foo"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "g",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "bar"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "table",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "tbody",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 10",
+        "input": "<!DOCTYPE html><body><table><tbody><tr><svg><g>foo</g><g>bar</g></svg></tr></tbody></table>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "g",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "foo"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "g",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "bar"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "table",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "tbody",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "tr",
+                                "properties": {},
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 11",
+        "input": "<!DOCTYPE html><body><table><tbody><tr><td><svg><g>foo</g><g>bar</g></svg></td></tr></tbody></table>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "table",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "tbody",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "tr",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "td",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "element",
+                                        "tagName": "svg",
+                                        "properties": {},
+                                        "children": [
+                                          {
+                                            "type": "element",
+                                            "tagName": "g",
+                                            "properties": {},
+                                            "children": [
+                                              {
+                                                "type": "text",
+                                                "value": "foo"
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "type": "element",
+                                            "tagName": "g",
+                                            "properties": {},
+                                            "children": [
+                                              {
+                                                "type": "text",
+                                                "value": "bar"
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 12",
+        "input": "<!DOCTYPE html><body><table><tbody><tr><td><svg><g>foo</g><g>bar</g></svg><p>baz</td></tr></tbody></table>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "table",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "tbody",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "tr",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "td",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "element",
+                                        "tagName": "svg",
+                                        "properties": {},
+                                        "children": [
+                                          {
+                                            "type": "element",
+                                            "tagName": "g",
+                                            "properties": {},
+                                            "children": [
+                                              {
+                                                "type": "text",
+                                                "value": "foo"
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "type": "element",
+                                            "tagName": "g",
+                                            "properties": {},
+                                            "children": [
+                                              {
+                                                "type": "text",
+                                                "value": "bar"
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "type": "element",
+                                        "tagName": "p",
+                                        "properties": {},
+                                        "children": [
+                                          {
+                                            "type": "text",
+                                            "value": "baz"
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 13",
+        "input": "<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g></svg><p>baz</caption></table>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "table",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "caption",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "svg",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "g",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "text",
+                                        "value": "foo"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "type": "element",
+                                    "tagName": "g",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "text",
+                                        "value": "bar"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "element",
+                                "tagName": "p",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "value": "baz"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 14",
+        "input": "<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g><p>baz</table><p>quux",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "table",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "caption",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "svg",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "g",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "text",
+                                        "value": "foo"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "type": "element",
+                                    "tagName": "g",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "text",
+                                        "value": "bar"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "element",
+                                "tagName": "p",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "value": "baz"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "p",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "quux"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 15",
+        "input": "<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g>baz</table><p>quux",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "table",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "caption",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "svg",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "g",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "text",
+                                        "value": "foo"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "type": "element",
+                                    "tagName": "g",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "text",
+                                        "value": "bar"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "type": "text",
+                                    "value": "baz"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "p",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "quux"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 16",
+        "input": "<!DOCTYPE html><body><table><colgroup><svg><g>foo</g><g>bar</g><p>baz</table><p>quux",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "g",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "foo"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "g",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "bar"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "p",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "baz"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "table",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "colgroup",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "p",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "quux"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 17",
+        "input": "<!DOCTYPE html><body><table><tr><td><select><svg><g>foo</g><g>bar</g><p>baz</table><p>quux",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "table",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "tbody",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "tr",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "td",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "element",
+                                        "tagName": "select",
+                                        "properties": {},
+                                        "children": [
+                                          {
+                                            "type": "text",
+                                            "value": "foobarbaz"
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "p",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "quux"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 18",
+        "input": "<!DOCTYPE html><body><table><select><svg><g>foo</g><g>bar</g><p>baz</table><p>quux",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "select",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "foobarbaz"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "table",
+                        "properties": {},
+                        "children": []
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "p",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "quux"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 19",
+        "input": "<!DOCTYPE html><body></body></html><svg><g>foo</g><g>bar</g><p>baz",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "g",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "foo"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "g",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "bar"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "p",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "baz"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 20",
+        "input": "<!DOCTYPE html><body></body><svg><g>foo</g><g>bar</g><p>baz",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "g",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "foo"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "g",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "bar"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "p",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "baz"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 21",
+        "input": "<!DOCTYPE html><frameset><svg><g></g><g></g><p><span>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "frameset",
+                    "properties": {},
+                    "children": []
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 22",
+        "input": "<!DOCTYPE html><frameset></frameset><svg><g></g><g></g><p><span>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "frameset",
+                    "properties": {},
+                    "children": []
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 23",
+        "input": "<!DOCTYPE html><body xlink:href=foo><svg xlink:href=foo></svg>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {
+                      "xLinkHref": "foo"
+                    },
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {
+                          "xLinkHref": "foo"
+                        },
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 24",
+        "input": "<!DOCTYPE html><body xlink:href=foo xml:lang=en><svg><g xml:lang=en xlink:href=foo></g></svg>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {
+                      "xLinkHref": "foo",
+                      "xmlLang": "en"
+                    },
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "g",
+                            "properties": {
+                              "xmlLang": "en",
+                              "xLinkHref": "foo"
+                            },
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 25",
+        "input": "<!DOCTYPE html><body xlink:href=foo xml:lang=en><svg><g xml:lang=en xlink:href=foo /></svg>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {
+                      "xLinkHref": "foo",
+                      "xmlLang": "en"
+                    },
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "g",
+                            "properties": {
+                              "xmlLang": "en",
+                              "xLinkHref": "foo"
+                            },
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 26",
+        "input": "<!DOCTYPE html><body xlink:href=foo xml:lang=en><svg><g xml:lang=en xlink:href=foo />bar</svg>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {
+                      "xLinkHref": "foo",
+                      "xmlLang": "en"
+                    },
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "g",
+                            "properties": {
+                              "xmlLang": "en",
+                              "xLinkHref": "foo"
+                            },
+                            "children": []
+                          },
+                          {
+                            "type": "text",
+                            "value": "bar"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 27",
+        "input": "<svg></path>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {},
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 28",
+        "input": "<div><svg></div>a",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "svg",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "type": "text",
+                        "value": "a"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 29",
+        "input": "<div><svg><path></div>a",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "svg",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "path",
+                                "properties": {},
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "text",
+                        "value": "a"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 30",
+        "input": "<div><svg><path></svg><path>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "svg",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "path",
+                                "properties": {},
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "path",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 31",
+        "input": "<div><svg><path><foreignObject><math></div>a",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "svg",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "path",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "foreignObject",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "element",
+                                        "tagName": "math",
+                                        "properties": {},
+                                        "children": [
+                                          {
+                                            "type": "text",
+                                            "value": "a"
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 32",
+        "input": "<div><svg><path><foreignObject><p></div>a",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "svg",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "path",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "foreignObject",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "element",
+                                        "tagName": "p",
+                                        "properties": {},
+                                        "children": [
+                                          {
+                                            "type": "text",
+                                            "value": "a"
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 33",
+        "input": "<!DOCTYPE html><svg><desc><div><svg><ul>a",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "desc",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "div",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "svg",
+                                    "properties": {},
+                                    "children": []
+                                  },
+                                  {
+                                    "type": "element",
+                                    "tagName": "ul",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "text",
+                                        "value": "a"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 34",
+        "input": "<!DOCTYPE html><svg><desc><svg><ul>a",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "desc",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "svg",
+                                "properties": {},
+                                "children": []
+                              },
+                              {
+                                "type": "element",
+                                "tagName": "ul",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "value": "a"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 35",
+        "input": "<!DOCTYPE html><p><svg><desc><p>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "p",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "svg",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "desc",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "p",
+                                    "properties": {},
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 36",
+        "input": "<!DOCTYPE html><p><svg><title><p>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "p",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "svg",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "title",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "p",
+                                    "properties": {},
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "case 37",
+        "input": "<div><svg><path><foreignObject><p></foreignObject><p>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "div",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "svg",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "path",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "foreignObject",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "element",
+                                        "tagName": "p",
+                                        "properties": {},
+                                        "children": []
+                                      },
+                                      {
+                                        "type": "element",
+                                        "tagName": "p",
+                                        "properties": {},
+                                        "children": []
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 38",
+        "input": "<math><mi><div><object><div><span></span></div></object></div></mi><mi>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "math",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "mi",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "div",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "object",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "element",
+                                        "tagName": "div",
+                                        "properties": {},
+                                        "children": [
+                                          {
+                                            "type": "element",
+                                            "tagName": "span",
+                                            "properties": {},
+                                            "children": []
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "mi",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 39",
+        "input": "<math><mi><svg><foreignObject><div><div></div></div></foreignObject></svg></mi><mi>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "math",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "mi",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "svg",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "foreignObject",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "element",
+                                        "tagName": "div",
+                                        "properties": {},
+                                        "children": [
+                                          {
+                                            "type": "element",
+                                            "tagName": "div",
+                                            "properties": {},
+                                            "children": []
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "mi",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 40",
+        "input": "<svg><script></script><path>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "script",
+                            "properties": {},
+                            "children": []
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "path",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 41",
+        "input": "<table><svg></svg><tr>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "svg",
+                        "properties": {},
+                        "children": []
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "table",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "tbody",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "tr",
+                                "properties": {},
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 42",
+        "input": "<math><mi><mglyph>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "math",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "mi",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "mglyph",
+                                "properties": {},
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 43",
+        "input": "<math><mi><malignmark>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "math",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "mi",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "malignmark",
+                                "properties": {},
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 44",
+        "input": "<math><mo><mglyph>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "math",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "mo",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "mglyph",
+                                "properties": {},
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 45",
+        "input": "<math><mo><malignmark>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "math",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "mo",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "malignmark",
+                                "properties": {},
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 46",
+        "input": "<math><mn><mglyph>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "math",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "mn",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "mglyph",
+                                "properties": {},
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 47",
+        "input": "<math><mn><malignmark>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "math",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "mn",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "malignmark",
+                                "properties": {},
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 48",
+        "input": "<math><ms><mglyph>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "math",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "ms",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "mglyph",
+                                "properties": {},
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 49",
+        "input": "<math><ms><malignmark>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "math",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "ms",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "malignmark",
+                                "properties": {},
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 50",
+        "input": "<math><mtext><mglyph>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "math",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "mtext",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "mglyph",
+                                "properties": {},
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 51",
+        "input": "<math><mtext><malignmark>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "math",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "mtext",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "malignmark",
+                                "properties": {},
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 52",
+        "input": "<math><annotation-xml><svg></svg></annotation-xml><mi>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "math",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "annotation-xml",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "svg",
+                                "properties": {},
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "mi",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 53",
+        "input": "<math><annotation-xml><svg><foreignObject><div><math><mi></mi></math><span></span></div></foreignObject><path></path></svg></annotation-xml><mi>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "math",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "annotation-xml",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "svg",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "foreignObject",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "element",
+                                        "tagName": "div",
+                                        "properties": {},
+                                        "children": [
+                                          {
+                                            "type": "element",
+                                            "tagName": "math",
+                                            "properties": {},
+                                            "children": [
+                                              {
+                                                "type": "element",
+                                                "tagName": "mi",
+                                                "properties": {},
+                                                "children": []
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "type": "element",
+                                            "tagName": "span",
+                                            "properties": {},
+                                            "children": []
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "type": "element",
+                                    "tagName": "path",
+                                    "properties": {},
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "mi",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 54",
+        "input": "<math><annotation-xml><svg><foreignObject><math><mi><svg></svg></mi><mo></mo></math><span></span></foreignObject><path></path></svg></annotation-xml><mi>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "math",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "annotation-xml",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "svg",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "foreignObject",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "element",
+                                        "tagName": "math",
+                                        "properties": {},
+                                        "children": [
+                                          {
+                                            "type": "element",
+                                            "tagName": "mi",
+                                            "properties": {},
+                                            "children": [
+                                              {
+                                                "type": "element",
+                                                "tagName": "svg",
+                                                "properties": {},
+                                                "children": []
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "type": "element",
+                                            "tagName": "mo",
+                                            "properties": {},
+                                            "children": []
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "type": "element",
+                                        "tagName": "span",
+                                        "properties": {},
+                                        "children": []
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "type": "element",
+                                    "tagName": "path",
+                                    "properties": {},
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "mi",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,1347 @@
+[
+  {
+    "description": "WPT ruby.dat",
+    "source": {
+      "repository": "https://github.com/web-platform-tests/wpt",
+      "commit": "07ce6e987a1606aec4dc84ef80062d9797330e0b",
+      "path": "html/syntax/parsing/resources/ruby.dat",
+      "license": "BSD-3-Clause"
+    },
+    "pipeline": [["html.parse"]],
+    "positions": false,
+    "tests": [
+      {
+        "description": "case 1",
+        "input": "<html><ruby>a<rb>b<rb></ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rb",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "b"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rb",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 2",
+        "input": "<html><ruby>a<rb>b<rt></ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rb",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "b"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rt",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 3",
+        "input": "<html><ruby>a<rb>b<rtc></ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rb",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "b"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rtc",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 4",
+        "input": "<html><ruby>a<rb>b<rp></ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rb",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "b"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rp",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 5",
+        "input": "<html><ruby>a<rb>b<span></ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rb",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "b"
+                              },
+                              {
+                                "type": "element",
+                                "tagName": "span",
+                                "properties": {},
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 6",
+        "input": "<html><ruby>a<rt>b<rb></ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rt",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "b"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rb",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 7",
+        "input": "<html><ruby>a<rt>b<rt></ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rt",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "b"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rt",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 8",
+        "input": "<html><ruby>a<rt>b<rtc></ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rt",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "b"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rtc",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 9",
+        "input": "<html><ruby>a<rt>b<rp></ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rt",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "b"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rp",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 10",
+        "input": "<html><ruby>a<rt>b<span></ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rt",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "b"
+                              },
+                              {
+                                "type": "element",
+                                "tagName": "span",
+                                "properties": {},
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 11",
+        "input": "<html><ruby>a<rtc>b<rb></ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rtc",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "b"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rb",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 12",
+        "input": "<html><ruby>a<rtc>b<rt>c<rt>d</ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rtc",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "b"
+                              },
+                              {
+                                "type": "element",
+                                "tagName": "rt",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "value": "c"
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "element",
+                                "tagName": "rt",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "value": "d"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 13",
+        "input": "<html><ruby>a<rtc>b<rtc></ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rtc",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "b"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rtc",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 14",
+        "input": "<html><ruby>a<rtc>b<rp></ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rtc",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "b"
+                              },
+                              {
+                                "type": "element",
+                                "tagName": "rp",
+                                "properties": {},
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 15",
+        "input": "<html><ruby>a<rtc>b<span></ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rtc",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "b"
+                              },
+                              {
+                                "type": "element",
+                                "tagName": "span",
+                                "properties": {},
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 16",
+        "input": "<html><ruby>a<rp>b<rb></ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rp",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "b"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rb",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 17",
+        "input": "<html><ruby>a<rp>b<rt></ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rp",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "b"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rt",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 18",
+        "input": "<html><ruby>a<rp>b<rtc></ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rp",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "b"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rtc",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 19",
+        "input": "<html><ruby>a<rp>b<rp></ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rp",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "b"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rp",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 20",
+        "input": "<html><ruby>a<rp>b<span></ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "rp",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "b"
+                              },
+                              {
+                                "type": "element",
+                                "tagName": "span",
+                                "properties": {},
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 21",
+        "input": "<html><ruby><rtc><ruby>a<rb>b<rt></ruby></ruby></html>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "ruby",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "rtc",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "ruby",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "value": "a"
+                                  },
+                                  {
+                                    "type": "element",
+                                    "tagName": "rb",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "text",
+                                        "value": "b"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "type": "element",
+                                    "tagName": "rt",
+                                    "properties": {},
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      }
+    ]
+  }
+]

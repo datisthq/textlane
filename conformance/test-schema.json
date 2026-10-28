@@ -178,6 +178,26 @@
               "type": "string"
             }
           }
+        },
+        "messages": {
+          "description": "The file's messages, compared on ruleId, source and place only",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["ruleId", "source"],
+            "additionalProperties": false,
+            "properties": {
+              "ruleId": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string"
+              },
+              "place": {
+                "type": ["object", "null"]
+              }
+            }
+          }
         }
       }
     }

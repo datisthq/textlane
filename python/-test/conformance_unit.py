@@ -43,6 +43,8 @@ def test_conformance(group, test, entry):
         if key in test:
             case[key] = test[key]
     actual = json.loads(textlane.run_case(json.dumps(case)))
+    if group.get("positions") is False:
+        actual = strip_positions(actual)
     if not entry:
         assert_outcome(actual, test["expected"])
         return
@@ -50,6 +52,15 @@ def test_conformance(group, test, entry):
         assert_outcome(actual, test["expected"])
     except AssertionError:
         failing_entries.add(entry)
+
+
+# A group with `positions: false` compares trees without them
+def strip_positions(value):
+    if isinstance(value, dict):
+        return {key: strip_positions(item) for key, item in value.items() if key != "position"}
+    if isinstance(value, list):
+        return [strip_positions(item) for item in value]
+    return value
 
 
 # A pending entry whose cases all pass is stale and fails the run

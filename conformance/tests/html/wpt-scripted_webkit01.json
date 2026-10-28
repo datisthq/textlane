@@ -1,0 +1,121 @@
+[
+  {
+    "description": "WPT scripted_webkit01.dat",
+    "source": {
+      "repository": "https://github.com/web-platform-tests/wpt",
+      "commit": "07ce6e987a1606aec4dc84ef80062d9797330e0b",
+      "path": "html/syntax/parsing/resources/scripted_webkit01.dat",
+      "license": "BSD-3-Clause"
+    },
+    "pipeline": [["html.parse"]],
+    "positions": false,
+    "tests": [
+      {
+        "description": "case 1",
+        "input": "1<script>document.write(\"2\")</script>3",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "1"
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "script",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "document.write(\"2\")"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "text",
+                        "value": "3"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 2",
+        "input": "1<script>document.write(\"<script>document.write('2')</scr\"+ \"ipt><script>document.write('3')</scr\" + \"ipt>\")</script>4",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "1"
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "script",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "document.write(\"<script>document.write('2')</scr\"+ \"ipt><script>document.write('3')</scr\" + \"ipt>\")"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "text",
+                        "value": "4"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      }
+    ]
+  }
+]

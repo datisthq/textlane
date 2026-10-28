@@ -1,3 +1,4 @@
+import rehypeParse from "rehype-parse"
 import rehypeStringify from "rehype-stringify"
 import { directiveToMarkdown } from "mdast-util-directive"
 import remarkDefinitionList, { defListHastHandlers } from "remark-definition-list"
@@ -119,4 +120,34 @@ function withOptions(name: string, options: unknown) {
   const empty =
     options === null || (typeof options === "object" && Object.keys(options).length === 0)
   return empty ? [name] : [name, options]
+}
+
+/** Parse HTML to hast, with positions, through the pinned rehype-parse. */
+export function parseHtml(html: string, options: Record<string, unknown> = {}): object {
+  return JSON.parse(JSON.stringify(unified().use(rehypeParse, options).parse(html)))
+}
+
+/** Parse and serialize HTML through the pinned rehype-parse and rehype-stringify. */
+export function processHtml(props: {
+  html: string
+  parse?: Record<string, unknown>
+  stringify?: Record<string, unknown>
+}) {
+  const processor = unified()
+    .use(rehypeParse, props.parse ?? {})
+    .use(rehypeStringify, props.stringify ?? {})
+  return String(processor.processSync(props.html))
+}
+
+/** The parse errors rehype-parse reports, as a case's `expected.messages`. */
+export function collectParseErrors(html: string, options: Record<string, unknown> = {}) {
+  const file = unified()
+    .use(rehypeParse, { ...options, emitParseErrors: true })
+    .use(rehypeStringify)
+    .processSync(html)
+  return file.messages.map(message => ({
+    ruleId: message.ruleId ?? "",
+    source: message.source ?? "",
+    place: JSON.parse(JSON.stringify(message.place ?? null)),
+  }))
 }

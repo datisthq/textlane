@@ -1,0 +1,2857 @@
+[
+  {
+    "description": "hast-util-sanitize",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-sanitize",
+      "commit": "7f30d9e6261583efc544ff6a93ba54ca6e53e1b5",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["html.sanitize"]],
+    "tests": [
+      {
+        "description": "should allow known properties",
+        "tree": {
+          "type": "text",
+          "tagName": "div",
+          "value": "alert(1)",
+          "unknown": "alert(1)",
+          "properties": {
+            "href": "javascript:alert(1)"
+          },
+          "children": [
+            {
+              "type": "element",
+              "tagName": "script",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alert(1)"
+                }
+              ]
+            }
+          ],
+          "data": {
+            "href": "alert(1)"
+          },
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1
+            },
+            "end": {
+              "line": 2,
+              "column": 1
+            }
+          }
+        },
+        "expected": {
+          "tree": {
+            "type": "text",
+            "value": "alert(1)",
+            "data": {
+              "href": "alert(1)"
+            },
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1
+              },
+              "end": {
+                "line": 2,
+                "column": 1
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should allow known properties (2)",
+        "tree": {
+          "type": "element",
+          "tagName": "div",
+          "value": "alert(1)",
+          "unknown": "alert(1)",
+          "properties": {
+            "href": "javascript:alert(1)"
+          },
+          "children": [
+            {
+              "type": "element",
+              "tagName": "script",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alert(1)"
+                }
+              ]
+            }
+          ],
+          "data": {
+            "href": "alert(1)"
+          },
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1
+            },
+            "end": {
+              "line": 2,
+              "column": 1
+            }
+          }
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "div",
+            "properties": {},
+            "children": [],
+            "data": {
+              "href": "alert(1)"
+            },
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1
+              },
+              "end": {
+                "line": 2,
+                "column": 1
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should ignore unknown elements",
+        "tree": {
+          "type": "element",
+          "tagName": "unknown",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "alert(1)"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "text",
+            "value": "alert(1)"
+          }
+        }
+      },
+      {
+        "description": "should ignore elements without name",
+        "tree": {
+          "type": "element",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "alert(1)"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "text",
+            "value": "alert(1)"
+          }
+        }
+      },
+      {
+        "description": "should support elements without children / properties",
+        "tree": {
+          "type": "element",
+          "tagName": "div"
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "div",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should always return a valid node (#1)",
+        "tree": {
+          "type": "element",
+          "tagName": "unknown",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should always return a valid node (#2)",
+        "tree": {
+          "type": "element",
+          "tagName": "script",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should always return a valid node (#3)",
+        "tree": {
+          "type": "element",
+          "tagName": "div",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "style",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "1"
+                },
+                {
+                  "type": "text",
+                  "value": "2"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "div",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "1"
+              },
+              {
+                "type": "text",
+                "value": "2"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should always return a valid node (#4)",
+        "tree": {
+          "type": "element",
+          "tagName": "unknown",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "value"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "text",
+            "value": "value"
+          }
+        }
+      },
+      {
+        "description": "should always return a valid node (#5)",
+        "tree": {
+          "type": "element",
+          "tagName": "unknown",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "1"
+            },
+            {
+              "type": "text",
+              "value": "2"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "1"
+              },
+              {
+                "type": "text",
+                "value": "2"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should allow known generic properties",
+        "tree": {
+          "type": "element",
+          "tagName": "div",
+          "properties": {
+            "alt": "alpha"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "div",
+            "properties": {
+              "alt": "alpha"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow specific properties",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "href": "#heading"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "a",
+            "properties": {
+              "href": "#heading"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should ignore mismatched specific properties",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "href": "#heading"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should ignore unspecified properties",
+        "tree": {
+          "type": "element",
+          "tagName": "div",
+          "properties": {
+            "dataFoo": "bar"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "div",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should ignore unspecified properties (2)",
+        "tree": {
+          "type": "element",
+          "tagName": "div",
+          "properties": {
+            "dataFoo": "bar"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "div",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow `string`s",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "alt": "hello"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "alt": "hello"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow `boolean`s",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "alt": true
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "alt": true
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow `number`s",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "alt": 1
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "alt": 1
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should ignore `null`",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "alt": null
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should ignore `undefined`",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should prevent clobbering (`id`)",
+        "tree": {
+          "type": "element",
+          "tagName": "div",
+          "properties": {
+            "id": "getElementById"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "div",
+            "properties": {
+              "id": "user-content-getElementById"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should prevent clobbering (`name`)",
+        "tree": {
+          "type": "element",
+          "tagName": "div",
+          "properties": {
+            "name": "getElementById"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "div",
+            "properties": {
+              "name": "user-content-getElementById"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should ignore `svg` elements",
+        "tree": {
+          "type": "element",
+          "tagName": "svg",
+          "properties": {
+            "viewBox": "0 0 50 50"
+          },
+          "children": [
+            {
+              "type": "text",
+              "value": "!"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "text",
+            "value": "!"
+          }
+        }
+      },
+      {
+        "description": "should allow anchor in a[href]",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "href": "#heading"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "a",
+            "properties": {
+              "href": "#heading"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow relative in a[href]",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "href": "/file.html"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "a",
+            "properties": {
+              "href": "/file.html"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow search in a[href]",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "href": "example.com?foo:bar"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "a",
+            "properties": {
+              "href": "example.com?foo:bar"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow hash in a[href]",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "href": "example.com#foo:bar"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "a",
+            "properties": {
+              "href": "example.com#foo:bar"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow protocol-less in a[href]",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "href": "www.example.com"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "a",
+            "properties": {
+              "href": "www.example.com"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow mailto in a[href]",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "href": "mailto:foo@bar.com"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "a",
+            "properties": {
+              "href": "mailto:foo@bar.com"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow https in a[href]",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "href": "http://example.com"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "a",
+            "properties": {
+              "href": "http://example.com"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow http in a[href]",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "href": "http://example.com"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "a",
+            "properties": {
+              "href": "http://example.com"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean javascript in a[href]",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "href": "javascript:alert(1)"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "a",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean whitespace in a[href]",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "href": " javascript:while(1){}"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "a",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean Unicode LS/PS I in a[href]",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "href": " javascript:alert(1)"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "a",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean Unicode Whitespace (#1) in a[href]",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "href": " javascript:alert(1)"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "a",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean Unicode Whitespace (#2) in a[href]",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "href": " javascript:alert(1)"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "a",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean infinity loop in a[href]",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "href": "javascript:while(1){}"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "a",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean data URL in a[href]",
+        "tree": {
+          "type": "element",
+          "tagName": "a",
+          "properties": {
+            "href": "data:,evilnastystuff"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "a",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow anchor in blockquote[cite]",
+        "tree": {
+          "type": "element",
+          "tagName": "blockquote",
+          "properties": {
+            "cite": "#heading"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "blockquote",
+            "properties": {
+              "cite": "#heading"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow relative in blockquote[cite]",
+        "tree": {
+          "type": "element",
+          "tagName": "blockquote",
+          "properties": {
+            "cite": "/file.html"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "blockquote",
+            "properties": {
+              "cite": "/file.html"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow search in blockquote[cite]",
+        "tree": {
+          "type": "element",
+          "tagName": "blockquote",
+          "properties": {
+            "cite": "example.com?foo:bar"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "blockquote",
+            "properties": {
+              "cite": "example.com?foo:bar"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow hash in blockquote[cite]",
+        "tree": {
+          "type": "element",
+          "tagName": "blockquote",
+          "properties": {
+            "cite": "example.com#foo:bar"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "blockquote",
+            "properties": {
+              "cite": "example.com#foo:bar"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow protocol-less in blockquote[cite]",
+        "tree": {
+          "type": "element",
+          "tagName": "blockquote",
+          "properties": {
+            "cite": "www.example.com"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "blockquote",
+            "properties": {
+              "cite": "www.example.com"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow https in blockquote[cite]",
+        "tree": {
+          "type": "element",
+          "tagName": "blockquote",
+          "properties": {
+            "cite": "http://example.com"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "blockquote",
+            "properties": {
+              "cite": "http://example.com"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow http in blockquote[cite]",
+        "tree": {
+          "type": "element",
+          "tagName": "blockquote",
+          "properties": {
+            "cite": "http://example.com"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "blockquote",
+            "properties": {
+              "cite": "http://example.com"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean mailto in blockquote[cite]",
+        "tree": {
+          "type": "element",
+          "tagName": "blockquote",
+          "properties": {
+            "cite": "mailto:foo@bar.com"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "blockquote",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean javascript in blockquote[cite]",
+        "tree": {
+          "type": "element",
+          "tagName": "blockquote",
+          "properties": {
+            "cite": "javascript:alert(1)"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "blockquote",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean Unicode LS/PS I in blockquote[cite]",
+        "tree": {
+          "type": "element",
+          "tagName": "blockquote",
+          "properties": {
+            "cite": " javascript:alert(1)"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "blockquote",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean Unicode Whitespace (#1) in blockquote[cite]",
+        "tree": {
+          "type": "element",
+          "tagName": "blockquote",
+          "properties": {
+            "cite": " javascript:alert(1)"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "blockquote",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean Unicode Whitespace (#2) in blockquote[cite]",
+        "tree": {
+          "type": "element",
+          "tagName": "blockquote",
+          "properties": {
+            "cite": " javascript:alert(1)"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "blockquote",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean infinity loop in blockquote[cite]",
+        "tree": {
+          "type": "element",
+          "tagName": "blockquote",
+          "properties": {
+            "cite": "javascript:while(1){}"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "blockquote",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean data URL in blockquote[cite]",
+        "tree": {
+          "type": "element",
+          "tagName": "blockquote",
+          "properties": {
+            "cite": "data:,evilnastystuff"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "blockquote",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow anchor in img[src]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "src": "#heading"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "src": "#heading"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow relative in img[src]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "src": "/file.html"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "src": "/file.html"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow search in img[src]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "src": "example.com?foo:bar"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "src": "example.com?foo:bar"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow hash in img[src]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "src": "example.com#foo:bar"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "src": "example.com#foo:bar"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow protocol-less in img[src]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "src": "www.example.com"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "src": "www.example.com"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow https in img[src]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "src": "http://example.com"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "src": "http://example.com"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow http in img[src]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "src": "http://example.com"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "src": "http://example.com"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean mailto in img[src]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "src": "mailto:foo@bar.com"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean javascript in img[src]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "src": "javascript:alert(1)"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean Unicode LS/PS I in img[src]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "src": " javascript:alert(1)"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean Unicode Whitespace (#1) in img[src]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "src": " javascript:alert(1)"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean Unicode Whitespace (#2) in img[src]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "src": " javascript:alert(1)"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean infinity loop in img[src]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "src": "javascript:while(1){}"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean data URL in img[src]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "src": "data:,evilnastystuff"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow anchor in img[longDesc]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "longDesc": "#heading"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "longDesc": "#heading"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow relative in img[longDesc]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "longDesc": "/file.html"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "longDesc": "/file.html"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow search in img[longDesc]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "longDesc": "example.com?foo:bar"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "longDesc": "example.com?foo:bar"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow hash in img[longDesc]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "longDesc": "example.com#foo:bar"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "longDesc": "example.com#foo:bar"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow protocol-less in img[longDesc]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "longDesc": "www.example.com"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "longDesc": "www.example.com"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow https in img[longDesc]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "longDesc": "http://example.com"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "longDesc": "http://example.com"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow http in img[longDesc]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "longDesc": "http://example.com"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "longDesc": "http://example.com"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean mailto in img[longDesc]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "longDesc": "mailto:foo@bar.com"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean javascript in img[longDesc]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "longDesc": "javascript:alert(1)"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean Unicode LS/PS I in img[longDesc]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "longDesc": " javascript:alert(1)"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean Unicode Whitespace (#1) in img[longDesc]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "longDesc": " javascript:alert(1)"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean Unicode Whitespace (#2) in img[longDesc]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "longDesc": " javascript:alert(1)"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean infinity loop in img[longDesc]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "longDesc": "javascript:while(1){}"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should clean data URL in img[longDesc]",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "longDesc": "data:,evilnastystuff"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow `li` outside list",
+        "tree": {
+          "type": "element",
+          "tagName": "li",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "alert(1)"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "li",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "alert(1)"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should allow `li` in `ol`",
+        "tree": {
+          "type": "element",
+          "tagName": "ol",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alert(1)"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "ol",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "li",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "alert(1)"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should allow `li` in `ul`",
+        "tree": {
+          "type": "element",
+          "tagName": "ul",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alert(1)"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "ul",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "li",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "alert(1)"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should allow `li` descendant `ol`",
+        "tree": {
+          "type": "element",
+          "tagName": "ol",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "div",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "li",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "alert(1)"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "ol",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "div",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "li",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "alert(1)"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should allow `li` descendant `ul`",
+        "tree": {
+          "type": "element",
+          "tagName": "ul",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "div",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "li",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "alert(1)"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "ul",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "div",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "li",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "alert(1)"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should allow only disabled checkbox inputs",
+        "tree": {
+          "type": "element",
+          "tagName": "input",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "input",
+            "properties": {
+              "disabled": true,
+              "type": "checkbox"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should not allow text inputs",
+        "tree": {
+          "type": "element",
+          "tagName": "input",
+          "properties": {
+            "type": "text"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "input",
+            "properties": {
+              "disabled": true,
+              "type": "checkbox"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should not allow enabled inputs",
+        "tree": {
+          "type": "element",
+          "tagName": "input",
+          "properties": {
+            "type": "checkbox",
+            "disabled": false
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "input",
+            "properties": {
+              "type": "checkbox",
+              "disabled": true
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow list items",
+        "tree": {
+          "type": "element",
+          "tagName": "ol",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "ol",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "li",
+                "properties": {},
+                "children": []
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should not allow classes on list items",
+        "tree": {
+          "type": "element",
+          "tagName": "ol",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {
+                "className": ["foo", "bar"]
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "ol",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "li",
+                "properties": {
+                  "className": []
+                },
+                "children": []
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should only allow `task-list-item` as a class on list items",
+        "tree": {
+          "type": "element",
+          "tagName": "ol",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {
+                "className": ["foo", "task-list-item"]
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "ol",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "li",
+                "properties": {
+                  "className": ["task-list-item"]
+                },
+                "children": []
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should ignore some elements by default",
+        "tree": {
+          "type": "element",
+          "tagName": "select",
+          "properties": {},
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should allow known properties (3)",
+        "tree": {
+          "type": "root",
+          "tagName": "div",
+          "value": "alert(1)",
+          "unknown": "alert(1)",
+          "properties": {
+            "href": "javascript:alert(1)"
+          },
+          "children": [
+            {
+              "type": "element",
+              "tagName": "script",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alert(1)"
+                }
+              ]
+            }
+          ],
+          "data": {
+            "href": "alert(1)"
+          },
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1
+            },
+            "end": {
+              "line": 2,
+              "column": 1
+            }
+          }
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [],
+            "data": {
+              "href": "alert(1)"
+            },
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1
+              },
+              "end": {
+                "line": 2,
+                "column": 1
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-sanitize {\"tagNames\":[\"img\"]}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-sanitize",
+      "commit": "7f30d9e6261583efc544ff6a93ba54ca6e53e1b5",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.sanitize",
+        {
+          "tagNames": ["img"]
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should not support allowing *all* attributes",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "title": true
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "title": true
+            },
+            "children": []
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-sanitize {\"tagNames\":[\"input\"]}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-sanitize",
+      "commit": "7f30d9e6261583efc544ff6a93ba54ca6e53e1b5",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.sanitize",
+        {
+          "tagNames": ["input"]
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support not setting `required`",
+        "tree": {
+          "type": "element",
+          "tagName": "input",
+          "properties": {
+            "checked": true
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "input",
+            "properties": {
+              "checked": true,
+              "disabled": true,
+              "type": "checkbox"
+            },
+            "children": []
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-sanitize {\"tagNames\":[\"div\",\"ul\",\"li\"],\"ancestors\":{\"li\":[\"ul\"]}}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-sanitize",
+      "commit": "7f30d9e6261583efc544ff6a93ba54ca6e53e1b5",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.sanitize",
+        {
+          "tagNames": ["div", "ul", "li"],
+          "ancestors": {
+            "li": ["ul"]
+          }
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support `ancestors` to enforce certain ancestors (rehypejs/rehype-sanitize#8)",
+        "tree": {
+          "type": "element",
+          "tagName": "div",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "text"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "div",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "text"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should support `ancestors` to enforce certain ancestors in a `root` (rehypejs/rehype-sanitize#8)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "div",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "li",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "text"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "div",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "text"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-sanitize {\"ancestors\":{\"tbody\":[\"table\"],\"td\":[\"table\"],\"th\":[\"table\"],\"thead\":[\"table\"],\"tfoot\":[\"table\"],\"tr\":[\"table\"]},\"attributes\":{\"a\":[[\"x\",\"y\"]],\"*\":[[\"x\",\"z\"]]},\"clobber\":[\"ariaDescribedBy\",\"ariaLabelledBy\",\"id\",\"name\"],\"clobberPrefix\":\"user-content-\",\"protocols\":{\"cite\":[\"http\",\"https\"],\"href\":[\"http\",\"https\",\"irc\",\"ircs\",\"mailto\",\"xmpp\"],\"longDesc\":[\"http\",\"https\"],\"src\":[\"http\",\"https\"]},\"required\":{\"input\":{\"disabled\":true,\"type\":\"checkbox\"}},\"strip\":[\"script\"],\"tagNames\":[\"a\",\"b\",\"blockquote\",\"br\",\"code\",\"dd\",\"del\",\"details\",\"div\",\"dl\",\"dt\",\"em\",\"h1\",\"h2\",\"h3\",\"h4\",\"h5\",\"h6\",\"hr\",\"i\",\"img\",\"input\",\"ins\",\"kbd\",\"li\",\"ol\",\"p\",\"picture\",\"pre\",\"q\",\"rp\",\"rt\",\"ruby\",\"s\",\"samp\",\"section\",\"source\",\"span\",\"strike\",\"strong\",\"sub\",\"summary\",\"sup\",\"table\",\"tbody\",\"td\",\"tfoot\",\"th\",\"thead\",\"tr\",\"tt\",\"ul\",\"var\"]}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-sanitize",
+      "commit": "7f30d9e6261583efc544ff6a93ba54ca6e53e1b5",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.sanitize",
+        {
+          "ancestors": {
+            "tbody": ["table"],
+            "td": ["table"],
+            "th": ["table"],
+            "thead": ["table"],
+            "tfoot": ["table"],
+            "tr": ["table"]
+          },
+          "attributes": {
+            "a": [["x", "y"]],
+            "*": [["x", "z"]]
+          },
+          "clobber": ["ariaDescribedBy", "ariaLabelledBy", "id", "name"],
+          "clobberPrefix": "user-content-",
+          "protocols": {
+            "cite": ["http", "https"],
+            "href": ["http", "https", "irc", "ircs", "mailto", "xmpp"],
+            "longDesc": ["http", "https"],
+            "src": ["http", "https"]
+          },
+          "required": {
+            "input": {
+              "disabled": true,
+              "type": "checkbox"
+            }
+          },
+          "strip": ["script"],
+          "tagNames": [
+            "a",
+            "b",
+            "blockquote",
+            "br",
+            "code",
+            "dd",
+            "del",
+            "details",
+            "div",
+            "dl",
+            "dt",
+            "em",
+            "h1",
+            "h2",
+            "h3",
+            "h4",
+            "h5",
+            "h6",
+            "hr",
+            "i",
+            "img",
+            "input",
+            "ins",
+            "kbd",
+            "li",
+            "ol",
+            "p",
+            "picture",
+            "pre",
+            "q",
+            "rp",
+            "rt",
+            "ruby",
+            "s",
+            "samp",
+            "section",
+            "source",
+            "span",
+            "strike",
+            "strong",
+            "sub",
+            "summary",
+            "sup",
+            "table",
+            "tbody",
+            "td",
+            "tfoot",
+            "th",
+            "thead",
+            "tr",
+            "tt",
+            "ul",
+            "var"
+          ]
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should allow specific values allowed by either a specific or generic attribute definition (1)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "a",
+              "properties": {
+                "x": "y"
+              },
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "a",
+              "properties": {
+                "x": "z"
+              },
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "a",
+              "properties": {
+                "x": "w"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "a",
+                "properties": {
+                  "x": "y"
+                },
+                "children": []
+              },
+              {
+                "type": "element",
+                "tagName": "a",
+                "properties": {
+                  "x": "z"
+                },
+                "children": []
+              },
+              {
+                "type": "element",
+                "tagName": "a",
+                "properties": {},
+                "children": []
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-sanitize {\"ancestors\":{\"tbody\":[\"table\"],\"td\":[\"table\"],\"th\":[\"table\"],\"thead\":[\"table\"],\"tfoot\":[\"table\"],\"tr\":[\"table\"]},\"attributes\":{\"a\":[\"x\"],\"*\":[[\"x\",\"z\"]]},\"clobber\":[\"ariaDescribedBy\",\"ariaLabelledBy\",\"id\",\"name\"],\"clobberPrefix\":\"user-content-\",\"protocols\":{\"cite\":[\"http\",\"https\"],\"href\":[\"http\",\"https\",\"irc\",\"ircs\",\"mailto\",\"xmpp\"],\"longDesc\":[\"http\",\"https\"],\"src\":[\"http\",\"https\"]},\"required\":{\"input\":{\"disabled\":true,\"type\":\"checkbox\"}},\"strip\":[\"script\"],\"tagNames\":[\"a\",\"b\",\"blockquote\",\"br\",\"code\",\"dd\",\"del\",\"details\",\"div\",\"dl\",\"dt\",\"em\",\"h1\",\"h2\",\"h3\",\"h4\",\"h5\",\"h6\",\"hr\",\"i\",\"img\",\"input\",\"ins\",\"kbd\",\"li\",\"ol\",\"p\",\"picture\",\"pre\",\"q\",\"rp\",\"rt\",\"ruby\",\"s\",\"samp\",\"section\",\"source\",\"span\",\"strike\",\"strong\",\"sub\",\"summary\",\"sup\",\"table\",\"tbody\",\"td\",\"tfoot\",\"th\",\"thead\",\"tr\",\"tt\",\"ul\",\"var\"]}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-sanitize",
+      "commit": "7f30d9e6261583efc544ff6a93ba54ca6e53e1b5",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.sanitize",
+        {
+          "ancestors": {
+            "tbody": ["table"],
+            "td": ["table"],
+            "th": ["table"],
+            "thead": ["table"],
+            "tfoot": ["table"],
+            "tr": ["table"]
+          },
+          "attributes": {
+            "a": ["x"],
+            "*": [["x", "z"]]
+          },
+          "clobber": ["ariaDescribedBy", "ariaLabelledBy", "id", "name"],
+          "clobberPrefix": "user-content-",
+          "protocols": {
+            "cite": ["http", "https"],
+            "href": ["http", "https", "irc", "ircs", "mailto", "xmpp"],
+            "longDesc": ["http", "https"],
+            "src": ["http", "https"]
+          },
+          "required": {
+            "input": {
+              "disabled": true,
+              "type": "checkbox"
+            }
+          },
+          "strip": ["script"],
+          "tagNames": [
+            "a",
+            "b",
+            "blockquote",
+            "br",
+            "code",
+            "dd",
+            "del",
+            "details",
+            "div",
+            "dl",
+            "dt",
+            "em",
+            "h1",
+            "h2",
+            "h3",
+            "h4",
+            "h5",
+            "h6",
+            "hr",
+            "i",
+            "img",
+            "input",
+            "ins",
+            "kbd",
+            "li",
+            "ol",
+            "p",
+            "picture",
+            "pre",
+            "q",
+            "rp",
+            "rt",
+            "ruby",
+            "s",
+            "samp",
+            "section",
+            "source",
+            "span",
+            "strike",
+            "strong",
+            "sub",
+            "summary",
+            "sup",
+            "table",
+            "tbody",
+            "td",
+            "tfoot",
+            "th",
+            "thead",
+            "tr",
+            "tt",
+            "ul",
+            "var"
+          ]
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should allow specific values allowed by either a specific or generic attribute definition (2)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "a",
+              "properties": {
+                "x": "y"
+              },
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "a",
+              "properties": {
+                "x": "z"
+              },
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "a",
+              "properties": {
+                "x": "w"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "a",
+                "properties": {
+                  "x": "y"
+                },
+                "children": []
+              },
+              {
+                "type": "element",
+                "tagName": "a",
+                "properties": {
+                  "x": "z"
+                },
+                "children": []
+              },
+              {
+                "type": "element",
+                "tagName": "a",
+                "properties": {
+                  "x": "w"
+                },
+                "children": []
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-sanitize {\"ancestors\":{\"tbody\":[\"table\"],\"td\":[\"table\"],\"th\":[\"table\"],\"thead\":[\"table\"],\"tfoot\":[\"table\"],\"tr\":[\"table\"]},\"attributes\":{\"a\":[[\"x\",\"y\"]],\"*\":[\"x\"]},\"clobber\":[\"ariaDescribedBy\",\"ariaLabelledBy\",\"id\",\"name\"],\"clobberPrefix\":\"user-content-\",\"protocols\":{\"cite\":[\"http\",\"https\"],\"href\":[\"http\",\"https\",\"irc\",\"ircs\",\"mailto\",\"xmpp\"],\"longDesc\":[\"http\",\"https\"],\"src\":[\"http\",\"https\"]},\"required\":{\"input\":{\"disabled\":true,\"type\":\"checkbox\"}},\"strip\":[\"script\"],\"tagNames\":[\"a\",\"b\",\"blockquote\",\"br\",\"code\",\"dd\",\"del\",\"details\",\"div\",\"dl\",\"dt\",\"em\",\"h1\",\"h2\",\"h3\",\"h4\",\"h5\",\"h6\",\"hr\",\"i\",\"img\",\"input\",\"ins\",\"kbd\",\"li\",\"ol\",\"p\",\"picture\",\"pre\",\"q\",\"rp\",\"rt\",\"ruby\",\"s\",\"samp\",\"section\",\"source\",\"span\",\"strike\",\"strong\",\"sub\",\"summary\",\"sup\",\"table\",\"tbody\",\"td\",\"tfoot\",\"th\",\"thead\",\"tr\",\"tt\",\"ul\",\"var\"]}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-sanitize",
+      "commit": "7f30d9e6261583efc544ff6a93ba54ca6e53e1b5",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.sanitize",
+        {
+          "ancestors": {
+            "tbody": ["table"],
+            "td": ["table"],
+            "th": ["table"],
+            "thead": ["table"],
+            "tfoot": ["table"],
+            "tr": ["table"]
+          },
+          "attributes": {
+            "a": [["x", "y"]],
+            "*": ["x"]
+          },
+          "clobber": ["ariaDescribedBy", "ariaLabelledBy", "id", "name"],
+          "clobberPrefix": "user-content-",
+          "protocols": {
+            "cite": ["http", "https"],
+            "href": ["http", "https", "irc", "ircs", "mailto", "xmpp"],
+            "longDesc": ["http", "https"],
+            "src": ["http", "https"]
+          },
+          "required": {
+            "input": {
+              "disabled": true,
+              "type": "checkbox"
+            }
+          },
+          "strip": ["script"],
+          "tagNames": [
+            "a",
+            "b",
+            "blockquote",
+            "br",
+            "code",
+            "dd",
+            "del",
+            "details",
+            "div",
+            "dl",
+            "dt",
+            "em",
+            "h1",
+            "h2",
+            "h3",
+            "h4",
+            "h5",
+            "h6",
+            "hr",
+            "i",
+            "img",
+            "input",
+            "ins",
+            "kbd",
+            "li",
+            "ol",
+            "p",
+            "picture",
+            "pre",
+            "q",
+            "rp",
+            "rt",
+            "ruby",
+            "s",
+            "samp",
+            "section",
+            "source",
+            "span",
+            "strike",
+            "strong",
+            "sub",
+            "summary",
+            "sup",
+            "table",
+            "tbody",
+            "td",
+            "tfoot",
+            "th",
+            "thead",
+            "tr",
+            "tt",
+            "ul",
+            "var"
+          ]
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should allow specific values allowed by either a specific or generic attribute definition (3)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "a",
+              "properties": {
+                "x": "y"
+              },
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "a",
+              "properties": {
+                "x": "z"
+              },
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "a",
+              "properties": {
+                "x": "w"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "a",
+                "properties": {
+                  "x": "y"
+                },
+                "children": []
+              },
+              {
+                "type": "element",
+                "tagName": "a",
+                "properties": {
+                  "x": "z"
+                },
+                "children": []
+              },
+              {
+                "type": "element",
+                "tagName": "a",
+                "properties": {
+                  "x": "w"
+                },
+                "children": []
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-sanitize",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-sanitize",
+      "commit": "b3ee205aeda4e0fc276cb6664b2d6d339305fcd6",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["html.parse"], ["html.sanitize"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should work",
+        "input": "<img onmouseover=\"alert('alpha')\">",
+        "expected": {
+          "html": "<img>"
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,1741 @@
+[
+  {
+    "description": "rehype parse errors",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype",
+      "commit": "cae74c7f729a55c6f407bdb95aaa362b44e7c2c2",
+      "path": "test/parse-error",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "emitParseErrors": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "abandoned-head-element-child",
+        "input": "<!doctype html>\n<title>abandoned-head-element-child</title>\n</head>\n<script>this.one.cant.be.here();</script>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "abandoned-head-element-child",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 68
+                },
+                "end": {
+                  "line": 4,
+                  "column": 9,
+                  "offset": 76
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "abrupt-closing-of-empty-comment",
+        "input": "<!doctype html>\n<title>abrupt closing of empty comment</title>\nThis one: <!-->.\nAnd this one: <!--->.\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "abrupt-closing-of-empty-comment",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 15,
+                  "offset": 77
+                },
+                "end": {
+                  "line": 3,
+                  "column": 15,
+                  "offset": 77
+                }
+              }
+            },
+            {
+              "ruleId": "abrupt-closing-of-empty-comment",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 4,
+                  "column": 20,
+                  "offset": 99
+                },
+                "end": {
+                  "line": 4,
+                  "column": 20,
+                  "offset": 99
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "abrupt-doctype-public-identifier",
+        "input": "<!doctype html public \"foo>\n<title>abrupt doctype public identifier</title>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "abrupt-doctype-public-identifier",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 27,
+                  "offset": 26
+                },
+                "end": {
+                  "line": 1,
+                  "column": 27,
+                  "offset": 26
+                }
+              }
+            },
+            {
+              "ruleId": "non-conforming-doctype",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 28,
+                  "offset": 27
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "abrupt-doctype-system-identifier",
+        "input": "<!doctype html public \"-//W3C//DTD HTML 4.01//EN\" \"foo>\n<title>abrupt doctype system identifier</title>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "abrupt-doctype-system-identifier",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 55,
+                  "offset": 54
+                },
+                "end": {
+                  "line": 1,
+                  "column": 55,
+                  "offset": 54
+                }
+              }
+            },
+            {
+              "ruleId": "non-conforming-doctype",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 56,
+                  "offset": 55
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "absence-of-digits-in-numeric-character-reference",
+        "input": "<!doctype html>\n<title>absence-of-digits-in-numeric-character-reference</title>\n&#abc;\n&#xghi;\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "absence-of-digits-in-numeric-character-reference",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 3,
+                  "offset": 82
+                },
+                "end": {
+                  "line": 3,
+                  "column": 3,
+                  "offset": 82
+                }
+              }
+            },
+            {
+              "ruleId": "absence-of-digits-in-numeric-character-reference",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 4,
+                  "column": 4,
+                  "offset": 90
+                },
+                "end": {
+                  "line": 4,
+                  "column": 4,
+                  "offset": 90
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "cdata-in-html-content",
+        "input": "<!doctype html>\n<title>cdata-in-html-content</title>\n<![CDATA[cdata is not ok in html anymore]]>\n<svg><![CDATA[but it’s fine in foreign content]]></svg>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "cdata-in-html-content",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 9,
+                  "offset": 61
+                },
+                "end": {
+                  "line": 3,
+                  "column": 9,
+                  "offset": 61
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "character-reference-outside-unicode-range",
+        "input": "<!doctype html>\n<title>character-reference-outside-unicode-range</title>\n&#1114112;\n&#x110000;\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "character-reference-outside-unicode-range",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 11,
+                  "offset": 83
+                },
+                "end": {
+                  "line": 3,
+                  "column": 11,
+                  "offset": 83
+                }
+              }
+            },
+            {
+              "ruleId": "character-reference-outside-unicode-range",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 4,
+                  "column": 11,
+                  "offset": 94
+                },
+                "end": {
+                  "line": 4,
+                  "column": 11,
+                  "offset": 94
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "closing-of-element-with-open-child-elements",
+        "input": "<!doctype html>\n<title>closing-of-element-with-open-child-elements</title>\n<template id=a><b></template>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "closing-of-element-with-open-child-elements",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 19,
+                  "offset": 93
+                },
+                "end": {
+                  "line": 3,
+                  "column": 30,
+                  "offset": 104
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "control-character-in-input-stream",
+        "input": "<!doctype html>\n<title>control-character-in-input-stream</title>\n<!-- note: there’s a 0x7f before the eof: -->\n\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "control-character-in-input-stream",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 111
+                },
+                "end": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 111
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "control-character-reference",
+        "input": "<!doctype html>\n<title>control-character-reference</title>\n&#x7f;\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "control-character-reference",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 7,
+                  "offset": 65
+                },
+                "end": {
+                  "line": 3,
+                  "column": 7,
+                  "offset": 65
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "disallowed-content-in-noscript-in-head",
+        "input": "<!doctype html>\n<title>disallowed-content-in-noscript-in-head</title>\n<noscript>hi!</noscript>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "disallowed-content-in-noscript-in-head",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 11,
+                  "offset": 80
+                },
+                "end": {
+                  "line": 3,
+                  "column": 14,
+                  "offset": 83
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "duplicate-attribute",
+        "input": "<!doctype html>\n<title id=a id=b>duplicate-attribute</title>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "duplicate-attribute",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 2,
+                  "column": 15,
+                  "offset": 30
+                },
+                "end": {
+                  "line": 2,
+                  "column": 15,
+                  "offset": 30
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "end-tag-with-attributes",
+        "input": "<!doctype html>\n<title>end-tag-with-attributes</title id=\"a\">\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "end-tag-with-attributes",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 2,
+                  "column": 45,
+                  "offset": 60
+                },
+                "end": {
+                  "line": 2,
+                  "column": 45,
+                  "offset": 60
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "end-tag-with-trailing-solidus",
+        "input": "<!doctype html>\n<title>end-tag-with-trailing-solidus</title/>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "end-tag-with-trailing-solidus",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 2,
+                  "column": 45,
+                  "offset": 60
+                },
+                "end": {
+                  "line": 2,
+                  "column": 45,
+                  "offset": 60
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "end-tag-without-matching-open-element",
+        "input": "<!doctype html>\n<title>end-tag-without-matching-open-element</title>\n</template>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "end-tag-without-matching-open-element",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 1,
+                  "offset": 69
+                },
+                "end": {
+                  "line": 3,
+                  "column": 12,
+                  "offset": 80
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "eof-before-tag-name",
+        "input": "<!doctype html>\n<title>eof-before-tag-name</title>\n<",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "eof-before-tag-name",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 2,
+                  "offset": 52
+                },
+                "end": {
+                  "line": 3,
+                  "column": 2,
+                  "offset": 52
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "eof-in-cdata",
+        "input": "<!doctype html>\n<title>eof-in-cdata</title>\n<svg><![CDATA[\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "eof-in-cdata",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 59
+                },
+                "end": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 59
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "eof-in-comment",
+        "input": "<!doctype html>\n<title>eof-in-comment</title>\n<!--\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "eof-in-comment",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 51
+                },
+                "end": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 51
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "eof-in-doctype",
+        "input": "<!doctype\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "eof-in-doctype",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 2,
+                  "column": 1,
+                  "offset": 10
+                },
+                "end": {
+                  "line": 2,
+                  "column": 1,
+                  "offset": 10
+                }
+              }
+            },
+            {
+              "ruleId": "non-conforming-doctype",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 2,
+                  "offset": 11
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "eof-in-element-that-can-contain-only-text",
+        "input": "<!doctype html>\n<title>eof-in-element-that-can-contain-only-text</title>\n<textarea>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "eof-in-element-that-can-contain-only-text",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 84
+                },
+                "end": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 84
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "eof-in-script-html-comment-like-text",
+        "input": "<!doctype html>\n<title>eof-in-script-html-comment-like-text</title>\n<script><!-- foo\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "eof-in-script-html-comment-like-text",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 85
+                },
+                "end": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 85
+                }
+              }
+            },
+            {
+              "ruleId": "eof-in-element-that-can-contain-only-text",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 85
+                },
+                "end": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 85
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "eof-in-tag",
+        "input": "<!doctype html>\n<title>eof-in-tag</title>\n<div\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "eof-in-tag",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 47
+                },
+                "end": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 47
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "incorrectly-closed-comment",
+        "input": "<!doctype html>\n<title>incorrectly-closed-comment</title>\n<!-- --!>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "incorrectly-closed-comment",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 9,
+                  "offset": 66
+                },
+                "end": {
+                  "line": 3,
+                  "column": 9,
+                  "offset": 66
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "incorrectly-opened-comment",
+        "input": "<!doctype html>\n<title>incorrectly-opened-comment</title>\n<!foo>\n<!-bar>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "incorrectly-opened-comment",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 3,
+                  "offset": 60
+                },
+                "end": {
+                  "line": 3,
+                  "column": 3,
+                  "offset": 60
+                }
+              }
+            },
+            {
+              "ruleId": "incorrectly-opened-comment",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 4,
+                  "column": 3,
+                  "offset": 67
+                },
+                "end": {
+                  "line": 4,
+                  "column": 3,
+                  "offset": 67
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "invalid-character-sequence-after-doctype-name",
+        "input": "<!doctype html bogus>\n<title>invalid-character-sequence-after-doctype-name</title>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "invalid-character-sequence-after-doctype-name",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 16,
+                  "offset": 15
+                },
+                "end": {
+                  "line": 1,
+                  "column": 16,
+                  "offset": 15
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "invalid-first-character-of-tag-name",
+        "input": "<!doctype html>\n<title>invalid-first-character-of-tag-name</title>\n<42></42>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "invalid-first-character-of-tag-name",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 2,
+                  "offset": 68
+                },
+                "end": {
+                  "line": 3,
+                  "column": 2,
+                  "offset": 68
+                }
+              }
+            },
+            {
+              "ruleId": "invalid-first-character-of-tag-name",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 7,
+                  "offset": 73
+                },
+                "end": {
+                  "line": 3,
+                  "column": 7,
+                  "offset": 73
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "misplaced-doctype",
+        "input": "<!doctype html>\n<title>misplaced-doctype</title>\n<!doctype html>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "misplaced-doctype",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 1,
+                  "offset": 49
+                },
+                "end": {
+                  "line": 3,
+                  "column": 16,
+                  "offset": 64
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "misplaced-start-tag-for-head-element",
+        "input": "<!doctype html>\n<title>misplaced-start-tag-for-head-element</title>\n<head>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "misplaced-start-tag-for-head-element",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 1,
+                  "offset": 68
+                },
+                "end": {
+                  "line": 3,
+                  "column": 7,
+                  "offset": 74
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "missing-attribute-value",
+        "input": "<!doctype html>\n<title id=>missing-attribute-value</title>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "missing-attribute-value",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 2,
+                  "column": 11,
+                  "offset": 26
+                },
+                "end": {
+                  "line": 2,
+                  "column": 11,
+                  "offset": 26
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "missing-doctype",
+        "input": "<title>missing doctype</title>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "missing-doctype",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "missing-doctype-name",
+        "input": "<!doctype>\n<title>missing-doctype-name</title>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "missing-doctype-name",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 10,
+                  "offset": 9
+                },
+                "end": {
+                  "line": 1,
+                  "column": 10,
+                  "offset": 9
+                }
+              }
+            },
+            {
+              "ruleId": "non-conforming-doctype",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 11,
+                  "offset": 10
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "missing-doctype-public-identifier",
+        "input": "<!doctype html public>\n<title>missing-doctype-public-identifier</title>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "missing-doctype-public-identifier",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 22,
+                  "offset": 21
+                },
+                "end": {
+                  "line": 1,
+                  "column": 22,
+                  "offset": 21
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "missing-doctype-system-identifier",
+        "input": "<!doctype html system>\n<title>missing-doctype-system-identifier</title>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "missing-doctype-system-identifier",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 22,
+                  "offset": 21
+                },
+                "end": {
+                  "line": 1,
+                  "column": 22,
+                  "offset": 21
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "missing-end-tag-name",
+        "input": "<!doctype html>\n<title>missing-end-tag-name</title>\n</>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "missing-end-tag-name",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 3,
+                  "offset": 54
+                },
+                "end": {
+                  "line": 3,
+                  "column": 3,
+                  "offset": 54
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "missing-quote-before-doctype-public-identifier",
+        "input": "<!doctype html public bogus>\n<title>missing-quote-before-doctype-public-identifier</title>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "missing-quote-before-doctype-public-identifier",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 23,
+                  "offset": 22
+                },
+                "end": {
+                  "line": 1,
+                  "column": 23,
+                  "offset": 22
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "missing-quote-before-doctype-system-identifier",
+        "input": "<!doctype html system bogus>\n<title>missing-quote-before-doctype-system-identifier</title>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "missing-quote-before-doctype-system-identifier",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 23,
+                  "offset": 22
+                },
+                "end": {
+                  "line": 1,
+                  "column": 23,
+                  "offset": 22
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "missing-semicolon-after-character-reference",
+        "input": "<!doctype html>\n<title>missing-semicolon-after-character-reference</title>\n&notin\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "missing-semicolon-after-character-reference",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 5,
+                  "offset": 79
+                },
+                "end": {
+                  "line": 3,
+                  "column": 5,
+                  "offset": 79
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "missing-whitespace-after-doctype-public-keyword",
+        "input": "<!doctype html public\"bogus\">\n<title>missing-whitespace-after-doctype-public-keyword</title>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "missing-whitespace-after-doctype-public-keyword",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 22,
+                  "offset": 21
+                },
+                "end": {
+                  "line": 1,
+                  "column": 22,
+                  "offset": 21
+                }
+              }
+            },
+            {
+              "ruleId": "non-conforming-doctype",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 30,
+                  "offset": 29
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "missing-whitespace-after-doctype-system-keyword",
+        "input": "<!doctype html system\"bogus\">\n<title>missing-whitespace-after-doctype-system-keyword</title>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "missing-whitespace-after-doctype-system-keyword",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 22,
+                  "offset": 21
+                },
+                "end": {
+                  "line": 1,
+                  "column": 22,
+                  "offset": 21
+                }
+              }
+            },
+            {
+              "ruleId": "non-conforming-doctype",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 30,
+                  "offset": 29
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "missing-whitespace-before-doctype-name",
+        "input": "<!doctypehtml>\n<title>missing-whitespace-before-doctype-name</title>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "missing-whitespace-before-doctype-name",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 10,
+                  "offset": 9
+                },
+                "end": {
+                  "line": 1,
+                  "column": 10,
+                  "offset": 9
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "missing-whitespace-between-attributes",
+        "input": "<!doctype html>\n<title id=\"foo\"class=\"bar\">missing-whitespace-between-attributes</title>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "missing-whitespace-between-attributes",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 2,
+                  "column": 16,
+                  "offset": 31
+                },
+                "end": {
+                  "line": 2,
+                  "column": 16,
+                  "offset": 31
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "missing-whitespace-between-doctype-public-and-system-identifiers",
+        "input": "<!doctype html public \"foo\"\"bar\">\n<title>missing-whitespace-between-doctype-public-and-system-identifiers</title>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "missing-whitespace-between-doctype-public-and-system-identifiers",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 28,
+                  "offset": 27
+                },
+                "end": {
+                  "line": 1,
+                  "column": 28,
+                  "offset": 27
+                }
+              }
+            },
+            {
+              "ruleId": "non-conforming-doctype",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 34,
+                  "offset": 33
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "nested-comment",
+        "input": "<!doctype html>\n<title>nested-comment</title>\n<!-- <!-- --> -->\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "nested-comment",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 10,
+                  "offset": 55
+                },
+                "end": {
+                  "line": 3,
+                  "column": 10,
+                  "offset": 55
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "nested-noscript-in-head",
+        "input": "<!doctype html>\n<title>nested-noscript-in-head</title>\n<noscript>\n  <link rel=\"stylesheet\" href=\"nojs.css\">\n  <noscript></noscript>\n</noscript>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "nested-noscript-in-head",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 5,
+                  "column": 3,
+                  "offset": 110
+                },
+                "end": {
+                  "line": 5,
+                  "column": 13,
+                  "offset": 120
+                }
+              }
+            },
+            {
+              "ruleId": "end-tag-without-matching-open-element",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 6,
+                  "column": 1,
+                  "offset": 132
+                },
+                "end": {
+                  "line": 6,
+                  "column": 12,
+                  "offset": 143
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "non-conforming-doctype",
+        "input": "<!doctype>\n<title>non-conforming-doctype</title>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "missing-doctype-name",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 10,
+                  "offset": 9
+                },
+                "end": {
+                  "line": 1,
+                  "column": 10,
+                  "offset": 9
+                }
+              }
+            },
+            {
+              "ruleId": "non-conforming-doctype",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 11,
+                  "offset": 10
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "non-void-html-element-start-tag-with-trailing-solidus",
+        "input": "<!doctype html>\n<title/>non-void-html-element-start-tag-with-trailing-solidus</title>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "non-void-html-element-start-tag-with-trailing-solidus",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 2,
+                  "column": 1,
+                  "offset": 16
+                },
+                "end": {
+                  "line": 2,
+                  "column": 9,
+                  "offset": 24
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "noncharacter-character-reference",
+        "input": "<!doctype html>\n<title>noncharacter-character-reference</title>\n&#xfdd0;\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "noncharacter-character-reference",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 9,
+                  "offset": 72
+                },
+                "end": {
+                  "line": 3,
+                  "column": 9,
+                  "offset": 72
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "noncharacter-in-input-stream",
+        "input": "<!doctype html>\n<title>noncharacter-in-input-stream</title>\n﷐\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "noncharacter-in-input-stream",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 1,
+                  "offset": 60
+                },
+                "end": {
+                  "line": 3,
+                  "column": 1,
+                  "offset": 60
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "null-character-reference",
+        "input": "<!doctype html>\n<title>null-character-reference</title>\n&#x0;\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "null-character-reference",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 6,
+                  "offset": 61
+                },
+                "end": {
+                  "line": 3,
+                  "column": 6,
+                  "offset": 61
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "open-elements-left-after-eof",
+        "input": "<!doctype html>\n<title>open-elements-left-after-eof</title>\n<noscript>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "open-elements-left-after-eof",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 71
+                },
+                "end": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 71
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "surrogate-character-reference",
+        "input": "<!doctype html>\n<title>surrogate-character-reference</title>\n&#xd800;\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "surrogate-character-reference",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 9,
+                  "offset": 69
+                },
+                "end": {
+                  "line": 3,
+                  "column": 9,
+                  "offset": 69
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "unexpected-character-after-doctype-system-identifier",
+        "input": "<!doctype html system \"about:legacy-compat\" bogus>\n<title>unexpected-character-after-doctype-system-identifier</title>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "unexpected-character-after-doctype-system-identifier",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 45,
+                  "offset": 44
+                },
+                "end": {
+                  "line": 1,
+                  "column": 45,
+                  "offset": 44
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "unexpected-character-in-attribute-name",
+        "input": "<!doctype html>\n<title>unexpected-character-in-attribute-name</title>\n<div foo<div id'bar'>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "unexpected-character-in-attribute-name",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 9,
+                  "offset": 78
+                },
+                "end": {
+                  "line": 3,
+                  "column": 9,
+                  "offset": 78
+                }
+              }
+            },
+            {
+              "ruleId": "unexpected-character-in-attribute-name",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 16,
+                  "offset": 85
+                },
+                "end": {
+                  "line": 3,
+                  "column": 16,
+                  "offset": 85
+                }
+              }
+            },
+            {
+              "ruleId": "unexpected-character-in-attribute-name",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 20,
+                  "offset": 89
+                },
+                "end": {
+                  "line": 3,
+                  "column": 20,
+                  "offset": 89
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "unexpected-character-in-unquoted-attribute-value",
+        "input": "<!doctype html>\n<title>unexpected-character-in-unquoted-attribute-value</title>\n<div foo=b`ar>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "unexpected-character-in-unquoted-attribute-value",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 11,
+                  "offset": 90
+                },
+                "end": {
+                  "line": 3,
+                  "column": 11,
+                  "offset": 90
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "unexpected-equals-sign-before-attribute-name",
+        "input": "<!doctype html>\n<title>unexpected-equals-sign-before-attribute-name</title>\n<div foo=\"bar\" =\"baz\">\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "unexpected-equals-sign-before-attribute-name",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 16,
+                  "offset": 91
+                },
+                "end": {
+                  "line": 3,
+                  "column": 16,
+                  "offset": 91
+                }
+              }
+            },
+            {
+              "ruleId": "unexpected-character-in-attribute-name",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 17,
+                  "offset": 92
+                },
+                "end": {
+                  "line": 3,
+                  "column": 17,
+                  "offset": 92
+                }
+              }
+            },
+            {
+              "ruleId": "unexpected-character-in-attribute-name",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 21,
+                  "offset": 96
+                },
+                "end": {
+                  "line": 3,
+                  "column": 21,
+                  "offset": 96
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "unexpected-null-character",
+        "input": "<!doctype html>\n<title>unexpected-null-character</title>\n\u0000\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "unexpected-null-character",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 1,
+                  "offset": 57
+                },
+                "end": {
+                  "line": 3,
+                  "column": 1,
+                  "offset": 57
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "unexpected-question-mark-instead-of-tag-name",
+        "input": "<!doctype html>\n<title>unexpected-question-mark-instead-of-tag-name</title>\n<?bogus>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "unexpected-question-mark-instead-of-tag-name",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 2,
+                  "offset": 77
+                },
+                "end": {
+                  "line": 3,
+                  "column": 2,
+                  "offset": 77
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "unexpected-solidus-in-tag",
+        "input": "<!doctype html>\n<title/id=\"foo\">unexpected-solidus-in-tag</title>\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "unexpected-solidus-in-tag",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 2,
+                  "column": 8,
+                  "offset": 23
+                },
+                "end": {
+                  "line": 2,
+                  "column": 8,
+                  "offset": 23
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "unknown-named-character-reference",
+        "input": "<!doctype html>\n<title>unknown-named-character-reference</title>\n&bogus;\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "unknown-named-character-reference",
+              "source": "hast-util-from-html",
+              "place": {
+                "start": {
+                  "line": 3,
+                  "column": 7,
+                  "offset": 71
+                },
+                "end": {
+                  "line": 3,
+                  "column": 7,
+                  "offset": 71
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+]

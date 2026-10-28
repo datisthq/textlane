@@ -75,7 +75,10 @@ fn run_group(group: &Value, group_id: &str, entry: Option<&String>, report: &mut
                 case[key] = value.clone();
             }
         }
-        let actual = run_case(&case);
+        let mut actual = run_case(&case);
+        if group["positions"] == Value::Bool(false) {
+            strip_positions(&mut actual);
+        }
         if matches_expected(&actual, &test["expected"]) {
             report.passed += 1;
         } else if let Some(entry) = entry {
@@ -88,6 +91,18 @@ fn run_group(group: &Value, group_id: &str, entry: Option<&String>, report: &mut
             );
             report.failures.push(message);
         }
+    }
+}
+
+// A group with `positions: false` compares trees without them
+fn strip_positions(value: &mut Value) {
+    match value {
+        Value::Object(map) => {
+            map.remove("position");
+            map.values_mut().for_each(strip_positions);
+        }
+        Value::Array(items) => items.iter_mut().for_each(strip_positions),
+        _ => {}
     }
 }
 

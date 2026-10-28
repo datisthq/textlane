@@ -52,7 +52,8 @@ textlane's pipeline produces (micromark's own HTML compiler, `h()` trees), the i
 the input once through the pinned unified packages instead. Record the spec or upstream output in
 a test's `comment` only where it means something different.
 
-- `actions/source/fetch.ts` checks out a pinned commit into the git-ignored `conformance/.cache/`;
+- `actions/source/fetch.ts` checks out a pinned commit (sparsely, given `paths`, for a repository
+  as large as WPT) into the git-ignored `conformance/.cache/`;
   `actions/group/write.ts` replaces one source's groups in a construct file and keeps the rest;
   `actions/markdown/render.ts` is the reference pipeline (`renderMarkdown`, `parseMarkdown`) and
   its textlane equivalent; `actions/mdast/extract.ts` reads an mdast-util's

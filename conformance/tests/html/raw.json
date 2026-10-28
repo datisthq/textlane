@@ -49,5 +49,2021 @@
         }
       }
     ]
+  },
+  {
+    "description": "hast-util-raw",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-raw",
+      "commit": "ad15a52350463223504999a6c4c763e1994522d4",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["html.raw"]],
+    "tests": [
+      {
+        "description": "should pass elements through",
+        "tree": {
+          "type": "element",
+          "tagName": "div",
+          "properties": {
+            "id": "foo",
+            "className": ["bar"]
+          },
+          "children": [
+            {
+              "type": "text",
+              "value": "baz"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "div",
+            "properties": {
+              "id": "foo",
+              "className": ["bar"]
+            },
+            "children": [
+              {
+                "type": "text",
+                "value": "baz"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should pass void elements through",
+        "tree": {
+          "type": "element",
+          "tagName": "img",
+          "properties": {
+            "alt": "foo",
+            "src": "bar.jpg"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "alt": "foo",
+              "src": "bar.jpg"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should pass roots through",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "div",
+              "properties": {
+                "id": "foo",
+                "className": ["bar"]
+              },
+              "children": [
+                {
+                  "type": "text",
+                  "value": "baz"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "div",
+                "properties": {
+                  "id": "foo",
+                  "className": ["bar"]
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "baz"
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should pass empty root’s through",
+        "tree": {
+          "type": "root",
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should pass texts through",
+        "tree": {
+          "type": "text",
+          "value": "foo"
+        },
+        "expected": {
+          "tree": {
+            "type": "text",
+            "value": "foo"
+          }
+        }
+      },
+      {
+        "description": "should pass comments through",
+        "tree": {
+          "type": "comment",
+          "value": "foo"
+        },
+        "expected": {
+          "tree": {
+            "type": "comment",
+            "value": "foo"
+          }
+        }
+      },
+      {
+        "description": "should pass documents through (#1)",
+        "tree": {
+          "type": "element",
+          "tagName": "html",
+          "properties": {
+            "lang": "en"
+          },
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "html",
+            "properties": {
+              "lang": "en"
+            },
+            "children": [
+              {
+                "type": "element",
+                "tagName": "head",
+                "properties": {},
+                "children": []
+              },
+              {
+                "type": "element",
+                "tagName": "body",
+                "properties": {},
+                "children": []
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should pass documents through (#2)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "doctype"
+            },
+            {
+              "type": "element",
+              "tagName": "html",
+              "properties": {
+                "lang": "en"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {
+                  "lang": "en"
+                },
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": []
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should pass raw nodes through (#1)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "img",
+              "properties": {
+                "alt": "foo",
+                "src": "bar.jpg"
+              },
+              "children": []
+            },
+            {
+              "type": "raw",
+              "value": "<img alt=\"foo\" src=\"bar.jpg\">"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "img",
+                "properties": {
+                  "alt": "foo",
+                  "src": "bar.jpg"
+                },
+                "children": []
+              },
+              {
+                "type": "element",
+                "tagName": "img",
+                "properties": {
+                  "alt": "foo",
+                  "src": "bar.jpg"
+                },
+                "children": []
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should pass raw nodes through (#2)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "raw",
+              "value": "<p>Foo, bar!"
+            },
+            {
+              "type": "element",
+              "tagName": "ol",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "li",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "baz"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Foo, bar!"
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "ol",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "li",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "baz"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should pass raw nodes through even after iframe",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "iframe",
+              "properties": {
+                "height": 500,
+                "src": "https://ddg.gg"
+              },
+              "children": []
+            },
+            {
+              "type": "raw",
+              "value": "<img alt=\"foo\" src=\"bar.jpg\">"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "iframe",
+                "properties": {
+                  "height": 500,
+                  "src": "https://ddg.gg"
+                },
+                "children": []
+              },
+              {
+                "type": "element",
+                "tagName": "img",
+                "properties": {
+                  "alt": "foo",
+                  "src": "bar.jpg"
+                },
+                "children": []
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should pass raw nodes through even after textarea (#1)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "textarea",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Some text that is <i>not</i> HTML."
+                }
+              ]
+            },
+            {
+              "type": "raw",
+              "value": "<img alt=\"foo\" src=\"bar.jpg\">"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "textarea",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Some text that is <i>not</i> HTML."
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "img",
+                "properties": {
+                  "alt": "foo",
+                  "src": "bar.jpg"
+                },
+                "children": []
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should pass raw nodes through even after textarea (#2)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "raw",
+              "value": "<textarea>Some text that is <i>not</i> HTML.</textarea>"
+            },
+            {
+              "type": "raw",
+              "value": "<img alt=\"foo\" src=\"bar.jpg\">"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "textarea",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Some text that is <i>not</i> HTML."
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "img",
+                "properties": {
+                  "alt": "foo",
+                  "src": "bar.jpg"
+                },
+                "children": []
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should pass raw nodes through even after textarea (#3)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "raw",
+              "value": "<textarea>"
+            },
+            {
+              "type": "text",
+              "value": "Some text that is <i>not</i> HTML."
+            },
+            {
+              "type": "raw",
+              "value": "</textarea>"
+            },
+            {
+              "type": "raw",
+              "value": "<p>but this is</p>"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "textarea",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Some text that is <i>not</i> HTML."
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "but this is"
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should pass character references through (decimal)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "raw",
+              "value": "&#123;and&#125;"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "{and}"
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should pass character references through (named)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "raw",
+              "value": "&lt;and&gt;"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "<and>"
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should pass character references through (hexadecimal)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "raw",
+              "value": "&#x7b;and&#x7d;"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "{and}"
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should support template nodes",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "raw",
+              "value": "<template>a<b></b>c</template>"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "template",
+                "properties": {},
+                "children": [],
+                "content": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a"
+                    },
+                    {
+                      "type": "element",
+                      "tagName": "b",
+                      "properties": {},
+                      "children": []
+                    },
+                    {
+                      "type": "text",
+                      "value": "c"
+                    }
+                  ],
+                  "data": {
+                    "quirksMode": false
+                  }
+                }
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should support HTML in SVG in HTML",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "svg",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "element",
+                      "tagName": "foreignObject",
+                      "properties": {},
+                      "children": [
+                        {
+                          "type": "element",
+                          "tagName": "div",
+                          "properties": {},
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "svg",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "foreignObject",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "div",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should discard broken HTML when a proper element node is found",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "raw",
+              "value": "<i"
+            },
+            {
+              "type": "element",
+              "tagName": "b",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "b",
+                "properties": {},
+                "children": []
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should discard broken HTML when a proper text node is found",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "raw",
+              "value": "<i"
+            },
+            {
+              "type": "text",
+              "value": "a"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "a"
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should not discard HTML broken over several raw nodes",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "raw",
+              "value": "<i"
+            },
+            {
+              "type": "raw",
+              "value": ">"
+            },
+            {
+              "type": "element",
+              "tagName": "b",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "i",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "b",
+                    "properties": {},
+                    "children": []
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should support raw text and then another raw node",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "raw",
+              "value": "aaa"
+            },
+            {
+              "type": "raw",
+              "value": "<x>"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "aaa"
+              },
+              {
+                "type": "element",
+                "tagName": "x",
+                "properties": {},
+                "children": []
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should switch to data state at a text node",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "raw",
+              "value": "<details>\n<summary>Complete logs</summary"
+            },
+            {
+              "type": "text",
+              "value": "\n"
+            },
+            {
+              "type": "raw",
+              "value": "</details>"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "details",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "\n"
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "summary",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Complete logs\n"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should support raw nodes (security, unsafe)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "raw",
+              "value": "<script>alert(1)</script>"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "script",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "alert(1)"
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should support unsafe nodes (security, unsafe)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "script",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alert(1)"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "script",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "alert(1)"
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should support text after a raw rcdata opening tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "a "
+            },
+            {
+              "type": "raw",
+              "value": "<title>"
+            },
+            {
+              "type": "text",
+              "value": " b."
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "a "
+              },
+              {
+                "type": "element",
+                "tagName": "title",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": " b."
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should ignore an element after a raw rcdata opening tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "a "
+            },
+            {
+              "type": "raw",
+              "value": "<title>"
+            },
+            {
+              "type": "element",
+              "tagName": "b",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "a "
+              },
+              {
+                "type": "element",
+                "tagName": "title",
+                "properties": {},
+                "children": []
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should ignore a mismatched rcdata closing tag after a raw rcdata opening tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "a "
+            },
+            {
+              "type": "raw",
+              "value": "<title>"
+            },
+            {
+              "type": "text",
+              "value": " b "
+            },
+            {
+              "type": "raw",
+              "value": "</textarea>"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "a "
+              },
+              {
+                "type": "element",
+                "tagName": "title",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": " b "
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should support a matched rcdata closing tag after a raw rcdata opening tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "a "
+            },
+            {
+              "type": "raw",
+              "value": "<title>"
+            },
+            {
+              "type": "text",
+              "value": " b "
+            },
+            {
+              "type": "raw",
+              "value": "</title>"
+            },
+            {
+              "type": "text",
+              "value": " c."
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "a "
+              },
+              {
+                "type": "element",
+                "tagName": "title",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": " b "
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": " c."
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should support text after a raw rawtext opening tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "a "
+            },
+            {
+              "type": "raw",
+              "value": "<iframe>"
+            },
+            {
+              "type": "text",
+              "value": " b."
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "a "
+              },
+              {
+                "type": "element",
+                "tagName": "iframe",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": " b."
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should ignore an element after a raw rawtext opening tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "a "
+            },
+            {
+              "type": "raw",
+              "value": "<iframe>"
+            },
+            {
+              "type": "element",
+              "tagName": "b",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "a "
+              },
+              {
+                "type": "element",
+                "tagName": "iframe",
+                "properties": {},
+                "children": []
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should ignore a mismatched rawtext closing tag after a raw rawtext opening tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "a "
+            },
+            {
+              "type": "raw",
+              "value": "<iframe>"
+            },
+            {
+              "type": "text",
+              "value": " b "
+            },
+            {
+              "type": "raw",
+              "value": "</style>"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "a "
+              },
+              {
+                "type": "element",
+                "tagName": "iframe",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": " b "
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should support a matched rawtext closing tag after a raw rawtext opening tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "a "
+            },
+            {
+              "type": "raw",
+              "value": "<iframe>"
+            },
+            {
+              "type": "text",
+              "value": " b "
+            },
+            {
+              "type": "raw",
+              "value": "</iframe>"
+            },
+            {
+              "type": "text",
+              "value": " c."
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "a "
+              },
+              {
+                "type": "element",
+                "tagName": "iframe",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": " b "
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": " c."
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should support text after a raw script data opening tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "a "
+            },
+            {
+              "type": "raw",
+              "value": "<script>"
+            },
+            {
+              "type": "text",
+              "value": " b."
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "a "
+              },
+              {
+                "type": "element",
+                "tagName": "script",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": " b."
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should ignore an element after a raw script data opening tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "a "
+            },
+            {
+              "type": "raw",
+              "value": "<script>"
+            },
+            {
+              "type": "element",
+              "tagName": "b",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "a "
+              },
+              {
+                "type": "element",
+                "tagName": "script",
+                "properties": {},
+                "children": []
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should support a matched script data closing tag after a raw script data opening tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "a "
+            },
+            {
+              "type": "raw",
+              "value": "<script>"
+            },
+            {
+              "type": "text",
+              "value": " b "
+            },
+            {
+              "type": "raw",
+              "value": "</script>"
+            },
+            {
+              "type": "text",
+              "value": " c."
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "a "
+              },
+              {
+                "type": "element",
+                "tagName": "script",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": " b "
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": " c."
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should support text after a raw plaintext opening tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "a "
+            },
+            {
+              "type": "raw",
+              "value": "<plaintext>"
+            },
+            {
+              "type": "text",
+              "value": " b."
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "a "
+              },
+              {
+                "type": "element",
+                "tagName": "plaintext",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": " b."
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should ignore an element after a raw plaintext opening tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "a "
+            },
+            {
+              "type": "raw",
+              "value": "<plaintext>"
+            },
+            {
+              "type": "element",
+              "tagName": "b",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "a "
+              },
+              {
+                "type": "element",
+                "tagName": "plaintext",
+                "properties": {},
+                "children": []
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should support a matched plaintext closing tag after a raw plaintext opening tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "a "
+            },
+            {
+              "type": "raw",
+              "value": "<plaintext>"
+            },
+            {
+              "type": "text",
+              "value": " b "
+            },
+            {
+              "type": "raw",
+              "value": "</plaintext>"
+            },
+            {
+              "type": "text",
+              "value": " c."
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "a "
+              },
+              {
+                "type": "element",
+                "tagName": "plaintext",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": " b  c."
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-raw {\"passThrough\":[\"customLiteral\"]}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-raw",
+      "commit": "ad15a52350463223504999a6c4c763e1994522d4",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.raw",
+        {
+          "passThrough": ["customLiteral"]
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support passing through nodes w/o children",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "customLiteral",
+              "value": "x"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "customLiteral",
+                "value": "x"
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-raw {\"passThrough\":[\"customParent\"]}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-raw",
+      "commit": "ad15a52350463223504999a6c4c763e1994522d4",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.raw",
+        {
+          "passThrough": ["customParent"]
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support passing through nodes w/ `raw` children",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "customParent",
+              "children": [
+                {
+                  "type": "raw",
+                  "value": "<i>j</i>"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "customParent",
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "i",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "j"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should support passing through nodes w/ `comment` children",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "customParent",
+              "children": [
+                {
+                  "type": "comment",
+                  "value": "x"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "customParent",
+                "children": [
+                  {
+                    "type": "comment",
+                    "value": "x"
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should support passing through nodes w/ `0` children",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "customParent",
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "customParent",
+                "children": []
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should support passing through nodes w/ broken raw children (1)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "customParent",
+              "children": [
+                {
+                  "type": "raw",
+                  "value": "<x"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "customParent",
+                "children": []
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should support passing through nodes w/ broken raw children (2)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "customParent",
+              "children": [
+                {
+                  "type": "raw",
+                  "value": "<x>"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "customParent",
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "x",
+                    "properties": {},
+                    "children": []
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should support passing through nodes w/ broken raw children (3)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "customParent",
+              "children": [
+                {
+                  "type": "raw",
+                  "value": "</x>"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "customParent",
+                "children": []
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
+        "description": "should support passing through nodes w/ broken raw children (4)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "customParent",
+              "children": [
+                {
+                  "type": "raw",
+                  "value": "<x>"
+                }
+              ]
+            },
+            {
+              "type": "raw",
+              "value": "</x>"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "customParent",
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "x",
+                    "properties": {},
+                    "children": []
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      }
+    ]
   }
 ]

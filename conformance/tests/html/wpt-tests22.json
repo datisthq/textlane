@@ -1,0 +1,811 @@
+[
+  {
+    "description": "WPT tests22.dat",
+    "source": {
+      "repository": "https://github.com/web-platform-tests/wpt",
+      "commit": "07ce6e987a1606aec4dc84ef80062d9797330e0b",
+      "path": "html/syntax/parsing/resources/tests22.dat",
+      "license": "BSD-3-Clause"
+    },
+    "pipeline": [["html.parse"]],
+    "positions": false,
+    "tests": [
+      {
+        "description": "case 1",
+        "input": "<a><b><big><em><strong><div>X</a>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "a",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "b",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "big",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "em",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "element",
+                                        "tagName": "strong",
+                                        "properties": {},
+                                        "children": []
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "big",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "em",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "strong",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "div",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "element",
+                                        "tagName": "a",
+                                        "properties": {},
+                                        "children": [
+                                          {
+                                            "type": "text",
+                                            "value": "X"
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 2",
+        "input": "<a><b><div id=1><div id=2><div id=3><div id=4><div id=5><div id=6><div id=7><div id=8>A</a>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "a",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "b",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "b",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "div",
+                            "properties": {
+                              "id": "1"
+                            },
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "a",
+                                "properties": {},
+                                "children": []
+                              },
+                              {
+                                "type": "element",
+                                "tagName": "div",
+                                "properties": {
+                                  "id": "2"
+                                },
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "a",
+                                    "properties": {},
+                                    "children": []
+                                  },
+                                  {
+                                    "type": "element",
+                                    "tagName": "div",
+                                    "properties": {
+                                      "id": "3"
+                                    },
+                                    "children": [
+                                      {
+                                        "type": "element",
+                                        "tagName": "a",
+                                        "properties": {},
+                                        "children": []
+                                      },
+                                      {
+                                        "type": "element",
+                                        "tagName": "div",
+                                        "properties": {
+                                          "id": "4"
+                                        },
+                                        "children": [
+                                          {
+                                            "type": "element",
+                                            "tagName": "a",
+                                            "properties": {},
+                                            "children": []
+                                          },
+                                          {
+                                            "type": "element",
+                                            "tagName": "div",
+                                            "properties": {
+                                              "id": "5"
+                                            },
+                                            "children": [
+                                              {
+                                                "type": "element",
+                                                "tagName": "a",
+                                                "properties": {},
+                                                "children": []
+                                              },
+                                              {
+                                                "type": "element",
+                                                "tagName": "div",
+                                                "properties": {
+                                                  "id": "6"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "type": "element",
+                                                    "tagName": "a",
+                                                    "properties": {},
+                                                    "children": []
+                                                  },
+                                                  {
+                                                    "type": "element",
+                                                    "tagName": "div",
+                                                    "properties": {
+                                                      "id": "7"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "type": "element",
+                                                        "tagName": "a",
+                                                        "properties": {},
+                                                        "children": []
+                                                      },
+                                                      {
+                                                        "type": "element",
+                                                        "tagName": "div",
+                                                        "properties": {
+                                                          "id": "8"
+                                                        },
+                                                        "children": [
+                                                          {
+                                                            "type": "element",
+                                                            "tagName": "a",
+                                                            "properties": {},
+                                                            "children": [
+                                                              {
+                                                                "type": "text",
+                                                                "value": "A"
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 3",
+        "input": "<a><b><div id=1><div id=2><div id=3><div id=4><div id=5><div id=6><div id=7><div id=8><div id=9>A</a>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "a",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "b",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "b",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "div",
+                            "properties": {
+                              "id": "1"
+                            },
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "a",
+                                "properties": {},
+                                "children": []
+                              },
+                              {
+                                "type": "element",
+                                "tagName": "div",
+                                "properties": {
+                                  "id": "2"
+                                },
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "a",
+                                    "properties": {},
+                                    "children": []
+                                  },
+                                  {
+                                    "type": "element",
+                                    "tagName": "div",
+                                    "properties": {
+                                      "id": "3"
+                                    },
+                                    "children": [
+                                      {
+                                        "type": "element",
+                                        "tagName": "a",
+                                        "properties": {},
+                                        "children": []
+                                      },
+                                      {
+                                        "type": "element",
+                                        "tagName": "div",
+                                        "properties": {
+                                          "id": "4"
+                                        },
+                                        "children": [
+                                          {
+                                            "type": "element",
+                                            "tagName": "a",
+                                            "properties": {},
+                                            "children": []
+                                          },
+                                          {
+                                            "type": "element",
+                                            "tagName": "div",
+                                            "properties": {
+                                              "id": "5"
+                                            },
+                                            "children": [
+                                              {
+                                                "type": "element",
+                                                "tagName": "a",
+                                                "properties": {},
+                                                "children": []
+                                              },
+                                              {
+                                                "type": "element",
+                                                "tagName": "div",
+                                                "properties": {
+                                                  "id": "6"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "type": "element",
+                                                    "tagName": "a",
+                                                    "properties": {},
+                                                    "children": []
+                                                  },
+                                                  {
+                                                    "type": "element",
+                                                    "tagName": "div",
+                                                    "properties": {
+                                                      "id": "7"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "type": "element",
+                                                        "tagName": "a",
+                                                        "properties": {},
+                                                        "children": []
+                                                      },
+                                                      {
+                                                        "type": "element",
+                                                        "tagName": "div",
+                                                        "properties": {
+                                                          "id": "8"
+                                                        },
+                                                        "children": [
+                                                          {
+                                                            "type": "element",
+                                                            "tagName": "a",
+                                                            "properties": {},
+                                                            "children": [
+                                                              {
+                                                                "type": "element",
+                                                                "tagName": "div",
+                                                                "properties": {
+                                                                  "id": "9"
+                                                                },
+                                                                "children": [
+                                                                  {
+                                                                    "type": "text",
+                                                                    "value": "A"
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 4",
+        "input": "<a><b><div id=1><div id=2><div id=3><div id=4><div id=5><div id=6><div id=7><div id=8><div id=9><div id=10>A</a>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "a",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "b",
+                            "properties": {},
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "b",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "div",
+                            "properties": {
+                              "id": "1"
+                            },
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "a",
+                                "properties": {},
+                                "children": []
+                              },
+                              {
+                                "type": "element",
+                                "tagName": "div",
+                                "properties": {
+                                  "id": "2"
+                                },
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "a",
+                                    "properties": {},
+                                    "children": []
+                                  },
+                                  {
+                                    "type": "element",
+                                    "tagName": "div",
+                                    "properties": {
+                                      "id": "3"
+                                    },
+                                    "children": [
+                                      {
+                                        "type": "element",
+                                        "tagName": "a",
+                                        "properties": {},
+                                        "children": []
+                                      },
+                                      {
+                                        "type": "element",
+                                        "tagName": "div",
+                                        "properties": {
+                                          "id": "4"
+                                        },
+                                        "children": [
+                                          {
+                                            "type": "element",
+                                            "tagName": "a",
+                                            "properties": {},
+                                            "children": []
+                                          },
+                                          {
+                                            "type": "element",
+                                            "tagName": "div",
+                                            "properties": {
+                                              "id": "5"
+                                            },
+                                            "children": [
+                                              {
+                                                "type": "element",
+                                                "tagName": "a",
+                                                "properties": {},
+                                                "children": []
+                                              },
+                                              {
+                                                "type": "element",
+                                                "tagName": "div",
+                                                "properties": {
+                                                  "id": "6"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "type": "element",
+                                                    "tagName": "a",
+                                                    "properties": {},
+                                                    "children": []
+                                                  },
+                                                  {
+                                                    "type": "element",
+                                                    "tagName": "div",
+                                                    "properties": {
+                                                      "id": "7"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "type": "element",
+                                                        "tagName": "a",
+                                                        "properties": {},
+                                                        "children": []
+                                                      },
+                                                      {
+                                                        "type": "element",
+                                                        "tagName": "div",
+                                                        "properties": {
+                                                          "id": "8"
+                                                        },
+                                                        "children": [
+                                                          {
+                                                            "type": "element",
+                                                            "tagName": "a",
+                                                            "properties": {},
+                                                            "children": [
+                                                              {
+                                                                "type": "element",
+                                                                "tagName": "div",
+                                                                "properties": {
+                                                                  "id": "9"
+                                                                },
+                                                                "children": [
+                                                                  {
+                                                                    "type": "element",
+                                                                    "tagName": "div",
+                                                                    "properties": {
+                                                                      "id": "10"
+                                                                    },
+                                                                    "children": [
+                                                                      {
+                                                                        "type": "text",
+                                                                        "value": "A"
+                                                                      }
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      },
+      {
+        "description": "case 5",
+        "input": "<cite><b><cite><i><cite><i><cite><i><div>X</b>TEST",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "cite",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "b",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "cite",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "i",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "element",
+                                        "tagName": "cite",
+                                        "properties": {},
+                                        "children": [
+                                          {
+                                            "type": "element",
+                                            "tagName": "i",
+                                            "properties": {},
+                                            "children": [
+                                              {
+                                                "type": "element",
+                                                "tagName": "cite",
+                                                "properties": {},
+                                                "children": [
+                                                  {
+                                                    "type": "element",
+                                                    "tagName": "i",
+                                                    "properties": {},
+                                                    "children": []
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "i",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "element",
+                                "tagName": "i",
+                                "properties": {},
+                                "children": [
+                                  {
+                                    "type": "element",
+                                    "tagName": "div",
+                                    "properties": {},
+                                    "children": [
+                                      {
+                                        "type": "element",
+                                        "tagName": "b",
+                                        "properties": {},
+                                        "children": [
+                                          {
+                                            "type": "text",
+                                            "value": "X"
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "type": "text",
+                                        "value": "TEST"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": true
+            }
+          }
+        }
+      }
+    ]
+  }
+]

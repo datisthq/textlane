@@ -3,7 +3,7 @@ import { dirname } from "node:path"
 
 type Group = {
   description: string
-  source?: { repository: string }
+  source?: { repository: string; [key: string]: unknown }
   [key: string]: unknown
 }
 

@@ -25,7 +25,12 @@ const LIBRARY_NAMES: Record<string, string> = {
 
 type Expected = { error?: { code: string; message?: string } } & Record<string, unknown>
 type Test = { description: string; input?: string; tree?: object; expected: Expected }
-type Group = { description: string; pipeline: unknown[]; tests: Test[] }
+type Group = {
+  description: string
+  pipeline: unknown[]
+  positions?: boolean
+  tests: Test[]
+}
 
 let runCase: (json: string) => string
 let addonDir = ""
@@ -73,7 +78,7 @@ describe("conformance", () => {
       describe(groupId, () => {
         for (const test of group.tests) {
           it(test.description, () => {
-            const actual: Expected = JSON.parse(
+            const parsed: Expected = JSON.parse(
               runCase(
                 JSON.stringify({
                   pipeline: group.pipeline,
@@ -82,6 +87,7 @@ describe("conformance", () => {
                 }),
               ),
             )
+            const actual = group.positions === false ? stripPositions(parsed) : parsed
             if (!entry) return expectOutcome(actual, test.expected)
             try {
               expectOutcome(actual, test.expected)
@@ -100,6 +106,13 @@ describe("conformance", () => {
     expect(stale).toEqual([])
   })
 })
+
+// A group with `positions: false` compares trees without them
+function stripPositions<T>(value: T): T {
+  return JSON.parse(
+    JSON.stringify(value, (key, item) => (key === "position" ? undefined : item)),
+  )
+}
 
 // An entry names a file, a group, or a whole area as `<area>/*`
 function matchesEntry(entry: string, fileId: string, groupId: string) {
