@@ -3,32 +3,33 @@
   name="description"
   content="What is settled about textlane's structure and conformance suite, who settled it and what was turned down."
 />
-<meta name="order" content="2" />
-<meta name="date" content="2026-10-27" />
+<meta name="order" content="3" />
+<meta name="date" content="2026-10-28" />
 
 <h1>Decisions</h1>
 <p>
   What has been settled about textlane's structure and its conformance suite, who settled
   it, and what was turned down. Sources: the "Review Unified Rust Architecture" planning
-  chat and the session that wrote the design spec. As of 2026-10-27.
+  chat, the session that wrote the design spec and the trees-and-plugins design session.
+  As of 2026-10-28.
 </p>
 
 <htmlpress-grid cols="3">
   <htmlpress-card>
-    <h3>21 decided</h3>
+    <h3>27 decided</h3>
     <p>
       <htmlpress-badge type="success">decided</htmlpress-badge> settled by the maintainer
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>16 agent's calls</h3>
+    <h3>22 agent's calls</h3>
     <p>
       <htmlpress-badge type="warning">my call</htmlpress-badge> settled by the agent, open
       to change
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>5 open</h3>
+    <h3>4 open</h3>
     <p><htmlpress-badge type="danger">open</htmlpress-badge> still to decide</p>
   </htmlpress-card>
 </htmlpress-grid>
@@ -186,6 +187,186 @@
       is oxc's and stays inside <code>mdx</code>.
     </p>
     <p><strong>Rejected.</strong> Each domain owning its tree types.</p>
+  </dd>
+</dl>
+
+<h2>Trees and plugins</h2>
+<p>Detail on <a href="trees-and-plugins.html">Trees and plugins</a>.</p>
+<dl>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Speed in Rust settles every
+    trade-off; JavaScript and Python plugins are a last resort
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Native pipelines pay nothing; a foreign plugin pays a
+      conversion at its boundary.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Optimizing the tree for cheap access from JavaScript.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> The parser is a port:
+    micromark's design, markdown-rs as the Rust reference, in textlane's own layout
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> micromark keeps the extension model markdown-rs flattened;
+      markdown-rs shows each state machine in Rust; the corpus makes a port safe.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Vendoring markdown-rs and reshaping it; a clean-room
+      design.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Crates follow fairspec's
+    layout (<code>models/</code>, <code>actions/</code>, <code>helpers/</code>,
+    <code>plugins/</code>) plus <code>utils/&lt;name&gt;/</code> for bounded internal
+    systems
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> A tokenizer or serializer is many mutually recursive functions
+      that cannot be one action per file.
+    </p>
+    <p>
+      <strong>Rejected.</strong> A layout of upstream-named layer modules
+      (<code>syntax/</code>, <code>from_markdown/</code>…).
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> <code>md</code> entities are
+    constructs or mdast nodes; verbs are the layers: <code>tokenize</code>,
+    <code>resolve</code>, <code>compile</code>, <code>stringify</code>,
+    <code>convert</code>
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> One folder holds everything about a construct, and each verb
+      names its upstream package.
+    </p>
+    <p>
+      <strong>Rejected.</strong> <code>to_hast</code> as a verb; one file per upstream
+      module.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Trees are structurally
+    unified's: same node types, fields and nesting
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Standard trees serialize to the exact JSON unified produces,
+      which the corpus pins.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Typed enum trees in a
+    per-document bump arena, strings borrowed from the input
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Allocation is a pointer bump and drop is one free, with a
+      normal <code>&amp;mut</code> tree API; the price is the <code>'a</code> lifetime on
+      every Rust plugin.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Owned enums with compact strings (simpler, an estimated
+      1.5–2× parse and drop cost); an index arena (as fast, but
+      <code>tree[id]</code> bookkeeping).
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Positions are two
+    <code>u32</code> byte offsets, with a boxed full unist position as fallback; UTF-16 is
+    computed at the edge
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> 8 bytes per node; the decided UTF-16 positions are what
+      serializing and foreign plugins see.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Storing line, column and UTF-16 offset on every node.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Fidelity slots: a per-field
+    null-or-omit rule, <code>Node::Unknown</code>, hast properties as a short inline list,
+    one <code>extra</code> box per node for <code>data</code>
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Covers where unist is looser than a typed tree, at one null
+      pointer per node when unused.
+    </p>
+    <p>
+      <strong>Rejected.</strong> A hash map per element for properties; no escape hatch
+      for unknown nodes.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Rust composes with
+    <code>.with()</code>; the bindings keep <code>.use()</code>
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> <code>use</code> is a Rust keyword; unified's users meet
+      <code>.use()</code> in JavaScript and Python, where it is free;
+      <code>.with()</code> has <code>tracing-subscriber</code>'s precedent.
+    </p>
+    <p>
+      <strong>Rejected.</strong> <code>.r#use()</code>, <code>.use_()</code>,
+      <code>.plugin()</code>, and <code>.add()</code>, which clippy's
+      <code>should_implement_trait</code> flags.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Freeze attaches each plugin
+    once into typed slots; <code>Tree</code> is an enum whose stage kinds
+    <code>freeze()</code> checks; options derive <code>Deserialize</code>; presets are
+    plugins
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> All setup happens once, a frozen processor is
+      <code>Send + Sync</code>, and plugin lists stay dynamic for livemark's config and
+      the bindings.
+    </p>
+    <p>
+      <strong>Rejected.</strong> String-keyed <code>data()</code> natively; a type-state
+      processor checked at compile time.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Transforms are sync; setup
+    may be async; per-document async work goes through jobs, filled after
+    <code>process()</code>
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Pausing on a JavaScript promise needs a self-referential arena
+      and tree moved across threads; Shiki is async only to load, and fetches, link checks
+      and Mermaid yield fragments. One batch per site beats one browser per run.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Async transforms everywhere; async JavaScript plugins
+      mid-pipeline in v1.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Foreign plugins are
+    transforms only in v1, each run on a converted copy; consecutive foreign stages share
+    one conversion
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> A live handle into the arena would tie JavaScript objects to a
+      tree that dies with <code>process()</code>.
+    </p>
+    <p><strong>Rejected.</strong> A live handle; foreign parsers and compilers.</p>
   </dd>
 </dl>
 
@@ -517,20 +698,13 @@
 <h2>Open</h2>
 <dl>
   <dt>
-    <htmlpress-badge type="danger">open</htmlpress-badge> The processor's async model:
-    runtime, awaiting a JS promise through napi, asyncio
-  </dt>
-  <dd>
-    <p>Shapes the processor's core types and which core cases each runner can run.</p>
-  </dd>
-  <dt>
-    <htmlpress-badge type="danger">open</htmlpress-badge> Host-plugin bridge semantics: a
-    serialized copy per plugin run, or a live handle
+    <htmlpress-badge type="danger">open</htmlpress-badge> Whether unknown top-level fields
+    a foreign plugin puts on a node survive the pipeline
   </dt>
   <dd>
     <p>
-      Decides the cost of mixing JavaScript and Rust plugins and what JavaScript plugins
-      may rely on.
+      The <code>extra</code> slot can hold them without changing any node shape; until
+      decided, conversion drops them with a warning.
     </p>
   </dd>
   <dt>

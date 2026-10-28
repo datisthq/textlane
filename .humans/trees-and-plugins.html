@@ -1,0 +1,368 @@
+<title>Trees and plugins</title>
+<meta
+  name="description"
+  content="How textlane stores its syntax trees, how plugins attach to a processor, how foreign plugins and async work fit in, and how the md crate is laid out."
+/>
+<meta name="order" content="2" />
+<meta name="date" content="2026-10-28" />
+
+<h1>Trees and plugins</h1>
+<p>
+  The tree shape and the plugin contract every crate builds on, and the layout of the
+  <code>md</code> crate that ports micromark. Source: the design session of 2026-10-28;
+  nothing here is implemented yet beyond the empty <code>md</code> scaffold. Each choice's
+  status and the alternatives turned down are on <a href="decisions.html">Decisions</a>.
+</p>
+
+<htmlpress-callout type="note">
+  <p>
+    <strong>The goal that settles every trade-off:</strong> be the fastest pipeline in
+    Rust. JavaScript and Python plugins are a last resort for exotic needs, so they pay a
+    conversion at the boundary and native plugins pay nothing.
+  </p>
+</htmlpress-callout>
+
+<h2>The tree</h2>
+<dl>
+  <dt>Typed enums</dt>
+  <dd>
+    <p>
+      <code>mdast::Node&lt;'a&gt;</code> and <code>hast::Node&lt;'a&gt;</code> have a
+      variant per node type (<code>Heading(Box&lt;'a, Heading&lt;'a&gt;&gt;)</code>…), so
+      plugins match exhaustively and never compare type strings.
+    </p>
+  </dd>
+  <dt>One bump arena per document</dt>
+  <dd>
+    <p>
+      Every node is allocated in an arena (<code>bumpalo</code>, as oxc does): building a
+      node is a pointer bump, dropping a tree is one free, siblings sit together in
+      memory. Children are <code>ArenaVec&lt;'a, Node&lt;'a&gt;&gt;</code>.
+    </p>
+  </dd>
+  <dt>Zero-copy strings</dt>
+  <dd>
+    <p>
+      <code>value: &amp;'a str</code> borrows the input where it can; decoded or joined
+      strings are allocated in the arena.
+    </p>
+  </dd>
+  <dt>Positions: two byte offsets</dt>
+  <dd>
+    <p>
+      A position is two <code>u32</code> byte offsets, 8 bytes. Line, column and the
+      UTF-16 offset unified reports are computed only at the edge (serializing,
+      diagnostics, foreign plugins) from a line index on the file. A position that does
+      not point into the current source, such as one a JavaScript plugin set by line and
+      column alone, falls back to a boxed full unist position.
+    </p>
+  </dd>
+  <dt>The price</dt>
+  <dd>
+    <p>
+      Every Rust plugin carries the <code>'a</code> lifetime; a tree cannot outlive its
+      allocator (<code>md::parse(&amp;alloc, input)</code>); anything stored in a node
+      lives in the arena or is <code>'static</code>; one tree stays on one thread at a
+      time, and parallelism is across documents.
+    </p>
+  </dd>
+</dl>
+
+<h3>Structurally unified's</h3>
+<p>
+  Node types, field names and nesting are unified's, so a standard tree serializes to the
+  exact JSON unified produces; the corpus pins it. unist is looser than a typed tree in
+  four places, each handled on purpose:
+</p>
+<dl>
+  <dt>Null or absent</dt>
+  <dd>
+    <p>
+      from-markdown emits <code>title: null</code> and omits other optional fields. Each
+      <code>Option</code> field carries a fixed rule, copied from unified's output, for
+      whether <code>None</code> serializes as <code>null</code> or is left out.
+    </p>
+  </dd>
+  <dt>Unknown node types</dt>
+  <dd>
+    <p>
+      <code>Node::Unknown</code> holds a type name and a JSON-like value, so a node a
+      foreign plugin invents survives the pipeline.
+    </p>
+  </dd>
+  <dt>The <code>extra</code> slot</dt>
+  <dd>
+    <p>
+      Each node has <code>extra: Option&lt;Box&lt;Extra&gt;&gt;</code>, one null pointer
+      when unused. It holds <code>data</code> (typed <code>hName</code>,
+      <code>hProperties</code>, <code>hChildren</code> plus an open map) and is where
+      unknown top-level fields would go. For now conversion drops those with a warning;
+      filling the slot later changes no node shape.
+    </p>
+  </dd>
+  <dt>Values only JavaScript has</dt>
+  <dd>
+    <p>
+      hast property values get their own enum (string, number, boolean, lists, null) in a
+      short inline list, not a map. Functions or class instances in
+      <code>data</code> cannot cross and fail the conversion. MDX's
+      <code>data.estree</code> is attached by <code>mdx</code> when a foreign plugin needs
+      it, since <code>md</code> has no JS parser.
+    </p>
+  </dd>
+</dl>
+
+<h2>The processor</h2>
+<htmlpress-steps>
+  <ol>
+    <li>
+      <h3>Compose</h3>
+      <p>
+        <code
+          >Processor::new().with(md::parse()).with(md::gfm()).with(md::to_html()).with(html::stringify())</code
+        >. Rust says <code>.with()</code>; the bindings keep unified's
+        <code>.use()</code>.
+      </p>
+    </li>
+    <li>
+      <h3>Freeze, once</h3>
+      <p>
+        Each plugin's <code>attach</code> runs once and does all setup:
+        <code>md::parse</code> merges every registered syntax extension into one table of
+        constructs by character code, and the stage sequence is checked. Setup may be
+        async (loading grammars or a highlighter).
+      </p>
+    </li>
+    <li>
+      <h3>Process, many times</h3>
+      <p>
+        A frozen processor is <code>Send + Sync</code>. Each
+        <code>process(&amp;self, input)</code> gets its own arena, so a site build is a
+        parallel map over files with no locks.
+      </p>
+    </li>
+  </ol>
+</htmlpress-steps>
+
+<dl>
+  <dt>The attach context</dt>
+  <dd>
+    <p>
+      <code>set_parser</code>, <code>add_transform</code>, <code>set_compiler</code>, and
+      cross-plugin data in slots keyed by type in place of unified's string-keyed
+      <code>this.data()</code>: <code>md::gfm</code> pushes into
+      <code>md::Syntax</code> and <code>md::Handlers</code>, which
+      <code>md::parse</code> and <code>md::stringify</code> read. Plugin order is free, as
+      in unified.
+    </p>
+  </dd>
+  <dt>Stages</dt>
+  <dd>
+    <p>
+      <code>enum Tree&lt;'a&gt; { Mdast, Hast, Prose }</code>. Every plugin declares the
+      kind it takes and returns, and <code>freeze()</code> rejects a mismatch. Plugin
+      lists stay dynamic, as livemark's config and the bindings need; the check costs one
+      <code>match</code> per stage, not per node.
+    </p>
+  </dd>
+  <dt>A transform</dt>
+  <dd>
+    <p>
+      <code
+        >fn run&lt;'a&gt;(&amp;self, tree: &amp;mut Tree&lt;'a&gt;, file: &amp;mut File,
+        alloc: &amp;'a Allocator) -&gt; Result&lt;(), Fatal&gt;</code
+      >, mutating in place; replacing the tree is <code>*tree = …</code>.
+    </p>
+  </dd>
+  <dt>The file</dt>
+  <dd>
+    <p>
+      Input, path, the line index, metadata, vfile-style messages (<code
+        >file.warn(reason, position, rule)</code
+      >) and the job list. A fatal error stops the pipeline as an <code>Err</code>.
+    </p>
+  </dd>
+  <dt>Options</dt>
+  <dd>
+    <p>
+      One struct per plugin deriving <code>Deserialize</code>; the bindings fill it from a
+      plain object, with names converted mechanically. No per-binding option code.
+    </p>
+  </dd>
+  <dt>Presets</dt>
+  <dd>
+    <p>A plugin whose <code>attach</code> attaches others.</p>
+  </dd>
+  <dt>Where it lives</dt>
+  <dd>
+    <p>
+      The plugin contract, <code>Tree</code> and <code>File</code> in
+      <code>textlane-core</code>; the processor and the foreign-plugin conversion in
+      <code>textlane</code>, as <a href="architecture.html">Architecture</a> lays out.
+    </p>
+  </dd>
+</dl>
+
+<h2>Foreign plugins</h2>
+<p>
+  A JavaScript or Python function joins a pipeline as a <code>ForeignTransform</code>, and
+  in v1 only as a transform: no foreign parsers or compilers. At its stage the tree is
+  converted into unified-shaped objects, UTF-16 positions included, the function runs, and
+  the result is rebuilt into the arena. Consecutive foreign stages share one conversion.
+  The cost is linear in the tree, paid only where a foreign plugin sits.
+</p>
+
+<h2>Async and jobs</h2>
+<p>
+  Transforms are sync. napi calls JavaScript only on the main thread, so pausing a
+  pipeline on a JavaScript promise means keeping an arena and the tree borrowing it alive
+  across the pause, a self-referential pair moved between threads. Few plugins need it:
+  Shiki's
+  <code>@shikijs/rehype</code> is async only to load grammars, and
+  <code>@shikijs/rehype/core</code> with a prepared highlighter is sync. The genuinely
+  per-document async plugins fetch, lint links or render in a browser, and those produce a
+  fragment of output.
+</p>
+<htmlpress-steps>
+  <ol>
+    <li>
+      <h3>Emit</h3>
+      <p>
+        A sync transform replaces the work with a placeholder
+        (<code>&lt;!--textlane:job:3--&gt;</code>) and records a job,
+        <code>{kind, payload}</code>, on the file.
+      </p>
+    </li>
+    <li>
+      <h3>Return</h3>
+      <p>
+        <code>process()</code> finishes and returns the output with its jobs; the arena is
+        already gone.
+      </p>
+    </li>
+    <li>
+      <h3>Resolve</h3>
+      <p>
+        The host resolves every job from every document in one async batch: one browser
+        session renders a whole site's Mermaid diagrams, where
+        <code>rehype-mermaid</code> launches one per run.
+      </p>
+    </li>
+    <li>
+      <h3>Fill</h3>
+      <p><code>fill(output, results)</code> splices the results in.</p>
+    </li>
+  </ol>
+</htmlpress-steps>
+<p>
+  A job can only yield a fragment; it cannot reshape the tree after the async step. A
+  fully pausable pipeline waits until a real plugin needs that.
+</p>
+
+<h2>The <code>md</code> crate</h2>
+<p>
+  A port of micromark and the mdast utilities: micromark (JavaScript) for the design,
+  since it keeps the extension model, and markdown-rs for how each state machine reads in
+  Rust. Both are MIT, so ported code keeps their attribution. The layout follows
+  fairspec's, plus <code>utils/</code>:
+</p>
+<htmlpress-file-tree>
+  <ul>
+    <li>
+      rust/md/src
+      <ul>
+        <li>lib.rs — the module tree, inline</li>
+        <li>
+          plugin.rs — the extension contract: constructs, compile and stringify handlers
+        </li>
+        <li>models — codes, events, token names, the construct trait, options</li>
+        <li>
+          utils — bounded internal systems, exempt from one action per file
+          <ul>
+            <li>tokenizer — the micromark engine: driver, content types, subtokenize</li>
+            <li>compiler — events to mdast</li>
+            <li>serializer — mdast to Markdown: join, safe, unsafe patterns</li>
+            <li>converter — mdast to hast, footnotes</li>
+          </ul>
+        </li>
+        <li>
+          actions — one handler per file, entity by construct or node
+          <ul>
+            <li>markdown/parse.rs, markdown/stringify.rs, mdast/convert.rs</li>
+            <li>heading_atx/tokenize.rs</li>
+            <li>heading/compile.rs, heading/stringify.rs, heading/convert.rs</li>
+            <li>attention/tokenize.rs, attention/resolve.rs</li>
+          </ul>
+        </li>
+        <li>helpers — UTF-16 positions, characters, identifiers, references, URIs</li>
+        <li>
+          plugins — every public stage: parse, stringify, to_html, gfm, math, directive,
+          definition_list, frontmatter, mdx, gemoji
+        </li>
+      </ul>
+    </li>
+  </ul>
+</htmlpress-file-tree>
+<table>
+  <thead>
+    <tr>
+      <th>Verb</th>
+      <th>Upstream</th>
+      <th>One file holds</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>tokenize</code></td>
+      <td>micromark</td>
+      <td>a construct's state machine</td>
+    </tr>
+    <tr>
+      <td><code>resolve</code></td>
+      <td>micromark resolvers</td>
+      <td>event post-processing</td>
+    </tr>
+    <tr>
+      <td><code>compile</code></td>
+      <td>mdast-util-from-markdown</td>
+      <td>events into one node</td>
+    </tr>
+    <tr>
+      <td><code>stringify</code></td>
+      <td>mdast-util-to-markdown</td>
+      <td>one node to Markdown</td>
+    </tr>
+    <tr>
+      <td><code>convert</code></td>
+      <td>mdast-util-to-hast</td>
+      <td>one node to hast</td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  CommonMark sits at the top level and registers through the same contract as
+  <code>gfm</code>, which proves the contract sufficient; extensions reuse its partials
+  (<code>label</code>, <code>destination</code>, <code>space_or_tab</code>). An extension
+  plugin bundles syntax, compile and stringify handlers, as remark-gfm bundles its
+  micromark and mdast-util halves. MDX syntax finds where <code>{…}</code> ends by
+  counting braces, micromark's own fallback without acorn, so <code>md</code> never needs
+  oxc.
+</p>
+
+<h2>Hardest points</h2>
+<ul>
+  <li>
+    Container continuation and lazy lines in block quotes and lists, with subtokenizing
+  </li>
+  <li>The attention resolver behind emphasis</li>
+  <li>
+    Precedence between extensions on one character code: <code>:</code> starts directives,
+    GFM autolinks and definition lists
+  </li>
+  <li>to-markdown's unsafe-pattern escaping</li>
+  <li>Exact UTF-16 positions through tab virtual spaces</li>
+  <li>
+    The corpus's lifecycle cases written for unified's async modes; under sync transforms
+    they become deviations
+  </li>
+</ul>
