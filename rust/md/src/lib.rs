@@ -209,6 +209,9 @@ mod actions {
     pub(crate) mod space_or_tab {
         pub(crate) mod tokenize;
     }
+    pub(crate) mod space_or_tab_eol {
+        pub(crate) mod tokenize;
+    }
     pub(crate) mod strong {
         pub(crate) mod compile;
         pub(crate) mod convert;
@@ -235,7 +238,9 @@ mod actions {
 }
 mod helpers {
     pub(crate) mod character;
+    pub(crate) mod decode;
     pub(crate) mod entities;
+    pub(crate) mod html;
     pub(crate) mod identifier;
     pub(crate) mod position;
     pub(crate) mod reference;

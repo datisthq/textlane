@@ -1,6 +1,8 @@
 use crate::models::construct::{State, StateFn};
+use crate::models::event::{ContentType, Link};
 use crate::models::token::Name;
 use crate::utils::tokenizer::driver::Tokenizer;
+use crate::utils::tokenizer::subtokenize::link;
 
 /// Between `min` and `max` spaces or tabs; returns the state to retry into.
 pub(crate) fn tokenize_space_or_tab(
@@ -8,8 +10,31 @@ pub(crate) fn tokenize_space_or_tab(
     min: usize,
     max: usize,
 ) -> StateFn {
-    tokenizer.tokenize_state.space_or_tab_connect = false;
-    tokenizer.tokenize_state.space_or_tab_content = None;
+    tokenize_space_or_tab_linked(tokenizer, min, max, None, false)
+}
+
+/// Between `min` and `max` spaces or tabs, as a token named `name`.
+pub(crate) fn tokenize_space_or_tab_named(
+    tokenizer: &mut Tokenizer,
+    name: Name,
+    min: usize,
+    max: usize,
+) -> StateFn {
+    let state = tokenize_space_or_tab_linked(tokenizer, min, max, None, false);
+    tokenizer.tokenize_state.space_or_tab_token = Some(name);
+    state
+}
+
+/// Spaces or tabs that are a chunk of `content`, linked to the chunk before when `connect`.
+pub(crate) fn tokenize_space_or_tab_linked(
+    tokenizer: &mut Tokenizer,
+    min: usize,
+    max: usize,
+    content: Option<ContentType>,
+    connect: bool,
+) -> StateFn {
+    tokenizer.tokenize_state.space_or_tab_connect = connect;
+    tokenizer.tokenize_state.space_or_tab_content = content;
     tokenizer.tokenize_state.space_or_tab_min = min;
     tokenizer.tokenize_state.space_or_tab_max = max;
     tokenizer.tokenize_state.space_or_tab_token = None;
@@ -24,7 +49,25 @@ fn start(tokenizer: &mut Tokenizer) -> State {
             .tokenize_state
             .space_or_tab_token
             .unwrap_or(Name::SPACE_OR_TAB);
-        tokenizer.enter(name);
+        match tokenizer.tokenize_state.space_or_tab_content {
+            Some(content) => {
+                tokenizer.enter_link(
+                    name,
+                    Link {
+                        previous: None,
+                        next: None,
+                        content,
+                    },
+                );
+                if tokenizer.tokenize_state.space_or_tab_connect {
+                    let index = tokenizer.events.len() - 1;
+                    link(&mut tokenizer.events, index);
+                } else {
+                    tokenizer.tokenize_state.space_or_tab_connect = true;
+                }
+            }
+            None => tokenizer.enter(name),
+        }
         State::Retry(inside)
     } else {
         State::Retry(after)

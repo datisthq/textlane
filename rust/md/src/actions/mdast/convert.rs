@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use textlane_core::Allocator;
 use textlane_core::hast;
 use textlane_core::mdast;
@@ -15,9 +17,23 @@ pub fn convert_mdast<'a>(
         alloc,
         options,
         loose_lists: vec![],
+        definitions: find_definitions(node),
     };
     let mut nodes = converter.convert(node);
+    // Handlers that return several nodes, or text in place of a reference, return a list,
+    // which mdast-util-to-hast wraps in a root
+    let list = match node {
+        mdast::Node::Break(_) => true,
+        mdast::Node::LinkReference(reference) => {
+            converter.find_definition(reference.identifier).is_none()
+        }
+        mdast::Node::ImageReference(reference) => {
+            converter.find_definition(reference.identifier).is_none()
+        }
+        _ => false,
+    };
     if nodes.len() == 1
+        && !list
         && let Some(node) = nodes.pop()
     {
         return node;
@@ -26,4 +42,23 @@ pub fn convert_mdast<'a>(
         children: nodes,
         position: None,
     })
+}
+
+// Every definition in the tree, walked without recursing; the first of an identifier wins
+fn find_definitions<'a>(
+    node: &mdast::Node<'a>,
+) -> HashMap<String, (&'a str, Option<&'a str>)> {
+    let mut definitions = HashMap::new();
+    let mut stack = vec![node];
+    while let Some(node) = stack.pop() {
+        if let mdast::Node::Definition(definition) = node {
+            definitions
+                .entry(definition.identifier.to_uppercase())
+                .or_insert((definition.url, definition.title));
+        }
+        if let Some(children) = node.children() {
+            stack.extend(children.iter().rev());
+        }
+    }
+    definitions
 }

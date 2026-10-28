@@ -26,6 +26,29 @@ pub(crate) struct ContainerState {
     pub(crate) size: usize,
 }
 
+/// Whether a label start opens a link or an image.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum LabelKind {
+    Image,
+    Link,
+}
+
+/// A `[` or `![`: the enter and exit of its events.
+#[derive(Clone, Debug)]
+pub(crate) struct LabelStart {
+    pub(crate) kind: LabelKind,
+    pub(crate) start: (usize, usize),
+    pub(crate) inactive: bool,
+}
+
+/// A label that closed: its start's events and its end's events.
+#[derive(Clone, Debug)]
+pub(crate) struct Label {
+    pub(crate) kind: LabelKind,
+    pub(crate) start: (usize, usize),
+    pub(crate) end: (usize, usize),
+}
+
 /// What a byte at a point means: a byte, a virtual space of a tab, or the `\r` of a CRLF.
 #[derive(Debug, PartialEq)]
 enum ByteAction {
@@ -76,8 +99,32 @@ pub(crate) struct TokenizeState<'a> {
     pub(crate) space_or_tab_max: usize,
     pub(crate) space_or_tab_size: usize,
     pub(crate) space_or_tab_token: Option<Name>,
+    pub(crate) space_or_tab_eol_connect: bool,
+    pub(crate) space_or_tab_eol_content: Option<ContentType>,
+    pub(crate) space_or_tab_eol_ok: bool,
     pub(crate) definitions: Vec<String>,
+    /// Link and image label starts (`[`, `![`) not yet closed.
+    pub(crate) label_starts: Vec<LabelStart>,
+    /// Label starts a label end could not close, turned into data later.
+    pub(crate) label_starts_loose: Vec<LabelStart>,
+    /// Link label starts before this index are inactive: links may not contain links.
+    pub(crate) label_starts_inactive_before: usize,
+    /// Labels that closed into links or images.
+    pub(crate) labels: Vec<Label>,
+    /// Token names partials (label, destination, title) emit, set by their caller.
+    pub(crate) token_1: Name,
+    pub(crate) token_2: Name,
+    pub(crate) token_3: Name,
+    pub(crate) token_4: Name,
+    pub(crate) token_5: Name,
+    /// Inline HTML comments, CDATA, declarations and instructions that scanned to the end
+    /// without closing: none of that kind can close after them either.
+    pub(crate) html_text_unclosed: [bool; 4],
     pub(crate) connect: bool,
+    pub(crate) seen: bool,
+    pub(crate) start: usize,
+    pub(crate) marker_b: u8,
+    pub(crate) end: usize,
     pub(crate) marker: u8,
     pub(crate) markers: &'static [u8],
     pub(crate) size: usize,

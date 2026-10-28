@@ -4,7 +4,8 @@ use crate::actions::mdast::serialize::MAX_JSON_DEPTH;
 use crate::actions::position::deserialize::deserialize_position;
 use crate::models::error::Error;
 use crate::models::hast::{
-    Comment, Doctype, Element, Node, Property, PropertyItem, PropertyValue, Root, Text,
+    Comment, Doctype, Element, Node, Property, PropertyItem, PropertyValue, Raw, Root,
+    Text,
 };
 use crate::{Allocator, ArenaVec};
 
@@ -54,6 +55,10 @@ fn deserialize_node<'a>(
             position,
         }),
         "doctype" => Node::Doctype(Doctype { position }),
+        "raw" => Node::Raw(Raw {
+            value: read_str("value"),
+            position,
+        }),
         _ => {
             return Err(Error::new(
                 "unsupported-node",

@@ -38,12 +38,12 @@ fn write_open<'n, 'a>(
     output: &mut String,
     node: &'n Node<'a>,
     stack: &mut Vec<Step<'n, 'a>>,
-    _options: &StringifyOptions,
+    options: &StringifyOptions,
 ) {
     match node {
         Node::Root(root) => stack.extend(root.children.iter().rev().map(Step::Open)),
         Node::Element(element) => {
-            write_start_tag(output, element);
+            write_start_tag(output, element, options);
             if !VOID_ELEMENTS.contains(&element.tag_name) {
                 stack.push(Step::Close(element.tag_name));
                 stack.extend(element.children.iter().rev().map(Step::Open));
@@ -56,19 +56,30 @@ fn write_open<'n, 'a>(
             output.push_str("-->");
         }
         Node::Doctype(_) => output.push_str("<!doctype html>"),
+        Node::Raw(raw) if options.allow_dangerous_html => output.push_str(raw.value),
+        Node::Raw(raw) => write_escaped(output, raw.value, &['<', '&']),
     }
 }
 
-fn write_start_tag(output: &mut String, element: &Element<'_>) {
+fn write_start_tag(
+    output: &mut String,
+    element: &Element<'_>,
+    options: &StringifyOptions,
+) {
     output.push('<');
     output.push_str(element.tag_name);
     for property in &element.properties {
-        write_attribute(output, property.name, &property.value);
+        write_attribute(output, property.name, &property.value, options);
     }
     output.push('>');
 }
 
-fn write_attribute(output: &mut String, name: &str, value: &PropertyValue<'_>) {
+fn write_attribute(
+    output: &mut String,
+    name: &str,
+    value: &PropertyValue<'_>,
+    options: &StringifyOptions,
+) {
     let attribute = match name {
         "className" => "class",
         "htmlFor" => "for",
@@ -95,7 +106,14 @@ fn write_attribute(output: &mut String, name: &str, value: &PropertyValue<'_>) {
     output.push(' ');
     output.push_str(attribute);
     output.push_str("=\"");
-    write_escaped(output, &value, &['"', '&']);
+    // hast-util-to-html escapes these in double-quoted values, `'` and `` ` `` too unless
+    // dangerous characters are allowed
+    let subset: &[char] = if options.allow_dangerous_characters {
+        &['"', '&']
+    } else {
+        &['"', '&', '\'', '`']
+    };
+    write_escaped(output, &value, subset);
     output.push('"');
 }
 

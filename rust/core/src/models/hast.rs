@@ -9,6 +9,7 @@ pub enum Node<'a> {
     Text(Text<'a>),
     Comment(Comment<'a>),
     Doctype(Doctype<'a>),
+    Raw(Raw<'a>),
 }
 
 /// The document or fragment.
@@ -65,6 +66,13 @@ pub struct Comment<'a> {
     pub position: Option<Position<'a>>,
 }
 
+/// Raw HTML, written as it is only when dangerous HTML is allowed.
+#[derive(Debug, PartialEq)]
+pub struct Raw<'a> {
+    pub value: &'a str,
+    pub position: Option<Position<'a>>,
+}
+
 /// A doctype.
 #[derive(Debug, PartialEq)]
 pub struct Doctype<'a> {
@@ -79,6 +87,7 @@ impl<'a> Node<'a> {
             Node::Text(node) => node.position.as_ref(),
             Node::Comment(node) => node.position.as_ref(),
             Node::Doctype(node) => node.position.as_ref(),
+            Node::Raw(node) => node.position.as_ref(),
         }
     }
 }

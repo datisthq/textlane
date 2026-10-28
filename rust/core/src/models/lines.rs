@@ -33,10 +33,13 @@ impl<'a> Lines<'a> {
         let offset = point.offset().min(self.source.len());
         let line = self.starts.partition_point(|start| *start <= offset);
         let start = self.starts[line - 1];
+        // Inside a tab, however far into its columns, micromark counts the tab as passed by
+        // one column
+        let inside_tab = usize::from(point.virtual_spaces() > 0);
         UnistPoint {
             line,
-            column: self.count_units(start, offset) + 1 + point.virtual_spaces(),
-            offset: Some(self.count_units(0, offset)),
+            column: self.count_units(start, offset) + 1 + inside_tab,
+            offset: Some(self.count_units(0, offset) + inside_tab),
         }
     }
 

@@ -58,7 +58,11 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   needs a memo of what the failed scan saw, as `code_text_runs` is for code spans and
   `thematic_break_failed` for nested list markers. Nested containers all close at one
   place, so a walk back over their exits must be precomputed (`helpers/spread.rs`);
-  blank lines skip list items that continue for free (`document_blank_ends`). Time
+  blank lines skip list items that continue for free (`document_blank_ends`). Text joins
+  pieces through a growable arena buffer, a label is matched against definitions in the
+  length of the longest identifier (`ParseState::is_defined`), and a label's text is read
+  only when it names a reference. Inline HTML remembers which kinds scanned to the end
+  unclosed (`html_text_unclosed`). Time
   growth in release mode, best of several runs: single debug timings are noisy.
 - Container ends follow micromark, not markdown-rs: a list item ends at the first line
   ending of its trailing blank lines (`prepareList`), stepping over the exits of lists
@@ -69,7 +73,12 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   `fn(&mut Tokenizer) -> State`, a token name an open `Name("…")` constant. A construct not
   ported yet is marked where it joins, in `utils/tokenizer/{document,flow,text}.rs`. Where
   markdown-rs differs from micromark or unified, the corpus wins (flow nodes start after their
-  indent: `tail_push_after_prefix`; `*` and `_` never count as punctuation next to attention).
+  indent: `tail_push_after_prefix`; `*` and `_` never count as punctuation next to attention;
+  an escape's text starts at its backslash, as from-markdown opens it on `characterEscape`;
+  string content is never trimmed; a token's slice leaves out container prefixes of its later
+  lines and reads NUL as U+FFFD, as micromark's chunks do; each line of a label or title is
+  a string of its own, a title's indent after a line ending belongs to neither; a point
+  inside a tab is one column and one offset past the tab's start).
   `helpers/entities.rs` and `helpers/unicode.rs` are tables generated from markdown-rs's,
   sorted for binary search
 - `md` names entities by syntax construct or mdast node and verbs by layer: `tokenize` and

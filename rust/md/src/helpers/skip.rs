@@ -9,6 +9,14 @@ pub(crate) fn skip_to(events: &[Event], mut index: usize, names: &[Name]) -> usi
     index
 }
 
+/// The index of the last event at or before `index` named one of `names`.
+pub(crate) fn skip_to_back(events: &[Event], mut index: usize, names: &[Name]) -> usize {
+    while index > 0 && !names.contains(&events[index].name) {
+        index -= 1;
+    }
+    index
+}
+
 /// Walk forward from `index` over whole tokens named one of `names`.
 pub(crate) fn skip_opt(events: &[Event], mut index: usize, names: &[Name]) -> usize {
     while index < events.len() {

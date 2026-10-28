@@ -84,3 +84,61 @@ fn continues_deep_containers_over_blank_lines_in_linear_time() -> Result<(), Err
     }
     Ok(())
 }
+
+#[test]
+fn resolves_many_setext_underlines_in_linear_time() -> Result<(), Error> {
+    for input in [
+        "a\n".to_string() + &"=\n".repeat(50_000),
+        "a\n-\n".repeat(25_000),
+    ] {
+        let started = std::time::Instant::now();
+        render(&input)?;
+        assert!(
+            started.elapsed().as_secs() < 5,
+            "took {:?}",
+            started.elapsed()
+        );
+    }
+    Ok(())
+}
+
+#[test]
+fn resolves_hostile_links_in_linear_time() -> Result<(), Error> {
+    let definition = "[a]: b\n\n";
+    for input in [
+        definition.to_string() + &"[".repeat(20_000) + &"]".repeat(20_000),
+        definition.to_string() + &"[ ".repeat(10_000) + &" ]".repeat(10_000),
+        "[".repeat(20_000) + &"[a](b)".repeat(20_000),
+        "[a](b 'c\n".repeat(10_000),
+        "[a](b".repeat(20_000),
+        "![".repeat(10_000) + &"](b)".repeat(10_000),
+        definition.to_string() + &"[a][a]".repeat(20_000),
+        "a\\*".repeat(30_000),
+    ] {
+        let started = std::time::Instant::now();
+        render(&input)?;
+        let took = started.elapsed();
+        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..20]);
+    }
+    Ok(())
+}
+
+#[test]
+fn rejects_hostile_html_in_linear_time() -> Result<(), Error> {
+    for input in [
+        "a <!-- b ".repeat(20_000),
+        "a <? b ".repeat(20_000),
+        "a <!B c ".repeat(20_000),
+        "a <![CDATA[ b ".repeat(20_000),
+        "a <b c=\" ".repeat(20_000),
+        "a <b c='\n".repeat(20_000),
+        "<div>\n".repeat(20_000),
+        "<!--\n".repeat(20_000),
+    ] {
+        let started = std::time::Instant::now();
+        render(&input)?;
+        let took = started.elapsed();
+        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+    }
+    Ok(())
+}

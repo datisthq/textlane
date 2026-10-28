@@ -9,7 +9,9 @@ use crate::utils::compiler::stack::Compiler;
 pub(crate) fn compile_text(compiler: &mut Compiler, name: Name, kind: Kind) {
     match (name, kind) {
         (Name::LINE_ENDING, Kind::Exit) => {
-            if compiler.hard_break_after {
+            if compiler.heading_setext_text_after {
+                // The line ending between a setext heading's text and its underline
+            } else if compiler.hard_break_after {
                 compiler.extend_last_child();
                 compiler.hard_break_after = false;
             } else if matches!(
@@ -27,6 +29,10 @@ pub(crate) fn compile_text(compiler: &mut Compiler, name: Name, kind: Kind) {
             }
         }
         (Name::LINE_ENDING, Kind::Enter) => {}
+        // An escape's text starts at its backslash but holds only the escaped character
+        (Name::CHARACTER_ESCAPE, Kind::Enter) => enter_text(compiler),
+        (Name::CHARACTER_ESCAPE, Kind::Exit)
+        | (Name::CHARACTER_ESCAPE_VALUE, Kind::Enter) => {}
         (_, Kind::Enter) => enter_text(compiler),
         (_, Kind::Exit) => {
             let value = compiler.slice();
@@ -54,18 +60,6 @@ pub(crate) fn enter_text(compiler: &mut Compiler) {
 
 /// Append `addition` to the open text node and close it.
 pub(crate) fn exit_text<'a>(compiler: &mut Compiler<'a, '_>, addition: &'a str) {
-    append_text(compiler, addition);
+    compiler.append_text(addition);
     compiler.tail_pop();
-}
-
-/// Append `addition` to the open text node.
-pub(crate) fn append_text<'a>(compiler: &mut Compiler<'a, '_>, addition: &'a str) {
-    let value = match compiler.tail_mut() {
-        Node::Text(text) => text.value,
-        _ => return,
-    };
-    let joined = compiler.join(value, addition);
-    if let Node::Text(text) = compiler.tail_mut() {
-        text.value = joined;
-    }
 }

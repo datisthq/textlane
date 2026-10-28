@@ -6,4 +6,6 @@ use serde::Deserialize;
 pub struct StringifyOptions {
     /// Write raw nodes as they are instead of escaping them.
     pub allow_dangerous_html: bool,
+    /// Leave `'` and `` ` `` in attribute values as they are.
+    pub allow_dangerous_characters: bool,
 }

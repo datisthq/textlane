@@ -2,8 +2,18 @@
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct Name(pub(crate) &'static str);
 
+impl Default for Name {
+    fn default() -> Self {
+        Name::DATA
+    }
+}
+
 impl Name {
     pub(crate) const ATTENTION_SEQUENCE: Name = Name("attentionSequence");
+    pub(crate) const AUTOLINK: Name = Name("autolink");
+    pub(crate) const AUTOLINK_EMAIL: Name = Name("autolinkEmail");
+    pub(crate) const AUTOLINK_MARKER: Name = Name("autolinkMarker");
+    pub(crate) const AUTOLINK_PROTOCOL: Name = Name("autolinkProtocol");
     pub(crate) const BLANK_LINE_ENDING: Name = Name("blankLineEnding");
     pub(crate) const BLOCK_QUOTE: Name = Name("blockQuote");
     pub(crate) const BLOCK_QUOTE_MARKER: Name = Name("blockQuoteMarker");
@@ -33,6 +43,22 @@ impl Name {
     pub(crate) const CODE_TEXT_SEQUENCE: Name = Name("codeTextSequence");
     pub(crate) const CONTENT: Name = Name("content");
     pub(crate) const DATA: Name = Name("data");
+    pub(crate) const DEFINITION: Name = Name("definition");
+    pub(crate) const DEFINITION_DESTINATION: Name = Name("definitionDestination");
+    pub(crate) const DEFINITION_DESTINATION_LITERAL: Name =
+        Name("definitionDestinationLiteral");
+    pub(crate) const DEFINITION_DESTINATION_LITERAL_MARKER: Name =
+        Name("definitionDestinationLiteralMarker");
+    pub(crate) const DEFINITION_DESTINATION_RAW: Name = Name("definitionDestinationRaw");
+    pub(crate) const DEFINITION_DESTINATION_STRING: Name =
+        Name("definitionDestinationString");
+    pub(crate) const DEFINITION_LABEL: Name = Name("definitionLabel");
+    pub(crate) const DEFINITION_LABEL_MARKER: Name = Name("definitionLabelMarker");
+    pub(crate) const DEFINITION_LABEL_STRING: Name = Name("definitionLabelString");
+    pub(crate) const DEFINITION_MARKER: Name = Name("definitionMarker");
+    pub(crate) const DEFINITION_TITLE: Name = Name("definitionTitle");
+    pub(crate) const DEFINITION_TITLE_MARKER: Name = Name("definitionTitleMarker");
+    pub(crate) const DEFINITION_TITLE_STRING: Name = Name("definitionTitleString");
     pub(crate) const EMPHASIS: Name = Name("emphasis");
     pub(crate) const EMPHASIS_SEQUENCE: Name = Name("emphasisSequence");
     pub(crate) const EMPHASIS_TEXT: Name = Name("emphasisText");
@@ -41,8 +67,25 @@ impl Name {
     pub(crate) const HEADING_ATX: Name = Name("headingAtx");
     pub(crate) const HEADING_ATX_SEQUENCE: Name = Name("headingAtxSequence");
     pub(crate) const HEADING_ATX_TEXT: Name = Name("headingAtxText");
+    pub(crate) const HEADING_SETEXT: Name = Name("headingSetext");
+    pub(crate) const HEADING_SETEXT_TEXT: Name = Name("headingSetextText");
     pub(crate) const HEADING_SETEXT_UNDERLINE: Name = Name("headingSetextUnderline");
+    pub(crate) const HEADING_SETEXT_UNDERLINE_SEQUENCE: Name =
+        Name("headingSetextUnderlineSequence");
+    pub(crate) const HTML_FLOW: Name = Name("htmlFlow");
+    pub(crate) const HTML_FLOW_DATA: Name = Name("htmlFlowData");
+    pub(crate) const HTML_TEXT: Name = Name("htmlText");
+    pub(crate) const HTML_TEXT_DATA: Name = Name("htmlTextData");
+    pub(crate) const IMAGE: Name = Name("image");
+    pub(crate) const LABEL: Name = Name("label");
+    pub(crate) const LABEL_END: Name = Name("labelEnd");
+    pub(crate) const LABEL_IMAGE: Name = Name("labelImage");
+    pub(crate) const LABEL_IMAGE_MARKER: Name = Name("labelImageMarker");
+    pub(crate) const LABEL_LINK: Name = Name("labelLink");
+    pub(crate) const LABEL_MARKER: Name = Name("labelMarker");
+    pub(crate) const LABEL_TEXT: Name = Name("labelText");
     pub(crate) const LINE_ENDING: Name = Name("lineEnding");
+    pub(crate) const LINK: Name = Name("link");
     pub(crate) const LIST_ITEM: Name = Name("listItem");
     pub(crate) const LIST_ITEM_MARKER: Name = Name("listItemMarker");
     pub(crate) const LIST_ITEM_PREFIX: Name = Name("listItemPrefix");
@@ -50,6 +93,22 @@ impl Name {
     pub(crate) const LIST_ORDERED: Name = Name("listOrdered");
     pub(crate) const LIST_UNORDERED: Name = Name("listUnordered");
     pub(crate) const PARAGRAPH: Name = Name("paragraph");
+    pub(crate) const REFERENCE: Name = Name("reference");
+    pub(crate) const REFERENCE_MARKER: Name = Name("referenceMarker");
+    pub(crate) const REFERENCE_STRING: Name = Name("referenceString");
+    pub(crate) const RESOURCE: Name = Name("resource");
+    pub(crate) const RESOURCE_DESTINATION: Name = Name("resourceDestination");
+    pub(crate) const RESOURCE_DESTINATION_LITERAL: Name =
+        Name("resourceDestinationLiteral");
+    pub(crate) const RESOURCE_DESTINATION_LITERAL_MARKER: Name =
+        Name("resourceDestinationLiteralMarker");
+    pub(crate) const RESOURCE_DESTINATION_RAW: Name = Name("resourceDestinationRaw");
+    pub(crate) const RESOURCE_DESTINATION_STRING: Name =
+        Name("resourceDestinationString");
+    pub(crate) const RESOURCE_MARKER: Name = Name("resourceMarker");
+    pub(crate) const RESOURCE_TITLE: Name = Name("resourceTitle");
+    pub(crate) const RESOURCE_TITLE_MARKER: Name = Name("resourceTitleMarker");
+    pub(crate) const RESOURCE_TITLE_STRING: Name = Name("resourceTitleString");
     pub(crate) const SPACE_OR_TAB: Name = Name("spaceOrTab");
     pub(crate) const STRONG: Name = Name("strong");
     pub(crate) const STRONG_SEQUENCE: Name = Name("strongSequence");

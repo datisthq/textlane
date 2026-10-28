@@ -17,6 +17,12 @@ pub enum Node<'a> {
     Blockquote(Blockquote<'a>),
     List(List<'a>),
     ListItem(ListItem<'a>),
+    Link(Link<'a>),
+    Image(Image<'a>),
+    LinkReference(LinkReference<'a>),
+    ImageReference(ImageReference<'a>),
+    Definition(Definition<'a>),
+    Html(Html<'a>),
 }
 
 /// The document.
@@ -110,6 +116,80 @@ pub struct ListItem<'a> {
     pub position: Option<Position<'a>>,
 }
 
+/// A link to `url`.
+#[derive(Debug, PartialEq)]
+pub struct Link<'a> {
+    pub url: &'a str,
+    pub title: Option<&'a str>,
+    pub children: ArenaVec<'a, Node<'a>>,
+    pub position: Option<Position<'a>>,
+}
+
+/// An image at `url`.
+#[derive(Debug, PartialEq)]
+pub struct Image<'a> {
+    pub url: &'a str,
+    pub title: Option<&'a str>,
+    pub alt: Option<&'a str>,
+    pub position: Option<Position<'a>>,
+}
+
+/// How a reference is written: `[a]`, `[a][]` or `[b][a]`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ReferenceType {
+    Shortcut,
+    Collapsed,
+    Full,
+}
+
+/// A link through a definition, matched by `identifier`.
+#[derive(Debug, PartialEq)]
+pub struct LinkReference<'a> {
+    pub identifier: &'a str,
+    pub label: Option<&'a str>,
+    pub reference_type: ReferenceType,
+    pub children: ArenaVec<'a, Node<'a>>,
+    pub position: Option<Position<'a>>,
+}
+
+/// An image through a definition, matched by `identifier`.
+#[derive(Debug, PartialEq)]
+pub struct ImageReference<'a> {
+    pub identifier: &'a str,
+    pub label: Option<&'a str>,
+    pub reference_type: ReferenceType,
+    pub alt: Option<&'a str>,
+    pub position: Option<Position<'a>>,
+}
+
+/// A definition of where references with its `identifier` go.
+#[derive(Debug, PartialEq)]
+pub struct Definition<'a> {
+    pub identifier: &'a str,
+    pub label: Option<&'a str>,
+    pub url: &'a str,
+    pub title: Option<&'a str>,
+    pub position: Option<Position<'a>>,
+}
+
+impl ReferenceType {
+    /// The name unist uses.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            ReferenceType::Shortcut => "shortcut",
+            ReferenceType::Collapsed => "collapsed",
+            ReferenceType::Full => "full",
+        }
+    }
+}
+
+/// Raw HTML.
+#[derive(Debug, PartialEq)]
+pub struct Html<'a> {
+    pub value: &'a str,
+    pub position: Option<Position<'a>>,
+}
+
 /// Plain text.
 #[derive(Debug, PartialEq)]
 pub struct Text<'a> {
@@ -129,11 +209,17 @@ impl<'a> Node<'a> {
             Node::Blockquote(node) => Some(&node.children),
             Node::List(node) => Some(&node.children),
             Node::ListItem(node) => Some(&node.children),
+            Node::Link(node) => Some(&node.children),
+            Node::LinkReference(node) => Some(&node.children),
             Node::ThematicBreak(_)
             | Node::Text(_)
             | Node::Break(_)
             | Node::Code(_)
-            | Node::InlineCode(_) => None,
+            | Node::InlineCode(_)
+            | Node::Image(_)
+            | Node::ImageReference(_)
+            | Node::Definition(_)
+            | Node::Html(_) => None,
         }
     }
 
@@ -148,11 +234,17 @@ impl<'a> Node<'a> {
             Node::Blockquote(node) => Some(&mut node.children),
             Node::List(node) => Some(&mut node.children),
             Node::ListItem(node) => Some(&mut node.children),
+            Node::Link(node) => Some(&mut node.children),
+            Node::LinkReference(node) => Some(&mut node.children),
             Node::ThematicBreak(_)
             | Node::Text(_)
             | Node::Break(_)
             | Node::Code(_)
-            | Node::InlineCode(_) => None,
+            | Node::InlineCode(_)
+            | Node::Image(_)
+            | Node::ImageReference(_)
+            | Node::Definition(_)
+            | Node::Html(_) => None,
         }
     }
 
@@ -171,6 +263,12 @@ impl<'a> Node<'a> {
             Node::Blockquote(node) => node.position.as_ref(),
             Node::List(node) => node.position.as_ref(),
             Node::ListItem(node) => node.position.as_ref(),
+            Node::Definition(node) => node.position.as_ref(),
+            Node::Html(node) => node.position.as_ref(),
+            Node::ImageReference(node) => node.position.as_ref(),
+            Node::LinkReference(node) => node.position.as_ref(),
+            Node::Image(node) => node.position.as_ref(),
+            Node::Link(node) => node.position.as_ref(),
         }
     }
 
@@ -189,6 +287,12 @@ impl<'a> Node<'a> {
             Node::Blockquote(node) => &mut node.position,
             Node::List(node) => &mut node.position,
             Node::ListItem(node) => &mut node.position,
+            Node::Definition(node) => &mut node.position,
+            Node::Html(node) => &mut node.position,
+            Node::ImageReference(node) => &mut node.position,
+            Node::LinkReference(node) => &mut node.position,
+            Node::Image(node) => &mut node.position,
+            Node::Link(node) => &mut node.position,
         }
     }
 }

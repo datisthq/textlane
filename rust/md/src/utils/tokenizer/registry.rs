@@ -1,6 +1,8 @@
 use crate::actions::attention::resolve::resolve_attention;
 use crate::actions::data::resolve::resolve_data;
 use crate::actions::heading_atx::resolve::resolve_heading_atx;
+use crate::actions::heading_setext::resolve::resolve_heading_setext;
+use crate::actions::label_end::resolve::resolve_label;
 use crate::actions::list_item::resolve::resolve_list_item;
 use crate::actions::whitespace::resolve::resolve_whitespace;
 use crate::models::construct::Resolver;
@@ -27,14 +29,20 @@ pub(crate) fn call_resolver(
             resolve_list_item(tokenizer);
             None
         }
+        Resolver::HeadingSetext => {
+            resolve_heading_setext(tokenizer);
+            None
+        }
+        Resolver::Label => {
+            resolve_label(tokenizer);
+            None
+        }
         Resolver::HeadingAtx => {
             resolve_heading_atx(tokenizer);
             None
         }
-        Resolver::String => {
-            resolve_whitespace(tokenizer, false, false);
-            None
-        }
+        // micromark trims whitespace around line endings in text only, never in strings
+        Resolver::String => None,
         Resolver::Text => {
             resolve_whitespace(tokenizer, true, true);
             None

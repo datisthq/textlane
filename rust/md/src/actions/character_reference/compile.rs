@@ -1,4 +1,4 @@
-use crate::actions::text::compile::{append_text, enter_text};
+use crate::actions::text::compile::enter_text;
 use crate::helpers::reference::decode_reference;
 use crate::models::event::Kind;
 use crate::models::token::Name;
@@ -27,7 +27,7 @@ pub(crate) fn compile_character_reference(
             let decoded = decode_reference(value, compiler.character_reference_marker)
                 .unwrap_or_default();
             let decoded = compiler.alloc.alloc_str(&decoded);
-            append_text(compiler, decoded);
+            compiler.append_text(decoded);
             compiler.character_reference_marker = 0;
         }
         _ => {}

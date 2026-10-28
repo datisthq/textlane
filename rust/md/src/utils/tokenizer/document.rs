@@ -159,6 +159,17 @@ fn new_container(kind: Container) -> ContainerState {
 
 fn containers_after(tokenizer: &mut Tokenizer) -> State {
     let point = tokenizer.point.clone();
+    let bytes = tokenizer.parse_state.bytes;
+    let mut line_start = point.index;
+    while line_start > 0 && !matches!(bytes[line_start - 1], b'\n' | b'\r') {
+        line_start -= 1;
+    }
+    if line_start < point.index {
+        let mut prefixes = tokenizer.parse_state.prefixes.borrow_mut();
+        if prefixes.last().is_none_or(|last| last.0 < line_start) {
+            prefixes.push((line_start, point.index));
+        }
+    }
     let lazy = tokenizer.tokenize_state.document_continued
         != tokenizer.tokenize_state.document_container_stack.len();
     if let Some(child) = tokenizer.tokenize_state.document_child.as_mut() {

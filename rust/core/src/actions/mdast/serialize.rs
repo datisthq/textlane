@@ -62,6 +62,47 @@ fn serialize_node(
             object.insert("checked".into(), item.checked.into());
             "listItem"
         }
+        Node::Link(link) => {
+            object.insert("url".into(), link.url.into());
+            object.insert("title".into(), link.title.into());
+            "link"
+        }
+        Node::Image(image) => {
+            object.insert("url".into(), image.url.into());
+            object.insert("title".into(), image.title.into());
+            object.insert("alt".into(), image.alt.into());
+            "image"
+        }
+        Node::LinkReference(reference) => {
+            object.insert("identifier".into(), reference.identifier.into());
+            object.insert("label".into(), reference.label.into());
+            object.insert(
+                "referenceType".into(),
+                reference.reference_type.as_str().into(),
+            );
+            "linkReference"
+        }
+        Node::ImageReference(reference) => {
+            object.insert("identifier".into(), reference.identifier.into());
+            object.insert("label".into(), reference.label.into());
+            object.insert(
+                "referenceType".into(),
+                reference.reference_type.as_str().into(),
+            );
+            object.insert("alt".into(), reference.alt.into());
+            "imageReference"
+        }
+        Node::Definition(definition) => {
+            object.insert("identifier".into(), definition.identifier.into());
+            object.insert("label".into(), definition.label.into());
+            object.insert("url".into(), definition.url.into());
+            object.insert("title".into(), definition.title.into());
+            "definition"
+        }
+        Node::Html(html) => {
+            object.insert("value".into(), html.value.into());
+            "html"
+        }
         Node::InlineCode(code) => {
             object.insert("value".into(), code.value.into());
             "inlineCode"

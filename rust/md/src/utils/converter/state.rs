@@ -1,13 +1,20 @@
-use textlane_core::hast::{self, Element};
+use std::collections::HashMap;
+
+use textlane_core::hast::{self, Element, Property, PropertyValue};
 use textlane_core::mdast;
-use textlane_core::{Allocator, ArenaVec, Position};
+use textlane_core::{Allocator, ArenaString, ArenaVec, Position};
 
 use crate::actions::blockquote::convert::convert_blockquote;
 use crate::actions::code::convert::convert_code;
 use crate::actions::emphasis::convert::convert_emphasis;
 use crate::actions::hard_break::convert::convert_hard_break;
 use crate::actions::heading::convert::convert_heading;
+use crate::actions::html::convert::convert_html;
+use crate::actions::image::convert::convert_image;
+use crate::actions::image_reference::convert::convert_image_reference;
 use crate::actions::inline_code::convert::convert_inline_code;
+use crate::actions::link::convert::convert_link;
+use crate::actions::link_reference::convert::convert_link_reference;
 use crate::actions::list::convert::convert_list;
 use crate::actions::list_item::convert::{convert_list_item, is_list_loose};
 use crate::actions::paragraph::convert::convert_paragraph;
@@ -20,11 +27,12 @@ use crate::models::options::ToHtmlOptions;
 /// Turns mdast into hast, as mdast-util-to-hast does.
 pub(crate) struct Converter<'a, 'o> {
     pub(crate) alloc: &'a Allocator,
-    // `allowDangerousHtml` decides what raw HTML becomes, once html nodes exist
-    #[allow(dead_code)]
     pub(crate) options: &'o ToHtmlOptions,
     /// Whether each list being converted is loose, worked out once per list for its items.
     pub(crate) loose_lists: Vec<bool>,
+    /// The URL and title of each definition, by its identifier in upper case; the first
+    /// definition of an identifier wins.
+    pub(crate) definitions: HashMap<String, (&'a str, Option<&'a str>)>,
 }
 
 // A parent whose children are being converted
@@ -67,7 +75,7 @@ impl<'a> Converter<'a, '_> {
             converted.extend(results.drain(frame.start..));
             let start = results.len();
             let parent = stack.last().map(|parent| parent.node);
-            results.push(self.exit(frame.node, parent, converted));
+            self.exit(frame.node, parent, converted, &mut results);
             if frame.trim {
                 trim_start(&mut results[start]);
             }
@@ -110,6 +118,11 @@ impl<'a> Converter<'a, '_> {
                 results.push(convert_hard_break(self, node));
                 results.push(line_ending());
             }
+            mdast::Node::Image(node) => results.push(convert_image(self, node)),
+            mdast::Node::Html(node) => results.extend(convert_html(self, node)),
+            mdast::Node::ImageReference(node) => {
+                results.push(convert_image_reference(self, node));
+            }
             _ => {}
         }
         if trim && let Some(first) = results.get_mut(start) {
@@ -122,8 +135,9 @@ impl<'a> Converter<'a, '_> {
         node: &mdast::Node<'a>,
         parent: Option<&mdast::Node<'a>>,
         children: ArenaVec<'a, hast::Node<'a>>,
-    ) -> hast::Node<'a> {
-        match node {
+        results: &mut Vec<hast::Node<'a>>,
+    ) {
+        let result = match node {
             mdast::Node::Blockquote(node) => convert_blockquote(self, node, children),
             mdast::Node::List(list) => {
                 self.loose_lists.pop();
@@ -143,14 +157,68 @@ impl<'a> Converter<'a, '_> {
             mdast::Node::Paragraph(paragraph) => {
                 convert_paragraph(self, paragraph, children)
             }
-            mdast::Node::ThematicBreak(_)
-            | mdast::Node::Text(_)
-            | mdast::Node::Break(_)
-            | mdast::Node::Code(_)
-            | mdast::Node::InlineCode(_) => {
-                unreachable!("leaves convert on enter")
+            mdast::Node::Link(link) => convert_link(self, link, children),
+            mdast::Node::LinkReference(reference) => {
+                convert_link_reference(self, reference, children, results);
+                return;
             }
+            _ => return,
+        };
+        results.push(result);
+    }
+
+    /// The URL and title of the definition an identifier refers to.
+    pub(crate) fn find_definition(
+        &self,
+        identifier: &str,
+    ) -> Option<(&'a str, Option<&'a str>)> {
+        self.definitions.get(&identifier.to_uppercase()).copied()
+    }
+
+    /// Add a property when it has a value.
+    pub(crate) fn push_property(
+        &self,
+        properties: &mut ArenaVec<'a, Property<'a>>,
+        name: &'a str,
+        value: Option<&'a str>,
+    ) {
+        if let Some(value) = value {
+            properties.push(Property {
+                name,
+                value: PropertyValue::String(value),
+            });
         }
+    }
+
+    /// A text node.
+    pub(crate) fn text(&self, value: &'a str) -> hast::Node<'a> {
+        hast::Node::Text(hast::Text {
+            value,
+            position: None,
+        })
+    }
+
+    /// Strings joined in the arena.
+    pub(crate) fn concat(&self, pieces: &[&str]) -> &'a str {
+        let mut value = ArenaString::new_in(self.alloc);
+        pieces.iter().for_each(|piece| value.push_str(piece));
+        value.into_bump_str()
+    }
+
+    /// An element with properties.
+    pub(crate) fn element_with(
+        &self,
+        tag_name: &'a str,
+        properties: ArenaVec<'a, Property<'a>>,
+        children: ArenaVec<'a, hast::Node<'a>>,
+        position: Option<Position<'a>>,
+    ) -> hast::Node<'a> {
+        hast::Node::Element(Element {
+            tag_name,
+            properties,
+            children,
+            position,
+        })
     }
 
     /// Put a line ending between nodes, and around them when `loose`.

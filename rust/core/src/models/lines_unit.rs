@@ -22,8 +22,8 @@ fn counts_columns_and_offsets_in_utf16_units() {
 }
 
 #[test]
-fn adds_virtual_spaces_to_the_column() {
+fn counts_a_point_inside_a_tab_as_past_its_first_column() {
     let lines = Lines::new("\ta");
     let point = lines.to_unist_point(Point::new(0, 2));
-    assert_eq!((point.column, point.offset), (3, Some(0)));
+    assert_eq!((point.column, point.offset), (2, Some(1)));
 }

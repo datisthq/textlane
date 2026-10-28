@@ -4,8 +4,9 @@ use crate::actions::mdast::serialize::MAX_JSON_DEPTH;
 use crate::actions::position::deserialize::deserialize_position;
 use crate::models::error::Error;
 use crate::models::mdast::{
-    Blockquote, Break, Code, Emphasis, Heading, InlineCode, List, ListItem, Node,
-    Paragraph, Root, Strong, Text, ThematicBreak,
+    Blockquote, Break, Code, Definition, Emphasis, Heading, Html, Image, ImageReference,
+    InlineCode, Link, LinkReference, List, ListItem, Node, Paragraph, ReferenceType,
+    Root, Strong, Text, ThematicBreak,
 };
 use crate::{Allocator, ArenaVec};
 
@@ -81,6 +82,43 @@ fn deserialize_node<'a>(
             children: deserialize_children(value, alloc, depth)?,
             position,
         }),
+        "link" => Node::Link(Link {
+            url: read_optional_str(value, "url", alloc).unwrap_or_default(),
+            title: read_optional_str(value, "title", alloc),
+            children: deserialize_children(value, alloc, depth)?,
+            position,
+        }),
+        "image" => Node::Image(Image {
+            url: read_optional_str(value, "url", alloc).unwrap_or_default(),
+            title: read_optional_str(value, "title", alloc),
+            alt: read_optional_str(value, "alt", alloc),
+            position,
+        }),
+        "linkReference" => Node::LinkReference(LinkReference {
+            identifier: read_optional_str(value, "identifier", alloc).unwrap_or_default(),
+            label: read_optional_str(value, "label", alloc),
+            reference_type: read_reference_type(value),
+            children: deserialize_children(value, alloc, depth)?,
+            position,
+        }),
+        "imageReference" => Node::ImageReference(ImageReference {
+            identifier: read_optional_str(value, "identifier", alloc).unwrap_or_default(),
+            label: read_optional_str(value, "label", alloc),
+            reference_type: read_reference_type(value),
+            alt: read_optional_str(value, "alt", alloc),
+            position,
+        }),
+        "definition" => Node::Definition(Definition {
+            identifier: read_optional_str(value, "identifier", alloc).unwrap_or_default(),
+            label: read_optional_str(value, "label", alloc),
+            url: read_optional_str(value, "url", alloc).unwrap_or_default(),
+            title: read_optional_str(value, "title", alloc),
+            position,
+        }),
+        "html" => Node::Html(Html {
+            value: read_optional_str(value, "value", alloc).unwrap_or_default(),
+            position,
+        }),
         "inlineCode" => Node::InlineCode(InlineCode {
             value: read_optional_str(value, "value", alloc).unwrap_or_default(),
             position,
@@ -133,4 +171,12 @@ fn read_optional_str<'a>(
         .get(key)
         .and_then(Value::as_str)
         .map(|text| &*alloc.alloc_str(text))
+}
+
+fn read_reference_type(value: &Value) -> ReferenceType {
+    match value.get("referenceType").and_then(Value::as_str) {
+        Some("collapsed") => ReferenceType::Collapsed,
+        Some("full") => ReferenceType::Full,
+        _ => ReferenceType::Shortcut,
+    }
 }

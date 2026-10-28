@@ -1,3 +1,4 @@
+use crate::actions::definition::tokenize::tokenize_definition;
 use crate::actions::paragraph::tokenize::tokenize_paragraph;
 use crate::models::construct::{Resolver, State};
 use crate::models::event::{ContentType, Kind, Link};
@@ -40,9 +41,22 @@ fn chunk_inside(tokenizer: &mut Tokenizer) -> State {
 }
 
 /// The content content type: definitions first, then a paragraph.
-pub(crate) fn tokenize_content_definition_before(_tokenizer: &mut Tokenizer) -> State {
-    // Definitions are tried here once they exist
-    State::Retry(tokenize_paragraph)
+pub(crate) fn tokenize_content_definition_before(tokenizer: &mut Tokenizer) -> State {
+    tokenizer.attempt(
+        State::Next(definition_after),
+        State::Next(tokenize_paragraph),
+    );
+    State::Retry(tokenize_definition)
+}
+
+fn definition_after(tokenizer: &mut Tokenizer) -> State {
+    if tokenizer.current.is_none() {
+        return State::Ok;
+    }
+    tokenizer.enter(Name::LINE_ENDING);
+    tokenizer.consume();
+    tokenizer.exit(Name::LINE_ENDING);
+    State::Next(tokenize_content_definition_before)
 }
 
 /// Join adjacent content chunks into one chain, then tokenize the chains.

@@ -59,6 +59,10 @@ fn serialize_node(
             object.insert("type".into(), "comment".into());
             object.insert("value".into(), comment.value.into());
         }
+        Node::Raw(raw) => {
+            object.insert("type".into(), "raw".into());
+            object.insert("value".into(), raw.value.into());
+        }
         Node::Doctype(_) => {
             object.insert("type".into(), "doctype".into());
         }
