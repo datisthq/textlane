@@ -61,6 +61,10 @@ a test's `comment` only where it means something different.
   equivalent yet (micromark's construct switches, `defaultLineEnding`), input that is not
   statically evaluable, lone UTF-16 surrogates, which UTF-8 input cannot hold, and stress tests
   over 2,000 characters (`actions/input/check.ts`), which belong in benchmarks.
+- Upstream's own expectations are kept verbatim where they describe textlane's path; they follow
+  upstream's latest release, while the pinned reference lags behind the 7-day quarantine. After
+  bumping a pin, rerun the importers and compare: a reference that still disagrees with a
+  verbatim expectation is a real difference to look at.
 - `actions/node/scope.ts` resolves an identifier in its test's own function before the module, so
   one test's `const value` never leaks into another's case.
 

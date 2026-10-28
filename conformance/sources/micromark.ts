@@ -1,7 +1,6 @@
 import { readdirSync, readFileSync } from "node:fs"
 import { basename, join, relative, resolve } from "node:path"
 import { parse } from "acorn"
-import type { AnyNode } from "acorn"
 import { ancestor } from "acorn-walk"
 import { commonmark } from "commonmark.json"
 import { writeGroups } from "../actions/group/write.ts"
@@ -12,6 +11,7 @@ import { normalizeHtml } from "../actions/html/normalize.ts"
 import { createPipeline, renderMarkdown } from "../actions/markdown/render.ts"
 import { resolveConstants } from "../actions/node/scope.ts"
 import { fetchSource } from "../actions/source/fetch.ts"
+import { isAssertEqual } from "../actions/test/assert.ts"
 
 const REPOSITORY = "https://github.com/micromark/micromark"
 const COMMIT = "6577c200155e9c6b85a42b26d298f8affc348f2f"
@@ -171,17 +171,6 @@ function extractCases(name: string, source: string) {
     },
   })
   return cases
-}
-
-function isAssertEqual(callee: AnyNode) {
-  if (callee.type !== "MemberExpression") return false
-  const { object, property } = callee
-  return (
-    object.type === "Identifier" &&
-    object.name === "assert" &&
-    property.type === "Identifier" &&
-    (property.name === "equal" || property.name === "strictEqual")
-  )
 }
 
 function caseKey(markdown: string, allowDangerousHtml: boolean) {

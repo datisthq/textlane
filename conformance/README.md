@@ -77,6 +77,7 @@ release; importers are run deliberately and their output committed, never run in
 | `from-markdown` | `mdast-util-from-markdown` at `afe9516`          | 55 fixture and inline inputs as tree cases, positions included                                                 |
 | `to-markdown`   | `mdast-util-to-markdown` at `a31fe06`            | 399 tree → Markdown cases with serializer options and 23 round trips, upstream's expected Markdown verbatim    |
 | `gfm`           | the GFM spec and micromark's five GFM extensions | 190 cases rendered by unified with remark-gfm; micromark's or GitHub's HTML kept in `comment` where it differs |
+| `gfm-mdast`     | mdast-util-gfm-*, mdast-util-gfm, remark-gfm     | 114 tree, stringify and round-trip cases; upstream's Markdown verbatim, the rest rendered by the reference     |
 
 A file holds one construct (`md/heading-atx`), named as micromark names its test files, with a
 group per source: the spec section, then each upstream test file. An importer replaces only its

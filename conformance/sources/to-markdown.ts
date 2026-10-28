@@ -8,6 +8,7 @@ import { isStressInput } from "../actions/input/check.ts"
 import { evaluateNode, isObject } from "../actions/node/evaluate.ts"
 import { resolveConstants } from "../actions/node/scope.ts"
 import { fetchSource } from "../actions/source/fetch.ts"
+import { isAssertEqual } from "../actions/test/assert.ts"
 import { findTestTitle } from "../actions/test/find.ts"
 
 const REPOSITORY = "https://github.com/syntax-tree/mdast-util-to-markdown"
@@ -166,16 +167,6 @@ function findTopTest(ancestors: AnyNode[]) {
 
 function isCallTo(call: CallExpression, name: string) {
   return call.callee.type === "Identifier" && call.callee.name === name
-}
-
-function isAssertEqual(callee: AnyNode) {
-  if (callee.type !== "MemberExpression") return false
-  return (
-    callee.object.type === "Identifier" &&
-    callee.object.name === "assert" &&
-    callee.property.type === "Identifier" &&
-    (callee.property.name === "equal" || callee.property.name === "strictEqual")
-  )
 }
 
 function countSkip(reason: string) {

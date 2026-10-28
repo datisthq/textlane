@@ -227,5 +227,678 @@
         }
       }
     ]
+  },
+  {
+    "description": "mdast-util-gfm-strikethrough stringify",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-gfm-strikethrough",
+      "commit": "9f4fa4c4b04f2048a2a6d6659fa63905fee4df37",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.gfm"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "should serialize strikethrough",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a "
+            },
+            {
+              "type": "delete",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": " c."
+            }
+          ]
+        },
+        "expected": {
+          "md": "a ~~b~~ c.\n"
+        }
+      },
+      {
+        "description": "should serialize strikethrough w/ eols",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a "
+            },
+            {
+              "type": "delete",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b\nc"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": " d."
+            }
+          ]
+        },
+        "expected": {
+          "md": "a ~~b\nc~~ d.\n"
+        }
+      },
+      {
+        "description": "should encode a character before strikethrough if needed",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a"
+            },
+            {
+              "type": "delete",
+              "children": [
+                {
+                  "type": "text",
+                  "value": ".b"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "c"
+            }
+          ]
+        },
+        "expected": {
+          "md": "&#x61;~~.b~~c\n"
+        }
+      },
+      {
+        "description": "should encode a character after strikethrough if needed",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a"
+            },
+            {
+              "type": "delete",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b."
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "c"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a~~b.~~&#x63;\n"
+        }
+      },
+      {
+        "description": "should encode characters around strikethrough w/ emphasis",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a"
+            },
+            {
+              "type": "delete",
+              "children": [
+                {
+                  "type": "emphasis",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "b"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "c"
+            }
+          ]
+        },
+        "expected": {
+          "md": "&#x61;~~*b*~~&#x63;\n"
+        }
+      },
+      {
+        "description": "should use single tildes for strikethrough in strikethrough if needed",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "delete",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                },
+                {
+                  "type": "delete",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "b"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "c"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "~~a~b~c~~\n"
+        }
+      },
+      {
+        "description": "should serialize strikethrough outside phrasing (legacy)",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "delete",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> ~~a~~\n"
+        }
+      },
+      {
+        "description": "should not escape tildes in a `destinationLiteral`",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "link",
+              "url": "~a",
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "md": "[](~a)\n"
+        }
+      },
+      {
+        "description": "should not escape tildes in a `destinationRaw`",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "link",
+              "url": "~a",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "link text"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "[link text](~a)\n"
+        }
+      },
+      {
+        "description": "should not escape tildes in a `reference`",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "linkReference",
+              "identifier": "~a",
+              "referenceType": "full",
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "md": "[][~a]\n"
+        }
+      },
+      {
+        "description": "should not escape tildes in a `title` (double quotes)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "link",
+              "url": "#",
+              "title": "~a",
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "md": "[](# \"~a\")\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-gfm-strikethrough stringify {\"quote\":\"'\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-gfm-strikethrough",
+      "commit": "9f4fa4c4b04f2048a2a6d6659fa63905fee4df37",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.gfm"],
+      [
+        "md.stringify",
+        {
+          "quote": "'"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should not escape tildes in a `title` (single quotes)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "link",
+              "url": "#",
+              "title": "~a",
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "md": "[](# '~a')\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-gfm spec round trip",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-gfm",
+      "commit": "6b34bb2868c38c0b2909fa69c78534d5e44dc309",
+      "path": "test/spec.js",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 11",
+        "input": "~~Hi~~ Hello, ~there~ world!\n",
+        "expected": {
+          "md": "~~Hi~~ Hello, ~~there~~ world!\n"
+        }
+      },
+      {
+        "description": "example 12",
+        "input": "This ~~has a\n\nnew paragraph~~.\n",
+        "expected": {
+          "md": "This \\~\\~has a\n\nnew paragraph\\~\\~.\n"
+        }
+      },
+      {
+        "description": "example 13",
+        "input": "This will ~~~not~~~ strike.\n",
+        "expected": {
+          "md": "This will \\~\\~\\~not\\~\\~\\~ strike.\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-gfm fixtures (tree)",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-gfm",
+      "commit": "109972e8a773bf5dac1d6d2da0776557f36971aa",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"]],
+    "tests": [
+      {
+        "description": "fixture strikethrough-default",
+        "input": "~one~, ~~two~~, ~~~three~~~.\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "delete",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "one",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 2,
+                            "offset": 1
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 5,
+                            "offset": 4
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 6,
+                        "offset": 5
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": ", ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 6,
+                        "offset": 5
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 8,
+                        "offset": 7
+                      }
+                    }
+                  },
+                  {
+                    "type": "delete",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "two",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 10,
+                            "offset": 9
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 13,
+                            "offset": 12
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 8,
+                        "offset": 7
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 15,
+                        "offset": 14
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": ", ~~~three~~~.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 15,
+                        "offset": 14
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 29,
+                        "offset": 28
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 29,
+                    "offset": 28
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 29
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-gfm fixtures (output)",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-gfm",
+      "commit": "109972e8a773bf5dac1d6d2da0776557f36971aa",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "fixture strikethrough-default",
+        "input": "~one~, ~~two~~, ~~~three~~~.\n",
+        "expected": {
+          "md": "~~one~~, ~~two~~, \\~\\~\\~three\\~\\~\\~.\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-gfm fixtures (tree) {\"singleTilde\":false}",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-gfm",
+      "commit": "109972e8a773bf5dac1d6d2da0776557f36971aa",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gfm",
+        {
+          "singleTilde": false
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "fixture strikethrough-not-one",
+        "input": "~one~, ~~two~~, ~~~three~~~.\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "~one~, ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 8,
+                        "offset": 7
+                      }
+                    }
+                  },
+                  {
+                    "type": "delete",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "two",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 10,
+                            "offset": 9
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 13,
+                            "offset": 12
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 8,
+                        "offset": 7
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 15,
+                        "offset": 14
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": ", ~~~three~~~.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 15,
+                        "offset": 14
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 29,
+                        "offset": 28
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 29,
+                    "offset": 28
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 29
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-gfm fixtures (output) {\"singleTilde\":false}",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-gfm",
+      "commit": "109972e8a773bf5dac1d6d2da0776557f36971aa",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gfm",
+        {
+          "singleTilde": false
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture strikethrough-not-one",
+        "input": "~one~, ~~two~~, ~~~three~~~.\n",
+        "expected": {
+          "md": "\\~one\\~, ~~two~~, \\~\\~\\~three\\~\\~\\~.\n"
+        }
+      }
+    ]
   }
 ]

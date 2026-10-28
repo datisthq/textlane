@@ -456,5 +456,404 @@
         }
       }
     ]
+  },
+  {
+    "description": "mdast-util-gfm-footnote tree",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-gfm-footnote",
+      "commit": "fd27b4ea62d177b8ca69f4c063f1a37f9054a053",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"]],
+    "tests": [
+      {
+        "description": "should support a footnote definition",
+        "input": "[^a]: b\nc\n\n    d",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "footnoteDefinition",
+                "identifier": "a",
+                "label": "a",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "b\nc",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 7,
+                            "offset": 6
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 2,
+                            "offset": 9
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 7,
+                        "offset": 6
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 2,
+                        "offset": 9
+                      }
+                    }
+                  },
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "d",
+                        "position": {
+                          "start": {
+                            "line": 4,
+                            "column": 5,
+                            "offset": 15
+                          },
+                          "end": {
+                            "line": 4,
+                            "column": 6,
+                            "offset": 16
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 5,
+                        "offset": 15
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 6,
+                        "offset": 16
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 6,
+                    "offset": 16
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 6,
+                "offset": 16
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-gfm-footnote stringify",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-gfm-footnote",
+      "commit": "fd27b4ea62d177b8ca69f4c063f1a37f9054a053",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.gfm"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "should serialize a footnote reference w/ identifier",
+        "tree": {
+          "type": "footnoteReference",
+          "identifier": "a"
+        },
+        "expected": {
+          "md": "[^a]\n"
+        }
+      },
+      {
+        "description": "should serialize a footnote reference w/ label",
+        "tree": {
+          "type": "footnoteReference",
+          "label": "X]Y"
+        },
+        "expected": {
+          "md": "[^X\\]Y]\n"
+        }
+      },
+      {
+        "description": "should serialize a footnote reference in a paragraph",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a"
+            },
+            {
+              "type": "footnoteReference",
+              "label": "b",
+              "identifier": "b"
+            },
+            {
+              "type": "text",
+              "value": "c"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a[^b]c\n"
+        }
+      },
+      {
+        "description": "should serialize a footnote definition w/ identifier",
+        "tree": {
+          "type": "footnoteDefinition",
+          "identifier": "a"
+        },
+        "expected": {
+          "md": "[^a]:\n"
+        }
+      },
+      {
+        "description": "should serialize a footnote definition w/ label",
+        "tree": {
+          "type": "footnoteDefinition",
+          "label": "X]Y"
+        },
+        "expected": {
+          "md": "[^X\\]Y]:\n"
+        }
+      },
+      {
+        "description": "should serialize a footnote definition w/ content",
+        "tree": {
+          "type": "footnoteDefinition",
+          "label": "a",
+          "identifier": "a",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b\nc"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "d"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "[^a]: b\n    c\n\n    d\n"
+        }
+      },
+      {
+        "description": "should serialize code in a footnote definition",
+        "tree": {
+          "type": "footnoteDefinition",
+          "label": "a",
+          "identifier": "a",
+          "children": [
+            {
+              "type": "code",
+              "value": "b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "[^a]: ```\n    b\n    ```\n"
+        }
+      },
+      {
+        "description": "should serialize code as the 2nd child in a footnote definition",
+        "tree": {
+          "type": "footnoteDefinition",
+          "label": "a",
+          "identifier": "a",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            },
+            {
+              "type": "code",
+              "value": "c"
+            }
+          ]
+        },
+        "expected": {
+          "md": "[^a]: b\n\n    ```\n    c\n    ```\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be an inline note",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "b^[a]"
+            }
+          ]
+        },
+        "expected": {
+          "md": "b^\\[a]\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be an footnote call",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "b[^a]"
+            }
+          ]
+        },
+        "expected": {
+          "md": "b\\[^a]\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be an footnote definition",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "[a]: b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\[a]: b\n"
+        }
+      },
+      {
+        "description": "should support colons in footnote definitions",
+        "tree": {
+          "type": "footnoteDefinition",
+          "identifier": "a:b",
+          "children": []
+        },
+        "expected": {
+          "md": "[^a:b]:\n"
+        }
+      },
+      {
+        "description": "should support lists in footnote definitions",
+        "tree": {
+          "type": "footnoteDefinition",
+          "identifier": "a",
+          "children": [
+            {
+              "type": "list",
+              "children": [
+                {
+                  "type": "listItem",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "[^a]: *\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-gfm-footnote stringify {\"firstLineBlank\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-gfm-footnote",
+      "commit": "fd27b4ea62d177b8ca69f4c063f1a37f9054a053",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.gfm",
+        {
+          "firstLineBlank": true
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should support `firstLineBlank`",
+        "tree": {
+          "type": "footnoteDefinition",
+          "identifier": "a",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "[^a]:\n    b\n"
+        }
+      },
+      {
+        "description": "should support `firstLineBlank` w/o children",
+        "tree": {
+          "type": "footnoteDefinition",
+          "identifier": "a",
+          "children": []
+        },
+        "expected": {
+          "md": "[^a]:\n"
+        }
+      }
+    ]
   }
 ]

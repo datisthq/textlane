@@ -11,6 +11,7 @@ import type { RenderOptions } from "../actions/markdown/render.ts"
 import { evaluateNode, isObject } from "../actions/node/evaluate.ts"
 import { resolveConstants } from "../actions/node/scope.ts"
 import { fetchSource } from "../actions/source/fetch.ts"
+import { isAssertEqual } from "../actions/test/assert.ts"
 import { findTestTitle } from "../actions/test/find.ts"
 
 const OUTPUT = resolve(import.meta.dirname, "..", "tests", "md")
@@ -358,16 +359,6 @@ function describeOptions(options: RenderOptions) {
     ),
   ]
   return parts.length === 0 ? "" : ` (${parts.join(", ")})`
-}
-
-function isAssertEqual(callee: AnyNode) {
-  if (callee.type !== "MemberExpression") return false
-  return (
-    callee.object.type === "Identifier" &&
-    callee.object.name === "assert" &&
-    callee.property.type === "Identifier" &&
-    ["equal", "strictEqual", "deepEqual"].includes(callee.property.name)
-  )
 }
 
 function countSkip(reason: string) {

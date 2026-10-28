@@ -21,14 +21,14 @@
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>10 agent's calls</h3>
+    <h3>11 agent's calls</h3>
     <p>
       <htmlpress-badge type="warning">my call</htmlpress-badge> settled by the agent, open
       to change
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>4 open</h3>
+    <h3>5 open</h3>
     <p><htmlpress-badge type="danger">open</htmlpress-badge> still to decide</p>
   </htmlpress-card>
 </htmlpress-grid>
@@ -424,6 +424,22 @@
     <p><strong>Rejected.</strong> One combined options object on <code>md.gfm</code>.</p>
   </dd>
   <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Verbatim upstream
+    expectations follow upstream's latest release, even while the pinned reference still
+    lags it
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> mdast-util-to-markdown 2.2.1 (2026-10-27) changes 21
+      expectations the quarantined 2.2.0 reference would get wrong; the corpus should not
+      encode a superseded release.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Rendering every expectation through the lagging
+      reference.
+    </p>
+  </dd>
+  <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge> Each runner skips only
     through a <code>KNOWN_DIVERGENCES</code> map of group to open issue, as fairspec's do
   </dt>
@@ -450,6 +466,17 @@
     <p>
       Decides the cost of mixing JavaScript and Rust plugins and what JavaScript plugins
       may rely on.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="danger">open</htmlpress-badge> Bump the conformance reference
+    to mdast-util-to-markdown 2.2.1 once it clears the quarantine (2026-11-03) and rerun
+    the importers
+  </dt>
+  <dd>
+    <p>
+      Until then the reference and 21 verbatim stringify expectations disagree; afterwards
+      none should.
     </p>
   </dd>
   <dt>

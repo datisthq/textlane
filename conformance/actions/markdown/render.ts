@@ -2,6 +2,7 @@ import rehypeStringify from "rehype-stringify"
 import remarkGfm from "remark-gfm"
 import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
+import remarkStringify from "remark-stringify"
 import { unified } from "unified"
 
 /** How a Markdown case is rendered: raw HTML handling, GFM and `md.toHtml` options. */
@@ -39,9 +40,25 @@ export function renderMarkdown(props: RenderOptions & { markdown: string }) {
   return String(processor.processSync(props.markdown))
 }
 
-/** Parse Markdown to mdast, with positions, through the pinned remark-parse. */
-export function parseMarkdown(markdown: string): object {
-  return JSON.parse(JSON.stringify(unified().use(remarkParse).parse(markdown)))
+/** Parse Markdown to mdast, with positions, through the pinned remark-parse (and remark-gfm). */
+export function parseMarkdown(markdown: string, gfm?: Record<string, unknown>): object {
+  const processor = unified()
+    .use(remarkParse)
+    .use(gfm ? [[remarkGfm, gfm]] : [])
+  return JSON.parse(JSON.stringify(processor.parse(markdown)))
+}
+
+/** Serialize mdast to Markdown through the pinned remark-stringify (and remark-gfm). */
+export function stringifyTree(props: {
+  tree: object
+  gfm?: Record<string, unknown>
+  stringify?: Record<string, unknown>
+}) {
+  const processor = unified()
+    .use(remarkStringify, props.stringify ?? {})
+    .use(props.gfm ? [[remarkGfm, props.gfm]] : [])
+  // A JSON tree is a valid mdast root; unified types roots, not plain objects
+  return processor.stringify(JSON.parse(JSON.stringify(props.tree)))
 }
 
 function withOptions(name: string, options: Record<string, unknown>) {

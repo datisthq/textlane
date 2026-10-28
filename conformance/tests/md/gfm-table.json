@@ -513,5 +513,1945 @@
         }
       }
     ]
+  },
+  {
+    "description": "mdast-util-gfm-table tree",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-gfm-table",
+      "commit": "d0d2278cb624b8258dfc8c9dfbdfdf944df9b3cd",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"]],
+    "tests": [
+      {
+        "description": "should support tables",
+        "input": "| a\n| -",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "table",
+                "align": [null],
+                "children": [
+                  {
+                    "type": "tableRow",
+                    "children": [
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 3,
+                                "offset": 2
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 4,
+                                "offset": 3
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 4,
+                            "offset": 3
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 4,
+                        "offset": 3
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 4,
+                    "offset": 7
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 4,
+                "offset": 7
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support alignment",
+        "input": "| a | b | c | d |\n| - | :- | -: | :-: |",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "table",
+                "align": [null, "left", "right", "center"],
+                "children": [
+                  {
+                    "type": "tableRow",
+                    "children": [
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 3,
+                                "offset": 2
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 4,
+                                "offset": 3
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 5,
+                            "offset": 4
+                          }
+                        }
+                      },
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "b",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 7,
+                                "offset": 6
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 8,
+                                "offset": 7
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 5,
+                            "offset": 4
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 9,
+                            "offset": 8
+                          }
+                        }
+                      },
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "c",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 11,
+                                "offset": 10
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 12,
+                                "offset": 11
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 9,
+                            "offset": 8
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 13,
+                            "offset": 12
+                          }
+                        }
+                      },
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "d",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 15,
+                                "offset": 14
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 16,
+                                "offset": 15
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 13,
+                            "offset": 12
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 18,
+                            "offset": 17
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 18,
+                        "offset": 17
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 22,
+                    "offset": 39
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 22,
+                "offset": 39
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-gfm-table stringify",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-gfm-table",
+      "commit": "d0d2278cb624b8258dfc8c9dfbdfdf944df9b3cd",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.gfm"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "should serialize a table cell",
+        "tree": {
+          "type": "tableCell",
+          "children": [
+            {
+              "type": "text",
+              "value": "a "
+            },
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": " c."
+            }
+          ]
+        },
+        "expected": {
+          "md": "a *b* c.\n"
+        }
+      },
+      {
+        "description": "should serialize a table row",
+        "tree": {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b "
+                },
+                {
+                  "type": "emphasis",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "c"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": " d."
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "| a | b *c* d. |\n"
+        }
+      },
+      {
+        "description": "should serialize a table",
+        "tree": {
+          "type": "table",
+          "children": [
+            {
+              "type": "tableRow",
+              "children": [
+                {
+                  "type": "tableCell",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a"
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "b "
+                    },
+                    {
+                      "type": "emphasis",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "c"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "value": " d."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "children": [
+                {
+                  "type": "tableCell",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "e"
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "children": [
+                    {
+                      "type": "inlineCode",
+                      "value": "f"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "| a | b *c* d. |\n| - | -------- |\n| e | `f`      |\n"
+        }
+      },
+      {
+        "description": "should align cells",
+        "tree": {
+          "type": "table",
+          "align": [null, "left", "center", "right"],
+          "children": [
+            {
+              "type": "tableRow",
+              "children": [
+                {
+                  "type": "tableCell",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a"
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "b"
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "c"
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "d"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "children": [
+                {
+                  "type": "tableCell",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "aaa"
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "bbb"
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "ccc"
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "ddd"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "| a   | b   |  c  |   d |\n| --- | :-- | :-: | --: |\n| aaa | bbb | ccc | ddd |\n"
+        }
+      },
+      {
+        "description": "should escape the leading pipe in what would start or continue a table",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "| a |\n| - |"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\| a |\n\\| - |\n"
+        }
+      },
+      {
+        "description": "should escape the leading dash in what could start a delimiter row (done by list dash)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a|\n-|"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a|\n\\-|\n"
+        }
+      },
+      {
+        "description": "should escape the leading colon in what could start a delimiter row",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a\n:-"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\n\\:-\n"
+        }
+      },
+      {
+        "description": "should not escape a backslash in code in a table cell",
+        "tree": {
+          "type": "tableCell",
+          "children": [
+            {
+              "type": "inlineCode",
+              "value": "a\\b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "`a\\b`\n"
+        }
+      },
+      {
+        "description": "should not escape an “escaped” backslash in code in a table cell",
+        "tree": {
+          "type": "tableCell",
+          "children": [
+            {
+              "type": "inlineCode",
+              "value": "a\\\\b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "`a\\\\b`\n"
+        }
+      },
+      {
+        "description": "should not escape an “escaped” other punctuation character in code in a table cell",
+        "tree": {
+          "type": "tableCell",
+          "children": [
+            {
+              "type": "inlineCode",
+              "value": "a\\+b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "`a\\+b`\n"
+        }
+      },
+      {
+        "description": "should not escape a pipe character in code *not* in a table cell",
+        "tree": {
+          "type": "inlineCode",
+          "value": "a|b"
+        },
+        "expected": {
+          "md": "`a|b`\n"
+        }
+      },
+      {
+        "description": "should escape a pipe character in code in a table cell",
+        "tree": {
+          "type": "tableCell",
+          "children": [
+            {
+              "type": "inlineCode",
+              "value": "a|b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "`a\\|b`\n"
+        }
+      },
+      {
+        "description": "should escape eols in a table cell",
+        "tree": {
+          "type": "tableCell",
+          "children": [
+            {
+              "type": "text",
+              "value": "a\nb"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a&#xA;b\n"
+        }
+      },
+      {
+        "description": "should escape phrasing characters in table cells",
+        "tree": {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "<a>"
+                }
+              ]
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "*a"
+                }
+              ]
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "![]()"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "| \\<a> | \\*a | !\\[]\\() |\n"
+        }
+      },
+      {
+        "description": "should escape pipes in a table cell",
+        "tree": {
+          "type": "tableCell",
+          "children": [
+            {
+              "type": "text",
+              "value": "a|b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\\|b\n"
+        }
+      },
+      {
+        "description": "should escape multiple pipes in inline code in a table cell",
+        "tree": {
+          "type": "tableCell",
+          "children": [
+            {
+              "type": "inlineCode",
+              "value": "a|b|c"
+            }
+          ]
+        },
+        "expected": {
+          "md": "`a\\|b\\|c`\n"
+        }
+      },
+      {
+        "description": "should escape multiple pipes in a table cell",
+        "tree": {
+          "type": "tableCell",
+          "children": [
+            {
+              "type": "text",
+              "value": "a|b|c"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\\|b\\|c\n"
+        }
+      },
+      {
+        "description": "should escape adjacent pipes in a table cell",
+        "tree": {
+          "type": "tableCell",
+          "children": [
+            {
+              "type": "inlineCode",
+              "value": "a||b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "`a\\|\\|b`\n"
+        }
+      },
+      {
+        "description": "should escape adjacent pipes in a table cell (2)",
+        "tree": {
+          "type": "tableCell",
+          "children": [
+            {
+              "type": "text",
+              "value": "a||b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\\|\\|b\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-gfm-table stringify {\"tableCellPadding\":false}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-gfm-table",
+      "commit": "d0d2278cb624b8258dfc8c9dfbdfdf944df9b3cd",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.gfm",
+        {
+          "tableCellPadding": false
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should support `tableCellPadding: false`",
+        "tree": {
+          "type": "table",
+          "align": [null, "left", "center", "right"],
+          "children": [
+            {
+              "type": "tableRow",
+              "children": [
+                {
+                  "type": "tableCell",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a"
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "b"
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "c"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "|a|b | c |\n|-|:-|:-:|\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-gfm-table stringify {\"tablePipeAlign\":false}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-gfm-table",
+      "commit": "d0d2278cb624b8258dfc8c9dfbdfdf944df9b3cd",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.gfm",
+        {
+          "tablePipeAlign": false
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should support `tablePipeAlign: false`",
+        "tree": {
+          "type": "table",
+          "align": [null, "left", "center", "right"],
+          "children": [
+            {
+              "type": "tableRow",
+              "children": [
+                {
+                  "type": "tableCell",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a"
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "b"
+                    }
+                  ]
+                },
+                {
+                  "type": "tableCell",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "c"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "| a | b | c |\n| - | :- | :-: |\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-gfm spec round trip",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-gfm",
+      "commit": "6b34bb2868c38c0b2909fa69c78534d5e44dc309",
+      "path": "test/spec.js",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 1",
+        "input": "| foo | bar |\n| --- | --- |\n| baz | bim |\n",
+        "expected": {
+          "md": "| foo | bar |\n| --- | --- |\n| baz | bim |\n"
+        }
+      },
+      {
+        "description": "example 2",
+        "input": "| abc | defghi |\n:-: | -----------:\nbar | baz\n",
+        "expected": {
+          "md": "| abc | defghi |\n| :-: | -----: |\n| bar |    baz |\n"
+        }
+      },
+      {
+        "description": "example 3",
+        "input": "| f\\|oo  |\n| ------ |\n| b `\\|` az |\n| b **\\|** im |\n",
+        "expected": {
+          "md": "| f\\|oo       |\n| ----------- |\n| b `\\|` az   |\n| b **\\|** im |\n"
+        }
+      },
+      {
+        "description": "example 4",
+        "input": "| abc | def |\n| --- | --- |\n| bar | baz |\n> bar\n",
+        "expected": {
+          "md": "| abc | def |\n| --- | --- |\n| bar | baz |\n\n> bar\n"
+        }
+      },
+      {
+        "description": "example 5",
+        "input": "| abc | def |\n| --- | --- |\n| bar | baz |\nbar\n\nbar\n",
+        "expected": {
+          "md": "| abc | def |\n| --- | --- |\n| bar | baz |\n| bar |     |\n\nbar\n"
+        }
+      },
+      {
+        "description": "example 6",
+        "input": "| abc | def |\n| --- |\n| bar |\n",
+        "expected": {
+          "md": "\\| abc | def |\n\\| --- |\n\\| bar |\n"
+        }
+      },
+      {
+        "description": "example 7",
+        "input": "| abc | def |\n| --- | --- |\n| bar |\n| bar | baz | boo |\n",
+        "expected": {
+          "md": "| abc | def |     |\n| --- | --- | --- |\n| bar |     |     |\n| bar | baz | boo |\n"
+        }
+      },
+      {
+        "description": "example 8",
+        "input": "| abc | def |\n| --- | --- |\n",
+        "expected": {
+          "md": "| abc | def |\n| --- | --- |\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-gfm fixtures (tree)",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-gfm",
+      "commit": "109972e8a773bf5dac1d6d2da0776557f36971aa",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"]],
+    "tests": [
+      {
+        "description": "fixture table",
+        "input": "| a | b | c | d |\n| - | :- | -: | :-: |\n| e | f |\n| g | h | i | j | k |\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "table",
+                "align": [null, "left", "right", "center"],
+                "children": [
+                  {
+                    "type": "tableRow",
+                    "children": [
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 3,
+                                "offset": 2
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 4,
+                                "offset": 3
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 5,
+                            "offset": 4
+                          }
+                        }
+                      },
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "b",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 7,
+                                "offset": 6
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 8,
+                                "offset": 7
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 5,
+                            "offset": 4
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 9,
+                            "offset": 8
+                          }
+                        }
+                      },
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "c",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 11,
+                                "offset": 10
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 12,
+                                "offset": 11
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 9,
+                            "offset": 8
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 13,
+                            "offset": 12
+                          }
+                        }
+                      },
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "d",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 15,
+                                "offset": 14
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 16,
+                                "offset": 15
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 13,
+                            "offset": 12
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 18,
+                            "offset": 17
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 18,
+                        "offset": 17
+                      }
+                    }
+                  },
+                  {
+                    "type": "tableRow",
+                    "children": [
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "e",
+                            "position": {
+                              "start": {
+                                "line": 3,
+                                "column": 3,
+                                "offset": 42
+                              },
+                              "end": {
+                                "line": 3,
+                                "column": 4,
+                                "offset": 43
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 3,
+                            "column": 1,
+                            "offset": 40
+                          },
+                          "end": {
+                            "line": 3,
+                            "column": 5,
+                            "offset": 44
+                          }
+                        }
+                      },
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "f",
+                            "position": {
+                              "start": {
+                                "line": 3,
+                                "column": 7,
+                                "offset": 46
+                              },
+                              "end": {
+                                "line": 3,
+                                "column": 8,
+                                "offset": 47
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 3,
+                            "column": 5,
+                            "offset": 44
+                          },
+                          "end": {
+                            "line": 3,
+                            "column": 10,
+                            "offset": 49
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 1,
+                        "offset": 40
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 10,
+                        "offset": 49
+                      }
+                    }
+                  },
+                  {
+                    "type": "tableRow",
+                    "children": [
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "g",
+                            "position": {
+                              "start": {
+                                "line": 4,
+                                "column": 3,
+                                "offset": 52
+                              },
+                              "end": {
+                                "line": 4,
+                                "column": 4,
+                                "offset": 53
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 4,
+                            "column": 1,
+                            "offset": 50
+                          },
+                          "end": {
+                            "line": 4,
+                            "column": 5,
+                            "offset": 54
+                          }
+                        }
+                      },
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "h",
+                            "position": {
+                              "start": {
+                                "line": 4,
+                                "column": 7,
+                                "offset": 56
+                              },
+                              "end": {
+                                "line": 4,
+                                "column": 8,
+                                "offset": 57
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 4,
+                            "column": 5,
+                            "offset": 54
+                          },
+                          "end": {
+                            "line": 4,
+                            "column": 9,
+                            "offset": 58
+                          }
+                        }
+                      },
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "i",
+                            "position": {
+                              "start": {
+                                "line": 4,
+                                "column": 11,
+                                "offset": 60
+                              },
+                              "end": {
+                                "line": 4,
+                                "column": 12,
+                                "offset": 61
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 4,
+                            "column": 9,
+                            "offset": 58
+                          },
+                          "end": {
+                            "line": 4,
+                            "column": 13,
+                            "offset": 62
+                          }
+                        }
+                      },
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "j",
+                            "position": {
+                              "start": {
+                                "line": 4,
+                                "column": 15,
+                                "offset": 64
+                              },
+                              "end": {
+                                "line": 4,
+                                "column": 16,
+                                "offset": 65
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 4,
+                            "column": 13,
+                            "offset": 62
+                          },
+                          "end": {
+                            "line": 4,
+                            "column": 17,
+                            "offset": 66
+                          }
+                        }
+                      },
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "k",
+                            "position": {
+                              "start": {
+                                "line": 4,
+                                "column": 19,
+                                "offset": 68
+                              },
+                              "end": {
+                                "line": 4,
+                                "column": 20,
+                                "offset": 69
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 4,
+                            "column": 17,
+                            "offset": 66
+                          },
+                          "end": {
+                            "line": 4,
+                            "column": 22,
+                            "offset": 71
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 1,
+                        "offset": 50
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 22,
+                        "offset": 71
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 22,
+                    "offset": 71
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 72
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-gfm fixtures (output)",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-gfm",
+      "commit": "109972e8a773bf5dac1d6d2da0776557f36971aa",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "fixture table",
+        "input": "| a | b | c | d |\n| - | :- | -: | :-: |\n| e | f |\n| g | h | i | j | k |\n",
+        "expected": {
+          "md": "| a | b  |  c |  d  |   |\n| - | :- | -: | :-: | - |\n| e | f  |    |     |   |\n| g | h  |  i |  j  | k |\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-gfm fixtures (tree) {\"tablePipeAlign\":false}",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-gfm",
+      "commit": "109972e8a773bf5dac1d6d2da0776557f36971aa",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gfm",
+        {
+          "tablePipeAlign": false
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "fixture table-no-align",
+        "input": "| a | b | c | d |\n| - | :- | -: | :-: |\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "table",
+                "align": [null, "left", "right", "center"],
+                "children": [
+                  {
+                    "type": "tableRow",
+                    "children": [
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 3,
+                                "offset": 2
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 4,
+                                "offset": 3
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 5,
+                            "offset": 4
+                          }
+                        }
+                      },
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "b",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 7,
+                                "offset": 6
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 8,
+                                "offset": 7
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 5,
+                            "offset": 4
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 9,
+                            "offset": 8
+                          }
+                        }
+                      },
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "c",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 11,
+                                "offset": 10
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 12,
+                                "offset": 11
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 9,
+                            "offset": 8
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 13,
+                            "offset": 12
+                          }
+                        }
+                      },
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "d",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 15,
+                                "offset": 14
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 16,
+                                "offset": 15
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 13,
+                            "offset": 12
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 18,
+                            "offset": 17
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 18,
+                        "offset": 17
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 22,
+                    "offset": 39
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 1,
+                "offset": 40
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-gfm fixtures (output) {\"tablePipeAlign\":false}",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-gfm",
+      "commit": "109972e8a773bf5dac1d6d2da0776557f36971aa",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gfm",
+        {
+          "tablePipeAlign": false
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture table-no-align",
+        "input": "| a | b | c | d |\n| - | :- | -: | :-: |\n",
+        "expected": {
+          "md": "| a | b | c | d |\n| - | :- | -: | :-: |\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-gfm fixtures (tree) {\"tableCellPadding\":false}",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-gfm",
+      "commit": "109972e8a773bf5dac1d6d2da0776557f36971aa",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gfm",
+        {
+          "tableCellPadding": false
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "fixture table-no-padding",
+        "input": "| a | b | c | d |\n| - | :- | -: | :-: |\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "table",
+                "align": [null, "left", "right", "center"],
+                "children": [
+                  {
+                    "type": "tableRow",
+                    "children": [
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 3,
+                                "offset": 2
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 4,
+                                "offset": 3
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 5,
+                            "offset": 4
+                          }
+                        }
+                      },
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "b",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 7,
+                                "offset": 6
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 8,
+                                "offset": 7
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 5,
+                            "offset": 4
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 9,
+                            "offset": 8
+                          }
+                        }
+                      },
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "c",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 11,
+                                "offset": 10
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 12,
+                                "offset": 11
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 9,
+                            "offset": 8
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 13,
+                            "offset": 12
+                          }
+                        }
+                      },
+                      {
+                        "type": "tableCell",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "d",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 15,
+                                "offset": 14
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 16,
+                                "offset": 15
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 13,
+                            "offset": 12
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 18,
+                            "offset": 17
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 18,
+                        "offset": 17
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 22,
+                    "offset": 39
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 1,
+                "offset": 40
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-gfm fixtures (output) {\"tableCellPadding\":false}",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-gfm",
+      "commit": "109972e8a773bf5dac1d6d2da0776557f36971aa",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gfm",
+        {
+          "tableCellPadding": false
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture table-no-padding",
+        "input": "| a | b | c | d |\n| - | :- | -: | :-: |\n",
+        "expected": {
+          "md": "|a|b | c| d |\n|-|:-|-:|:-:|\n"
+        }
+      }
+    ]
   }
 ]
