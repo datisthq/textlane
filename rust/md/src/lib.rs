@@ -180,6 +180,7 @@ mod actions {
     pub(crate) mod list_item {
         pub(crate) mod compile;
         pub(crate) mod convert;
+        pub(crate) mod resolve;
         pub(crate) mod stringify;
         pub(crate) mod tokenize;
     }
@@ -240,6 +241,7 @@ mod helpers {
     pub(crate) mod reference;
     pub(crate) mod skip;
     pub(crate) mod slice;
+    pub(crate) mod spread;
     pub(crate) mod unicode;
     pub(crate) mod uri;
 }

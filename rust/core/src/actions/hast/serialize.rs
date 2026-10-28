@@ -71,16 +71,25 @@ fn serialize_value(value: &PropertyValue<'_>) -> Value {
     match value {
         PropertyValue::Null => Value::Null,
         PropertyValue::Boolean(value) => (*value).into(),
-        PropertyValue::Number(value) => (*value).into(),
+        PropertyValue::Number(value) => serialize_number(*value),
         PropertyValue::String(value) => (*value).into(),
         PropertyValue::List(items) => Value::Array(
             items
                 .iter()
                 .map(|item| match item {
-                    PropertyItem::Number(value) => (*value).into(),
+                    PropertyItem::Number(value) => serialize_number(*value),
                     PropertyItem::String(value) => (*value).into(),
                 })
                 .collect(),
         ),
+    }
+}
+
+// Whole numbers serialize as integers, as JavaScript writes them
+fn serialize_number(value: f64) -> Value {
+    if value.fract() == 0.0 && value.abs() < 9_007_199_254_740_992.0 {
+        Value::from(value as i64)
+    } else {
+        Value::from(value)
     }
 }

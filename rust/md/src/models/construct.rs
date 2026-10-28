@@ -22,6 +22,7 @@ pub(crate) enum Resolver {
     Content,
     Data,
     HeadingAtx,
+    ListItem,
     String,
     Text,
 }

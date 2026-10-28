@@ -46,6 +46,22 @@ fn serialize_node(
             object.insert("value".into(), code.value.into());
             "code"
         }
+        Node::Blockquote(_) => "blockquote",
+        Node::List(list) => {
+            object.insert("ordered".into(), list.ordered.into());
+            object.insert("start".into(), list.start.into());
+            if let Some(spread) = list.spread {
+                object.insert("spread".into(), spread.into());
+            }
+            "list"
+        }
+        Node::ListItem(item) => {
+            if let Some(spread) = item.spread {
+                object.insert("spread".into(), spread.into());
+            }
+            object.insert("checked".into(), item.checked.into());
+            "listItem"
+        }
         Node::InlineCode(code) => {
             object.insert("value".into(), code.value.into());
             "inlineCode"

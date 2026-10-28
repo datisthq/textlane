@@ -1,7 +1,10 @@
 use textlane_core::mdast::{Node, Paragraph, Root};
 use textlane_core::{Allocator, ArenaString, ArenaVec, Point, Position};
 
+use std::collections::HashSet;
+
 use crate::helpers::slice::Slice;
+use crate::helpers::spread::{find_loose, find_trailing_line_endings};
 use crate::models::event::{self, Event};
 use crate::models::token::Name;
 
@@ -18,6 +21,11 @@ pub(crate) struct Compiler<'a, 'e> {
     pub(crate) hard_break_after: bool,
     /// Whether a code fence's opening fence closed, so the code after it is buffered.
     pub(crate) code_fence_seen: bool,
+    /// The enters of loose lists and list items.
+    pub(crate) loose: HashSet<usize>,
+    // The first line ending of the trailing lines before each event, without and with
+    // block quote prefixes
+    trailing_line_endings: [Vec<Option<usize>>; 2],
     stack: Vec<Node<'a>>,
 }
 
@@ -43,6 +51,11 @@ impl<'a, 'e> Compiler<'a, 'e> {
             character_reference_marker: 0,
             hard_break_after: false,
             code_fence_seen: false,
+            loose: find_loose(events),
+            trailing_line_endings: [
+                find_trailing_line_endings(events, false),
+                find_trailing_line_endings(events, true),
+            ],
             stack: vec![root],
         }
     }
@@ -79,6 +92,13 @@ impl<'a, 'e> Compiler<'a, 'e> {
     /// current token: micromark eats a flow construct's indent as a line prefix before it.
     pub(crate) fn tail_push_after_prefix(&mut self, mut child: Node<'a>) {
         let mut index = self.index + 1;
+        // A list starts where its first item does, and that item after its indent
+        while index < self.events.len()
+            && self.events[index].kind == event::Kind::Enter
+            && self.events[index].name == Name::LIST_ITEM
+        {
+            index += 1;
+        }
         while index + 1 < self.events.len()
             && self.events[index].name == Name::SPACE_OR_TAB
             && self.events[index].kind == event::Kind::Enter
@@ -111,6 +131,24 @@ impl<'a, 'e> Compiler<'a, 'e> {
         self.attach_tail();
     }
 
+    /// Close the innermost open node at the first line ending of the blank lines before
+    /// the current event, as micromark ends lists and mdast-util-from-markdown list items;
+    /// `prefixes` also passes block quote prefixes, as items do.
+    pub(crate) fn tail_pop_before_trailing_lines(&mut self, prefixes: bool) {
+        let end = self.trailing_line_endings[usize::from(prefixes)][self.index]
+            .unwrap_or(self.index);
+        let end = to_point(&self.events[end].point);
+        self.set_tail_end(end);
+        self.attach_tail();
+    }
+
+    fn set_tail_end(&mut self, end: Point) {
+        if let Some(Position::Span { end: node_end, .. }) = self.tail_mut().position_mut()
+        {
+            *node_end = end;
+        }
+    }
+
     // Move the innermost open node into its parent's children
     fn attach_tail(&mut self) {
         if self.stack.len() < 2 {
@@ -121,6 +159,12 @@ impl<'a, 'e> Compiler<'a, 'e> {
         {
             children.push(node);
         }
+    }
+
+    /// The node the innermost open node sits in.
+    pub(crate) fn penultimate_mut(&mut self) -> Option<&mut Node<'a>> {
+        let index = self.stack.len().checked_sub(2)?;
+        self.stack.get_mut(index)
     }
 
     /// Collect the text that follows into a buffer, until `resume`.

@@ -1,6 +1,7 @@
 use crate::actions::attention::resolve::resolve_attention;
 use crate::actions::data::resolve::resolve_data;
 use crate::actions::heading_atx::resolve::resolve_heading_atx;
+use crate::actions::list_item::resolve::resolve_list_item;
 use crate::actions::whitespace::resolve::resolve_whitespace;
 use crate::models::construct::Resolver;
 use crate::utils::tokenizer::content::resolve_content;
@@ -20,6 +21,10 @@ pub(crate) fn call_resolver(
         Resolver::Content => Some(resolve_content(tokenizer)),
         Resolver::Data => {
             resolve_data(tokenizer);
+            None
+        }
+        Resolver::ListItem => {
+            resolve_list_item(tokenizer);
             None
         }
         Resolver::HeadingAtx => {

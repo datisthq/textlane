@@ -7,7 +7,7 @@ use crate::utils::compiler::stack::Compiler;
 /// Open and close a paragraph.
 pub(crate) fn compile_paragraph(compiler: &mut Compiler, kind: Kind) {
     match kind {
-        Kind::Enter => compiler.tail_push(Node::Paragraph(Paragraph {
+        Kind::Enter => compiler.tail_push_after_prefix(Node::Paragraph(Paragraph {
             children: ArenaVec::new_in(compiler.alloc),
             position: None,
         })),

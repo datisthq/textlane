@@ -1,14 +1,16 @@
+use crate::actions::block_quote::tokenize::{continue_block_quote, tokenize_block_quote};
 use crate::actions::bom::tokenize::tokenize_bom;
+use crate::actions::list_item::tokenize::{continue_list_item, tokenize_list_item};
 use crate::helpers::skip::{skip_opt_back, skip_to};
 use crate::models::construct::State;
 use crate::models::event::{ContentType, Event, Kind, Link};
 use crate::models::token::Name;
-use crate::utils::tokenizer::driver::{Container, Tokenizer};
+use crate::utils::tokenizer::driver::{
+    Container, ContainerState, TokenizeState, Tokenizer,
+};
 use crate::utils::tokenizer::flow::tokenize_flow;
 use crate::utils::tokenizer::subtokenize::divide_events;
 
-// Block quotes and list items exit with `Prefix` once they exist
-#[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 enum Phase {
     After,
@@ -30,13 +32,38 @@ pub(crate) fn tokenize_document(tokenizer: &mut Tokenizer) -> State {
     State::Retry(tokenize_bom)
 }
 
-fn container_existing_before(_tokenizer: &mut Tokenizer) -> State {
-    // Block quotes and list items continue here once they exist
-    State::Retry(container_new_before)
+fn container_existing_before(tokenizer: &mut Tokenizer) -> State {
+    // On an empty line, list items that did not start blank all continue without consuming
+    // anything: skip them at once, as checking each costs the nesting depth per line
+    if matches!(tokenizer.current, None | Some(b'\n')) {
+        let continued = tokenizer.tokenize_state.document_continued;
+        let end = find_blank_end(&mut tokenizer.tokenize_state, continued);
+        tokenizer.tokenize_state.document_continued = end;
+    }
+    let state = &tokenizer.tokenize_state;
+    let Some(container) = state.document_container_stack.get(state.document_continued)
+    else {
+        return State::Retry(container_new_before);
+    };
+    let continuation = match container.kind {
+        Container::BlockQuote => continue_block_quote,
+        Container::ListItem => continue_list_item,
+    };
+    tokenizer.attempt(
+        State::Next(container_existing_after),
+        State::Next(container_new_before),
+    );
+    State::Retry(continuation)
+}
+
+fn container_existing_after(tokenizer: &mut Tokenizer) -> State {
+    tokenizer.tokenize_state.document_continued += 1;
+    State::Retry(container_existing_before)
 }
 
 fn container_new_before(tokenizer: &mut Tokenizer) -> State {
     let state = &tokenizer.tokenize_state;
+    // Every container continued: a fenced code block (concrete) takes the line whole
     if state.document_continued == state.document_container_stack.len()
         && let Some(child) = state.document_child.as_ref()
     {
@@ -45,8 +72,89 @@ fn container_new_before(tokenizer: &mut Tokenizer) -> State {
             return State::Retry(containers_after);
         }
     }
-    // Block quotes and list items start here once they exist
+    // The new container goes where the next one to continue was, for its constructs to
+    // store their state; it moves to the end once it starts
+    push_container(tokenizer, Container::BlockQuote);
+    tokenizer.attempt(
+        State::Next(container_new_after),
+        State::Next(container_new_before_not_block_quote),
+    );
+    State::Retry(tokenize_block_quote)
+}
+
+fn container_new_before_not_block_quote(tokenizer: &mut Tokenizer) -> State {
+    let continued = tokenizer.tokenize_state.document_continued;
+    tokenizer.tokenize_state.document_container_stack[continued] =
+        new_container(Container::ListItem);
+    tokenizer.attempt(
+        State::Next(container_new_after),
+        State::Next(container_new_before_not_list),
+    );
+    State::Retry(tokenize_list_item)
+}
+
+fn container_new_before_not_list(tokenizer: &mut Tokenizer) -> State {
+    let continued = tokenizer.tokenize_state.document_continued;
+    tokenizer
+        .tokenize_state
+        .document_container_stack
+        .swap_remove(continued);
     State::Retry(containers_after)
+}
+
+fn container_new_after(tokenizer: &mut Tokenizer) -> State {
+    let continued = tokenizer.tokenize_state.document_continued;
+    let container = tokenizer
+        .tokenize_state
+        .document_container_stack
+        .swap_remove(continued);
+    // A new container closes the ones that did not continue, before it opens
+    if continued != tokenizer.tokenize_state.document_container_stack.len() {
+        exit_containers(tokenizer, &Phase::Prefix);
+    }
+    if let Some(child) = tokenizer.tokenize_state.document_child.as_mut() {
+        child.pierce = true;
+    }
+    tokenizer
+        .tokenize_state
+        .document_container_stack
+        .push(container);
+    tokenizer.tokenize_state.document_continued += 1;
+    tokenizer.interrupt = false;
+    State::Retry(container_new_before)
+}
+
+fn push_container(tokenizer: &mut Tokenizer, kind: Container) {
+    // A failed attempt swaps the stack back, so the cache of blank ends stays valid
+    let state = &mut tokenizer.tokenize_state;
+    let tail = state.document_container_stack.len();
+    state.document_container_stack.push(new_container(kind));
+    state
+        .document_container_stack
+        .swap(state.document_continued, tail);
+}
+
+// The first container at or after `from` that an empty line does not continue for free
+fn find_blank_end(state: &mut TokenizeState, from: usize) -> usize {
+    let stack = &state.document_container_stack;
+    let ends = state.document_blank_ends.get_or_insert_with(|| {
+        let mut ends = vec![stack.len(); stack.len() + 1];
+        for index in (0..stack.len()).rev() {
+            let container = &stack[index];
+            let free = container.kind == Container::ListItem && !container.blank_initial;
+            ends[index] = if free { ends[index + 1] } else { index };
+        }
+        ends
+    });
+    ends.get(from).copied().unwrap_or(from)
+}
+
+fn new_container(kind: Container) -> ContainerState {
+    ContainerState {
+        kind,
+        blank_initial: false,
+        size: 0,
+    }
 }
 
 fn containers_after(tokenizer: &mut Tokenizer) -> State {
@@ -158,6 +266,7 @@ fn exit_containers(tokenizer: &mut Tokenizer, phase: &Phase) {
         .tokenize_state
         .document_container_stack
         .split_off(continued);
+    tokenizer.tokenize_state.document_blank_ends = None;
     if *phase != Phase::After {
         let state = tokenizer
             .tokenize_state
@@ -174,8 +283,8 @@ fn exit_containers(tokenizer: &mut Tokenizer, phase: &Phase) {
         let mut exits = Vec::with_capacity(stack_close.len());
         while let Some(container) = stack_close.pop() {
             let name = match container.kind {
-                Container::BlockQuote => Name("blockQuote"),
-                Container::ListItem => Name("listItem"),
+                Container::BlockQuote => Name::BLOCK_QUOTE,
+                Container::ListItem => Name::LIST_ITEM,
             };
             exits.push(Event {
                 kind: Kind::Exit,

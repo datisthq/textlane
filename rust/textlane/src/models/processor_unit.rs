@@ -50,3 +50,37 @@ fn rejects_many_unclosed_code_spans_in_linear_time() -> Result<(), Error> {
     );
     Ok(())
 }
+
+#[test]
+fn survives_deeply_nested_containers() -> Result<(), Error> {
+    for prefix in ["- ", "> ", "1. "] {
+        let input = prefix.repeat(20_000) + "a\n";
+        let started = std::time::Instant::now();
+        render(&input)?;
+        assert!(
+            started.elapsed().as_secs() < 5,
+            "{prefix:?} took {:?}",
+            started.elapsed()
+        );
+    }
+    Ok(())
+}
+
+#[test]
+fn continues_deep_containers_over_blank_lines_in_linear_time() -> Result<(), Error> {
+    let items = (0..20_000).map(|_| "- a\n").collect::<String>();
+    for input in [
+        "- ".repeat(20_000) + "a\n" + &"\n".repeat(20_000),
+        "- ".repeat(20_000) + "a\n" + &"  \n".repeat(10_000),
+        items,
+    ] {
+        let started = std::time::Instant::now();
+        render(&input)?;
+        assert!(
+            started.elapsed().as_secs() < 5,
+            "took {:?}",
+            started.elapsed()
+        );
+    }
+    Ok(())
+}

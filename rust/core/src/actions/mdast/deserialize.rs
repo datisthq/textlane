@@ -4,8 +4,8 @@ use crate::actions::mdast::serialize::MAX_JSON_DEPTH;
 use crate::actions::position::deserialize::deserialize_position;
 use crate::models::error::Error;
 use crate::models::mdast::{
-    Break, Code, Emphasis, Heading, InlineCode, Node, Paragraph, Root, Strong, Text,
-    ThematicBreak,
+    Blockquote, Break, Code, Emphasis, Heading, InlineCode, List, ListItem, Node,
+    Paragraph, Root, Strong, Text, ThematicBreak,
 };
 use crate::{Allocator, ArenaVec};
 
@@ -56,6 +56,29 @@ fn deserialize_node<'a>(
             lang: read_optional_str(value, "lang", alloc),
             meta: read_optional_str(value, "meta", alloc),
             value: read_optional_str(value, "value", alloc).unwrap_or_default(),
+            position,
+        }),
+        "blockquote" => Node::Blockquote(Blockquote {
+            children: deserialize_children(value, alloc, depth)?,
+            position,
+        }),
+        "list" => Node::List(List {
+            ordered: value
+                .get("ordered")
+                .and_then(Value::as_bool)
+                .unwrap_or(false),
+            start: value
+                .get("start")
+                .and_then(Value::as_u64)
+                .and_then(|start| u32::try_from(start).ok()),
+            spread: value.get("spread").and_then(Value::as_bool),
+            children: deserialize_children(value, alloc, depth)?,
+            position,
+        }),
+        "listItem" => Node::ListItem(ListItem {
+            spread: value.get("spread").and_then(Value::as_bool),
+            checked: value.get("checked").and_then(Value::as_bool),
+            children: deserialize_children(value, alloc, depth)?,
             position,
         }),
         "inlineCode" => Node::InlineCode(InlineCode {

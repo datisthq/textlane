@@ -5,6 +5,7 @@ pub(crate) struct Name(pub(crate) &'static str);
 impl Name {
     pub(crate) const ATTENTION_SEQUENCE: Name = Name("attentionSequence");
     pub(crate) const BLANK_LINE_ENDING: Name = Name("blankLineEnding");
+    pub(crate) const BLOCK_QUOTE: Name = Name("blockQuote");
     pub(crate) const BLOCK_QUOTE_MARKER: Name = Name("blockQuoteMarker");
     pub(crate) const BLOCK_QUOTE_PREFIX: Name = Name("blockQuotePrefix");
     pub(crate) const BYTE_ORDER_MARK: Name = Name("byteOrderMark");
@@ -42,6 +43,12 @@ impl Name {
     pub(crate) const HEADING_ATX_TEXT: Name = Name("headingAtxText");
     pub(crate) const HEADING_SETEXT_UNDERLINE: Name = Name("headingSetextUnderline");
     pub(crate) const LINE_ENDING: Name = Name("lineEnding");
+    pub(crate) const LIST_ITEM: Name = Name("listItem");
+    pub(crate) const LIST_ITEM_MARKER: Name = Name("listItemMarker");
+    pub(crate) const LIST_ITEM_PREFIX: Name = Name("listItemPrefix");
+    pub(crate) const LIST_ITEM_VALUE: Name = Name("listItemValue");
+    pub(crate) const LIST_ORDERED: Name = Name("listOrdered");
+    pub(crate) const LIST_UNORDERED: Name = Name("listUnordered");
     pub(crate) const PARAGRAPH: Name = Name("paragraph");
     pub(crate) const SPACE_OR_TAB: Name = Name("spaceOrTab");
     pub(crate) const STRONG: Name = Name("strong");

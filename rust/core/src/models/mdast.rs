@@ -14,6 +14,9 @@ pub enum Node<'a> {
     Break(Break<'a>),
     Code(Code<'a>),
     InlineCode(InlineCode<'a>),
+    Blockquote(Blockquote<'a>),
+    List(List<'a>),
+    ListItem(ListItem<'a>),
 }
 
 /// The document.
@@ -80,6 +83,33 @@ pub struct InlineCode<'a> {
     pub position: Option<Position<'a>>,
 }
 
+/// A block quote.
+#[derive(Debug, PartialEq)]
+pub struct Blockquote<'a> {
+    pub children: ArenaVec<'a, Node<'a>>,
+    pub position: Option<Position<'a>>,
+}
+
+/// A list: `ordered` from `1.`, starting at `start`; `spread` when its items are separated
+/// by blank lines.
+#[derive(Debug, PartialEq)]
+pub struct List<'a> {
+    pub ordered: bool,
+    pub start: Option<u32>,
+    pub spread: Option<bool>,
+    pub children: ArenaVec<'a, Node<'a>>,
+    pub position: Option<Position<'a>>,
+}
+
+/// A list item; `checked` is a GFM task's state.
+#[derive(Debug, PartialEq)]
+pub struct ListItem<'a> {
+    pub spread: Option<bool>,
+    pub checked: Option<bool>,
+    pub children: ArenaVec<'a, Node<'a>>,
+    pub position: Option<Position<'a>>,
+}
+
 /// Plain text.
 #[derive(Debug, PartialEq)]
 pub struct Text<'a> {
@@ -96,6 +126,9 @@ impl<'a> Node<'a> {
             Node::Heading(node) => Some(&node.children),
             Node::Emphasis(node) => Some(&node.children),
             Node::Strong(node) => Some(&node.children),
+            Node::Blockquote(node) => Some(&node.children),
+            Node::List(node) => Some(&node.children),
+            Node::ListItem(node) => Some(&node.children),
             Node::ThematicBreak(_)
             | Node::Text(_)
             | Node::Break(_)
@@ -112,6 +145,9 @@ impl<'a> Node<'a> {
             Node::Heading(node) => Some(&mut node.children),
             Node::Emphasis(node) => Some(&mut node.children),
             Node::Strong(node) => Some(&mut node.children),
+            Node::Blockquote(node) => Some(&mut node.children),
+            Node::List(node) => Some(&mut node.children),
+            Node::ListItem(node) => Some(&mut node.children),
             Node::ThematicBreak(_)
             | Node::Text(_)
             | Node::Break(_)
@@ -132,6 +168,9 @@ impl<'a> Node<'a> {
             Node::Break(node) => node.position.as_ref(),
             Node::Code(node) => node.position.as_ref(),
             Node::InlineCode(node) => node.position.as_ref(),
+            Node::Blockquote(node) => node.position.as_ref(),
+            Node::List(node) => node.position.as_ref(),
+            Node::ListItem(node) => node.position.as_ref(),
         }
     }
 
@@ -147,6 +186,9 @@ impl<'a> Node<'a> {
             Node::Break(node) => &mut node.position,
             Node::Code(node) => &mut node.position,
             Node::InlineCode(node) => &mut node.position,
+            Node::Blockquote(node) => &mut node.position,
+            Node::List(node) => &mut node.position,
+            Node::ListItem(node) => &mut node.position,
         }
     }
 }

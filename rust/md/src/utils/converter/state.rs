@@ -2,11 +2,14 @@ use textlane_core::hast::{self, Element};
 use textlane_core::mdast;
 use textlane_core::{Allocator, ArenaVec, Position};
 
+use crate::actions::blockquote::convert::convert_blockquote;
 use crate::actions::code::convert::convert_code;
 use crate::actions::emphasis::convert::convert_emphasis;
 use crate::actions::hard_break::convert::convert_hard_break;
 use crate::actions::heading::convert::convert_heading;
 use crate::actions::inline_code::convert::convert_inline_code;
+use crate::actions::list::convert::convert_list;
+use crate::actions::list_item::convert::{convert_list_item, is_list_loose};
 use crate::actions::paragraph::convert::convert_paragraph;
 use crate::actions::root::convert::convert_root;
 use crate::actions::strong::convert::convert_strong;
@@ -20,6 +23,8 @@ pub(crate) struct Converter<'a, 'o> {
     // `allowDangerousHtml` decides what raw HTML becomes, once html nodes exist
     #[allow(dead_code)]
     pub(crate) options: &'o ToHtmlOptions,
+    /// Whether each list being converted is loose, worked out once per list for its items.
+    pub(crate) loose_lists: Vec<bool>,
 }
 
 // A parent whose children are being converted
@@ -61,7 +66,8 @@ impl<'a> Converter<'a, '_> {
                 ArenaVec::with_capacity_in(results.len() - frame.start, self.alloc);
             converted.extend(results.drain(frame.start..));
             let start = results.len();
-            results.push(self.exit(frame.node, converted));
+            let parent = stack.last().map(|parent| parent.node);
+            results.push(self.exit(frame.node, parent, converted));
             if frame.trim {
                 trim_start(&mut results[start]);
             }
@@ -79,6 +85,9 @@ impl<'a> Converter<'a, '_> {
         stack: &mut Vec<Frame<'n, 'a>>,
     ) {
         let start = results.len();
+        if let mdast::Node::List(list) = node {
+            self.loose_lists.push(is_list_loose(list));
+        }
         if node.children().is_some() {
             stack.push(Frame {
                 node,
@@ -111,9 +120,22 @@ impl<'a> Converter<'a, '_> {
     fn exit(
         &mut self,
         node: &mdast::Node<'a>,
+        parent: Option<&mdast::Node<'a>>,
         children: ArenaVec<'a, hast::Node<'a>>,
     ) -> hast::Node<'a> {
         match node {
+            mdast::Node::Blockquote(node) => convert_blockquote(self, node, children),
+            mdast::Node::List(list) => {
+                self.loose_lists.pop();
+                convert_list(self, list, children)
+            }
+            mdast::Node::ListItem(item) => {
+                let loose = match parent {
+                    Some(mdast::Node::List(_)) => self.loose_lists.last().copied(),
+                    _ => None,
+                };
+                convert_list_item(self, item, loose, children)
+            }
             mdast::Node::Root(root) => convert_root(self, root, children),
             mdast::Node::Heading(heading) => convert_heading(self, heading, children),
             mdast::Node::Emphasis(emphasis) => convert_emphasis(self, emphasis, children),

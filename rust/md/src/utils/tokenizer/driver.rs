@@ -11,8 +11,6 @@ use crate::utils::tokenizer::subtokenize::Subresult;
 const TAB_SIZE: usize = 4;
 
 /// A container the document content type has open.
-// Opened by block quotes and list items, which do not exist yet
-#[allow(dead_code)]
 #[derive(Debug, PartialEq, Eq)]
 pub(crate) enum Container {
     BlockQuote,
@@ -22,6 +20,10 @@ pub(crate) enum Container {
 #[derive(Debug)]
 pub(crate) struct ContainerState {
     pub(crate) kind: Container,
+    /// Whether a list item started with a blank line, so a blank line next ends it.
+    pub(crate) blank_initial: bool,
+    /// How far a list item's content is indented.
+    pub(crate) size: usize,
 }
 
 /// What a byte at a point means: a byte, a virtual space of a tab, or the `\r` of a CRLF.
@@ -65,6 +67,9 @@ pub(crate) struct TokenizeState<'a> {
     pub(crate) document_data_index: Option<usize>,
     pub(crate) document_exits: Vec<Option<Vec<Event>>>,
     pub(crate) document_lazy_accepting_before: bool,
+    /// For each open container, the first at or after it that an empty line does not
+    /// simply continue; cleared whenever the containers change.
+    pub(crate) document_blank_ends: Option<Vec<usize>>,
     pub(crate) space_or_tab_connect: bool,
     pub(crate) space_or_tab_content: Option<ContentType>,
     pub(crate) space_or_tab_min: usize,
@@ -82,6 +87,8 @@ pub(crate) struct TokenizeState<'a> {
     pub(crate) code_text_runs: HashMap<usize, usize>,
     /// Whether a code span scanned to the end of the content without closing.
     pub(crate) code_text_scanned: bool,
+    /// Where a thematic break of a marker started and where it then failed.
+    pub(crate) thematic_break_failed: Option<(u8, usize, usize)>,
 }
 
 /// Feeds bytes to state functions and records the events they emit.

@@ -62,7 +62,7 @@ impl EditMap {
             return;
         }
         self.map.sort_unstable_by_key(|edit| edit.at);
-        let mut map: Vec<(usize, usize, Vec<Event>)> = self
+        let map: Vec<(usize, usize, Vec<Event>)> = self
             .map
             .drain(..)
             .map(|mut edit| {
@@ -84,20 +84,20 @@ impl EditMap {
             jumps.push((*at, remove_acc, add_acc));
         }
         shift_links(events, &jumps);
-        let len_before = events.len();
-        let mut index = map.len();
-        let mut vecs = Vec::with_capacity(index * 2 + 1);
-        while index > 0 {
-            index -= 1;
-            vecs.push(events.split_off(map[index].0 + map[index].1));
-            vecs.push(map[index].2.split_off(0));
-            events.truncate(map[index].0);
+        // One pass that copies each kept event and each added one exactly once
+        let old = std::mem::take(events);
+        events.reserve(old.len() + add_acc - remove_acc);
+        let mut old = old.into_iter().enumerate().peekable();
+        for (at, remove, add) in map {
+            while let Some((_, event)) = old.next_if(|(index, _)| *index < at) {
+                events.push(event);
+            }
+            events.extend(add);
+            for _ in 0..remove {
+                old.next();
+            }
         }
-        vecs.push(events.split_off(0));
-        events.reserve(len_before + add_acc - remove_acc);
-        while let Some(mut slice) = vecs.pop() {
-            events.append(&mut slice);
-        }
+        events.extend(old.map(|(_, event)| event));
     }
 }
 

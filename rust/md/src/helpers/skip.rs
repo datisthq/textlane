@@ -9,6 +9,31 @@ pub(crate) fn skip_to(events: &[Event], mut index: usize, names: &[Name]) -> usi
     index
 }
 
+/// Walk forward from `index` over whole tokens named one of `names`.
+pub(crate) fn skip_opt(events: &[Event], mut index: usize, names: &[Name]) -> usize {
+    while index < events.len() {
+        let event = &events[index];
+        if !names.contains(&event.name) || event.kind != Kind::Enter {
+            break;
+        }
+        let name = event.name;
+        let mut balance = 0usize;
+        while index < events.len() {
+            balance = if events[index].kind == Kind::Enter {
+                balance + 1
+            } else {
+                balance - 1
+            };
+            let at_end = events[index].name == name && balance == 0;
+            index += 1;
+            if at_end {
+                break;
+            }
+        }
+    }
+    index
+}
+
 /// Walk back from `index` over whole tokens named one of `names`.
 pub(crate) fn skip_opt_back(events: &[Event], mut index: usize, names: &[Name]) -> usize {
     loop {

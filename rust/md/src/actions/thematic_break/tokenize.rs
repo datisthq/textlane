@@ -20,7 +20,19 @@ pub(crate) fn tokenize_thematic_break(tokenizer: &mut Tokenizer) -> State {
 fn before(tokenizer: &mut Tokenizer) -> State {
     match tokenizer.current {
         Some(marker @ (b'*' | b'-' | b'_')) => {
+            // A break failed from earlier on this line fails from here too: only markers
+            // and spaces lie between, and checking again for each nested list item would
+            // make input quadratic
+            let index = tokenizer.point.index;
+            if let Some((failed, start, end)) =
+                tokenizer.tokenize_state.thematic_break_failed
+                && failed == marker
+                && (start..end).contains(&index)
+            {
+                return State::Nok;
+            }
             tokenizer.tokenize_state.marker = marker;
+            tokenizer.tokenize_state.size_c = index;
             State::Retry(at_break)
         }
         _ => State::Nok,
@@ -40,8 +52,11 @@ fn at_break(tokenizer: &mut Tokenizer) -> State {
         tokenizer.interrupt = false;
         State::Ok
     } else {
-        tokenizer.tokenize_state.marker = 0;
-        tokenizer.tokenize_state.size = 0;
+        let state = &mut tokenizer.tokenize_state;
+        state.thematic_break_failed =
+            Some((state.marker, state.size_c, tokenizer.point.index));
+        state.marker = 0;
+        state.size = 0;
         State::Nok
     }
 }

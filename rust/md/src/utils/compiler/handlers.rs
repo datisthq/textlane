@@ -1,9 +1,12 @@
+use crate::actions::blockquote::compile::compile_blockquote;
 use crate::actions::character_reference::compile::compile_character_reference;
 use crate::actions::code::compile::compile_code;
 use crate::actions::emphasis::compile::compile_emphasis;
 use crate::actions::hard_break::compile::compile_hard_break;
 use crate::actions::heading::compile::compile_heading;
 use crate::actions::inline_code::compile::compile_inline_code;
+use crate::actions::list::compile::compile_list;
+use crate::actions::list_item::compile::compile_list_item;
 use crate::actions::paragraph::compile::compile_paragraph;
 use crate::actions::strong::compile::compile_strong;
 use crate::actions::text::compile::compile_text;
@@ -35,6 +38,11 @@ pub(crate) fn compile_event(compiler: &mut Compiler) {
             compile_text(compiler, name, kind)
         }
         Name::CODE_TEXT => compile_inline_code(compiler, kind),
+        Name::BLOCK_QUOTE => compile_blockquote(compiler, kind),
+        Name::LIST_ORDERED | Name::LIST_UNORDERED | Name::LIST_ITEM_VALUE => {
+            compile_list(compiler, name, kind);
+        }
+        Name::LIST_ITEM => compile_list_item(compiler, kind),
         Name::EMPHASIS => compile_emphasis(compiler, kind),
         Name::HARD_BREAK_ESCAPE | Name::HARD_BREAK_TRAILING => {
             compile_hard_break(compiler, kind)

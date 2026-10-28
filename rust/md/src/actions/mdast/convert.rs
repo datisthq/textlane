@@ -11,7 +11,11 @@ pub fn convert_mdast<'a>(
     alloc: &'a Allocator,
     options: &ToHtmlOptions,
 ) -> hast::Node<'a> {
-    let mut converter = Converter { alloc, options };
+    let mut converter = Converter {
+        alloc,
+        options,
+        loose_lists: vec![],
+    };
     let mut nodes = converter.convert(node);
     if nodes.len() == 1
         && let Some(node) = nodes.pop()
