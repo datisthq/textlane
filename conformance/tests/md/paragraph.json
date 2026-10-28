@@ -1039,5 +1039,42 @@
         }
       }
     ]
+  },
+  {
+    "description": "mdast-util-to-hast paragraph",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/paragraph.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.toHtml"]],
+    "tests": [
+      {
+        "description": "should transform `paragraph` to a `p` element",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "alpha"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "p",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "alpha"
+              }
+            ]
+          }
+        }
+      }
+    ]
   }
 ]

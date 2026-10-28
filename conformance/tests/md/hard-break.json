@@ -2152,5 +2152,255 @@
         }
       }
     ]
+  },
+  {
+    "description": "mdast-util-to-hast break",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/break.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.toHtml"]],
+    "tests": [
+      {
+        "description": "should transform `break` to `br`",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "alpha"
+            },
+            {
+              "type": "break"
+            },
+            {
+              "type": "text",
+              "value": "bravo"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "p",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "alpha"
+              },
+              {
+                "type": "element",
+                "tagName": "br",
+                "properties": {},
+                "children": []
+              },
+              {
+                "type": "text",
+                "value": "\n"
+              },
+              {
+                "type": "text",
+                "value": "bravo"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should trim text after a `br` (#1)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "alpha"
+            },
+            {
+              "type": "break"
+            },
+            {
+              "type": "text",
+              "value": "  bravo"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "p",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "alpha"
+              },
+              {
+                "type": "element",
+                "tagName": "br",
+                "properties": {},
+                "children": []
+              },
+              {
+                "type": "text",
+                "value": "\n"
+              },
+              {
+                "type": "text",
+                "value": "bravo"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should trim text after a `br` (#2)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "alpha"
+            },
+            {
+              "type": "break"
+            },
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  bravo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "p",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "alpha"
+              },
+              {
+                "type": "element",
+                "tagName": "br",
+                "properties": {},
+                "children": []
+              },
+              {
+                "type": "text",
+                "value": "\n"
+              },
+              {
+                "type": "element",
+                "tagName": "em",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "bravo"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should trim text after a `br` (#3)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a"
+            },
+            {
+              "type": "break"
+            },
+            {
+              "type": "text",
+              "value": "　b"
+            },
+            {
+              "type": "break"
+            },
+            {
+              "type": "text",
+              "value": " c"
+            },
+            {
+              "type": "break"
+            },
+            {
+              "type": "text",
+              "value": " d"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "p",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "a"
+              },
+              {
+                "type": "element",
+                "tagName": "br",
+                "properties": {},
+                "children": []
+              },
+              {
+                "type": "text",
+                "value": "\n"
+              },
+              {
+                "type": "text",
+                "value": "　b"
+              },
+              {
+                "type": "element",
+                "tagName": "br",
+                "properties": {},
+                "children": []
+              },
+              {
+                "type": "text",
+                "value": "\n"
+              },
+              {
+                "type": "text",
+                "value": " c"
+              },
+              {
+                "type": "element",
+                "tagName": "br",
+                "properties": {},
+                "children": []
+              },
+              {
+                "type": "text",
+                "value": "\n"
+              },
+              {
+                "type": "text",
+                "value": " d"
+              }
+            ]
+          }
+        }
+      }
+    ]
   }
 ]

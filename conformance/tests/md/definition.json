@@ -3983,5 +3983,92 @@
         }
       }
     ]
+  },
+  {
+    "description": "mdast-util-to-hast definition",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/definition.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.toHtml"]],
+    "tests": [
+      {
+        "description": "should ignore `definition`",
+        "tree": {
+          "type": "definition",
+          "identifier": "alpha",
+          "url": "bravo"
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should prefer the first definition",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "linkReference",
+                  "identifier": "charlie",
+                  "referenceType": "shortcut",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "charlie"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "definition",
+              "identifier": "charlie",
+              "url": "delta"
+            },
+            {
+              "type": "definition",
+              "identifier": "charlie",
+              "url": "echo"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "a",
+                    "properties": {
+                      "href": "delta"
+                    },
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "charlie"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
   }
 ]

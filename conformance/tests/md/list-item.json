@@ -8336,5 +8336,588 @@
         }
       }
     ]
+  },
+  {
+    "description": "mdast-util-to-hast list-item",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/list-item.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.toHtml"]],
+    "tests": [
+      {
+        "description": "should transform `listItem`s to a `li` element",
+        "tree": {
+          "type": "listItem",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "alpha"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "li",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "alpha"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should transform a spread `listItem`s to a `li` element",
+        "tree": {
+          "type": "listItem",
+          "spread": true,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "bravo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "li",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "\n"
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "bravo"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": "\n"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should detect that an item is spread, even when not explicitly set",
+        "tree": {
+          "type": "listItem",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "charlie"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "delta"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "li",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "\n"
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "charlie"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": "\n"
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "delta"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": "\n"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should support checkboxes in `listItem`s (`true`, tight item)",
+        "tree": {
+          "type": "listItem",
+          "checked": true,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "echo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "li",
+            "properties": {
+              "className": ["task-list-item"]
+            },
+            "children": [
+              {
+                "type": "element",
+                "tagName": "input",
+                "properties": {
+                  "type": "checkbox",
+                  "checked": true,
+                  "disabled": true
+                },
+                "children": []
+              },
+              {
+                "type": "text",
+                "value": " "
+              },
+              {
+                "type": "text",
+                "value": "echo"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should support checkboxes in `listItem`s (`false`, loose item)",
+        "tree": {
+          "type": "listItem",
+          "checked": false,
+          "spread": true,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "foxtrot"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "golf"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "li",
+            "properties": {
+              "className": ["task-list-item"]
+            },
+            "children": [
+              {
+                "type": "text",
+                "value": "\n"
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "input",
+                    "properties": {
+                      "type": "checkbox",
+                      "checked": false,
+                      "disabled": true
+                    },
+                    "children": []
+                  },
+                  {
+                    "type": "text",
+                    "value": " "
+                  },
+                  {
+                    "type": "text",
+                    "value": "foxtrot"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": "\n"
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "golf"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": "\n"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should support checkboxes in `listItem`s that don’t start with paragraphs",
+        "tree": {
+          "type": "listItem",
+          "checked": true,
+          "children": [
+            {
+              "type": "blockquote",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "india"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "juliett"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "li",
+            "properties": {
+              "className": ["task-list-item"]
+            },
+            "children": [
+              {
+                "type": "text",
+                "value": "\n"
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "input",
+                    "properties": {
+                      "type": "checkbox",
+                      "checked": true,
+                      "disabled": true
+                    },
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": "\n"
+              },
+              {
+                "type": "element",
+                "tagName": "blockquote",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "\n"
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "p",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "india"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": "\n"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": "\n"
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "juliett"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": "\n"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should support `listItem`s without children",
+        "tree": {
+          "type": "listItem",
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "li",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should support checkboxes in `listItem`s without children",
+        "tree": {
+          "type": "listItem",
+          "checked": true,
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "li",
+            "properties": {
+              "className": ["task-list-item"]
+            },
+            "children": [
+              {
+                "type": "element",
+                "tagName": "input",
+                "properties": {
+                  "type": "checkbox",
+                  "checked": true,
+                  "disabled": true
+                },
+                "children": []
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should support lists in `listItem`s",
+        "tree": {
+          "type": "listItem",
+          "children": [
+            {
+              "type": "list",
+              "children": [
+                {
+                  "type": "listItem",
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "kilo"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "li",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "\n"
+              },
+              {
+                "type": "element",
+                "tagName": "ul",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "\n"
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "li",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "kilo"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": "\n"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": "\n"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-to-hast list-item {\"allowDangerousHtml\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/list-item.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support checkboxes in `listItem`s w/o paragraph",
+        "tree": {
+          "type": "listItem",
+          "checked": true,
+          "children": [
+            {
+              "type": "html",
+              "value": "<!--hotel-->"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "li",
+            "properties": {
+              "className": ["task-list-item"]
+            },
+            "children": [
+              {
+                "type": "element",
+                "tagName": "input",
+                "properties": {
+                  "type": "checkbox",
+                  "checked": true,
+                  "disabled": true
+                },
+                "children": []
+              },
+              {
+                "type": "text",
+                "value": "\n"
+              },
+              {
+                "type": "raw",
+                "value": "<!--hotel-->"
+              },
+              {
+                "type": "text",
+                "value": "\n"
+              }
+            ]
+          }
+        }
+      }
+    ]
   }
 ]

@@ -2468,5 +2468,77 @@
         }
       }
     ]
+  },
+  {
+    "description": "mdast-util-to-hast inline-code",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/inline-code.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.toHtml"]],
+    "tests": [
+      {
+        "description": "should transform `inlineCode` to a `code` element",
+        "tree": {
+          "type": "inlineCode",
+          "value": "alpha()"
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "code",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "alpha()"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should support tabs in inline code",
+        "tree": {
+          "type": "inlineCode",
+          "value": "a\tb"
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "code",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "a\tb"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should change eols to spaces in inline code",
+        "tree": {
+          "type": "inlineCode",
+          "value": "a\nb"
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "code",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "a b"
+              }
+            ]
+          }
+        }
+      }
+    ]
   }
 ]

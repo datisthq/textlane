@@ -311,5 +311,162 @@
         }
       }
     ]
+  },
+  {
+    "description": "mdast-util-to-hast text",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/text.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.toHtml"]],
+    "tests": [
+      {
+        "description": "should map `text`s",
+        "tree": {
+          "type": "text",
+          "value": "alpha"
+        },
+        "expected": {
+          "tree": {
+            "type": "text",
+            "value": "alpha"
+          }
+        }
+      },
+      {
+        "description": "should trim spaces and tabs around eols",
+        "tree": {
+          "type": "text",
+          "value": "bravo \n \n charlie"
+        },
+        "expected": {
+          "tree": {
+            "type": "text",
+            "value": "bravo\n\ncharlie"
+          }
+        }
+      },
+      {
+        "description": "should transform text nodes w/ `hName` to an `element`",
+        "tree": {
+          "type": "text",
+          "value": "delta",
+          "data": {
+            "hName": "span"
+          }
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "span",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "delta"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should ignore `hProperties` on text nodes w/o `hName`",
+        "tree": {
+          "type": "text",
+          "value": "echo",
+          "data": {
+            "hProperties": {
+              "className": ["foxtrot"]
+            }
+          }
+        },
+        "expected": {
+          "tree": {
+            "type": "text",
+            "value": "echo"
+          }
+        }
+      },
+      {
+        "description": "should transform text nodes w/ `hProperties` and `hName` to an `element`",
+        "tree": {
+          "type": "text",
+          "value": "golf",
+          "data": {
+            "hName": "span",
+            "hProperties": {
+              "className": ["hotel"]
+            }
+          }
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "span",
+            "properties": {
+              "className": ["hotel"]
+            },
+            "children": [
+              {
+                "type": "text",
+                "value": "golf"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should not transform text nodes w/ `hChildren` w/o `hName` to an `element`",
+        "tree": {
+          "type": "text",
+          "value": "india",
+          "data": {
+            "hChildren": [
+              {
+                "type": "text",
+                "value": "juliett"
+              }
+            ]
+          }
+        },
+        "expected": {
+          "tree": {
+            "type": "text",
+            "value": "india"
+          }
+        }
+      },
+      {
+        "description": "should transform text nodes w/ `hChildren` and `hName` to an `element`",
+        "tree": {
+          "type": "text",
+          "value": "kilo",
+          "data": {
+            "hName": "span",
+            "hChildren": [
+              {
+                "type": "text",
+                "value": "lima"
+              }
+            ]
+          }
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "span",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "lima"
+              }
+            ]
+          }
+        }
+      }
+    ]
   }
 ]

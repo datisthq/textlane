@@ -3297,5 +3297,55 @@
         }
       }
     ]
+  },
+  {
+    "description": "mdast-util-to-hast toml",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/toml.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.toHtml"]],
+    "tests": [
+      {
+        "description": "should ignore `toml`",
+        "tree": {
+          "type": "toml",
+          "value": "alpha"
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": []
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-to-hast yaml",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/yaml.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.toHtml"]],
+    "tests": [
+      {
+        "description": "should ignore `yaml`",
+        "tree": {
+          "type": "yaml",
+          "value": "alpha"
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": []
+          }
+        }
+      }
+    ]
   }
 ]

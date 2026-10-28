@@ -900,5 +900,42 @@
         }
       }
     ]
+  },
+  {
+    "description": "mdast-util-to-hast delete",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/delete.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.toHtml"]],
+    "tests": [
+      {
+        "description": "should transform `delete` to `del`",
+        "tree": {
+          "type": "delete",
+          "children": [
+            {
+              "type": "text",
+              "value": "alpha"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "del",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "alpha"
+              }
+            ]
+          }
+        }
+      }
+    ]
   }
 ]

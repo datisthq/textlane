@@ -466,5 +466,682 @@
         }
       }
     ]
+  },
+  {
+    "description": "mdast-util-to-hast core",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/core.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.toHtml"]],
+    "tests": [
+      {
+        "description": "should prefer `data.hName` to tag names",
+        "tree": {
+          "type": "strong",
+          "data": {
+            "hName": "b"
+          },
+          "children": [
+            {
+              "type": "text",
+              "value": "alpha"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "b",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "alpha"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should support `data.hProperties`",
+        "tree": {
+          "type": "strong",
+          "data": {
+            "hProperties": {
+              "title": "delta"
+            }
+          },
+          "children": [
+            {
+              "type": "text",
+              "value": "echo"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "strong",
+            "properties": {
+              "title": "delta"
+            },
+            "children": [
+              {
+                "type": "text",
+                "value": "echo"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should patch `position`s when given",
+        "tree": {
+          "type": "emphasis",
+          "children": [
+            {
+              "type": "text",
+              "value": "foxtrot"
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 2,
+              "column": 3
+            },
+            "end": {
+              "line": 2,
+              "column": 12
+            }
+          }
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "em",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "foxtrot"
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 2,
+                "column": 3
+              },
+              "end": {
+                "line": 2,
+                "column": 12
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should patch `position`s on `pre` and `code`",
+        "tree": {
+          "type": "code",
+          "value": "golf",
+          "position": {
+            "start": {
+              "line": 2,
+              "column": 3
+            },
+            "end": {
+              "line": 2,
+              "column": 12
+            }
+          }
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "pre",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "code",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "golf\n"
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 2,
+                    "column": 3
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 12
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 2,
+                "column": 3
+              },
+              "end": {
+                "line": 2,
+                "column": 12
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should patch `position`s when given (2)",
+        "tree": {
+          "type": "emphasis",
+          "children": [
+            {
+              "type": "text",
+              "value": "foxtrot"
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 2,
+              "column": 3
+            },
+            "end": {
+              "line": 2,
+              "column": 12
+            }
+          }
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "em",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "foxtrot"
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 2,
+                "column": 3
+              },
+              "end": {
+                "line": 2,
+                "column": 12
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should patch `position`s on `pre` and `code` (2)",
+        "tree": {
+          "type": "code",
+          "value": "golf",
+          "position": {
+            "start": {
+              "line": 2,
+              "column": 3
+            },
+            "end": {
+              "line": 2,
+              "column": 12
+            }
+          }
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "pre",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "code",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "golf\n"
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 2,
+                    "column": 3
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 12
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 2,
+                "column": 3
+              },
+              "end": {
+                "line": 2,
+                "column": 12
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should transform unknown texts to `text`",
+        "tree": {
+          "type": "hotel",
+          "value": "india"
+        },
+        "expected": {
+          "tree": {
+            "type": "text",
+            "value": "india"
+          }
+        }
+      },
+      {
+        "description": "should transform unknown parents to `div`",
+        "tree": {
+          "type": "juliett",
+          "children": [
+            {
+              "type": "text",
+              "value": "kilo"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "div",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "kilo"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should transform unknown voids to `div`",
+        "tree": {
+          "type": "lima"
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "div",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should transform unknown nodes with `data.h*` properties",
+        "tree": {
+          "type": "mike",
+          "data": {
+            "hName": "code",
+            "hProperties": {
+              "className": ["november"]
+            },
+            "hChildren": [
+              {
+                "type": "text",
+                "value": "oscar"
+              }
+            ]
+          },
+          "value": "papa"
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "code",
+            "properties": {
+              "className": ["november"]
+            },
+            "children": [
+              {
+                "type": "text",
+                "value": "oscar"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should transform unknown nodes with `data.hChildren` only to `div`",
+        "tree": {
+          "type": "quebec",
+          "data": {
+            "hChildren": [
+              {
+                "type": "text",
+                "value": "romeo"
+              }
+            ]
+          },
+          "value": "sierra"
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "div",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "romeo"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should transform unknown nodes with `data.hProperties` only to a `element` node",
+        "tree": {
+          "type": "tango",
+          "data": {
+            "hProperties": {
+              "className": ["uniform"]
+            }
+          },
+          "value": "whiskey"
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "div",
+            "properties": {
+              "className": ["uniform"]
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should support unknown nodes by default",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "alpha",
+              "value": "alpha"
+            },
+            {
+              "type": "bravo",
+              "children": [
+                {
+                  "type": "image",
+                  "url": "bravo"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "charlie"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "p",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "alpha"
+              },
+              {
+                "type": "element",
+                "tagName": "div",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "img",
+                    "properties": {
+                      "src": "bravo"
+                    },
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": "charlie"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-to-hast core {\"passThrough\":[\"alpha\",\"bravo\"]}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/core.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.toHtml",
+        {
+          "passThrough": ["alpha", "bravo"]
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support `passThrough`",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "alpha",
+              "value": "alpha"
+            },
+            {
+              "type": "bravo",
+              "children": [
+                {
+                  "type": "image",
+                  "url": "bravo"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "charlie"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "p",
+            "properties": {},
+            "children": [
+              {
+                "type": "alpha",
+                "value": "alpha"
+              },
+              {
+                "type": "bravo",
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "img",
+                    "properties": {
+                      "src": "bravo"
+                    },
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": "charlie"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-to-hast root",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/root.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.toHtml"]],
+    "tests": [
+      {
+        "description": "should map `root`s",
+        "tree": {
+          "type": "root",
+          "children": []
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should transform root nodes w/ `hName`",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "alpha"
+            }
+          ],
+          "data": {
+            "hName": "article"
+          }
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "article",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "alpha"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should transform root nodes w/ `hName`, `hProperties`",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "alpha"
+            }
+          ],
+          "data": {
+            "hName": "article",
+            "hProperties": {
+              "className": ["bravo"]
+            }
+          }
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "article",
+            "properties": {
+              "className": ["bravo"]
+            },
+            "children": [
+              {
+                "type": "text",
+                "value": "alpha"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should transform root nodes w/ `hName`, `hChildren`",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "alpha"
+            }
+          ],
+          "data": {
+            "hName": "article",
+            "hChildren": [
+              {
+                "type": "element",
+                "tagName": "section",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "bravo"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "article",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "section",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "bravo"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
   }
 ]

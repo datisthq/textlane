@@ -13741,5 +13741,398 @@
         }
       }
     ]
+  },
+  {
+    "description": "mdast-util-to-hast link-reference",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/link-reference.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.toHtml"]],
+    "tests": [
+      {
+        "description": "should fall back on `linkReference`s without definition",
+        "tree": {
+          "type": "linkReference",
+          "identifier": "alpha",
+          "referenceType": "shortcut",
+          "children": [
+            {
+              "type": "text",
+              "value": "alpha"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "[alpha]"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should fall back on full `linkReference`s",
+        "tree": {
+          "type": "linkReference",
+          "identifier": "bravo",
+          "referenceType": "full",
+          "children": [
+            {
+              "type": "text",
+              "value": "charlie"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "[charlie][bravo]"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should fall back on collapsed `linkReference`s",
+        "tree": {
+          "type": "linkReference",
+          "identifier": "delta",
+          "referenceType": "collapsed",
+          "children": [
+            {
+              "type": "text",
+              "value": "delta"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "[delta][]"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should fall back on the label on a full `linkReference` (GH-22)",
+        "tree": {
+          "type": "linkReference",
+          "identifier": "x",
+          "label": "X",
+          "referenceType": "full",
+          "children": [
+            {
+              "type": "text",
+              "value": "y"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "[y][X]"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should support link references with non-text content",
+        "tree": {
+          "type": "linkReference",
+          "identifier": "echo",
+          "referenceType": "full",
+          "children": [
+            {
+              "type": "inlineCode",
+              "value": "foxtrot"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "["
+              },
+              {
+                "type": "element",
+                "tagName": "code",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "foxtrot"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": "][echo]"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should transform `linkReference`s to `a`s",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "linkReference",
+                  "identifier": "golf",
+                  "referenceType": "full",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "hotel"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "definition",
+              "identifier": "golf",
+              "url": "india",
+              "title": "x"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "a",
+                    "properties": {
+                      "href": "india",
+                      "title": "x"
+                    },
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "hotel"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should transform `linkReference`s with an empty defined url to `a`s",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "linkReference",
+                  "identifier": "juliett",
+                  "referenceType": "full",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "kilo"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "definition",
+              "identifier": "juliett",
+              "url": ""
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "a",
+                    "properties": {
+                      "href": ""
+                    },
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "kilo"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-to-hast link",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/link.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.toHtml"]],
+    "tests": [
+      {
+        "description": "should transform `link` to `a`",
+        "tree": {
+          "type": "link",
+          "url": "alpha",
+          "title": "bravo",
+          "children": [
+            {
+              "type": "text",
+              "value": "charlie"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "a",
+            "properties": {
+              "href": "alpha",
+              "title": "bravo"
+            },
+            "children": [
+              {
+                "type": "text",
+                "value": "charlie"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should transform `link` to `a` (w/o `title`)",
+        "tree": {
+          "type": "link",
+          "url": "delta",
+          "children": [
+            {
+              "type": "text",
+              "value": "echo"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "a",
+            "properties": {
+              "href": "delta"
+            },
+            "children": [
+              {
+                "type": "text",
+                "value": "echo"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should correctly decode/encode urls",
+        "tree": {
+          "type": "link",
+          "url": "https://github.com/facebook/react/pulls?q=is%3Apr%20is%3Aclosed",
+          "children": [
+            {
+              "type": "text",
+              "value": "foxtrot"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "a",
+            "properties": {
+              "href": "https://github.com/facebook/react/pulls?q=is%3Apr%20is%3Aclosed"
+            },
+            "children": [
+              {
+                "type": "text",
+                "value": "foxtrot"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should correctly decode/encode dangerous characters",
+        "tree": {
+          "type": "link",
+          "url": "https://a.com/b.png#c=d&e=f",
+          "children": [
+            {
+              "type": "text",
+              "value": "golf"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "a",
+            "properties": {
+              "href": "https://a.com/b.png#c=d&e=f"
+            },
+            "children": [
+              {
+                "type": "text",
+                "value": "golf"
+              }
+            ]
+          }
+        }
+      }
+    ]
   }
 ]

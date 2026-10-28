@@ -4619,5 +4619,62 @@
         }
       }
     ]
+  },
+  {
+    "description": "mdast-util-to-hast html",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/html.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.toHtml"]],
+    "tests": [
+      {
+        "description": "should ignore `html`",
+        "tree": {
+          "type": "html",
+          "value": "<alpha></alpha>"
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": []
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-to-hast html {\"allowDangerousHtml\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/html.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should transform `html` to `raw` if `allowDangerousHtml` is given",
+        "tree": {
+          "type": "html",
+          "value": "<alpha></alpha>"
+        },
+        "expected": {
+          "tree": {
+            "type": "raw",
+            "value": "<alpha></alpha>"
+          }
+        }
+      }
+    ]
   }
 ]

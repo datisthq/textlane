@@ -3993,5 +3993,220 @@
         }
       }
     ]
+  },
+  {
+    "description": "mdast-util-to-hast image-reference",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/image-reference.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.toHtml"]],
+    "tests": [
+      {
+        "description": "should fall back on `imageReference`s without definition",
+        "tree": {
+          "type": "imageReference",
+          "referenceType": "shortcut",
+          "identifier": "alpha",
+          "alt": "bravo"
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "![bravo]"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should fall back on full `imageReference`s",
+        "tree": {
+          "type": "imageReference",
+          "identifier": "charlie",
+          "referenceType": "full",
+          "alt": "delta"
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "![delta][charlie]"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should fall back on collapsed `imageReference`s",
+        "tree": {
+          "type": "imageReference",
+          "identifier": "echo",
+          "referenceType": "collapsed",
+          "alt": "foxtrot"
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "![foxtrot][]"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should transform `imageReference`s to `img`s (1)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "imageReference",
+              "identifier": "golf",
+              "alt": "hotel"
+            },
+            {
+              "type": "definition",
+              "identifier": "golf",
+              "url": "india",
+              "title": "x"
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "img",
+                "properties": {
+                  "src": "india",
+                  "alt": "hotel",
+                  "title": "x"
+                },
+                "children": []
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should transform `imageReference`s with an empty defined url to `img`s",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "imageReference",
+              "identifier": "juliett",
+              "alt": "kilo"
+            },
+            {
+              "type": "definition",
+              "identifier": "juliett",
+              "url": ""
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "img",
+                "properties": {
+                  "src": "",
+                  "alt": "kilo"
+                },
+                "children": []
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should fall back on the label on a full `imageReference` (GH-22)",
+        "tree": {
+          "type": "imageReference",
+          "identifier": "lima",
+          "label": "Lima",
+          "referenceType": "full",
+          "alt": "mike"
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "text",
+                "value": "![mike][Lima]"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-to-hast image",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/image.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.toHtml"]],
+    "tests": [
+      {
+        "description": "should transform `image` to `img`",
+        "tree": {
+          "type": "image",
+          "url": "alpha",
+          "alt": "bravo",
+          "title": "charlie"
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "src": "alpha",
+              "alt": "bravo",
+              "title": "charlie"
+            },
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should transform `image` to `img` (missing `title`)",
+        "tree": {
+          "type": "image",
+          "url": "delta",
+          "alt": "echo"
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "img",
+            "properties": {
+              "src": "delta",
+              "alt": "echo"
+            },
+            "children": []
+          }
+        }
+      }
+    ]
   }
 ]

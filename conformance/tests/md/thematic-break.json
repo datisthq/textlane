@@ -2203,5 +2203,31 @@
         }
       }
     ]
+  },
+  {
+    "description": "mdast-util-to-hast thematic-break",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/thematic-break.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.toHtml"]],
+    "tests": [
+      {
+        "description": "should transform `thematicBreak` to `hr`",
+        "tree": {
+          "type": "thematicBreak"
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "hr",
+            "properties": {},
+            "children": []
+          }
+        }
+      }
+    ]
   }
 ]

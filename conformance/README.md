@@ -83,6 +83,7 @@ release; importers are run deliberately and their output committed, never run in
 | `frontmatter`     | micromark-extension-frontmatter, mdast-util-frontmatter, remark-frontmatter | 91 cases: HTML (frontmatter renders to nothing), serializer output, fixtures, and 7 invalid-option errors                                                   |
 | `gemoji`          | remark-gemoji with gemoji 8.1.0                                             | 1,915 cases: every name in gemoji's table, as remark-gemoji's own test loops, plus its fixtures                                                             |
 | `definition-list` | micromark-extension-definition-list (TypeScript, types stripped)            | 97 cases in the plain, dangerous-HTML and GFM variants upstream runs, rendered by remark-definition-list's hast handlers                                    |
+| `to-hast`         | mdast-util-to-hast                                                          | 97 `md.toHtml` cases, mdast in and hast out, the hast rendered by the pinned mdast-util-to-hast rather than by running upstream's `h()` expectations        |
 
 A file holds one construct (`md/heading-atx`), named as micromark names its test files, with a
 group per source: the spec section, then each upstream test file. An importer replaces only its

@@ -855,5 +855,493 @@
         }
       }
     ]
+  },
+  {
+    "description": "mdast-util-to-hast footnote-definition",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/footnote-definition.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.toHtml"]],
+    "tests": [
+      {
+        "description": "should ignore `footnoteDefinition`",
+        "tree": {
+          "type": "footnoteDefinition",
+          "identifier": "alpha",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "bravo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should support a `footnoteDefinition`",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "footnoteReference",
+                  "identifier": "charlie"
+                }
+              ]
+            },
+            {
+              "type": "footnoteDefinition",
+              "identifier": "charlie",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "delta"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "sup",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "a",
+                        "properties": {
+                          "href": "#user-content-fn-charlie",
+                          "id": "user-content-fnref-charlie",
+                          "dataFootnoteRef": true,
+                          "ariaDescribedBy": ["footnote-label"]
+                        },
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "1"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": "\n"
+              },
+              {
+                "type": "element",
+                "tagName": "section",
+                "properties": {
+                  "dataFootnotes": true,
+                  "className": ["footnotes"]
+                },
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "h2",
+                    "properties": {
+                      "className": ["sr-only"],
+                      "id": "footnote-label"
+                    },
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Footnotes"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": "\n"
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "ol",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "\n"
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "li",
+                        "properties": {
+                          "id": "user-content-fn-charlie"
+                        },
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "\n"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "p",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "delta "
+                              },
+                              {
+                                "type": "element",
+                                "tagName": "a",
+                                "properties": {
+                                  "href": "#user-content-fnref-charlie",
+                                  "dataFootnoteBackref": "",
+                                  "ariaLabel": "Back to reference 1",
+                                  "className": ["data-footnote-backref"]
+                                },
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "value": "↩"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "text",
+                            "value": "\n"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "text",
+                        "value": "\n"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": "\n"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should use the first `footnoteDefinition` if multiple exist",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "footnoteReference",
+                  "identifier": "echo"
+                }
+              ]
+            },
+            {
+              "type": "footnoteDefinition",
+              "identifier": "echo",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "foxtrot"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "footnoteDefinition",
+              "identifier": "echo",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "golf"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "sup",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "a",
+                        "properties": {
+                          "href": "#user-content-fn-echo",
+                          "id": "user-content-fnref-echo",
+                          "dataFootnoteRef": true,
+                          "ariaDescribedBy": ["footnote-label"]
+                        },
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "1"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": "\n"
+              },
+              {
+                "type": "element",
+                "tagName": "section",
+                "properties": {
+                  "dataFootnotes": true,
+                  "className": ["footnotes"]
+                },
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "h2",
+                    "properties": {
+                      "className": ["sr-only"],
+                      "id": "footnote-label"
+                    },
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Footnotes"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": "\n"
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "ol",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "\n"
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "li",
+                        "properties": {
+                          "id": "user-content-fn-echo"
+                        },
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "\n"
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "p",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "foxtrot "
+                              },
+                              {
+                                "type": "element",
+                                "tagName": "a",
+                                "properties": {
+                                  "href": "#user-content-fnref-echo",
+                                  "dataFootnoteBackref": "",
+                                  "ariaLabel": "Back to reference 1",
+                                  "className": ["data-footnote-backref"]
+                                },
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "value": "↩"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "text",
+                            "value": "\n"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "text",
+                        "value": "\n"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": "\n"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-to-hast footnote-reference",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-hast",
+      "commit": "174795b21f7757fffb54dd8d5fb4012f4751f791",
+      "path": "test/footnote-reference.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.toHtml"]],
+    "tests": [
+      {
+        "description": "should render `footnoteReference`s",
+        "tree": {
+          "type": "footnoteReference",
+          "identifier": "alpha"
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "sup",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "a",
+                "properties": {
+                  "href": "#user-content-fn-alpha",
+                  "id": "user-content-fnref-alpha",
+                  "dataFootnoteRef": true,
+                  "ariaDescribedBy": ["footnote-label"]
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "1"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should render `footnoteReference`s (#2)",
+        "tree": {
+          "type": "footnoteReference",
+          "identifier": "bravo",
+          "label": "Bravo"
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "sup",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "a",
+                "properties": {
+                  "href": "#user-content-fn-bravo",
+                  "id": "user-content-fnref-bravo",
+                  "dataFootnoteRef": true,
+                  "ariaDescribedBy": ["footnote-label"]
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "1"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should not fail on non-string identifiers",
+        "tree": {
+          "type": "footnoteReference",
+          "identifier": 1
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "sup",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "a",
+                "properties": {
+                  "href": "#user-content-fn-1",
+                  "id": "user-content-fnref-1",
+                  "dataFootnoteRef": true,
+                  "ariaDescribedBy": ["footnote-label"]
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "1"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
   }
 ]
