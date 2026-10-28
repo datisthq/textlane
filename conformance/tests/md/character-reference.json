@@ -148,6 +148,1089 @@
     ]
   },
   {
+    "description": "Entity and numeric character references (tree)",
+    "specification": [
+      "https://spec.commonmark.org/0.31.2/#entity-and-numeric-character-references"
+    ],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"]],
+    "tests": [
+      {
+        "description": "example 25",
+        "input": "&nbsp; &amp; &copy; &AElig; &Dcaron;\n&frac34; &HilbertSpace; &DifferentialD;\n&ClockwiseContourIntegral; &ngE;\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "  & © Æ Ď\n¾ ℋ ⅆ\n∲ ≧̸",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 33,
+                        "offset": 109
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 33,
+                    "offset": 109
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 110
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 26",
+        "input": "&#35; &#1234; &#992; &#0;\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "# Ӓ Ϡ �",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 26,
+                        "offset": 25
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 26,
+                    "offset": 25
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 26
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 27",
+        "input": "&#X22; &#XD06; &#xcab;\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "\" ആ ಫ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 23,
+                        "offset": 22
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 23,
+                    "offset": 22
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 23
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 28",
+        "input": "&nbsp &x; &#; &#x;\n&#87654321;\n&#abcdef0;\n&ThisIsNotDefined; &hi?;\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "&nbsp &x; &#; &#x;\n&#87654321;\n&#abcdef0;\n&ThisIsNotDefined; &hi?;",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 25,
+                        "offset": 66
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 25,
+                    "offset": 66
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 67
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 29",
+        "input": "&copy\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "&copy",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 6,
+                        "offset": 5
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 6,
+                    "offset": 5
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 6
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 30",
+        "input": "&MadeUpEntity;\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "&MadeUpEntity;",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 15,
+                        "offset": 14
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 15,
+                    "offset": 14
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 15
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 31",
+        "input": "<a href=\"&ouml;&ouml;.html\">\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<a href=\"&ouml;&ouml;.html\">",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 29,
+                    "offset": 28
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 29
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 32",
+        "input": "[foo](/f&ouml;&ouml; \"f&ouml;&ouml;\")\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "link",
+                    "title": "föö",
+                    "url": "/föö",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "foo",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 2,
+                            "offset": 1
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 5,
+                            "offset": 4
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 38,
+                        "offset": 37
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 38,
+                    "offset": 37
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 38
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 33",
+        "input": "[foo]\n\n[foo]: /f&ouml;&ouml; \"f&ouml;&ouml;\"\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "linkReference",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "foo",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 2,
+                            "offset": 1
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 5,
+                            "offset": 4
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 6,
+                        "offset": 5
+                      }
+                    },
+                    "label": "foo",
+                    "identifier": "foo",
+                    "referenceType": "shortcut"
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 6,
+                    "offset": 5
+                  }
+                }
+              },
+              {
+                "type": "definition",
+                "identifier": "foo",
+                "label": "foo",
+                "title": "föö",
+                "url": "/föö",
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 7
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 38,
+                    "offset": 44
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 45
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 34",
+        "input": "``` f&ouml;&ouml;\nfoo\n```\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": "föö",
+                "meta": null,
+                "value": "foo",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 4,
+                    "offset": 25
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 26
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 35",
+        "input": "`f&ouml;&ouml;`\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "inlineCode",
+                    "value": "f&ouml;&ouml;",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 16,
+                        "offset": 15
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 16,
+                    "offset": 15
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 16
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 36",
+        "input": "    f&ouml;f&ouml;\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "f&ouml;f&ouml;",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 19,
+                    "offset": 18
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 19
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 37",
+        "input": "&#42;foo&#42;\n*foo*\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "*foo*\n",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 1,
+                        "offset": 14
+                      }
+                    }
+                  },
+                  {
+                    "type": "emphasis",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "foo",
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 2,
+                            "offset": 15
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 5,
+                            "offset": 18
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 1,
+                        "offset": 14
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 6,
+                        "offset": 19
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 6,
+                    "offset": 19
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 1,
+                "offset": 20
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 38",
+        "input": "&#42; foo\n\n* foo\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "* foo",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 10,
+                        "offset": 9
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 10,
+                    "offset": 9
+                  }
+                }
+              },
+              {
+                "type": "list",
+                "ordered": false,
+                "start": null,
+                "spread": false,
+                "children": [
+                  {
+                    "type": "listItem",
+                    "spread": false,
+                    "checked": null,
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "foo",
+                            "position": {
+                              "start": {
+                                "line": 3,
+                                "column": 3,
+                                "offset": 13
+                              },
+                              "end": {
+                                "line": 3,
+                                "column": 6,
+                                "offset": 16
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 3,
+                            "column": 3,
+                            "offset": 13
+                          },
+                          "end": {
+                            "line": 3,
+                            "column": 6,
+                            "offset": 16
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 1,
+                        "offset": 11
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 6,
+                        "offset": 16
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 11
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 6,
+                    "offset": 16
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 17
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 39",
+        "input": "foo&#10;&#10;bar\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "foo\n\nbar",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 17,
+                        "offset": 16
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 17,
+                    "offset": 16
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 17
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 40",
+        "input": "&#9;foo\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "\tfoo",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 8,
+                        "offset": 7
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 8,
+                    "offset": 7
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 8
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 41",
+        "input": "[a](url &quot;tit&quot;)\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "[a](url \"tit\")",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 25,
+                        "offset": 24
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 25,
+                    "offset": 24
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 25
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark text/character-reference",
     "source": {
       "repository": "https://github.com/micromark/micromark",
@@ -377,6 +1460,998 @@
         "input": "<a href=\"&ouml;&ouml;.html\">",
         "expected": {
           "html": "<a href=\"&ouml;&ouml;.html\">"
+        }
+      }
+    ]
+  },
+  {
+    "description": "from-markdown",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-from-markdown",
+      "commit": "afe9516d97683e51974694f944a799a915a242c0",
+      "path": "test",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"]],
+    "tests": [
+      {
+        "description": "fixture character-reference",
+        "input": "Character references, such as named: &amp;,\ndecimal: &#35;, &#1234;, &#992;, &#0;,\nand hexadecimal: &#X22;, &#XD06;, &#xcab;.\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Character references, such as named: &,\ndecimal: #, Ӓ, Ϡ, �,\nand hexadecimal: \", ആ, ಫ.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 43,
+                        "offset": 125
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 43,
+                    "offset": 125
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 126
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "fixture character-references-everywhere",
+        "input": "> However, &MadeUpEntities; are kept in the document.\n\n> Entities even work in the language flag of fenced code blocks:\n\n> ```some&copy;language\n> alert('Hello');\n> ```\n\n> And in an auto-link: <http://example&copy;xample.com>\n\n> Foo and bar and http://example&copy;xample.com and baz.\n\n> Or in [l&copy;nks](\n>   ~/some&copy;file \"in some pl&copy;ce\")\n\n> Or in [l&copy;lnks](\n>   <~/some&copy;file>\n>   \"in some pl&copy;ce\")\n\n> Or in ![\n>   l&copy;nks\n> ](\n>   ~/some&copy;file \"in some pl&copy;ce\")\n\n***\n\n> Or in ![l&copy;lnks](\n>   <~/some&copy;file>\n>   \"in some pl&copy;ce\")\n\n> Or in ![\n>   l&copy;nks\n> ][12]\n\n> [1]: http://example&copy;xample.com \"in some\n> pl&copy;ce\"\n\n> [\n>   1\n> ]: http://example&copy;xample.com \"in some\n> pl&copy;ce\"\n\n***\n\n> But, entities are not interpreted in `inline c&ouml;de`, or in\n> code blocks:\n\n>     C&Ouml;DE block.\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "However, &MadeUpEntities; are kept in the document.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 3,
+                            "offset": 2
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 54,
+                            "offset": 53
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 54,
+                        "offset": 53
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 54,
+                    "offset": 53
+                  }
+                }
+              },
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Entities even work in the language flag of fenced code blocks:",
+                        "position": {
+                          "start": {
+                            "line": 3,
+                            "column": 3,
+                            "offset": 57
+                          },
+                          "end": {
+                            "line": 3,
+                            "column": 65,
+                            "offset": 119
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 3,
+                        "offset": 57
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 65,
+                        "offset": 119
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 55
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 65,
+                    "offset": 119
+                  }
+                }
+              },
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "code",
+                    "lang": "some©language",
+                    "meta": null,
+                    "value": "alert('Hello');",
+                    "position": {
+                      "start": {
+                        "line": 5,
+                        "column": 3,
+                        "offset": 123
+                      },
+                      "end": {
+                        "line": 7,
+                        "column": 6,
+                        "offset": 168
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 5,
+                    "column": 1,
+                    "offset": 121
+                  },
+                  "end": {
+                    "line": 7,
+                    "column": 6,
+                    "offset": 168
+                  }
+                }
+              },
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "And in an auto-link: ",
+                        "position": {
+                          "start": {
+                            "line": 9,
+                            "column": 3,
+                            "offset": 172
+                          },
+                          "end": {
+                            "line": 9,
+                            "column": 24,
+                            "offset": 193
+                          }
+                        }
+                      },
+                      {
+                        "type": "link",
+                        "title": null,
+                        "url": "http://example&copy;xample.com",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "http://example&copy;xample.com",
+                            "position": {
+                              "start": {
+                                "line": 9,
+                                "column": 25,
+                                "offset": 194
+                              },
+                              "end": {
+                                "line": 9,
+                                "column": 55,
+                                "offset": 224
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 9,
+                            "column": 24,
+                            "offset": 193
+                          },
+                          "end": {
+                            "line": 9,
+                            "column": 56,
+                            "offset": 225
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 9,
+                        "column": 3,
+                        "offset": 172
+                      },
+                      "end": {
+                        "line": 9,
+                        "column": 56,
+                        "offset": 225
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 9,
+                    "column": 1,
+                    "offset": 170
+                  },
+                  "end": {
+                    "line": 9,
+                    "column": 56,
+                    "offset": 225
+                  }
+                }
+              },
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Foo and bar and http://example©xample.com and baz.",
+                        "position": {
+                          "start": {
+                            "line": 11,
+                            "column": 3,
+                            "offset": 229
+                          },
+                          "end": {
+                            "line": 11,
+                            "column": 58,
+                            "offset": 284
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 11,
+                        "column": 3,
+                        "offset": 229
+                      },
+                      "end": {
+                        "line": 11,
+                        "column": 58,
+                        "offset": 284
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 11,
+                    "column": 1,
+                    "offset": 227
+                  },
+                  "end": {
+                    "line": 11,
+                    "column": 58,
+                    "offset": 284
+                  }
+                }
+              },
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Or in ",
+                        "position": {
+                          "start": {
+                            "line": 13,
+                            "column": 3,
+                            "offset": 288
+                          },
+                          "end": {
+                            "line": 13,
+                            "column": 9,
+                            "offset": 294
+                          }
+                        }
+                      },
+                      {
+                        "type": "link",
+                        "title": "in some pl©ce",
+                        "url": "~/some©file",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "l©nks",
+                            "position": {
+                              "start": {
+                                "line": 13,
+                                "column": 10,
+                                "offset": 295
+                              },
+                              "end": {
+                                "line": 13,
+                                "column": 20,
+                                "offset": 305
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 13,
+                            "column": 9,
+                            "offset": 294
+                          },
+                          "end": {
+                            "line": 14,
+                            "column": 43,
+                            "offset": 350
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 13,
+                        "column": 3,
+                        "offset": 288
+                      },
+                      "end": {
+                        "line": 14,
+                        "column": 43,
+                        "offset": 350
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 13,
+                    "column": 1,
+                    "offset": 286
+                  },
+                  "end": {
+                    "line": 14,
+                    "column": 43,
+                    "offset": 350
+                  }
+                }
+              },
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Or in ",
+                        "position": {
+                          "start": {
+                            "line": 16,
+                            "column": 3,
+                            "offset": 354
+                          },
+                          "end": {
+                            "line": 16,
+                            "column": 9,
+                            "offset": 360
+                          }
+                        }
+                      },
+                      {
+                        "type": "link",
+                        "title": "in some pl©ce",
+                        "url": "~/some©file",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "l©lnks",
+                            "position": {
+                              "start": {
+                                "line": 16,
+                                "column": 10,
+                                "offset": 361
+                              },
+                              "end": {
+                                "line": 16,
+                                "column": 21,
+                                "offset": 372
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 16,
+                            "column": 9,
+                            "offset": 360
+                          },
+                          "end": {
+                            "line": 18,
+                            "column": 26,
+                            "offset": 423
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 16,
+                        "column": 3,
+                        "offset": 354
+                      },
+                      "end": {
+                        "line": 18,
+                        "column": 26,
+                        "offset": 423
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 16,
+                    "column": 1,
+                    "offset": 352
+                  },
+                  "end": {
+                    "line": 18,
+                    "column": 26,
+                    "offset": 423
+                  }
+                }
+              },
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Or in ",
+                        "position": {
+                          "start": {
+                            "line": 20,
+                            "column": 3,
+                            "offset": 427
+                          },
+                          "end": {
+                            "line": 20,
+                            "column": 9,
+                            "offset": 433
+                          }
+                        }
+                      },
+                      {
+                        "type": "image",
+                        "title": "in some pl©ce",
+                        "url": "~/some©file",
+                        "alt": "\nl©nks\n",
+                        "position": {
+                          "start": {
+                            "line": 20,
+                            "column": 9,
+                            "offset": 433
+                          },
+                          "end": {
+                            "line": 23,
+                            "column": 43,
+                            "offset": 498
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 20,
+                        "column": 3,
+                        "offset": 427
+                      },
+                      "end": {
+                        "line": 23,
+                        "column": 43,
+                        "offset": 498
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 20,
+                    "column": 1,
+                    "offset": 425
+                  },
+                  "end": {
+                    "line": 23,
+                    "column": 43,
+                    "offset": 498
+                  }
+                }
+              },
+              {
+                "type": "thematicBreak",
+                "position": {
+                  "start": {
+                    "line": 25,
+                    "column": 1,
+                    "offset": 500
+                  },
+                  "end": {
+                    "line": 25,
+                    "column": 4,
+                    "offset": 503
+                  }
+                }
+              },
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Or in ",
+                        "position": {
+                          "start": {
+                            "line": 27,
+                            "column": 3,
+                            "offset": 507
+                          },
+                          "end": {
+                            "line": 27,
+                            "column": 9,
+                            "offset": 513
+                          }
+                        }
+                      },
+                      {
+                        "type": "image",
+                        "title": "in some pl©ce",
+                        "url": "~/some©file",
+                        "alt": "l©lnks",
+                        "position": {
+                          "start": {
+                            "line": 27,
+                            "column": 9,
+                            "offset": 513
+                          },
+                          "end": {
+                            "line": 29,
+                            "column": 26,
+                            "offset": 577
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 27,
+                        "column": 3,
+                        "offset": 507
+                      },
+                      "end": {
+                        "line": 29,
+                        "column": 26,
+                        "offset": 577
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 27,
+                    "column": 1,
+                    "offset": 505
+                  },
+                  "end": {
+                    "line": 29,
+                    "column": 26,
+                    "offset": 577
+                  }
+                }
+              },
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Or in ![\nl©nks\n][12]",
+                        "position": {
+                          "start": {
+                            "line": 31,
+                            "column": 3,
+                            "offset": 581
+                          },
+                          "end": {
+                            "line": 33,
+                            "column": 8,
+                            "offset": 612
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 31,
+                        "column": 3,
+                        "offset": 581
+                      },
+                      "end": {
+                        "line": 33,
+                        "column": 8,
+                        "offset": 612
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 31,
+                    "column": 1,
+                    "offset": 579
+                  },
+                  "end": {
+                    "line": 33,
+                    "column": 8,
+                    "offset": 612
+                  }
+                }
+              },
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "definition",
+                    "identifier": "1",
+                    "label": "1",
+                    "title": "in some\npl©ce",
+                    "url": "http://example©xample.com",
+                    "position": {
+                      "start": {
+                        "line": 35,
+                        "column": 3,
+                        "offset": 616
+                      },
+                      "end": {
+                        "line": 36,
+                        "column": 14,
+                        "offset": 674
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 35,
+                    "column": 1,
+                    "offset": 614
+                  },
+                  "end": {
+                    "line": 36,
+                    "column": 14,
+                    "offset": 674
+                  }
+                }
+              },
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "definition",
+                    "identifier": "1",
+                    "label": "\n  1\n",
+                    "title": "in some\npl©ce",
+                    "url": "http://example©xample.com",
+                    "position": {
+                      "start": {
+                        "line": 38,
+                        "column": 3,
+                        "offset": 678
+                      },
+                      "end": {
+                        "line": 41,
+                        "column": 14,
+                        "offset": 744
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 38,
+                    "column": 1,
+                    "offset": 676
+                  },
+                  "end": {
+                    "line": 41,
+                    "column": 14,
+                    "offset": 744
+                  }
+                }
+              },
+              {
+                "type": "thematicBreak",
+                "position": {
+                  "start": {
+                    "line": 43,
+                    "column": 1,
+                    "offset": 746
+                  },
+                  "end": {
+                    "line": 43,
+                    "column": 4,
+                    "offset": 749
+                  }
+                }
+              },
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "But, entities are not interpreted in ",
+                        "position": {
+                          "start": {
+                            "line": 45,
+                            "column": 3,
+                            "offset": 753
+                          },
+                          "end": {
+                            "line": 45,
+                            "column": 40,
+                            "offset": 790
+                          }
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "inline c&ouml;de",
+                        "position": {
+                          "start": {
+                            "line": 45,
+                            "column": 40,
+                            "offset": 790
+                          },
+                          "end": {
+                            "line": 45,
+                            "column": 58,
+                            "offset": 808
+                          }
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": ", or in\ncode blocks:",
+                        "position": {
+                          "start": {
+                            "line": 45,
+                            "column": 58,
+                            "offset": 808
+                          },
+                          "end": {
+                            "line": 46,
+                            "column": 15,
+                            "offset": 830
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 45,
+                        "column": 3,
+                        "offset": 753
+                      },
+                      "end": {
+                        "line": 46,
+                        "column": 15,
+                        "offset": 830
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 45,
+                    "column": 1,
+                    "offset": 751
+                  },
+                  "end": {
+                    "line": 46,
+                    "column": 15,
+                    "offset": 830
+                  }
+                }
+              },
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "code",
+                    "lang": null,
+                    "meta": null,
+                    "value": "C&Ouml;DE block.",
+                    "position": {
+                      "start": {
+                        "line": 48,
+                        "column": 3,
+                        "offset": 834
+                      },
+                      "end": {
+                        "line": 48,
+                        "column": 23,
+                        "offset": 854
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 48,
+                    "column": 1,
+                    "offset": 832
+                  },
+                  "end": {
+                    "line": 48,
+                    "column": 23,
+                    "offset": 854
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 49,
+                "column": 1,
+                "offset": 855
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should parse a character reference",
+        "input": "a&amp;b",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a&b",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 8,
+                        "offset": 7
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 8,
+                    "offset": 7
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 8,
+                "offset": 7
+              }
+            }
+          }
         }
       }
     ]

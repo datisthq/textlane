@@ -32,5 +32,90 @@
         }
       }
     ]
+  },
+  {
+    "description": "Inlines (tree)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#inlines"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"]],
+    "tests": [
+      {
+        "description": "example 327",
+        "input": "`hi`lo`\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "inlineCode",
+                    "value": "hi",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 5,
+                        "offset": 4
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": "lo`",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 5,
+                        "offset": 4
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 8,
+                        "offset": 7
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 8,
+                    "offset": 7
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 8
+              }
+            }
+          }
+        }
+      }
+    ]
   }
 ]

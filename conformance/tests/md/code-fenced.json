@@ -230,6 +230,1469 @@
     ]
   },
   {
+    "description": "Fenced code blocks (tree)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#fenced-code-blocks"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"]],
+    "tests": [
+      {
+        "description": "example 119",
+        "input": "```\n<\n >\n```\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "<\n >",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 4,
+                    "offset": 12
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 13
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 120",
+        "input": "~~~\n<\n >\n~~~\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "<\n >",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 4,
+                    "offset": 12
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 13
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 121",
+        "input": "``\nfoo\n``\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "inlineCode",
+                    "value": "foo",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 3,
+                        "offset": 9
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 3,
+                    "offset": 9
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 10
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 122",
+        "input": "```\naaa\n~~~\n```\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "aaa\n~~~",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 4,
+                    "offset": 15
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 16
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 123",
+        "input": "~~~\naaa\n```\n~~~\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "aaa\n```",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 4,
+                    "offset": 15
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 16
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 124",
+        "input": "````\naaa\n```\n``````\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "aaa\n```",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 7,
+                    "offset": 19
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 20
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 125",
+        "input": "~~~~\naaa\n~~~\n~~~~\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "aaa\n~~~",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 5,
+                    "offset": 17
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 18
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 126",
+        "input": "```\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 1,
+                    "offset": 4
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 4
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 127",
+        "input": "`````\n\n```\naaa\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "\n```\naaa",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 1,
+                    "offset": 15
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 15
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 128",
+        "input": "> ```\n> aaa\n\nbbb\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "code",
+                    "lang": null,
+                    "meta": null,
+                    "value": "aaa",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 6,
+                        "offset": 11
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 6,
+                    "offset": 11
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "bbb",
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 1,
+                        "offset": 13
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 4,
+                        "offset": 16
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 4,
+                    "column": 1,
+                    "offset": 13
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 4,
+                    "offset": 16
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 17
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 129",
+        "input": "```\n\n  \n```\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "\n  ",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 4,
+                    "offset": 11
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 12
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 130",
+        "input": "```\n```\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 4,
+                    "offset": 7
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 1,
+                "offset": 8
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 131",
+        "input": " ```\n aaa\naaa\n```\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "aaa\naaa",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 2,
+                    "offset": 1
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 4,
+                    "offset": 17
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 18
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 132",
+        "input": "  ```\naaa\n  aaa\naaa\n  ```\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "aaa\naaa\naaa",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 3,
+                    "offset": 2
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 6,
+                    "offset": 25
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 6,
+                "column": 1,
+                "offset": 26
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 133",
+        "input": "   ```\n   aaa\n    aaa\n  aaa\n   ```\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "aaa\n aaa\naaa",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 4,
+                    "offset": 3
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 7,
+                    "offset": 34
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 6,
+                "column": 1,
+                "offset": 35
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 134",
+        "input": "    ```\n    aaa\n    ```\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "```\naaa\n```",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 8,
+                    "offset": 23
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 24
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 135",
+        "input": "```\naaa\n  ```\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "aaa",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 6,
+                    "offset": 13
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 14
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 136",
+        "input": "   ```\naaa\n  ```\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "aaa",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 4,
+                    "offset": 3
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 6,
+                    "offset": 16
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 17
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 137",
+        "input": "```\naaa\n    ```\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "aaa\n    ```",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 1,
+                    "offset": 16
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 16
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 138",
+        "input": "``` ```\naaa\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "inlineCode",
+                    "value": " ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 8,
+                        "offset": 7
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": "\naaa",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 8,
+                        "offset": 7
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 4,
+                        "offset": 11
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 4,
+                    "offset": 11
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 1,
+                "offset": 12
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 139",
+        "input": "~~~~~~\naaa\n~~~ ~~\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "aaa\n~~~ ~~",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 1,
+                    "offset": 18
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 18
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 140",
+        "input": "foo\n```\nbar\n```\nbaz\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "foo",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 4,
+                        "offset": 3
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 4,
+                    "offset": 3
+                  }
+                }
+              },
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "bar",
+                "position": {
+                  "start": {
+                    "line": 2,
+                    "column": 1,
+                    "offset": 4
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 4,
+                    "offset": 15
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "baz",
+                    "position": {
+                      "start": {
+                        "line": 5,
+                        "column": 1,
+                        "offset": 16
+                      },
+                      "end": {
+                        "line": 5,
+                        "column": 4,
+                        "offset": 19
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 5,
+                    "column": 1,
+                    "offset": 16
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 4,
+                    "offset": 19
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 6,
+                "column": 1,
+                "offset": 20
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 141",
+        "input": "foo\n---\n~~~\nbar\n~~~\n# baz\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "heading",
+                "depth": 2,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "foo",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 4,
+                        "offset": 3
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 4,
+                    "offset": 7
+                  }
+                }
+              },
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "bar",
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 8
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 4,
+                    "offset": 19
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "baz",
+                    "position": {
+                      "start": {
+                        "line": 6,
+                        "column": 3,
+                        "offset": 22
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 6,
+                        "offset": 25
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 6,
+                    "column": 1,
+                    "offset": 20
+                  },
+                  "end": {
+                    "line": 6,
+                    "column": 6,
+                    "offset": 25
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 7,
+                "column": 1,
+                "offset": 26
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 142",
+        "input": "```ruby\ndef foo(x)\n  return 3\nend\n```\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": "ruby",
+                "meta": null,
+                "value": "def foo(x)\n  return 3\nend",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 4,
+                    "offset": 37
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 6,
+                "column": 1,
+                "offset": 38
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 143",
+        "input": "~~~~    ruby startline=3 $%@#$\ndef foo(x)\n  return 3\nend\n~~~~~~~\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": "ruby",
+                "meta": "startline=3 $%@#$",
+                "value": "def foo(x)\n  return 3\nend",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 8,
+                    "offset": 64
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 6,
+                "column": 1,
+                "offset": 65
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 144",
+        "input": "````;\n````\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": ";",
+                "meta": null,
+                "value": "",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 5,
+                    "offset": 10
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 1,
+                "offset": 11
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 145",
+        "input": "``` aa ```\nfoo\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "inlineCode",
+                    "value": "aa",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 11,
+                        "offset": 10
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": "\nfoo",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 11,
+                        "offset": 10
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 4,
+                        "offset": 14
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 4,
+                    "offset": 14
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 1,
+                "offset": 15
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 146",
+        "input": "~~~ aa ``` ~~~\nfoo\n~~~\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": "aa",
+                "meta": "``` ~~~",
+                "value": "foo",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 4,
+                    "offset": 22
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 23
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 147",
+        "input": "```\n``` aaa\n```\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "``` aaa",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 4,
+                    "offset": 15
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 16
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark flow/code-fenced",
     "source": {
       "repository": "https://github.com/micromark/micromark",
@@ -525,6 +1988,241 @@
         "input": "> ```a\n```",
         "expected": {
           "html": "<blockquote>\n<pre><code class=\"language-a\"></code></pre>\n</blockquote>\n<pre><code></code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "from-markdown",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-from-markdown",
+      "commit": "afe9516d97683e51974694f944a799a915a242c0",
+      "path": "test",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"]],
+    "tests": [
+      {
+        "description": "fixture code-fenced",
+        "input": "```\nfenced code\n```\n\n```js\nfenced code with a language\n```\n\n```js line=1\nfenced code with meta\n```\n\n~~~\nfenced code with tildes\n~~~\n\n```not fenced code```\n\n~~~fenced code~~~\nasd\n~~~\n\n```\n\nasd\n```\n\n```\nasd\n\n```\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "fenced code",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 4,
+                    "offset": 19
+                  }
+                }
+              },
+              {
+                "type": "code",
+                "lang": "js",
+                "meta": null,
+                "value": "fenced code with a language",
+                "position": {
+                  "start": {
+                    "line": 5,
+                    "column": 1,
+                    "offset": 21
+                  },
+                  "end": {
+                    "line": 7,
+                    "column": 4,
+                    "offset": 58
+                  }
+                }
+              },
+              {
+                "type": "code",
+                "lang": "js",
+                "meta": "line=1",
+                "value": "fenced code with meta",
+                "position": {
+                  "start": {
+                    "line": 9,
+                    "column": 1,
+                    "offset": 60
+                  },
+                  "end": {
+                    "line": 11,
+                    "column": 4,
+                    "offset": 98
+                  }
+                }
+              },
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "fenced code with tildes",
+                "position": {
+                  "start": {
+                    "line": 13,
+                    "column": 1,
+                    "offset": 100
+                  },
+                  "end": {
+                    "line": 15,
+                    "column": 4,
+                    "offset": 131
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "inlineCode",
+                    "value": "not fenced code",
+                    "position": {
+                      "start": {
+                        "line": 17,
+                        "column": 1,
+                        "offset": 133
+                      },
+                      "end": {
+                        "line": 17,
+                        "column": 22,
+                        "offset": 154
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 17,
+                    "column": 1,
+                    "offset": 133
+                  },
+                  "end": {
+                    "line": 17,
+                    "column": 22,
+                    "offset": 154
+                  }
+                }
+              },
+              {
+                "type": "code",
+                "lang": "fenced",
+                "meta": "code~~~",
+                "value": "asd",
+                "position": {
+                  "start": {
+                    "line": 19,
+                    "column": 1,
+                    "offset": 156
+                  },
+                  "end": {
+                    "line": 21,
+                    "column": 4,
+                    "offset": 181
+                  }
+                }
+              },
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "\nasd",
+                "position": {
+                  "start": {
+                    "line": 23,
+                    "column": 1,
+                    "offset": 183
+                  },
+                  "end": {
+                    "line": 26,
+                    "column": 4,
+                    "offset": 195
+                  }
+                }
+              },
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "asd\n",
+                "position": {
+                  "start": {
+                    "line": 28,
+                    "column": 1,
+                    "offset": 197
+                  },
+                  "end": {
+                    "line": 31,
+                    "column": 4,
+                    "offset": 209
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 32,
+                "column": 1,
+                "offset": 210
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should parse code (fenced)",
+        "input": "```a b\nc\n```",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": "a",
+                "meta": "b",
+                "value": "c",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 4,
+                    "offset": 12
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 4,
+                "offset": 12
+              }
+            }
+          }
         }
       }
     ]

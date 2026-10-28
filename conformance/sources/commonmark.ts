@@ -2,7 +2,11 @@ import { join, resolve } from "node:path"
 import { commonmark } from "commonmark.json"
 import { writeGroups } from "../actions/group/write.ts"
 import { normalizeHtml } from "../actions/html/normalize.ts"
-import { createPipeline, renderMarkdown } from "../actions/markdown/render.ts"
+import {
+  createPipeline,
+  parseMarkdown,
+  renderMarkdown,
+} from "../actions/markdown/render.ts"
 
 const SPEC_VERSION = "0.31.2"
 const SPEC_URL = `https://spec.commonmark.org/${SPEC_VERSION}/`
@@ -41,13 +45,13 @@ const CONSTRUCTS: Record<string, string> = {
 
 writeSections()
 
+// Each section yields an HTML group and a tree group over the same examples
 function writeSections() {
-  for (const [section, tests] of groupBySection()) {
+  for (const [section, examples] of groupBySection()) {
     const construct = CONSTRUCTS[section]
     if (!construct) throw new Error(`no construct file for the spec section ${section}`)
     const slug = section.toLowerCase().replace(/[^a-z0-9]+/g, "-")
-    const group = {
-      description: section,
+    const shared = {
       specification: [`${SPEC_URL}#${slug}`],
       source: {
         repository: REPOSITORY,
@@ -55,37 +59,54 @@ function writeSections() {
         path: "spec.txt",
         license: "CC-BY-SA-4.0",
       },
-      pipeline: createPipeline({ allowDangerousHtml: true }),
-      tests,
     }
-    writeGroups({
-      path: join(OUTPUT, `${construct}.json`),
-      repository: REPOSITORY,
-      groups: [group],
-    })
+    const html = {
+      description: section,
+      ...shared,
+      pipeline: createPipeline({ allowDangerousHtml: true }),
+      tests: examples.map(example => createHtmlTest(example)),
+    }
+    const tree = {
+      description: `${section} (tree)`,
+      ...shared,
+      pipeline: [["md.parse"]],
+      tests: examples.map(example => createTreeTest(example)),
+    }
+    const path = join(OUTPUT, `${construct}.json`)
+    writeGroups({ path, repository: REPOSITORY, groups: [html, tree] })
   }
 }
 
+type Example = { number: number; markdown: string; html: string }
+
 function groupBySection() {
-  const sections = new Map<string, object[]>()
+  const sections = new Map<string, Example[]>()
   commonmark.forEach((example, index) => {
-    const tests = sections.get(example.section) ?? []
-    tests.push(
-      createTest({ number: index + 1, markdown: example.markdown, html: example.html }),
-    )
-    sections.set(example.section, tests)
+    const examples = sections.get(example.section) ?? []
+    examples.push({ number: index + 1, markdown: example.markdown, html: example.html })
+    sections.set(example.section, examples)
   })
   return sections
 }
 
 // The same options mdast-util-from-markdown's own CommonMark test renders with
-function createTest(props: { number: number; markdown: string; html: string }) {
-  const actual = renderMarkdown({ markdown: props.markdown, allowDangerousHtml: true })
-  const differs = normalizeHtml(actual) !== normalizeHtml(props.html)
+function createHtmlTest(example: Example) {
+  const actual = renderMarkdown({ markdown: example.markdown, allowDangerousHtml: true })
+  const differs = normalizeHtml(actual) !== normalizeHtml(example.html)
   return {
-    description: `example ${props.number}`,
-    ...(differs ? { comment: `CommonMark ${SPEC_VERSION} expects: ${props.html}` } : {}),
-    input: props.markdown,
+    description: `example ${example.number}`,
+    ...(differs
+      ? { comment: `CommonMark ${SPEC_VERSION} expects: ${example.html}` }
+      : {}),
+    input: example.markdown,
     expected: { html: actual },
+  }
+}
+
+function createTreeTest(example: Example) {
+  return {
+    description: `example ${example.number}`,
+    input: example.markdown,
+    expected: { tree: parseMarkdown(example.markdown) },
   }
 }

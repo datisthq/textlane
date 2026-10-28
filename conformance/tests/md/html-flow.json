@@ -335,6 +335,2883 @@
     ]
   },
   {
+    "description": "HTML blocks (tree)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#html-blocks"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"]],
+    "tests": [
+      {
+        "description": "example 148",
+        "input": "<table><tr><td>\n<pre>\n**Hello**,\n\n_world_.\n</pre>\n</td></tr></table>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<table><tr><td>\n<pre>\n**Hello**,",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 11,
+                    "offset": 32
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "emphasis",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "world",
+                        "position": {
+                          "start": {
+                            "line": 5,
+                            "column": 2,
+                            "offset": 35
+                          },
+                          "end": {
+                            "line": 5,
+                            "column": 7,
+                            "offset": 40
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 5,
+                        "column": 1,
+                        "offset": 34
+                      },
+                      "end": {
+                        "line": 5,
+                        "column": 8,
+                        "offset": 41
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": ".\n",
+                    "position": {
+                      "start": {
+                        "line": 5,
+                        "column": 8,
+                        "offset": 41
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 1,
+                        "offset": 43
+                      }
+                    }
+                  },
+                  {
+                    "type": "html",
+                    "value": "</pre>",
+                    "position": {
+                      "start": {
+                        "line": 6,
+                        "column": 1,
+                        "offset": 43
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 7,
+                        "offset": 49
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 5,
+                    "column": 1,
+                    "offset": 34
+                  },
+                  "end": {
+                    "line": 6,
+                    "column": 7,
+                    "offset": 49
+                  }
+                }
+              },
+              {
+                "type": "html",
+                "value": "</td></tr></table>",
+                "position": {
+                  "start": {
+                    "line": 7,
+                    "column": 1,
+                    "offset": 50
+                  },
+                  "end": {
+                    "line": 7,
+                    "column": 19,
+                    "offset": 68
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 8,
+                "column": 1,
+                "offset": 69
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 149",
+        "input": "<table>\n  <tr>\n    <td>\n           hi\n    </td>\n  </tr>\n</table>\n\nokay.\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<table>\n  <tr>\n    <td>\n           hi\n    </td>\n  </tr>\n</table>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 7,
+                    "column": 9,
+                    "offset": 64
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "okay.",
+                    "position": {
+                      "start": {
+                        "line": 9,
+                        "column": 1,
+                        "offset": 66
+                      },
+                      "end": {
+                        "line": 9,
+                        "column": 6,
+                        "offset": 71
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 9,
+                    "column": 1,
+                    "offset": 66
+                  },
+                  "end": {
+                    "line": 9,
+                    "column": 6,
+                    "offset": 71
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 10,
+                "column": 1,
+                "offset": 72
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 150",
+        "input": " <div>\n  *hello*\n         <foo><a>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": " <div>\n  *hello*\n         <foo><a>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 18,
+                    "offset": 34
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 35
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 151",
+        "input": "</div>\n*foo*\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "</div>\n*foo*",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 6,
+                    "offset": 12
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 1,
+                "offset": 13
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 152",
+        "input": "<DIV CLASS=\"foo\">\n\n*Markdown*\n\n</DIV>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<DIV CLASS=\"foo\">",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 18,
+                    "offset": 17
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "emphasis",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Markdown",
+                        "position": {
+                          "start": {
+                            "line": 3,
+                            "column": 2,
+                            "offset": 20
+                          },
+                          "end": {
+                            "line": 3,
+                            "column": 10,
+                            "offset": 28
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 1,
+                        "offset": 19
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 11,
+                        "offset": 29
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 19
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 11,
+                    "offset": 29
+                  }
+                }
+              },
+              {
+                "type": "html",
+                "value": "</DIV>",
+                "position": {
+                  "start": {
+                    "line": 5,
+                    "column": 1,
+                    "offset": 31
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 7,
+                    "offset": 37
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 6,
+                "column": 1,
+                "offset": 38
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 153",
+        "input": "<div id=\"foo\"\n  class=\"bar\">\n</div>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<div id=\"foo\"\n  class=\"bar\">\n</div>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 7,
+                    "offset": 35
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 36
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 154",
+        "input": "<div id=\"foo\" class=\"bar\n  baz\">\n</div>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<div id=\"foo\" class=\"bar\n  baz\">\n</div>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 7,
+                    "offset": 39
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 40
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 155",
+        "input": "<div>\n*foo*\n\n*bar*\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<div>\n*foo*",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 6,
+                    "offset": 11
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "emphasis",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "bar",
+                        "position": {
+                          "start": {
+                            "line": 4,
+                            "column": 2,
+                            "offset": 14
+                          },
+                          "end": {
+                            "line": 4,
+                            "column": 5,
+                            "offset": 17
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 1,
+                        "offset": 13
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 6,
+                        "offset": 18
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 4,
+                    "column": 1,
+                    "offset": 13
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 6,
+                    "offset": 18
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 19
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 156",
+        "input": "<div id=\"foo\"\n*hi*\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<div id=\"foo\"\n*hi*",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 5,
+                    "offset": 18
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 1,
+                "offset": 19
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 157",
+        "input": "<div class\nfoo\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<div class\nfoo",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 4,
+                    "offset": 14
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 1,
+                "offset": 15
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 158",
+        "input": "<div *???-&&&-<---\n*foo*\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<div *???-&&&-<---\n*foo*",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 6,
+                    "offset": 24
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 1,
+                "offset": 25
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 159",
+        "input": "<div><a href=\"bar\">*foo*</a></div>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<div><a href=\"bar\">*foo*</a></div>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 35,
+                    "offset": 34
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 35
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 160",
+        "input": "<table><tr><td>\nfoo\n</td></tr></table>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<table><tr><td>\nfoo\n</td></tr></table>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 19,
+                    "offset": 38
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 39
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 161",
+        "input": "<div></div>\n``` c\nint x = 33;\n```\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<div></div>\n``` c\nint x = 33;\n```",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 4,
+                    "offset": 33
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 34
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 162",
+        "input": "<a href=\"foo\">\n*bar*\n</a>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<a href=\"foo\">\n*bar*\n</a>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 5,
+                    "offset": 25
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 26
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 163",
+        "input": "<Warning>\n*bar*\n</Warning>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<Warning>\n*bar*\n</Warning>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 11,
+                    "offset": 26
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 27
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 164",
+        "input": "<i class=\"foo\">\n*bar*\n</i>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<i class=\"foo\">\n*bar*\n</i>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 5,
+                    "offset": 26
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 27
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 165",
+        "input": "</ins>\n*bar*\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "</ins>\n*bar*",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 6,
+                    "offset": 12
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 1,
+                "offset": 13
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 166",
+        "input": "<del>\n*foo*\n</del>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<del>\n*foo*\n</del>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 7,
+                    "offset": 18
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 19
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 167",
+        "input": "<del>\n\n*foo*\n\n</del>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<del>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 6,
+                    "offset": 5
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "emphasis",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "foo",
+                        "position": {
+                          "start": {
+                            "line": 3,
+                            "column": 2,
+                            "offset": 8
+                          },
+                          "end": {
+                            "line": 3,
+                            "column": 5,
+                            "offset": 11
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 1,
+                        "offset": 7
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 6,
+                        "offset": 12
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 7
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 6,
+                    "offset": 12
+                  }
+                }
+              },
+              {
+                "type": "html",
+                "value": "</del>",
+                "position": {
+                  "start": {
+                    "line": 5,
+                    "column": 1,
+                    "offset": 14
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 7,
+                    "offset": 20
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 6,
+                "column": 1,
+                "offset": 21
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 168",
+        "input": "<del>*foo*</del>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "html",
+                    "value": "<del>",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 6,
+                        "offset": 5
+                      }
+                    }
+                  },
+                  {
+                    "type": "emphasis",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "foo",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 7,
+                            "offset": 6
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 10,
+                            "offset": 9
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 6,
+                        "offset": 5
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 11,
+                        "offset": 10
+                      }
+                    }
+                  },
+                  {
+                    "type": "html",
+                    "value": "</del>",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 11,
+                        "offset": 10
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 17,
+                        "offset": 16
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 17,
+                    "offset": 16
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 17
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 169",
+        "input": "<pre language=\"haskell\"><code>\nimport Text.HTML.TagSoup\n\nmain :: IO ()\nmain = print $ parseTags tags\n</code></pre>\nokay\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<pre language=\"haskell\"><code>\nimport Text.HTML.TagSoup\n\nmain :: IO ()\nmain = print $ parseTags tags\n</code></pre>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 6,
+                    "column": 14,
+                    "offset": 114
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "okay",
+                    "position": {
+                      "start": {
+                        "line": 7,
+                        "column": 1,
+                        "offset": 115
+                      },
+                      "end": {
+                        "line": 7,
+                        "column": 5,
+                        "offset": 119
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 7,
+                    "column": 1,
+                    "offset": 115
+                  },
+                  "end": {
+                    "line": 7,
+                    "column": 5,
+                    "offset": 119
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 8,
+                "column": 1,
+                "offset": 120
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 170",
+        "input": "<script type=\"text/javascript\">\n// JavaScript example\n\ndocument.getElementById(\"demo\").innerHTML = \"Hello JavaScript!\";\n</script>\nokay\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<script type=\"text/javascript\">\n// JavaScript example\n\ndocument.getElementById(\"demo\").innerHTML = \"Hello JavaScript!\";\n</script>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 10,
+                    "offset": 129
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "okay",
+                    "position": {
+                      "start": {
+                        "line": 6,
+                        "column": 1,
+                        "offset": 130
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 5,
+                        "offset": 134
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 6,
+                    "column": 1,
+                    "offset": 130
+                  },
+                  "end": {
+                    "line": 6,
+                    "column": 5,
+                    "offset": 134
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 7,
+                "column": 1,
+                "offset": 135
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 171",
+        "input": "<textarea>\n\n*foo*\n\n_bar_\n\n</textarea>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<textarea>\n\n*foo*\n\n_bar_\n\n</textarea>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 7,
+                    "column": 12,
+                    "offset": 37
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 8,
+                "column": 1,
+                "offset": 38
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 172",
+        "input": "<style\n  type=\"text/css\">\nh1 {color:red;}\n\np {color:blue;}\n</style>\nokay\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<style\n  type=\"text/css\">\nh1 {color:red;}\n\np {color:blue;}\n</style>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 6,
+                    "column": 9,
+                    "offset": 67
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "okay",
+                    "position": {
+                      "start": {
+                        "line": 7,
+                        "column": 1,
+                        "offset": 68
+                      },
+                      "end": {
+                        "line": 7,
+                        "column": 5,
+                        "offset": 72
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 7,
+                    "column": 1,
+                    "offset": 68
+                  },
+                  "end": {
+                    "line": 7,
+                    "column": 5,
+                    "offset": 72
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 8,
+                "column": 1,
+                "offset": 73
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 173",
+        "input": "<style\n  type=\"text/css\">\n\nfoo\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<style\n  type=\"text/css\">\n\nfoo\n",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 1,
+                    "offset": 31
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 31
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 174",
+        "input": "> <div>\n> foo\n\nbar\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "html",
+                    "value": "<div>\nfoo",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 6,
+                        "offset": 13
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 6,
+                    "offset": 13
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "bar",
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 1,
+                        "offset": 15
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 4,
+                        "offset": 18
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 4,
+                    "column": 1,
+                    "offset": 15
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 4,
+                    "offset": 18
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 19
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 175",
+        "input": "- <div>\n- foo\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "list",
+                "ordered": false,
+                "start": null,
+                "spread": false,
+                "children": [
+                  {
+                    "type": "listItem",
+                    "spread": false,
+                    "checked": null,
+                    "children": [
+                      {
+                        "type": "html",
+                        "value": "<div>",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 3,
+                            "offset": 2
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 8,
+                            "offset": 7
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 8,
+                        "offset": 7
+                      }
+                    }
+                  },
+                  {
+                    "type": "listItem",
+                    "spread": false,
+                    "checked": null,
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "foo",
+                            "position": {
+                              "start": {
+                                "line": 2,
+                                "column": 3,
+                                "offset": 10
+                              },
+                              "end": {
+                                "line": 2,
+                                "column": 6,
+                                "offset": 13
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 3,
+                            "offset": 10
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 6,
+                            "offset": 13
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 1,
+                        "offset": 8
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 6,
+                        "offset": 13
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 6,
+                    "offset": 13
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 1,
+                "offset": 14
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 176",
+        "input": "<style>p{color:red;}</style>\n*foo*\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<style>p{color:red;}</style>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 29,
+                    "offset": 28
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "emphasis",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "foo",
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 2,
+                            "offset": 30
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 5,
+                            "offset": 33
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 1,
+                        "offset": 29
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 6,
+                        "offset": 34
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 2,
+                    "column": 1,
+                    "offset": 29
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 6,
+                    "offset": 34
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 1,
+                "offset": 35
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 177",
+        "input": "<!-- foo -->*bar*\n*baz*\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<!-- foo -->*bar*",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 18,
+                    "offset": 17
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "emphasis",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "baz",
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 2,
+                            "offset": 19
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 5,
+                            "offset": 22
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 1,
+                        "offset": 18
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 6,
+                        "offset": 23
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 2,
+                    "column": 1,
+                    "offset": 18
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 6,
+                    "offset": 23
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 1,
+                "offset": 24
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 178",
+        "input": "<script>\nfoo\n</script>1. *bar*\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<script>\nfoo\n</script>1. *bar*",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 18,
+                    "offset": 30
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 31
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 179",
+        "input": "<!-- Foo\n\nbar\n   baz -->\nokay\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<!-- Foo\n\nbar\n   baz -->",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 11,
+                    "offset": 24
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "okay",
+                    "position": {
+                      "start": {
+                        "line": 5,
+                        "column": 1,
+                        "offset": 25
+                      },
+                      "end": {
+                        "line": 5,
+                        "column": 5,
+                        "offset": 29
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 5,
+                    "column": 1,
+                    "offset": 25
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 5,
+                    "offset": 29
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 6,
+                "column": 1,
+                "offset": 30
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 180",
+        "input": "<?php\n\n  echo '>';\n\n?>\nokay\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<?php\n\n  echo '>';\n\n?>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 3,
+                    "offset": 22
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "okay",
+                    "position": {
+                      "start": {
+                        "line": 6,
+                        "column": 1,
+                        "offset": 23
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 5,
+                        "offset": 27
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 6,
+                    "column": 1,
+                    "offset": 23
+                  },
+                  "end": {
+                    "line": 6,
+                    "column": 5,
+                    "offset": 27
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 7,
+                "column": 1,
+                "offset": 28
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 181",
+        "input": "<!DOCTYPE html>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<!DOCTYPE html>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 16,
+                    "offset": 15
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 16
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 182",
+        "input": "<![CDATA[\nfunction matchwo(a,b)\n{\n  if (a < b && a < 0) then {\n    return 1;\n\n  } else {\n\n    return 0;\n  }\n}\n]]>\nokay\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<![CDATA[\nfunction matchwo(a,b)\n{\n  if (a < b && a < 0) then {\n    return 1;\n\n  } else {\n\n    return 0;\n  }\n}\n]]>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 12,
+                    "column": 4,
+                    "offset": 113
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "okay",
+                    "position": {
+                      "start": {
+                        "line": 13,
+                        "column": 1,
+                        "offset": 114
+                      },
+                      "end": {
+                        "line": 13,
+                        "column": 5,
+                        "offset": 118
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 13,
+                    "column": 1,
+                    "offset": 114
+                  },
+                  "end": {
+                    "line": 13,
+                    "column": 5,
+                    "offset": 118
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 14,
+                "column": 1,
+                "offset": 119
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 183",
+        "input": "  <!-- foo -->\n\n    <!-- foo -->\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "  <!-- foo -->",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 15,
+                    "offset": 14
+                  }
+                }
+              },
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "<!-- foo -->",
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 16
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 17,
+                    "offset": 32
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 33
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 184",
+        "input": "  <div>\n\n    <div>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "  <div>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 8,
+                    "offset": 7
+                  }
+                }
+              },
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "<div>",
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 9
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 10,
+                    "offset": 18
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 19
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 185",
+        "input": "Foo\n<div>\nbar\n</div>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Foo",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 4,
+                        "offset": 3
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 4,
+                    "offset": 3
+                  }
+                }
+              },
+              {
+                "type": "html",
+                "value": "<div>\nbar\n</div>",
+                "position": {
+                  "start": {
+                    "line": 2,
+                    "column": 1,
+                    "offset": 4
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 7,
+                    "offset": 20
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 21
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 186",
+        "input": "<div>\nbar\n</div>\n*foo*\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<div>\nbar\n</div>\n*foo*",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 6,
+                    "offset": 22
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 23
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 187",
+        "input": "Foo\n<a href=\"bar\">\nbaz\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Foo\n",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 1,
+                        "offset": 4
+                      }
+                    }
+                  },
+                  {
+                    "type": "html",
+                    "value": "<a href=\"bar\">",
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 1,
+                        "offset": 4
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 15,
+                        "offset": 18
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": "\nbaz",
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 15,
+                        "offset": 18
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 4,
+                        "offset": 22
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 4,
+                    "offset": 22
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 23
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 188",
+        "input": "<div>\n\n*Emphasized* text.\n\n</div>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<div>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 6,
+                    "offset": 5
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "emphasis",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Emphasized",
+                        "position": {
+                          "start": {
+                            "line": 3,
+                            "column": 2,
+                            "offset": 8
+                          },
+                          "end": {
+                            "line": 3,
+                            "column": 12,
+                            "offset": 18
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 1,
+                        "offset": 7
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 13,
+                        "offset": 19
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " text.",
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 13,
+                        "offset": 19
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 19,
+                        "offset": 25
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 7
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 19,
+                    "offset": 25
+                  }
+                }
+              },
+              {
+                "type": "html",
+                "value": "</div>",
+                "position": {
+                  "start": {
+                    "line": 5,
+                    "column": 1,
+                    "offset": 27
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 7,
+                    "offset": 33
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 6,
+                "column": 1,
+                "offset": 34
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 189",
+        "input": "<div>\n*Emphasized* text.\n</div>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<div>\n*Emphasized* text.\n</div>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 7,
+                    "offset": 31
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 32
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 190",
+        "input": "<table>\n\n<tr>\n\n<td>\nHi\n</td>\n\n</tr>\n\n</table>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<table>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 8,
+                    "offset": 7
+                  }
+                }
+              },
+              {
+                "type": "html",
+                "value": "<tr>",
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 9
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 5,
+                    "offset": 13
+                  }
+                }
+              },
+              {
+                "type": "html",
+                "value": "<td>\nHi\n</td>",
+                "position": {
+                  "start": {
+                    "line": 5,
+                    "column": 1,
+                    "offset": 15
+                  },
+                  "end": {
+                    "line": 7,
+                    "column": 6,
+                    "offset": 28
+                  }
+                }
+              },
+              {
+                "type": "html",
+                "value": "</tr>",
+                "position": {
+                  "start": {
+                    "line": 9,
+                    "column": 1,
+                    "offset": 30
+                  },
+                  "end": {
+                    "line": 9,
+                    "column": 6,
+                    "offset": 35
+                  }
+                }
+              },
+              {
+                "type": "html",
+                "value": "</table>",
+                "position": {
+                  "start": {
+                    "line": 11,
+                    "column": 1,
+                    "offset": 37
+                  },
+                  "end": {
+                    "line": 11,
+                    "column": 9,
+                    "offset": 45
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 12,
+                "column": 1,
+                "offset": 46
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 191",
+        "input": "<table>\n\n  <tr>\n\n    <td>\n      Hi\n    </td>\n\n  </tr>\n\n</table>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<table>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 8,
+                    "offset": 7
+                  }
+                }
+              },
+              {
+                "type": "html",
+                "value": "  <tr>",
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 9
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 7,
+                    "offset": 15
+                  }
+                }
+              },
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "<td>\n  Hi\n</td>",
+                "position": {
+                  "start": {
+                    "line": 5,
+                    "column": 1,
+                    "offset": 17
+                  },
+                  "end": {
+                    "line": 7,
+                    "column": 10,
+                    "offset": 44
+                  }
+                }
+              },
+              {
+                "type": "html",
+                "value": "  </tr>",
+                "position": {
+                  "start": {
+                    "line": 9,
+                    "column": 1,
+                    "offset": 46
+                  },
+                  "end": {
+                    "line": 9,
+                    "column": 8,
+                    "offset": 53
+                  }
+                }
+              },
+              {
+                "type": "html",
+                "value": "</table>",
+                "position": {
+                  "start": {
+                    "line": 11,
+                    "column": 1,
+                    "offset": 55
+                  },
+                  "end": {
+                    "line": 11,
+                    "column": 9,
+                    "offset": 63
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 12,
+                "column": 1,
+                "offset": 64
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark flow/html with dangerous HTML allowed",
     "source": {
       "repository": "https://github.com/micromark/micromark",
@@ -1350,6 +4227,192 @@
         "input": "> a\n<a>",
         "expected": {
           "html": "<blockquote>\n<p>a</p>\n</blockquote>\n<a>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "from-markdown",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-from-markdown",
+      "commit": "afe9516d97683e51974694f944a799a915a242c0",
+      "path": "test",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"]],
+    "tests": [
+      {
+        "description": "fixture html-flow",
+        "input": "<script>\na\n</script>\n\n<!--b-->\n\n<?c?>\n\n<!d>\n\n<![CDATA[e]]>\n\n<div\nf\n\n<g>\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<script>\na\n</script>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 10,
+                    "offset": 20
+                  }
+                }
+              },
+              {
+                "type": "html",
+                "value": "<!--b-->",
+                "position": {
+                  "start": {
+                    "line": 5,
+                    "column": 1,
+                    "offset": 22
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 9,
+                    "offset": 30
+                  }
+                }
+              },
+              {
+                "type": "html",
+                "value": "<?c?>",
+                "position": {
+                  "start": {
+                    "line": 7,
+                    "column": 1,
+                    "offset": 32
+                  },
+                  "end": {
+                    "line": 7,
+                    "column": 6,
+                    "offset": 37
+                  }
+                }
+              },
+              {
+                "type": "html",
+                "value": "<!d>",
+                "position": {
+                  "start": {
+                    "line": 9,
+                    "column": 1,
+                    "offset": 39
+                  },
+                  "end": {
+                    "line": 9,
+                    "column": 5,
+                    "offset": 43
+                  }
+                }
+              },
+              {
+                "type": "html",
+                "value": "<![CDATA[e]]>",
+                "position": {
+                  "start": {
+                    "line": 11,
+                    "column": 1,
+                    "offset": 45
+                  },
+                  "end": {
+                    "line": 11,
+                    "column": 14,
+                    "offset": 58
+                  }
+                }
+              },
+              {
+                "type": "html",
+                "value": "<div\nf",
+                "position": {
+                  "start": {
+                    "line": 13,
+                    "column": 1,
+                    "offset": 60
+                  },
+                  "end": {
+                    "line": 14,
+                    "column": 2,
+                    "offset": 66
+                  }
+                }
+              },
+              {
+                "type": "html",
+                "value": "<g>",
+                "position": {
+                  "start": {
+                    "line": 16,
+                    "column": 1,
+                    "offset": 68
+                  },
+                  "end": {
+                    "line": 16,
+                    "column": 4,
+                    "offset": 71
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 17,
+                "column": 1,
+                "offset": 72
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should parse html (flow)",
+        "input": "<a>\nb\n</a>",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "html",
+                "value": "<a>\nb\n</a>",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 5,
+                    "offset": 10
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 5,
+                "offset": 10
+              }
+            }
+          }
         }
       }
     ]

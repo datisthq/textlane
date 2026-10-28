@@ -1,0 +1,36 @@
+[
+  {
+    "description": "from-markdown",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-from-markdown",
+      "commit": "afe9516d97683e51974694f944a799a915a242c0",
+      "path": "test",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"]],
+    "tests": [
+      {
+        "description": "fixture empty",
+        "input": "",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+]

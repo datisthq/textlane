@@ -104,6 +104,896 @@
     ]
   },
   {
+    "description": "Tabs (tree)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#tabs"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"]],
+    "tests": [
+      {
+        "description": "example 1",
+        "input": "\tfoo\tbaz\t\tbim\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "foo\tbaz\t\tbim",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 14,
+                    "offset": 13
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 14
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 2",
+        "input": "  \tfoo\tbaz\t\tbim\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "foo\tbaz\t\tbim",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 16,
+                    "offset": 15
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 16
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 3",
+        "input": "    a\ta\n    ὐ\ta\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "a\ta\nὐ\ta",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 8,
+                    "offset": 15
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 1,
+                "offset": 16
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 4",
+        "input": "  - foo\n\n\tbar\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "list",
+                "ordered": false,
+                "start": null,
+                "spread": false,
+                "children": [
+                  {
+                    "type": "listItem",
+                    "spread": true,
+                    "checked": null,
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "foo",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 5,
+                                "offset": 4
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 8,
+                                "offset": 7
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 5,
+                            "offset": 4
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 8,
+                            "offset": 7
+                          }
+                        }
+                      },
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "bar",
+                            "position": {
+                              "start": {
+                                "line": 3,
+                                "column": 2,
+                                "offset": 10
+                              },
+                              "end": {
+                                "line": 3,
+                                "column": 5,
+                                "offset": 13
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 3,
+                            "column": 2,
+                            "offset": 10
+                          },
+                          "end": {
+                            "line": 3,
+                            "column": 5,
+                            "offset": 13
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 5,
+                        "offset": 13
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 3,
+                    "offset": 2
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 5,
+                    "offset": 13
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 14
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 5",
+        "input": "- foo\n\n\t\tbar\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "list",
+                "ordered": false,
+                "start": null,
+                "spread": false,
+                "children": [
+                  {
+                    "type": "listItem",
+                    "spread": true,
+                    "checked": null,
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "foo",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 3,
+                                "offset": 2
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 6,
+                                "offset": 5
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 3,
+                            "offset": 2
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 6,
+                            "offset": 5
+                          }
+                        }
+                      },
+                      {
+                        "type": "code",
+                        "lang": null,
+                        "meta": null,
+                        "value": "  bar",
+                        "position": {
+                          "start": {
+                            "line": 3,
+                            "column": 2,
+                            "offset": 8
+                          },
+                          "end": {
+                            "line": 3,
+                            "column": 6,
+                            "offset": 12
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 6,
+                        "offset": 12
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 6,
+                    "offset": 12
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 13
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 6",
+        "input": ">\t\tfoo\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "code",
+                    "lang": null,
+                    "meta": null,
+                    "value": "  foo",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 7,
+                        "offset": 6
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 7,
+                    "offset": 6
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 7
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 7",
+        "input": "-\t\tfoo\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "list",
+                "ordered": false,
+                "start": null,
+                "spread": false,
+                "children": [
+                  {
+                    "type": "listItem",
+                    "spread": false,
+                    "checked": null,
+                    "children": [
+                      {
+                        "type": "code",
+                        "lang": null,
+                        "meta": null,
+                        "value": "  foo",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 3,
+                            "offset": 2
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 7,
+                            "offset": 6
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 7,
+                        "offset": 6
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 7,
+                    "offset": 6
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 7
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 8",
+        "input": "    foo\n\tbar\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "foo\nbar",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 5,
+                    "offset": 12
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 1,
+                "offset": 13
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 9",
+        "input": " - foo\n   - bar\n\t - baz\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "list",
+                "ordered": false,
+                "start": null,
+                "spread": false,
+                "children": [
+                  {
+                    "type": "listItem",
+                    "spread": false,
+                    "checked": null,
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "foo",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 4,
+                                "offset": 3
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 7,
+                                "offset": 6
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 4,
+                            "offset": 3
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 7,
+                            "offset": 6
+                          }
+                        }
+                      },
+                      {
+                        "type": "list",
+                        "ordered": false,
+                        "start": null,
+                        "spread": false,
+                        "children": [
+                          {
+                            "type": "listItem",
+                            "spread": false,
+                            "checked": null,
+                            "children": [
+                              {
+                                "type": "paragraph",
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "value": "bar",
+                                    "position": {
+                                      "start": {
+                                        "line": 2,
+                                        "column": 6,
+                                        "offset": 12
+                                      },
+                                      "end": {
+                                        "line": 2,
+                                        "column": 9,
+                                        "offset": 15
+                                      }
+                                    }
+                                  }
+                                ],
+                                "position": {
+                                  "start": {
+                                    "line": 2,
+                                    "column": 6,
+                                    "offset": 12
+                                  },
+                                  "end": {
+                                    "line": 2,
+                                    "column": 9,
+                                    "offset": 15
+                                  }
+                                }
+                              },
+                              {
+                                "type": "list",
+                                "ordered": false,
+                                "start": null,
+                                "spread": false,
+                                "children": [
+                                  {
+                                    "type": "listItem",
+                                    "spread": false,
+                                    "checked": null,
+                                    "children": [
+                                      {
+                                        "type": "paragraph",
+                                        "children": [
+                                          {
+                                            "type": "text",
+                                            "value": "baz",
+                                            "position": {
+                                              "start": {
+                                                "line": 3,
+                                                "column": 5,
+                                                "offset": 20
+                                              },
+                                              "end": {
+                                                "line": 3,
+                                                "column": 8,
+                                                "offset": 23
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "position": {
+                                          "start": {
+                                            "line": 3,
+                                            "column": 5,
+                                            "offset": 20
+                                          },
+                                          "end": {
+                                            "line": 3,
+                                            "column": 8,
+                                            "offset": 23
+                                          }
+                                        }
+                                      }
+                                    ],
+                                    "position": {
+                                      "start": {
+                                        "line": 3,
+                                        "column": 3,
+                                        "offset": 18
+                                      },
+                                      "end": {
+                                        "line": 3,
+                                        "column": 8,
+                                        "offset": 23
+                                      }
+                                    }
+                                  }
+                                ],
+                                "position": {
+                                  "start": {
+                                    "line": 3,
+                                    "column": 3,
+                                    "offset": 18
+                                  },
+                                  "end": {
+                                    "line": 3,
+                                    "column": 8,
+                                    "offset": 23
+                                  }
+                                }
+                              }
+                            ],
+                            "position": {
+                              "start": {
+                                "line": 2,
+                                "column": 4,
+                                "offset": 10
+                              },
+                              "end": {
+                                "line": 3,
+                                "column": 8,
+                                "offset": 23
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 4,
+                            "offset": 10
+                          },
+                          "end": {
+                            "line": 3,
+                            "column": 8,
+                            "offset": 23
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 2,
+                        "offset": 1
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 8,
+                        "offset": 23
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 2,
+                    "offset": 1
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 8,
+                    "offset": 23
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 24
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 10",
+        "input": "#\tFoo\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Foo",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 6,
+                        "offset": 5
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 6,
+                    "offset": 5
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 6
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "example 11",
+        "input": "*\t*\t*\t\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "thematicBreak",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 7,
+                    "offset": 6
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 1,
+                "offset": 7
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark misc/tab",
     "source": {
       "repository": "https://github.com/micromark/micromark",

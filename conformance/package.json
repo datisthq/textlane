@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "import:commonmark": "node sources/commonmark.ts && vp fmt tests",
+    "import:from-markdown": "node sources/from-markdown.ts && vp fmt tests",
     "import:micromark": "node sources/micromark.ts && vp fmt tests"
   },
   "devDependencies": {

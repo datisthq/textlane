@@ -70,10 +70,11 @@ every `pending.json` entry against the files and groups that exist.
 `pnpm -C conformance import:<source>` rewrites that source's files from a pinned upstream
 release; importers are run deliberately and their output committed, never run in CI.
 
-| source       | reads                  | expectations                                                                             |
-| ------------ | ---------------------- | ---------------------------------------------------------------------------------------- |
-| `commonmark` | the 26 spec sections   | the spec's 652 examples rendered by unified, pinned                                      |
-| `micromark`  | `test/io` at `6577c20` | 1,089 cases rendered by unified; micromark's own HTML kept in `comment` where it differs |
+| source          | reads                                   | expectations                                                                               |
+| --------------- | --------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `commonmark`    | the 26 spec sections                    | the spec's 652 examples, each as an HTML case and a tree case, rendered by unified, pinned |
+| `micromark`     | `test/io` at `6577c20`                  | 1,089 cases rendered by unified; micromark's own HTML kept in `comment` where it differs   |
+| `from-markdown` | `mdast-util-from-markdown` at `afe9516` | 55 fixture and inline inputs as tree cases, positions included                             |
 
 A file holds one construct (`md/heading-atx`), named as micromark names its test files, with a
 group per source: the spec section, then each upstream test file. An importer replaces only its

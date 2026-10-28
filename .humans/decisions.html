@@ -15,7 +15,7 @@
 
 <htmlpress-grid cols="3">
   <htmlpress-card>
-    <h3>20 decided</h3>
+    <h3>21 decided</h3>
     <p>
       <htmlpress-badge type="success">decided</htmlpress-badge> settled by the maintainer
     </p>
@@ -271,6 +271,21 @@
     <p>
       <strong>Rejected.</strong> One file per upstream source and section
       (<code>md/commonmark-atx-headings</code>).
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Every CommonMark example is
+    also a tree case: <code>md.parse</code> to the mdast unified produces, positions
+    included
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Pins mdast shapes and UTF-16 positions for every spec
+      construct, not only the HTML they render to.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Tree cases from from-markdown alone; trees for every
+      micromark input too.
     </p>
   </dd>
   <dt>

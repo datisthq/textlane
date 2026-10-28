@@ -22,3 +22,8 @@ export function renderMarkdown(props: { markdown: string; allowDangerousHtml: bo
     .use(rehypeStringify, options)
   return String(processor.processSync(props.markdown))
 }
+
+/** Parse Markdown to mdast, with positions, through the pinned remark-parse. */
+export function parseMarkdown(markdown: string): object {
+  return JSON.parse(JSON.stringify(unified().use(remarkParse).parse(markdown)))
+}

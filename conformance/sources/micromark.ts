@@ -5,6 +5,8 @@ import type { AnyNode } from "acorn"
 import { ancestor } from "acorn-walk"
 import { commonmark } from "commonmark.json"
 import { writeGroups } from "../actions/group/write.ts"
+import { evaluateNode, isObject } from "../actions/node/evaluate.ts"
+import { findTestTitle } from "../actions/test/find.ts"
 import { normalizeHtml } from "../actions/html/normalize.ts"
 import { createPipeline, renderMarkdown } from "../actions/markdown/render.ts"
 import { fetchSource } from "../actions/source/fetch.ts"
@@ -150,9 +152,9 @@ function extractCases(name: string, source: string) {
       const [call, expected] = node.arguments
       if (call?.type !== "CallExpression" || call.callee.type !== "Identifier") return
       if (call.callee.name !== "micromark") return
-      const markdown = evaluate(call.arguments[0], constants)
-      const options = call.arguments[1] ? evaluate(call.arguments[1], constants) : {}
-      const html = evaluate(expected, constants)
+      const markdown = evaluateNode(call.arguments[0], constants)
+      const options = call.arguments[1] ? evaluateNode(call.arguments[1], constants) : {}
+      const html = evaluateNode(expected, constants)
       if (
         typeof markdown !== "string" ||
         typeof html !== "string" ||
@@ -171,19 +173,6 @@ function extractCases(name: string, source: string) {
   return cases
 }
 
-function findTestTitle(ancestors: AnyNode[], constants: Map<string, AnyNode>) {
-  for (const node of [...ancestors].reverse()) {
-    if (node.type !== "CallExpression" || node.callee.type !== "MemberExpression")
-      continue
-    const property = node.callee.property
-    if (property.type === "Identifier" && property.name === "test") {
-      const title = evaluate(node.arguments[0], constants)
-      if (typeof title === "string") return title
-    }
-  }
-  return undefined
-}
-
 function isAssertEqual(callee: AnyNode) {
   if (callee.type !== "MemberExpression") return false
   const { object, property } = callee
@@ -193,59 +182,6 @@ function isAssertEqual(callee: AnyNode) {
     property.type === "Identifier" &&
     (property.name === "equal" || property.name === "strictEqual")
   )
-}
-
-// Literals, template strings without expressions, `+` of strings, objects, arrays and constants
-function evaluate(
-  node: AnyNode | null | undefined,
-  constants: Map<string, AnyNode>,
-  depth = 0,
-): unknown {
-  if (!node || depth > 20) return undefined
-  switch (node.type) {
-    case "Literal":
-      return node.value
-    case "TemplateLiteral":
-      return node.expressions.length === 0 ? node.quasis[0]?.value.cooked : undefined
-    case "BinaryExpression": {
-      const left = evaluate(node.left, constants, depth + 1)
-      const right = evaluate(node.right, constants, depth + 1)
-      if (
-        node.operator !== "+" ||
-        typeof left !== "string" ||
-        typeof right !== "string"
-      ) {
-        return undefined
-      }
-      return left + right
-    }
-    case "Identifier":
-      return evaluate(constants.get(node.name), constants, depth + 1)
-    case "ArrayExpression": {
-      const values = node.elements.map(item => evaluate(item, constants, depth + 1))
-      return values.includes(undefined) ? undefined : values
-    }
-    case "ObjectExpression": {
-      const result: Record<string, unknown> = {}
-      for (const property of node.properties) {
-        if (property.type !== "Property") return undefined
-        const key =
-          property.key.type === "Identifier"
-            ? property.key.name
-            : evaluate(property.key, constants)
-        const value = evaluate(property.value, constants, depth + 1)
-        if (typeof key !== "string" || value === undefined) return undefined
-        result[key] = value
-      }
-      return result
-    }
-    default:
-      return undefined
-  }
-}
-
-function isObject(value: unknown): value is object {
-  return typeof value === "object" && value !== null && !Array.isArray(value)
 }
 
 function caseKey(markdown: string, allowDangerousHtml: boolean) {
