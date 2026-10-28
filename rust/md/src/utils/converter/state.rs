@@ -2,9 +2,11 @@ use textlane_core::hast::{self, Element};
 use textlane_core::mdast;
 use textlane_core::{Allocator, ArenaVec, Position};
 
+use crate::actions::code::convert::convert_code;
 use crate::actions::emphasis::convert::convert_emphasis;
 use crate::actions::hard_break::convert::convert_hard_break;
 use crate::actions::heading::convert::convert_heading;
+use crate::actions::inline_code::convert::convert_inline_code;
 use crate::actions::paragraph::convert::convert_paragraph;
 use crate::actions::root::convert::convert_root;
 use crate::actions::strong::convert::convert_strong;
@@ -88,6 +90,10 @@ impl<'a> Converter<'a, '_> {
         }
         match node {
             mdast::Node::Text(text) => results.push(convert_text(self, text)),
+            mdast::Node::Code(node) => results.push(convert_code(self, node)),
+            mdast::Node::InlineCode(node) => {
+                results.push(convert_inline_code(self, node))
+            }
             mdast::Node::ThematicBreak(node) => {
                 results.push(convert_thematic_break(self, node))
             }
@@ -117,7 +123,9 @@ impl<'a> Converter<'a, '_> {
             }
             mdast::Node::ThematicBreak(_)
             | mdast::Node::Text(_)
-            | mdast::Node::Break(_) => {
+            | mdast::Node::Break(_)
+            | mdast::Node::Code(_)
+            | mdast::Node::InlineCode(_) => {
                 unreachable!("leaves convert on enter")
             }
         }

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::models::construct::{Resolver, State, StateFn};
 use crate::models::event::{ContentType, Event, Kind, Link, Point};
 use crate::models::token::Name;
@@ -74,6 +76,12 @@ pub(crate) struct TokenizeState<'a> {
     pub(crate) marker: u8,
     pub(crate) markers: &'static [u8],
     pub(crate) size: usize,
+    pub(crate) size_b: usize,
+    pub(crate) size_c: usize,
+    /// The last start of a backtick run of each length, as code spans scan for closers.
+    pub(crate) code_text_runs: HashMap<usize, usize>,
+    /// Whether a code span scanned to the end of the content without closing.
+    pub(crate) code_text_scanned: bool,
 }
 
 /// Feeds bytes to state functions and records the events they emit.
@@ -252,8 +260,6 @@ impl<'a> Tokenizer<'a> {
         self.stack.truncate(progress.stack_len);
     }
 
-    // Used by constructs that look ahead, such as setext headings, once they exist
-    #[allow(dead_code)]
     /// Try what follows and always revert it, then go to `ok` or `nok`.
     pub(crate) fn check(&mut self, ok: State, nok: State) {
         let progress = Some(self.capture());

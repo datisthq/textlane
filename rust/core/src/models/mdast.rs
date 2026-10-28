@@ -12,6 +12,8 @@ pub enum Node<'a> {
     Emphasis(Emphasis<'a>),
     Strong(Strong<'a>),
     Break(Break<'a>),
+    Code(Code<'a>),
+    InlineCode(InlineCode<'a>),
 }
 
 /// The document.
@@ -62,6 +64,22 @@ pub struct Break<'a> {
     pub position: Option<Position<'a>>,
 }
 
+/// A block of code, fenced or indented; `lang` and `meta` come from a fence's info string.
+#[derive(Debug, PartialEq)]
+pub struct Code<'a> {
+    pub lang: Option<&'a str>,
+    pub meta: Option<&'a str>,
+    pub value: &'a str,
+    pub position: Option<Position<'a>>,
+}
+
+/// A code span.
+#[derive(Debug, PartialEq)]
+pub struct InlineCode<'a> {
+    pub value: &'a str,
+    pub position: Option<Position<'a>>,
+}
+
 /// Plain text.
 #[derive(Debug, PartialEq)]
 pub struct Text<'a> {
@@ -78,7 +96,11 @@ impl<'a> Node<'a> {
             Node::Heading(node) => Some(&node.children),
             Node::Emphasis(node) => Some(&node.children),
             Node::Strong(node) => Some(&node.children),
-            Node::ThematicBreak(_) | Node::Text(_) | Node::Break(_) => None,
+            Node::ThematicBreak(_)
+            | Node::Text(_)
+            | Node::Break(_)
+            | Node::Code(_)
+            | Node::InlineCode(_) => None,
         }
     }
 
@@ -90,7 +112,11 @@ impl<'a> Node<'a> {
             Node::Heading(node) => Some(&mut node.children),
             Node::Emphasis(node) => Some(&mut node.children),
             Node::Strong(node) => Some(&mut node.children),
-            Node::ThematicBreak(_) | Node::Text(_) | Node::Break(_) => None,
+            Node::ThematicBreak(_)
+            | Node::Text(_)
+            | Node::Break(_)
+            | Node::Code(_)
+            | Node::InlineCode(_) => None,
         }
     }
 
@@ -104,6 +130,8 @@ impl<'a> Node<'a> {
             Node::Emphasis(node) => node.position.as_ref(),
             Node::Strong(node) => node.position.as_ref(),
             Node::Break(node) => node.position.as_ref(),
+            Node::Code(node) => node.position.as_ref(),
+            Node::InlineCode(node) => node.position.as_ref(),
         }
     }
 
@@ -117,6 +145,8 @@ impl<'a> Node<'a> {
             Node::Emphasis(node) => &mut node.position,
             Node::Strong(node) => &mut node.position,
             Node::Break(node) => &mut node.position,
+            Node::Code(node) => &mut node.position,
+            Node::InlineCode(node) => &mut node.position,
         }
     }
 }

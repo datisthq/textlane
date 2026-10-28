@@ -1,4 +1,6 @@
 use crate::actions::blank_line::tokenize::tokenize_blank_line;
+use crate::actions::code_fenced::tokenize::tokenize_code_fenced;
+use crate::actions::code_indented::tokenize::tokenize_code_indented;
 use crate::actions::heading_atx::tokenize::tokenize_heading_atx;
 use crate::actions::thematic_break::tokenize::tokenize_thematic_break;
 use crate::models::construct::State;
@@ -13,6 +15,10 @@ pub(crate) fn tokenize_flow(tokenizer: &mut Tokenizer) -> State {
             tokenizer.attempt(State::Next(after), State::Next(before_content));
             State::Retry(tokenize_heading_atx)
         }
+        Some(b'`' | b'~') => {
+            tokenizer.attempt(State::Next(after), State::Next(before_content));
+            State::Retry(tokenize_code_fenced)
+        }
         Some(b'*' | b'_') => {
             tokenizer.attempt(State::Next(after), State::Next(before_content));
             State::Retry(tokenize_thematic_break)
@@ -24,9 +30,19 @@ pub(crate) fn tokenize_flow(tokenizer: &mut Tokenizer) -> State {
 fn blank_line_before(tokenizer: &mut Tokenizer) -> State {
     tokenizer.attempt(
         State::Next(blank_line_after),
-        State::Next(before_heading_atx),
+        State::Next(before_code_indented),
     );
     State::Retry(tokenize_blank_line)
+}
+
+fn before_code_indented(tokenizer: &mut Tokenizer) -> State {
+    tokenizer.attempt(State::Next(after), State::Next(before_code_fenced));
+    State::Retry(tokenize_code_indented)
+}
+
+fn before_code_fenced(tokenizer: &mut Tokenizer) -> State {
+    tokenizer.attempt(State::Next(after), State::Next(before_heading_atx));
+    State::Retry(tokenize_code_fenced)
 }
 
 fn before_heading_atx(tokenizer: &mut Tokenizer) -> State {

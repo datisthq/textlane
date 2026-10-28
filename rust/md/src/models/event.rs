@@ -18,8 +18,6 @@ pub(crate) struct Point {
 }
 
 /// The content type a linked token holds, tokenized later by subtokenizing.
-// `String` is the content of definitions and link destinations, which do not exist yet
-#[allow(dead_code)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum ContentType {
     Flow,

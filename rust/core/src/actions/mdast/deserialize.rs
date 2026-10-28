@@ -4,7 +4,8 @@ use crate::actions::mdast::serialize::MAX_JSON_DEPTH;
 use crate::actions::position::deserialize::deserialize_position;
 use crate::models::error::Error;
 use crate::models::mdast::{
-    Break, Emphasis, Heading, Node, Paragraph, Root, Strong, Text, ThematicBreak,
+    Break, Code, Emphasis, Heading, InlineCode, Node, Paragraph, Root, Strong, Text,
+    ThematicBreak,
 };
 use crate::{Allocator, ArenaVec};
 
@@ -51,6 +52,16 @@ fn deserialize_node<'a>(
         }),
         "thematicBreak" => Node::ThematicBreak(ThematicBreak { position }),
         "break" => Node::Break(Break { position }),
+        "code" => Node::Code(Code {
+            lang: read_optional_str(value, "lang", alloc),
+            meta: read_optional_str(value, "meta", alloc),
+            value: read_optional_str(value, "value", alloc).unwrap_or_default(),
+            position,
+        }),
+        "inlineCode" => Node::InlineCode(InlineCode {
+            value: read_optional_str(value, "value", alloc).unwrap_or_default(),
+            position,
+        }),
         "emphasis" => Node::Emphasis(Emphasis {
             children: deserialize_children(value, alloc, depth)?,
             position,
@@ -88,4 +99,15 @@ fn deserialize_children<'a>(
         children.push(deserialize_node(child, alloc, depth + 1)?);
     }
     Ok(children)
+}
+
+fn read_optional_str<'a>(
+    value: &Value,
+    key: &str,
+    alloc: &'a Allocator,
+) -> Option<&'a str> {
+    value
+        .get(key)
+        .and_then(Value::as_str)
+        .map(|text| &*alloc.alloc_str(text))
 }

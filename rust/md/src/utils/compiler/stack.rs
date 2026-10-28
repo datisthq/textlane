@@ -1,6 +1,7 @@
-use textlane_core::mdast::{Node, Root};
+use textlane_core::mdast::{Node, Paragraph, Root};
 use textlane_core::{Allocator, ArenaString, ArenaVec, Point, Position};
 
+use crate::helpers::slice::Slice;
 use crate::models::event::{self, Event};
 use crate::models::token::Name;
 
@@ -15,6 +16,8 @@ pub(crate) struct Compiler<'a, 'e> {
     pub(crate) character_reference_marker: u8,
     /// Whether a hard break just closed, so the line ending after it joins it.
     pub(crate) hard_break_after: bool,
+    /// Whether a code fence's opening fence closed, so the code after it is buffered.
+    pub(crate) code_fence_seen: bool,
     stack: Vec<Node<'a>>,
 }
 
@@ -39,6 +42,7 @@ impl<'a, 'e> Compiler<'a, 'e> {
             index: 0,
             character_reference_marker: 0,
             hard_break_after: false,
+            code_fence_seen: false,
             stack: vec![root],
         }
     }
@@ -119,6 +123,29 @@ impl<'a, 'e> Compiler<'a, 'e> {
         }
     }
 
+    /// Collect the text that follows into a buffer, until `resume`.
+    pub(crate) fn buffer(&mut self) {
+        self.stack.push(Node::Paragraph(Paragraph {
+            children: ArenaVec::new_in(self.alloc),
+            position: None,
+        }));
+    }
+
+    /// Close the buffer and return the text collected in it.
+    pub(crate) fn resume(&mut self) -> &'a str {
+        let mut value = "";
+        if let Some(buffer) = self.stack.pop()
+            && let Some(children) = buffer.children()
+        {
+            for child in children {
+                if let Node::Text(text) = child {
+                    value = self.join(value, text.value);
+                }
+            }
+        }
+        value
+    }
+
     /// Set the end of the innermost open node's last child to the current event.
     pub(crate) fn extend_last_child(&mut self) {
         let end = to_point(&self.events[self.index].point);
@@ -143,9 +170,18 @@ impl<'a, 'e> Compiler<'a, 'e> {
         {
             start -= 1;
         }
-        self.source
-            .get(self.events[start].point.index..end.index)
-            .unwrap_or_default()
+        let start = &self.events[start].point;
+        let slice = Slice::from_points(self.source.as_bytes(), start, end);
+        let text = std::str::from_utf8(slice.bytes).unwrap_or_default();
+        if slice.before == 0 && slice.after == 0 {
+            return text;
+        }
+        // A token that starts or ends inside a tab has the tab's columns there as spaces
+        let mut value = ArenaString::with_capacity_in(slice.len(), self.alloc);
+        value.extend(std::iter::repeat_n(' ', slice.before));
+        value.push_str(text);
+        value.extend(std::iter::repeat_n(' ', slice.after));
+        value.into_bump_str()
     }
 
     /// `value` followed by `addition`, borrowing the source when they are adjacent in it.

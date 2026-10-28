@@ -37,3 +37,16 @@ fn pairs_many_unmatched_runs_in_linear_time() -> Result<(), Error> {
     );
     Ok(())
 }
+
+#[test]
+fn rejects_many_unclosed_code_spans_in_linear_time() -> Result<(), Error> {
+    let input: String = (1..=1_000).map(|size| "`".repeat(size) + "a").collect();
+    let started = std::time::Instant::now();
+    render(&input)?;
+    assert!(
+        started.elapsed().as_secs() < 5,
+        "took {:?}",
+        started.elapsed()
+    );
+    Ok(())
+}

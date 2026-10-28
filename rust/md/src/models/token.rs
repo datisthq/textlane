@@ -20,6 +20,16 @@ impl Name {
     pub(crate) const CHARACTER_REFERENCE_MARKER_SEMI: Name =
         Name("characterReferenceMarkerSemi");
     pub(crate) const CHARACTER_REFERENCE_VALUE: Name = Name("characterReferenceValue");
+    pub(crate) const CODE_FENCED: Name = Name("codeFenced");
+    pub(crate) const CODE_FENCED_FENCE: Name = Name("codeFencedFence");
+    pub(crate) const CODE_FENCED_FENCE_INFO: Name = Name("codeFencedFenceInfo");
+    pub(crate) const CODE_FENCED_FENCE_META: Name = Name("codeFencedFenceMeta");
+    pub(crate) const CODE_FENCED_FENCE_SEQUENCE: Name = Name("codeFencedFenceSequence");
+    pub(crate) const CODE_FLOW_CHUNK: Name = Name("codeFlowChunk");
+    pub(crate) const CODE_INDENTED: Name = Name("codeIndented");
+    pub(crate) const CODE_TEXT: Name = Name("codeText");
+    pub(crate) const CODE_TEXT_DATA: Name = Name("codeTextData");
+    pub(crate) const CODE_TEXT_SEQUENCE: Name = Name("codeTextSequence");
     pub(crate) const CONTENT: Name = Name("content");
     pub(crate) const DATA: Name = Name("data");
     pub(crate) const EMPHASIS: Name = Name("emphasis");

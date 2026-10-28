@@ -53,7 +53,9 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   strings borrow the input or the arena. Input decides how deep a tree nests, so nothing
   walks one by recursion: `ArenaVec` never drops its items, conversion and `html.stringify`
   keep an explicit stack, and JSON stops at 1000 levels with `tree-too-deep`. Watch for
-  quadratic passes too: `processor_unit.rs` runs 100,000-deep and 50,000-run inputs. A `Point` is a byte offset whose top two bits hold
+  quadratic passes too: `processor_unit.rs` runs 100,000-deep and 50,000-run inputs,
+  and unclosed code spans of growing length. A construct that scans ahead and can fail
+  needs a memo of what the failed scan saw, as `code_text_runs` is for code spans. A `Point` is a byte offset whose top two bits hold
   a tab's virtual spaces; `Lines` turns it into unist's UTF-16 line, column and offset
 - `md`'s engine is a port of markdown-rs (micromark's design in Rust): a state is a plain
   `fn(&mut Tokenizer) -> State`, a token name an open `Name("…")` constant. A construct not

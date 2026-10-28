@@ -190,6 +190,9 @@ mod actions {
     pub(crate) mod mdast {
         pub(crate) mod convert;
     }
+    pub(crate) mod non_lazy_continuation {
+        pub(crate) mod tokenize;
+    }
     pub(crate) mod paragraph {
         pub(crate) mod compile;
         pub(crate) mod convert;

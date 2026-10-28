@@ -40,6 +40,16 @@ fn serialize_node(
         Node::Emphasis(_) => "emphasis",
         Node::Strong(_) => "strong",
         Node::Break(_) => "break",
+        Node::Code(code) => {
+            object.insert("lang".into(), code.lang.into());
+            object.insert("meta".into(), code.meta.into());
+            object.insert("value".into(), code.value.into());
+            "code"
+        }
+        Node::InlineCode(code) => {
+            object.insert("value".into(), code.value.into());
+            "inlineCode"
+        }
         Node::Text(text) => {
             object.insert("value".into(), text.value.into());
             "text"
