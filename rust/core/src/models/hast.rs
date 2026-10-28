@@ -1,4 +1,5 @@
 use crate::ArenaVec;
+use crate::models::data::Data;
 use crate::models::position::Position;
 
 /// A hast node.
@@ -17,6 +18,8 @@ pub enum Node<'a> {
 pub struct Root<'a> {
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
     /// `data.quirksMode`, set by the HTML parser: whether the document is in quirks mode.
     pub quirks_mode: Option<bool>,
 }
@@ -28,6 +31,8 @@ pub struct Element<'a> {
     pub properties: ArenaVec<'a, Property<'a>>,
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
     /// A `template`'s contents, which hast keeps out of its children.
     pub content: Option<&'a Root<'a>>,
 }
@@ -61,6 +66,8 @@ pub enum PropertyItem<'a> {
 pub struct Text<'a> {
     pub value: &'a str,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A comment.
@@ -68,6 +75,8 @@ pub struct Text<'a> {
 pub struct Comment<'a> {
     pub value: &'a str,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// Raw HTML, written as it is only when dangerous HTML is allowed.
@@ -75,15 +84,31 @@ pub struct Comment<'a> {
 pub struct Raw<'a> {
     pub value: &'a str,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A doctype.
 #[derive(Debug, PartialEq)]
 pub struct Doctype<'a> {
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 impl<'a> Node<'a> {
+    /// The node's unist `data`, when it carries any.
+    pub fn data(&self) -> Option<&'a Data<'a>> {
+        match self {
+            Node::Root(node) => node.data,
+            Node::Element(node) => node.data,
+            Node::Text(node) => node.data,
+            Node::Comment(node) => node.data,
+            Node::Doctype(node) => node.data,
+            Node::Raw(node) => node.data,
+        }
+    }
+
     pub fn position(&self) -> Option<&Position<'a>> {
         match self {
             Node::Root(node) => node.position.as_ref(),

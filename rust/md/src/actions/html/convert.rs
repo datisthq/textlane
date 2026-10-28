@@ -14,5 +14,6 @@ pub(crate) fn convert_html<'a>(
         .then_some(hast::Node::Raw(hast::Raw {
             value: node.value,
             position: node.position,
+            data: None,
         }))
 }

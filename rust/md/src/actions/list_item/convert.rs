@@ -55,5 +55,6 @@ fn line_ending<'a>() -> hast::Node<'a> {
     hast::Node::Text(hast::Text {
         value: "\n",
         position: None,
+        data: None,
     })
 }

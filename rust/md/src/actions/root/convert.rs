@@ -14,5 +14,6 @@ pub(crate) fn convert_root<'a>(
         children: converter.wrap(children, false),
         position: node.position,
         quirks_mode: None,
+        data: None,
     })
 }

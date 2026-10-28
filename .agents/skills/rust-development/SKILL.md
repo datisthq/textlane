@@ -103,6 +103,9 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   `html` and `svg` schemas, generated and sorted for a binary search. `html.stringify` ports
   hast-util-to-html 9.0.5 whole, omission rules in `helpers/omission.rs`; serde_json keeps
   `preserve_order`, since hast writes properties in the order a tree lists them
+  `html.sanitize` and `html.slug` port hast-util-sanitize and rehype-slug; the sanitizer
+  walks with its own stack and counts open ancestors instead of searching them, and
+  `helpers/slug_table.rs` is github-slugger's removal regex as generated code-point ranges
 - `md` names entities by syntax construct or mdast node and verbs by layer: `tokenize` and
   `resolve` (micromark), `compile` (from-markdown), `stringify` (to-markdown), `convert`
   (to-hast), so `actions/heading/compile.rs` exports `compile_heading`. No file named after

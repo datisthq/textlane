@@ -4,6 +4,7 @@
 mod plugin;
 mod models {
     pub(crate) mod arena;
+    pub(crate) mod data;
     pub(crate) mod error;
     pub(crate) mod file;
     pub(crate) mod hast;
@@ -48,6 +49,7 @@ pub mod hast {
 
 // models
 pub use models::arena::ArenaVec;
+pub use models::data::Data;
 pub use models::error::Error;
 pub use models::file::{File, Message};
 pub use models::lines::Lines;

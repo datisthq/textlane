@@ -242,3 +242,26 @@ fn parses_hostile_html_in_linear_time() -> Result<(), Error> {
     }
     Ok(())
 }
+
+#[test]
+fn sanitizes_and_slugs_hostile_html_in_linear_time() -> Result<(), Error> {
+    let processor = Processor::new()
+        .with(textlane_html::parse(Default::default()))
+        .with(textlane_html::sanitize(Default::default()))
+        .with(textlane_html::slug(Default::default()))
+        .with(textlane_html::stringify(Default::default()))
+        .freeze()?;
+    for input in [
+        "<div>".repeat(100_000),
+        "<unknown>".repeat(100_000) + "x",
+        "<table><tr><td>".repeat(20_000),
+        "<h1>a</h1>".repeat(20_000),
+        "<h1>".to_string() + &"<b>a".repeat(50_000),
+    ] {
+        let started = std::time::Instant::now();
+        processor.process(&input)?;
+        let took = started.elapsed();
+        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+    }
+    Ok(())
+}

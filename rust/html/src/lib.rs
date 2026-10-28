@@ -22,6 +22,8 @@ mod utils {
 }
 mod actions {
     pub(crate) mod hast {
+        pub(crate) mod sanitize;
+        pub(crate) mod slug;
         pub(crate) mod stringify;
     }
     pub(crate) mod html {
@@ -36,10 +38,18 @@ mod helpers {
     pub(crate) mod property;
     pub(crate) mod reason;
     pub(crate) mod schema;
+    pub(crate) mod slug;
+    pub(crate) mod slug_table;
     pub(crate) mod tag;
 }
 mod plugins {
     pub(crate) mod parse {
+        pub(crate) mod plugin;
+    }
+    pub(crate) mod sanitize {
+        pub(crate) mod plugin;
+    }
+    pub(crate) mod slug {
         pub(crate) mod plugin;
     }
     pub(crate) mod stringify {
@@ -48,12 +58,19 @@ mod plugins {
 }
 
 // models
-pub use models::options::{ParseOptions, StringifyOptions};
+pub use models::options::{
+    AttributeDefinition, ParseOptions, Primitive, SanitizeOptions, SlugOptions,
+    StringifyOptions,
+};
 
 // actions
+pub use actions::hast::sanitize::sanitize_hast;
+pub use actions::hast::slug::slug_hast;
 pub use actions::hast::stringify::stringify_hast;
 pub use actions::html::parse::parse_html;
 
 // plugins
 pub use plugins::parse::plugin::{Parse, parse};
+pub use plugins::sanitize::plugin::{Sanitize, sanitize};
+pub use plugins::slug::plugin::{Slug, slug};
 pub use plugins::stringify::plugin::{Stringify, stringify};

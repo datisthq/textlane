@@ -12,6 +12,7 @@ pub(crate) fn convert_text<'a>(
     hast::Node::Text(hast::Text {
         value: trim_lines(converter, node.value),
         position: node.position,
+        data: None,
     })
 }
 

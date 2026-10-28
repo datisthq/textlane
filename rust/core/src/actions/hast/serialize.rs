@@ -2,6 +2,7 @@ use serde_json::{Map, Value};
 
 use crate::actions::mdast::serialize::MAX_JSON_DEPTH;
 use crate::actions::position::serialize::serialize_position;
+use crate::models::data::Data;
 use crate::models::error::Error;
 use crate::models::hast::{Node, PropertyItem, PropertyValue, Root};
 use crate::models::lines::Lines;
@@ -68,6 +69,9 @@ fn serialize_node(
             object.insert("type".into(), "doctype".into());
         }
     }
+    if let Some(data) = node.data() {
+        object.insert("data".into(), serialize_data(data));
+    }
     serialize_position(&mut object, node.position(), lines);
     Ok(Value::Object(object))
 }
@@ -91,13 +95,35 @@ fn serialize_root(
         .map(|child| serialize_node(child, lines, depth + 1))
         .collect::<Result<_, _>>()?;
     object.insert("children".into(), Value::Array(children));
+    let mut data = match root.data.map(serialize_data) {
+        Some(Value::Object(data)) => data,
+        _ => Map::new(),
+    };
     if let Some(quirks_mode) = root.quirks_mode {
-        let mut data = Map::new();
         data.insert("quirksMode".into(), quirks_mode.into());
+    }
+    if !data.is_empty() {
         object.insert("data".into(), Value::Object(data));
     }
     serialize_position(&mut object, root.position.as_ref(), lines);
     Ok(Value::Object(object))
+}
+
+/// Write unist `data` as JSON.
+pub(crate) fn serialize_data(data: &Data<'_>) -> Value {
+    match data {
+        Data::Null => Value::Null,
+        Data::Boolean(value) => (*value).into(),
+        Data::Number(value) => serialize_number(*value),
+        Data::String(value) => (*value).into(),
+        Data::Array(items) => Value::Array(items.iter().map(serialize_data).collect()),
+        Data::Object(entries) => Value::Object(
+            entries
+                .iter()
+                .map(|(key, value)| (key.to_string(), serialize_data(value)))
+                .collect(),
+        ),
+    }
 }
 
 fn serialize_value(value: &PropertyValue<'_>) -> Value {

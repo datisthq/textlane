@@ -144,6 +144,7 @@ impl<'a> Converter<'_, 'a> {
                     children,
                     position,
                     content,
+                    data: None,
                 })
             }
             _ => Node::Root(self.create_root(Some(frame.children))),
@@ -157,6 +158,7 @@ impl<'a> Converter<'_, 'a> {
                 Position::span(Point::new(0, 0), Point::new(self.source_length, 0))
             }),
             quirks_mode: Some(false),
+            data: None,
         }
     }
 
@@ -169,12 +171,17 @@ impl<'a> Converter<'_, 'a> {
             NodeData::Text(value) => Node::Text(Text {
                 value: self.alloc.alloc_str(value),
                 position,
+                data: None,
             }),
             NodeData::Comment(value) => Node::Comment(Comment {
                 value: self.alloc.alloc_str(value),
                 position,
+                data: None,
             }),
-            _ => Node::Doctype(Doctype { position }),
+            _ => Node::Doctype(Doctype {
+                position,
+                data: None,
+            }),
         }
     }
 

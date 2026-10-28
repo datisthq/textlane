@@ -128,10 +128,12 @@ impl<'o> State<'o> {
             Node::Element(element) => self.open_element(element, index, parent, stack),
             Node::Text(text) => self.write_text(text.value, parent),
             Node::Raw(raw) => {
+                // Unlike upstream, raw is escaped even in `script` and `style` unless allowed:
+                // its value is HTML from elsewhere, which could close the element early
                 if self.options.allow_dangerous_html {
                     self.output.push_str(raw.value);
                 } else {
-                    self.write_text(raw.value, parent);
+                    push_escaped(&mut self.output, raw.value, "<&");
                 }
             }
             Node::Comment(comment) => self.write_comment(comment.value),
@@ -461,3 +463,7 @@ pub(crate) fn write_js_number(number: f64) -> String {
         _ => formatted,
     }
 }
+
+#[cfg(test)]
+#[path = "stringify_unit.rs"]
+mod unit;

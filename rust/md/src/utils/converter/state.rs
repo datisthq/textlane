@@ -195,6 +195,7 @@ impl<'a> Converter<'a, '_> {
         hast::Node::Text(hast::Text {
             value,
             position: None,
+            data: None,
         })
     }
 
@@ -219,6 +220,7 @@ impl<'a> Converter<'a, '_> {
             children,
             position,
             content: None,
+            data: None,
         })
     }
 
@@ -258,6 +260,7 @@ impl<'a> Converter<'a, '_> {
             children,
             position,
             content: None,
+            data: None,
         })
     }
 }
@@ -281,5 +284,6 @@ fn line_ending<'a>() -> hast::Node<'a> {
     hast::Node::Text(hast::Text {
         value: "\n",
         position: None,
+        data: None,
     })
 }

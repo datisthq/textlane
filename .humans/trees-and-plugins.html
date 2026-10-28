@@ -100,8 +100,9 @@
       Each node has <code>extra: Option&lt;Box&lt;Extra&gt;&gt;</code>, one null pointer
       when unused. It holds <code>data</code> (typed <code>hName</code>,
       <code>hProperties</code>, <code>hChildren</code> plus an open map) and is where
-      unknown top-level fields would go. For now conversion drops those with a warning;
-      filling the slot later changes no node shape.
+      unknown top-level fields would go. hast nodes carry it as <code>data</code>, a
+      JSON-like value read from and written to unified's JSON, which
+      <code>html.sanitize</code> keeps as hast-util-sanitize does; mdast does not yet.
     </p>
   </dd>
   <dt>Values only JavaScript has</dt>

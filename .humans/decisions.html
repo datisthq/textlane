@@ -217,6 +217,20 @@
     </p>
   </dd>
   <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge>
+    <code>html.stringify</code> escapes <code>raw</code> nodes inside
+    <code>script</code> and <code>style</code> unless <code>allowDangerousHtml</code> is
+    on
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> hast-util-to-html writes them as they are there, so HTML from
+      elsewhere could close the element early; <code>raw</code> is meant to need the
+      option. Text in those elements still is written as it is, as the spec has it.
+    </p>
+    <p><strong>Rejected.</strong> Upstream's behavior.</p>
+  </dd>
+  <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge> <code>html.parse</code>
     ports parse5 7.3.0 and hast-util-from-parse5, with scripting off as
     hast-util-from-html parses

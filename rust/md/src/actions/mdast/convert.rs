@@ -42,6 +42,7 @@ pub fn convert_mdast<'a>(
         children: nodes,
         position: None,
         quirks_mode: None,
+        data: None,
     })
 }
 

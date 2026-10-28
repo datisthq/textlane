@@ -2,6 +2,7 @@ use serde_json::Value;
 
 use crate::actions::mdast::serialize::MAX_JSON_DEPTH;
 use crate::actions::position::deserialize::deserialize_position;
+use crate::models::data::Data;
 use crate::models::error::Error;
 use crate::models::hast::{
     Comment, Doctype, Element, Node, Property, PropertyItem, PropertyValue, Raw, Root,
@@ -33,12 +34,14 @@ fn deserialize_node<'a>(
         .get("type")
         .and_then(Value::as_str)
         .unwrap_or_default();
+    let data = deserialize_data_field(value, alloc, depth, kind == "root")?;
     let read_str =
         |key: &str| alloc.alloc_str(value.get(key).and_then(Value::as_str).unwrap_or(""));
     Ok(match kind {
         "root" => Node::Root(Root {
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
             quirks_mode: value
                 .get("data")
                 .and_then(|data| data.get("quirksMode"))
@@ -49,6 +52,7 @@ fn deserialize_node<'a>(
             properties: deserialize_properties(value, alloc)?,
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
             content: match value.get("content") {
                 Some(content) => match deserialize_node(content, alloc, depth + 1)? {
                     Node::Root(root) => Some(&*alloc.alloc(root)),
@@ -60,15 +64,18 @@ fn deserialize_node<'a>(
         "text" => Node::Text(Text {
             value: read_str("value"),
             position,
+            data,
         }),
         "comment" => Node::Comment(Comment {
             value: read_str("value"),
             position,
+            data,
         }),
-        "doctype" => Node::Doctype(Doctype { position }),
+        "doctype" => Node::Doctype(Doctype { position, data }),
         "raw" => Node::Raw(Raw {
             value: read_str("value"),
             position,
+            data,
         }),
         _ => {
             return Err(Error::new(
@@ -151,4 +158,69 @@ fn deserialize_properties<'a>(
         });
     }
     Ok(properties)
+}
+
+// A root's `data.quirksMode` is a field of its own
+fn deserialize_data_field<'a>(
+    value: &Value,
+    alloc: &'a Allocator,
+    depth: usize,
+    is_root: bool,
+) -> Result<Option<&'a Data<'a>>, Error> {
+    let Some(data) = value.get("data") else {
+        return Ok(None);
+    };
+    if is_root && let Value::Object(map) = data {
+        let mut entries = ArenaVec::new_in(alloc);
+        for (key, item) in map {
+            if key != "quirksMode" {
+                let item = deserialize_data(item, alloc, depth + 1)?;
+                entries.push((&*alloc.alloc_str(key), item));
+            }
+        }
+        if entries.is_empty() {
+            return Ok(None);
+        }
+        return Ok(Some(&*alloc.alloc(Data::Object(entries))));
+    }
+    Ok(Some(&*alloc.alloc(deserialize_data(
+        data,
+        alloc,
+        depth + 1,
+    )?)))
+}
+
+/// Read unist `data` JSON into the arena.
+pub(crate) fn deserialize_data<'a>(
+    value: &Value,
+    alloc: &'a Allocator,
+    depth: usize,
+) -> Result<Data<'a>, Error> {
+    if depth > MAX_JSON_DEPTH {
+        return Err(Error::new(
+            "tree-too-deep",
+            format!("trees nest at most {MAX_JSON_DEPTH} levels in JSON"),
+        ));
+    }
+    Ok(match value {
+        Value::Null => Data::Null,
+        Value::Bool(value) => Data::Boolean(*value),
+        Value::Number(value) => Data::Number(value.as_f64().unwrap_or_default()),
+        Value::String(value) => Data::String(alloc.alloc_str(value)),
+        Value::Array(items) => {
+            let mut list = ArenaVec::new_in(alloc);
+            for item in items {
+                list.push(deserialize_data(item, alloc, depth + 1)?);
+            }
+            Data::Array(list)
+        }
+        Value::Object(map) => {
+            let mut entries = ArenaVec::new_in(alloc);
+            for (key, item) in map {
+                let item = deserialize_data(item, alloc, depth + 1)?;
+                entries.push((&*alloc.alloc_str(key), item));
+            }
+            Data::Object(entries)
+        }
+    })
 }

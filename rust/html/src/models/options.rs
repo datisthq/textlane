@@ -1,3 +1,5 @@
+use std::collections::{BTreeMap, HashMap};
+
 use serde::Deserialize;
 
 /// Options of `html.stringify`, named as hast-util-to-html names them.
@@ -52,4 +54,57 @@ pub struct ParseOptions {
     pub emit_parse_errors: bool,
     /// Add the positions of opening and closing tags and attributes to elements.
     pub verbose: bool,
+}
+
+/// Options of `html.sanitize`: hast-util-sanitize's schema; a field left out keeps the
+/// default schema's, which is GitHub's.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
+pub struct SanitizeOptions {
+    /// Keep comments.
+    pub allow_comments: Option<bool>,
+    /// Keep doctypes.
+    pub allow_doctypes: Option<bool>,
+    /// Elements allowed only inside one of these ancestors, by tag name.
+    pub ancestors: Option<HashMap<String, Vec<String>>>,
+    /// Properties allowed per tag name, `*` for every element; a list names a property and
+    /// the values it may have.
+    pub attributes: Option<HashMap<String, Vec<AttributeDefinition>>>,
+    /// Properties whose values get `clobber_prefix`, so they cannot clobber globals.
+    pub clobber: Option<Vec<String>>,
+    /// The prefix of clobbered values.
+    pub clobber_prefix: Option<String>,
+    /// URL properties and the protocols they may use.
+    pub protocols: Option<HashMap<String, Vec<String>>>,
+    /// Properties set on elements whatever they had, by tag name.
+    pub required: Option<HashMap<String, BTreeMap<String, Primitive>>>,
+    /// Elements dropped with their content rather than unwrapped.
+    pub strip: Option<Vec<String>>,
+    /// The elements kept.
+    pub tag_names: Option<Vec<String>>,
+}
+
+/// A property a sanitize schema allows: by name, or a name and its allowed values.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(untagged)]
+pub enum AttributeDefinition {
+    Name(String),
+    Values(Vec<Primitive>),
+}
+
+/// A primitive property value.
+#[derive(Clone, Debug, PartialEq, Deserialize)]
+#[serde(untagged)]
+pub enum Primitive {
+    Boolean(bool),
+    Number(f64),
+    String(String),
+}
+
+/// Options of `html.slug`, named as rehype-slug names them.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
+pub struct SlugOptions {
+    /// Put before each id.
+    pub prefix: String,
 }

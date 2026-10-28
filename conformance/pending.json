@@ -17,8 +17,6 @@
   "md/to-prose": "the md constructs and plugins this needs are not implemented yet",
   "html/format": "the html plugins this needs are not implemented yet",
   "html/highlight": "the html plugins this needs are not implemented yet",
-  "html/sanitize": "the html plugins this needs are not implemented yet",
-  "html/slug": "the html plugins this needs are not implemented yet",
   "html/to-markdown": "the html plugins this needs are not implemented yet",
   "html/to-prose": "the html plugins this needs are not implemented yet",
   "core/use": "the processor and its test plugins are not implemented yet",

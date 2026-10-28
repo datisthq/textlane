@@ -171,6 +171,12 @@ fn add_plugin(
         #[cfg(feature = "html")]
         "html.parse" => processor.with(textlane_html::parse(read_options(options)?)),
         #[cfg(feature = "html")]
+        "html.sanitize" => {
+            processor.with(textlane_html::sanitize(read_options(options)?))
+        }
+        #[cfg(feature = "html")]
+        "html.slug" => processor.with(textlane_html::slug(read_options(options)?)),
+        #[cfg(feature = "html")]
         "html.stringify" => {
             processor.with(textlane_html::stringify(read_options(options)?))
         }

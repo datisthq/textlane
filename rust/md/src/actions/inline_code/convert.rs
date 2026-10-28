@@ -20,6 +20,7 @@ pub(crate) fn convert_inline_code<'a>(
     children.push(hast::Node::Text(hast::Text {
         value,
         position: None,
+        data: None,
     }));
     converter.element("code", children, node.position)
 }

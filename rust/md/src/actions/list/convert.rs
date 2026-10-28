@@ -23,5 +23,6 @@ pub(crate) fn convert_list<'a>(
         children: converter.wrap(children, true),
         position: node.position,
         content: None,
+        data: None,
     })
 }
