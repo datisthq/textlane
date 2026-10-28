@@ -1,3 +1,5 @@
+use crate::models::position::UnistPosition;
+
 /// The document a pipeline processes: where it came from and what plugins reported about it.
 #[derive(Clone, Debug, Default)]
 pub struct File {
@@ -11,6 +13,8 @@ pub struct Message {
     pub reason: String,
     pub source: Option<String>,
     pub rule: Option<String>,
+    /// Where in the file the message is about.
+    pub place: Option<UnistPosition>,
 }
 
 impl File {
@@ -24,6 +28,7 @@ impl File {
             reason: reason.into(),
             source: None,
             rule: rule.map(str::to_string),
+            place: None,
         });
     }
 }

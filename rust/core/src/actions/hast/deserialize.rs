@@ -39,12 +39,23 @@ fn deserialize_node<'a>(
         "root" => Node::Root(Root {
             children: deserialize_children(value, alloc, depth)?,
             position,
+            quirks_mode: value
+                .get("data")
+                .and_then(|data| data.get("quirksMode"))
+                .and_then(Value::as_bool),
         }),
         "element" => Node::Element(Element {
             tag_name: read_str("tagName"),
             properties: deserialize_properties(value, alloc)?,
             children: deserialize_children(value, alloc, depth)?,
             position,
+            content: match value.get("content") {
+                Some(content) => match deserialize_node(content, alloc, depth + 1)? {
+                    Node::Root(root) => Some(&*alloc.alloc(root)),
+                    _ => None,
+                },
+                None => None,
+            },
         }),
         "text" => Node::Text(Text {
             value: read_str("value"),

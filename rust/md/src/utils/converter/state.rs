@@ -218,6 +218,7 @@ impl<'a> Converter<'a, '_> {
             properties,
             children,
             position,
+            content: None,
         })
     }
 
@@ -256,6 +257,7 @@ impl<'a> Converter<'a, '_> {
             properties: ArenaVec::new_in(self.alloc),
             children,
             position,
+            content: None,
         })
     }
 }

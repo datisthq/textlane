@@ -82,6 +82,7 @@ The root is a private pnpm workspace (`package.json`, `pnpm-workspace.yaml`): fo
   - `core/` — `textlane-core`: the unist, mdast and hast trees in a per-document arena, positions, the file and the plugin contract (its `json` feature reads and writes unified's JSON) every other crate shares
   - `md/`, `html/`, `mdx/`, `prose/` — `textlane-<domain>`, each domain's plugins, depending on `textlane-core` only
   - `md/src/` — a port of micromark and the mdast utilities: `utils/` holds the engines (`tokenizer`, `compiler`, `serializer`, `converter`), `actions/<construct|node>/<verb>.rs` one handler each (`tokenize`, `resolve`, `compile`, `stringify`, `convert`), `plugins/` the public stages and syntax extensions
+  - `html/src/` — a port of parse5 and hast-util-from-parse5: `utils/tokenizer` (the tokenizer, pulled one token at a time), `utils/builder` (the tree builder over a linked arena DOM, then the conversion to hast), `helpers/` the tag, entity, foreign-content and property-information tables
   - Unit tests beside their module as `<module>_unit.rs`
   - `docs/` — the docs site's Markdown pages, outside the crate's `include`
 - `typescript/` — the npm package `textlane`: `index.ts` loads the addon `actions/addon/resolve.ts` finds; `settings.ts` lists the platforms; `scripts/` packs and publishes the platform packages into `typescript/compile/` (**`package-distribution`**)

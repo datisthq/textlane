@@ -123,13 +123,35 @@ fn run_processor(case: &Value, pipeline: &[Value]) -> Result<Value, Error> {
         _ => return Err(Error::new("missing-parser", "the processor has no parser")),
     };
     let tree = processor.run(tree, &mut file, &alloc)?;
-    match processor.extension() {
+    let mut result = match processor.extension() {
         Some(extension) => {
             let value = processor.stringify(&tree, &mut file)?;
-            Ok(json!({ extension: value }))
+            json!({ extension: value })
         }
-        None => Ok(json!({ "tree": write_tree(&tree, lines.as_ref())? })),
-    }
+        None => json!({ "tree": write_tree(&tree, lines.as_ref())? }),
+    };
+    result["messages"] = write_messages(&file);
+    Ok(result)
+}
+
+// Messages in the order they were reported, compared on their rule, source and place only
+fn write_messages(file: &File) -> Value {
+    let messages = file.messages.iter();
+    let write_point = |point: &textlane_core::UnistPoint| json!({ "line": point.line, "column": point.column, "offset": point.offset });
+    Value::Array(
+        messages
+            .map(|message| {
+                json!({
+                    "ruleId": message.rule,
+                    "source": message.source,
+                    "place": message.place.as_ref().map(|place| json!({
+                        "start": write_point(&place.start),
+                        "end": write_point(&place.end),
+                    })),
+                })
+            })
+            .collect(),
+    )
 }
 
 fn add_plugin(
@@ -146,6 +168,8 @@ fn add_plugin(
         "md.stringify" => processor.with(textlane_md::stringify(read_options(options)?)),
         #[cfg(feature = "md")]
         "md.toHtml" => processor.with(textlane_md::to_html(read_options(options)?)),
+        #[cfg(feature = "html")]
+        "html.parse" => processor.with(textlane_html::parse(read_options(options)?)),
         #[cfg(feature = "html")]
         "html.stringify" => {
             processor.with(textlane_html::stringify(read_options(options)?))

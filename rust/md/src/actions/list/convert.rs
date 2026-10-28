@@ -22,5 +22,6 @@ pub(crate) fn convert_list<'a>(
         properties,
         children: converter.wrap(children, true),
         position: node.position,
+        content: None,
     })
 }

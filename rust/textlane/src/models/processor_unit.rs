@@ -194,3 +194,51 @@ fn formats_hostile_phrasing_in_linear_time() -> Result<(), Error> {
     }
     Ok(())
 }
+
+fn reformat_html(input: &str) -> Result<String, Error> {
+    let processor = Processor::new()
+        .with(textlane_html::parse(Default::default()))
+        .with(textlane_html::stringify(Default::default()))
+        .freeze()?;
+    Ok(processor.process(input)?.value)
+}
+
+#[test]
+fn parses_html() -> Result<(), Error> {
+    assert_eq!(
+        reformat_html("<p>a<b>c")?,
+        "<html><head></head><body><p>a<b>c</b></p></body></html>"
+    );
+    Ok(())
+}
+
+#[test]
+fn parses_hostile_html_in_linear_time() -> Result<(), Error> {
+    let numbered = |template: &str| -> String {
+        (0..20_000)
+            .map(|index| template.replace('N', &index.to_string()))
+            .collect()
+    };
+    for input in [
+        "<div>".repeat(100_000),
+        "<svg>".repeat(100_000),
+        "<template>".repeat(50_000),
+        "<template><div>".repeat(50_000),
+        "<template><table>".repeat(50_000),
+        numbered("<b x=N>"),
+        "<a><b>".repeat(20_000) + &"</a>".repeat(20_000),
+        "<table>".to_string() + &"x<td>".repeat(20_000),
+        "<table>".to_string() + &"<p>x".repeat(20_000),
+        "<div ".to_string() + &numbered("aN=1 ") + ">",
+        "<li><ul>".repeat(20_000),
+        "<div>".repeat(20_000) + &"x<i></i>".repeat(20_000),
+        "<font color=red>".repeat(20_000) + &"<p>x".repeat(20_000),
+        "&amp".repeat(50_000),
+    ] {
+        let started = std::time::Instant::now();
+        reformat_html(&input)?;
+        let took = started.elapsed();
+        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+    }
+    Ok(())
+}

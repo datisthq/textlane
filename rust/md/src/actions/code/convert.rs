@@ -40,6 +40,7 @@ pub(crate) fn convert_code<'a>(
         properties,
         children: text,
         position: node.position,
+        content: None,
     });
     let mut children = ArenaVec::with_capacity_in(1, alloc);
     children.push(code);

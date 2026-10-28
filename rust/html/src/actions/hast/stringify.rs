@@ -1,3 +1,5 @@
+use crate::helpers::property::find_property;
+use crate::helpers::schema::HTML;
 use textlane_core::hast::{Element, Node, PropertyItem, PropertyValue};
 
 use crate::models::options::StringifyOptions;
@@ -46,7 +48,11 @@ fn write_open<'n, 'a>(
             write_start_tag(output, element, options);
             if !VOID_ELEMENTS.contains(&element.tag_name) {
                 stack.push(Step::Close(element.tag_name));
-                stack.extend(element.children.iter().rev().map(Step::Open));
+                // A template's children are its content's
+                let children = element
+                    .content
+                    .map_or(&element.children, |root| &root.children);
+                stack.extend(children.iter().rev().map(Step::Open));
             }
         }
         Node::Text(text) => write_escaped(output, text.value, &['<', '&']),
@@ -80,11 +86,8 @@ fn write_attribute(
     value: &PropertyValue<'_>,
     options: &StringifyOptions,
 ) {
-    let attribute = match name {
-        "className" => "class",
-        "htmlFor" => "for",
-        _ => name,
-    };
+    let found = find_property(&HTML, name);
+    let attribute = found.attribute.as_ref();
     let value = match value {
         PropertyValue::Null | PropertyValue::Boolean(false) => return,
         PropertyValue::Boolean(true) => {

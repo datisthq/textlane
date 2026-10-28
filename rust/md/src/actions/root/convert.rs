@@ -13,5 +13,6 @@ pub(crate) fn convert_root<'a>(
     hast::Node::Root(hast::Root {
         children: converter.wrap(children, false),
         position: node.position,
+        quirks_mode: None,
     })
 }

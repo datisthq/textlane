@@ -217,6 +217,23 @@
     </p>
   </dd>
   <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> <code>html.parse</code>
+    ports parse5 7.3.0 and hast-util-from-parse5, with scripting off as
+    hast-util-from-html parses
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> rehype's trees, positions and parse-error places are parse5's,
+      down to its quirks (a doctype ended by the end of file ends one past it), and WPT
+      passes through the same code. The tokenizer is pulled a token at a time instead of
+      calling back, which Rust's borrows make simpler and which keeps parse5's order.
+    </p>
+    <p>
+      <strong>Rejected.</strong> html5ever, whose trees match the spec but whose error
+      codes and locations do not match parse5's; a fresh parser.
+    </p>
+  </dd>
+  <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge> <code>md.stringify</code>
     ports mdast-util-to-markdown 2.2.1 handler for handler, recursing per tree level on a
     stack that grows onto the heap (<code>stacker</code>)

@@ -17,6 +17,8 @@ pub enum Node<'a> {
 pub struct Root<'a> {
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// `data.quirksMode`, set by the HTML parser: whether the document is in quirks mode.
+    pub quirks_mode: Option<bool>,
 }
 
 /// An element.
@@ -26,6 +28,8 @@ pub struct Element<'a> {
     pub properties: ArenaVec<'a, Property<'a>>,
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// A `template`'s contents, which hast keeps out of its children.
+    pub content: Option<&'a Root<'a>>,
 }
 
 /// One property of an element, by its hast name (`className`, not `class`).

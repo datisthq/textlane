@@ -34,12 +34,12 @@ impl<'a> Lines<'a> {
         let line = self.starts.partition_point(|start| *start <= offset);
         let start = self.starts[line - 1];
         // Inside a tab, however far into its columns, micromark counts the tab as passed by
-        // one column
-        let inside_tab = usize::from(point.virtual_spaces() > 0);
+        // one column; past the end, as parse5 puts a token ended by EOF, counts on the last line
+        let extra = usize::from(point.virtual_spaces() > 0) + (point.offset() - offset);
         UnistPoint {
             line,
-            column: self.count_units(start, offset) + 1 + inside_tab,
-            offset: Some(self.count_units(0, offset) + inside_tab),
+            column: self.count_units(start, offset) + 1 + extra,
+            offset: Some(self.count_units(0, offset) + extra),
         }
     }
 

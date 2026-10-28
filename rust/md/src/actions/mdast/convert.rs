@@ -41,6 +41,7 @@ pub fn convert_mdast<'a>(
     hast::Node::Root(hast::Root {
         children: nodes,
         position: None,
+        quirks_mode: None,
     })
 }
 

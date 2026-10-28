@@ -91,6 +91,16 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   `referenceType` is collapsed.
   `helpers/entities.rs` and `helpers/unicode.rs` are tables generated from markdown-rs's,
   sorted for binary search
+- `html`'s parser is a port of parse5 7.3.0, the tree hast-util-from-parse5 and hastscript
+  make from it. The tokenizer is pulled (`next_token`) where parse5 calls back: it stops
+  after each non-character token so the tree builder can switch its `state` and
+  `in_foreign_node` first, and its errors are drained before each token is handled, which
+  keeps parse5's error order. The tree builder works on `utils/builder/dom.rs`, an arena with
+  sibling links, because it moves nodes. parse5 scans for things that are not there:
+  the stack keeps per-tag counts (`has_open_tag`, the scope checks) and the formatting
+  list per-marker counts (Noah's Ark, `find_in_scope`), and parse5's recursion through
+  `onEof` for nested templates is a loop. `helpers/schema.rs` is property-information's
+  `html` and `svg` schemas, generated and sorted for a binary search
 - `md` names entities by syntax construct or mdast node and verbs by layer: `tokenize` and
   `resolve` (micromark), `compile` (from-markdown), `stringify` (to-markdown), `convert`
   (to-hast), so `actions/heading/compile.rs` exports `compile_heading`. No file named after

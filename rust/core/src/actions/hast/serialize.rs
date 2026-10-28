@@ -3,7 +3,7 @@ use serde_json::{Map, Value};
 use crate::actions::mdast::serialize::MAX_JSON_DEPTH;
 use crate::actions::position::serialize::serialize_position;
 use crate::models::error::Error;
-use crate::models::hast::{Node, PropertyItem, PropertyValue};
+use crate::models::hast::{Node, PropertyItem, PropertyValue, Root};
 use crate::models::lines::Lines;
 
 /// Serialize a hast node to the JSON unified produces; spans need the source's `lines`.
@@ -34,10 +34,7 @@ fn serialize_node(
         Ok(Value::Array(children))
     };
     match node {
-        Node::Root(root) => {
-            object.insert("type".into(), "root".into());
-            object.insert("children".into(), serialize_all(&root.children)?);
-        }
+        Node::Root(root) => return serialize_root(root, lines, depth),
         Node::Element(element) => {
             object.insert("type".into(), "element".into());
             object.insert("tagName".into(), element.tag_name.into());
@@ -50,6 +47,10 @@ fn serialize_node(
                 .collect();
             object.insert("properties".into(), Value::Object(properties));
             object.insert("children".into(), serialize_all(&element.children)?);
+            if let Some(content) = element.content {
+                object
+                    .insert("content".into(), serialize_root(content, lines, depth + 1)?);
+            }
         }
         Node::Text(text) => {
             object.insert("type".into(), "text".into());
@@ -68,6 +69,34 @@ fn serialize_node(
         }
     }
     serialize_position(&mut object, node.position(), lines);
+    Ok(Value::Object(object))
+}
+
+fn serialize_root(
+    root: &Root<'_>,
+    lines: Option<&Lines<'_>>,
+    depth: usize,
+) -> Result<Value, Error> {
+    if depth > MAX_JSON_DEPTH {
+        return Err(Error::new(
+            "tree-too-deep",
+            format!("trees nest at most {MAX_JSON_DEPTH} levels in JSON"),
+        ));
+    }
+    let mut object = Map::new();
+    object.insert("type".into(), "root".into());
+    let children = root
+        .children
+        .iter()
+        .map(|child| serialize_node(child, lines, depth + 1))
+        .collect::<Result<_, _>>()?;
+    object.insert("children".into(), Value::Array(children));
+    if let Some(quirks_mode) = root.quirks_mode {
+        let mut data = Map::new();
+        data.insert("quirksMode".into(), quirks_mode.into());
+        object.insert("data".into(), Value::Object(data));
+    }
+    serialize_position(&mut object, root.position.as_ref(), lines);
     Ok(Value::Object(object))
 }
 
