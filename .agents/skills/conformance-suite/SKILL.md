@@ -59,6 +59,7 @@ a test's `comment` only where it means something different.
   `fromMarkdown` / `toMarkdown` tests for any syntax plugin; `actions/node/evaluate.ts` and
   `actions/test/find.ts` read upstream
   test files statically with acorn.
+- A TypeScript test file is read through Node's `stripTypeScriptTypes` before acorn parses it.
 - An importer skips, and counts, what a pipeline case cannot express: options with no textlane
   equivalent yet (micromark's construct switches, `defaultLineEnding`), input that is not
   statically evaluable, lone UTF-16 surrogates, which UTF-8 input cannot hold, and stress tests

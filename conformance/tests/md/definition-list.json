@@ -1,0 +1,800 @@
+[
+  {
+    "description": "micromark-extension-definition-list",
+    "source": {
+      "repository": "https://github.com/wataru-chocola/micromark-extension-definition-list",
+      "commit": "7a9a3841bce369f4d3dfb401f27106daac2bad45",
+      "path": "dev",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.definitionList"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "simple definition list",
+        "comment": "micromark renders: <dl>\n<dt>Apple</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.</dd>\n</dl>",
+        "input": "Apple\n:   Pomaceous fruit of plants of the genus Malus in \n    the family Rosaceae.\n\nOrange\n:   The fruit of an evergreen tree of the genus Citrus.",
+        "expected": {
+          "html": "<dl>\n<dt>Apple</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.\n</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "definition with multiple lines without indentation",
+        "comment": "micromark renders: <dl>\n<dt>Apple</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.</dd>\n</dl>",
+        "input": "Apple\n:   Pomaceous fruit of plants of the genus Malus in \nthe family Rosaceae.\n\nOrange\n:   The fruit of an evergreen tree of the genus Citrus.",
+        "expected": {
+          "html": "<dl>\n<dt>Apple</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.\n</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "have one definition associated with one term",
+        "comment": "micromark renders: <dl>\n<dt>Apple</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</dd>\n<dd>An American computer company.</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.</dd>\n</dl>",
+        "input": "Apple\n:   Pomaceous fruit of plants of the genus Malus in \n    the family Rosaceae.\n:   An American computer company.\n\nOrange\n:   The fruit of an evergreen tree of the genus Citrus.",
+        "expected": {
+          "html": "<dl>\n<dt>Apple</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.\n</dd>\n<dd>An American computer company.\n</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "associate multiple terms to a definition",
+        "comment": "micromark renders: <dl>\n<dt>Term 1</dt>\n<dt>Term 2</dt>\n<dd>Definition a</dd>\n<dt>Term 3</dt>\n<dd>Definition b</dd>\n</dl>",
+        "input": "Term 1\nTerm 2\n:   Definition a\n\nTerm 3\n:   Definition b",
+        "expected": {
+          "html": "<dl>\n<dt>Term 1</dt>\n<dt>Term 2</dt>\n<dd>Definition a\n</dd>\n<dt>Term 3</dt>\n<dd>Definition b\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "definition preceded by a blank line",
+        "comment": "micromark renders: <dl>\n<dt>Apple</dt>\n<dd>\n<p>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</p>\n</dd>\n<dt>Orange</dt>\n<dd>\n<p>The fruit of an evergreen tree of the genus Citrus.</p></dd>\n</dl>",
+        "input": "Apple\n\n:   Pomaceous fruit of plants of the genus Malus in\n    the family Rosaceae.\n\nOrange\n\n:    The fruit of an evergreen tree of the genus Citrus.",
+        "expected": {
+          "html": "<dl>\n<dt>Apple</dt>\n<dd>\n<p>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</p>\n</dd>\n<dt>Orange</dt>\n<dd>\n<p>The fruit of an evergreen tree of the genus Citrus.</p>\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "definition term can be decorated",
+        "comment": "micromark renders: <dl>\n<dt>A<strong>pp</strong>le</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.</dd>\n</dl>",
+        "input": "A**pp**le\n:   Pomaceous fruit of plants of the genus Malus in\n    the family Rosaceae.\n\nOrange\n:   The fruit of an evergreen tree of the genus Citrus.",
+        "expected": {
+          "html": "<dl>\n<dt>A<strong>pp</strong>le</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.\n</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "definition term with markdown definition",
+        "comment": "micromark renders: <dl>\n<dt>A<a href=\"http://example.com/\">pp</a>le</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</dd>\n<dt>O<a href=\"http://example.com/ra\">ra</a>nge</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.</dd>\n</dl>",
+        "input": "[ra]: http://example.com/ra\nA[pp]le\n:   Pomaceous fruit of plants of the genus Malus in\n    the family Rosaceae.\n\nO[ra]nge\n:   The fruit of an evergreen tree of the genus Citrus.\n\n[pp]: http://example.com/",
+        "expected": {
+          "html": "<dl>\n<dt>A<a href=\"http://example.com/\">pp</a>le</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.\n</dd>\n<dt>O<a href=\"http://example.com/ra\">ra</a>nge</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "definition before dd-like paragraph (1)",
+        "input": "[fruit]: http://example.com/fruit\n\n:   Pomaceous [fruit] of plants of the genus Malus in\n    the family Rosaceae.",
+        "expected": {
+          "html": "<p>:   Pomaceous <a href=\"http://example.com/fruit\">fruit</a> of plants of the genus Malus in\nthe family Rosaceae.</p>"
+        }
+      },
+      {
+        "description": "definition before dd-like paragraph (2)",
+        "input": "[fruit]: http://example.com/fruit\n:   Pomaceous [fruit] of plants of the genus Malus in\n    the family Rosaceae.",
+        "expected": {
+          "html": "<p>:   Pomaceous <a href=\"http://example.com/fruit\">fruit</a> of plants of the genus Malus in\nthe family Rosaceae.</p>"
+        }
+      },
+      {
+        "description": "nested defList",
+        "comment": "micromark renders: <dl>\n<dt>Term 1</dt>\n<dd>\n<p>This is a definition wrapped by paragraph.</p>\n<dl>\n<dt>Nested term 1</dt>\n<dd>Nested description here.\nAnd next line.</dd>\n<dt>Nested term 2</dt>\n<dd>Description 2.</dd>\n</dl></dd>\n<dd>\n<p>Description.</p>\n</dd>\n<dt>Term 2</dt>\n<dd>\n<p>Description.</p></dd>\n</dl>",
+        "input": "Term 1\n\n:   This is a definition wrapped by paragraph.\n\n    Nested term 1\n    :   Nested description here.\n        And next line.\n\n    Nested term 2\n    :   Description 2.\n\n:   Description.\n\nTerm 2\n\n:   Description.",
+        "expected": {
+          "html": "<dl>\n<dt>Term 1</dt>\n<dd>\n<p>This is a definition wrapped by paragraph.</p>\n<dl>\n<dt>Nested term 1</dt>\n<dd>Nested description here.\nAnd next line.\n</dd>\n<dt>Nested term 2</dt>\n<dd>Description 2.\n</dd>\n</dl>\n</dd>\n<dd>\n<p>Description.</p>\n</dd>\n<dt>Term 2</dt>\n<dd>\n<p>Description.</p>\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "defList can contain multiple paragraph and other block-level elements",
+        "comment": "micromark renders: <dl>\n<dt>Term 1</dt>\n<dd>\n<p>This is a definition with two paragraphs. Lorem ipsum\ndolor sit amet, consectetuer adipiscing elit. Aliquam\nhendrerit mi posuere lectus.</p>\n<p>Vestibulum enim wisi, viverra nec, fringilla in, laoreet\nvitae, risus.</p>\n</dd>\n<dd>\n<p>Second definition for term 1, also wrapped in a paragraph\nbecause of the blank line preceding it.</p>\n</dd>\n<dt>Term 2</dt>\n<dd>\n<p>This definition has a code block, a blockquote and a list.</p>\n<pre><code>code block.\n</code></pre>\n<blockquote>\n<p>block quote\non two lines.</p>\n</blockquote>\n<ol>\n<li>first list item</li>\n<li>second list item</li>\n</ol></dd>\n</dl>",
+        "input": "Term 1\n\n:   This is a definition with two paragraphs. Lorem ipsum\n    dolor sit amet, consectetuer adipiscing elit. Aliquam\n    hendrerit mi posuere lectus.\n\n    Vestibulum enim wisi, viverra nec, fringilla in, laoreet\n    vitae, risus.\n\n:   Second definition for term 1, also wrapped in a paragraph\n    because of the blank line preceding it.\n\nTerm 2\n\n:   This definition has a code block, a blockquote and a list.\n\n        code block.\n\n    > block quote\n    > on two lines.\n\n    1.  first list item\n    2.  second list item",
+        "expected": {
+          "html": "<dl>\n<dt>Term 1</dt>\n<dd>\n<p>This is a definition with two paragraphs. Lorem ipsum\ndolor sit amet, consectetuer adipiscing elit. Aliquam\nhendrerit mi posuere lectus.</p>\n<p>Vestibulum enim wisi, viverra nec, fringilla in, laoreet\nvitae, risus.</p>\n</dd>\n<dd>\n<p>Second definition for term 1, also wrapped in a paragraph\nbecause of the blank line preceding it.</p>\n</dd>\n<dt>Term 2</dt>\n<dd>\n<p>This definition has a code block, a blockquote and a list.</p>\n<pre><code>code block.\n</code></pre>\n<blockquote>\n<p>block quote\non two lines.</p>\n</blockquote>\n<ol>\n<li>first list item</li>\n<li>second list item</li>\n</ol>\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "document with multiple defList and other contents",
+        "comment": "micromark renders: <h1>Header 1</h1>\n<dl>\n<dt>Term 1</dt>\n<dd>Description 1</dd>\n<dd>Description 2</dd>\n<dt>Term 2</dt>\n<dd>Description 3</dd>\n</dl>\n<p>This is paragraph.</p>\n<dl>\n<dt>New Term A</dt>\n<dd>Description A\nwith countinous line.</dd>\n<dd>Description B</dd>\n</dl>",
+        "input": "# Header 1\n\nTerm 1\n:   Description 1\n:   Description 2\n\nTerm 2\n:   Description 3\n\nThis is paragraph.\n\nNew Term A\n: Description A\n  with countinous line.\n: Description B\n",
+        "expected": {
+          "html": "<h1>Header 1</h1>\n<dl>\n<dt>Term 1</dt>\n<dd>Description 1\n</dd>\n<dd>Description 2\n</dd>\n<dt>Term 2</dt>\n<dd>Description 3\n</dd>\n</dl>\n<p>This is paragraph.</p>\n<dl>\n<dt>New Term A</dt>\n<dd>Description A\nwith countinous line.\n</dd>\n<dd>Description B\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "defList cannot start without any term",
+        "input": ": Definition a",
+        "expected": {
+          "html": "<p>: Definition a</p>"
+        }
+      },
+      {
+        "description": "defList cannot start without any term (2)",
+        "input": "- a\n- b\n\n: Definition a",
+        "expected": {
+          "html": "<ul>\n<li>a</li>\n<li>b</li>\n</ul>\n<p>: Definition a</p>"
+        }
+      },
+      {
+        "description": "defList cannot start without any term, but this IS defList",
+        "comment": "micromark renders: <dl>\n<dt>: Definition a</dt>\n<dd>Definition b</dd>\n</dl>",
+        "input": ": Definition a\n: Definition b",
+        "expected": {
+          "html": "<dl>\n<dt>: Definition a</dt>\n<dd>Definition b\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "colon after thematicBreak",
+        "input": "****\n: NotDefinition",
+        "expected": {
+          "html": "<hr>\n<p>: NotDefinition</p>"
+        }
+      },
+      {
+        "description": "colon after heading",
+        "input": "# heading\n: NotDefinition",
+        "expected": {
+          "html": "<h1>heading</h1>\n<p>: NotDefinition</p>"
+        }
+      },
+      {
+        "description": "colon after the start of fenced code",
+        "input": "```\n: Definition\n```",
+        "expected": {
+          "html": "<pre><code>: Definition\n</code></pre>"
+        }
+      },
+      {
+        "description": "single term starting with whitespace",
+        "comment": "micromark renders: <dl>\n<dt>Term1</dt>\n<dd>Definition a</dd>\n</dl>",
+        "input": " Term1\n: Definition a",
+        "expected": {
+          "html": "<dl>\n<dt>Term1</dt>\n<dd>Definition a\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "multiple terms starting with whitespace",
+        "comment": "micromark renders: <dl>\n<dt>Term1</dt>\n<dt> Term2</dt>\n<dd>Definition a</dd>\n</dl>",
+        "input": " Term1\n Term2\n: Definition a",
+        "expected": {
+          "html": "<dl>\n<dt>Term1</dt>\n<dt> Term2</dt>\n<dd>Definition a\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "defList starting in lazy line of blockquote",
+        "comment": "micromark renders: <blockquote>\n<p>BlockQuote\n</p>\n</blockquote>\n<dl>\n<dt>Term</dt>\n<dd>Definition a</dd>\n</dl>",
+        "input": "> BlockQuote\nTerm\n: Definition a",
+        "expected": {
+          "html": "<blockquote>\n<p>BlockQuote\n</p>\n</blockquote>\n<dl>\n<dt>Term</dt>\n<dd>Definition a\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "no more than two blank lines between term and description",
+        "input": "Apple\n\n\n:   Pomaceous fruit of plants of the genus Malus in\n    the family Rosaceae.\n\nOrange\n\n\n:   The fruit of an evergreen tree of the genus Citrus.",
+        "expected": {
+          "html": "<p>Apple</p>\n<p>:   Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</p>\n<p>Orange</p>\n<p>:   The fruit of an evergreen tree of the genus Citrus.</p>"
+        }
+      },
+      {
+        "description": "regression: list inside dd followed by another dd without emptyline",
+        "comment": "micromark renders: <dl>\n<dt>Term1</dt>\n<dd>Description 1.\n<ul>\n<li>li1</li>\n<li>li2</li>\n<li>li3</li>\n</ul>\n</dd>\n<dd>Description 2.</dd>\n</dl>",
+        "input": "Term1\n: Description 1.\n    * li1\n    * li2\n    * li3\n: Description 2.",
+        "expected": {
+          "html": "<dl>\n<dt>Term1</dt>\n<dd>Description 1.\n<ul>\n<li>li1</li>\n<li>li2</li>\n<li>li3</li>\n</ul>\n</dd>\n<dd>Description 2.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "regression: list inside dd followed by not-dd text without emptyline",
+        "comment": "micromark renders: <dl>\n<dt>Term1</dt>\n<dd>Description 1.\n<ul>\n<li>li1</li>\n<li>li2\nNotTerm2</li>\n</ul>\n</dd>\n<dd>Description 2.</dd>\n</dl>",
+        "input": "Term1\n: Description 1.\n    * li1\n    * li2\nNotTerm2\n: Description 2.",
+        "expected": {
+          "html": "<dl>\n<dt>Term1</dt>\n<dd>Description 1.\n<ul>\n<li>li1</li>\n<li>li2\nNotTerm2</li>\n</ul>\n</dd>\n<dd>Description 2.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "regression: fenced code",
+        "comment": "micromark renders: <dl>\n<dt>Term</dt>\n<dd>\n<pre><code>This is test.\nAnd next line.\n</code></pre></dd>\n</dl>",
+        "input": "Term\n:   ```\n    This is test.\n    And next line.\n    ```",
+        "expected": {
+          "html": "<dl>\n<dt>Term</dt>\n<dd>\n<pre><code>This is test.\nAnd next line.\n</code></pre>\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "regression: blankline followed by fenced code",
+        "comment": "micromark renders: <dl>\n<dt>Term</dt>\n<dd>\n<pre><code>This is test.\nAnd next line.\n</code></pre></dd>\n</dl>",
+        "input": "Term\n:\n    ```\n    This is test.\n    And next line.\n    ```",
+        "expected": {
+          "html": "<dl>\n<dt>Term</dt>\n<dd>\n<pre><code>This is test.\nAnd next line.\n</code></pre>\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "regression: dd inside of blockquote",
+        "comment": "micromark renders: <blockquote>\n<dl>\n<dt>Term1</dt>\n<dd>Description 1.</dd>\n<dd>Description 2.</dd>\n<dt>Term2</dt>\n<dd>Description 1.</dd>\n<dd>Description 2.</dd>\n</dl>\n</blockquote>",
+        "input": "> Term1\n> : Description 1.\n> : Description 2.\n>\n> Term2\n> : Description 1.\n> : Description 2.",
+        "expected": {
+          "html": "<blockquote>\n<dl>\n<dt>Term1</dt>\n<dd>Description 1.\n</dd>\n<dd>Description 2.\n</dd>\n<dt>Term2</dt>\n<dd>Description 1.\n</dd>\n<dd>Description 2.\n</dd>\n</dl>\n</blockquote>"
+        }
+      },
+      {
+        "description": "regression: dd inside of nested blockquote",
+        "comment": "micromark renders: <blockquote>\n<blockquote>\n<dl>\n<dt>Term1</dt>\n<dd>Description 1.</dd>\n<dd>Description 2.</dd>\n</dl>\n</blockquote>\n</blockquote>",
+        "input": "> > Term1\n> > : Description 1.\n> > : Description 2.",
+        "expected": {
+          "html": "<blockquote>\n<blockquote>\n<dl>\n<dt>Term1</dt>\n<dd>Description 1.\n</dd>\n<dd>Description 2.\n</dd>\n</dl>\n</blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "regression: dd-like stuff inside of blockquote",
+        "input": "test\n\n> : Description 1.",
+        "expected": {
+          "html": "<p>test</p>\n<blockquote>\n<p>: Description 1.</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "regression: dd-like stuff inside of nested blockquote",
+        "input": "> Term1\n> > : Description 1.",
+        "expected": {
+          "html": "<blockquote>\n<p>Term1</p>\n<blockquote>\n<p>: Description 1.</p>\n</blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "indented code",
+        "input": "Term\n:       This is test.\n        And next line.\n\n*   one\n*       Code first line.\n        Second.",
+        "expected": {
+          "html": "<dl>\n<dt>Term</dt>\n<dd>\n<pre><code>  This is test.\n  And next line.\n</code></pre>\n</dd>\n</dl>\n<ul>\n<li>one</li>\n<li>\n<pre><code>  Code first line.\n  Second.\n</code></pre>\n</li>\n</ul>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark-extension-definition-list dangerous HTML allowed",
+    "source": {
+      "repository": "https://github.com/wataru-chocola/micromark-extension-definition-list",
+      "commit": "7a9a3841bce369f4d3dfb401f27106daac2bad45",
+      "path": "dev",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.definitionList"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "simple definition list",
+        "comment": "micromark renders: <dl>\n<dt>Apple</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.</dd>\n</dl>",
+        "input": "Apple\n:   Pomaceous fruit of plants of the genus Malus in \n    the family Rosaceae.\n\nOrange\n:   The fruit of an evergreen tree of the genus Citrus.",
+        "expected": {
+          "html": "<dl>\n<dt>Apple</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.\n</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "definition with multiple lines without indentation",
+        "comment": "micromark renders: <dl>\n<dt>Apple</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.</dd>\n</dl>",
+        "input": "Apple\n:   Pomaceous fruit of plants of the genus Malus in \nthe family Rosaceae.\n\nOrange\n:   The fruit of an evergreen tree of the genus Citrus.",
+        "expected": {
+          "html": "<dl>\n<dt>Apple</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.\n</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "have one definition associated with one term",
+        "comment": "micromark renders: <dl>\n<dt>Apple</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</dd>\n<dd>An American computer company.</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.</dd>\n</dl>",
+        "input": "Apple\n:   Pomaceous fruit of plants of the genus Malus in \n    the family Rosaceae.\n:   An American computer company.\n\nOrange\n:   The fruit of an evergreen tree of the genus Citrus.",
+        "expected": {
+          "html": "<dl>\n<dt>Apple</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.\n</dd>\n<dd>An American computer company.\n</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "associate multiple terms to a definition",
+        "comment": "micromark renders: <dl>\n<dt>Term 1</dt>\n<dt>Term 2</dt>\n<dd>Definition a</dd>\n<dt>Term 3</dt>\n<dd>Definition b</dd>\n</dl>",
+        "input": "Term 1\nTerm 2\n:   Definition a\n\nTerm 3\n:   Definition b",
+        "expected": {
+          "html": "<dl>\n<dt>Term 1</dt>\n<dt>Term 2</dt>\n<dd>Definition a\n</dd>\n<dt>Term 3</dt>\n<dd>Definition b\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "definition preceded by a blank line",
+        "comment": "micromark renders: <dl>\n<dt>Apple</dt>\n<dd>\n<p>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</p>\n</dd>\n<dt>Orange</dt>\n<dd>\n<p>The fruit of an evergreen tree of the genus Citrus.</p></dd>\n</dl>",
+        "input": "Apple\n\n:   Pomaceous fruit of plants of the genus Malus in\n    the family Rosaceae.\n\nOrange\n\n:    The fruit of an evergreen tree of the genus Citrus.",
+        "expected": {
+          "html": "<dl>\n<dt>Apple</dt>\n<dd>\n<p>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</p>\n</dd>\n<dt>Orange</dt>\n<dd>\n<p>The fruit of an evergreen tree of the genus Citrus.</p>\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "definition term can be decorated",
+        "comment": "micromark renders: <dl>\n<dt>A<strong>pp</strong>le</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.</dd>\n</dl>",
+        "input": "A**pp**le\n:   Pomaceous fruit of plants of the genus Malus in\n    the family Rosaceae.\n\nOrange\n:   The fruit of an evergreen tree of the genus Citrus.",
+        "expected": {
+          "html": "<dl>\n<dt>A<strong>pp</strong>le</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.\n</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "definition term with markdown definition",
+        "comment": "micromark renders: <dl>\n<dt>A<a href=\"http://example.com/\">pp</a>le</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</dd>\n<dt>O<a href=\"http://example.com/ra\">ra</a>nge</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.</dd>\n</dl>",
+        "input": "[ra]: http://example.com/ra\nA[pp]le\n:   Pomaceous fruit of plants of the genus Malus in\n    the family Rosaceae.\n\nO[ra]nge\n:   The fruit of an evergreen tree of the genus Citrus.\n\n[pp]: http://example.com/",
+        "expected": {
+          "html": "<dl>\n<dt>A<a href=\"http://example.com/\">pp</a>le</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.\n</dd>\n<dt>O<a href=\"http://example.com/ra\">ra</a>nge</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "definition before dd-like paragraph (1)",
+        "input": "[fruit]: http://example.com/fruit\n\n:   Pomaceous [fruit] of plants of the genus Malus in\n    the family Rosaceae.",
+        "expected": {
+          "html": "<p>:   Pomaceous <a href=\"http://example.com/fruit\">fruit</a> of plants of the genus Malus in\nthe family Rosaceae.</p>"
+        }
+      },
+      {
+        "description": "definition before dd-like paragraph (2)",
+        "input": "[fruit]: http://example.com/fruit\n:   Pomaceous [fruit] of plants of the genus Malus in\n    the family Rosaceae.",
+        "expected": {
+          "html": "<p>:   Pomaceous <a href=\"http://example.com/fruit\">fruit</a> of plants of the genus Malus in\nthe family Rosaceae.</p>"
+        }
+      },
+      {
+        "description": "nested defList",
+        "comment": "micromark renders: <dl>\n<dt>Term 1</dt>\n<dd>\n<p>This is a definition wrapped by paragraph.</p>\n<dl>\n<dt>Nested term 1</dt>\n<dd>Nested description here.\nAnd next line.</dd>\n<dt>Nested term 2</dt>\n<dd>Description 2.</dd>\n</dl></dd>\n<dd>\n<p>Description.</p>\n</dd>\n<dt>Term 2</dt>\n<dd>\n<p>Description.</p></dd>\n</dl>",
+        "input": "Term 1\n\n:   This is a definition wrapped by paragraph.\n\n    Nested term 1\n    :   Nested description here.\n        And next line.\n\n    Nested term 2\n    :   Description 2.\n\n:   Description.\n\nTerm 2\n\n:   Description.",
+        "expected": {
+          "html": "<dl>\n<dt>Term 1</dt>\n<dd>\n<p>This is a definition wrapped by paragraph.</p>\n<dl>\n<dt>Nested term 1</dt>\n<dd>Nested description here.\nAnd next line.\n</dd>\n<dt>Nested term 2</dt>\n<dd>Description 2.\n</dd>\n</dl>\n</dd>\n<dd>\n<p>Description.</p>\n</dd>\n<dt>Term 2</dt>\n<dd>\n<p>Description.</p>\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "defList can contain multiple paragraph and other block-level elements",
+        "comment": "micromark renders: <dl>\n<dt>Term 1</dt>\n<dd>\n<p>This is a definition with two paragraphs. Lorem ipsum\ndolor sit amet, consectetuer adipiscing elit. Aliquam\nhendrerit mi posuere lectus.</p>\n<p>Vestibulum enim wisi, viverra nec, fringilla in, laoreet\nvitae, risus.</p>\n</dd>\n<dd>\n<p>Second definition for term 1, also wrapped in a paragraph\nbecause of the blank line preceding it.</p>\n</dd>\n<dt>Term 2</dt>\n<dd>\n<p>This definition has a code block, a blockquote and a list.</p>\n<pre><code>code block.\n</code></pre>\n<blockquote>\n<p>block quote\non two lines.</p>\n</blockquote>\n<ol>\n<li>first list item</li>\n<li>second list item</li>\n</ol></dd>\n</dl>",
+        "input": "Term 1\n\n:   This is a definition with two paragraphs. Lorem ipsum\n    dolor sit amet, consectetuer adipiscing elit. Aliquam\n    hendrerit mi posuere lectus.\n\n    Vestibulum enim wisi, viverra nec, fringilla in, laoreet\n    vitae, risus.\n\n:   Second definition for term 1, also wrapped in a paragraph\n    because of the blank line preceding it.\n\nTerm 2\n\n:   This definition has a code block, a blockquote and a list.\n\n        code block.\n\n    > block quote\n    > on two lines.\n\n    1.  first list item\n    2.  second list item",
+        "expected": {
+          "html": "<dl>\n<dt>Term 1</dt>\n<dd>\n<p>This is a definition with two paragraphs. Lorem ipsum\ndolor sit amet, consectetuer adipiscing elit. Aliquam\nhendrerit mi posuere lectus.</p>\n<p>Vestibulum enim wisi, viverra nec, fringilla in, laoreet\nvitae, risus.</p>\n</dd>\n<dd>\n<p>Second definition for term 1, also wrapped in a paragraph\nbecause of the blank line preceding it.</p>\n</dd>\n<dt>Term 2</dt>\n<dd>\n<p>This definition has a code block, a blockquote and a list.</p>\n<pre><code>code block.\n</code></pre>\n<blockquote>\n<p>block quote\non two lines.</p>\n</blockquote>\n<ol>\n<li>first list item</li>\n<li>second list item</li>\n</ol>\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "document with multiple defList and other contents",
+        "comment": "micromark renders: <h1>Header 1</h1>\n<dl>\n<dt>Term 1</dt>\n<dd>Description 1</dd>\n<dd>Description 2</dd>\n<dt>Term 2</dt>\n<dd>Description 3</dd>\n</dl>\n<p>This is paragraph.</p>\n<dl>\n<dt>New Term A</dt>\n<dd>Description A\nwith countinous line.</dd>\n<dd>Description B</dd>\n</dl>",
+        "input": "# Header 1\n\nTerm 1\n:   Description 1\n:   Description 2\n\nTerm 2\n:   Description 3\n\nThis is paragraph.\n\nNew Term A\n: Description A\n  with countinous line.\n: Description B\n",
+        "expected": {
+          "html": "<h1>Header 1</h1>\n<dl>\n<dt>Term 1</dt>\n<dd>Description 1\n</dd>\n<dd>Description 2\n</dd>\n<dt>Term 2</dt>\n<dd>Description 3\n</dd>\n</dl>\n<p>This is paragraph.</p>\n<dl>\n<dt>New Term A</dt>\n<dd>Description A\nwith countinous line.\n</dd>\n<dd>Description B\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "defList cannot start without any term",
+        "input": ": Definition a",
+        "expected": {
+          "html": "<p>: Definition a</p>"
+        }
+      },
+      {
+        "description": "defList cannot start without any term (2)",
+        "input": "- a\n- b\n\n: Definition a",
+        "expected": {
+          "html": "<ul>\n<li>a</li>\n<li>b</li>\n</ul>\n<p>: Definition a</p>"
+        }
+      },
+      {
+        "description": "defList cannot start without any term, but this IS defList",
+        "comment": "micromark renders: <dl>\n<dt>: Definition a</dt>\n<dd>Definition b</dd>\n</dl>",
+        "input": ": Definition a\n: Definition b",
+        "expected": {
+          "html": "<dl>\n<dt>: Definition a</dt>\n<dd>Definition b\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "colon after thematicBreak",
+        "input": "****\n: NotDefinition",
+        "expected": {
+          "html": "<hr>\n<p>: NotDefinition</p>"
+        }
+      },
+      {
+        "description": "colon after heading",
+        "input": "# heading\n: NotDefinition",
+        "expected": {
+          "html": "<h1>heading</h1>\n<p>: NotDefinition</p>"
+        }
+      },
+      {
+        "description": "colon after the start of fenced code",
+        "input": "```\n: Definition\n```",
+        "expected": {
+          "html": "<pre><code>: Definition\n</code></pre>"
+        }
+      },
+      {
+        "description": "single term starting with whitespace",
+        "comment": "micromark renders: <dl>\n<dt>Term1</dt>\n<dd>Definition a</dd>\n</dl>",
+        "input": " Term1\n: Definition a",
+        "expected": {
+          "html": "<dl>\n<dt>Term1</dt>\n<dd>Definition a\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "multiple terms starting with whitespace",
+        "comment": "micromark renders: <dl>\n<dt>Term1</dt>\n<dt> Term2</dt>\n<dd>Definition a</dd>\n</dl>",
+        "input": " Term1\n Term2\n: Definition a",
+        "expected": {
+          "html": "<dl>\n<dt>Term1</dt>\n<dt> Term2</dt>\n<dd>Definition a\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "defList starting in lazy line of blockquote",
+        "comment": "micromark renders: <blockquote>\n<p>BlockQuote\n</p>\n</blockquote>\n<dl>\n<dt>Term</dt>\n<dd>Definition a</dd>\n</dl>",
+        "input": "> BlockQuote\nTerm\n: Definition a",
+        "expected": {
+          "html": "<blockquote>\n<p>BlockQuote\n</p>\n</blockquote>\n<dl>\n<dt>Term</dt>\n<dd>Definition a\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "no more than two blank lines between term and description",
+        "input": "Apple\n\n\n:   Pomaceous fruit of plants of the genus Malus in\n    the family Rosaceae.\n\nOrange\n\n\n:   The fruit of an evergreen tree of the genus Citrus.",
+        "expected": {
+          "html": "<p>Apple</p>\n<p>:   Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</p>\n<p>Orange</p>\n<p>:   The fruit of an evergreen tree of the genus Citrus.</p>"
+        }
+      },
+      {
+        "description": "regression: list inside dd followed by another dd without emptyline",
+        "comment": "micromark renders: <dl>\n<dt>Term1</dt>\n<dd>Description 1.\n<ul>\n<li>li1</li>\n<li>li2</li>\n<li>li3</li>\n</ul>\n</dd>\n<dd>Description 2.</dd>\n</dl>",
+        "input": "Term1\n: Description 1.\n    * li1\n    * li2\n    * li3\n: Description 2.",
+        "expected": {
+          "html": "<dl>\n<dt>Term1</dt>\n<dd>Description 1.\n<ul>\n<li>li1</li>\n<li>li2</li>\n<li>li3</li>\n</ul>\n</dd>\n<dd>Description 2.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "regression: list inside dd followed by not-dd text without emptyline",
+        "comment": "micromark renders: <dl>\n<dt>Term1</dt>\n<dd>Description 1.\n<ul>\n<li>li1</li>\n<li>li2\nNotTerm2</li>\n</ul>\n</dd>\n<dd>Description 2.</dd>\n</dl>",
+        "input": "Term1\n: Description 1.\n    * li1\n    * li2\nNotTerm2\n: Description 2.",
+        "expected": {
+          "html": "<dl>\n<dt>Term1</dt>\n<dd>Description 1.\n<ul>\n<li>li1</li>\n<li>li2\nNotTerm2</li>\n</ul>\n</dd>\n<dd>Description 2.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "regression: fenced code",
+        "comment": "micromark renders: <dl>\n<dt>Term</dt>\n<dd>\n<pre><code>This is test.\nAnd next line.\n</code></pre></dd>\n</dl>",
+        "input": "Term\n:   ```\n    This is test.\n    And next line.\n    ```",
+        "expected": {
+          "html": "<dl>\n<dt>Term</dt>\n<dd>\n<pre><code>This is test.\nAnd next line.\n</code></pre>\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "regression: blankline followed by fenced code",
+        "comment": "micromark renders: <dl>\n<dt>Term</dt>\n<dd>\n<pre><code>This is test.\nAnd next line.\n</code></pre></dd>\n</dl>",
+        "input": "Term\n:\n    ```\n    This is test.\n    And next line.\n    ```",
+        "expected": {
+          "html": "<dl>\n<dt>Term</dt>\n<dd>\n<pre><code>This is test.\nAnd next line.\n</code></pre>\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "regression: dd inside of blockquote",
+        "comment": "micromark renders: <blockquote>\n<dl>\n<dt>Term1</dt>\n<dd>Description 1.</dd>\n<dd>Description 2.</dd>\n<dt>Term2</dt>\n<dd>Description 1.</dd>\n<dd>Description 2.</dd>\n</dl>\n</blockquote>",
+        "input": "> Term1\n> : Description 1.\n> : Description 2.\n>\n> Term2\n> : Description 1.\n> : Description 2.",
+        "expected": {
+          "html": "<blockquote>\n<dl>\n<dt>Term1</dt>\n<dd>Description 1.\n</dd>\n<dd>Description 2.\n</dd>\n<dt>Term2</dt>\n<dd>Description 1.\n</dd>\n<dd>Description 2.\n</dd>\n</dl>\n</blockquote>"
+        }
+      },
+      {
+        "description": "regression: dd inside of nested blockquote",
+        "comment": "micromark renders: <blockquote>\n<blockquote>\n<dl>\n<dt>Term1</dt>\n<dd>Description 1.</dd>\n<dd>Description 2.</dd>\n</dl>\n</blockquote>\n</blockquote>",
+        "input": "> > Term1\n> > : Description 1.\n> > : Description 2.",
+        "expected": {
+          "html": "<blockquote>\n<blockquote>\n<dl>\n<dt>Term1</dt>\n<dd>Description 1.\n</dd>\n<dd>Description 2.\n</dd>\n</dl>\n</blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "regression: dd-like stuff inside of blockquote",
+        "input": "test\n\n> : Description 1.",
+        "expected": {
+          "html": "<p>test</p>\n<blockquote>\n<p>: Description 1.</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "regression: dd-like stuff inside of nested blockquote",
+        "input": "> Term1\n> > : Description 1.",
+        "expected": {
+          "html": "<blockquote>\n<p>Term1</p>\n<blockquote>\n<p>: Description 1.</p>\n</blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "deflist and table",
+        "comment": "micromark renders: <dl>\n<dt><em>term</em></dt>\n<dd>hello</dd>\n</dl>",
+        "input": "<em>term</em>\n: hello",
+        "expected": {
+          "html": "<dl>\n<dt><em>term</em></dt>\n<dd>hello\n</dd>\n</dl>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark-extension-definition-list with GFM",
+    "source": {
+      "repository": "https://github.com/wataru-chocola/micromark-extension-definition-list",
+      "commit": "7a9a3841bce369f4d3dfb401f27106daac2bad45",
+      "path": "dev",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      ["md.definitionList"],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "simple definition list",
+        "comment": "micromark renders: <dl>\n<dt>Apple</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.</dd>\n</dl>",
+        "input": "Apple\n:   Pomaceous fruit of plants of the genus Malus in \n    the family Rosaceae.\n\nOrange\n:   The fruit of an evergreen tree of the genus Citrus.",
+        "expected": {
+          "html": "<dl>\n<dt>Apple</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.\n</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "definition with multiple lines without indentation",
+        "comment": "micromark renders: <dl>\n<dt>Apple</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.</dd>\n</dl>",
+        "input": "Apple\n:   Pomaceous fruit of plants of the genus Malus in \nthe family Rosaceae.\n\nOrange\n:   The fruit of an evergreen tree of the genus Citrus.",
+        "expected": {
+          "html": "<dl>\n<dt>Apple</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.\n</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "have one definition associated with one term",
+        "comment": "micromark renders: <dl>\n<dt>Apple</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</dd>\n<dd>An American computer company.</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.</dd>\n</dl>",
+        "input": "Apple\n:   Pomaceous fruit of plants of the genus Malus in \n    the family Rosaceae.\n:   An American computer company.\n\nOrange\n:   The fruit of an evergreen tree of the genus Citrus.",
+        "expected": {
+          "html": "<dl>\n<dt>Apple</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.\n</dd>\n<dd>An American computer company.\n</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "associate multiple terms to a definition",
+        "comment": "micromark renders: <dl>\n<dt>Term 1</dt>\n<dt>Term 2</dt>\n<dd>Definition a</dd>\n<dt>Term 3</dt>\n<dd>Definition b</dd>\n</dl>",
+        "input": "Term 1\nTerm 2\n:   Definition a\n\nTerm 3\n:   Definition b",
+        "expected": {
+          "html": "<dl>\n<dt>Term 1</dt>\n<dt>Term 2</dt>\n<dd>Definition a\n</dd>\n<dt>Term 3</dt>\n<dd>Definition b\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "definition preceded by a blank line",
+        "comment": "micromark renders: <dl>\n<dt>Apple</dt>\n<dd>\n<p>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</p>\n</dd>\n<dt>Orange</dt>\n<dd>\n<p>The fruit of an evergreen tree of the genus Citrus.</p></dd>\n</dl>",
+        "input": "Apple\n\n:   Pomaceous fruit of plants of the genus Malus in\n    the family Rosaceae.\n\nOrange\n\n:    The fruit of an evergreen tree of the genus Citrus.",
+        "expected": {
+          "html": "<dl>\n<dt>Apple</dt>\n<dd>\n<p>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</p>\n</dd>\n<dt>Orange</dt>\n<dd>\n<p>The fruit of an evergreen tree of the genus Citrus.</p>\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "definition term can be decorated",
+        "comment": "micromark renders: <dl>\n<dt>A<strong>pp</strong>le</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.</dd>\n</dl>",
+        "input": "A**pp**le\n:   Pomaceous fruit of plants of the genus Malus in\n    the family Rosaceae.\n\nOrange\n:   The fruit of an evergreen tree of the genus Citrus.",
+        "expected": {
+          "html": "<dl>\n<dt>A<strong>pp</strong>le</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.\n</dd>\n<dt>Orange</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "definition term with markdown definition",
+        "comment": "micromark renders: <dl>\n<dt>A<a href=\"http://example.com/\">pp</a>le</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</dd>\n<dt>O<a href=\"http://example.com/ra\">ra</a>nge</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.</dd>\n</dl>",
+        "input": "[ra]: http://example.com/ra\nA[pp]le\n:   Pomaceous fruit of plants of the genus Malus in\n    the family Rosaceae.\n\nO[ra]nge\n:   The fruit of an evergreen tree of the genus Citrus.\n\n[pp]: http://example.com/",
+        "expected": {
+          "html": "<dl>\n<dt>A<a href=\"http://example.com/\">pp</a>le</dt>\n<dd>Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.\n</dd>\n<dt>O<a href=\"http://example.com/ra\">ra</a>nge</dt>\n<dd>The fruit of an evergreen tree of the genus Citrus.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "definition before dd-like paragraph (1)",
+        "input": "[fruit]: http://example.com/fruit\n\n:   Pomaceous [fruit] of plants of the genus Malus in\n    the family Rosaceae.",
+        "expected": {
+          "html": "<p>:   Pomaceous <a href=\"http://example.com/fruit\">fruit</a> of plants of the genus Malus in\nthe family Rosaceae.</p>"
+        }
+      },
+      {
+        "description": "definition before dd-like paragraph (2)",
+        "input": "[fruit]: http://example.com/fruit\n:   Pomaceous [fruit] of plants of the genus Malus in\n    the family Rosaceae.",
+        "expected": {
+          "html": "<p>:   Pomaceous <a href=\"http://example.com/fruit\">fruit</a> of plants of the genus Malus in\nthe family Rosaceae.</p>"
+        }
+      },
+      {
+        "description": "nested defList",
+        "comment": "micromark renders: <dl>\n<dt>Term 1</dt>\n<dd>\n<p>This is a definition wrapped by paragraph.</p>\n<dl>\n<dt>Nested term 1</dt>\n<dd>Nested description here.\nAnd next line.</dd>\n<dt>Nested term 2</dt>\n<dd>Description 2.</dd>\n</dl></dd>\n<dd>\n<p>Description.</p>\n</dd>\n<dt>Term 2</dt>\n<dd>\n<p>Description.</p></dd>\n</dl>",
+        "input": "Term 1\n\n:   This is a definition wrapped by paragraph.\n\n    Nested term 1\n    :   Nested description here.\n        And next line.\n\n    Nested term 2\n    :   Description 2.\n\n:   Description.\n\nTerm 2\n\n:   Description.",
+        "expected": {
+          "html": "<dl>\n<dt>Term 1</dt>\n<dd>\n<p>This is a definition wrapped by paragraph.</p>\n<dl>\n<dt>Nested term 1</dt>\n<dd>Nested description here.\nAnd next line.\n</dd>\n<dt>Nested term 2</dt>\n<dd>Description 2.\n</dd>\n</dl>\n</dd>\n<dd>\n<p>Description.</p>\n</dd>\n<dt>Term 2</dt>\n<dd>\n<p>Description.</p>\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "defList can contain multiple paragraph and other block-level elements",
+        "comment": "micromark renders: <dl>\n<dt>Term 1</dt>\n<dd>\n<p>This is a definition with two paragraphs. Lorem ipsum\ndolor sit amet, consectetuer adipiscing elit. Aliquam\nhendrerit mi posuere lectus.</p>\n<p>Vestibulum enim wisi, viverra nec, fringilla in, laoreet\nvitae, risus.</p>\n</dd>\n<dd>\n<p>Second definition for term 1, also wrapped in a paragraph\nbecause of the blank line preceding it.</p>\n</dd>\n<dt>Term 2</dt>\n<dd>\n<p>This definition has a code block, a blockquote and a list.</p>\n<pre><code>code block.\n</code></pre>\n<blockquote>\n<p>block quote\non two lines.</p>\n</blockquote>\n<ol>\n<li>first list item</li>\n<li>second list item</li>\n</ol></dd>\n</dl>",
+        "input": "Term 1\n\n:   This is a definition with two paragraphs. Lorem ipsum\n    dolor sit amet, consectetuer adipiscing elit. Aliquam\n    hendrerit mi posuere lectus.\n\n    Vestibulum enim wisi, viverra nec, fringilla in, laoreet\n    vitae, risus.\n\n:   Second definition for term 1, also wrapped in a paragraph\n    because of the blank line preceding it.\n\nTerm 2\n\n:   This definition has a code block, a blockquote and a list.\n\n        code block.\n\n    > block quote\n    > on two lines.\n\n    1.  first list item\n    2.  second list item",
+        "expected": {
+          "html": "<dl>\n<dt>Term 1</dt>\n<dd>\n<p>This is a definition with two paragraphs. Lorem ipsum\ndolor sit amet, consectetuer adipiscing elit. Aliquam\nhendrerit mi posuere lectus.</p>\n<p>Vestibulum enim wisi, viverra nec, fringilla in, laoreet\nvitae, risus.</p>\n</dd>\n<dd>\n<p>Second definition for term 1, also wrapped in a paragraph\nbecause of the blank line preceding it.</p>\n</dd>\n<dt>Term 2</dt>\n<dd>\n<p>This definition has a code block, a blockquote and a list.</p>\n<pre><code>code block.\n</code></pre>\n<blockquote>\n<p>block quote\non two lines.</p>\n</blockquote>\n<ol>\n<li>first list item</li>\n<li>second list item</li>\n</ol>\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "document with multiple defList and other contents",
+        "comment": "micromark renders: <h1>Header 1</h1>\n<dl>\n<dt>Term 1</dt>\n<dd>Description 1</dd>\n<dd>Description 2</dd>\n<dt>Term 2</dt>\n<dd>Description 3</dd>\n</dl>\n<p>This is paragraph.</p>\n<dl>\n<dt>New Term A</dt>\n<dd>Description A\nwith countinous line.</dd>\n<dd>Description B</dd>\n</dl>",
+        "input": "# Header 1\n\nTerm 1\n:   Description 1\n:   Description 2\n\nTerm 2\n:   Description 3\n\nThis is paragraph.\n\nNew Term A\n: Description A\n  with countinous line.\n: Description B\n",
+        "expected": {
+          "html": "<h1>Header 1</h1>\n<dl>\n<dt>Term 1</dt>\n<dd>Description 1\n</dd>\n<dd>Description 2\n</dd>\n<dt>Term 2</dt>\n<dd>Description 3\n</dd>\n</dl>\n<p>This is paragraph.</p>\n<dl>\n<dt>New Term A</dt>\n<dd>Description A\nwith countinous line.\n</dd>\n<dd>Description B\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "defList cannot start without any term",
+        "input": ": Definition a",
+        "expected": {
+          "html": "<p>: Definition a</p>"
+        }
+      },
+      {
+        "description": "defList cannot start without any term (2)",
+        "input": "- a\n- b\n\n: Definition a",
+        "expected": {
+          "html": "<ul>\n<li>a</li>\n<li>b</li>\n</ul>\n<p>: Definition a</p>"
+        }
+      },
+      {
+        "description": "defList cannot start without any term, but this IS defList",
+        "comment": "micromark renders: <dl>\n<dt>: Definition a</dt>\n<dd>Definition b</dd>\n</dl>",
+        "input": ": Definition a\n: Definition b",
+        "expected": {
+          "html": "<dl>\n<dt>: Definition a</dt>\n<dd>Definition b\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "colon after thematicBreak",
+        "input": "****\n: NotDefinition",
+        "expected": {
+          "html": "<hr>\n<p>: NotDefinition</p>"
+        }
+      },
+      {
+        "description": "colon after heading",
+        "input": "# heading\n: NotDefinition",
+        "expected": {
+          "html": "<h1>heading</h1>\n<p>: NotDefinition</p>"
+        }
+      },
+      {
+        "description": "colon after the start of fenced code",
+        "input": "```\n: Definition\n```",
+        "expected": {
+          "html": "<pre><code>: Definition\n</code></pre>"
+        }
+      },
+      {
+        "description": "single term starting with whitespace",
+        "comment": "micromark renders: <dl>\n<dt>Term1</dt>\n<dd>Definition a</dd>\n</dl>",
+        "input": " Term1\n: Definition a",
+        "expected": {
+          "html": "<dl>\n<dt>Term1</dt>\n<dd>Definition a\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "multiple terms starting with whitespace",
+        "comment": "micromark renders: <dl>\n<dt>Term1</dt>\n<dt> Term2</dt>\n<dd>Definition a</dd>\n</dl>",
+        "input": " Term1\n Term2\n: Definition a",
+        "expected": {
+          "html": "<dl>\n<dt>Term1</dt>\n<dt> Term2</dt>\n<dd>Definition a\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "defList starting in lazy line of blockquote",
+        "comment": "micromark renders: <blockquote>\n<p>BlockQuote\n</p>\n</blockquote>\n<dl>\n<dt>Term</dt>\n<dd>Definition a</dd>\n</dl>",
+        "input": "> BlockQuote\nTerm\n: Definition a",
+        "expected": {
+          "html": "<blockquote>\n<p>BlockQuote\n</p>\n</blockquote>\n<dl>\n<dt>Term</dt>\n<dd>Definition a\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "no more than two blank lines between term and description",
+        "input": "Apple\n\n\n:   Pomaceous fruit of plants of the genus Malus in\n    the family Rosaceae.\n\nOrange\n\n\n:   The fruit of an evergreen tree of the genus Citrus.",
+        "expected": {
+          "html": "<p>Apple</p>\n<p>:   Pomaceous fruit of plants of the genus Malus in\nthe family Rosaceae.</p>\n<p>Orange</p>\n<p>:   The fruit of an evergreen tree of the genus Citrus.</p>"
+        }
+      },
+      {
+        "description": "regression: list inside dd followed by another dd without emptyline",
+        "comment": "micromark renders: <dl>\n<dt>Term1</dt>\n<dd>Description 1.\n<ul>\n<li>li1</li>\n<li>li2</li>\n<li>li3</li>\n</ul>\n</dd>\n<dd>Description 2.</dd>\n</dl>",
+        "input": "Term1\n: Description 1.\n    * li1\n    * li2\n    * li3\n: Description 2.",
+        "expected": {
+          "html": "<dl>\n<dt>Term1</dt>\n<dd>Description 1.\n<ul>\n<li>li1</li>\n<li>li2</li>\n<li>li3</li>\n</ul>\n</dd>\n<dd>Description 2.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "regression: list inside dd followed by not-dd text without emptyline",
+        "comment": "micromark renders: <dl>\n<dt>Term1</dt>\n<dd>Description 1.\n<ul>\n<li>li1</li>\n<li>li2\nNotTerm2</li>\n</ul>\n</dd>\n<dd>Description 2.</dd>\n</dl>",
+        "input": "Term1\n: Description 1.\n    * li1\n    * li2\nNotTerm2\n: Description 2.",
+        "expected": {
+          "html": "<dl>\n<dt>Term1</dt>\n<dd>Description 1.\n<ul>\n<li>li1</li>\n<li>li2\nNotTerm2</li>\n</ul>\n</dd>\n<dd>Description 2.\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "regression: fenced code",
+        "comment": "micromark renders: <dl>\n<dt>Term</dt>\n<dd>\n<pre><code>This is test.\nAnd next line.\n</code></pre></dd>\n</dl>",
+        "input": "Term\n:   ```\n    This is test.\n    And next line.\n    ```",
+        "expected": {
+          "html": "<dl>\n<dt>Term</dt>\n<dd>\n<pre><code>This is test.\nAnd next line.\n</code></pre>\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "regression: blankline followed by fenced code",
+        "comment": "micromark renders: <dl>\n<dt>Term</dt>\n<dd>\n<pre><code>This is test.\nAnd next line.\n</code></pre></dd>\n</dl>",
+        "input": "Term\n:\n    ```\n    This is test.\n    And next line.\n    ```",
+        "expected": {
+          "html": "<dl>\n<dt>Term</dt>\n<dd>\n<pre><code>This is test.\nAnd next line.\n</code></pre>\n</dd>\n</dl>"
+        }
+      },
+      {
+        "description": "regression: dd inside of blockquote",
+        "comment": "micromark renders: <blockquote>\n<dl>\n<dt>Term1</dt>\n<dd>Description 1.</dd>\n<dd>Description 2.</dd>\n<dt>Term2</dt>\n<dd>Description 1.</dd>\n<dd>Description 2.</dd>\n</dl>\n</blockquote>",
+        "input": "> Term1\n> : Description 1.\n> : Description 2.\n>\n> Term2\n> : Description 1.\n> : Description 2.",
+        "expected": {
+          "html": "<blockquote>\n<dl>\n<dt>Term1</dt>\n<dd>Description 1.\n</dd>\n<dd>Description 2.\n</dd>\n<dt>Term2</dt>\n<dd>Description 1.\n</dd>\n<dd>Description 2.\n</dd>\n</dl>\n</blockquote>"
+        }
+      },
+      {
+        "description": "regression: dd inside of nested blockquote",
+        "comment": "micromark renders: <blockquote>\n<blockquote>\n<dl>\n<dt>Term1</dt>\n<dd>Description 1.</dd>\n<dd>Description 2.</dd>\n</dl>\n</blockquote>\n</blockquote>",
+        "input": "> > Term1\n> > : Description 1.\n> > : Description 2.",
+        "expected": {
+          "html": "<blockquote>\n<blockquote>\n<dl>\n<dt>Term1</dt>\n<dd>Description 1.\n</dd>\n<dd>Description 2.\n</dd>\n</dl>\n</blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "regression: dd-like stuff inside of blockquote",
+        "input": "test\n\n> : Description 1.",
+        "expected": {
+          "html": "<p>test</p>\n<blockquote>\n<p>: Description 1.</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "regression: dd-like stuff inside of nested blockquote",
+        "input": "> Term1\n> > : Description 1.",
+        "expected": {
+          "html": "<blockquote>\n<p>Term1</p>\n<blockquote>\n<p>: Description 1.</p>\n</blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "simple deflist and table",
+        "comment": "micromark renders: <dl>\n<dt>a</dt>\n<dd>b</dd>\n</dl>\n<table>\n<thead>\n<tr>\n<th>c</th>\n</tr>\n</thead>\n</table>",
+        "input": "a\n: b\n\n| c |\n| - |",
+        "expected": {
+          "html": "<dl>\n<dt>a</dt>\n<dd>b\n</dd>\n</dl>\n<table>\n<thead>\n<tr>\n<th>c</th>\n</tr>\n</thead>\n</table>"
+        }
+      },
+      {
+        "description": "left-alignment column",
+        "input": "head1 | head2\n:--|:--\ncell1 | cell2",
+        "expected": {
+          "html": "<table>\n<thead>\n<tr>\n<th align=\"left\">head1</th>\n<th align=\"left\">head2</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"left\">cell1</td>\n<td align=\"left\">cell2</td>\n</tr>\n</tbody>\n</table>"
+        }
+      },
+      {
+        "description": "colon inside table cell",
+        "input": "head1 | head2\n|:-:|:-:|\ncell1 | : cell2",
+        "expected": {
+          "html": "<table>\n<thead>\n<tr>\n<th align=\"center\">head1</th>\n<th align=\"center\">head2</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"center\">cell1</td>\n<td align=\"center\">: cell2</td>\n</tr>\n</tbody>\n</table>"
+        }
+      },
+      {
+        "description": "known issue: dd-like line breaks table",
+        "input": "aaa\n| - |\nbbb\n:   c1\n    c2",
+        "expected": {
+          "html": "<table>\n<thead>\n<tr>\n<th>aaa</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>bbb</td>\n</tr>\n</tbody>\n</table>\n<p>:   c1\nc2</p>"
+        }
+      },
+      {
+        "description": "workaround: dd-like line breaks table",
+        "input": "aaa\n| - |\nbbb\n\\: c1",
+        "expected": {
+          "html": "<table>\n<thead>\n<tr>\n<th>aaa</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>bbb</td>\n</tr>\n<tr>\n<td>: c1</td>\n</tr>\n</tbody>\n</table>"
+        }
+      }
+    ]
+  }
+]

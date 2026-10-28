@@ -1,5 +1,6 @@
 import rehypeStringify from "rehype-stringify"
 import { directiveToMarkdown } from "mdast-util-directive"
+import remarkDefinitionList, { defListHastHandlers } from "remark-definition-list"
 import remarkDirective from "remark-directive"
 import remarkFrontmatter from "remark-frontmatter"
 import type { Options as FrontmatterOptions } from "remark-frontmatter"
@@ -17,6 +18,7 @@ export type RenderOptions = {
   frontmatter?: FrontmatterOptions | null
   gfm?: Record<string, unknown>
   math?: Record<string, unknown>
+  definitionList?: boolean
   toHtml?: Record<string, unknown>
 }
 
@@ -33,6 +35,7 @@ export function createPipeline(props: RenderOptions) {
       : []),
     ...(props.gfm ? [withOptions("md.gfm", props.gfm)] : []),
     ...(props.math ? [withOptions("md.math", props.math)] : []),
+    ...(props.definitionList ? [["md.definitionList"]] : []),
     withOptions("md.toHtml", toHtml),
     withOptions(
       "html.stringify",
@@ -53,7 +56,13 @@ export function renderMarkdown(props: RenderOptions & { markdown: string }) {
     )
     .use(props.gfm ? [[remarkGfm, props.gfm]] : [])
     .use(props.math ? [[remarkMath, props.math]] : [])
-    .use(remarkRehype, { ...props.toHtml, ...html })
+    .use(props.definitionList ? [remarkDefinitionList] : [])
+    // remark-definition-list renders through remark-rehype handlers it exports, not by itself
+    .use(remarkRehype, {
+      ...props.toHtml,
+      ...html,
+      ...(props.definitionList ? { handlers: { ...defListHastHandlers } } : {}),
+    })
     .use(rehypeStringify, html)
   return String(processor.processSync(props.markdown))
 }
