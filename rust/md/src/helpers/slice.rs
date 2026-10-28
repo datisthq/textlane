@@ -16,8 +16,9 @@ impl<'a> Slice<'a> {
         let mut after = end.vs;
         let mut start_index = start.index;
         let mut end_index = end.index;
+        // The rest of a split tab runs to the next tab stop, which its column tells
         if before > 0 {
-            before = TAB_SIZE - before;
+            before = TAB_SIZE - (start.column - 1) % TAB_SIZE;
             start_index += 1;
         }
         if after > 0 {

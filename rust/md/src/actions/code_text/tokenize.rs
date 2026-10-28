@@ -87,7 +87,13 @@ fn sequence_close(tokenizer: &mut Tokenizer) -> State {
     }
     let size = tokenizer.tokenize_state.size_b;
     let start = tokenizer.point.index - size;
-    tokenizer.tokenize_state.code_text_runs.insert(size, start);
+    // Spans closing early meet runs again: keep the last of each length, not the latest seen
+    let last = tokenizer
+        .tokenize_state
+        .code_text_runs
+        .entry(size)
+        .or_insert(start);
+    *last = (*last).max(start);
     tokenizer.exit(Name::CODE_TEXT_SEQUENCE);
     if tokenizer.tokenize_state.size == tokenizer.tokenize_state.size_b {
         tokenizer.exit(Name::CODE_TEXT);

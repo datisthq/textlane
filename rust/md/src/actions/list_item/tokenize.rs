@@ -1,7 +1,6 @@
 use crate::actions::blank_line::tokenize::tokenize_blank_line;
 use crate::actions::space_or_tab::tokenize::tokenize_space_or_tab;
 use crate::actions::thematic_break::tokenize::tokenize_thematic_break;
-use crate::helpers::slice::Slice;
 use crate::models::construct::{Resolver, State};
 use crate::models::token::Name;
 use crate::utils::tokenizer::driver::Tokenizer;
@@ -128,9 +127,8 @@ fn after(tokenizer: &mut Tokenizer) -> State {
         .iter()
         .rposition(|event| event.name == Name::LIST_ITEM)
         .unwrap_or_default();
-    let start = tokenizer.events[start].point.clone();
-    let mut prefix =
-        Slice::from_points(tokenizer.parse_state.bytes, &start, &tokenizer.point).len();
+    // Columns, not bytes: a tab after the marker widens the prefix to the next tab stop
+    let mut prefix = tokenizer.point.column - tokenizer.events[start].point.column;
     if blank {
         prefix += 1;
     }

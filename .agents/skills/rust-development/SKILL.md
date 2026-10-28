@@ -77,8 +77,19 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
 - Container ends follow micromark, not markdown-rs: a list item ends at the first line
   ending of its trailing blank lines (`prepareList`), stepping over the exits of lists
   inside but not of block quotes; a list does the same without stepping over block quote
-  prefixes. Trailing blank lines never make an item loose A `Point` is a byte offset whose top two bits hold
-  a tab's virtual spaces; `Lines` turns it into unist's UTF-16 line, column and offset
+  prefixes. Trailing blank lines never make an item loose, nor does the blank line that
+  closes empty containers opened on its own line (micromark puts it inside them). An item
+  whose last construct swallowed its line ending (an unclosed fence) ends after the next
+  item's prefix. A `Point` is a byte offset whose top two bits hold a tab's virtual
+  spaces; `Lines` turns it into unist's UTF-16 line, column and offset
+- `utils/tokenizer/document.rs` follows micromark's `document.js`, where markdown-rs
+  differs: `interrupt` is decided once a line, before any container opens on it
+  (`document_opened`); the last line is flushed before laziness is judged; the empty line
+  after a final line ending is lazy inside a block quote the line continued; closing
+  containers after a line keeps the child's `interrupt`. Sizes are columns, not bytes: a
+  tab after a list marker widens the prefix to the next tab stop. Differences show best
+  by fuzzing random fragments through `md.parse` and the pinned from-markdown; each one
+  fixed becomes a case in `conformance/sources/differential.ts`
 - `md`'s engine is a port of markdown-rs (micromark's design in Rust): a state is a plain
   `fn(&mut Tokenizer) -> State`, a token name an open `Name("…")` constant. A construct not
   ported yet is marked where it joins, in `utils/tokenizer/{document,flow,text}.rs`. Where

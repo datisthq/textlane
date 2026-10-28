@@ -6,6 +6,7 @@
     "import:chains": "node sources/chains.ts && vp fmt tests",
     "import:commonmark": "node sources/commonmark.ts && vp fmt tests",
     "import:definition-list": "node sources/definition-list.ts && vp fmt tests",
+    "import:differential": "node sources/differential.ts && vp fmt tests",
     "import:directive": "node sources/directive.ts && vp fmt tests",
     "import:from-markdown": "node sources/from-markdown.ts && vp fmt tests",
     "import:frontmatter": "node sources/frontmatter.ts && vp fmt tests",

@@ -107,6 +107,12 @@ fn trim_data(
         if index > 0 || slice.before > 0 {
             let enter_point = tokenizer.events[exit_index - 1].point.clone();
             let mut exit_point = enter_point.clone();
+            // Starting inside a tab, the slice starts after it: so must the whitespace's end,
+            // or the rest of the tab stays in the text (markdown-rs has this bug)
+            if slice.before > 0 {
+                exit_point.column += slice.before;
+                exit_point.index += 1;
+            }
             exit_point.index += index;
             exit_point.column += index;
             exit_point.vs = 0;

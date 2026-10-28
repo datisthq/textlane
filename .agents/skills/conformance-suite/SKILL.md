@@ -81,6 +81,10 @@ a test's `comment` only where it means something different.
 - `actions/node/scope.ts` resolves an identifier lexically, through each enclosing block from the
   module inward, so one loop's or test's `const value` never leaks into another's case.
 
+`sources/differential.ts` holds textlane's own md inputs where `md.parse` once differed from
+the reference, found by fuzzing; add an input there and rerun `import:differential`, never
+write its tree by hand.
+
 ## Core cases
 
 unified's tests call inline JavaScript plugins, so `sources/unified.ts` holds the core cases as

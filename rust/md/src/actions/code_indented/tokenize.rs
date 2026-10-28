@@ -19,6 +19,9 @@ fn at_break(tokenizer: &mut Tokenizer) -> State {
     match tokenizer.current {
         None => State::Retry(after),
         Some(b'\n') => {
+            // Open code is a construct in progress: micromark counts any such as interrupting,
+            // so an empty list item cannot start on the next line
+            tokenizer.interrupt = true;
             tokenizer.attempt(State::Next(at_break), State::Next(after));
             State::Retry(further_start)
         }

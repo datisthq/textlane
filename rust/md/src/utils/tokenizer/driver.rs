@@ -79,6 +79,8 @@ struct Progress {
     previous: Option<u8>,
     current: Option<u8>,
     point: Point,
+    // An exit right after a line ending sits at the line's start, which must rewind too
+    line_start: Point,
 }
 
 /// State constructs share while tokenizing, so state functions need no closures.
@@ -88,6 +90,8 @@ pub(crate) struct TokenizeState<'a> {
     pub(crate) document_child_state: Option<State>,
     pub(crate) document_container_stack: Vec<ContainerState>,
     pub(crate) document_continued: usize,
+    /// Whether a new container opened on this line: the line's `interrupt` holds for them all.
+    pub(crate) document_opened: bool,
     pub(crate) document_data_index: Option<usize>,
     pub(crate) document_exits: Vec<Option<Vec<Event>>>,
     pub(crate) document_lazy_accepting_before: bool,
@@ -322,6 +326,7 @@ impl<'a> Tokenizer<'a> {
             point: self.point.clone(),
             events_len: self.events.len(),
             stack_len: self.stack.len(),
+            line_start: self.line_start.clone(),
         }
     }
 
@@ -331,6 +336,7 @@ impl<'a> Tokenizer<'a> {
         self.point = progress.point;
         self.events.truncate(progress.events_len);
         self.stack.truncate(progress.stack_len);
+        self.line_start = progress.line_start;
     }
 
     /// Try what follows and always revert it, then go to `ok` or `nok`.

@@ -22,7 +22,6 @@
   "prose/*": "prose.parse, prose.stringify and the prose plugins are not implemented yet",
   "mdx/*": "mdx.compile is not implemented yet",
   "md/code-fenced#mdast-util-to-hast code": "the md constructs and plugins this needs are not implemented yet",
-  "md/definition#Link reference definitions (tree)": "the md constructs and plugins this needs are not implemented yet",
   "html/raw#hast-util-raw": "the html plugins this needs are not implemented yet",
   "html/raw#hast-util-raw {\"passThrough\":[\"customLiteral\"]}": "the html plugins this needs are not implemented yet",
   "html/raw#hast-util-raw {\"passThrough\":[\"customParent\"]}": "the html plugins this needs are not implemented yet",

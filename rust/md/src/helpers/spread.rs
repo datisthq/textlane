@@ -49,12 +49,13 @@ pub(crate) fn find_loose(events: &[Event]) -> HashSet<usize> {
         };
         let parent_name = events[parent].name;
         if parent_name == Name::LIST_ITEM {
-            if !after_item_prefix(events, index) {
+            if !after_item_prefix(events, index) && !after_empty_container(events, index)
+            {
                 first_blank.entry(parent).or_insert(index);
             }
         } else if (parent_name == Name::LIST_ORDERED
             || parent_name == Name::LIST_UNORDERED)
-            && !after_empty_item(events, index)
+            && !after_empty_container(events, index)
         {
             loose.insert(parent);
         }
@@ -91,28 +92,33 @@ fn after_item_prefix(events: &[Event], exit: usize) -> bool {
     events[before].name == Name::LIST_ITEM_PREFIX
 }
 
-// A blank line after an item that is empty, or holds only an empty block quote
-fn after_empty_item(events: &[Event], exit: usize) -> bool {
-    let Some(mut before) = exit.checked_sub(2) else {
-        return false;
-    };
-    if events[before].name != Name::LIST_ITEM {
-        return false;
+// A blank line closing empty containers opened on its own line: micromark puts it inside
+// the innermost, so it separates nothing in the items around
+fn after_empty_container(events: &[Event], exit: usize) -> bool {
+    let mut before = exit.saturating_sub(1);
+    let mut innermost = None;
+    while let Some(earlier) = before.checked_sub(1) {
+        before = earlier;
+        let event = &events[before];
+        let container =
+            CONTAINERS.contains(&event.name) || event.name == Name::BLOCK_QUOTE;
+        if !(event.kind == Kind::Exit && container) {
+            break;
+        }
+        innermost = Some(event.name);
     }
-    let Some(earlier) = before.checked_sub(1) else {
-        return false;
-    };
-    before = earlier;
     if events[before].name == Name::SPACE_OR_TAB {
         let Some(earlier) = before.checked_sub(2) else {
             return false;
         };
         before = earlier;
     }
-    let empty_block_quote = events[before].name == Name::BLOCK_QUOTE
-        && before > 0
-        && events[before - 1].name == Name::BLOCK_QUOTE_PREFIX;
-    empty_block_quote || events[before].name == Name::LIST_ITEM_PREFIX
+    // The prefix must open the innermost closed container, not continue an outer one
+    matches!(
+        (events[before].name, innermost),
+        (Name::LIST_ITEM_PREFIX, Some(Name::LIST_ITEM))
+            | (Name::BLOCK_QUOTE_PREFIX, Some(Name::BLOCK_QUOTE))
+    )
 }
 
 /// For each event, the first line ending in the run of trailing lines right before it,

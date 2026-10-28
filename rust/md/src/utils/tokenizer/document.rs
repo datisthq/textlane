@@ -71,7 +71,10 @@ fn container_new_before(tokenizer: &mut Tokenizer) -> State {
     if state.document_continued == state.document_container_stack.len()
         && let Some(child) = state.document_child.as_ref()
     {
-        tokenizer.interrupt = child.interrupt;
+        // micromark decides `interrupt` once a line, before any container opens on it
+        if !state.document_opened {
+            tokenizer.interrupt = child.interrupt;
+        }
         if child.concrete {
             return State::Retry(containers_after);
         }
@@ -127,15 +130,18 @@ fn container_new_after(tokenizer: &mut Tokenizer) -> State {
     if continued != tokenizer.tokenize_state.document_container_stack.len() {
         exit_containers(tokenizer, &Phase::Prefix);
     }
+    // micromark closes the flow when a container opens, so what was open before cannot
+    // keep the new container's first construct from interrupting it
     if let Some(child) = tokenizer.tokenize_state.document_child.as_mut() {
         child.pierce = true;
+        child.interrupt = false;
     }
     tokenizer
         .tokenize_state
         .document_container_stack
         .push(container);
     tokenizer.tokenize_state.document_continued += 1;
-    tokenizer.interrupt = false;
+    tokenizer.tokenize_state.document_opened = true;
     State::Retry(container_new_before)
 }
 
@@ -243,11 +249,51 @@ fn flow_end(tokenizer: &mut Tokenizer) -> State {
         .take()
         .unwrap_or(State::Next(tokenize_flow));
     tokenizer.tokenize_state.document_exits.push(None);
+    // After a final line ending, the empty last line continues only the containers that
+    // take blank lines: block quotes do not, so it is lazy inside one this line continued
+    let empty_last_line_lazy =
+        (tokenizer.current.is_none() && tokenizer.previous == Some(b'\n')).then(|| {
+            tokenizer
+                .tokenize_state
+                .document_container_stack
+                .iter()
+                .take(tokenizer.tokenize_state.document_continued)
+                .any(|container| match container.kind {
+                    Container::BlockQuote => true,
+                    Container::ListItem => container.blank_initial,
+                    Container::GfmFootnoteDefinition => false,
+                })
+        });
     let Some(child) = tokenizer.tokenize_state.document_child.as_mut() else {
         return State::Nok;
     };
     let from = (child.point.index, child.point.vs);
-    let state = child.push(from, to, state);
+    // A blank last line, with no line ending, inside a block quote closes the containers
+    // it did not continue at the end, as micromark does
+    let blank_last_line = tokenizer.current.is_none()
+        && tokenizer
+            .tokenize_state
+            .document_continued
+            .checked_sub(1)
+            .and_then(|last| tokenizer.tokenize_state.document_container_stack.get(last))
+            .is_some_and(|container| container.kind == Container::BlockQuote)
+        && tokenizer.previous != Some(b'\n')
+        && tokenizer.parse_state.bytes[from.0.min(to.0)..to.0]
+            .iter()
+            .all(|byte| matches!(byte, b' ' | b'\t'));
+    let mut state = child.push(from, to, state);
+    // At the end, the last line is finished before laziness is judged, as micromark's last
+    // write does: a construct still trying it (`~` as a fence) would end the paragraph
+    if tokenizer.current.is_none() {
+        // The flush reads the empty line's laziness; the line itself keeps its own after
+        let line_lazy = child.lazy;
+        if let Some(lazy) = empty_last_line_lazy {
+            child.lazy = lazy;
+        }
+        child.flush(state, false);
+        child.lazy = line_lazy;
+        state = State::Ok;
+    }
     tokenizer.tokenize_state.document_child_state = Some(state);
 
     // A paragraph (or table head) still open can take a lazy line
@@ -274,16 +320,19 @@ fn flow_end(tokenizer: &mut Tokenizer) -> State {
     }
     if tokenizer.tokenize_state.document_continued
         != tokenizer.tokenize_state.document_container_stack.len()
+        && !blank_last_line
     {
         exit_containers(tokenizer, &Phase::After);
     }
     if tokenizer.current.is_none() {
         tokenizer.tokenize_state.document_continued = 0;
+        tokenizer.tokenize_state.document_opened = false;
         exit_containers(tokenizer, &Phase::Eof);
         resolve(tokenizer);
         State::Ok
     } else {
         tokenizer.tokenize_state.document_continued = 0;
+        tokenizer.tokenize_state.document_opened = false;
         tokenizer.tokenize_state.document_lazy_accepting_before = lazy_continuation;
         tokenizer.interrupt = false;
         State::Retry(container_existing_before)
@@ -330,7 +379,11 @@ fn exit_containers(tokenizer: &mut Tokenizer, phase: &Phase) {
         }
         tokenizer.tokenize_state.document_exits[index] = Some(exits);
     }
-    if let Some(child) = tokenizer.tokenize_state.document_child.as_mut() {
+    // After a line, its own construct is still open below the closed containers: a
+    // paragraph there must stay uninterruptible by indented code on the next line
+    if *phase != Phase::After
+        && let Some(child) = tokenizer.tokenize_state.document_child.as_mut()
+    {
         child.interrupt = false;
     }
 }

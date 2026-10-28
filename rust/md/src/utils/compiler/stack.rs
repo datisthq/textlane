@@ -133,10 +133,13 @@ impl<'a, 'e> Compiler<'a, 'e> {
     pub(crate) fn tail_push_after_prefix(&mut self, mut child: Node<'a>) {
         let mut index = self.index + 1;
         // A list starts where its first item does, and that item after its indent
+        // A setext heading after definitions starts where they do, lines above its text
+        let line = self.events[self.index].point.line;
         while index < self.events.len()
             && self.events[index].kind == event::Kind::Enter
             && (self.events[index].name == Name::LIST_ITEM
-                || self.events[index].name == Name::HEADING_SETEXT_TEXT)
+                || (self.events[index].name == Name::HEADING_SETEXT_TEXT
+                    && self.events[index].point.line == line))
         {
             index += 1;
         }
@@ -181,8 +184,22 @@ impl<'a, 'e> Compiler<'a, 'e> {
     /// `prefixes` also passes block quote prefixes, as items do.
     pub(crate) fn tail_pop_before_trailing_lines(&mut self, prefixes: bool) {
         self.flush_text();
-        let end = self.trailing_line_endings[usize::from(prefixes)][self.index]
-            .unwrap_or(self.index);
+        let trailing = self.trailing_line_endings[usize::from(prefixes)][self.index];
+        let mut end = trailing.unwrap_or(self.index);
+        // An item whose last construct took its line ending (an unclosed fence) ends
+        // after the next item's prefix, as mdast-util-from-markdown's `prepareList` does
+        let next = self.index + 1;
+        if trailing.is_none()
+            && self.events[self.index].name == Name::LIST_ITEM
+            && self.events.get(next).is_some_and(|event| {
+                event.kind == event::Kind::Enter && event.name == Name::LIST_ITEM
+            })
+            && let Some(offset) = self.events[next..].iter().position(|event| {
+                event.kind == event::Kind::Exit && event.name == Name::LIST_ITEM_PREFIX
+            })
+        {
+            end = next + offset;
+        }
         let end = to_point(&self.events[end].point);
         self.set_tail_end(end);
         self.attach_tail();
