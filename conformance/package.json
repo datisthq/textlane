@@ -5,6 +5,7 @@
   "scripts": {
     "import:commonmark": "node sources/commonmark.ts && vp fmt tests",
     "import:from-markdown": "node sources/from-markdown.ts && vp fmt tests",
+    "import:gfm": "node sources/gfm.ts && vp fmt tests",
     "import:micromark": "node sources/micromark.ts && vp fmt tests",
     "import:to-markdown": "node sources/to-markdown.ts && vp fmt tests"
   },
@@ -15,6 +16,7 @@
     "hast-util-from-html": "2.0.3",
     "hast-util-to-html": "9.0.5",
     "rehype-stringify": "10.0.1",
+    "remark-gfm": "4.0.1",
     "remark-parse": "11.0.0",
     "remark-rehype": "11.1.2",
     "unified": "11.0.5",

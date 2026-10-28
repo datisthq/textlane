@@ -1,0 +1,58 @@
+[
+  {
+    "description": "micromark-extension-gfm fixtures",
+    "source": {
+      "repository": "https://github.com/micromark/micromark-extension-gfm",
+      "commit": "cd4e38f455e5872eefc83c9036ca621ba954cad8",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "fixture https-autolink-in-html-phrasing",
+        "input": "a <a href=\"#\">https://example.com</a>\n",
+        "expected": {
+          "html": "<p>a <a href=\"#\"><a href=\"https://example.com\">https://example.com</a></a></p>"
+        }
+      },
+      {
+        "description": "fixture https-url-in-path",
+        "input": "/media/oembed?url=https://example.com/%3Ffoo=bar\n\n/media/oembed?url=https%3a//example.com/%3Ffoo=bar\n",
+        "expected": {
+          "html": "<p>/media/oembed?url=<a href=\"https://example.com/%3Ffoo=bar\">https://example.com/%3Ffoo=bar</a></p>\n<p>/media/oembed?url=https%3a//example.com/%3Ffoo=bar</p>"
+        }
+      },
+      {
+        "description": "fixture www-autolink-in-html.comment",
+        "comment": "GitHub renders: <p>a <a href=\"#\">www.example.com</a></p>\n",
+        "input": "a <a href=\"#\">www.example.com</a>\n",
+        "expected": {
+          "html": "<p>a <a href=\"#\"><a href=\"http://www.example.com\">www.example.com</a></a></p>"
+        }
+      },
+      {
+        "description": "fixture www-autolink-in-table",
+        "input": "| a | b |\n| - | - |\n| c | www.example.com |\n",
+        "expected": {
+          "html": "<table>\n<thead>\n<tr>\n<th>a</th>\n<th>b</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>c</td>\n<td><a href=\"http://www.example.com\">www.example.com</a></td>\n</tr>\n</tbody>\n</table>"
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,106 @@
+[
+  {
+    "description": "GFM spec: Task list items",
+    "source": {
+      "repository": "https://github.com/micromark/micromark-extension-gfm",
+      "commit": "cd4e38f455e5872eefc83c9036ca621ba954cad8",
+      "path": "test/spec.js",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 9",
+        "comment": "the GFM spec expects: <ul>\n<li><input disabled=\"\" type=\"checkbox\"> foo</li>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\"> bar</li>\n</ul>\n",
+        "input": "- [ ] foo\n- [x] bar\n",
+        "expected": {
+          "html": "<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled> foo</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" checked disabled> bar</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 10",
+        "comment": "the GFM spec expects: <ul>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\"> foo\n<ul>\n<li><input disabled=\"\" type=\"checkbox\"> bar</li>\n<li><input checked=\"\" disabled=\"\" type=\"checkbox\"> baz</li>\n</ul>\n</li>\n<li><input disabled=\"\" type=\"checkbox\"> bim</li>\n</ul>\n",
+        "input": "- [x] foo\n  - [ ] bar\n  - [x] baz\n- [ ] bim\n",
+        "expected": {
+          "html": "<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" checked disabled> foo\n<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled> bar</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" checked disabled> baz</li>\n</ul>\n</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled> bim</li>\n</ul>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark-extension-gfm-task-list-item",
+    "source": {
+      "repository": "https://github.com/micromark/micromark-extension-gfm-task-list-item",
+      "commit": "7902c38c76a6dea80928a54829313b702615d1e1",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should not support laziness (1)",
+        "input": "*\n    [x]",
+        "expected": {
+          "html": "<ul>\n<li>[x]</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should not support laziness (2)",
+        "input": "*\n[x]",
+        "expected": {
+          "html": "<ul>\n<li></li>\n</ul>\n<p>[x]</p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark-extension-gfm-task-list-item fixtures",
+    "source": {
+      "repository": "https://github.com/micromark/micromark-extension-gfm-task-list-item",
+      "commit": "7902c38c76a6dea80928a54829313b702615d1e1",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "fixture basic",
+        "comment": "GitHub renders: <ul>\n<li><input type=\"checkbox\" disabled /> foo</li>\n<li><input type=\"checkbox\" disabled checked /> bar</li>\n</ul>\n<ul>\n<li><input type=\"checkbox\" disabled checked /> foo\n<ul>\n<li><input type=\"checkbox\" disabled /> bar</li>\n<li><input type=\"checkbox\" disabled checked /> baz</li>\n</ul>\n</li>\n<li><input type=\"checkbox\" disabled /> bim</li>\n</ul>\n<ul>\n<li><input type=\"checkbox\" disabled /> Unchecked?</li>\n</ul>\n<ul>\n<li><input type=\"checkbox\" disabled checked /> Checked?</li>\n</ul>\n<ul>\n<li>[y] What is this even?</li>\n</ul>\n<ul>\n<li><input type=\"checkbox\" disabled /> After a definition</li>\n</ul>\n<ul>\n<li>\n<h1>[ ] In a setext heading</h1>\n</li>\n</ul>\n<ul>\n<li>\n<p>In the…</p>\n<p>[ ] Second paragraph</p>\n</li>\n</ul>\n<ul>\n<li><input type=\"checkbox\" disabled /> With a tab</li>\n</ul>\n<ul>\n<li>\n<p><input type=\"checkbox\" disabled checked /> With an upper case <code>x</code></p>\n</li>\n<li>\n<p><input type=\"checkbox\" disabled /> In a lazy line</p>\n</li>\n</ul>\n<ul>\n<li>[  ] With two spaces</li>\n</ul>\n<ul>\n<li><input type=\"checkbox\" disabled checked /> Two spaces indent</li>\n</ul>\n<ul>\n<li><input type=\"checkbox\" disabled checked /> Three spaces indent</li>\n</ul>\n<ul>\n<li><input type=\"checkbox\" disabled checked /> Four spaces indent</li>\n</ul>\n<ul>\n<li>\n<pre><code>[x] Five spaces indent\n</code></pre>\n</li>\n</ul>\n<p>[ ] here?</p>\n<ul>\n<li>\n<blockquote>\n<p>[ ] here?</p>\n</blockquote>\n</li>\n</ul>\n<ul>\n<li>[ ]No space?</li>\n</ul>\n<p>Empty?</p>\n<ul>\n<li>[ ]</li>\n</ul>\n<p>Space after:</p>\n<ul>\n<li>[ ]</li>\n</ul>\n<ul>\n<li><input type=\"checkbox\" disabled /> Text.</li>\n</ul>\n<p>Tab after:</p>\n<ul>\n<li>[ ]</li>\n</ul>\n<ul>\n<li><input type=\"checkbox\" disabled />\tText.</li>\n</ul>\n<p>EOL after:</p>\n<ul>\n<li>[ ]</li>\n</ul>\n<ul>\n<li><input type=\"checkbox\" disabled />\nText.</li>\n</ul>\n<ul>\n<li><input type=\"checkbox\" disabled /> after blank?</li>\n</ul>\n<ul>\n<li>\n<h1>[ ] ATX Heading</h1>\n</li>\n</ul>\n<blockquote>\n<ul>\n<li><input type=\"checkbox\" disabled checked /> In a list in a block quote</li>\n</ul>\n</blockquote>\n",
+        "input": "* [ ] foo\n* [x] bar\n\n- [x] foo\n  - [ ] bar\n  - [x] baz\n- [ ] bim\n\n+ [ ] Unchecked?\n\n* [x] Checked?\n\n+ [y] What is this even?\n\n- [n]: #\n  [ ] After a definition\n\n+ [ ] In a setext heading\n  =======================\n\n* In the…\n\n  [ ] Second paragraph\n\n- [\t] With a tab\n\n+ [X] With an upper case `x`\n\n+ [\n] In a lazy line\n\n- [  ] With two spaces\n\n+  [x] Two spaces indent\n\n*   [x] Three spaces indent\n\n-    [x] Four spaces indent\n\n+     [x] Five spaces indent\n\n[ ] here?\n\n* > [ ] here?\n\n- [ ]No space?\n\nEmpty?\n\n+ [ ]\n\nSpace after:\n\n+ [ ]␠\n\n* [ ]␠Text.\n\nTab after:\n\n+ [ ]␉\n\n* [ ]␉Text.\n\nEOL after:\n\n+ [ ]\n\n* [ ]\n  Text.\n\n-\n  [ ] after blank?\n\n+ # [ ] ATX Heading\n\n> * [x] In a list in a block quote\n",
+        "expected": {
+          "html": "<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled> foo</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" checked disabled> bar</li>\n</ul>\n<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" checked disabled> foo\n<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled> bar</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" checked disabled> baz</li>\n</ul>\n</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled> bim</li>\n</ul>\n<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled> Unchecked?</li>\n</ul>\n<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" checked disabled> Checked?</li>\n</ul>\n<ul>\n<li>[y] What is this even?</li>\n</ul>\n<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled> After a definition</li>\n</ul>\n<ul>\n<li>\n<h1>[ ] In a setext heading</h1>\n</li>\n</ul>\n<ul>\n<li>\n<p>In the…</p>\n<p>[ ] Second paragraph</p>\n</li>\n</ul>\n<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled> With a tab</li>\n</ul>\n<ul class=\"contains-task-list\">\n<li class=\"task-list-item\">\n<p><input type=\"checkbox\" checked disabled> With an upper case <code>x</code></p>\n</li>\n<li class=\"task-list-item\">\n<p><input type=\"checkbox\" disabled> In a lazy line</p>\n</li>\n</ul>\n<ul>\n<li>[  ] With two spaces</li>\n</ul>\n<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" checked disabled> Two spaces indent</li>\n</ul>\n<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" checked disabled> Three spaces indent</li>\n</ul>\n<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" checked disabled> Four spaces indent</li>\n</ul>\n<ul>\n<li>\n<pre><code>[x] Five spaces indent\n</code></pre>\n</li>\n</ul>\n<p>[ ] here?</p>\n<ul>\n<li>\n<blockquote>\n<p>[ ] here?</p>\n</blockquote>\n</li>\n</ul>\n<ul>\n<li>[ ]No space?</li>\n</ul>\n<p>Empty?</p>\n<ul>\n<li>[ ]</li>\n</ul>\n<p>Space after:</p>\n<ul>\n<li>[ ]␠</li>\n</ul>\n<ul>\n<li>[ ]␠Text.</li>\n</ul>\n<p>Tab after:</p>\n<ul>\n<li>[ ]␉</li>\n</ul>\n<ul>\n<li>[ ]␉Text.</li>\n</ul>\n<p>EOL after:</p>\n<ul>\n<li>[ ]</li>\n</ul>\n<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled> Text.</li>\n</ul>\n<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled> after blank?</li>\n</ul>\n<ul>\n<li>\n<h1>[ ] ATX Heading</h1>\n</li>\n</ul>\n<blockquote>\n<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" checked disabled> In a list in a block quote</li>\n</ul>\n</blockquote>"
+        }
+      }
+    ]
+  }
+]

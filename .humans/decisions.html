@@ -21,7 +21,7 @@
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>9 agent's calls</h3>
+    <h3>10 agent's calls</h3>
     <p>
       <htmlpress-badge type="warning">my call</htmlpress-badge> settled by the agent, open
       to change
@@ -409,6 +409,19 @@
       <code>allowDangerousHtml</code> made.
     </p>
     <p><strong>Rejected.</strong> Renaming them now, before any implementation exists.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> <code>md.gfm</code> options
+    keep remark-gfm's names (<code>singleTilde</code>…), and footnote rendering options
+    sit on <code>md.toHtml</code> under remark-rehype's (<code>clobberPrefix</code>,
+    <code>footnoteLabel</code>…)
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Each option lives on the plugin whose upstream counterpart
+      owns it, under that counterpart's name.
+    </p>
+    <p><strong>Rejected.</strong> One combined options object on <code>md.gfm</code>.</p>
   </dd>
   <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge> Each runner skips only
