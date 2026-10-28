@@ -1,5 +1,6 @@
 use textlane_core::{
-    Allocator, Attach, Compiler, Error, File, Parser, Plugin, Transform, Tree, TreeKind,
+    Allocator, Attach, Compiler, Error, File, Parser, Plugin, Step, Transform, Tree,
+    TreeKind,
 };
 
 /// A pipeline being composed: `.with()` adds a plugin, as unified's `.use()` does.
@@ -34,13 +35,30 @@ impl Processor {
         self
     }
 
+    pub(crate) fn with_boxed(mut self, plugin: Box<dyn Plugin>) -> Self {
+        self.plugins.push(plugin);
+        self
+    }
+
     /// Attach every plugin once and check that each stage takes the tree the one before
     /// returns.
     pub fn freeze(self) -> Result<FrozenProcessor, Error> {
+        self.freeze_with(|_| {}, |_| {})
+    }
+
+    // `prepare` runs before the first plugin attaches and `collect` after the last, so a
+    // caller can seed and read back the slots plugins share
+    pub(crate) fn freeze_with(
+        self,
+        prepare: impl FnOnce(&mut Attach),
+        collect: impl FnOnce(&mut Attach),
+    ) -> Result<FrozenProcessor, Error> {
         let mut context = Attach::default();
+        prepare(&mut context);
         for plugin in &self.plugins {
             plugin.attach(&mut context)?;
         }
+        collect(&mut context);
         let (parser, transforms, compiler) = context.finish()?;
         let mut kind = parser.as_ref().map(|parser| parser.output());
         for transform in &transforms {
@@ -85,7 +103,8 @@ impl FrozenProcessor {
         }
     }
 
-    /// Run every transform over a tree, in order.
+    /// Run every transform over a tree, in order, finishing the jobs asynchronous ones
+    /// hand back.
     pub fn run<'a>(
         &self,
         mut tree: Tree<'a>,
@@ -93,7 +112,29 @@ impl FrozenProcessor {
         alloc: &'a Allocator,
     ) -> Result<Tree<'a>, Error> {
         for transform in &self.transforms {
-            tree = transform.run(tree, file, alloc)?;
+            tree = match transform.start(tree, file, alloc)? {
+                Step::Done(tree) => tree,
+                Step::Job(job) => job(file)?,
+            };
+        }
+        Ok(tree)
+    }
+
+    /// Run every transform over a tree, failing with `async-in-sync` when one hands back a
+    /// job.
+    pub fn run_sync<'a>(
+        &self,
+        mut tree: Tree<'a>,
+        file: &mut File,
+        alloc: &'a Allocator,
+    ) -> Result<Tree<'a>, Error> {
+        for transform in &self.transforms {
+            tree = match transform.start(tree, file, alloc)? {
+                Step::Done(tree) => tree,
+                Step::Job(_) => {
+                    return Err(Error::new("async-in-sync", "a stage finished async"));
+                }
+            };
         }
         Ok(tree)
     }
@@ -112,9 +153,18 @@ impl FrozenProcessor {
         self.parser.is_some()
     }
 
+    pub fn has_compiler(&self) -> bool {
+        self.compiler.is_some()
+    }
+
     /// The kind of text the compiler writes (`html`, `md`), when there is one.
     pub fn extension(&self) -> Option<&'static str> {
         self.compiler.as_ref().map(|compiler| compiler.extension())
+    }
+
+    /// The kind of tree the compiler takes, when there is one.
+    pub fn compiler_kind(&self) -> Option<TreeKind> {
+        self.compiler.as_ref().map(|compiler| compiler.input())
     }
 
     /// The kind of tree the first stage after parsing takes.

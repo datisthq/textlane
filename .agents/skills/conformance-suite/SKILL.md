@@ -29,11 +29,15 @@ otherwise.
   it never reaches the published packages or the loader's types.
 - Serialized output is keyed by its file extension (`html`, `md`, `js`, `txt`), never by the
   domain that produced it; `tree` and `error` are the other outcomes.
-- A pipeline of the crate's plugins runs through the real `Processor`: `add_plugin` in `run.rs`
-  maps each name (`md.parse`, `md.gemoji`, `md.gfm`, `md.stringify`, `md.toHtml`, `html.parse`, `html.sanitize`, `html.slug`, `html.stringify`, `html.toMarkdown`) and reads its options into the
+- Every case runs through `Pipeline` (`models/pipeline.rs`), the name-based processor the
+  bindings drive: `find_plugin` in `actions/plugin/find.rs` maps each name (`md.parse`, `md.gemoji`, `md.gfm`, `md.stringify`, `md.toHtml`, `html.parse`, `html.sanitize`, `html.slug`, `html.stringify`, `html.toMarkdown`) and reads its options into the
   plugin's options struct, failing with `invalid-options`; a new plugin joins there. A tree
-  input is read as the kind the first stage takes. `test.*` plugins live only there, as the
-  stub `test.parseText` and `test.compileValue`.
+  input is read as the kind the first stage takes. The `test.*` plugins live in
+  `utils/testing/plugins.rs`, compiled only under `testing`; `mode: "async"` makes a stage
+  hand back a job, as a JavaScript plugin returning a promise would.
+- A case with `operations` calls the pipeline once per entry (`use`, `data`, `freeze`,
+  `parse`, `run`, `stringify`, `process`); the last call's output is the case's, beside
+  `data`, `messages` and the labels `test.trace:<label>` recorded (`trace`).
 - Every result also carries the file's `messages`, in the order they were reported, as
   `{ruleId, source, place}`; a test names the one outcome it compares.
 - Each runner compares exactly, except `expected.error`: its `code` must match and its
@@ -91,8 +95,8 @@ unified's tests call inline JavaScript plugins, so `sources/unified.ts` holds th
 data, each citing the unified test it ports, and computes every expectation by running its
 `operations` through the pinned unified with JavaScript versions of the test plugins. Never write
 an expected outcome by hand: add the case, rerun `pnpm -C conformance import:unified`, read what
-unified did. The crate's test plugins must behave as those JavaScript ones do; the stub answers
-`unsupported-operations` until the processor runs operations.
+unified did. The crate's test plugins must behave as those JavaScript ones do, and an error
+`Pipeline` raises carries unified's own message (`` Cannot `processSync` without `parser` ``).
 
 ## Errors
 

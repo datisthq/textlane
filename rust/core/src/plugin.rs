@@ -32,6 +32,25 @@ pub trait Transform: Send + Sync {
         file: &mut File,
         alloc: &'a Allocator,
     ) -> Result<Tree<'a>, Error>;
+
+    /// Start the stage: a finished tree, or a job when its work is asynchronous.
+    fn start<'a>(
+        &self,
+        tree: Tree<'a>,
+        file: &mut File,
+        alloc: &'a Allocator,
+    ) -> Result<Step<'a>, Error> {
+        self.run(tree, file, alloc).map(Step::Done)
+    }
+}
+
+/// Deferred work a stage hands back, finished only by the asynchronous API.
+pub type Job<'a> = Box<dyn FnOnce(&mut File) -> Result<Tree<'a>, Error> + 'a>;
+
+/// What starting a stage gives: its tree, or a job that yields it.
+pub enum Step<'a> {
+    Done(Tree<'a>),
+    Job(Job<'a>),
 }
 
 /// Turns a tree into output text, whose kind `extension` names (`html`, `md`).

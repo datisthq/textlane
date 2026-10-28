@@ -2,6 +2,7 @@
 //! run natively, with Node.js and Python bindings over the same crate.
 
 mod models {
+    pub(crate) mod pipeline;
     pub(crate) mod processor;
 }
 mod actions {
@@ -11,6 +12,15 @@ mod actions {
     }
     pub(crate) mod package {
         pub(crate) mod version;
+    }
+    pub(crate) mod plugin {
+        pub(crate) mod find;
+    }
+}
+#[cfg(feature = "testing")]
+mod utils {
+    pub(crate) mod testing {
+        pub(crate) mod plugins;
     }
 }
 
@@ -28,6 +38,7 @@ mod bindings {
 #[cfg(feature = "testing")]
 pub use actions::case::run::run_case;
 pub use actions::package::version::read_version;
+pub use models::pipeline::{Api, Pipeline};
 pub use models::processor::{FrozenProcessor, Output, Processor};
 pub use textlane_core::*;
 #[cfg(feature = "html")]

@@ -55,7 +55,7 @@ pub use models::file::{File, Message};
 pub use models::lines::Lines;
 pub use models::position::{Point, Position, UnistPoint, UnistPosition};
 pub use models::tree::{Tree, TreeKind};
-pub use plugin::{Attach, Compiler, Parser, Plugin, Slots, Transform};
+pub use plugin::{Attach, Compiler, Job, Parser, Plugin, Slots, Step, Transform};
 
 /// The arena every node of one document is allocated in.
 pub use bumpalo::Bump as Allocator;

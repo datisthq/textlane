@@ -1,11 +1,6 @@
 [
   {
     "description": "differential",
-    "source": {
-      "repository": "https://github.com/datisthq/textlane",
-      "path": "conformance/sources/differential.ts",
-      "license": "MIT"
-    },
     "pipeline": [["md.parse"]],
     "tests": [
       {

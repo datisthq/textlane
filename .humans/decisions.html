@@ -527,12 +527,35 @@
     <p><strong>Rejected.</strong> One plan for everything.</p>
   </dd>
   <dt>
-    <htmlpress-badge type="warning">my call</htmlpress-badge> Runners skip lifecycle modes
-    they cannot express until the processor's async model exists
+    <htmlpress-badge type="success">decided</htmlpress-badge> Async stages are jobs, with
+    no runtime: <code>Transform::start</code> hands back a tree or a job; the sync API
+    fails on a job with <code>async-in-sync</code>, the async API finishes it
   </dt>
   <dd>
     <p>
-      <strong>Why.</strong> Keeps the suite runnable before the processor is designed.
+      <strong>Why.</strong> Every core case runs in all three runners without an async
+      runtime in the crate; the bridge later wraps a JavaScript promise or a Python
+      coroutine as a job.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Real futures on tokio, a dependency every install pays
+      for; deferring the async API and its cases to the bridge.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> The bindings drive a
+    name-based <code>Pipeline</code> with unified's <code>use</code> semantics; Rust keeps
+    the typed <code>Processor::with</code>
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Reconfiguring a plugin merges JSON options before the plugin
+      exists, and presets, settings and data are JSON in unified; typed options suit Rust
+      callers, who never reconfigure.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Reconfiguration on typed plugins; separate pipelines per
+      binding.
     </p>
   </dd>
   <dt>
@@ -544,7 +567,8 @@
     <p>
       <strong>Why.</strong> Proves the format, the schema guard and all three runners
       before the processor and tree types are designed in phase 3; test files stay
-      unchanged when the stub goes.
+      unchanged when the stub goes. Phase 3 replaced it with the processor's own
+      <code>test.*</code> plugins.
     </p>
     <p>
       <strong>Rejected.</strong> Designing the processor and the tree types in phase 2.
@@ -814,13 +838,6 @@
 
 <h2>Open</h2>
 <dl>
-  <dt>
-    <htmlpress-badge type="danger">open</htmlpress-badge> The processor's async model:
-    runtime, awaiting a JS promise through napi, asyncio
-  </dt>
-  <dd>
-    <p>Shapes the processor's core types and which core cases each runner can run.</p>
-  </dd>
   <dt>
     <htmlpress-badge type="danger">open</htmlpress-badge> Host-plugin bridge semantics: a
     serialized copy per plugin run, or a live handle

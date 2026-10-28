@@ -1,12 +1,11 @@
+import { writeFileSync } from "node:fs"
 import { join, resolve } from "node:path"
-import { writeGroups } from "../actions/group/write.ts"
 import { parseMarkdown } from "../actions/markdown/render.ts"
 
 const OUTPUT = join(
   resolve(import.meta.dirname, "..", "tests", "md"),
   "differential.json",
 )
-const REPOSITORY = "https://github.com/datisthq/textlane"
 
 // Inputs where md.parse once differed from mdast-util-from-markdown, found by fuzzing
 // both with random fragments; each expectation is the pinned reference's tree
@@ -52,25 +51,16 @@ const INPUTS: { description: string; input: string }[] = [
 
 importDifferential()
 
+// textlane's own cases, not ported from upstream: the file is this one group, with no source
 function importDifferential() {
-  writeGroups({
-    path: OUTPUT,
-    repository: REPOSITORY,
-    groups: [
-      {
-        description: "differential",
-        source: {
-          repository: REPOSITORY,
-          path: "conformance/sources/differential.ts",
-          license: "MIT",
-        },
-        pipeline: [["md.parse"]],
-        tests: INPUTS.map(test => ({
-          ...test,
-          expected: { tree: parseMarkdown(test.input) },
-        })),
-      },
-    ],
-  })
+  const group = {
+    description: "differential",
+    pipeline: [["md.parse"]],
+    tests: INPUTS.map(test => ({
+      ...test,
+      expected: { tree: parseMarkdown(test.input) },
+    })),
+  }
+  writeFileSync(OUTPUT, `${JSON.stringify([group], null, 2)}\n`)
   console.log(`differential: ${INPUTS.length} cases`)
 }

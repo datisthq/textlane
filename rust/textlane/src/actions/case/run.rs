@@ -1,137 +1,155 @@
-use serde_json::{Map, Value, json};
-use textlane_core::{Allocator, Error, File, Lines, Tree, TreeKind};
+use serde_json::{Value, json};
+use textlane_core::{Allocator, Error, File, Lines};
 
-use crate::models::processor::Processor;
+use crate::models::pipeline::{Api, Pipeline, read_tree, write_tree};
+use crate::utils::testing::plugins::take_trace;
 
-/// Run one conformance case, `{pipeline, input | tree}`, through the crate's plugins.
+/// Run one conformance case, `{pipeline, input | tree | operations}`, through the crate.
 ///
-/// The result has one key, as a test's `expected` does: `txt`, `tree` or `error`.
+/// The result holds every outcome the case produced (`tree`, the output keyed by its
+/// extension, `data`, `messages`, `trace`), or only `error`.
 pub fn run_case(case: &Value) -> Value {
-    if let Some(pipeline) = read_plugin_pipeline(case) {
-        return match run_processor(case, pipeline) {
-            Ok(result) => result,
-            Err(error) => {
-                json!({ "error": { "code": error.code, "message": error.message } })
-            }
-        };
-    }
-    match run_pipeline(case) {
-        Ok(result) => result,
-        Err((code, message)) => json!({ "error": { "code": code, "message": message } }),
-    }
-}
-
-// A pipeline of the crate's plugins; the `test.*` stub plugins run without the processor
-fn read_plugin_pipeline(case: &Value) -> Option<&Vec<Value>> {
-    let pipeline = case.get("pipeline").and_then(Value::as_array)?;
-    let is_stub = |entry: &Value| {
-        entry
-            .get(0)
-            .and_then(Value::as_str)
-            .is_none_or(|name| name.starts_with("test."))
+    take_trace();
+    let mut file = File::new();
+    let result = match read_case(case) {
+        Ok((pipeline, Some(operations))) => {
+            run_operations(pipeline, operations, &mut file)
+        }
+        Ok((pipeline, None)) => run_document(case, pipeline, &mut file),
+        Err(error) => Err(error),
     };
-    let plugins = case.get("operations").is_none() && !pipeline.iter().all(is_stub);
-    plugins.then_some(pipeline)
+    match result {
+        Ok(mut result) => {
+            result["messages"] = write_messages(&file);
+            result["trace"] = json!(take_trace());
+            result
+        }
+        Err(error) => {
+            json!({ "error": { "code": error.code, "message": error.message } })
+        }
+    }
 }
 
-type Failure = (&'static str, String);
-
-fn run_pipeline(case: &Value) -> Result<Value, Failure> {
-    let pipeline = case
+fn read_case(case: &Value) -> Result<(Pipeline, Option<&Vec<Value>>), Error> {
+    let entries = case
         .get("pipeline")
         .and_then(Value::as_array)
-        .ok_or_else(|| {
-            (
-                "invalid-case",
-                "a case needs a `pipeline` array".to_string(),
-            )
-        })?;
-    if case.get("operations").is_some() {
-        return Err((
-            "unsupported-operations",
-            "the stub runs pipelines, not operations".into(),
-        ));
+        .ok_or_else(|| Error::new("invalid-case", "a case needs a `pipeline` array"))?;
+    let mut pipeline = Pipeline::new();
+    for entry in entries {
+        let name = entry.get(0).cloned().unwrap_or(Value::Null);
+        pipeline.use_value(&name, entry.get(1).cloned())?;
     }
-    let mut state = match (case.get("input"), case.get("tree")) {
-        (Some(Value::String(text)), None) => State::Text(text.clone()),
-        (None, Some(tree)) => State::Tree(tree.clone()),
-        _ => {
-            return Err((
-                "invalid-case",
-                "a case needs either `input` or `tree`".into(),
-            ));
-        }
-    };
-    for entry in pipeline {
-        let name = entry
-            .get(0)
-            .and_then(Value::as_str)
-            .ok_or_else(|| ("invalid-case", format!("not a pipeline entry: {entry}")))?;
-        state = apply_plugin(name, state)?;
-    }
-    Ok(match state {
-        State::Text(text) => json!({ "txt": text }),
-        State::Tree(tree) => json!({ "tree": tree }),
-    })
+    Ok((pipeline, case.get("operations").and_then(Value::as_array)))
 }
 
-enum State {
-    Text(String),
-    Tree(Value),
-}
-
-fn apply_plugin(name: &str, state: State) -> Result<State, Failure> {
-    match (name, state) {
-        ("test.parseText", State::Text(text)) => {
-            let mut node = Map::new();
-            node.insert("type".into(), "text".into());
-            node.insert("value".into(), text.into());
-            Ok(State::Tree(Value::Object(node)))
-        }
-        ("test.compileValue", State::Tree(tree)) => {
-            let value = tree
-                .get("value")
-                .and_then(Value::as_str)
-                .unwrap_or_default();
-            Ok(State::Text(value.to_string()))
-        }
-        ("test.parseText" | "test.compileValue", _) => Err((
-            "invalid-stage",
-            format!("`{name}` cannot run at this point of the pipeline"),
-        )),
-        _ => Err(("unknown-plugin", format!("no plugin named `{name}`"))),
-    }
-}
-
-fn run_processor(case: &Value, pipeline: &[Value]) -> Result<Value, Error> {
-    let mut processor = Processor::new();
-    for entry in pipeline {
-        let name = entry.get(0).and_then(Value::as_str).unwrap_or_default();
-        let options = entry.get(1).cloned().unwrap_or(Value::Null);
-        processor = add_plugin(processor, name, options)?;
-    }
-    let processor = processor.freeze()?;
+// A pipeline case parses its input when there is a parser, or reads its tree, then compiles
+// when there is a compiler and otherwise gives the tree
+fn run_document(
+    case: &Value,
+    mut pipeline: Pipeline,
+    file: &mut File,
+) -> Result<Value, Error> {
+    let processor = pipeline.freeze()?;
     let alloc = Allocator::new();
-    let mut file = File::new();
     let input = case.get("input").and_then(Value::as_str);
     let lines = input.map(Lines::new);
     let tree = match (input, case.get("tree")) {
         (Some(input), _) if processor.has_parser() => {
-            processor.parse(input, &mut file, &alloc)?
+            processor.parse(input, file, &alloc)?
         }
         (_, Some(tree)) => read_tree(tree, processor.input_kind(), &alloc)?,
-        _ => return Err(Error::new("missing-parser", "the processor has no parser")),
-    };
-    let tree = processor.run(tree, &mut file, &alloc)?;
-    let mut result = match processor.extension() {
-        Some(extension) => {
-            let value = processor.stringify(&tree, &mut file)?;
-            json!({ extension: value })
+        (Some(_), None) => {
+            return Err(Error::new(
+                "missing-parser",
+                "Cannot `parse` without `parser`",
+            ));
         }
+        (None, None) => {
+            return Err(Error::new(
+                "invalid-case",
+                "a case needs either `input` or `tree`",
+            ));
+        }
+    };
+    let tree = processor.run_sync(tree, file, &alloc)?;
+    let mut result = match processor.extension() {
+        Some(extension) => json!({ extension: processor.stringify(&tree, file)? }),
         None => json!({ "tree": write_tree(&tree, lines.as_ref())? }),
     };
-    result["messages"] = write_messages(&file);
+    result["data"] = pipeline.data(None);
     Ok(result)
+}
+
+// Each operation is one call on the processor; the last one's output is the case's
+fn run_operations(
+    mut pipeline: Pipeline,
+    operations: &[Value],
+    file: &mut File,
+) -> Result<Value, Error> {
+    let mut result = json!({});
+    for operation in operations {
+        let name = operation.get(0).and_then(Value::as_str).unwrap_or_default();
+        let argument = |index: usize| operation.get(index).cloned();
+        let api = match operation.get(2).and_then(|options| options.get("api")) {
+            Some(Value::String(api)) if api == "async" => Api::Async,
+            _ => Api::Sync,
+        };
+        result = match name {
+            "use" => {
+                let value = argument(1).unwrap_or(Value::Null);
+                pipeline.use_value(&value, argument(2))?;
+                json!({})
+            }
+            "data" => match (argument(1), argument(2)) {
+                (Some(Value::String(key)), Some(value)) => {
+                    pipeline.set_data(&key, value)?;
+                    json!({})
+                }
+                (Some(Value::String(key)), None) => {
+                    json!({ "data": pipeline.data(Some(&key)) })
+                }
+                _ => json!({ "data": pipeline.data(None) }),
+            },
+            "freeze" => {
+                pipeline.freeze()?;
+                json!({})
+            }
+            "parse" => {
+                let input = argument(1).unwrap_or(Value::Null);
+                json!({ "tree": pipeline.parse(input.as_str().unwrap_or_default(), file)? })
+            }
+            "run" => {
+                let tree = argument(1).unwrap_or(Value::Null);
+                json!({ "tree": pipeline.run(&tree, file, api)? })
+            }
+            "stringify" => {
+                let tree = argument(1).unwrap_or(Value::Null);
+                let value = pipeline.stringify(&tree, file)?;
+                json!({ extension_of(&mut pipeline)?: value })
+            }
+            "process" => {
+                let input = argument(1).unwrap_or(Value::Null);
+                let value =
+                    pipeline.process(input.as_str().unwrap_or_default(), file, api)?;
+                json!({ extension_of(&mut pipeline)?: value })
+            }
+            _ => {
+                return Err(Error::new(
+                    "invalid-case",
+                    format!("not an operation: {operation}"),
+                ));
+            }
+        };
+    }
+    if result.get("data").is_none() {
+        result["data"] = pipeline.data(None);
+    }
+    Ok(result)
+}
+
+fn extension_of(pipeline: &mut Pipeline) -> Result<&'static str, Error> {
+    Ok(pipeline.freeze()?.extension().unwrap_or("txt"))
 }
 
 // Messages in the order they were reported, compared on their rule, source and place only
@@ -152,79 +170,6 @@ fn write_messages(file: &File) -> Value {
             })
             .collect(),
     )
-}
-
-fn add_plugin(
-    processor: Processor,
-    name: &str,
-    options: Value,
-) -> Result<Processor, Error> {
-    Ok(match name {
-        #[cfg(feature = "md")]
-        "md.parse" => processor.with(textlane_md::parse(read_options(options)?)),
-        #[cfg(feature = "md")]
-        "md.gfm" => processor.with(textlane_md::gfm(read_options(options)?)),
-        #[cfg(feature = "md")]
-        "md.gemoji" => processor.with(textlane_md::gemoji()),
-        #[cfg(feature = "md")]
-        "md.stringify" => processor.with(textlane_md::stringify(read_options(options)?)),
-        #[cfg(feature = "md")]
-        "md.toHtml" => processor.with(textlane_md::to_html(read_options(options)?)),
-        #[cfg(feature = "html")]
-        "html.parse" => processor.with(textlane_html::parse(read_options(options)?)),
-        #[cfg(feature = "html")]
-        "html.sanitize" => {
-            processor.with(textlane_html::sanitize(read_options(options)?))
-        }
-        #[cfg(feature = "html")]
-        "html.slug" => processor.with(textlane_html::slug(read_options(options)?)),
-        #[cfg(feature = "html")]
-        "html.toMarkdown" => {
-            processor.with(textlane_html::to_markdown(read_options(options)?))
-        }
-        #[cfg(feature = "html")]
-        "html.stringify" => {
-            processor.with(textlane_html::stringify(read_options(options)?))
-        }
-        _ => {
-            return Err(Error::new(
-                "unknown-plugin",
-                format!("no plugin named `{name}`"),
-            ));
-        }
-    })
-}
-
-fn read_options<T: serde::de::DeserializeOwned + Default>(
-    options: Value,
-) -> Result<T, Error> {
-    if options.is_null() {
-        return Ok(T::default());
-    }
-    serde_json::from_value(options)
-        .map_err(|error| Error::new("invalid-options", error.to_string()))
-}
-
-fn read_tree<'a>(
-    tree: &Value,
-    kind: Option<TreeKind>,
-    alloc: &'a Allocator,
-) -> Result<Tree<'a>, Error> {
-    match kind {
-        Some(TreeKind::Hast) => Ok(Tree::Hast(textlane_core::hast::deserialize_hast(
-            tree, alloc,
-        )?)),
-        _ => Ok(Tree::Mdast(textlane_core::mdast::deserialize_mdast(
-            tree, alloc,
-        )?)),
-    }
-}
-
-fn write_tree(tree: &Tree<'_>, lines: Option<&Lines<'_>>) -> Result<Value, Error> {
-    match tree {
-        Tree::Mdast(node) => textlane_core::mdast::serialize_mdast(node, lines),
-        Tree::Hast(node) => textlane_core::hast::serialize_hast(node, lines),
-    }
 }
 
 #[cfg(test)]
