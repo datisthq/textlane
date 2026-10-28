@@ -24,7 +24,7 @@ mdx = ["dep:textlane-mdx"]
 prose = ["dep:textlane-prose"]
 node = ["md", "html", "mdx", "prose", "dep:napi", "dep:napi-derive", "dep:napi-build"]
 python = ["md", "html", "mdx", "prose", "dep:pyo3"]
-testing = ["dep:serde_json"]
+testing = ["dep:serde_json", "dep:serde", "textlane-core/json"]
 
 [dependencies]
 textlane-core.workspace = true
@@ -36,7 +36,8 @@ napi = { version = "3.14.2", default-features = false, features = [
   "napi4",
 ], optional = true }
 napi-derive = { version = "3.6.12", optional = true }
-serde_json = { version = "1.0.145", optional = true }
+serde_json = { workspace = true, optional = true }
+serde = { workspace = true, optional = true }
 pyo3 = { version = "0.30.1", features = [
   "extension-module",
   "abi3-py39",

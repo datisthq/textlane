@@ -29,8 +29,11 @@ otherwise.
   it never reaches the published packages or the loader's types.
 - Serialized output is keyed by its file extension (`html`, `md`, `js`, `txt`), never by the
   domain that produced it; `tree` and `error` are the other outcomes.
-- `test.*` plugins live only there. Phase 2 ships `test.parseText` and `test.compileValue` as a
-  stub; the real processor replaces the stub in phase 3 without changing a test file.
+- A pipeline of the crate's plugins runs through the real `Processor`: `add_plugin` in `run.rs`
+  maps each name (`md.parse`, `md.toHtml`, `html.stringify`) and reads its options into the
+  plugin's options struct, failing with `invalid-options`; a new plugin joins there. A tree
+  input is read as the kind the first stage takes. `test.*` plugins live only there, as the
+  stub `test.parseText` and `test.compileValue`.
 - Each runner compares exactly, except `expected.error`: its `code` must match and its
   `message`, if given, is a substring. Change that rule in all three runners at once.
 
@@ -41,7 +44,9 @@ Cases are ported before the code that passes them. A new source lands with its f
 cases and swallow their failures. When an implementation makes every case of an entry pass, the
 run fails with `<entry> passes now; remove it from conformance/pending.json`: delete the entry,
 or narrow a wildcard to the files still failing. A wildcard only trips once its whole area
-passes.
+passes, so it protects nothing that already passes: once some groups of an area pass, list the
+files that fail whole and the failing `<file>#<group>` of the rest. To see what passes, run the
+Rust runner with `pending.json` emptied to `{}` and restore it after.
 
 ## Importing a source
 
@@ -81,7 +86,7 @@ data, each citing the unified test it ports, and computes every expectation by r
 `operations` through the pinned unified with JavaScript versions of the test plugins. Never write
 an expected outcome by hand: add the case, rerun `pnpm -C conformance import:unified`, read what
 unified did. The crate's test plugins must behave as those JavaScript ones do; the stub answers
-`unsupported-operations` until the processor exists.
+`unsupported-operations` until the processor runs operations.
 
 ## Errors
 

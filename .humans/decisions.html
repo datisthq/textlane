@@ -21,7 +21,7 @@
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>25 agent's calls</h3>
+    <h3>27 agent's calls</h3>
     <p>
       <htmlpress-badge type="warning">my call</htmlpress-badge> settled by the agent, open
       to change
@@ -186,6 +186,35 @@
       is oxc's and stays inside <code>mdx</code>.
     </p>
     <p><strong>Rejected.</strong> Each domain owning its tree types.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> A transform takes the tree
+    by value and returns one, instead of mutating it through <code>&amp;mut</code>
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> A bridge (<code>md.toHtml</code>) returns another kind of
+      tree; moving it costs nothing, since nodes live in the arena.
+    </p>
+    <p>
+      <strong>Rejected.</strong> <code>&amp;mut Tree</code> with <code>*tree = …</code>.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> The engine follows
+    markdown-rs, with state functions as plain function pointers and token names as an
+    open set of constants
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> markdown-rs's events match micromark's, which the corpus pins;
+      function pointers and open names let extensions add states and tokens without a
+      central enum.
+    </p>
+    <p>
+      <strong>Rejected.</strong> markdown-rs's state-name enum with one dispatch
+      <code>match</code>; a fresh line-based block parser.
+    </p>
   </dd>
 </dl>
 

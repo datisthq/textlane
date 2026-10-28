@@ -10,8 +10,10 @@
 <p>
   The tree shape and the plugin contract every crate builds on, and the layout of the
   <code>md</code> crate that ports micromark. Source: the design session of 2026-10-28;
-  nothing here is implemented yet beyond the empty <code>md</code> scaffold. Each choice's
-  status and the alternatives turned down are on <a href="decisions.html">Decisions</a>.
+  the bootstrap implements the arena tree, positions, the processor,
+  <code>html.stringify</code> and <code>md</code>'s engine with paragraphs, ATX headings
+  and thematic breaks; the rest is design. Each choice's status and the alternatives
+  turned down are on <a href="decisions.html">Decisions</a>.
 </p>
 
 <htmlpress-callout type="note">
@@ -50,8 +52,9 @@
   <dt>Positions: two byte offsets</dt>
   <dd>
     <p>
-      A position is two <code>u32</code> byte offsets, 8 bytes. Line, column and the
-      UTF-16 offset unified reports are computed only at the edge (serializing,
+      A position is two <code>u32</code> byte offsets, 8 bytes; the top two bits of each
+      hold the virtual spaces into a tab, which unist counts in columns. Line, column and
+      the UTF-16 offset unified reports are computed only at the edge (serializing,
       diagnostics, foreign plugins) from a line index on the file. A position that does
       not point into the current source, such as one a JavaScript plugin set by line and
       column alone, falls back to a boxed full unist position.
@@ -169,9 +172,10 @@
   <dd>
     <p>
       <code
-        >fn run&lt;'a&gt;(&amp;self, tree: &amp;mut Tree&lt;'a&gt;, file: &amp;mut File,
-        alloc: &amp;'a Allocator) -&gt; Result&lt;(), Fatal&gt;</code
-      >, mutating in place; replacing the tree is <code>*tree = …</code>.
+        >fn run&lt;'a&gt;(&amp;self, tree: Tree&lt;'a&gt;, file: &amp;mut File, alloc:
+        &amp;'a Allocator) -&gt; Result&lt;Tree&lt;'a&gt;, Error&gt;</code
+      >: it takes the tree and returns one, so a bridge such as <code>md.toHtml</code>
+      returns another kind.
     </p>
   </dd>
   <dt>The file</dt>

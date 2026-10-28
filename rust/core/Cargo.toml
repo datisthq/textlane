@@ -11,5 +11,12 @@ description = "Textlane's core: unist, mdast and hast trees, the file and the pl
 keywords = ["unist", "mdast", "hast", "plugin", "textlane"]
 categories = ["text-processing", "data-structures"]
 
+[features]
+json = ["dep:serde_json"]
+
+[dependencies]
+bumpalo.workspace = true
+serde_json = { workspace = true, optional = true }
+
 [lints]
 workspace = true

@@ -1,0 +1,128 @@
+use std::any::{Any, TypeId};
+use std::collections::HashMap;
+
+use crate::Allocator;
+use crate::models::error::Error;
+use crate::models::file::File;
+use crate::models::tree::{Tree, TreeKind};
+
+/// A pipeline stage: attached once when a processor freezes, where it registers what it does.
+pub trait Plugin: Send + Sync {
+    fn attach(&self, context: &mut Attach) -> Result<(), Error>;
+}
+
+/// Turns input text into a tree.
+pub trait Parser: Send + Sync {
+    fn output(&self) -> TreeKind;
+    fn parse<'a>(
+        &self,
+        input: &'a str,
+        file: &mut File,
+        alloc: &'a Allocator,
+    ) -> Result<Tree<'a>, Error>;
+}
+
+/// Changes a tree, or bridges it into another kind of tree.
+pub trait Transform: Send + Sync {
+    fn input(&self) -> TreeKind;
+    fn output(&self) -> TreeKind;
+    fn run<'a>(
+        &self,
+        tree: Tree<'a>,
+        file: &mut File,
+        alloc: &'a Allocator,
+    ) -> Result<Tree<'a>, Error>;
+}
+
+/// Turns a tree into output text, whose kind `extension` names (`html`, `md`).
+pub trait Compiler: Send + Sync {
+    fn input(&self) -> TreeKind;
+    fn extension(&self) -> &'static str;
+    fn compile(&self, tree: &Tree<'_>, file: &mut File) -> Result<String, Error>;
+}
+
+type ParserFactory = Box<dyn FnOnce(&Slots) -> Result<Box<dyn Parser>, Error>>;
+type CompilerFactory = Box<dyn FnOnce(&Slots) -> Result<Box<dyn Compiler>, Error>>;
+
+/// What plugins register while a processor freezes.
+#[derive(Default)]
+pub struct Attach {
+    parser: Option<ParserFactory>,
+    compiler: Option<CompilerFactory>,
+    transforms: Vec<Box<dyn Transform>>,
+    slots: Slots,
+}
+
+/// Data plugins share while attaching, one value per type.
+#[derive(Default)]
+pub struct Slots {
+    values: HashMap<TypeId, Box<dyn Any>>,
+}
+
+impl Attach {
+    /// Set the parser, built once every plugin has attached, so it sees all their slots.
+    pub fn set_parser(
+        &mut self,
+        factory: impl FnOnce(&Slots) -> Result<Box<dyn Parser>, Error> + 'static,
+    ) {
+        self.parser = Some(Box::new(factory));
+    }
+
+    /// Set the compiler, built once every plugin has attached.
+    pub fn set_compiler(
+        &mut self,
+        factory: impl FnOnce(&Slots) -> Result<Box<dyn Compiler>, Error> + 'static,
+    ) {
+        self.compiler = Some(Box::new(factory));
+    }
+
+    pub fn add_transform(&mut self, transform: Box<dyn Transform>) {
+        self.transforms.push(transform);
+    }
+
+    pub fn slots_mut(&mut self) -> &mut Slots {
+        &mut self.slots
+    }
+
+    /// Build the parser and compiler and hand back every stage.
+    #[allow(clippy::type_complexity)]
+    pub fn finish(
+        self,
+    ) -> Result<
+        (
+            Option<Box<dyn Parser>>,
+            Vec<Box<dyn Transform>>,
+            Option<Box<dyn Compiler>>,
+        ),
+        Error,
+    > {
+        let parser = self
+            .parser
+            .map(|factory| factory(&self.slots))
+            .transpose()?;
+        let compiler = self
+            .compiler
+            .map(|factory| factory(&self.slots))
+            .transpose()?;
+        Ok((parser, self.transforms, compiler))
+    }
+}
+
+impl Slots {
+    pub fn get<T: 'static>(&self) -> Option<&T> {
+        self.values
+            .get(&TypeId::of::<T>())
+            .and_then(|value| value.downcast_ref())
+    }
+
+    pub fn get_or_default<T: Default + 'static>(&mut self) -> &mut T {
+        let value = self
+            .values
+            .entry(TypeId::of::<T>())
+            .or_insert_with(|| Box::new(T::default()));
+        match value.downcast_mut() {
+            Some(value) => value,
+            None => unreachable!("a slot holds the type it is keyed by"),
+        }
+    }
+}

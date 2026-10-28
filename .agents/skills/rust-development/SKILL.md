@@ -49,6 +49,14 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   `plugins/<name>/` for one `.use()` stage each (`plugin.rs` plus its own `actions/`), and
   `utils/<name>/` for a bounded internal system whose files are mutually recursive (`md`'s
   `tokenizer`, `compiler`, `serializer`, `converter`); only it is exempt from one action per file
+- Trees live in one `bumpalo` arena per document (`textlane_core::Allocator`, `ArenaVec`);
+  strings borrow the input or the arena. A `Point` is a byte offset whose top two bits hold
+  a tab's virtual spaces; `Lines` turns it into unist's UTF-16 line, column and offset
+- `md`'s engine is a port of markdown-rs (micromark's design in Rust): a state is a plain
+  `fn(&mut Tokenizer) -> State`, a token name an open `Name("…")` constant. A construct not
+  ported yet is marked where it joins, in `utils/tokenizer/{document,flow,text}.rs`. Where
+  markdown-rs's mdast differs from unified's, the corpus wins (flow nodes start after their
+  indent: `tail_push_after_prefix`)
 - `md` names entities by syntax construct or mdast node and verbs by layer: `tokenize` and
   `resolve` (micromark), `compile` (from-markdown), `stringify` (to-markdown), `convert`
   (to-hast), so `actions/heading/compile.rs` exports `compile_heading`. No file named after

@@ -3,255 +3,281 @@
 
 mod plugin;
 mod models {
-    mod code;
-    mod construct;
-    mod event;
-    mod options;
-    mod token;
+    pub(crate) mod code;
+    pub(crate) mod construct;
+    pub(crate) mod event;
+    pub(crate) mod options;
+    pub(crate) mod token;
 }
 mod utils {
-    mod compiler {
-        mod handlers;
-        mod stack;
+    pub(crate) mod compiler {
+        pub(crate) mod handlers;
+        pub(crate) mod stack;
     }
-    mod converter {
-        mod footnote;
-        mod state;
+    pub(crate) mod converter {
+        pub(crate) mod footnote;
+        pub(crate) mod state;
     }
-    mod serializer {
-        mod join;
-        mod safe;
-        mod state;
-        mod unsafe_patterns;
+    pub(crate) mod serializer {
+        pub(crate) mod join;
+        pub(crate) mod safe;
+        pub(crate) mod state;
+        pub(crate) mod unsafe_patterns;
     }
-    mod tokenizer {
-        mod content;
-        mod driver;
-        mod preprocess;
-        mod registry;
-        mod subtokenize;
+    pub(crate) mod tokenizer {
+        pub(crate) mod content;
+        pub(crate) mod document;
+        pub(crate) mod driver;
+        pub(crate) mod edit_map;
+        pub(crate) mod flow;
+        pub(crate) mod preprocess;
+        pub(crate) mod registry;
+        pub(crate) mod string;
+        pub(crate) mod subtokenize;
+        pub(crate) mod text;
     }
 }
 mod actions {
-    mod attention {
-        mod resolve;
-        mod tokenize;
+    pub(crate) mod attention {
+        pub(crate) mod resolve;
+        pub(crate) mod tokenize;
     }
-    mod autolink {
-        mod tokenize;
+    pub(crate) mod autolink {
+        pub(crate) mod tokenize;
     }
-    mod blank_line {
-        mod tokenize;
+    pub(crate) mod blank_line {
+        pub(crate) mod tokenize;
     }
-    mod block_quote {
-        mod tokenize;
+    pub(crate) mod block_quote {
+        pub(crate) mod tokenize;
     }
-    mod blockquote {
-        mod compile;
-        mod convert;
-        mod stringify;
+    pub(crate) mod blockquote {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
     }
-    mod character_escape {
-        mod tokenize;
+    pub(crate) mod bom {
+        pub(crate) mod tokenize;
     }
-    mod character_reference {
-        mod tokenize;
+    pub(crate) mod character_escape {
+        pub(crate) mod tokenize;
     }
-    mod code {
-        mod compile;
-        mod convert;
-        mod stringify;
+    pub(crate) mod character_reference {
+        pub(crate) mod tokenize;
     }
-    mod code_fenced {
-        mod tokenize;
+    pub(crate) mod code {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
     }
-    mod code_indented {
-        mod tokenize;
+    pub(crate) mod code_fenced {
+        pub(crate) mod tokenize;
     }
-    mod code_text {
-        mod resolve;
-        mod tokenize;
+    pub(crate) mod code_indented {
+        pub(crate) mod tokenize;
     }
-    mod definition {
-        mod compile;
-        mod convert;
-        mod stringify;
-        mod tokenize;
+    pub(crate) mod code_text {
+        pub(crate) mod resolve;
+        pub(crate) mod tokenize;
     }
-    mod destination {
-        mod tokenize;
+    pub(crate) mod data {
+        pub(crate) mod resolve;
+        pub(crate) mod tokenize;
     }
-    mod emphasis {
-        mod compile;
-        mod convert;
-        mod stringify;
+    pub(crate) mod definition {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
+        pub(crate) mod tokenize;
     }
-    mod hard_break {
-        mod compile;
-        mod convert;
-        mod stringify;
+    pub(crate) mod destination {
+        pub(crate) mod tokenize;
     }
-    mod hard_break_escape {
-        mod tokenize;
+    pub(crate) mod emphasis {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
     }
-    mod heading {
-        mod compile;
-        mod convert;
-        mod stringify;
+    pub(crate) mod hard_break {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
     }
-    mod heading_atx {
-        mod resolve;
-        mod tokenize;
+    pub(crate) mod hard_break_escape {
+        pub(crate) mod tokenize;
     }
-    mod heading_setext {
-        mod resolve;
-        mod tokenize;
+    pub(crate) mod heading {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
     }
-    mod html {
-        mod compile;
-        mod convert;
-        mod stringify;
+    pub(crate) mod heading_atx {
+        pub(crate) mod resolve;
+        pub(crate) mod tokenize;
     }
-    mod html_flow {
-        mod tokenize;
+    pub(crate) mod heading_setext {
+        pub(crate) mod resolve;
+        pub(crate) mod tokenize;
     }
-    mod html_text {
-        mod tokenize;
+    pub(crate) mod html {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
     }
-    mod image {
-        mod compile;
-        mod convert;
-        mod stringify;
+    pub(crate) mod html_flow {
+        pub(crate) mod tokenize;
     }
-    mod image_reference {
-        mod compile;
-        mod convert;
-        mod stringify;
+    pub(crate) mod html_text {
+        pub(crate) mod tokenize;
     }
-    mod inline_code {
-        mod compile;
-        mod convert;
-        mod stringify;
+    pub(crate) mod image {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
     }
-    mod label {
-        mod tokenize;
+    pub(crate) mod image_reference {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
     }
-    mod label_end {
-        mod resolve;
-        mod tokenize;
+    pub(crate) mod inline_code {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
     }
-    mod label_start_image {
-        mod tokenize;
+    pub(crate) mod label {
+        pub(crate) mod tokenize;
     }
-    mod label_start_link {
-        mod tokenize;
+    pub(crate) mod label_end {
+        pub(crate) mod resolve;
+        pub(crate) mod tokenize;
     }
-    mod line_ending {
-        mod tokenize;
+    pub(crate) mod label_start_image {
+        pub(crate) mod tokenize;
     }
-    mod link {
-        mod compile;
-        mod convert;
-        mod stringify;
+    pub(crate) mod label_start_link {
+        pub(crate) mod tokenize;
     }
-    mod link_reference {
-        mod compile;
-        mod convert;
-        mod stringify;
+    pub(crate) mod line_ending {
+        pub(crate) mod tokenize;
     }
-    mod list {
-        mod compile;
-        mod convert;
-        mod stringify;
+    pub(crate) mod link {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
     }
-    mod list_item {
-        mod compile;
-        mod convert;
-        mod stringify;
-        mod tokenize;
+    pub(crate) mod link_reference {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
     }
-    mod markdown {
-        mod parse;
-        mod stringify;
+    pub(crate) mod list {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
     }
-    mod mdast {
-        mod convert;
+    pub(crate) mod list_item {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
+        pub(crate) mod tokenize;
     }
-    mod paragraph {
-        mod compile;
-        mod convert;
-        mod resolve;
-        mod stringify;
-        mod tokenize;
+    pub(crate) mod markdown {
+        pub(crate) mod parse;
+        pub(crate) mod stringify;
     }
-    mod root {
-        mod compile;
-        mod convert;
-        mod stringify;
+    pub(crate) mod mdast {
+        pub(crate) mod convert;
     }
-    mod space_or_tab {
-        mod tokenize;
+    pub(crate) mod paragraph {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod resolve;
+        pub(crate) mod stringify;
+        pub(crate) mod tokenize;
     }
-    mod strong {
-        mod compile;
-        mod convert;
-        mod stringify;
+    pub(crate) mod root {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
     }
-    mod text {
-        mod compile;
-        mod convert;
-        mod stringify;
+    pub(crate) mod space_or_tab {
+        pub(crate) mod tokenize;
     }
-    mod thematic_break {
-        mod compile;
-        mod convert;
-        mod stringify;
-        mod tokenize;
+    pub(crate) mod strong {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
     }
-    mod title {
-        mod tokenize;
+    pub(crate) mod text {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
     }
-    mod whitespace {
-        mod tokenize;
+    pub(crate) mod thematic_break {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod title {
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod whitespace {
+        pub(crate) mod resolve;
+        pub(crate) mod tokenize;
     }
 }
 mod helpers {
-    mod character;
-    mod entities;
-    mod identifier;
-    mod position;
-    mod reference;
-    mod uri;
+    pub(crate) mod character;
+    pub(crate) mod entities;
+    pub(crate) mod identifier;
+    pub(crate) mod position;
+    pub(crate) mod reference;
+    pub(crate) mod skip;
+    pub(crate) mod slice;
+    pub(crate) mod uri;
 }
 mod plugins {
-    mod definition_list {
-        mod plugin;
+    pub(crate) mod definition_list {
+        pub(crate) mod plugin;
     }
-    mod directive {
-        mod plugin;
+    pub(crate) mod directive {
+        pub(crate) mod plugin;
     }
-    mod frontmatter {
-        mod plugin;
+    pub(crate) mod frontmatter {
+        pub(crate) mod plugin;
     }
-    mod gemoji {
-        mod plugin;
+    pub(crate) mod gemoji {
+        pub(crate) mod plugin;
     }
-    mod gfm {
-        mod plugin;
+    pub(crate) mod gfm {
+        pub(crate) mod plugin;
     }
-    mod math {
-        mod plugin;
+    pub(crate) mod math {
+        pub(crate) mod plugin;
     }
-    mod mdx {
-        mod plugin;
+    pub(crate) mod mdx {
+        pub(crate) mod plugin;
     }
-    mod parse {
-        mod plugin;
+    pub(crate) mod parse {
+        pub(crate) mod plugin;
     }
-    mod stringify {
-        mod plugin;
+    pub(crate) mod stringify {
+        pub(crate) mod plugin;
     }
-    mod to_html {
-        mod plugin;
+    pub(crate) mod to_html {
+        pub(crate) mod plugin;
     }
 }
+
+// models
+pub use models::options::{ParseOptions, ToHtmlOptions};
+
+// actions
+pub use actions::markdown::parse::parse_markdown;
+pub use actions::mdast::convert::convert_mdast;
+
+// plugins
+pub use plugins::parse::plugin::{Parse, parse};
+pub use plugins::to_html::plugin::{ToHtml, to_html};
