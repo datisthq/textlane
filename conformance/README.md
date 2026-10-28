@@ -70,15 +70,16 @@ every `pending.json` entry against the files and groups that exist.
 `pnpm -C conformance import:<source>` rewrites that source's files from a pinned upstream
 release; importers are run deliberately and their output committed, never run in CI.
 
-| source          | reads                                                                 | expectations                                                                                                    |
-| --------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `commonmark`    | the 26 spec sections                                                  | the spec's 652 examples, each as an HTML case and a tree case, rendered by unified, pinned                      |
-| `micromark`     | `test/io` at `6577c20`                                                | 1,098 cases rendered by unified; micromark's own HTML kept in `comment` where it differs                        |
-| `from-markdown` | `mdast-util-from-markdown` at `afe9516`                               | 55 fixture and inline inputs as tree cases, positions included                                                  |
-| `to-markdown`   | `mdast-util-to-markdown` at `a31fe06`                                 | 399 tree → Markdown cases with serializer options and 23 round trips, upstream's expected Markdown verbatim     |
-| `gfm`           | the GFM spec and micromark's five GFM extensions                      | 190 cases rendered by unified with remark-gfm; micromark's or GitHub's HTML kept in `comment` where it differs  |
-| `gfm-mdast`     | mdast-util-gfm-*, mdast-util-gfm, remark-gfm                          | 114 tree, stringify and round-trip cases; upstream's Markdown verbatim, the rest rendered by the reference      |
-| `directive`     | micromark-extension-directive, mdast-util-directive, remark-directive | 325 cases: micromark's inputs as tree cases, upstream's serializer output verbatim, remark-directive's fixtures |
+| source          | reads                                                                 | expectations                                                                                                                                                |
+| --------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `commonmark`    | the 26 spec sections                                                  | the spec's 652 examples, each as an HTML case and a tree case, rendered by unified, pinned                                                                  |
+| `micromark`     | `test/io` at `6577c20`                                                | 1,098 cases rendered by unified; micromark's own HTML kept in `comment` where it differs                                                                    |
+| `from-markdown` | `mdast-util-from-markdown` at `afe9516`                               | 55 fixture and inline inputs as tree cases, positions included                                                                                              |
+| `to-markdown`   | `mdast-util-to-markdown` at `a31fe06`                                 | 399 tree → Markdown cases with serializer options and 23 round trips, upstream's expected Markdown verbatim                                                 |
+| `gfm`           | the GFM spec and micromark's five GFM extensions                      | 190 cases rendered by unified with remark-gfm; micromark's or GitHub's HTML kept in `comment` where it differs                                              |
+| `gfm-mdast`     | mdast-util-gfm-*, mdast-util-gfm, remark-gfm                          | 114 tree, stringify and round-trip cases; upstream's Markdown verbatim, the rest rendered by the reference                                                  |
+| `directive`     | micromark-extension-directive, mdast-util-directive, remark-directive | 325 cases: micromark's inputs as tree cases, upstream's serializer output verbatim, remark-directive's fixtures                                             |
+| `math`          | micromark-extension-math, mdast-util-math, remark-math                | 111 cases: micromark's inputs as tree cases (its HTML embeds KaTeX), mdast-util-math's serializer output, remark-math's KaTeX-free HTML, trees and Markdown |
 
 A file holds one construct (`md/heading-atx`), named as micromark names its test files, with a
 group per source: the spec section, then each upstream test file. An importer replaces only its

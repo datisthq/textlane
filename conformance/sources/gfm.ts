@@ -304,7 +304,11 @@ function readOptions(
   const target = node?.type === "Identifier" ? constants.get(node.name) : node
   if (!target) return "no GFM extension enabled"
   if (target.type !== "ObjectExpression") return "options not statically evaluable"
-  const options: Required<RenderOptions> = {
+  const options: {
+    allowDangerousHtml: boolean
+    gfm: Record<string, unknown>
+    toHtml: Record<string, unknown>
+  } = {
     allowDangerousHtml: false,
     gfm: {},
     toHtml: {},

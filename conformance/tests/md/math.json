@@ -1,0 +1,4885 @@
+[
+  {
+    "description": "micromark-extension-math (tree)",
+    "source": {
+      "repository": "https://github.com/micromark/micromark-extension-math",
+      "commit": "4c9e82c46f4ee3bb794382b84f9fa537f7452f9e",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.math"]],
+    "tests": [
+      {
+        "description": "should skip `mathFlow` and `mathText` construct if `disable.null` includes `mathFlow` and `mathText`",
+        "input": "$a$, $$b$$\n\n$$\nc\n$$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "inlineMath",
+                    "value": "a",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "a"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 4,
+                        "offset": 3
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": ", ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 4,
+                        "offset": 3
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 6,
+                        "offset": 5
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "b",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "b"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 6,
+                        "offset": 5
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 11,
+                        "offset": 10
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 11,
+                    "offset": 10
+                  }
+                }
+              },
+              {
+                "type": "math",
+                "meta": null,
+                "value": "c",
+                "data": {
+                  "hName": "pre",
+                  "hChildren": [
+                    {
+                      "type": "element",
+                      "tagName": "code",
+                      "properties": {
+                        "className": ["language-math", "math-display"]
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "c"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 12
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 3,
+                    "offset": 19
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 3,
+                "offset": 19
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support one, two, or more dollars by default",
+        "input": "$a$, $$b$$, $$$c$$$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "inlineMath",
+                    "value": "a",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "a"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 4,
+                        "offset": 3
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": ", ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 4,
+                        "offset": 3
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 6,
+                        "offset": 5
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "b",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "b"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 6,
+                        "offset": 5
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 11,
+                        "offset": 10
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": ", ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 11,
+                        "offset": 10
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 13,
+                        "offset": 12
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "c",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "c"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 13,
+                        "offset": 12
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 20,
+                        "offset": 19
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 20,
+                    "offset": 19
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 20,
+                "offset": 19
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support an escaped dollar sign which would otherwise open math",
+        "input": "a \\$b$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a $b$",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 7,
+                        "offset": 6
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 7,
+                    "offset": 6
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 7,
+                "offset": 6
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should not support escaped dollar signs in math (text)",
+        "input": "a $b\\$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "b\\",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "b\\"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 7,
+                        "offset": 6
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 7,
+                    "offset": 6
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 7,
+                "offset": 6
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support math (text) right after an escaped dollar sign",
+        "input": "a \\$$b$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a $",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 5,
+                        "offset": 4
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "b",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "b"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 5,
+                        "offset": 4
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 8,
+                        "offset": 7
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 8,
+                    "offset": 7
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 8,
+                "offset": 7
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support a single dollar in math (text) w/ padding and two dollar signs",
+        "input": "a $$ $ $$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "$",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "$"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 10,
+                        "offset": 9
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 10,
+                    "offset": 9
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 10,
+                "offset": 9
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support nested math by using more dollars outside of math (text)",
+        "input": "a $$\\raisebox{0.25em}{$\\frac a b$}$$ b",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "\\raisebox{0.25em}{$\\frac a b$}",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "\\raisebox{0.25em}{$\\frac a b$}"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 37,
+                        "offset": 36
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " b",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 37,
+                        "offset": 36
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 39,
+                        "offset": 38
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 39,
+                    "offset": 38
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 39,
+                "offset": 38
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support an “escaped” dollar right on the KaTeX level, not on the Markdown level",
+        "input": "a $$ \\$ $$ b",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "\\$",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "\\$"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 11,
+                        "offset": 10
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " b",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 11,
+                        "offset": 10
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 13,
+                        "offset": 12
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 13,
+                    "offset": 12
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 13,
+                "offset": 12
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support padding with a line ending in math (text)",
+        "input": "a $$\na\\$ $$ b",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "a\\$",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "a\\$"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 7,
+                        "offset": 11
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " b",
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 7,
+                        "offset": 11
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 9,
+                        "offset": 13
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 9,
+                    "offset": 13
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 9,
+                "offset": 13
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support math (text) w/ one dollar sign",
+        "input": "a $b$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "b",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "b"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 6,
+                        "offset": 5
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 6,
+                    "offset": 5
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 6,
+                "offset": 5
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support math (text) w/ two dollar signs",
+        "input": "a $$b$$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "b",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "b"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 8,
+                        "offset": 7
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 8,
+                    "offset": 7
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 8,
+                "offset": 7
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support math (text) w/ three dollar signs",
+        "input": "a $$$b$$$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "b",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "b"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 10,
+                        "offset": 9
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 10,
+                    "offset": 9
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 10,
+                "offset": 9
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support EOLs in math",
+        "input": "a $b\nc\rd\r\ne$ f",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "b\nc\rd\r\ne",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "b\nc\rd\r\ne"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 3,
+                        "offset": 12
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " f",
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 3,
+                        "offset": 12
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 5,
+                        "offset": 14
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 5,
+                    "offset": 14
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 5,
+                "offset": 14
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should not support math (flow) w/ one dollar sign",
+        "input": "$\na\n$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "inlineMath",
+                    "value": "a",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "a"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 2,
+                        "offset": 5
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 2,
+                    "offset": 5
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 2,
+                "offset": 5
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support math (flow) w/ two dollar sign",
+        "input": "$$\na\n$$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "math",
+                "meta": null,
+                "value": "a",
+                "data": {
+                  "hName": "pre",
+                  "hChildren": [
+                    {
+                      "type": "element",
+                      "tagName": "code",
+                      "properties": {
+                        "className": ["language-math", "math-display"]
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "a"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 3,
+                    "offset": 7
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 3,
+                "offset": 7
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support math (flow) w/ three dollar sign",
+        "input": "$$$\na\n$$$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "math",
+                "meta": null,
+                "value": "a",
+                "data": {
+                  "hName": "pre",
+                  "hChildren": [
+                    {
+                      "type": "element",
+                      "tagName": "code",
+                      "properties": {
+                        "className": ["language-math", "math-display"]
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "a"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 4,
+                    "offset": 9
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 4,
+                "offset": 9
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support math (flow) w/o content",
+        "input": "$$\n$$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "math",
+                "meta": null,
+                "value": "",
+                "data": {
+                  "hName": "pre",
+                  "hChildren": [
+                    {
+                      "type": "element",
+                      "tagName": "code",
+                      "properties": {
+                        "className": ["language-math", "math-display"]
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 3,
+                    "offset": 5
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 3,
+                "offset": 5
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support math (flow) w/o closing fence",
+        "input": "$$\na",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "math",
+                "meta": null,
+                "value": "a",
+                "data": {
+                  "hName": "pre",
+                  "hChildren": [
+                    {
+                      "type": "element",
+                      "tagName": "code",
+                      "properties": {
+                        "className": ["language-math", "math-display"]
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "a"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 2,
+                    "offset": 4
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 2,
+                "offset": 4
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support math (flow) w/o closing fence ending at an EOL",
+        "input": "$$\na\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "math",
+                "meta": null,
+                "value": "a",
+                "data": {
+                  "hName": "pre",
+                  "hChildren": [
+                    {
+                      "type": "element",
+                      "tagName": "code",
+                      "properties": {
+                        "className": ["language-math", "math-display"]
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "a"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 5
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 1,
+                "offset": 5
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support math (flow) w/ a meta string",
+        "input": "$$asd &amp; \\& asd\na\n$$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "math",
+                "meta": "asd & & asd",
+                "value": "a",
+                "data": {
+                  "hName": "pre",
+                  "hChildren": [
+                    {
+                      "type": "element",
+                      "tagName": "code",
+                      "properties": {
+                        "className": ["language-math", "math-display"]
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "a"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 3,
+                    "offset": 23
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 3,
+                "offset": 23
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should not support math (flow) w/ a dollar sign in the meta string",
+        "input": "$$asd$asd\na\n$$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "$$asd$asd\na",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 2,
+                        "offset": 11
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 2,
+                    "offset": 11
+                  }
+                }
+              },
+              {
+                "type": "math",
+                "meta": null,
+                "value": "",
+                "data": {
+                  "hName": "pre",
+                  "hChildren": [
+                    {
+                      "type": "element",
+                      "tagName": "code",
+                      "properties": {
+                        "className": ["language-math", "math-display"]
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 12
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 3,
+                    "offset": 14
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 3,
+                "offset": 14
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should not support math (flow) w/ content on the closing fence",
+        "input": "$$\na\n$$ b",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "math",
+                "meta": null,
+                "value": "a\n$$ b",
+                "data": {
+                  "hName": "pre",
+                  "hChildren": [
+                    {
+                      "type": "element",
+                      "tagName": "code",
+                      "properties": {
+                        "className": ["language-math", "math-display"]
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "a\n$$ b"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 5,
+                    "offset": 9
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 5,
+                "offset": 9
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support whitespace on the closing fence",
+        "input": "$$\na\n$$  ",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "math",
+                "meta": null,
+                "value": "a",
+                "data": {
+                  "hName": "pre",
+                  "hChildren": [
+                    {
+                      "type": "element",
+                      "tagName": "code",
+                      "properties": {
+                        "className": ["language-math", "math-display"]
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "a"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 5,
+                    "offset": 9
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 5,
+                "offset": 9
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should strip the prefix of the opening fence from content lines",
+        "input": "  $$\n\ta\n  b\n c\nd\n$$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "math",
+                "meta": null,
+                "value": "  a\nb\nc\nd",
+                "data": {
+                  "hName": "pre",
+                  "hChildren": [
+                    {
+                      "type": "element",
+                      "tagName": "code",
+                      "properties": {
+                        "className": ["language-math", "math-display"]
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "  a\nb\nc\nd"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 3,
+                    "offset": 2
+                  },
+                  "end": {
+                    "line": 6,
+                    "column": 3,
+                    "offset": 19
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 6,
+                "column": 3,
+                "offset": 19
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should strip arbitrary length prefix from closing fence line (codeIndented disabled)",
+        "input": "      $$\n      a\n          $$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "  $$\n  a\n      $$",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 13,
+                    "offset": 29
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 13,
+                "offset": 29
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support math (flow) in a block quote",
+        "input": "> $$\n> a\n> $$\n> b",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "math",
+                    "meta": null,
+                    "value": "a",
+                    "data": {
+                      "hName": "pre",
+                      "hChildren": [
+                        {
+                          "type": "element",
+                          "tagName": "code",
+                          "properties": {
+                            "className": ["language-math", "math-display"]
+                          },
+                          "children": [
+                            {
+                              "type": "text",
+                              "value": "a"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 5,
+                        "offset": 13
+                      }
+                    }
+                  },
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "b",
+                        "position": {
+                          "start": {
+                            "line": 4,
+                            "column": 3,
+                            "offset": 16
+                          },
+                          "end": {
+                            "line": 4,
+                            "column": 4,
+                            "offset": 17
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 3,
+                        "offset": 16
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 4,
+                        "offset": 17
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 4,
+                    "offset": 17
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 4,
+                "offset": 17
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support math (flow) in a list (item)",
+        "input": "* $$\n  a\n  $$\n  b",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "list",
+                "ordered": false,
+                "start": null,
+                "spread": false,
+                "children": [
+                  {
+                    "type": "listItem",
+                    "spread": false,
+                    "checked": null,
+                    "children": [
+                      {
+                        "type": "math",
+                        "meta": null,
+                        "value": "a",
+                        "data": {
+                          "hName": "pre",
+                          "hChildren": [
+                            {
+                              "type": "element",
+                              "tagName": "code",
+                              "properties": {
+                                "className": ["language-math", "math-display"]
+                              },
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "value": "a"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 3,
+                            "offset": 2
+                          },
+                          "end": {
+                            "line": 3,
+                            "column": 5,
+                            "offset": 13
+                          }
+                        }
+                      },
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "b",
+                            "position": {
+                              "start": {
+                                "line": 4,
+                                "column": 3,
+                                "offset": 16
+                              },
+                              "end": {
+                                "line": 4,
+                                "column": 4,
+                                "offset": 17
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 4,
+                            "column": 3,
+                            "offset": 16
+                          },
+                          "end": {
+                            "line": 4,
+                            "column": 4,
+                            "offset": 17
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 4,
+                        "offset": 17
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 4,
+                    "offset": 17
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 4,
+                "offset": 17
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support `<`",
+        "input": "a $\\sum_{\\substack{0<i<m\\\\0<j<n}}$ b",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "\\sum_{\\substack{0<i<m\\\\0<j<n}}",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "\\sum_{\\substack{0<i<m\\\\0<j<n}}"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 35,
+                        "offset": 34
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " b",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 35,
+                        "offset": 34
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 37,
+                        "offset": 36
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 37,
+                    "offset": 36
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 37,
+                "offset": 36
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support `\"`",
+        "input": "a $\\text{a \\\"{a} c}$ b",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "\\text{a \\\"{a} c}",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "\\text{a \\\"{a} c}"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 21,
+                        "offset": 20
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " b",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 21,
+                        "offset": 20
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 23,
+                        "offset": 22
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 23,
+                    "offset": 22
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 23,
+                "offset": 22
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support options",
+        "input": "a $$ $ $$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "$",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "$"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 10,
+                        "offset": 9
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 10,
+                    "offset": 9
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 10,
+                "offset": 9
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should not support laziness (1)",
+        "input": "> $$\na\n$$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "math",
+                    "meta": null,
+                    "value": "",
+                    "data": {
+                      "hName": "pre",
+                      "hChildren": [
+                        {
+                          "type": "element",
+                          "tagName": "code",
+                          "properties": {
+                            "className": ["language-math", "math-display"]
+                          },
+                          "children": [
+                            {
+                              "type": "text",
+                              "value": ""
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 5,
+                        "offset": 4
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 5,
+                    "offset": 4
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a",
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 1,
+                        "offset": 5
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 2,
+                        "offset": 6
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 2,
+                    "column": 1,
+                    "offset": 5
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 2,
+                    "offset": 6
+                  }
+                }
+              },
+              {
+                "type": "math",
+                "meta": null,
+                "value": "",
+                "data": {
+                  "hName": "pre",
+                  "hChildren": [
+                    {
+                      "type": "element",
+                      "tagName": "code",
+                      "properties": {
+                        "className": ["language-math", "math-display"]
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 7
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 3,
+                    "offset": 9
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 3,
+                "offset": 9
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should not support laziness (2)",
+        "input": "> $$\n> a\n$$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "math",
+                    "meta": null,
+                    "value": "a",
+                    "data": {
+                      "hName": "pre",
+                      "hChildren": [
+                        {
+                          "type": "element",
+                          "tagName": "code",
+                          "properties": {
+                            "className": ["language-math", "math-display"]
+                          },
+                          "children": [
+                            {
+                              "type": "text",
+                              "value": "a"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 4,
+                        "offset": 8
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 4,
+                    "offset": 8
+                  }
+                }
+              },
+              {
+                "type": "math",
+                "meta": null,
+                "value": "",
+                "data": {
+                  "hName": "pre",
+                  "hChildren": [
+                    {
+                      "type": "element",
+                      "tagName": "code",
+                      "properties": {
+                        "className": ["language-math", "math-display"]
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 9
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 3,
+                    "offset": 11
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 3,
+                "offset": 11
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should not support laziness (3)",
+        "input": "a\n> $$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 2,
+                        "offset": 1
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 2,
+                    "offset": 1
+                  }
+                }
+              },
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "math",
+                    "meta": null,
+                    "value": "",
+                    "data": {
+                      "hName": "pre",
+                      "hChildren": [
+                        {
+                          "type": "element",
+                          "tagName": "code",
+                          "properties": {
+                            "className": ["language-math", "math-display"]
+                          },
+                          "children": [
+                            {
+                              "type": "text",
+                              "value": ""
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 3,
+                        "offset": 4
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 5,
+                        "offset": 6
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 2,
+                    "column": 1,
+                    "offset": 2
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 5,
+                    "offset": 6
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 5,
+                "offset": 6
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark-extension-math (tree) {\"singleDollarTextMath\":false}",
+    "source": {
+      "repository": "https://github.com/micromark/micromark-extension-math",
+      "commit": "4c9e82c46f4ee3bb794382b84f9fa537f7452f9e",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.math",
+        {
+          "singleDollarTextMath": false
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support two or more dollars w/ `singleDollarTextMath: false`, but not one",
+        "input": "$a$, $$b$$, $$$c$$$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "$a$, ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 6,
+                        "offset": 5
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "b",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "b"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 6,
+                        "offset": 5
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 11,
+                        "offset": 10
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": ", ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 11,
+                        "offset": 10
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 13,
+                        "offset": 12
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "c",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "c"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 13,
+                        "offset": 12
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 20,
+                        "offset": 19
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 20,
+                    "offset": 19
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 20,
+                "offset": 19
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-math tree",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-math",
+      "commit": "23647664692ae59be25896d0099ba3f7157d6a76",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.math"]],
+    "tests": [
+      {
+        "description": "should support math (text)",
+        "input": "a $b$ c",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "b",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "b"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 6,
+                        "offset": 5
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": " c",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 6,
+                        "offset": 5
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 8,
+                        "offset": 7
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 8,
+                    "offset": 7
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 8,
+                "offset": 7
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-math stringify",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-math",
+      "commit": "23647664692ae59be25896d0099ba3f7157d6a76",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.math"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "should serialize math (text)",
+        "tree": {
+          "type": "inlineMath",
+          "value": "a"
+        },
+        "expected": {
+          "md": "$a$\n"
+        }
+      },
+      {
+        "description": "should serialize math (text) w/o `value`",
+        "tree": {
+          "type": "inlineMath"
+        },
+        "expected": {
+          "md": "$$\n"
+        }
+      },
+      {
+        "description": "should serialize math (text) w/ two dollar signs when including a dollar",
+        "tree": {
+          "type": "inlineMath",
+          "value": "a \\$ b"
+        },
+        "expected": {
+          "md": "$$a \\$ b$$\n"
+        }
+      },
+      {
+        "description": "should serialize math (text) w/ padding when ending in a dollar sign",
+        "tree": {
+          "type": "inlineMath",
+          "value": "a \\$"
+        },
+        "expected": {
+          "md": "$$ a \\$ $$\n"
+        }
+      },
+      {
+        "description": "should serialize math (text) w/ padding when starting in a dollar sign",
+        "tree": {
+          "type": "inlineMath",
+          "value": "$ a"
+        },
+        "expected": {
+          "md": "$$ $ a $$\n"
+        }
+      },
+      {
+        "description": "should pad w/ a space if the value starts and ends w/ a space",
+        "tree": {
+          "type": "inlineMath",
+          "value": " a "
+        },
+        "expected": {
+          "md": "$  a  $\n"
+        }
+      },
+      {
+        "description": "should not pad w/ spaces if the value ends w/ a non-space",
+        "tree": {
+          "type": "inlineMath",
+          "value": " a"
+        },
+        "expected": {
+          "md": "$ a$\n"
+        }
+      },
+      {
+        "description": "should not pad w/ spaces if the value starts w/ a non-space",
+        "tree": {
+          "type": "inlineMath",
+          "value": "a "
+        },
+        "expected": {
+          "md": "$a $\n"
+        }
+      },
+      {
+        "description": "should serialize math (flow)",
+        "tree": {
+          "type": "math",
+          "value": "a"
+        },
+        "expected": {
+          "md": "$$\na\n$$\n"
+        }
+      },
+      {
+        "description": "should serialize math (flow) w/o `value`",
+        "tree": {
+          "type": "math"
+        },
+        "expected": {
+          "md": "$$\n$$\n"
+        }
+      },
+      {
+        "description": "should serialize math (flow) w/ `meta`",
+        "tree": {
+          "type": "math",
+          "meta": "a"
+        },
+        "expected": {
+          "md": "$$a\n$$\n"
+        }
+      },
+      {
+        "description": "should serialize math (flow) w/ more dollars than occur together in `value`",
+        "tree": {
+          "type": "math",
+          "value": "$$"
+        },
+        "expected": {
+          "md": "$$$\n$$\n$$$\n"
+        }
+      },
+      {
+        "description": "should serialize math (flow) w/ `meta` (2)",
+        "tree": {
+          "type": "math",
+          "meta": "a"
+        },
+        "expected": {
+          "md": "$$a\n$$\n"
+        }
+      },
+      {
+        "description": "should escape `$` in phrasing",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a $ b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a \\$ b\n"
+        }
+      },
+      {
+        "description": "should escape `$` around math (text)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a $"
+            },
+            {
+              "type": "inlineMath",
+              "value": "b"
+            },
+            {
+              "type": "text",
+              "value": "$ c"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a \\$$b$\\$ c\n"
+        }
+      },
+      {
+        "description": "should not escape `$` at the start of a line",
+        "tree": {
+          "type": "definition",
+          "label": "a",
+          "identifier": "a",
+          "url": "b",
+          "title": "a\n$\nb"
+        },
+        "expected": {
+          "md": "[a]: b \"a\n$\nb\"\n"
+        }
+      },
+      {
+        "description": "should escape `\\r`, `\\n` when in `meta` of math (flow)",
+        "tree": {
+          "type": "math",
+          "meta": "a\rb\nc",
+          "value": ""
+        },
+        "expected": {
+          "md": "$$a&#xD;b&#xA;c\n$$\n"
+        }
+      },
+      {
+        "description": "should escape `$` when in `meta` of math (flow)",
+        "tree": {
+          "type": "math",
+          "meta": "a$b",
+          "value": ""
+        },
+        "expected": {
+          "md": "$$a&#x24;b\n$$\n"
+        }
+      },
+      {
+        "description": "should prevent breaking out of code (-)",
+        "tree": {
+          "type": "inlineMath",
+          "value": "a\n- b"
+        },
+        "expected": {
+          "md": "$a - b$\n"
+        }
+      },
+      {
+        "description": "should prevent breaking out of code (#)",
+        "tree": {
+          "type": "inlineMath",
+          "value": "a\n#"
+        },
+        "expected": {
+          "md": "$a #$\n"
+        }
+      },
+      {
+        "description": "should prevent breaking out of code (\\d\\.)",
+        "tree": {
+          "type": "inlineMath",
+          "value": "a\n1. "
+        },
+        "expected": {
+          "md": "$a 1. $\n"
+        }
+      },
+      {
+        "description": "should prevent breaking out of code (cr)",
+        "tree": {
+          "type": "inlineMath",
+          "value": "a\r- b"
+        },
+        "expected": {
+          "md": "$a - b$\n"
+        }
+      },
+      {
+        "description": "should prevent breaking out of code (crlf)",
+        "tree": {
+          "type": "inlineMath",
+          "value": "a\r\n- b"
+        },
+        "expected": {
+          "md": "$a - b$\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-math stringify {\"singleDollarTextMath\":false}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-math",
+      "commit": "23647664692ae59be25896d0099ba3f7157d6a76",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.math",
+        {
+          "singleDollarTextMath": false
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should serialize math (text) with at least 2 dollars w/ `singleDollarTextMath: false`",
+        "tree": {
+          "type": "inlineMath",
+          "value": "a"
+        },
+        "expected": {
+          "md": "$$a$$\n"
+        }
+      },
+      {
+        "description": "should not escape a single dollar in phrasing w/ `singleDollarTextMath: false`",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a $ b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a $ b\n"
+        }
+      },
+      {
+        "description": "should escape two dollars in phrasing w/ `singleDollarTextMath: false`",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a $$ b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a \\$$ b\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-math (tree)",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-math",
+      "commit": "76c14978ff6805011b8c56727c54104a511b9055",
+      "path": "packages/remark-math/test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.math"]],
+    "tests": [
+      {
+        "description": "should parse inline and block math",
+        "input": "Math $\\alpha$\n\n$$\n\\beta+\\gamma\n$$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Math ",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 6,
+                        "offset": 5
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "\\alpha",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "\\alpha"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 6,
+                        "offset": 5
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 14,
+                        "offset": 13
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 14,
+                    "offset": 13
+                  }
+                }
+              },
+              {
+                "type": "math",
+                "meta": null,
+                "value": "\\beta+\\gamma",
+                "data": {
+                  "hName": "pre",
+                  "hChildren": [
+                    {
+                      "type": "element",
+                      "tagName": "code",
+                      "properties": {
+                        "className": ["language-math", "math-display"]
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "\\beta+\\gamma"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 15
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 3,
+                    "offset": 33
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 3,
+                "offset": 33
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should ignore an escaped opening dollar sign",
+        "input": "\\$\\alpha$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "$\\alpha$",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 10,
+                        "offset": 9
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 10,
+                    "offset": 9
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 10,
+                "offset": 9
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should *not* ignore an escaped closing dollar sign",
+        "input": "$\\alpha\\$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "inlineMath",
+                    "value": "\\alpha\\",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "\\alpha\\"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 10,
+                        "offset": 9
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 10,
+                    "offset": 9
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 10,
+                "offset": 9
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support a escaped escape before a dollar sign",
+        "input": "\\\\$\\alpha$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "\\",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      }
+                    }
+                  },
+                  {
+                    "type": "inlineMath",
+                    "value": "\\alpha",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "\\alpha"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 11,
+                        "offset": 10
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 11,
+                    "offset": 10
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 11,
+                "offset": 10
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should ignore dollar signs in inline code (#1)",
+        "input": "`$`\\alpha$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "inlineCode",
+                    "value": "$",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 4,
+                        "offset": 3
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": "\\alpha$",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 4,
+                        "offset": 3
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 11,
+                        "offset": 10
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 11,
+                    "offset": 10
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 11,
+                "offset": 10
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should allow backticks in math",
+        "input": "$\\alpha`$`",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "inlineMath",
+                    "value": "\\alpha`",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "\\alpha`"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 10,
+                        "offset": 9
+                      }
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": "`",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 10,
+                        "offset": 9
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 11,
+                        "offset": 10
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 11,
+                    "offset": 10
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 11,
+                "offset": 10
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support backticks in inline math",
+        "input": "$`\\alpha`$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "inlineMath",
+                    "value": "`\\alpha`",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "`\\alpha`"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 11,
+                        "offset": 10
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 11,
+                    "offset": 10
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 11,
+                "offset": 10
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support a super factorial in inline math",
+        "input": "$$ \\alpha$ $$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "inlineMath",
+                    "value": "\\alpha$",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "\\alpha$"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 14,
+                        "offset": 13
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 14,
+                    "offset": 13
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 14,
+                "offset": 13
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support a super factorial in block math",
+        "input": "$$\n\\alpha\\$\n$$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "math",
+                "meta": null,
+                "value": "\\alpha\\$",
+                "data": {
+                  "hName": "pre",
+                  "hChildren": [
+                    {
+                      "type": "element",
+                      "tagName": "code",
+                      "properties": {
+                        "className": ["language-math", "math-display"]
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "\\alpha\\$"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 3,
+                    "offset": 14
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 3,
+                "offset": 14
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support a math block right after a paragraph",
+        "input": "tango\n$$\n\\alpha\n$$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "tango",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 6,
+                        "offset": 5
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 6,
+                    "offset": 5
+                  }
+                }
+              },
+              {
+                "type": "math",
+                "meta": null,
+                "value": "\\alpha",
+                "data": {
+                  "hName": "pre",
+                  "hChildren": [
+                    {
+                      "type": "element",
+                      "tagName": "code",
+                      "properties": {
+                        "className": ["language-math", "math-display"]
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "\\alpha"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "position": {
+                  "start": {
+                    "line": 2,
+                    "column": 1,
+                    "offset": 6
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 3,
+                    "offset": 18
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 3,
+                "offset": 18
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support inline math with double dollars",
+        "input": "$$\\alpha$$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "inlineMath",
+                    "value": "\\alpha",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "\\alpha"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 11,
+                        "offset": 10
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 11,
+                    "offset": 10
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 11,
+                "offset": 10
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support block math with triple dollars",
+        "input": "$$$\n\\alpha\n$$$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "math",
+                "meta": null,
+                "value": "\\alpha",
+                "data": {
+                  "hName": "pre",
+                  "hChildren": [
+                    {
+                      "type": "element",
+                      "tagName": "code",
+                      "properties": {
+                        "className": ["language-math", "math-display"]
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "\\alpha"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 4,
+                    "offset": 14
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 4,
+                "offset": 14
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support indented block math",
+        "input": "  $$\n    \\alpha\n  $$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "math",
+                "meta": null,
+                "value": "  \\alpha",
+                "data": {
+                  "hName": "pre",
+                  "hChildren": [
+                    {
+                      "type": "element",
+                      "tagName": "code",
+                      "properties": {
+                        "className": ["language-math", "math-display"]
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "  \\alpha"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 3,
+                    "offset": 2
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 5,
+                    "offset": 20
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 5,
+                "offset": 20
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should not affect the next block",
+        "input": "$$\n\\alpha\n$$\n```\nbravo\n```\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "math",
+                "meta": null,
+                "value": "\\alpha",
+                "data": {
+                  "hName": "pre",
+                  "hChildren": [
+                    {
+                      "type": "element",
+                      "tagName": "code",
+                      "properties": {
+                        "className": ["language-math", "math-display"]
+                      },
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "\\alpha"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 3,
+                    "offset": 12
+                  }
+                }
+              },
+              {
+                "type": "code",
+                "lang": null,
+                "meta": null,
+                "value": "bravo",
+                "position": {
+                  "start": {
+                    "line": 4,
+                    "column": 1,
+                    "offset": 13
+                  },
+                  "end": {
+                    "line": 6,
+                    "column": 4,
+                    "offset": 26
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 7,
+                "column": 1,
+                "offset": 27
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should support two dollar signs on inline math",
+        "input": "$$\\alpha$$",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "inlineMath",
+                    "value": "\\alpha",
+                    "data": {
+                      "hName": "code",
+                      "hProperties": {
+                        "className": ["language-math", "math-inline"]
+                      },
+                      "hChildren": [
+                        {
+                          "type": "text",
+                          "value": "\\alpha"
+                        }
+                      ]
+                    },
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 11,
+                        "offset": 10
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 11,
+                    "offset": 10
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 11,
+                "offset": 10
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-math (md)",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-math",
+      "commit": "76c14978ff6805011b8c56727c54104a511b9055",
+      "path": "packages/remark-math/test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.math"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "should stringify inline and block math",
+        "input": "Math $\\alpha$\n\n$$\n\\beta+\\gamma\n$$\n",
+        "expected": {
+          "md": "Math $\\alpha$\n\n$$\n\\beta+\\gamma\n$$\n"
+        }
+      },
+      {
+        "description": "should stringify math in a blockquote",
+        "input": "> $$\n> \\alpha\\beta\n> $$\n",
+        "expected": {
+          "md": "> $$\n> \\alpha\\beta\n> $$\n"
+        }
+      },
+      {
+        "description": "should stringify inline math with double dollars using one dollar by default",
+        "input": "$$\\alpha$$",
+        "expected": {
+          "md": "$\\alpha$\n"
+        }
+      },
+      {
+        "description": "should stringify inline math with double dollars using one dollar",
+        "input": "$$\\alpha$$",
+        "expected": {
+          "md": "$\\alpha$\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-math (md) {\"singleDollarTextMath\":false}",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-math",
+      "commit": "76c14978ff6805011b8c56727c54104a511b9055",
+      "path": "packages/remark-math/test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.math",
+        {
+          "singleDollarTextMath": false
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should support `singleDollarTextMath: false` (1)",
+        "input": "Math $\\alpha$\n\n$$\\beta+\\gamma$$\n",
+        "expected": {
+          "md": "Math $\\alpha$\n\n$$\\beta+\\gamma$$\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-math (html) {\"singleDollarTextMath\":false}",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-math",
+      "commit": "76c14978ff6805011b8c56727c54104a511b9055",
+      "path": "packages/remark-math/test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.math",
+        {
+          "singleDollarTextMath": false
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should support `singleDollarTextMath: false` (2)",
+        "input": "Math $\\alpha$\n\n$$\\beta+\\gamma$$\n",
+        "expected": {
+          "html": "<p>Math $\\alpha$</p>\n<p><code class=\"language-math math-inline\">\\beta+\\gamma</code></p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-math (html)",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-math",
+      "commit": "76c14978ff6805011b8c56727c54104a511b9055",
+      "path": "packages/remark-math/test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.math"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should support an opening fence w/ meta, w/o closing fence",
+        "input": "$$just two dollars",
+        "expected": {
+          "html": "<pre><code class=\"language-math math-display\"></code></pre>"
+        }
+      },
+      {
+        "description": "should support `meta`",
+        "input": "$$  must\n\\alpha\n$$",
+        "expected": {
+          "html": "<pre><code class=\"language-math math-display\">\\alpha</code></pre>"
+        }
+      },
+      {
+        "description": "should include values after the opening fence",
+        "input": "$$  \n\\alpha\n$$",
+        "expected": {
+          "html": "<pre><code class=\"language-math math-display\">\\alpha</code></pre>"
+        }
+      },
+      {
+        "description": "should not support values before the closing fence",
+        "input": "$$\n\\alpha\nmust  $$",
+        "expected": {
+          "html": "<pre><code class=\"language-math math-display\">\\alpha\nmust  $$</code></pre>"
+        }
+      },
+      {
+        "description": "should include values before the closing fence (except for spacing #2)",
+        "input": "$$\n\\alpha\n  $$",
+        "expected": {
+          "html": "<pre><code class=\"language-math math-display\">\\alpha</code></pre>"
+        }
+      },
+      {
+        "description": "should exclude spacing after the closing fence",
+        "input": "$$\n\\alpha\n$$  ",
+        "expected": {
+          "html": "<pre><code class=\"language-math math-display\">\\alpha</code></pre>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#01",
+        "input": "$1+1 = 2$",
+        "expected": {
+          "html": "<p><code class=\"language-math math-inline\">1+1 = 2</code></p>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#02 (deviation)",
+        "input": "$$1+1 = 2$$",
+        "expected": {
+          "html": "<p><code class=\"language-math math-inline\">1+1 = 2</code></p>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#03: no whitespace before and after is fine",
+        "input": "foo$1+1 = 2$bar",
+        "expected": {
+          "html": "<p>foo<code class=\"language-math math-inline\">1+1 = 2</code>bar</p>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#04: even when it starts with a negative sign",
+        "input": "foo$-1+1 = 2$bar",
+        "expected": {
+          "html": "<p>foo<code class=\"language-math math-inline\">-1+1 = 2</code>bar</p>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#05: shouldn’t render empty content",
+        "input": "aaa $$ bbb",
+        "expected": {
+          "html": "<p>aaa $$ bbb</p>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#06: should require a closing delimiter",
+        "input": "aaa $5.99 bbb",
+        "expected": {
+          "html": "<p>aaa $5.99 bbb</p>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#07: paragraph break in inline math is not allowed",
+        "input": "foo $1+1\n\n= 2$ bar",
+        "expected": {
+          "html": "<p>foo $1+1</p>\n<p>= 2$ bar</p>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#08: inline math with apparent markup should not be processed",
+        "input": "foo $1 *i* 1$ bar",
+        "expected": {
+          "html": "<p>foo <code class=\"language-math math-inline\">1 *i* 1</code> bar</p>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#09: block math can be indented up to 3 spaces",
+        "input": "   $$\n   1+1 = 2\n   $$",
+        "expected": {
+          "html": "<pre><code class=\"language-math math-display\">1+1 = 2</code></pre>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#10: …but 4 means a code block",
+        "input": "    $$\n    1+1 = 2\n    $$",
+        "expected": {
+          "html": "<pre><code>$$\n1+1 = 2\n$$\n</code></pre>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#11: multiline inline math",
+        "input": "foo $1 + 1\n= 2$ bar",
+        "expected": {
+          "html": "<p>foo <code class=\"language-math math-inline\">1 + 1\n= 2</code> bar</p>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#12: multiline display math",
+        "input": "$$\n\n  1\n+ 1\n\n= 2\n\n$$",
+        "expected": {
+          "html": "<pre><code class=\"language-math math-display\">\n  1\n+ 1\n\n= 2\n</code></pre>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#13: text can immediately follow inline math",
+        "input": "$n$-th order",
+        "expected": {
+          "html": "<p><code class=\"language-math math-inline\">n</code>-th order</p>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#14: display math self-closes at the end of document",
+        "input": "$$\n1+1 = 2",
+        "expected": {
+          "html": "<pre><code class=\"language-math math-display\">1+1 = 2</code></pre>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#15: display and inline math can appear in lists",
+        "input": "* $1+1 = 2$\n* $$\n  1+1 = 2\n  $$",
+        "expected": {
+          "html": "<ul>\n<li><code class=\"language-math math-inline\">1+1 = 2</code></li>\n<li>\n<pre><code class=\"language-math math-display\">1+1 = 2</code></pre>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#16: display math can be written in one line (deviation)",
+        "input": "$$1+1 = 2$$",
+        "expected": {
+          "html": "<p><code class=\"language-math math-inline\">1+1 = 2</code></p>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#17: …or on multiple lines with expression starting and ending on delimited lines (deviation)",
+        "input": "$$\n[\n[1, 2]\n[3, 4]\n]\n$$",
+        "expected": {
+          "html": "<pre><code class=\"language-math math-display\">[\n[1, 2]\n[3, 4]\n]</code></pre>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#18: escaped delimiters should not render math (deviated)",
+        "input": "Foo \\$1$ bar\n\\$\\$\n1\n\\$\\$",
+        "expected": {
+          "html": "<p>Foo $1<code class=\"language-math math-inline\"> bar\n\\</code>$\n1\n$$</p>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#19: numbers can not follow closing inline math (deviated)",
+        "input": "Thus, $20,000 and USD$30,000 won’t parse as math.",
+        "expected": {
+          "html": "<p>Thus, <code class=\"language-math math-inline\">20,000 and USD</code>30,000 won’t parse as math.</p>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#20: require non whitespace to right of opening inline math (deviated)",
+        "input": "It is 2$ for a can of soda, not 1$.",
+        "expected": {
+          "html": "<p>It is 2<code class=\"language-math math-inline\"> for a can of soda, not 1</code>.</p>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#21: require non whitespace to left of closing inline math (deviated)",
+        "input": "I’ll give $20 today, if you give me more $ tomorrow.",
+        "expected": {
+          "html": "<p>I’ll give <code class=\"language-math math-inline\">20 today, if you give me more </code> tomorrow.</p>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#23: escaped delimiters in math mode (deviated)",
+        "input": "Money adds: $\\$X + \\$Y = \\$Z$.",
+        "expected": {
+          "html": "<p>Money adds: <code class=\"language-math math-inline\">\\</code>X + $Y = $Z$.</p>"
+        }
+      },
+      {
+        "description": "should do markdown-it-katex#24: multiple escaped delimiters in math module (deviated)",
+        "input": "Weird-o: $\\displaystyle{\\begin{pmatrix} \\$ & 1\\\\\\$ \\end{pmatrix}}$.",
+        "expected": {
+          "html": "<p>Weird-o: <code class=\"language-math math-inline\">\\displaystyle{\\begin{pmatrix} \\</code> &#x26; 1\\$ \\end{pmatrix}}$.</p>"
+        }
+      }
+    ]
+  }
+]

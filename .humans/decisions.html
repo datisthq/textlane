@@ -21,7 +21,7 @@
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>13 agent's calls</h3>
+    <h3>14 agent's calls</h3>
     <p>
       <htmlpress-badge type="warning">my call</htmlpress-badge> settled by the agent, open
       to change
@@ -466,6 +466,19 @@
       them names them.
     </p>
     <p><strong>Rejected.</strong> Leaving the serializer options unreachable.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Math ports without KaTeX:
+    micromark's inputs as tree cases, remark-math's HTML as the <code>math-inline</code> /
+    <code>math-display</code> code elements <code>md.toHtml</code> emits;
+    <code>md.math</code> keeps remark-math's <code>singleDollarTextMath</code>
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> micromark's expected HTML embeds KaTeX's output, a renderer
+      textlane defers.
+    </p>
+    <p><strong>Rejected.</strong> Freezing KaTeX's output into the corpus.</p>
   </dd>
   <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge> Each runner skips only
