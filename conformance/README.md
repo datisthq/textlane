@@ -81,6 +81,7 @@ release; importers are run deliberately and their output committed, never run in
 | `directive`     | micromark-extension-directive, mdast-util-directive, remark-directive       | 325 cases: micromark's inputs as tree cases, upstream's serializer output verbatim, remark-directive's fixtures                                             |
 | `math`          | micromark-extension-math, mdast-util-math, remark-math                      | 111 cases: micromark's inputs as tree cases (its HTML embeds KaTeX), mdast-util-math's serializer output, remark-math's KaTeX-free HTML, trees and Markdown |
 | `frontmatter`   | micromark-extension-frontmatter, mdast-util-frontmatter, remark-frontmatter | 91 cases: HTML (frontmatter renders to nothing), serializer output, fixtures, and 7 invalid-option errors                                                   |
+| `gemoji`        | remark-gemoji with gemoji 8.1.0                                             | 1,915 cases: every name in gemoji's table, as remark-gemoji's own test loops, plus its fixtures                                                             |
 
 A file holds one construct (`md/heading-atx`), named as micromark names its test files, with a
 group per source: the spec section, then each upstream test file. An importer replaces only its

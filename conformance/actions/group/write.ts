@@ -1,7 +1,11 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { dirname } from "node:path"
 
-type Group = { description: string; source?: { repository: string } }
+type Group = {
+  description: string
+  source?: { repository: string }
+  [key: string]: unknown
+}
 
 /** Replace one upstream repository's groups in a test file, keeping every other source's. */
 export function writeGroups(props: {

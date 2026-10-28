@@ -21,7 +21,7 @@
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>15 agent's calls</h3>
+    <h3>16 agent's calls</h3>
     <p>
       <htmlpress-badge type="warning">my call</htmlpress-badge> settled by the agent, open
       to change
@@ -492,6 +492,17 @@
       stable while messages stay free to change.
     </p>
     <p><strong>Rejected.</strong> A code per upstream message.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Gemoji stores a case for
+    every name in gemoji's table (1,915), not a sample
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> The table is the plugin's behaviour; full coverage proves
+      textlane embeds the same one, at about 340 KB.
+    </p>
+    <p><strong>Rejected.</strong> Generating cases at test time; a sample.</p>
   </dd>
   <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge> Each runner skips only
