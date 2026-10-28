@@ -21,14 +21,14 @@
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>20 agent's calls</h3>
+    <h3>22 agent's calls</h3>
     <p>
       <htmlpress-badge type="warning">my call</htmlpress-badge> settled by the agent, open
       to change
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>5 open</h3>
+    <h3>4 open</h3>
     <p><htmlpress-badge type="danger">open</htmlpress-badge> still to decide</p>
   </htmlpress-card>
 </htmlpress-grid>
@@ -580,6 +580,33 @@
     <p><strong>Rejected.</strong> Hand-writing expected outcomes.</p>
   </dd>
   <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge>
+    <code>prose.parse</code> takes <code>language</code> (<code>latin</code> by default,
+    <code>english</code>); prose plugins keep the retext packages' option names; messages
+    are compared in place order
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> One parse plugin rather than one per language;
+      retext-equality's own test sorts messages by place, which makes emission order part
+      of the contract.
+    </p>
+    <p>
+      <strong>Rejected.</strong> <code>prose.parseLatin</code> /
+      <code>prose.parseEnglish</code>.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> retext-spell is deferred
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Every case needs the hunspell dictionary-en files and nspell's
+      suggestion ranking; it returns once textlane has a dictionary story.
+    </p>
+    <p><strong>Rejected.</strong> Vendoring dictionary-en into the corpus.</p>
+  </dd>
+  <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge> Each runner skips only
     through a <code>KNOWN_DIVERGENCES</code> map of group to open issue, as fairspec's do
   </dt>
@@ -625,16 +652,6 @@
   </dt>
   <dd>
     <p>Decides whether a <code>textlane-code</code> crate exists.</p>
-  </dd>
-  <dt>
-    <htmlpress-badge type="danger">open</htmlpress-badge> Uninventoried sources: retext
-    (prose), <code>@mdx-js/mdx</code> and recma (mdx)
-  </dt>
-  <dd>
-    <p>
-      Their phases start with a survey like the ones on
-      <a href="conformance.html">Conformance</a>.
-    </p>
   </dd>
 </dl>
 

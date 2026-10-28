@@ -71,8 +71,8 @@ a test's `comment` only where it means something different.
   upstream's latest release, while the pinned reference lags behind the 7-day quarantine. After
   bumping a pin, rerun the importers and compare: a reference that still disagrees with a
   verbatim expectation is a real difference to look at.
-- `actions/node/scope.ts` resolves an identifier in its test's own function before the module, so
-  one test's `const value` never leaks into another's case.
+- `actions/node/scope.ts` resolves an identifier lexically, through each enclosing block from the
+  module inward, so one loop's or test's `const value` never leaks into another's case.
 
 ## Core cases
 

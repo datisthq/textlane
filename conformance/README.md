@@ -40,7 +40,7 @@ A file is an array of groups. A group fixes the pipeline; its tests vary only th
 - A test has a `description`, an `input` string or a `tree`, and exactly one `expected`
   outcome. Serialized output is keyed by its file extension: `html`, `md`, `js`, `txt`. A
   `tree` compares as JSON, positions in UTF-16 code units (dropped on both sides when the group
-  says `positions: false`); `messages` compare on `ruleId`, `source` and `place`; an `error`
+  says `positions: false`); `messages` compare on `ruleId`, `source` and `place`, in place order; an `error`
   matches on its `code` and on `message` only as a substring.
 - `status: "deviation"` marks a deliberate difference from upstream, explained in `comment`.
 - Core lifecycle cases carry `operations` instead of an input: steps run in order on a processor
@@ -101,6 +101,8 @@ release; importers are run deliberately and their output committed, never run in
 | `wpt`             | web-platform-tests tree construction, sparse checkout                           | 1,738 `html.parse` cases, trees without positions (`positions: false`); fragment and scripting-off cases skipped                                                        |
 | `unified`         | unified's test files, as operations                                             | 82 core lifecycle cases authored as data, each citing the unified test it ports; expectations from running them through the pinned unified with JavaScript test plugins |
 | `html-convert`    | hast-util-to-mdast, rehype-format                                               | 241 `html.toMarkdown` Markdown and tree cases (stringified with GFM and fenced code, as upstream's harness does) and 16 `html.format` cases                             |
+| `prose-parse`     | parse-latin, parse-english, mdast-util-to-nlcst, hast-util-to-nlcst             | 360 `prose.parse` cases (each input is its fixture's text, which nlcst keeps whole) and 25 `md.toProse` / `html.toProse` cases                                          |
+| `prose-plugins`   | nine retext plugins                                                             | 283 `prose.*` cases: smartypants output and the others' messages, sorted by place; retext-spell deferred (it needs a hunspell dictionary)                               |
 
 A file holds one construct (`md/heading-atx`), named as micromark names its test files, with a
 group per source: the spec section, then each upstream test file. An importer replaces only its

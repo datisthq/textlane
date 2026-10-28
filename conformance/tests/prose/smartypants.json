@@ -1,0 +1,736 @@
+[
+  {
+    "description": "retext-smartypants",
+    "source": {
+      "repository": "https://github.com/retextjs/retext-smartypants",
+      "commit": "0ffca5eeb04b3d163624aad28ef36911edd224d7",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["prose.parse"], ["prose.smartypants"], ["prose.stringify"]],
+    "tests": [
+      {
+        "description": "should curl double quotes",
+        "input": "Alfred \"bertrand\" cees.",
+        "expected": {
+          "txt": "Alfred “bertrand” cees."
+        }
+      },
+      {
+        "description": "should curl single quotes",
+        "input": "Alfred 'bertrand' cees.",
+        "expected": {
+          "txt": "Alfred ‘bertrand’ cees."
+        }
+      },
+      {
+        "description": "should curl initial double quotes",
+        "input": "\"Alfred\" bertrand.",
+        "expected": {
+          "txt": "“Alfred” bertrand."
+        }
+      },
+      {
+        "description": "should curl initial single quotes",
+        "input": "'Alfred' bertrand.",
+        "expected": {
+          "txt": "‘Alfred’ bertrand."
+        }
+      },
+      {
+        "description": "should curl final double quotes",
+        "input": "Alfred \"bertrand\".",
+        "expected": {
+          "txt": "Alfred “bertrand”."
+        }
+      },
+      {
+        "description": "should curl final single quotes",
+        "input": "Alfred 'bertrand'.",
+        "expected": {
+          "txt": "Alfred ‘bertrand’."
+        }
+      },
+      {
+        "description": "should curl single quotes in double quotes",
+        "input": "\"'Alfred' bertrand\" cees.",
+        "expected": {
+          "txt": "“‘Alfred’ bertrand” cees."
+        }
+      },
+      {
+        "description": "should curl single quotes in double quotes (2)",
+        "input": "\"Alfred 'bertrand'\" cees.",
+        "expected": {
+          "txt": "“Alfred ‘bertrand’” cees."
+        }
+      },
+      {
+        "description": "should curl double quotes in single quotes",
+        "input": "'\"Alfred\" bertrand' cees.",
+        "expected": {
+          "txt": "‘“Alfred” bertrand’ cees."
+        }
+      },
+      {
+        "description": "should curl double quotes in single quotes (2)",
+        "input": "'Alfred \"bertrand\"' cees.",
+        "expected": {
+          "txt": "‘Alfred “bertrand”’ cees."
+        }
+      },
+      {
+        "description": "should curl nested double quotes",
+        "input": "\"Alfred \"bertrand\" cees.\"",
+        "expected": {
+          "txt": "“Alfred “bertrand” cees.”"
+        }
+      },
+      {
+        "description": "should curl nested single quotes",
+        "input": "'Alfred 'bertrand' cees.'",
+        "expected": {
+          "txt": "‘Alfred ‘bertrand’ cees.’"
+        }
+      },
+      {
+        "description": "should curl initial double quotes when followed by a full stop",
+        "input": "Alfred \".bertrand\" cees.",
+        "expected": {
+          "txt": "Alfred “.bertrand” cees."
+        }
+      },
+      {
+        "description": "should curl initial single quotes when followed by a full stop",
+        "input": "Alfred '.bertrand' cees.",
+        "expected": {
+          "txt": "Alfred ‘.bertrand’ cees."
+        }
+      },
+      {
+        "description": "should curl initial double quotes when preceded by a full stop",
+        "input": "Alfred \"bertrand.\" cees.",
+        "expected": {
+          "txt": "Alfred “bertrand.” cees."
+        }
+      },
+      {
+        "description": "should curl initial single quotes when preceded by a full stop",
+        "input": "Alfred 'bertrand.' cees.",
+        "expected": {
+          "txt": "Alfred ‘bertrand.’ cees."
+        }
+      },
+      {
+        "description": "should curl initial double quotes when followed by a multiple full-stops",
+        "input": "\"..Alfred\"",
+        "expected": {
+          "txt": "“..Alfred”"
+        }
+      },
+      {
+        "description": "should curl initial single quotes when followed by a multiple full-stops",
+        "input": "'..Alfred'",
+        "expected": {
+          "txt": "‘..Alfred’"
+        }
+      },
+      {
+        "description": "should curl final double quotes when followed by a multiple full-stops",
+        "input": "\"Alfred\"..",
+        "expected": {
+          "txt": "“Alfred”.."
+        }
+      },
+      {
+        "description": "should curl final single quotes when followed by a multiple full-stops",
+        "input": "'Alfred'..",
+        "expected": {
+          "txt": "‘Alfred’.."
+        }
+      },
+      {
+        "description": "should curl final double quotes when followed by a comma",
+        "input": "\"Alfred\", bertrand.",
+        "expected": {
+          "txt": "“Alfred”, bertrand."
+        }
+      },
+      {
+        "description": "should curl final single quotes when followed by a comma",
+        "input": "'Alfred', bertrand.",
+        "expected": {
+          "txt": "‘Alfred’, bertrand."
+        }
+      },
+      {
+        "description": "should curl apostrophes when followed `s`",
+        "input": "Alfred's bertrand.",
+        "expected": {
+          "txt": "Alfred’s bertrand."
+        }
+      },
+      {
+        "description": "should curl apostrophes when followed by a decade (`80s`)",
+        "input": "In the '90s.",
+        "expected": {
+          "txt": "In the ’90s."
+        }
+      },
+      {
+        "description": "should curl final double quotes when followed by a full stop",
+        "input": "\"Alfred bertrand\". Cees.",
+        "expected": {
+          "txt": "“Alfred bertrand”. Cees."
+        }
+      },
+      {
+        "description": "should curl final single quotes when followed by a full stop",
+        "input": "'Alfred bertrand'. Cees.",
+        "expected": {
+          "txt": "‘Alfred bertrand’. Cees."
+        }
+      },
+      {
+        "description": "should use correct quotes around work breaks",
+        "input": "(\"A.\")",
+        "expected": {
+          "txt": "(“A.”)"
+        }
+      },
+      {
+        "description": "should use correct quotes around work breaks #1",
+        "input": "\"~a",
+        "expected": {
+          "txt": "“~a"
+        }
+      },
+      {
+        "description": "should use correct quotes around work breaks #2",
+        "input": "\"~*",
+        "expected": {
+          "txt": "”~*"
+        }
+      },
+      {
+        "description": "should use correct quotes around work breaks #3",
+        "input": "\"~",
+        "expected": {
+          "txt": "”~"
+        }
+      },
+      {
+        "description": "should replace two dashes with an em-dash",
+        "input": "Alfred--bertrand--cees.",
+        "expected": {
+          "txt": "Alfred—bertrand—cees."
+        }
+      },
+      {
+        "description": "should replace three full stops",
+        "input": "Alfred... Bertrand.",
+        "expected": {
+          "txt": "Alfred… Bertrand."
+        }
+      },
+      {
+        "description": "should replace three initial full stops",
+        "input": "...Alfred Bertrand.",
+        "expected": {
+          "txt": "…Alfred Bertrand."
+        }
+      },
+      {
+        "description": "should replace three final full stops",
+        "input": "Alfred Bertrand...",
+        "expected": {
+          "txt": "Alfred Bertrand…"
+        }
+      },
+      {
+        "description": "should replace three padded full stops",
+        "input": "Alfred ... Bertrand.",
+        "expected": {
+          "txt": "Alfred … Bertrand."
+        }
+      },
+      {
+        "description": "should replace three padded initial full stops",
+        "input": "... Alfred Bertrand.",
+        "expected": {
+          "txt": "… Alfred Bertrand."
+        }
+      },
+      {
+        "description": "should replace three padded final full stops",
+        "input": "Alfred Bertrand ...",
+        "expected": {
+          "txt": "Alfred Bertrand …"
+        }
+      },
+      {
+        "description": "should replace three padded full stops with spaces",
+        "input": "Alfred . . . Bertrand.",
+        "expected": {
+          "txt": "Alfred … Bertrand."
+        }
+      },
+      {
+        "description": "should replace three padded initial full stops with spaces",
+        "input": ". . . Alfred Bertrand.",
+        "expected": {
+          "txt": "… Alfred Bertrand."
+        }
+      },
+      {
+        "description": "should replace three padded final full stops with spaces",
+        "input": "Alfred Bertrand . . .",
+        "expected": {
+          "txt": "Alfred Bertrand …"
+        }
+      },
+      {
+        "description": "should replace three full stops with spaces",
+        "input": "Alfred. . . Bertrand.",
+        "expected": {
+          "txt": "Alfred… Bertrand."
+        }
+      },
+      {
+        "description": "should replace three initial full stops with spaces",
+        "input": ". . .Alfred Bertrand.",
+        "expected": {
+          "txt": "…Alfred Bertrand."
+        }
+      },
+      {
+        "description": "should replace three final full stops with spaces",
+        "input": "Alfred Bertrand. . .",
+        "expected": {
+          "txt": "Alfred Bertrand…"
+        }
+      },
+      {
+        "description": "should replace more than three full stops",
+        "input": "Alfred..... Bertrand.",
+        "expected": {
+          "txt": "Alfred… Bertrand."
+        }
+      },
+      {
+        "description": "should replace more than three full stops (2)",
+        "input": "Alfred bertrand....",
+        "expected": {
+          "txt": "Alfred bertrand…"
+        }
+      },
+      {
+        "description": "should replace more than three full stops (3)",
+        "input": "......Alfred bertrand.",
+        "expected": {
+          "txt": "…Alfred bertrand."
+        }
+      },
+      {
+        "description": "should replace more than three full stops with funky spacing",
+        "input": "Alfred .. .. . Bertrand.",
+        "expected": {
+          "txt": "Alfred … Bertrand."
+        }
+      },
+      {
+        "description": "should NOT replace less than three full stops",
+        "input": "Alfred.. Bertrand.",
+        "expected": {
+          "txt": "Alfred.. Bertrand."
+        }
+      },
+      {
+        "description": "should NOT replace less than three full stops (2)",
+        "input": "Alfred bertrand. .",
+        "expected": {
+          "txt": "Alfred bertrand. ."
+        }
+      },
+      {
+        "description": "should NOT replace less than three full stops (3)",
+        "input": ".Alfred bertrand.",
+        "expected": {
+          "txt": ".Alfred bertrand."
+        }
+      }
+    ]
+  },
+  {
+    "description": "retext-smartypants {\"closingQuotes\":{\"double\":\"»\",\"single\":\"›\"},\"openingQuotes\":{\"double\":\"«\",\"single\":\"‹\"}}",
+    "source": {
+      "repository": "https://github.com/retextjs/retext-smartypants",
+      "commit": "0ffca5eeb04b3d163624aad28ef36911edd224d7",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["prose.parse"],
+      [
+        "prose.smartypants",
+        {
+          "closingQuotes": {
+            "double": "»",
+            "single": "›"
+          },
+          "openingQuotes": {
+            "double": "«",
+            "single": "‹"
+          }
+        }
+      ],
+      ["prose.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should use quotes from options",
+        "input": "Alfred \"bertrand\" 'cees'.",
+        "expected": {
+          "txt": "Alfred «bertrand» ‹cees›."
+        }
+      }
+    ]
+  },
+  {
+    "description": "retext-smartypants {\"dashes\":\"oldschool\"}",
+    "source": {
+      "repository": "https://github.com/retextjs/retext-smartypants",
+      "commit": "0ffca5eeb04b3d163624aad28ef36911edd224d7",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["prose.parse"],
+      [
+        "prose.smartypants",
+        {
+          "dashes": "oldschool"
+        }
+      ],
+      ["prose.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should replace two dashes with an en-dash, three dashes with an em-dash",
+        "input": "Alfred--bertrand---cees.",
+        "expected": {
+          "txt": "Alfred–bertrand—cees."
+        }
+      },
+      {
+        "description": "should turn an en dash + dash into an em-dash",
+        "input": "Alfred–-",
+        "expected": {
+          "txt": "Alfred—"
+        }
+      }
+    ]
+  },
+  {
+    "description": "retext-smartypants {\"dashes\":\"inverted\"}",
+    "source": {
+      "repository": "https://github.com/retextjs/retext-smartypants",
+      "commit": "0ffca5eeb04b3d163624aad28ef36911edd224d7",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["prose.parse"],
+      [
+        "prose.smartypants",
+        {
+          "dashes": "inverted"
+        }
+      ],
+      ["prose.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should replace two dashes with an em-dash, three dashes with an en-dash",
+        "input": "Alfred--bertrand---cees.",
+        "expected": {
+          "txt": "Alfred—bertrand–cees."
+        }
+      },
+      {
+        "description": "should turn an em dash + dash into an en-dash",
+        "input": "Alfred—-",
+        "expected": {
+          "txt": "Alfred–"
+        }
+      }
+    ]
+  },
+  {
+    "description": "retext-smartypants {\"quotes\":false}",
+    "source": {
+      "repository": "https://github.com/retextjs/retext-smartypants",
+      "commit": "0ffca5eeb04b3d163624aad28ef36911edd224d7",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["prose.parse"],
+      [
+        "prose.smartypants",
+        {
+          "quotes": false
+        }
+      ],
+      ["prose.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should replace two backticks with an opening double quote",
+        "input": "``Alfred bertrand.",
+        "expected": {
+          "txt": "“Alfred bertrand."
+        }
+      },
+      {
+        "description": "should replace two single quotes with a closing double quote",
+        "input": "Alfred'' bertrand.",
+        "expected": {
+          "txt": "Alfred” bertrand."
+        }
+      },
+      {
+        "description": "should NOT replace a single backtick",
+        "input": "`Alfred bertrand.",
+        "expected": {
+          "txt": "`Alfred bertrand."
+        }
+      },
+      {
+        "description": "should NOT replace a single quote",
+        "input": "Alfred' bertrand.",
+        "expected": {
+          "txt": "Alfred' bertrand."
+        }
+      }
+    ]
+  },
+  {
+    "description": "retext-smartypants {\"backticks\":\"all\",\"quotes\":false}",
+    "source": {
+      "repository": "https://github.com/retextjs/retext-smartypants",
+      "commit": "0ffca5eeb04b3d163624aad28ef36911edd224d7",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["prose.parse"],
+      [
+        "prose.smartypants",
+        {
+          "backticks": "all",
+          "quotes": false
+        }
+      ],
+      ["prose.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should replace two backticks with an opening double quote (2)",
+        "input": "``Alfred bertrand.",
+        "expected": {
+          "txt": "“Alfred bertrand."
+        }
+      },
+      {
+        "description": "should replace two single quotes with a closing double quote (2)",
+        "input": "Alfred'' bertrand.",
+        "expected": {
+          "txt": "Alfred” bertrand."
+        }
+      },
+      {
+        "description": "should replace a single backtick",
+        "input": "`Alfred bertrand.",
+        "expected": {
+          "txt": "‘Alfred bertrand."
+        }
+      },
+      {
+        "description": "should replace a single quote",
+        "input": "Alfred' bertrand.",
+        "expected": {
+          "txt": "Alfred’ bertrand."
+        }
+      }
+    ]
+  },
+  {
+    "description": "retext-smartypants {\"ellipses\":\"unspaced\"}",
+    "source": {
+      "repository": "https://github.com/retextjs/retext-smartypants",
+      "commit": "0ffca5eeb04b3d163624aad28ef36911edd224d7",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["prose.parse"],
+      [
+        "prose.smartypants",
+        {
+          "ellipses": "unspaced"
+        }
+      ],
+      ["prose.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should replace three full stops (2)",
+        "input": "Alfred... Bertrand.",
+        "expected": {
+          "txt": "Alfred… Bertrand."
+        }
+      },
+      {
+        "description": "should replace three initial full stops (2)",
+        "input": "...Alfred Bertrand.",
+        "expected": {
+          "txt": "…Alfred Bertrand."
+        }
+      },
+      {
+        "description": "should replace three final full stops (2)",
+        "input": "Alfred Bertrand...",
+        "expected": {
+          "txt": "Alfred Bertrand…"
+        }
+      },
+      {
+        "description": "should replace three padded full stops (2)",
+        "input": "Alfred ... Bertrand.",
+        "expected": {
+          "txt": "Alfred … Bertrand."
+        }
+      },
+      {
+        "description": "should replace three padded initial full stops (2)",
+        "input": "... Alfred Bertrand.",
+        "expected": {
+          "txt": "… Alfred Bertrand."
+        }
+      },
+      {
+        "description": "should replace three padded final full stops (2)",
+        "input": "Alfred Bertrand ...",
+        "expected": {
+          "txt": "Alfred Bertrand …"
+        }
+      },
+      {
+        "description": "should replace more than three full stops (4)",
+        "input": "Alfred..... Bertrand.",
+        "expected": {
+          "txt": "Alfred… Bertrand."
+        }
+      },
+      {
+        "description": "should replace more than three full stops (5)",
+        "input": "Alfred bertrand....",
+        "expected": {
+          "txt": "Alfred bertrand…"
+        }
+      },
+      {
+        "description": "should replace more than three full stops (6)",
+        "input": "......Alfred bertrand.",
+        "expected": {
+          "txt": "…Alfred bertrand."
+        }
+      },
+      {
+        "description": "should NOT replace less than three full stops (4)",
+        "input": "Alfred.. Bertrand.",
+        "expected": {
+          "txt": "Alfred.. Bertrand."
+        }
+      },
+      {
+        "description": "should NOT replace less than three full stops (5)",
+        "input": "Alfred bertrand. .",
+        "expected": {
+          "txt": "Alfred bertrand. ."
+        }
+      },
+      {
+        "description": "should NOT replace less than three full stops (6)",
+        "input": ".Alfred bertrand.",
+        "expected": {
+          "txt": ".Alfred bertrand."
+        }
+      }
+    ]
+  },
+  {
+    "description": "retext-smartypants {\"ellipses\":\"spaced\"}",
+    "source": {
+      "repository": "https://github.com/retextjs/retext-smartypants",
+      "commit": "0ffca5eeb04b3d163624aad28ef36911edd224d7",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["prose.parse"],
+      [
+        "prose.smartypants",
+        {
+          "ellipses": "spaced"
+        }
+      ],
+      ["prose.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should replace three padded full stops with spaces (2)",
+        "input": "Alfred . . . Bertrand.",
+        "expected": {
+          "txt": "Alfred … Bertrand."
+        }
+      },
+      {
+        "description": "should replace three padded initial full stops with spaces (2)",
+        "input": ". . . Alfred Bertrand.",
+        "expected": {
+          "txt": "… Alfred Bertrand."
+        }
+      },
+      {
+        "description": "should replace three padded final full stops with spaces (2)",
+        "input": "Alfred Bertrand . . .",
+        "expected": {
+          "txt": "Alfred Bertrand …"
+        }
+      },
+      {
+        "description": "should replace three full stops with spaces (2)",
+        "input": "Alfred. . . Bertrand.",
+        "expected": {
+          "txt": "Alfred… Bertrand."
+        }
+      },
+      {
+        "description": "should replace three initial full stops with spaces (2)",
+        "input": ". . .Alfred Bertrand.",
+        "expected": {
+          "txt": "…Alfred Bertrand."
+        }
+      },
+      {
+        "description": "should replace three final full stops with spaces (2)",
+        "input": "Alfred Bertrand. . .",
+        "expected": {
+          "txt": "Alfred Bertrand…"
+        }
+      }
+    ]
+  }
+]

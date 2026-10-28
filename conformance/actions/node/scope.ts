@@ -1,28 +1,25 @@
 import type { AnyNode, Program } from "acorn"
-import { simple } from "acorn-walk"
 
-/** Constants visible at a node: those of its innermost enclosing function, then the module's. */
+/** Constants visible at a node: those declared in each enclosing block, from the module inward,
+ * an inner declaration shadowing an outer one of the same name. */
 export function resolveConstants(props: { program: Program; ancestors: AnyNode[] }) {
-  const constants = collectConstants(props.program)
-  const scope = [...props.ancestors]
-    .reverse()
-    .find(
-      node =>
-        node.type === "FunctionExpression" || node.type === "ArrowFunctionExpression",
-    )
-  // A test's own `const value` shadows a same-named one elsewhere in the file
-  if (scope)
-    for (const [name, value] of collectConstants(scope)) constants.set(name, value)
-  return constants
-}
-
-function collectConstants(root: AnyNode) {
   const constants = new Map<string, AnyNode>()
-  simple(root, {
-    VariableDeclarator(node) {
-      if (node.id.type === "Identifier" && node.init)
-        constants.set(node.id.name, node.init)
-    },
-  })
+  const scopes =
+    props.ancestors[0] === props.program
+      ? props.ancestors
+      : [props.program, ...props.ancestors]
+  for (const scope of scopes) {
+    const statements =
+      scope.type === "Program" || scope.type === "BlockStatement" ? scope.body : []
+    for (const statement of statements) {
+      const declaration =
+        statement.type === "ExportNamedDeclaration" ? statement.declaration : statement
+      if (declaration?.type !== "VariableDeclaration") continue
+      for (const declarator of declaration.declarations) {
+        if (declarator.id.type === "Identifier" && declarator.init)
+          constants.set(declarator.id.name, declarator.init)
+      }
+    }
+  }
   return constants
 }

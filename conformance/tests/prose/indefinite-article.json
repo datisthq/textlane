@@ -1,0 +1,1106 @@
+[
+  {
+    "description": "retext-indefinite-article",
+    "source": {
+      "repository": "https://github.com/retextjs/retext-indefinite-article",
+      "commit": "960875ee40ffd0806054d634f96052955fff8c18",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["prose.parse"], ["prose.indefiniteArticle"], ["prose.stringify"]],
+    "tests": [
+      {
+        "description": "should catch indefinite articles",
+        "input": "He should have arrived a hour ago on an European flight.\nan historic event, or a historic event?",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 24,
+                  "offset": 23
+                },
+                "end": {
+                  "line": 1,
+                  "column": 25,
+                  "offset": 24
+                }
+              }
+            },
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 38,
+                  "offset": 37
+                },
+                "end": {
+                  "line": 1,
+                  "column": 40,
+                  "offset": 39
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article",
+        "input": "She had a house so large that an elephant would get lost without a map",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (2)",
+        "input": "a European",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (3)",
+        "input": "a hallucination",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (4)",
+        "input": "an hallucination",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (5)",
+        "input": "a hilarious",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (6)",
+        "input": "an hilarious",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (7)",
+        "input": "a historic",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (8)",
+        "input": "an historic",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (9)",
+        "input": "a historical",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (10)",
+        "input": "an historical",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (11)",
+        "input": "a horrendous",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (12)",
+        "input": "an horrendous",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (13)",
+        "input": "a horrific",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (14)",
+        "input": "an horrific",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (15)",
+        "input": "a hotel",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (16)",
+        "input": "an hotel",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (17)",
+        "input": "a herb",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (18)",
+        "input": "an herb",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (19)",
+        "input": "a hereditary",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (20)",
+        "input": "an hereditary",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (21)",
+        "input": "a unist tree",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (22)",
+        "input": "an mdast tree",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (23)",
+        "input": "This is a test sentence",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (24)",
+        "input": "It was an hour ago",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (25)",
+        "input": "A unidirectional flow",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (26)",
+        "input": "A unified thing",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (27)",
+        "input": "A university is",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (28)",
+        "input": "A one-way street",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (29)",
+        "input": "An hour’s work",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (30)",
+        "input": "Going to an “industry party”",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (31)",
+        "input": "An 8-year old boy",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (32)",
+        "input": "An 18-year old boy",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (33)",
+        "input": "a 1px border",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (34)",
+        "input": "a 100m sprint",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (35)",
+        "input": "a 1rem font size",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (36)",
+        "input": "a 1/4\" hole",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (37)",
+        "input": "a 1-off thing",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (38)",
+        "input": "a 1x increase",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (39)",
+        "input": "a 1:1 correspondence",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (40)",
+        "input": "a 1:00 train",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (41)",
+        "input": "a 1.0 release",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (42)",
+        "input": "an h1",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (43)",
+        "input": "an h6",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (44)",
+        "input": "The A-levels are",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (45)",
+        "input": "An NOP check",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (46)",
+        "input": "A USA-wide license",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (47)",
+        "input": "asked a UN member",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (48)",
+        "input": "In an un-united Germany",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (49)",
+        "input": "Here, a and b are supplementary angles",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (50)",
+        "input": "Station A equals station B",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (51)",
+        "input": "A University",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (52)",
+        "input": "a unique identifier",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (53)",
+        "input": "A Europe wide thing",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (54)",
+        "input": "an npm package",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (55)",
+        "input": "A. R.J. Turgot",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (56)",
+        "input": "an MSc",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (57)",
+        "input": "an XMR-based",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (58)",
+        "input": "plural A’s, A's, As, as, or a’s, a's.",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (59)",
+        "input": "They form a union and get laws passed.",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (60)",
+        "input": "Station N equals station A",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (61)",
+        "input": "Station N equals station A.",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (62)",
+        "input": "a.",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (63)",
+        "input": "an.",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (64)",
+        "input": "a \"",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (65)",
+        "input": "a (",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (66)",
+        "input": "an “hour",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (67)",
+        "input": "a \"bicycle\"",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (68)",
+        "input": "a unicycle",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "retext-indefinite-article (69)",
+        "input": "was a hour ago",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 5,
+                  "offset": 4
+                },
+                "end": {
+                  "line": 1,
+                  "column": 6,
+                  "offset": 5
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (70)",
+        "input": "was an sentence",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 5,
+                  "offset": 4
+                },
+                "end": {
+                  "line": 1,
+                  "column": 7,
+                  "offset": 6
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (71)",
+        "input": "An unidirectional flow",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 3,
+                  "offset": 2
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (72)",
+        "input": "was a uninteresting",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 5,
+                  "offset": 4
+                },
+                "end": {
+                  "line": 1,
+                  "column": 6,
+                  "offset": 5
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (73)",
+        "input": "An university",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 3,
+                  "offset": 2
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (74)",
+        "input": "A uninteresting",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 2,
+                  "offset": 1
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (75)",
+        "input": "A hour’s work",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 2,
+                  "offset": 1
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (76)",
+        "input": "to a “industry party”",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 4,
+                  "offset": 3
+                },
+                "end": {
+                  "line": 1,
+                  "column": 5,
+                  "offset": 4
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (77)",
+        "input": "\"It was a uninteresting talk\"",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 9,
+                  "offset": 8
+                },
+                "end": {
+                  "line": 1,
+                  "column": 10,
+                  "offset": 9
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (78)",
+        "input": "then an University",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 6,
+                  "offset": 5
+                },
+                "end": {
+                  "line": 1,
+                  "column": 8,
+                  "offset": 7
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (79)",
+        "input": "A 8-year old",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 2,
+                  "offset": 1
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (80)",
+        "input": "A 18-year old",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 2,
+                  "offset": 1
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (81)",
+        "input": "An 1/4\" hole",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 3,
+                  "offset": 2
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (82)",
+        "input": "An 1-off thing",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 3,
+                  "offset": 2
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (83)",
+        "input": "an 1:1 correspondence",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 3,
+                  "offset": 2
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (84)",
+        "input": "an 1:00 train",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 3,
+                  "offset": 2
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (85)",
+        "input": "a h1",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 2,
+                  "offset": 1
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (86)",
+        "input": "a h6",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 2,
+                  "offset": 1
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (87)",
+        "input": "asked an UN member",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 7,
+                  "offset": 6
+                },
+                "end": {
+                  "line": 1,
+                  "column": 9,
+                  "offset": 8
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (88)",
+        "input": "In a un-united Germany",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 4,
+                  "offset": 3
+                },
+                "end": {
+                  "line": 1,
+                  "column": 5,
+                  "offset": 4
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (89)",
+        "input": "Anyone for a MSc?",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 12,
+                  "offset": 11
+                },
+                "end": {
+                  "line": 1,
+                  "column": 13,
+                  "offset": 12
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (90)",
+        "input": "They form an union and get laws passed.",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 11,
+                  "offset": 10
+                },
+                "end": {
+                  "line": 1,
+                  "column": 13,
+                  "offset": 12
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (91)",
+        "input": "an unicycle",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 3,
+                  "offset": 2
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "retext-indefinite-article (92)",
+        "input": "an URL",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "retext-indefinite-article",
+              "source": "retext-indefinite-article",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 3,
+                  "offset": 2
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+]

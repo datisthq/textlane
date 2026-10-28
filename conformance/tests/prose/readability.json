@@ -1,0 +1,239 @@
+[
+  {
+    "description": "retext-readability",
+    "source": {
+      "repository": "https://github.com/retextjs/retext-readability",
+      "commit": "ece962416e72edeea12f670d3120da4f32e0d423",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["prose.parse"], ["prose.readability"], ["prose.stringify"]],
+    "tests": [
+      {
+        "description": "should emit a message w/ metadata",
+        "input": "Oberon, also designated Uranus IV, is the outermost \nmajor moon of the planet Uranus and quite large\nand massive for a Uranian moon.\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "readability",
+              "source": "retext-readability",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 3,
+                  "column": 32,
+                  "offset": 132
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "should not warn when a sentence is easy to read",
+        "input": "The cat sat on the mat",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "should warn when moderately confident that a sentence is hard to read",
+        "input": "Oberon, also designated Uranus IV, is the outermost \nmajor moon of the planet Uranus and the second-largest \nand second most massive of the Uranian moons.\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "readability",
+              "source": "retext-readability",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 3,
+                  "column": 46,
+                  "offset": 154
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "should support minWords (default)",
+        "input": "Honorificabilitudinitatibus.",
+        "expected": {
+          "messages": []
+        }
+      }
+    ]
+  },
+  {
+    "description": "retext-readability {\"age\":18}",
+    "source": {
+      "repository": "https://github.com/retextjs/retext-readability",
+      "commit": "ece962416e72edeea12f670d3120da4f32e0d423",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["prose.parse"],
+      [
+        "prose.readability",
+        {
+          "age": 18
+        }
+      ],
+      ["prose.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should support a given age (removing the warning)",
+        "input": "Oberon, also designated Uranus IV, is the outermost \nmajor moon of the planet Uranus and quite large\nand massive for a Uranian moon.\n",
+        "expected": {
+          "messages": []
+        }
+      }
+    ]
+  },
+  {
+    "description": "retext-readability {\"age\":14}",
+    "source": {
+      "repository": "https://github.com/retextjs/retext-readability",
+      "commit": "ece962416e72edeea12f670d3120da4f32e0d423",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["prose.parse"],
+      [
+        "prose.readability",
+        {
+          "age": 14
+        }
+      ],
+      ["prose.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should support a given age (upping the warning)",
+        "input": "Oberon, also designated Uranus IV, is the outermost \nmajor moon of the planet Uranus and quite large\nand massive for a Uranian moon.\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "readability",
+              "source": "retext-readability",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 3,
+                  "column": 32,
+                  "offset": 132
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "description": "retext-readability {\"age\":6}",
+    "source": {
+      "repository": "https://github.com/retextjs/retext-readability",
+      "commit": "ece962416e72edeea12f670d3120da4f32e0d423",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["prose.parse"],
+      [
+        "prose.readability",
+        {
+          "age": 6
+        }
+      ],
+      ["prose.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should warn when highly confident that a sentence is hard to read",
+        "input": "Oberon, also designated Uranus IV, is the outermost \nmajor moon of the planet Uranus and the second-largest \nand second most massive of the Uranian moons, and the \nninth most massive moon in the Solar System.\n",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "readability",
+              "source": "retext-readability",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 4,
+                  "column": 45,
+                  "offset": 208
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "description": "retext-readability {\"minWords\":0}",
+    "source": {
+      "repository": "https://github.com/retextjs/retext-readability",
+      "commit": "ece962416e72edeea12f670d3120da4f32e0d423",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["prose.parse"],
+      [
+        "prose.readability",
+        {
+          "minWords": 0
+        }
+      ],
+      ["prose.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should support `minWords` (config)",
+        "input": "Honorificabilitudinitatibus.",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "readability",
+              "source": "retext-readability",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 29,
+                  "offset": 28
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+]
