@@ -1,0 +1,120 @@
+[
+  {
+    "description": "Backslash escapes",
+    "specification": ["https://spec.commonmark.org/0.31.2/#backslash-escapes"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 12",
+        "input": "\\!\\\"\\#\\$\\%\\&\\'\\(\\)\\*\\+\\,\\-\\.\\/\\:\\;\\<\\=\\>\\?\\@\\[\\\\\\]\\^\\_\\`\\{\\|\\}\\~\n",
+        "expected": {
+          "html": "<p>!\"#$%&#x26;'()*+,-./:;&#x3C;=>?@[\\]^_`{|}~</p>"
+        }
+      },
+      {
+        "description": "example 13",
+        "input": "\\\t\\A\\a\\ \\3\\φ\\«\n",
+        "expected": {
+          "html": "<p>\\\t\\A\\a\\ \\3\\φ\\«</p>"
+        }
+      },
+      {
+        "description": "example 14",
+        "input": "\\*not emphasized*\n\\<br/> not a tag\n\\[not a link](/foo)\n\\`not code`\n1\\. not a list\n\\* not a list\n\\# not a heading\n\\[foo]: /url \"not a reference\"\n\\&ouml; not a character entity\n",
+        "expected": {
+          "html": "<p>*not emphasized*\n&#x3C;br/> not a tag\n[not a link](/foo)\n`not code`\n1. not a list\n* not a list\n# not a heading\n[foo]: /url \"not a reference\"\n&#x26;ouml; not a character entity</p>"
+        }
+      },
+      {
+        "description": "example 15",
+        "input": "\\\\*emphasis*\n",
+        "expected": {
+          "html": "<p>\\<em>emphasis</em></p>"
+        }
+      },
+      {
+        "description": "example 16",
+        "input": "foo\\\nbar\n",
+        "expected": {
+          "html": "<p>foo<br>\nbar</p>"
+        }
+      },
+      {
+        "description": "example 17",
+        "input": "`` \\[\\` ``\n",
+        "expected": {
+          "html": "<p><code>\\[\\`</code></p>"
+        }
+      },
+      {
+        "description": "example 18",
+        "input": "    \\[\\]\n",
+        "expected": {
+          "html": "<pre><code>\\[\\]\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 19",
+        "input": "~~~\n\\[\\]\n~~~\n",
+        "expected": {
+          "html": "<pre><code>\\[\\]\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 20",
+        "input": "<https://example.com?find=\\*>\n",
+        "expected": {
+          "html": "<p><a href=\"https://example.com?find=%5C*\">https://example.com?find=\\*</a></p>"
+        }
+      },
+      {
+        "description": "example 21",
+        "input": "<a href=\"/bar\\/)\">\n",
+        "expected": {
+          "html": "<a href=\"/bar\\/)\">"
+        }
+      },
+      {
+        "description": "example 22",
+        "input": "[foo](/bar\\* \"ti\\*tle\")\n",
+        "expected": {
+          "html": "<p><a href=\"/bar*\" title=\"ti*tle\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 23",
+        "input": "[foo]\n\n[foo]: /bar\\* \"ti\\*tle\"\n",
+        "expected": {
+          "html": "<p><a href=\"/bar*\" title=\"ti*tle\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 24",
+        "input": "``` foo\\+bar\nfoo\n```\n",
+        "expected": {
+          "html": "<pre><code class=\"language-foo+bar\">foo\n</code></pre>"
+        }
+      }
+    ]
+  }
+]

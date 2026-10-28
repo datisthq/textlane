@@ -10,8 +10,12 @@ import { ADDON_ENV } from "../settings.ts"
 const ROOT = resolve(import.meta.dirname, "..", "..")
 const TESTS = join(ROOT, "conformance", "tests")
 
-// "<area>/<file>#<group>" to the open issue whose fix unblocks it; nothing else skips
+// "<area>/<file>#<group>" to the open issue whose fix unblocks it in this runner alone;
+// what the crate does not implement yet is conformance/pending.json, shared by every runner
 const KNOWN_DIVERGENCES: Record<string, string> = {}
+const PENDING: Record<string, string> = JSON.parse(
+  readFileSync(join(ROOT, "conformance", "pending.json"), "utf8"),
+)
 
 const LIBRARY_NAMES: Record<string, string> = {
   darwin: "libtextlane.dylib",
@@ -54,6 +58,8 @@ afterAll(() => {
 })
 
 describe("conformance", () => {
+  const matchedEntries = new Set<string>()
+  const failingEntries = new Set<string>()
   for (const file of listFiles(TESTS)) {
     const id = relative(TESTS, file)
       .replace(/\\/g, "/")
@@ -62,6 +68,8 @@ describe("conformance", () => {
     for (const group of groups) {
       const groupId = `${id}#${group.description}`
       if (groupId in KNOWN_DIVERGENCES) continue
+      const entry = Object.keys(PENDING).find(key => matchesEntry(key, id, groupId))
+      if (entry) matchedEntries.add(entry)
       describe(groupId, () => {
         for (const test of group.tests) {
           it(test.description, () => {
@@ -74,13 +82,30 @@ describe("conformance", () => {
                 }),
               ),
             )
-            expectOutcome(actual, test.expected)
+            if (!entry) return expectOutcome(actual, test.expected)
+            try {
+              expectOutcome(actual, test.expected)
+            } catch {
+              failingEntries.add(entry)
+            }
           })
         }
       })
     }
   }
+
+  // A pending entry whose cases all pass is stale and fails the run
+  it("pending.json lists only failing cases", () => {
+    const stale = [...matchedEntries].filter(entry => !failingEntries.has(entry))
+    expect(stale).toEqual([])
+  })
 })
+
+// An entry names a file, a group, or a whole area as `<area>/*`
+function matchesEntry(entry: string, fileId: string, groupId: string) {
+  if (entry.endsWith("*")) return fileId.startsWith(entry.slice(0, -1))
+  return entry === fileId || entry === groupId
+}
 
 // An expected error matches on its code, and on its message only as a substring
 function expectOutcome(actual: Expected, expected: Expected) {

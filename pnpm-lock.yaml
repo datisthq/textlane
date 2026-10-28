@@ -91,6 +91,33 @@ importers:
         specifier: ^4.4.1
         version: 4.6.7
 
+  conformance:
+    devDependencies:
+      commonmark.json:
+        specifier: 0.31.0
+        version: 0.31.0
+      hast-util-from-html:
+        specifier: 2.0.3
+        version: 2.0.3
+      hast-util-to-html:
+        specifier: 9.0.5
+        version: 9.0.5
+      rehype-stringify:
+        specifier: 10.0.1
+        version: 10.0.1
+      remark-parse:
+        specifier: 11.0.0
+        version: 11.0.0(supports-color@10.2.2)
+      remark-rehype:
+        specifier: 11.1.2
+        version: 11.1.2
+      unified:
+        specifier: 11.0.5
+        version: 11.0.5
+      vite-plus:
+        specifier: 'catalog:'
+        version: 1.0.0(@types/node@24.2.0)(@vitest/coverage-v8@5.0.1)(@vitest/ui@5.0.1)(esbuild@0.27.3)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1)
+
   python: {}
 
   rust: {}
@@ -3027,6 +3054,9 @@ packages:
   commander@8.3.0:
     resolution: {integrity: sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==}
     engines: {node: '>= 12'}
+
+  commonmark.json@0.31.0:
+    resolution: {integrity: sha512-AJFKhaVtIDQwoaLJhe8TtwKkCq6cJUF8U7ZoU0dHKZn4bnMTXFBmkFFU0R4vneUdXM32gWkwsyfVXsu7ikBORQ==}
 
   conf@10.2.0:
     resolution: {integrity: sha512-8fLl9F04EJqjSqH+QjITQfJF8BrOVaYr1jewVgSRAEWePfxT0sku4w2hrGQ60BC/TNLGQ2pgxNlTbWQmMPFvXg==}
@@ -8439,6 +8469,8 @@ snapshots:
   commander@7.2.0: {}
 
   commander@8.3.0: {}
+
+  commonmark.json@0.31.0: {}
 
   conf@10.2.0:
     dependencies:

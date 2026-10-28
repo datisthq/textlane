@@ -1,0 +1,50 @@
+[
+  {
+    "description": "Textual content",
+    "specification": ["https://spec.commonmark.org/0.31.2/#textual-content"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 650",
+        "input": "hello $.;'there\n",
+        "expected": {
+          "html": "<p>hello $.;'there</p>"
+        }
+      },
+      {
+        "description": "example 651",
+        "input": "Foo χρῆν\n",
+        "expected": {
+          "html": "<p>Foo χρῆν</p>"
+        }
+      },
+      {
+        "description": "example 652",
+        "input": "Multiple     spaces\n",
+        "expected": {
+          "html": "<p>Multiple     spaces</p>"
+        }
+      }
+    ]
+  }
+]

@@ -23,7 +23,7 @@
       {
         "description": "non-ASCII text survives",
         "input": "naïve café 🚀",
-        "expected": { "text": "naïve café 🚀" }
+        "expected": { "txt": "naïve café 🚀" }
       }
     ]
   },
@@ -34,12 +34,12 @@
       {
         "description": "a text node yields its value",
         "tree": { "type": "text", "value": "beta" },
-        "expected": { "text": "beta" }
+        "expected": { "txt": "beta" }
       },
       {
         "description": "a node without a value yields nothing",
         "tree": { "type": "root", "children": [] },
-        "expected": { "text": "" }
+        "expected": { "txt": "" }
       }
     ]
   },

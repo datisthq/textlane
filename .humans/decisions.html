@@ -15,13 +15,13 @@
 
 <htmlpress-grid cols="3">
   <htmlpress-card>
-    <h3>15 decided</h3>
+    <h3>18 decided</h3>
     <p>
       <htmlpress-badge type="success">decided</htmlpress-badge> settled by the maintainer
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>6 agent's calls</h3>
+    <h3>7 agent's calls</h3>
     <p>
       <htmlpress-badge type="warning">my call</htmlpress-badge> settled by the agent, open
       to change
@@ -232,6 +232,45 @@
     <p><strong>Rejected.</strong> Bytes; code points.</p>
   </dd>
   <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Serialized output is keyed
+    by its file extension: <code>expected.html</code>, <code>.md</code>, <code>.js</code>,
+    <code>.txt</code>
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> A case reads self-describing, and the key names what the
+      string is, not which domain made it: <code>mdx.compile</code> yields
+      <code>js</code>, <code>prose.stringify</code> yields <code>txt</code>.
+    </p>
+    <p>
+      <strong>Rejected.</strong> One generic <code>text</code> key;
+      <code>.markdown</code>; <code>.prose</code>.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Ported groups follow
+    upstream's grouping: one group per spec section or test block
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Files read like the upstream suite, and a section shares one
+      pipeline.
+    </p>
+    <p><strong>Rejected.</strong> One group per example.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> The corpus is filled before
+    the implementation; <code>conformance/pending.json</code> marks what the crate does
+    not pass yet
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Implementation then works against a complete target, and the
+      list records progress.
+    </p>
+    <p><strong>Rejected.</strong> Porting tests alongside each feature.</p>
+  </dd>
+  <dt>
     <htmlpress-badge type="success">decided</htmlpress-badge> Importers may run unified
     once to produce expectations; comparison is always exact
   </dt>
@@ -287,6 +326,18 @@
     <p>
       <strong>Rejected.</strong> Designing the processor and the tree types in phase 2.
     </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Pending is strict: pending
+    cases run and may fail, an entry whose cases all pass fails the run until removed; an
+    area wildcard trips only once its whole area passes
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Keeps <code>pending.json</code> an exact record of what is
+      unimplemented without forcing early wildcards apart.
+    </p>
+    <p><strong>Rejected.</strong> Report-only, which lets the list go stale.</p>
   </dd>
   <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge> Each runner skips only

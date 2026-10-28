@@ -4,13 +4,14 @@ use std::path::{Path, PathBuf};
 use serde_json::{Value, json};
 use textlane::run_case;
 
-// "<area>/<file>#<group>" to the open issue whose fix unblocks it; nothing else skips
+// "<area>/<file>#<group>" to the open issue whose fix unblocks it in this runner alone;
+// what the crate does not implement yet is conformance/pending.json, shared by every runner
 const KNOWN_DIVERGENCES: &[(&str, &str)] = &[];
 
 #[test]
 fn conformance() -> Result<(), String> {
-    let mut failures = Vec::new();
-    let mut passed = 0;
+    let pending = read_pending()?;
+    let mut report = Report::default();
     for file in list_files(&suite_path().join("tests"))? {
         let id = case_id(&file)?;
         let text = fs::read_to_string(&file).map_err(|e| format!("{id}: {e}"))?;
@@ -19,39 +20,74 @@ fn conformance() -> Result<(), String> {
         for group in groups.as_array().into_iter().flatten() {
             let description = group["description"].as_str().unwrap_or_default();
             let group_id = format!("{id}#{description}");
-            if KNOWN_DIVERGENCES
+            if !KNOWN_DIVERGENCES
                 .iter()
                 .any(|(skipped, _)| *skipped == group_id)
             {
-                continue;
-            }
-            for test in group["tests"].as_array().into_iter().flatten() {
-                let mut case = json!({ "pipeline": group["pipeline"] });
-                for key in ["input", "tree"] {
-                    if let Some(value) = test.get(key) {
-                        case[key] = value.clone();
-                    }
-                }
-                let actual = run_case(&case);
-                if matches_expected(&actual, &test["expected"]) {
-                    passed += 1;
-                } else {
-                    let name = test["description"].as_str().unwrap_or_default();
-                    failures.push(format!(
-                        "{group_id} / {name}\n  expected {}\n  actual   {actual}",
-                        test["expected"]
-                    ));
-                }
+                let entry = pending
+                    .iter()
+                    .find(|entry| matches_entry(entry, &id, &group_id));
+                run_group(group, &group_id, entry, &mut report);
             }
         }
     }
-    if passed == 0 {
-        return Err("the suite ran no tests".into());
+    report.finish()
+}
+
+#[derive(Default)]
+struct Report {
+    passed: usize,
+    failures: Vec<String>,
+    matched_entries: Vec<String>,
+    failing_entries: Vec<String>,
+}
+
+impl Report {
+    // A pending entry whose cases all pass is stale and fails the run
+    fn finish(mut self) -> Result<(), String> {
+        for entry in &self.matched_entries {
+            if !self.failing_entries.contains(entry) {
+                let message = format!(
+                    "{entry} passes now; remove it from conformance/pending.json"
+                );
+                self.failures.push(message);
+            }
+        }
+        if self.passed == 0 && self.failing_entries.is_empty() {
+            return Err("the suite ran no tests".into());
+        }
+        if self.failures.is_empty() {
+            Ok(())
+        } else {
+            Err(self.failures.join("\n"))
+        }
     }
-    if failures.is_empty() {
-        Ok(())
-    } else {
-        Err(failures.join("\n"))
+}
+
+fn run_group(group: &Value, group_id: &str, entry: Option<&String>, report: &mut Report) {
+    if let Some(entry) = entry.filter(|entry| !report.matched_entries.contains(entry)) {
+        report.matched_entries.push(entry.clone());
+    }
+    for test in group["tests"].as_array().into_iter().flatten() {
+        let mut case = json!({ "pipeline": group["pipeline"] });
+        for key in ["input", "tree"] {
+            if let Some(value) = test.get(key) {
+                case[key] = value.clone();
+            }
+        }
+        let actual = run_case(&case);
+        if matches_expected(&actual, &test["expected"]) {
+            report.passed += 1;
+        } else if let Some(entry) = entry {
+            report.failing_entries.push(entry.clone());
+        } else {
+            let name = test["description"].as_str().unwrap_or_default();
+            let expected = &test["expected"];
+            let message = format!(
+                "{group_id} / {name}\n  expected {expected}\n  actual   {actual}"
+            );
+            report.failures.push(message);
+        }
     }
 }
 
@@ -67,6 +103,22 @@ fn matches_expected(actual: &Value, expected: &Value) -> bool {
         }
         _ => actual == expected,
     }
+}
+
+// An entry names a file, a group, or a whole area as `<area>/*`
+fn matches_entry(entry: &str, file_id: &str, group_id: &str) -> bool {
+    match entry.strip_suffix('*') {
+        Some(prefix) => file_id.starts_with(prefix),
+        None => entry == file_id || entry == group_id,
+    }
+}
+
+fn read_pending() -> Result<Vec<String>, String> {
+    let path = suite_path().join("pending.json");
+    let text = fs::read_to_string(path).map_err(|e| e.to_string())?;
+    let pending: Value = serde_json::from_str(&text).map_err(|e| e.to_string())?;
+    let entries = pending.as_object().into_iter().flatten();
+    Ok(entries.map(|(entry, _)| entry.clone()).collect())
 }
 
 fn suite_path() -> PathBuf {

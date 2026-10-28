@@ -13,13 +13,13 @@ fn run_case_parses_text_into_a_tree() {
 fn run_case_round_trips_text() {
     let case =
         json!({ "pipeline": [["test.parseText"], ["test.compileValue"]], "input": "a" });
-    assert_eq!(run_case(&case), json!({ "text": "a" }));
+    assert_eq!(run_case(&case), json!({ "txt": "a" }));
 }
 
 #[test]
 fn run_case_compiles_a_given_tree() {
     let case = json!({ "pipeline": [["test.compileValue"]], "tree": { "type": "root" } });
-    assert_eq!(run_case(&case), json!({ "text": "" }));
+    assert_eq!(run_case(&case), json!({ "txt": "" }));
 }
 
 #[test]

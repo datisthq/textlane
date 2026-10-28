@@ -2,7 +2,7 @@ use serde_json::{Map, Value, json};
 
 /// Run one conformance case, `{pipeline, input | tree}`, through the stub test plugins.
 ///
-/// The result has one key, as a test's `expected` does: `text`, `tree` or `error`.
+/// The result has one key, as a test's `expected` does: `txt`, `tree` or `error`.
 pub fn run_case(case: &Value) -> Value {
     match run_pipeline(case) {
         Ok(result) => result,
@@ -40,7 +40,7 @@ fn run_pipeline(case: &Value) -> Result<Value, Failure> {
         state = apply_plugin(name, state)?;
     }
     Ok(match state {
-        State::Text(text) => json!({ "text": text }),
+        State::Text(text) => json!({ "txt": text }),
         State::Tree(tree) => json!({ "tree": tree }),
     })
 }

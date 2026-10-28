@@ -13,6 +13,8 @@ and the layout fairspec's suite.
 conformance/
   test-schema.json             JSON Schema of a test file
   tests/<area>/<feature>.json  one area per domain: core, md, html, mdx, prose
+  pending.json                 what the crate does not pass yet, shared by every runner
+  sources/<source>.ts          importers that turn an upstream suite into test files
 ```
 
 ## Test files
@@ -24,17 +26,19 @@ A file is an array of groups. A group fixes the pipeline; its tests vary only th
   {
     "description": "a parser and a compiler round-trip text",
     "pipeline": [["test.parseText"], ["test.compileValue"]],
-    "tests": [{ "description": "a word", "input": "alpha", "expected": { "text": "alpha" } }]
+    "tests": [{ "description": "a word", "input": "alpha", "expected": { "txt": "alpha" } }]
   }
 ]
 ```
 
 - A group has a `description`, unique within its file, a `pipeline` of `[name, options?]`
   entries naming public plugins, and `tests`. It may carry a `comment`, `specification` links,
-  and a `source` (repository, commit, path, test name, licence), required for anything ported
-  from upstream.
+  and a `source` (repository, a commit or release `version`, path, test name, licence),
+  required for anything ported from upstream. Ported groups follow upstream's grouping: one
+  per spec section or test block.
 - A test has a `description`, an `input` string or a `tree`, and exactly one `expected`
-  outcome: `text`, `tree` (positions in UTF-16 code units) or `error`, matched on its `code`
+  outcome. Serialized output is keyed by its file extension: `html`, `md`, `js`, `txt`. A
+  `tree` compares as JSON, positions in UTF-16 code units; an `error` matches on its `code`
   and on `message` only as a substring.
 - `status: "deviation"` marks a deliberate difference from upstream, explained in `comment`.
 
@@ -49,6 +53,22 @@ case exercise the pipeline itself.
 | Node           | `typescript/-test/conformance.unit.ts` | `pnpm -C typescript test:unit` |
 | Python         | `python/-test/conformance_unit.py`     | `pnpm -C python test:unit`     |
 
-Each runner skips only what its `KNOWN_DIVERGENCES` lists: `<area>/<file>#<group>` mapped to
-the open issue whose fix unblocks it. `.scripts/-test/conformance.unit.ts` validates every test
-file against `test-schema.json`.
+## Pending
+
+The suite is filled before the implementation: `pending.json` maps a file (`md/commonmark-tabs`),
+a group (`…#Tabs`) or a whole area (`md/*`) to why it does not pass yet. Every runner still runs
+pending cases and tolerates their failures; an entry whose cases all pass fails the run until it
+is removed, so the list only shrinks as the crate grows. A runner's own `KNOWN_DIVERGENCES`, an
+entry mapped to an open issue, is for a difference in that runner alone.
+
+`.scripts/-test/conformance.unit.ts` validates every test file against `test-schema.json`, and
+every `pending.json` entry against the files and groups that exist.
+
+## Importers
+
+`pnpm -C conformance import:<source>` rewrites that source's files from a pinned upstream
+release; importers are run deliberately and their output committed, never run in CI.
+
+| source       | writes                       | expectations                                        |
+| ------------ | ---------------------------- | --------------------------------------------------- |
+| `commonmark` | `tests/md/commonmark-*.json` | the spec's 652 examples rendered by unified, pinned |

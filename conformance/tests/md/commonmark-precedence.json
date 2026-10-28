@@ -1,0 +1,36 @@
+[
+  {
+    "description": "Precedence",
+    "specification": ["https://spec.commonmark.org/0.31.2/#precedence"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 42",
+        "input": "- `one\n- two`\n",
+        "expected": {
+          "html": "<ul>\n<li>`one</li>\n<li>two`</li>\n</ul>"
+        }
+      }
+    ]
+  }
+]

@@ -173,8 +173,10 @@
 <dl>
   <dt><code>input</code> / <code>tree</code></dt>
   <dd>A source string, or a JSON tree for stringify-only and transform cases.</dd>
-  <dt><code>expected.html</code>, <code>.markdown</code>, <code>.text</code></dt>
-  <dd>Serialized output, compared exactly.</dd>
+  <dt>
+    <code>expected.html</code>, <code>.md</code>, <code>.js</code>, <code>.txt</code>
+  </dt>
+  <dd>Serialized output, compared exactly, keyed by its file extension.</dd>
   <dt><code>expected.tree</code></dt>
   <dd>
     The resulting tree as JSON, positions in UTF-16 code units;
@@ -195,6 +197,15 @@
     <code>api: sync | async</code>.
   </dd>
 </dl>
+
+<h3>Pending</h3>
+<p>
+  The corpus is filled before the implementation.
+  <code>conformance/pending.json</code> maps a file, a group or a whole area
+  (<code>md/*</code>) to why it does not pass yet. Runners still run pending cases and
+  tolerate their failures; an entry whose cases all pass fails the run until it is
+  removed, so the list only shrinks.
+</p>
 
 <h3>Runners</h3>
 <ul>
@@ -290,7 +301,7 @@
     </thead>
     <tbody>
       <tr>
-        <td>CommonMark spec 0.31.2 ¹</td>
+        <td>CommonMark spec 0.31.2 ¹ — imported</td>
         <td>652</td>
         <td>100%</td>
         <td>parse → html</td>

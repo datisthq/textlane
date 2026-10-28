@@ -29,6 +29,26 @@ describe("the conformance suite", () => {
       expect(new Set(descriptions).size).toBe(descriptions.length)
     },
   )
+
+  it("lists only existing files, groups or areas in pending.json", () => {
+    const pending: Record<string, string> = JSON.parse(
+      readFileSync(join(SUITE, "pending.json"), "utf8"),
+    )
+    const ids = files.flatMap(file => {
+      const fileId = relative(TESTS, file)
+        .replace(/\\/g, "/")
+        .replace(/\.json$/, "")
+      const groups: { description: string }[] = JSON.parse(readFileSync(file, "utf8"))
+      return [fileId, ...groups.map(group => `${fileId}#${group.description}`)]
+    })
+    const unknown = Object.keys(pending).filter(entry =>
+      entry.endsWith("*")
+        ? !ids.some(id => id.startsWith(entry.slice(0, -1)))
+        : !ids.includes(entry),
+    )
+    expect(unknown).toEqual([])
+    expect(Object.values(pending).every(reason => reason.length > 0)).toBe(true)
+  })
 })
 
 function listFiles(directory: string): string[] {

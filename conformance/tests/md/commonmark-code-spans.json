@@ -1,0 +1,183 @@
+[
+  {
+    "description": "Code spans",
+    "specification": ["https://spec.commonmark.org/0.31.2/#code-spans"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 328",
+        "input": "`foo`\n",
+        "expected": {
+          "html": "<p><code>foo</code></p>"
+        }
+      },
+      {
+        "description": "example 329",
+        "input": "`` foo ` bar ``\n",
+        "expected": {
+          "html": "<p><code>foo ` bar</code></p>"
+        }
+      },
+      {
+        "description": "example 330",
+        "input": "` `` `\n",
+        "expected": {
+          "html": "<p><code>``</code></p>"
+        }
+      },
+      {
+        "description": "example 331",
+        "input": "`  ``  `\n",
+        "expected": {
+          "html": "<p><code> `` </code></p>"
+        }
+      },
+      {
+        "description": "example 332",
+        "input": "` a`\n",
+        "expected": {
+          "html": "<p><code> a</code></p>"
+        }
+      },
+      {
+        "description": "example 333",
+        "input": "` b `\n",
+        "expected": {
+          "html": "<p><code> b </code></p>"
+        }
+      },
+      {
+        "description": "example 334",
+        "input": "` `\n`  `\n",
+        "expected": {
+          "html": "<p><code> </code>\n<code>  </code></p>"
+        }
+      },
+      {
+        "description": "example 335",
+        "input": "``\nfoo\nbar  \nbaz\n``\n",
+        "expected": {
+          "html": "<p><code>foo bar   baz</code></p>"
+        }
+      },
+      {
+        "description": "example 336",
+        "input": "``\nfoo \n``\n",
+        "expected": {
+          "html": "<p><code>foo </code></p>"
+        }
+      },
+      {
+        "description": "example 337",
+        "input": "`foo   bar \nbaz`\n",
+        "expected": {
+          "html": "<p><code>foo   bar  baz</code></p>"
+        }
+      },
+      {
+        "description": "example 338",
+        "input": "`foo\\`bar`\n",
+        "expected": {
+          "html": "<p><code>foo\\</code>bar`</p>"
+        }
+      },
+      {
+        "description": "example 339",
+        "input": "``foo`bar``\n",
+        "expected": {
+          "html": "<p><code>foo`bar</code></p>"
+        }
+      },
+      {
+        "description": "example 340",
+        "input": "` foo `` bar `\n",
+        "expected": {
+          "html": "<p><code>foo `` bar</code></p>"
+        }
+      },
+      {
+        "description": "example 341",
+        "input": "*foo`*`\n",
+        "expected": {
+          "html": "<p>*foo<code>*</code></p>"
+        }
+      },
+      {
+        "description": "example 342",
+        "input": "[not a `link](/foo`)\n",
+        "expected": {
+          "html": "<p>[not a <code>link](/foo</code>)</p>"
+        }
+      },
+      {
+        "description": "example 343",
+        "input": "`<a href=\"`\">`\n",
+        "expected": {
+          "html": "<p><code>&#x3C;a href=\"</code>\">`</p>"
+        }
+      },
+      {
+        "description": "example 344",
+        "input": "<a href=\"`\">`\n",
+        "expected": {
+          "html": "<p><a href=\"`\">`</p>"
+        }
+      },
+      {
+        "description": "example 345",
+        "input": "`<https://foo.bar.`baz>`\n",
+        "expected": {
+          "html": "<p><code>&#x3C;https://foo.bar.</code>baz>`</p>"
+        }
+      },
+      {
+        "description": "example 346",
+        "input": "<https://foo.bar.`baz>`\n",
+        "expected": {
+          "html": "<p><a href=\"https://foo.bar.%60baz\">https://foo.bar.`baz</a>`</p>"
+        }
+      },
+      {
+        "description": "example 347",
+        "input": "```foo``\n",
+        "expected": {
+          "html": "<p>```foo``</p>"
+        }
+      },
+      {
+        "description": "example 348",
+        "input": "`foo\n",
+        "expected": {
+          "html": "<p>`foo</p>"
+        }
+      },
+      {
+        "description": "example 349",
+        "input": "`foo``bar``\n",
+        "expected": {
+          "html": "<p>`foo<code>bar</code></p>"
+        }
+      }
+    ]
+  }
+]

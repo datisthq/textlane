@@ -1,0 +1,85 @@
+[
+  {
+    "description": "Paragraphs",
+    "specification": ["https://spec.commonmark.org/0.31.2/#paragraphs"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 219",
+        "input": "aaa\n\nbbb\n",
+        "expected": {
+          "html": "<p>aaa</p>\n<p>bbb</p>"
+        }
+      },
+      {
+        "description": "example 220",
+        "input": "aaa\nbbb\n\nccc\nddd\n",
+        "expected": {
+          "html": "<p>aaa\nbbb</p>\n<p>ccc\nddd</p>"
+        }
+      },
+      {
+        "description": "example 221",
+        "input": "aaa\n\n\nbbb\n",
+        "expected": {
+          "html": "<p>aaa</p>\n<p>bbb</p>"
+        }
+      },
+      {
+        "description": "example 222",
+        "input": "  aaa\n bbb\n",
+        "expected": {
+          "html": "<p>aaa\nbbb</p>"
+        }
+      },
+      {
+        "description": "example 223",
+        "input": "aaa\n             bbb\n                                       ccc\n",
+        "expected": {
+          "html": "<p>aaa\nbbb\nccc</p>"
+        }
+      },
+      {
+        "description": "example 224",
+        "input": "   aaa\nbbb\n",
+        "expected": {
+          "html": "<p>aaa\nbbb</p>"
+        }
+      },
+      {
+        "description": "example 225",
+        "input": "    aaa\nbbb\n",
+        "expected": {
+          "html": "<pre><code>aaa\n</code></pre>\n<p>bbb</p>"
+        }
+      },
+      {
+        "description": "example 226",
+        "input": "aaa     \nbbb     \n",
+        "expected": {
+          "html": "<p>aaa<br>\nbbb</p>"
+        }
+      }
+    ]
+  }
+]

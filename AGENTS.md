@@ -84,7 +84,7 @@ The root is a private pnpm workspace (`package.json`, `pnpm-workspace.yaml`): fo
   - Unit tests beside their module as `<module>_unit.rs`
   - `docs/` — the docs site's Markdown pages, outside the crate's `include`
 - `typescript/` — the npm package `textlane`: `index.ts` loads the addon `actions/addon/resolve.ts` finds; `settings.ts` lists the platforms; `scripts/` packs and publishes the platform packages into `typescript/compile/` (**`package-distribution`**)
-- `conformance/` — the language-neutral conformance suite: `test-schema.json` and `tests/<area>/<feature>.json`, run by `rust/textlane/tests/conformance.rs`, `typescript/-test/conformance.unit.ts` and `python/-test/conformance_unit.py` (**`conformance-suite`**)
+- `conformance/` — the language-neutral conformance suite and a private workspace package: `test-schema.json`, `tests/<area>/<feature>.json`, `pending.json` (what the crate does not pass yet) and `sources/` importers (`pnpm -C conformance import:commonmark`, one script per source), run by `rust/textlane/tests/conformance.rs`, `typescript/-test/conformance.unit.ts` and `python/-test/conformance_unit.py` (**`conformance-suite`**)
 - `python/` — the PyPI package `textlane`: `pyproject.toml`, which points maturin at `rust/textlane/Cargo.toml` with `bindings = "pyo3"` and the `python` feature, `scripts/copy-skills.sh`, which stages the shipped skills as wheel data, and `scripts/test.sh`, which builds a `testing` wheel and runs the conformance suite
 - `.skills/` — the shipped agent skills
 - `README.md`, `CONTRIBUTING.md` — the GitHub overview and the contributor guide; `rust/textlane/README.md`, `typescript/README.md` and `python/README.md` are each registry's page

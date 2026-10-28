@@ -27,10 +27,30 @@ otherwise.
   `{pipeline, input | tree}` in, `{text}`, `{tree}` or `{error: {code, message}}` out. The
   napi and PyO3 bindings expose it as `runCase` / `run_case` only in builds with `testing`, so
   it never reaches the published packages or the loader's types.
+- Serialized output is keyed by its file extension (`html`, `md`, `js`, `txt`), never by the
+  domain that produced it; `tree` and `error` are the other outcomes.
 - `test.*` plugins live only there. Phase 2 ships `test.parseText` and `test.compileValue` as a
   stub; the real processor replaces the stub in phase 3 without changing a test file.
 - Each runner compares exactly, except `expected.error`: its `code` must match and its
   `message`, if given, is a substring. Change that rule in all three runners at once.
+
+## Corpus first
+
+Cases are ported before the code that passes them. A new source lands with its files listed in
+`conformance/pending.json` (an area wildcard such as `md/*` is fine); the runners run pending
+cases and swallow their failures. When an implementation makes every case of an entry pass, the
+run fails with `<entry> passes now; remove it from conformance/pending.json`: delete the entry,
+or narrow a wildcard to the files still failing. A wildcard only trips once its whole area
+passes.
+
+## Importing a source
+
+`conformance/` is a private workspace package holding the importers and their pinned upstream
+dependencies, one `import:<source>` script per importer: `pnpm -C conformance import:commonmark` runs `sources/commonmark.ts` and formats the
+output; commit the result. Inputs are extracted as data; where upstream's expectation is not what
+textlane's pipeline produces (micromark's own HTML compiler, `h()` trees), the importer renders
+the input once through the pinned unified packages instead. Record the spec or upstream output in
+a test's `comment` only where it means something different.
 
 ## Adding cases
 
@@ -38,9 +58,9 @@ otherwise.
    `html`, `mdx` or `prose`. Group descriptions are unique within a file.
 2. Anything ported from upstream carries `source` (repository, commit, path, test, licence).
 3. Run the schema guard, then the Rust runner; the Node and Python runners read the same files.
-4. A case an implementation cannot pass yet goes in that runner's `KNOWN_DIVERGENCES` as
-   `"<area>/<file>#<group>": "<issue URL>"`. Nothing else skips, and an entry without an open
-   issue is a bug.
+4. A case the crate cannot pass yet goes in `conformance/pending.json`. A case one runner
+   alone cannot pass goes in that runner's `KNOWN_DIVERGENCES` as
+   `"<area>/<file>#<group>": "<issue URL>"`; an entry without an open issue is a bug.
 
 A failing test names `<area>/<file>#<group> / <test>` with the expected and actual outcomes;
 fix the implementation, never the expectation, unless upstream disagrees with it.

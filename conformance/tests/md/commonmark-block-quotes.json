@@ -1,0 +1,204 @@
+[
+  {
+    "description": "Block quotes",
+    "specification": ["https://spec.commonmark.org/0.31.2/#block-quotes"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 228",
+        "input": "> # Foo\n> bar\n> baz\n",
+        "expected": {
+          "html": "<blockquote>\n<h1>Foo</h1>\n<p>bar\nbaz</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 229",
+        "input": "># Foo\n>bar\n> baz\n",
+        "expected": {
+          "html": "<blockquote>\n<h1>Foo</h1>\n<p>bar\nbaz</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 230",
+        "input": "   > # Foo\n   > bar\n > baz\n",
+        "expected": {
+          "html": "<blockquote>\n<h1>Foo</h1>\n<p>bar\nbaz</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 231",
+        "input": "    > # Foo\n    > bar\n    > baz\n",
+        "expected": {
+          "html": "<pre><code>> # Foo\n> bar\n> baz\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 232",
+        "input": "> # Foo\n> bar\nbaz\n",
+        "expected": {
+          "html": "<blockquote>\n<h1>Foo</h1>\n<p>bar\nbaz</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 233",
+        "input": "> bar\nbaz\n> foo\n",
+        "expected": {
+          "html": "<blockquote>\n<p>bar\nbaz\nfoo</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 234",
+        "input": "> foo\n---\n",
+        "expected": {
+          "html": "<blockquote>\n<p>foo</p>\n</blockquote>\n<hr>"
+        }
+      },
+      {
+        "description": "example 235",
+        "input": "> - foo\n- bar\n",
+        "expected": {
+          "html": "<blockquote>\n<ul>\n<li>foo</li>\n</ul>\n</blockquote>\n<ul>\n<li>bar</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 236",
+        "input": ">     foo\n    bar\n",
+        "expected": {
+          "html": "<blockquote>\n<pre><code>foo\n</code></pre>\n</blockquote>\n<pre><code>bar\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 237",
+        "input": "> ```\nfoo\n```\n",
+        "expected": {
+          "html": "<blockquote>\n<pre><code></code></pre>\n</blockquote>\n<p>foo</p>\n<pre><code></code></pre>"
+        }
+      },
+      {
+        "description": "example 238",
+        "input": "> foo\n    - bar\n",
+        "expected": {
+          "html": "<blockquote>\n<p>foo\n- bar</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 239",
+        "input": ">\n",
+        "expected": {
+          "html": "<blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 240",
+        "input": ">\n>  \n> \n",
+        "expected": {
+          "html": "<blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 241",
+        "input": ">\n> foo\n>  \n",
+        "expected": {
+          "html": "<blockquote>\n<p>foo</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 242",
+        "input": "> foo\n\n> bar\n",
+        "expected": {
+          "html": "<blockquote>\n<p>foo</p>\n</blockquote>\n<blockquote>\n<p>bar</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 243",
+        "input": "> foo\n> bar\n",
+        "expected": {
+          "html": "<blockquote>\n<p>foo\nbar</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 244",
+        "input": "> foo\n>\n> bar\n",
+        "expected": {
+          "html": "<blockquote>\n<p>foo</p>\n<p>bar</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 245",
+        "input": "foo\n> bar\n",
+        "expected": {
+          "html": "<p>foo</p>\n<blockquote>\n<p>bar</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 246",
+        "input": "> aaa\n***\n> bbb\n",
+        "expected": {
+          "html": "<blockquote>\n<p>aaa</p>\n</blockquote>\n<hr>\n<blockquote>\n<p>bbb</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 247",
+        "input": "> bar\nbaz\n",
+        "expected": {
+          "html": "<blockquote>\n<p>bar\nbaz</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 248",
+        "input": "> bar\n\nbaz\n",
+        "expected": {
+          "html": "<blockquote>\n<p>bar</p>\n</blockquote>\n<p>baz</p>"
+        }
+      },
+      {
+        "description": "example 249",
+        "input": "> bar\n>\nbaz\n",
+        "expected": {
+          "html": "<blockquote>\n<p>bar</p>\n</blockquote>\n<p>baz</p>"
+        }
+      },
+      {
+        "description": "example 250",
+        "input": "> > > foo\nbar\n",
+        "expected": {
+          "html": "<blockquote>\n<blockquote>\n<blockquote>\n<p>foo\nbar</p>\n</blockquote>\n</blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 251",
+        "input": ">>> foo\n> bar\n>>baz\n",
+        "expected": {
+          "html": "<blockquote>\n<blockquote>\n<blockquote>\n<p>foo\nbar\nbaz</p>\n</blockquote>\n</blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 252",
+        "input": ">     code\n\n>    not code\n",
+        "expected": {
+          "html": "<blockquote>\n<pre><code>code\n</code></pre>\n</blockquote>\n<blockquote>\n<p>not code</p>\n</blockquote>"
+        }
+      }
+    ]
+  }
+]

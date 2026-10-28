@@ -151,7 +151,8 @@ An array of groups; a group fixes the pipeline, its tests vary the input:
   required for anything imported).
 - **Test**: `description`, an input and exactly one expectation kind.
   - Input: `input` (a string) or `tree` (a JSON tree, for stringify-only and transform cases).
-  - `expected.html`, `expected.markdown`, `expected.text`: the serialized output.
+  - `expected.html`, `expected.md`, `expected.js`, `expected.txt`: the serialized output,
+    keyed by its file extension, never by the domain that produced it.
   - `expected.tree`: the resulting tree; `positions: false` on the group or test strips
     positions before comparing. `offset` and `column` count UTF-16 code units, as unified's
     do, so upstream trees import verbatim and host plugins see unified-identical positions;
@@ -161,6 +162,14 @@ An array of groups; a group fixes the pipeline, its tests vary the input:
   - `expected.error`: a stable code plus an optional substring, never a JS regex.
 - **Status**: a test may carry `status: "deviation"` with a `comment` when textlane
   deliberately differs from upstream, so an intentional difference is never a failure.
+
+### Pending
+
+The corpus is filled before the implementation. `conformance/pending.json` maps a file, a group
+or an area wildcard (`md/*`) to why it does not pass yet. Every runner runs pending cases and
+tolerates their failures; an entry whose cases all pass fails the run until it is removed (a
+wildcard only once its whole area passes), so the list only shrinks. Ported groups follow
+upstream's grouping, one per spec section or test block.
 
 ### Comparison
 

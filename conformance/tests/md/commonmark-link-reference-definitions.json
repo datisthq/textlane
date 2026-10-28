@@ -1,0 +1,218 @@
+[
+  {
+    "description": "Link reference definitions",
+    "specification": ["https://spec.commonmark.org/0.31.2/#link-reference-definitions"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 192",
+        "input": "[foo]: /url \"title\"\n\n[foo]\n",
+        "expected": {
+          "html": "<p><a href=\"/url\" title=\"title\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 193",
+        "input": "   [foo]: \n      /url  \n           'the title'  \n\n[foo]\n",
+        "expected": {
+          "html": "<p><a href=\"/url\" title=\"the title\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 194",
+        "input": "[Foo*bar\\]]:my_(url) 'title (with parens)'\n\n[Foo*bar\\]]\n",
+        "expected": {
+          "html": "<p><a href=\"my_(url)\" title=\"title (with parens)\">Foo*bar]</a></p>"
+        }
+      },
+      {
+        "description": "example 195",
+        "input": "[Foo bar]:\n<my url>\n'title'\n\n[Foo bar]\n",
+        "expected": {
+          "html": "<p><a href=\"my%20url\" title=\"title\">Foo bar</a></p>"
+        }
+      },
+      {
+        "description": "example 196",
+        "input": "[foo]: /url '\ntitle\nline1\nline2\n'\n\n[foo]\n",
+        "expected": {
+          "html": "<p><a href=\"/url\" title=\"\ntitle\nline1\nline2\n\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 197",
+        "input": "[foo]: /url 'title\n\nwith blank line'\n\n[foo]\n",
+        "expected": {
+          "html": "<p>[foo]: /url 'title</p>\n<p>with blank line'</p>\n<p>[foo]</p>"
+        }
+      },
+      {
+        "description": "example 198",
+        "input": "[foo]:\n/url\n\n[foo]\n",
+        "expected": {
+          "html": "<p><a href=\"/url\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 199",
+        "input": "[foo]:\n\n[foo]\n",
+        "expected": {
+          "html": "<p>[foo]:</p>\n<p>[foo]</p>"
+        }
+      },
+      {
+        "description": "example 200",
+        "input": "[foo]: <>\n\n[foo]\n",
+        "expected": {
+          "html": "<p><a href=\"\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 201",
+        "input": "[foo]: <bar>(baz)\n\n[foo]\n",
+        "expected": {
+          "html": "<p>[foo]: <bar>(baz)</p>\n<p>[foo]</p>"
+        }
+      },
+      {
+        "description": "example 202",
+        "input": "[foo]: /url\\bar\\*baz \"foo\\\"bar\\baz\"\n\n[foo]\n",
+        "expected": {
+          "html": "<p><a href=\"/url%5Cbar*baz\" title=\"foo&#x22;bar\\baz\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 203",
+        "input": "[foo]\n\n[foo]: url\n",
+        "expected": {
+          "html": "<p><a href=\"url\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 204",
+        "input": "[foo]\n\n[foo]: first\n[foo]: second\n",
+        "expected": {
+          "html": "<p><a href=\"first\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 205",
+        "input": "[FOO]: /url\n\n[Foo]\n",
+        "expected": {
+          "html": "<p><a href=\"/url\">Foo</a></p>"
+        }
+      },
+      {
+        "description": "example 206",
+        "input": "[ΑΓΩ]: /φου\n\n[αγω]\n",
+        "expected": {
+          "html": "<p><a href=\"/%CF%86%CE%BF%CF%85\">αγω</a></p>"
+        }
+      },
+      {
+        "description": "example 207",
+        "input": "[foo]: /url\n",
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "example 208",
+        "input": "[\nfoo\n]: /url\nbar\n",
+        "expected": {
+          "html": "<p>bar</p>"
+        }
+      },
+      {
+        "description": "example 209",
+        "input": "[foo]: /url \"title\" ok\n",
+        "expected": {
+          "html": "<p>[foo]: /url \"title\" ok</p>"
+        }
+      },
+      {
+        "description": "example 210",
+        "input": "[foo]: /url\n\"title\" ok\n",
+        "expected": {
+          "html": "<p>\"title\" ok</p>"
+        }
+      },
+      {
+        "description": "example 211",
+        "input": "    [foo]: /url \"title\"\n\n[foo]\n",
+        "expected": {
+          "html": "<pre><code>[foo]: /url \"title\"\n</code></pre>\n<p>[foo]</p>"
+        }
+      },
+      {
+        "description": "example 212",
+        "input": "```\n[foo]: /url\n```\n\n[foo]\n",
+        "expected": {
+          "html": "<pre><code>[foo]: /url\n</code></pre>\n<p>[foo]</p>"
+        }
+      },
+      {
+        "description": "example 213",
+        "input": "Foo\n[bar]: /baz\n\n[bar]\n",
+        "expected": {
+          "html": "<p>Foo\n[bar]: /baz</p>\n<p>[bar]</p>"
+        }
+      },
+      {
+        "description": "example 214",
+        "input": "# [Foo]\n[foo]: /url\n> bar\n",
+        "expected": {
+          "html": "<h1><a href=\"/url\">Foo</a></h1>\n<blockquote>\n<p>bar</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 215",
+        "input": "[foo]: /url\nbar\n===\n[foo]\n",
+        "expected": {
+          "html": "<h1>bar</h1>\n<p><a href=\"/url\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 216",
+        "input": "[foo]: /url\n===\n[foo]\n",
+        "expected": {
+          "html": "<p>===\n<a href=\"/url\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 217",
+        "input": "[foo]: /foo-url \"foo\"\n[bar]: /bar-url\n  \"bar\"\n[baz]: /baz-url\n\n[foo],\n[bar],\n[baz]\n",
+        "expected": {
+          "html": "<p><a href=\"/foo-url\" title=\"foo\">foo</a>,\n<a href=\"/bar-url\" title=\"bar\">bar</a>,\n<a href=\"/baz-url\">baz</a></p>"
+        }
+      },
+      {
+        "description": "example 218",
+        "input": "[foo]\n\n> [foo]: /url\n",
+        "expected": {
+          "html": "<p><a href=\"/url\">foo</a></p>\n<blockquote>\n</blockquote>"
+        }
+      }
+    ]
+  }
+]

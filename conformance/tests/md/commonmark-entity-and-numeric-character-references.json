@@ -1,0 +1,150 @@
+[
+  {
+    "description": "Entity and numeric character references",
+    "specification": [
+      "https://spec.commonmark.org/0.31.2/#entity-and-numeric-character-references"
+    ],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 25",
+        "input": "&nbsp; &amp; &copy; &AElig; &Dcaron;\n&frac34; &HilbertSpace; &DifferentialD;\n&ClockwiseContourIntegral; &ngE;\n",
+        "expected": {
+          "html": "<p>  &#x26; © Æ Ď\n¾ ℋ ⅆ\n∲ ≧̸</p>"
+        }
+      },
+      {
+        "description": "example 26",
+        "input": "&#35; &#1234; &#992; &#0;\n",
+        "expected": {
+          "html": "<p># Ӓ Ϡ �</p>"
+        }
+      },
+      {
+        "description": "example 27",
+        "input": "&#X22; &#XD06; &#xcab;\n",
+        "expected": {
+          "html": "<p>\" ആ ಫ</p>"
+        }
+      },
+      {
+        "description": "example 28",
+        "input": "&nbsp &x; &#; &#x;\n&#87654321;\n&#abcdef0;\n&ThisIsNotDefined; &hi?;\n",
+        "expected": {
+          "html": "<p>&#x26;nbsp &#x26;x; &#x26;#; &#x26;#x;\n&#x26;#87654321;\n&#x26;#abcdef0;\n&#x26;ThisIsNotDefined; &#x26;hi?;</p>"
+        }
+      },
+      {
+        "description": "example 29",
+        "input": "&copy\n",
+        "expected": {
+          "html": "<p>&#x26;copy</p>"
+        }
+      },
+      {
+        "description": "example 30",
+        "input": "&MadeUpEntity;\n",
+        "expected": {
+          "html": "<p>&#x26;MadeUpEntity;</p>"
+        }
+      },
+      {
+        "description": "example 31",
+        "input": "<a href=\"&ouml;&ouml;.html\">\n",
+        "expected": {
+          "html": "<a href=\"&ouml;&ouml;.html\">"
+        }
+      },
+      {
+        "description": "example 32",
+        "input": "[foo](/f&ouml;&ouml; \"f&ouml;&ouml;\")\n",
+        "expected": {
+          "html": "<p><a href=\"/f%C3%B6%C3%B6\" title=\"föö\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 33",
+        "input": "[foo]\n\n[foo]: /f&ouml;&ouml; \"f&ouml;&ouml;\"\n",
+        "expected": {
+          "html": "<p><a href=\"/f%C3%B6%C3%B6\" title=\"föö\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 34",
+        "input": "``` f&ouml;&ouml;\nfoo\n```\n",
+        "expected": {
+          "html": "<pre><code class=\"language-föö\">foo\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 35",
+        "input": "`f&ouml;&ouml;`\n",
+        "expected": {
+          "html": "<p><code>f&#x26;ouml;&#x26;ouml;</code></p>"
+        }
+      },
+      {
+        "description": "example 36",
+        "input": "    f&ouml;f&ouml;\n",
+        "expected": {
+          "html": "<pre><code>f&#x26;ouml;f&#x26;ouml;\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 37",
+        "input": "&#42;foo&#42;\n*foo*\n",
+        "expected": {
+          "html": "<p>*foo*\n<em>foo</em></p>"
+        }
+      },
+      {
+        "description": "example 38",
+        "input": "&#42; foo\n\n* foo\n",
+        "expected": {
+          "html": "<p>* foo</p>\n<ul>\n<li>foo</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 39",
+        "input": "foo&#10;&#10;bar\n",
+        "expected": {
+          "html": "<p>foo\n\nbar</p>"
+        }
+      },
+      {
+        "description": "example 40",
+        "input": "&#9;foo\n",
+        "expected": {
+          "html": "<p>\tfoo</p>"
+        }
+      },
+      {
+        "description": "example 41",
+        "input": "[a](url &quot;tit&quot;)\n",
+        "expected": {
+          "html": "<p>[a](url \"tit\")</p>"
+        }
+      }
+    ]
+  }
+]

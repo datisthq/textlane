@@ -1,0 +1,169 @@
+[
+  {
+    "description": "Raw HTML",
+    "specification": ["https://spec.commonmark.org/0.31.2/#raw-html"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 613",
+        "input": "<a><bab><c2c>\n",
+        "expected": {
+          "html": "<p><a><bab><c2c></p>"
+        }
+      },
+      {
+        "description": "example 614",
+        "input": "<a/><b2/>\n",
+        "expected": {
+          "html": "<p><a/><b2/></p>"
+        }
+      },
+      {
+        "description": "example 615",
+        "input": "<a  /><b2\ndata=\"foo\" >\n",
+        "expected": {
+          "html": "<p><a  /><b2\ndata=\"foo\" ></p>"
+        }
+      },
+      {
+        "description": "example 616",
+        "input": "<a foo=\"bar\" bam = 'baz <em>\"</em>'\n_boolean zoop:33=zoop:33 />\n",
+        "expected": {
+          "html": "<p><a foo=\"bar\" bam = 'baz <em>\"</em>'\n_boolean zoop:33=zoop:33 /></p>"
+        }
+      },
+      {
+        "description": "example 617",
+        "input": "Foo <responsive-image src=\"foo.jpg\" />\n",
+        "expected": {
+          "html": "<p>Foo <responsive-image src=\"foo.jpg\" /></p>"
+        }
+      },
+      {
+        "description": "example 618",
+        "input": "<33> <__>\n",
+        "expected": {
+          "html": "<p>&#x3C;33> &#x3C;__></p>"
+        }
+      },
+      {
+        "description": "example 619",
+        "input": "<a h*#ref=\"hi\">\n",
+        "expected": {
+          "html": "<p>&#x3C;a h*#ref=\"hi\"></p>"
+        }
+      },
+      {
+        "description": "example 620",
+        "input": "<a href=\"hi'> <a href=hi'>\n",
+        "expected": {
+          "html": "<p>&#x3C;a href=\"hi'> &#x3C;a href=hi'></p>"
+        }
+      },
+      {
+        "description": "example 621",
+        "input": "< a><\nfoo><bar/ >\n<foo bar=baz\nbim!bop />\n",
+        "expected": {
+          "html": "<p>&#x3C; a>&#x3C;\nfoo>&#x3C;bar/ >\n&#x3C;foo bar=baz\nbim!bop /></p>"
+        }
+      },
+      {
+        "description": "example 622",
+        "input": "<a href='bar'title=title>\n",
+        "expected": {
+          "html": "<p>&#x3C;a href='bar'title=title></p>"
+        }
+      },
+      {
+        "description": "example 623",
+        "input": "</a></foo >\n",
+        "expected": {
+          "html": "<p></a></foo ></p>"
+        }
+      },
+      {
+        "description": "example 624",
+        "input": "</a href=\"foo\">\n",
+        "expected": {
+          "html": "<p>&#x3C;/a href=\"foo\"></p>"
+        }
+      },
+      {
+        "description": "example 625",
+        "input": "foo <!-- this is a --\ncomment - with hyphens -->\n",
+        "expected": {
+          "html": "<p>foo <!-- this is a --\ncomment - with hyphens --></p>"
+        }
+      },
+      {
+        "description": "example 626",
+        "input": "foo <!--> foo -->\n\nfoo <!---> foo -->\n",
+        "expected": {
+          "html": "<p>foo <!--> foo --></p>\n<p>foo <!---> foo --></p>"
+        }
+      },
+      {
+        "description": "example 627",
+        "input": "foo <?php echo $a; ?>\n",
+        "expected": {
+          "html": "<p>foo <?php echo $a; ?></p>"
+        }
+      },
+      {
+        "description": "example 628",
+        "input": "foo <!ELEMENT br EMPTY>\n",
+        "expected": {
+          "html": "<p>foo <!ELEMENT br EMPTY></p>"
+        }
+      },
+      {
+        "description": "example 629",
+        "input": "foo <![CDATA[>&<]]>\n",
+        "expected": {
+          "html": "<p>foo <![CDATA[>&<]]></p>"
+        }
+      },
+      {
+        "description": "example 630",
+        "input": "foo <a href=\"&ouml;\">\n",
+        "expected": {
+          "html": "<p>foo <a href=\"&ouml;\"></p>"
+        }
+      },
+      {
+        "description": "example 631",
+        "input": "foo <a href=\"\\*\">\n",
+        "expected": {
+          "html": "<p>foo <a href=\"\\*\"></p>"
+        }
+      },
+      {
+        "description": "example 632",
+        "input": "<a href=\"\\\"\">\n",
+        "expected": {
+          "html": "<p>&#x3C;a href=\"\"\"></p>"
+        }
+      }
+    ]
+  }
+]

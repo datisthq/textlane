@@ -1,0 +1,18 @@
+{
+  "name": "textlane-conformance",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "import:commonmark": "node sources/commonmark.ts && vp fmt tests"
+  },
+  "devDependencies": {
+    "commonmark.json": "0.31.0",
+    "hast-util-from-html": "2.0.3",
+    "hast-util-to-html": "9.0.5",
+    "rehype-stringify": "10.0.1",
+    "remark-parse": "11.0.0",
+    "remark-rehype": "11.1.2",
+    "unified": "11.0.5",
+    "vite-plus": "catalog:"
+  }
+}

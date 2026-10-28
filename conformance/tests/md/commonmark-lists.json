@@ -1,0 +1,211 @@
+[
+  {
+    "description": "Lists",
+    "specification": ["https://spec.commonmark.org/0.31.2/#lists"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 301",
+        "input": "- foo\n- bar\n+ baz\n",
+        "expected": {
+          "html": "<ul>\n<li>foo</li>\n<li>bar</li>\n</ul>\n<ul>\n<li>baz</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 302",
+        "input": "1. foo\n2. bar\n3) baz\n",
+        "expected": {
+          "html": "<ol>\n<li>foo</li>\n<li>bar</li>\n</ol>\n<ol start=\"3\">\n<li>baz</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 303",
+        "input": "Foo\n- bar\n- baz\n",
+        "expected": {
+          "html": "<p>Foo</p>\n<ul>\n<li>bar</li>\n<li>baz</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 304",
+        "input": "The number of windows in my house is\n14.  The number of doors is 6.\n",
+        "expected": {
+          "html": "<p>The number of windows in my house is\n14.  The number of doors is 6.</p>"
+        }
+      },
+      {
+        "description": "example 305",
+        "input": "The number of windows in my house is\n1.  The number of doors is 6.\n",
+        "expected": {
+          "html": "<p>The number of windows in my house is</p>\n<ol>\n<li>The number of doors is 6.</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 306",
+        "input": "- foo\n\n- bar\n\n\n- baz\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>foo</p>\n</li>\n<li>\n<p>bar</p>\n</li>\n<li>\n<p>baz</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 307",
+        "input": "- foo\n  - bar\n    - baz\n\n\n      bim\n",
+        "expected": {
+          "html": "<ul>\n<li>foo\n<ul>\n<li>bar\n<ul>\n<li>\n<p>baz</p>\n<p>bim</p>\n</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 308",
+        "input": "- foo\n- bar\n\n<!-- -->\n\n- baz\n- bim\n",
+        "expected": {
+          "html": "<ul>\n<li>foo</li>\n<li>bar</li>\n</ul>\n<!-- -->\n<ul>\n<li>baz</li>\n<li>bim</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 309",
+        "input": "-   foo\n\n    notcode\n\n-   foo\n\n<!-- -->\n\n    code\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>foo</p>\n<p>notcode</p>\n</li>\n<li>\n<p>foo</p>\n</li>\n</ul>\n<!-- -->\n<pre><code>code\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 310",
+        "input": "- a\n - b\n  - c\n   - d\n  - e\n - f\n- g\n",
+        "expected": {
+          "html": "<ul>\n<li>a</li>\n<li>b</li>\n<li>c</li>\n<li>d</li>\n<li>e</li>\n<li>f</li>\n<li>g</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 311",
+        "input": "1. a\n\n  2. b\n\n   3. c\n",
+        "expected": {
+          "html": "<ol>\n<li>\n<p>a</p>\n</li>\n<li>\n<p>b</p>\n</li>\n<li>\n<p>c</p>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 312",
+        "input": "- a\n - b\n  - c\n   - d\n    - e\n",
+        "expected": {
+          "html": "<ul>\n<li>a</li>\n<li>b</li>\n<li>c</li>\n<li>d\n- e</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 313",
+        "input": "1. a\n\n  2. b\n\n    3. c\n",
+        "expected": {
+          "html": "<ol>\n<li>\n<p>a</p>\n</li>\n<li>\n<p>b</p>\n</li>\n</ol>\n<pre><code>3. c\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 314",
+        "input": "- a\n- b\n\n- c\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>a</p>\n</li>\n<li>\n<p>b</p>\n</li>\n<li>\n<p>c</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 315",
+        "input": "* a\n*\n\n* c\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>a</p>\n</li>\n<li></li>\n<li>\n<p>c</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 316",
+        "input": "- a\n- b\n\n  c\n- d\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>a</p>\n</li>\n<li>\n<p>b</p>\n<p>c</p>\n</li>\n<li>\n<p>d</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 317",
+        "input": "- a\n- b\n\n  [ref]: /url\n- d\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>a</p>\n</li>\n<li>\n<p>b</p>\n</li>\n<li>\n<p>d</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 318",
+        "input": "- a\n- ```\n  b\n\n\n  ```\n- c\n",
+        "expected": {
+          "html": "<ul>\n<li>a</li>\n<li>\n<pre><code>b\n\n\n</code></pre>\n</li>\n<li>c</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 319",
+        "input": "- a\n  - b\n\n    c\n- d\n",
+        "expected": {
+          "html": "<ul>\n<li>a\n<ul>\n<li>\n<p>b</p>\n<p>c</p>\n</li>\n</ul>\n</li>\n<li>d</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 320",
+        "input": "* a\n  > b\n  >\n* c\n",
+        "expected": {
+          "html": "<ul>\n<li>a\n<blockquote>\n<p>b</p>\n</blockquote>\n</li>\n<li>c</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 321",
+        "input": "- a\n  > b\n  ```\n  c\n  ```\n- d\n",
+        "expected": {
+          "html": "<ul>\n<li>a\n<blockquote>\n<p>b</p>\n</blockquote>\n<pre><code>c\n</code></pre>\n</li>\n<li>d</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 322",
+        "input": "- a\n",
+        "expected": {
+          "html": "<ul>\n<li>a</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 323",
+        "input": "- a\n  - b\n",
+        "expected": {
+          "html": "<ul>\n<li>a\n<ul>\n<li>b</li>\n</ul>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 324",
+        "input": "1. ```\n   foo\n   ```\n\n   bar\n",
+        "expected": {
+          "html": "<ol>\n<li>\n<pre><code>foo\n</code></pre>\n<p>bar</p>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 325",
+        "input": "* foo\n  * bar\n\n  baz\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>foo</p>\n<ul>\n<li>bar</li>\n</ul>\n<p>baz</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 326",
+        "input": "- a\n  - b\n  - c\n\n- d\n  - e\n  - f\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>a</p>\n<ul>\n<li>b</li>\n<li>c</li>\n</ul>\n</li>\n<li>\n<p>d</p>\n<ul>\n<li>e</li>\n<li>f</li>\n</ul>\n</li>\n</ul>"
+        }
+      }
+    ]
+  }
+]

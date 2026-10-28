@@ -2,6 +2,7 @@ packages:
   - typescript
   - python
   - rust
+  - conformance
 
 # Supply-chain hardening. Quarantine freshly-published versions for seven days: a
 # compromised-maintainer publish is typically detected and yanked within hours, so a version

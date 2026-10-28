@@ -1,0 +1,232 @@
+[
+  {
+    "description": "Fenced code blocks",
+    "specification": ["https://spec.commonmark.org/0.31.2/#fenced-code-blocks"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 119",
+        "input": "```\n<\n >\n```\n",
+        "expected": {
+          "html": "<pre><code>&#x3C;\n >\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 120",
+        "input": "~~~\n<\n >\n~~~\n",
+        "expected": {
+          "html": "<pre><code>&#x3C;\n >\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 121",
+        "input": "``\nfoo\n``\n",
+        "expected": {
+          "html": "<p><code>foo</code></p>"
+        }
+      },
+      {
+        "description": "example 122",
+        "input": "```\naaa\n~~~\n```\n",
+        "expected": {
+          "html": "<pre><code>aaa\n~~~\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 123",
+        "input": "~~~\naaa\n```\n~~~\n",
+        "expected": {
+          "html": "<pre><code>aaa\n```\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 124",
+        "input": "````\naaa\n```\n``````\n",
+        "expected": {
+          "html": "<pre><code>aaa\n```\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 125",
+        "input": "~~~~\naaa\n~~~\n~~~~\n",
+        "expected": {
+          "html": "<pre><code>aaa\n~~~\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 126",
+        "input": "```\n",
+        "expected": {
+          "html": "<pre><code></code></pre>"
+        }
+      },
+      {
+        "description": "example 127",
+        "input": "`````\n\n```\naaa\n",
+        "expected": {
+          "html": "<pre><code>\n```\naaa\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 128",
+        "input": "> ```\n> aaa\n\nbbb\n",
+        "expected": {
+          "html": "<blockquote>\n<pre><code>aaa\n</code></pre>\n</blockquote>\n<p>bbb</p>"
+        }
+      },
+      {
+        "description": "example 129",
+        "input": "```\n\n  \n```\n",
+        "expected": {
+          "html": "<pre><code>\n  \n</code></pre>"
+        }
+      },
+      {
+        "description": "example 130",
+        "input": "```\n```\n",
+        "expected": {
+          "html": "<pre><code></code></pre>"
+        }
+      },
+      {
+        "description": "example 131",
+        "input": " ```\n aaa\naaa\n```\n",
+        "expected": {
+          "html": "<pre><code>aaa\naaa\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 132",
+        "input": "  ```\naaa\n  aaa\naaa\n  ```\n",
+        "expected": {
+          "html": "<pre><code>aaa\naaa\naaa\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 133",
+        "input": "   ```\n   aaa\n    aaa\n  aaa\n   ```\n",
+        "expected": {
+          "html": "<pre><code>aaa\n aaa\naaa\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 134",
+        "input": "    ```\n    aaa\n    ```\n",
+        "expected": {
+          "html": "<pre><code>```\naaa\n```\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 135",
+        "input": "```\naaa\n  ```\n",
+        "expected": {
+          "html": "<pre><code>aaa\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 136",
+        "input": "   ```\naaa\n  ```\n",
+        "expected": {
+          "html": "<pre><code>aaa\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 137",
+        "input": "```\naaa\n    ```\n",
+        "expected": {
+          "html": "<pre><code>aaa\n    ```\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 138",
+        "input": "``` ```\naaa\n",
+        "expected": {
+          "html": "<p><code> </code>\naaa</p>"
+        }
+      },
+      {
+        "description": "example 139",
+        "input": "~~~~~~\naaa\n~~~ ~~\n",
+        "expected": {
+          "html": "<pre><code>aaa\n~~~ ~~\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 140",
+        "input": "foo\n```\nbar\n```\nbaz\n",
+        "expected": {
+          "html": "<p>foo</p>\n<pre><code>bar\n</code></pre>\n<p>baz</p>"
+        }
+      },
+      {
+        "description": "example 141",
+        "input": "foo\n---\n~~~\nbar\n~~~\n# baz\n",
+        "expected": {
+          "html": "<h2>foo</h2>\n<pre><code>bar\n</code></pre>\n<h1>baz</h1>"
+        }
+      },
+      {
+        "description": "example 142",
+        "input": "```ruby\ndef foo(x)\n  return 3\nend\n```\n",
+        "expected": {
+          "html": "<pre><code class=\"language-ruby\">def foo(x)\n  return 3\nend\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 143",
+        "input": "~~~~    ruby startline=3 $%@#$\ndef foo(x)\n  return 3\nend\n~~~~~~~\n",
+        "expected": {
+          "html": "<pre><code class=\"language-ruby\">def foo(x)\n  return 3\nend\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 144",
+        "input": "````;\n````\n",
+        "expected": {
+          "html": "<pre><code class=\"language-;\"></code></pre>"
+        }
+      },
+      {
+        "description": "example 145",
+        "input": "``` aa ```\nfoo\n",
+        "expected": {
+          "html": "<p><code>aa</code>\nfoo</p>"
+        }
+      },
+      {
+        "description": "example 146",
+        "input": "~~~ aa ``` ~~~\nfoo\n~~~\n",
+        "expected": {
+          "html": "<pre><code class=\"language-aa\">foo\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 147",
+        "input": "```\n``` aaa\n```\n",
+        "expected": {
+          "html": "<pre><code>``` aaa\n</code></pre>"
+        }
+      }
+    ]
+  }
+]

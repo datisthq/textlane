@@ -1,0 +1,218 @@
+[
+  {
+    "description": "Setext headings",
+    "specification": ["https://spec.commonmark.org/0.31.2/#setext-headings"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 80",
+        "input": "Foo *bar*\n=========\n\nFoo *bar*\n---------\n",
+        "expected": {
+          "html": "<h1>Foo <em>bar</em></h1>\n<h2>Foo <em>bar</em></h2>"
+        }
+      },
+      {
+        "description": "example 81",
+        "input": "Foo *bar\nbaz*\n====\n",
+        "expected": {
+          "html": "<h1>Foo <em>bar\nbaz</em></h1>"
+        }
+      },
+      {
+        "description": "example 82",
+        "input": "  Foo *bar\nbaz*\t\n====\n",
+        "expected": {
+          "html": "<h1>Foo <em>bar\nbaz</em></h1>"
+        }
+      },
+      {
+        "description": "example 83",
+        "input": "Foo\n-------------------------\n\nFoo\n=\n",
+        "expected": {
+          "html": "<h2>Foo</h2>\n<h1>Foo</h1>"
+        }
+      },
+      {
+        "description": "example 84",
+        "input": "   Foo\n---\n\n  Foo\n-----\n\n  Foo\n  ===\n",
+        "expected": {
+          "html": "<h2>Foo</h2>\n<h2>Foo</h2>\n<h1>Foo</h1>"
+        }
+      },
+      {
+        "description": "example 85",
+        "input": "    Foo\n    ---\n\n    Foo\n---\n",
+        "expected": {
+          "html": "<pre><code>Foo\n---\n\nFoo\n</code></pre>\n<hr>"
+        }
+      },
+      {
+        "description": "example 86",
+        "input": "Foo\n   ----      \n",
+        "expected": {
+          "html": "<h2>Foo</h2>"
+        }
+      },
+      {
+        "description": "example 87",
+        "input": "Foo\n    ---\n",
+        "expected": {
+          "html": "<p>Foo\n---</p>"
+        }
+      },
+      {
+        "description": "example 88",
+        "input": "Foo\n= =\n\nFoo\n--- -\n",
+        "expected": {
+          "html": "<p>Foo\n= =</p>\n<p>Foo</p>\n<hr>"
+        }
+      },
+      {
+        "description": "example 89",
+        "input": "Foo  \n-----\n",
+        "expected": {
+          "html": "<h2>Foo</h2>"
+        }
+      },
+      {
+        "description": "example 90",
+        "input": "Foo\\\n----\n",
+        "expected": {
+          "html": "<h2>Foo\\</h2>"
+        }
+      },
+      {
+        "description": "example 91",
+        "input": "`Foo\n----\n`\n\n<a title=\"a lot\n---\nof dashes\"/>\n",
+        "expected": {
+          "html": "<h2>`Foo</h2>\n<p>`</p>\n<h2>&#x3C;a title=\"a lot</h2>\n<p>of dashes\"/></p>"
+        }
+      },
+      {
+        "description": "example 92",
+        "input": "> Foo\n---\n",
+        "expected": {
+          "html": "<blockquote>\n<p>Foo</p>\n</blockquote>\n<hr>"
+        }
+      },
+      {
+        "description": "example 93",
+        "input": "> foo\nbar\n===\n",
+        "expected": {
+          "html": "<blockquote>\n<p>foo\nbar\n===</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 94",
+        "input": "- Foo\n---\n",
+        "expected": {
+          "html": "<ul>\n<li>Foo</li>\n</ul>\n<hr>"
+        }
+      },
+      {
+        "description": "example 95",
+        "input": "Foo\nBar\n---\n",
+        "expected": {
+          "html": "<h2>Foo\nBar</h2>"
+        }
+      },
+      {
+        "description": "example 96",
+        "input": "---\nFoo\n---\nBar\n---\nBaz\n",
+        "expected": {
+          "html": "<hr>\n<h2>Foo</h2>\n<h2>Bar</h2>\n<p>Baz</p>"
+        }
+      },
+      {
+        "description": "example 97",
+        "input": "\n====\n",
+        "expected": {
+          "html": "<p>====</p>"
+        }
+      },
+      {
+        "description": "example 98",
+        "input": "---\n---\n",
+        "expected": {
+          "html": "<hr>\n<hr>"
+        }
+      },
+      {
+        "description": "example 99",
+        "input": "- foo\n-----\n",
+        "expected": {
+          "html": "<ul>\n<li>foo</li>\n</ul>\n<hr>"
+        }
+      },
+      {
+        "description": "example 100",
+        "input": "    foo\n---\n",
+        "expected": {
+          "html": "<pre><code>foo\n</code></pre>\n<hr>"
+        }
+      },
+      {
+        "description": "example 101",
+        "input": "> foo\n-----\n",
+        "expected": {
+          "html": "<blockquote>\n<p>foo</p>\n</blockquote>\n<hr>"
+        }
+      },
+      {
+        "description": "example 102",
+        "input": "\\> foo\n------\n",
+        "expected": {
+          "html": "<h2>> foo</h2>"
+        }
+      },
+      {
+        "description": "example 103",
+        "input": "Foo\n\nbar\n---\nbaz\n",
+        "expected": {
+          "html": "<p>Foo</p>\n<h2>bar</h2>\n<p>baz</p>"
+        }
+      },
+      {
+        "description": "example 104",
+        "input": "Foo\nbar\n\n---\n\nbaz\n",
+        "expected": {
+          "html": "<p>Foo\nbar</p>\n<hr>\n<p>baz</p>"
+        }
+      },
+      {
+        "description": "example 105",
+        "input": "Foo\nbar\n* * *\nbaz\n",
+        "expected": {
+          "html": "<p>Foo\nbar</p>\n<hr>\n<p>baz</p>"
+        }
+      },
+      {
+        "description": "example 106",
+        "input": "Foo\nbar\n\\---\nbaz\n",
+        "expected": {
+          "html": "<p>Foo\nbar\n---\nbaz</p>"
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,183 @@
+[
+  {
+    "description": "Images",
+    "specification": ["https://spec.commonmark.org/0.31.2/#images"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 572",
+        "input": "![foo](/url \"title\")\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "example 573",
+        "input": "![foo *bar*]\n\n[foo *bar*]: train.jpg \"train & tracks\"\n",
+        "expected": {
+          "html": "<p><img src=\"train.jpg\" alt=\"foo bar\" title=\"train &#x26; tracks\"></p>"
+        }
+      },
+      {
+        "description": "example 574",
+        "input": "![foo ![bar](/url)](/url2)\n",
+        "expected": {
+          "html": "<p><img src=\"/url2\" alt=\"foo bar\"></p>"
+        }
+      },
+      {
+        "description": "example 575",
+        "input": "![foo [bar](/url)](/url2)\n",
+        "expected": {
+          "html": "<p><img src=\"/url2\" alt=\"foo bar\"></p>"
+        }
+      },
+      {
+        "description": "example 576",
+        "input": "![foo *bar*][]\n\n[foo *bar*]: train.jpg \"train & tracks\"\n",
+        "expected": {
+          "html": "<p><img src=\"train.jpg\" alt=\"foo bar\" title=\"train &#x26; tracks\"></p>"
+        }
+      },
+      {
+        "description": "example 577",
+        "input": "![foo *bar*][foobar]\n\n[FOOBAR]: train.jpg \"train & tracks\"\n",
+        "expected": {
+          "html": "<p><img src=\"train.jpg\" alt=\"foo bar\" title=\"train &#x26; tracks\"></p>"
+        }
+      },
+      {
+        "description": "example 578",
+        "input": "![foo](train.jpg)\n",
+        "expected": {
+          "html": "<p><img src=\"train.jpg\" alt=\"foo\"></p>"
+        }
+      },
+      {
+        "description": "example 579",
+        "input": "My ![foo bar](/path/to/train.jpg  \"title\"   )\n",
+        "expected": {
+          "html": "<p>My <img src=\"/path/to/train.jpg\" alt=\"foo bar\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "example 580",
+        "input": "![foo](<url>)\n",
+        "expected": {
+          "html": "<p><img src=\"url\" alt=\"foo\"></p>"
+        }
+      },
+      {
+        "description": "example 581",
+        "input": "![](/url)\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"\"></p>"
+        }
+      },
+      {
+        "description": "example 582",
+        "input": "![foo][bar]\n\n[bar]: /url\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo\"></p>"
+        }
+      },
+      {
+        "description": "example 583",
+        "input": "![foo][bar]\n\n[BAR]: /url\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo\"></p>"
+        }
+      },
+      {
+        "description": "example 584",
+        "input": "![foo][]\n\n[foo]: /url \"title\"\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "example 585",
+        "input": "![*foo* bar][]\n\n[*foo* bar]: /url \"title\"\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo bar\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "example 586",
+        "input": "![Foo][]\n\n[foo]: /url \"title\"\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"Foo\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "example 587",
+        "input": "![foo] \n[]\n\n[foo]: /url \"title\"\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo\" title=\"title\">\n[]</p>"
+        }
+      },
+      {
+        "description": "example 588",
+        "input": "![foo]\n\n[foo]: /url \"title\"\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "example 589",
+        "input": "![*foo* bar]\n\n[*foo* bar]: /url \"title\"\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo bar\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "example 590",
+        "input": "![[foo]]\n\n[[foo]]: /url \"title\"\n",
+        "expected": {
+          "html": "<p>![[foo]]</p>\n<p>[[foo]]: /url \"title\"</p>"
+        }
+      },
+      {
+        "description": "example 591",
+        "input": "![Foo]\n\n[foo]: /url \"title\"\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"Foo\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "example 592",
+        "input": "!\\[foo]\n\n[foo]: /url \"title\"\n",
+        "expected": {
+          "html": "<p>![foo]</p>"
+        }
+      },
+      {
+        "description": "example 593",
+        "input": "\\![foo]\n\n[foo]: /url \"title\"\n",
+        "expected": {
+          "html": "<p>!<a href=\"/url\" title=\"title\">foo</a></p>"
+        }
+      }
+    ]
+  }
+]
