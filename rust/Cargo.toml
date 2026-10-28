@@ -19,7 +19,7 @@ textlane-prose = { path = "prose", version = "0.0.0" }
 textlane-mdx = { path = "mdx", version = "0.0.0" }
 bumpalo = { version = "3.19.0", features = ["collections"] }
 serde = { version = "1.0.228", features = ["derive"] }
-serde_json = "1.0.145"
+serde_json = { version = "1.0.145", features = ["preserve_order"] }
 regex = { version = "1.11.1", default-features = false, features = [
   "std",
   "perf",

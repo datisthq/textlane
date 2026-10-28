@@ -32,6 +32,7 @@ mod helpers {
     pub(crate) mod doctype;
     pub(crate) mod entities;
     pub(crate) mod foreign;
+    pub(crate) mod omission;
     pub(crate) mod property;
     pub(crate) mod reason;
     pub(crate) mod schema;

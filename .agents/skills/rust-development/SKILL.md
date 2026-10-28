@@ -100,7 +100,9 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   the stack keeps per-tag counts (`has_open_tag`, the scope checks) and the formatting
   list per-marker counts (Noah's Ark, `find_in_scope`), and parse5's recursion through
   `onEof` for nested templates is a loop. `helpers/schema.rs` is property-information's
-  `html` and `svg` schemas, generated and sorted for a binary search
+  `html` and `svg` schemas, generated and sorted for a binary search. `html.stringify` ports
+  hast-util-to-html 9.0.5 whole, omission rules in `helpers/omission.rs`; serde_json keeps
+  `preserve_order`, since hast writes properties in the order a tree lists them
 - `md` names entities by syntax construct or mdast node and verbs by layer: `tokenize` and
   `resolve` (micromark), `compile` (from-markdown), `stringify` (to-markdown), `convert`
   (to-hast), so `actions/heading/compile.rs` exports `compile_heading`. No file named after

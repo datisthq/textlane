@@ -124,6 +124,10 @@ fn deserialize_properties<'a>(
                         Value::String(value) => {
                             PropertyItem::String(alloc.alloc_str(value))
                         }
+                        // hast-util-to-html writes any other item as `String(item)` would
+                        Value::Bool(value) => {
+                            PropertyItem::String(if *value { "true" } else { "false" })
+                        }
                         _ => {
                             return Err(Error::new(
                                 "invalid-tree",

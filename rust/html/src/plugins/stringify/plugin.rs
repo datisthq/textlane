@@ -33,7 +33,7 @@ impl Compiler for Stringify {
 
     fn compile(&self, tree: &Tree<'_>, _file: &mut File) -> Result<String, Error> {
         match tree {
-            Tree::Hast(node) => Ok(stringify_hast(node, &self.options)),
+            Tree::Hast(node) => stringify_hast(node, &self.options),
             Tree::Mdast(_) => {
                 Err(Error::new("invalid-stage", "`html.stringify` takes hast"))
             }
