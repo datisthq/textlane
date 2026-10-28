@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::helpers::character::{
-    CharacterKind, classify_character, find_character_after, find_character_before,
+    CharacterKind, classify_character_unit, find_character_after, find_character_before,
 };
 use crate::models::event::{Event, Kind, Point};
 use crate::models::token::Name;
@@ -115,6 +115,7 @@ fn find_opener(
 
 fn find_sequences(tokenizer: &Tokenizer) -> Vec<Sequence> {
     let bytes = tokenizer.parse_state.bytes;
+    let gfm = tokenizer.parse_state.gfm.is_some();
     let mut stack = vec![];
     let mut stacks: HashMap<Vec<usize>, usize> = HashMap::new();
     let mut sequences = vec![];
@@ -124,17 +125,19 @@ fn find_sequences(tokenizer: &Tokenizer) -> Vec<Sequence> {
                 let exit = &tokenizer.events[index + 1];
                 let marker = bytes[enter.point.index];
                 let before_char = find_character_before(bytes, enter.point.index);
-                let before = classify_character(before_char);
+                let before = classify_character_unit(before_char);
                 let after_char = find_character_after(bytes, exit.point.index);
-                let after = classify_character(after_char);
-                // micromark lets extension markers (GFM's `~`) open and close next to
-                // punctuation too, but never `*` or `_`
+                let after = classify_character_unit(after_char);
+                // micromark lets a sequence open before and close after an extension's
+                // attention marker (GFM's `~`) whatever surrounds it
                 let open = after == CharacterKind::Other
                     || (after == CharacterKind::Punctuation
-                        && before != CharacterKind::Other);
+                        && before != CharacterKind::Other)
+                    || (gfm && after_char == Some('~'));
                 let close = before == CharacterKind::Other
                     || (before == CharacterKind::Punctuation
-                        && after != CharacterKind::Other);
+                        && after != CharacterKind::Other)
+                    || (gfm && before_char == Some('~'));
                 // `_` may not open or close inside a word
                 let (open, close) = if marker == b'_' {
                     (

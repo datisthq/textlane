@@ -23,6 +23,12 @@ pub enum Node<'a> {
     ImageReference(ImageReference<'a>),
     Definition(Definition<'a>),
     Html(Html<'a>),
+    Delete(Delete<'a>),
+    Table(Table<'a>),
+    TableRow(TableRow<'a>),
+    TableCell(TableCell<'a>),
+    FootnoteDefinition(FootnoteDefinition<'a>),
+    FootnoteReference(FootnoteReference<'a>),
 }
 
 /// The document.
@@ -183,6 +189,61 @@ impl ReferenceType {
     }
 }
 
+/// Struck-through text, GFM's `~~a~~`.
+#[derive(Debug, PartialEq)]
+pub struct Delete<'a> {
+    pub children: ArenaVec<'a, Node<'a>>,
+    pub position: Option<Position<'a>>,
+}
+
+/// How a table column is aligned.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum AlignKind {
+    Left,
+    Right,
+    Center,
+    None,
+}
+
+/// A GFM table; `align` holds one alignment per column.
+#[derive(Debug, PartialEq)]
+pub struct Table<'a> {
+    pub align: ArenaVec<'a, AlignKind>,
+    pub children: ArenaVec<'a, Node<'a>>,
+    pub position: Option<Position<'a>>,
+}
+
+/// A row of a table; the first is its head.
+#[derive(Debug, PartialEq)]
+pub struct TableRow<'a> {
+    pub children: ArenaVec<'a, Node<'a>>,
+    pub position: Option<Position<'a>>,
+}
+
+/// A cell of a table row.
+#[derive(Debug, PartialEq)]
+pub struct TableCell<'a> {
+    pub children: ArenaVec<'a, Node<'a>>,
+    pub position: Option<Position<'a>>,
+}
+
+/// A GFM footnote's content, `[^a]: b`, matched by `identifier`.
+#[derive(Debug, PartialEq)]
+pub struct FootnoteDefinition<'a> {
+    pub identifier: &'a str,
+    pub label: Option<&'a str>,
+    pub children: ArenaVec<'a, Node<'a>>,
+    pub position: Option<Position<'a>>,
+}
+
+/// A call to a GFM footnote, `[^a]`.
+#[derive(Debug, PartialEq)]
+pub struct FootnoteReference<'a> {
+    pub identifier: &'a str,
+    pub label: Option<&'a str>,
+    pub position: Option<Position<'a>>,
+}
+
 /// Raw HTML.
 #[derive(Debug, PartialEq)]
 pub struct Html<'a> {
@@ -211,7 +272,13 @@ impl<'a> Node<'a> {
             Node::ListItem(node) => Some(&node.children),
             Node::Link(node) => Some(&node.children),
             Node::LinkReference(node) => Some(&node.children),
+            Node::Delete(node) => Some(&node.children),
+            Node::Table(node) => Some(&node.children),
+            Node::TableRow(node) => Some(&node.children),
+            Node::TableCell(node) => Some(&node.children),
+            Node::FootnoteDefinition(node) => Some(&node.children),
             Node::ThematicBreak(_)
+            | Node::FootnoteReference(_)
             | Node::Text(_)
             | Node::Break(_)
             | Node::Code(_)
@@ -236,7 +303,13 @@ impl<'a> Node<'a> {
             Node::ListItem(node) => Some(&mut node.children),
             Node::Link(node) => Some(&mut node.children),
             Node::LinkReference(node) => Some(&mut node.children),
+            Node::Delete(node) => Some(&mut node.children),
+            Node::Table(node) => Some(&mut node.children),
+            Node::TableRow(node) => Some(&mut node.children),
+            Node::TableCell(node) => Some(&mut node.children),
+            Node::FootnoteDefinition(node) => Some(&mut node.children),
             Node::ThematicBreak(_)
+            | Node::FootnoteReference(_)
             | Node::Text(_)
             | Node::Break(_)
             | Node::Code(_)
@@ -269,6 +342,12 @@ impl<'a> Node<'a> {
             Node::LinkReference(node) => node.position.as_ref(),
             Node::Image(node) => node.position.as_ref(),
             Node::Link(node) => node.position.as_ref(),
+            Node::Delete(node) => node.position.as_ref(),
+            Node::Table(node) => node.position.as_ref(),
+            Node::TableRow(node) => node.position.as_ref(),
+            Node::TableCell(node) => node.position.as_ref(),
+            Node::FootnoteDefinition(node) => node.position.as_ref(),
+            Node::FootnoteReference(node) => node.position.as_ref(),
         }
     }
 
@@ -293,6 +372,12 @@ impl<'a> Node<'a> {
             Node::LinkReference(node) => &mut node.position,
             Node::Image(node) => &mut node.position,
             Node::Link(node) => &mut node.position,
+            Node::Delete(node) => &mut node.position,
+            Node::Table(node) => &mut node.position,
+            Node::TableRow(node) => &mut node.position,
+            Node::TableCell(node) => &mut node.position,
+            Node::FootnoteDefinition(node) => &mut node.position,
+            Node::FootnoteReference(node) => &mut node.position,
         }
     }
 }

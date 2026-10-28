@@ -14,7 +14,10 @@ pub(crate) fn compile_inline_code(compiler: &mut Compiler, kind: Kind) {
             compiler.buffer();
         }
         Kind::Exit => {
-            let value = strip_padding(compiler.resume());
+            let mut value = strip_padding(compiler.resume());
+            if compiler.in_table && value.contains("\\|") {
+                value = compiler.alloc_str(&unescape_pipes(value));
+            }
             if let Node::InlineCode(code) = compiler.tail_mut() {
                 code.value = value;
             }
@@ -48,4 +51,24 @@ fn strip_padding(value: &str) -> &str {
         (Some(start), Some(end)) => &value[start..value.len() - end],
         _ => value,
     }
+}
+
+// As mdast-util-gfm-table: `\|` is `|` in a table, while `\\` keeps both backslashes
+fn unescape_pipes(value: &str) -> String {
+    let mut result = String::with_capacity(value.len());
+    let mut chars = value.chars().peekable();
+    while let Some(character) = chars.next() {
+        if character == '\\'
+            && let Some(next @ ('\\' | '|')) = chars.peek().copied()
+        {
+            if next == '\\' {
+                result.push(character);
+            }
+            result.push(next);
+            chars.next();
+            continue;
+        }
+        result.push(character);
+    }
+    result
 }

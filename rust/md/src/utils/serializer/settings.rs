@@ -1,6 +1,6 @@
 use textlane_core::Error;
 
-use crate::models::options::StringifyOptions;
+use crate::models::options::{GfmOptions, StringifyOptions};
 
 /// `md::stringify`'s options, checked once, with their defaults filled in.
 #[derive(Clone, Debug)]
@@ -22,6 +22,8 @@ pub(crate) struct Settings {
     pub(crate) setext: bool,
     pub(crate) strong: char,
     pub(crate) tight_definitions: bool,
+    /// GFM's options, when `md::gfm` is used: its handlers, unsafe patterns and joins.
+    pub(crate) gfm: Option<GfmOptions>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -127,6 +129,7 @@ impl Settings {
                 )
             })?,
             tight_definitions: options.tight_definitions,
+            gfm: None,
         })
     }
 }

@@ -16,7 +16,8 @@ pub(crate) fn compile_text(compiler: &mut Compiler, name: Name, kind: Kind) {
                 compiler.hard_break_after = false;
             } else if matches!(
                 compiler.tail_mut(),
-                Node::Heading(_)
+                Node::Delete(_)
+                    | Node::Heading(_)
                     | Node::Paragraph(_)
                     | Node::Emphasis(_)
                     | Node::Strong(_)

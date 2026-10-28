@@ -25,13 +25,17 @@ pub(crate) enum Construct {
     Paragraph,
     Phrasing,
     Reference,
+    Strikethrough,
     Strong,
+    Table,
+    TableCell,
+    TableRow,
     TitleApostrophe,
     TitleQuote,
 }
 
 impl Construct {
-    pub(crate) const COUNT: usize = 27;
+    pub(crate) const COUNT: usize = 31;
 
     /// The construct mdast-util-to-markdown calls `name`, if any.
     pub(crate) fn from_name(name: &str) -> Option<Construct> {
@@ -60,7 +64,11 @@ impl Construct {
             "paragraph" => Construct::Paragraph,
             "phrasing" => Construct::Phrasing,
             "reference" => Construct::Reference,
+            "strikethrough" => Construct::Strikethrough,
             "strong" => Construct::Strong,
+            "table" => Construct::Table,
+            "tableCell" => Construct::TableCell,
+            "tableRow" => Construct::TableRow,
             "titleApostrophe" => Construct::TitleApostrophe,
             "titleQuote" => Construct::TitleQuote,
             _ => return None,

@@ -108,3 +108,20 @@ pub struct SlugOptions {
     /// Put before each id.
     pub prefix: String,
 }
+
+/// Options of `html.toMarkdown`, named as hast-util-to-mdast names them.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
+pub struct ToMarkdownOptions {
+    /// Wrap all phrasing content of the root in paragraphs, as for a whole document.
+    pub document: bool,
+    /// Collapse whitespace holding a line ending to that line ending instead of a space.
+    pub newlines: bool,
+    /// The text of a checked checkbox or radio, `[x]` by default.
+    pub checked: Option<String>,
+    /// The text of an unchecked checkbox or radio, `[ ]` by default.
+    pub unchecked: Option<String>,
+    /// The quotes `<q>` uses, an opening and closing character each, alternating by how
+    /// deep it nests; `"` by default.
+    pub quotes: Option<Vec<String>>,
+}

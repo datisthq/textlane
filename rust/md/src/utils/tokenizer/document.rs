@@ -1,5 +1,8 @@
 use crate::actions::block_quote::tokenize::{continue_block_quote, tokenize_block_quote};
 use crate::actions::bom::tokenize::tokenize_bom;
+use crate::actions::gfm_footnote_definition::tokenize::{
+    continue_gfm_footnote_definition, tokenize_gfm_footnote_definition,
+};
 use crate::actions::list_item::tokenize::{continue_list_item, tokenize_list_item};
 use crate::helpers::skip::{skip_opt_back, skip_to};
 use crate::models::construct::State;
@@ -47,6 +50,7 @@ fn container_existing_before(tokenizer: &mut Tokenizer) -> State {
     };
     let continuation = match container.kind {
         Container::BlockQuote => continue_block_quote,
+        Container::GfmFootnoteDefinition => continue_gfm_footnote_definition,
         Container::ListItem => continue_list_item,
     };
     tokenizer.attempt(
@@ -95,6 +99,17 @@ fn container_new_before_not_block_quote(tokenizer: &mut Tokenizer) -> State {
 
 fn container_new_before_not_list(tokenizer: &mut Tokenizer) -> State {
     let continued = tokenizer.tokenize_state.document_continued;
+    tokenizer.tokenize_state.document_container_stack[continued] =
+        new_container(Container::GfmFootnoteDefinition);
+    tokenizer.attempt(
+        State::Next(container_new_after),
+        State::Next(container_new_before_not_gfm_footnote_definition),
+    );
+    State::Retry(tokenize_gfm_footnote_definition)
+}
+
+fn container_new_before_not_gfm_footnote_definition(tokenizer: &mut Tokenizer) -> State {
+    let continued = tokenizer.tokenize_state.document_continued;
     tokenizer
         .tokenize_state
         .document_container_stack
@@ -141,7 +156,11 @@ fn find_blank_end(state: &mut TokenizeState, from: usize) -> usize {
         let mut ends = vec![stack.len(); stack.len() + 1];
         for index in (0..stack.len()).rev() {
             let container = &stack[index];
-            let free = container.kind == Container::ListItem && !container.blank_initial;
+            let free = match container.kind {
+                Container::BlockQuote => false,
+                Container::GfmFootnoteDefinition => true,
+                Container::ListItem => !container.blank_initial,
+            };
             ends[index] = if free { ends[index + 1] } else { index };
         }
         ends
@@ -295,6 +314,7 @@ fn exit_containers(tokenizer: &mut Tokenizer, phase: &Phase) {
         while let Some(container) = stack_close.pop() {
             let name = match container.kind {
                 Container::BlockQuote => Name::BLOCK_QUOTE,
+                Container::GfmFootnoteDefinition => Name::GFM_FOOTNOTE_DEFINITION,
                 Container::ListItem => Name::LIST_ITEM,
             };
             exits.push(Event {

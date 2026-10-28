@@ -4,9 +4,10 @@ use crate::actions::mdast::serialize::MAX_JSON_DEPTH;
 use crate::actions::position::deserialize::deserialize_position;
 use crate::models::error::Error;
 use crate::models::mdast::{
-    Blockquote, Break, Code, Definition, Emphasis, Heading, Html, Image, ImageReference,
-    InlineCode, Link, LinkReference, List, ListItem, Node, Paragraph, ReferenceType,
-    Root, Strong, Text, ThematicBreak,
+    AlignKind, Blockquote, Break, Code, Definition, Delete, Emphasis, FootnoteDefinition,
+    FootnoteReference, Heading, Html, Image, ImageReference, InlineCode, Link,
+    LinkReference, List, ListItem, Node, Paragraph, ReferenceType, Root, Strong, Table,
+    TableCell, TableRow, Text, ThematicBreak,
 };
 use crate::{Allocator, ArenaVec};
 
@@ -115,6 +116,50 @@ fn deserialize_node<'a>(
             title: read_optional_str(value, "title", alloc),
             position,
         }),
+        "delete" => Node::Delete(Delete {
+            children: deserialize_children(value, alloc, depth)?,
+            position,
+        }),
+        "table" => Node::Table(Table {
+            align: {
+                let mut align = ArenaVec::new_in(alloc);
+                for item in value
+                    .get("align")
+                    .and_then(Value::as_array)
+                    .into_iter()
+                    .flatten()
+                {
+                    align.push(match item.as_str() {
+                        Some("left") => AlignKind::Left,
+                        Some("right") => AlignKind::Right,
+                        Some("center") => AlignKind::Center,
+                        _ => AlignKind::None,
+                    });
+                }
+                align
+            },
+            children: deserialize_children(value, alloc, depth)?,
+            position,
+        }),
+        "footnoteDefinition" => Node::FootnoteDefinition(FootnoteDefinition {
+            identifier: read_identifier(value, alloc),
+            label: read_optional_str(value, "label", alloc),
+            children: deserialize_children(value, alloc, depth)?,
+            position,
+        }),
+        "footnoteReference" => Node::FootnoteReference(FootnoteReference {
+            identifier: read_identifier(value, alloc),
+            label: read_optional_str(value, "label", alloc),
+            position,
+        }),
+        "tableRow" => Node::TableRow(TableRow {
+            children: deserialize_children(value, alloc, depth)?,
+            position,
+        }),
+        "tableCell" => Node::TableCell(TableCell {
+            children: deserialize_children(value, alloc, depth)?,
+            position,
+        }),
         "html" => Node::Html(Html {
             value: read_optional_str(value, "value", alloc).unwrap_or_default(),
             position,
@@ -171,6 +216,14 @@ fn read_optional_str<'a>(
         .get(key)
         .and_then(Value::as_str)
         .map(|text| &*alloc.alloc_str(text))
+}
+
+// mdast-util-to-hast reads a footnote's identifier through `String()`, so a number works
+fn read_identifier<'a>(value: &Value, alloc: &'a Allocator) -> &'a str {
+    match value.get("identifier") {
+        Some(Value::Number(number)) => alloc.alloc_str(&number.to_string()),
+        _ => read_optional_str(value, "identifier", alloc).unwrap_or_default(),
+    }
 }
 
 // mdast-util-to-markdown writes a reference without a type as a collapsed one

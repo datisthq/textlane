@@ -62,6 +62,33 @@ impl Name {
     pub(crate) const EMPHASIS: Name = Name("emphasis");
     pub(crate) const EMPHASIS_SEQUENCE: Name = Name("emphasisSequence");
     pub(crate) const EMPHASIS_TEXT: Name = Name("emphasisText");
+    pub(crate) const GFM_FOOTNOTE_CALL: Name = Name("gfmFootnoteCall");
+    pub(crate) const GFM_FOOTNOTE_CALL_LABEL_MARKER: Name =
+        Name("gfmFootnoteCallLabelMarker");
+    pub(crate) const GFM_FOOTNOTE_CALL_MARKER: Name = Name("gfmFootnoteCallMarker");
+    pub(crate) const GFM_FOOTNOTE_CALL_STRING: Name = Name("gfmFootnoteCallString");
+    pub(crate) const GFM_FOOTNOTE_DEFINITION: Name = Name("gfmFootnoteDefinition");
+    pub(crate) const GFM_FOOTNOTE_DEFINITION_LABEL: Name =
+        Name("gfmFootnoteDefinitionLabel");
+    pub(crate) const GFM_FOOTNOTE_DEFINITION_LABEL_MARKER: Name =
+        Name("gfmFootnoteDefinitionLabelMarker");
+    pub(crate) const GFM_FOOTNOTE_DEFINITION_LABEL_STRING: Name =
+        Name("gfmFootnoteDefinitionLabelString");
+    pub(crate) const GFM_FOOTNOTE_DEFINITION_MARKER: Name =
+        Name("gfmFootnoteDefinitionMarker");
+    pub(crate) const GFM_TABLE: Name = Name("gfmTable");
+    pub(crate) const GFM_TABLE_BODY: Name = Name("gfmTableBody");
+    pub(crate) const GFM_TABLE_CELL: Name = Name("gfmTableCell");
+    pub(crate) const GFM_TABLE_CELL_DIVIDER: Name = Name("gfmTableCellDivider");
+    pub(crate) const GFM_TABLE_CELL_TEXT: Name = Name("gfmTableCellText");
+    pub(crate) const GFM_TABLE_DELIMITER_CELL: Name = Name("gfmTableDelimiterCell");
+    pub(crate) const GFM_TABLE_DELIMITER_CELL_VALUE: Name =
+        Name("gfmTableDelimiterCellValue");
+    pub(crate) const GFM_TABLE_DELIMITER_FILLER: Name = Name("gfmTableDelimiterFiller");
+    pub(crate) const GFM_TABLE_DELIMITER_MARKER: Name = Name("gfmTableDelimiterMarker");
+    pub(crate) const GFM_TABLE_DELIMITER_ROW: Name = Name("gfmTableDelimiterRow");
+    pub(crate) const GFM_TABLE_HEAD: Name = Name("gfmTableHead");
+    pub(crate) const GFM_TABLE_ROW: Name = Name("gfmTableRow");
     pub(crate) const HARD_BREAK_ESCAPE: Name = Name("hardBreakEscape");
     pub(crate) const HARD_BREAK_TRAILING: Name = Name("hardBreakTrailing");
     pub(crate) const HEADING_ATX: Name = Name("headingAtx");
@@ -92,6 +119,10 @@ impl Name {
     pub(crate) const LIST_ITEM_VALUE: Name = Name("listItemValue");
     pub(crate) const LIST_ORDERED: Name = Name("listOrdered");
     pub(crate) const LIST_UNORDERED: Name = Name("listUnordered");
+    pub(crate) const LITERAL_AUTOLINK: Name = Name("literalAutolink");
+    pub(crate) const LITERAL_AUTOLINK_EMAIL: Name = Name("literalAutolinkEmail");
+    pub(crate) const LITERAL_AUTOLINK_HTTP: Name = Name("literalAutolinkHttp");
+    pub(crate) const LITERAL_AUTOLINK_WWW: Name = Name("literalAutolinkWww");
     pub(crate) const PARAGRAPH: Name = Name("paragraph");
     pub(crate) const REFERENCE: Name = Name("reference");
     pub(crate) const REFERENCE_MARKER: Name = Name("referenceMarker");
@@ -110,9 +141,20 @@ impl Name {
     pub(crate) const RESOURCE_TITLE_MARKER: Name = Name("resourceTitleMarker");
     pub(crate) const RESOURCE_TITLE_STRING: Name = Name("resourceTitleString");
     pub(crate) const SPACE_OR_TAB: Name = Name("spaceOrTab");
+    pub(crate) const STRIKETHROUGH: Name = Name("strikethrough");
+    pub(crate) const STRIKETHROUGH_SEQUENCE: Name = Name("strikethroughSequence");
+    pub(crate) const STRIKETHROUGH_SEQUENCE_TEMPORARY: Name =
+        Name("strikethroughSequenceTemporary");
+    pub(crate) const STRIKETHROUGH_TEXT: Name = Name("strikethroughText");
     pub(crate) const STRONG: Name = Name("strong");
     pub(crate) const STRONG_SEQUENCE: Name = Name("strongSequence");
     pub(crate) const STRONG_TEXT: Name = Name("strongText");
+    pub(crate) const TASK_LIST_CHECK: Name = Name("taskListCheck");
+    pub(crate) const TASK_LIST_CHECK_MARKER: Name = Name("taskListCheckMarker");
+    pub(crate) const TASK_LIST_CHECK_VALUE_CHECKED: Name =
+        Name("taskListCheckValueChecked");
+    pub(crate) const TASK_LIST_CHECK_VALUE_UNCHECKED: Name =
+        Name("taskListCheckValueUnchecked");
     pub(crate) const THEMATIC_BREAK: Name = Name("thematicBreak");
     pub(crate) const THEMATIC_BREAK_SEQUENCE: Name = Name("thematicBreakSequence");
 }

@@ -46,8 +46,13 @@ pub(crate) struct Compiler<'a, 'e> {
     pub(crate) media: Vec<Media<'a>>,
     /// Whether a code fence's opening fence closed, so the code after it is buffered.
     pub(crate) code_fence_seen: bool,
+    /// Whether a GFM table is open, where code spans read `\|` as `|`.
+    pub(crate) in_table: bool,
     /// The enters of loose lists and list items.
     pub(crate) loose: HashSet<usize>,
+    /// Whether a GFM task list check is in the open paragraph, whose first text then
+    /// loses the space after it.
+    pub(crate) task_list_check_seen: bool,
     // The first line ending of the trailing lines before each event, without and with
     // block quote prefixes
     trailing_line_endings: [Vec<Option<usize>>; 2],
@@ -77,12 +82,14 @@ impl<'a, 'e> Compiler<'a, 'e> {
             character_reference_marker: 0,
             hard_break_after: false,
             code_fence_seen: false,
+            in_table: false,
             media: vec![],
             enters: find_enters(events),
             prefixes,
             text_builder: None,
             heading_setext_text_after: false,
             loose: find_loose(events),
+            task_list_check_seen: false,
             trailing_line_endings: [
                 find_trailing_line_endings(events, false),
                 find_trailing_line_endings(events, true),

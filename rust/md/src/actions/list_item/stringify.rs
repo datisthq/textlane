@@ -40,10 +40,30 @@ pub(crate) fn stringify_list_item(
     {
         size = size.div_ceil(4) * 4;
     }
+    let checkbox = read_checkbox(state, item, &bullet);
     state.enter(Construct::ListItem);
     state.open_layer(Layer::ListItem { bullet, size });
+    if let Some(checkbox) = checkbox {
+        state.write(checkbox);
+    }
     let result = state.container_flow(node);
     state.close_layer();
     state.exit();
     result
+}
+
+// GFM's checkbox of a task item that starts with a paragraph; upstream adds it after a
+// bullet it recognizes, so not after `)`
+fn read_checkbox(
+    state: &Serializer,
+    item: &ListItem,
+    bullet: &str,
+) -> Option<&'static str> {
+    let checked = item.checked.filter(|_| state.settings.gfm.is_some())?;
+    let known = matches!(bullet, "*" | "+" | "-")
+        || bullet.strip_suffix('.').is_some_and(|digits| {
+            !digits.is_empty() && digits.bytes().all(|b| b.is_ascii_digit())
+        });
+    let paragraph = matches!(item.children.first(), Some(Node::Paragraph(_)));
+    (known && paragraph).then_some(if checked { "[x] " } else { "[ ] " })
 }

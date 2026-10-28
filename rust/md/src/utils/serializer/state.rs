@@ -4,9 +4,12 @@ use textlane_core::mdast::{Emphasis, Node, Strong};
 use crate::actions::blockquote::stringify::stringify_blockquote;
 use crate::actions::code::stringify::stringify_code;
 use crate::actions::definition::stringify::stringify_definition;
+use crate::actions::delete::stringify::{create_delete_attention, stringify_delete};
 use crate::actions::emphasis::stringify::{
     create_emphasis_attention, stringify_emphasis,
 };
+use crate::actions::footnote_definition::stringify::stringify_footnote_definition;
+use crate::actions::footnote_reference::stringify::stringify_footnote_reference;
 use crate::actions::hard_break::stringify::stringify_hard_break;
 use crate::actions::heading::stringify::stringify_heading;
 use crate::actions::html::stringify::stringify_html;
@@ -20,6 +23,9 @@ use crate::actions::list_item::stringify::stringify_list_item;
 use crate::actions::paragraph::stringify::stringify_paragraph;
 use crate::actions::root::stringify::stringify_root;
 use crate::actions::strong::stringify::{create_strong_attention, stringify_strong};
+use crate::actions::table::stringify::stringify_table;
+use crate::actions::table_cell::stringify::stringify_table_cell;
+use crate::actions::table_row::stringify::stringify_table_row;
 use crate::actions::text::stringify::stringify_text;
 use crate::actions::thematic_break::stringify::stringify_thematic_break;
 use crate::helpers::character::{CharacterKind, classify_character};
@@ -198,6 +204,37 @@ impl<'c> Serializer<'c> {
                 stringify_html(self, html);
                 Ok(())
             }
+            Node::Table(table) if self.settings.gfm.is_some() => {
+                stringify_table(self, table, Parent::of(node))
+            }
+            Node::TableRow(_) if self.settings.gfm.is_some() => {
+                stringify_table_row(self, Parent::of(node))
+            }
+            Node::TableCell(_) if self.settings.gfm.is_some() => {
+                let value = stringify_table_cell(self, Parent::of(node))?;
+                self.write(&value);
+                Ok(())
+            }
+            Node::FootnoteDefinition(definition) if self.settings.gfm.is_some() => {
+                stringify_footnote_definition(self, definition, Parent::of(node))
+            }
+            Node::FootnoteReference(reference) if self.settings.gfm.is_some() => {
+                stringify_footnote_reference(self, reference);
+                Ok(())
+            }
+            Node::Delete(_) if self.settings.gfm.is_some() => {
+                stringify_delete(self, Parent::of(node), info)
+            }
+            // GFM's nodes need `md.gfm`'s handlers, which mdast-util-to-markdown lacks too
+            Node::Delete(_)
+            | Node::Table(_)
+            | Node::TableRow(_)
+            | Node::TableCell(_)
+            | Node::FootnoteDefinition(_)
+            | Node::FootnoteReference(_) => Err(Error::new(
+                "unknown-node",
+                format!("Cannot handle unknown node `{}`", read_node_type(node)),
+            )),
         })
     }
 
@@ -292,6 +329,9 @@ impl<'c> Serializer<'c> {
             let kind = match child {
                 Node::Emphasis(_) => Some(create_emphasis_attention(self.settings)),
                 Node::Strong(_) => Some(create_strong_attention(self.settings)),
+                Node::Delete(_) if self.settings.gfm.is_some() => {
+                    Some(create_delete_attention())
+                }
                 _ => None,
             };
             if let Some(kind) = kind {
@@ -365,6 +405,7 @@ impl<'c> Serializer<'c> {
         let character = match next {
             Node::Emphasis(Emphasis { .. }) => Some(self.settings.emphasis),
             Node::Strong(Strong { .. }) => Some(self.settings.strong),
+            Node::Delete(_) if self.settings.gfm.is_some() => Some('~'),
             Node::Html(_) => Some('<'),
             Node::Image(_) | Node::ImageReference(_) => Some('!'),
             Node::InlineCode(_) => Some('`'),
@@ -373,7 +414,7 @@ impl<'c> Serializer<'c> {
             } else {
                 '['
             }),
-            Node::LinkReference(_) => Some('['),
+            Node::LinkReference(_) | Node::FootnoteReference(_) => Some('['),
             _ => None,
         };
         if let Some(character) = character {
@@ -445,5 +486,11 @@ pub(crate) fn read_node_type(node: &Node) -> &'static str {
         Node::ImageReference(_) => "imageReference",
         Node::Definition(_) => "definition",
         Node::Html(_) => "html",
+        Node::Delete(_) => "delete",
+        Node::Table(_) => "table",
+        Node::TableRow(_) => "tableRow",
+        Node::TableCell(_) => "tableCell",
+        Node::FootnoteDefinition(_) => "footnoteDefinition",
+        Node::FootnoteReference(_) => "footnoteReference",
     }
 }

@@ -14,6 +14,7 @@ const TAB_SIZE: usize = 4;
 #[derive(Debug, PartialEq, Eq)]
 pub(crate) enum Container {
     BlockQuote,
+    GfmFootnoteDefinition,
     ListItem,
 }
 
@@ -111,6 +112,11 @@ pub(crate) struct TokenizeState<'a> {
     pub(crate) label_starts_inactive_before: usize,
     /// Labels that closed into links or images.
     pub(crate) labels: Vec<Label>,
+    /// The normalized labels of the GFM footnote definitions found so far.
+    pub(crate) gfm_footnote_definitions: Vec<String>,
+    /// The last label start when it opens an image and nothing label-like follows it: a
+    /// `]` may still turn `![^a]` into `!` and a footnote call.
+    pub(crate) gfm_footnote_image: Option<(usize, usize)>,
     /// Token names partials (label, destination, title) emit, set by their caller.
     pub(crate) token_1: Name,
     pub(crate) token_2: Name,
@@ -136,6 +142,19 @@ pub(crate) struct TokenizeState<'a> {
     pub(crate) code_text_scanned: bool,
     /// Where a thematic break of a marker started and where it then failed.
     pub(crate) thematic_break_failed: Option<(u8, usize, usize)>,
+    /// Whether GFM's literal autolinks may start in this text, so data stops where one can.
+    pub(crate) literal_autolinks: bool,
+    /// Where the domain of a literal autolink being scanned started, and its last two dots.
+    pub(crate) literal_domain: (usize, usize, usize),
+    /// Where the last literal domain that failed started, and its second-last dot: one
+    /// starting in between ends the same way and fails too.
+    pub(crate) literal_domain_failed: (usize, usize),
+    /// Where the last trail check started, and where it failed if it did: a check from
+    /// in between fails there too.
+    pub(crate) literal_trail: (usize, usize),
+    /// Whether this text starts the first paragraph of a list item, where a GFM task list
+    /// check may be.
+    pub(crate) task_list_check_allowed: bool,
 }
 
 /// Feeds bytes to state functions and records the events they emit.

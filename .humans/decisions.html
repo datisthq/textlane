@@ -217,6 +217,47 @@
     </p>
   </dd>
   <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> <code>html.slug</code> slugs
+    at most 64 KiB more text than headings hold, then cuts the rest short
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Headings nested in each other each read the same text, which
+      rehype-slug does in quadratic time. Ordinary headings hold their text once, so they
+      never reach the limit.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Upstream's unbounded reads; a cap per heading, which cut
+      github-slugger's long fixtures.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> <code>md.gfm</code> is a
+    switch: it puts its options in a slot that <code>md.parse</code> and
+    <code>md.stringify</code> read, and GFM's constructs are built into the engine
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> markdown-rs builds GFM in the same way, behind flags; a
+      construct registry for extensions can come when a third-party syntax needs one.
+    </p>
+    <p><strong>Rejected.</strong> A general extension registry before any user of it.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge>
+    <code>html.toMarkdown</code> bounds what tables can add: <code>colspan</code> at
+    1,000, <code>rowspan</code> at 65,534, and at most 2<sup>19</sup> empty cells a table
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> hast-util-to-mdast pads spanned cells without limit, so a few
+      bytes of HTML can ask for millions of cells. The limits are browsers'; the cell
+      budget only differs from upstream past half a million added cells. An invalid
+      <code>&lt;base href&gt;</code> leaves URLs as they are, where upstream throws.
+    </p>
+    <p><strong>Rejected.</strong> Upstream's unbounded padding.</p>
+  </dd>
+  <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge>
     <code>html.stringify</code> escapes <code>raw</code> nodes inside
     <code>script</code> and <code>style</code> unless <code>allowDangerousHtml</code> is

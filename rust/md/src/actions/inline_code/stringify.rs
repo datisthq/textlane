@@ -2,6 +2,7 @@ use std::collections::HashSet;
 
 use textlane_core::mdast::InlineCode;
 
+use crate::utils::serializer::construct::Construct;
 use crate::utils::serializer::state::Serializer;
 
 /// Write a code span, with a fence no run of backticks inside matches.
@@ -55,6 +56,10 @@ pub(crate) fn stringify_inline_code(state: &mut Serializer, code: &InlineCode) {
         }
         output.push_str(&value[copied.min(value.len())..]);
         value = output;
+    }
+    // A pipe would end the cell, as GFM splits rows before code spans
+    if state.in_construct(Construct::TableCell) {
+        value = value.replace('|', "\\|");
     }
     let fence = "`".repeat(size);
     state.write(&format!("{fence}{value}{fence}"));

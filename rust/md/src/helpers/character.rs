@@ -22,6 +22,15 @@ pub(crate) fn classify_character(character: Option<char>) -> CharacterKind {
     }
 }
 
+/// Classify a character as micromark does a UTF-16 code unit: half of a surrogate pair is
+/// neither whitespace nor punctuation.
+pub(crate) fn classify_character_unit(character: Option<char>) -> CharacterKind {
+    match character {
+        Some(character) if u32::from(character) > 0xFFFF => CharacterKind::Other,
+        character => classify_character(character),
+    }
+}
+
 /// The character that ends right before byte `index`.
 pub(crate) fn find_character_before(bytes: &[u8], index: usize) -> Option<char> {
     let start = index.saturating_sub(4);

@@ -6,7 +6,9 @@ use textlane_core::{Allocator, ArenaString, ArenaVec, Position};
 
 use crate::actions::blockquote::convert::convert_blockquote;
 use crate::actions::code::convert::convert_code;
+use crate::actions::delete::convert::convert_delete;
 use crate::actions::emphasis::convert::convert_emphasis;
+use crate::actions::footnote_reference::convert::convert_footnote_reference;
 use crate::actions::hard_break::convert::convert_hard_break;
 use crate::actions::heading::convert::convert_heading;
 use crate::actions::html::convert::convert_html;
@@ -20,6 +22,9 @@ use crate::actions::list_item::convert::{convert_list_item, is_list_loose};
 use crate::actions::paragraph::convert::convert_paragraph;
 use crate::actions::root::convert::convert_root;
 use crate::actions::strong::convert::convert_strong;
+use crate::actions::table::convert::convert_table;
+use crate::actions::table_cell::convert::convert_table_cell;
+use crate::actions::table_row::convert::convert_table_row;
 use crate::actions::text::convert::convert_text;
 use crate::actions::thematic_break::convert::convert_thematic_break;
 use crate::models::options::ToHtmlOptions;
@@ -33,6 +38,10 @@ pub(crate) struct Converter<'a, 'o> {
     /// The URL and title of each definition, by its identifier in upper case; the first
     /// definition of an identifier wins.
     pub(crate) definitions: HashMap<String, (&'a str, Option<&'a str>)>,
+    /// The identifiers of called footnotes in upper case, in the order of their first call.
+    pub(crate) footnote_order: Vec<String>,
+    /// For each called footnote, where it is in `footnote_order` and how often it is called.
+    pub(crate) footnote_counts: HashMap<String, (usize, usize)>,
 }
 
 // A parent whose children are being converted
@@ -96,6 +105,10 @@ impl<'a> Converter<'a, '_> {
         if let mdast::Node::List(list) = node {
             self.loose_lists.push(is_list_loose(list));
         }
+        // Footnote definitions turn up in the footer only, once called
+        if matches!(node, mdast::Node::FootnoteDefinition(_)) {
+            return;
+        }
         if node.children().is_some() {
             stack.push(Frame {
                 node,
@@ -122,6 +135,9 @@ impl<'a> Converter<'a, '_> {
             mdast::Node::Html(node) => results.extend(convert_html(self, node)),
             mdast::Node::ImageReference(node) => {
                 results.push(convert_image_reference(self, node));
+            }
+            mdast::Node::FootnoteReference(node) => {
+                results.push(convert_footnote_reference(self, node));
             }
             _ => {}
         }
@@ -152,12 +168,18 @@ impl<'a> Converter<'a, '_> {
             }
             mdast::Node::Root(root) => convert_root(self, root, children),
             mdast::Node::Heading(heading) => convert_heading(self, heading, children),
+            mdast::Node::Delete(delete) => convert_delete(self, delete, children),
             mdast::Node::Emphasis(emphasis) => convert_emphasis(self, emphasis, children),
             mdast::Node::Strong(strong) => convert_strong(self, strong, children),
             mdast::Node::Paragraph(paragraph) => {
                 convert_paragraph(self, paragraph, children)
             }
             mdast::Node::Link(link) => convert_link(self, link, children),
+            mdast::Node::Table(table) => convert_table(self, table, children),
+            mdast::Node::TableRow(row) => {
+                convert_table_row(self, row, node, parent, children)
+            }
+            mdast::Node::TableCell(cell) => convert_table_cell(self, cell, children),
             mdast::Node::LinkReference(reference) => {
                 convert_link_reference(self, reference, children, results);
                 return;
@@ -173,6 +195,16 @@ impl<'a> Converter<'a, '_> {
         identifier: &str,
     ) -> Option<(&'a str, Option<&'a str>)> {
         self.definitions.get(&identifier.to_uppercase()).copied()
+    }
+
+    /// What footnote `id`s start with.
+    pub(crate) fn clobber_prefix(&self) -> &'a str {
+        let prefix = self
+            .options
+            .clobber_prefix
+            .as_deref()
+            .unwrap_or("user-content-");
+        self.alloc.alloc_str(prefix)
     }
 
     /// Add a property when it has a value.

@@ -11,6 +11,19 @@ pub struct ParseOptions {}
 pub struct ToHtmlOptions {
     /// Keep raw HTML in the tree instead of dropping it.
     pub allow_dangerous_html: bool,
+    /// What footnote `id`s start with, so they cannot clobber the page's; `user-content-`
+    /// when unset.
+    pub clobber_prefix: Option<String>,
+    /// The text of each footnote's back reference; `↩`, numbered from the second, when
+    /// unset.
+    pub footnote_back_content: Option<String>,
+    /// The `aria-label` of each footnote's back reference; `Back to reference 1` and so
+    /// on when unset.
+    pub footnote_back_label: Option<String>,
+    /// The heading of the footnotes section; `Footnotes` when unset.
+    pub footnote_label: Option<String>,
+    /// The tag name of the footnotes section's heading; `h2` when unset.
+    pub footnote_label_tag_name: Option<String>,
 }
 
 /// Options of `md::stringify`, named as mdast-util-to-markdown names them.
@@ -122,3 +135,32 @@ impl Names {
         }
     }
 }
+
+/// Options of `md::gfm`, named as remark-gfm names them.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
+pub struct GfmOptions {
+    /// Let one tilde, `~a~`, form strikethrough, as well as two.
+    pub single_tilde: bool,
+    /// Pad table cells with a space on each side when writing Markdown.
+    pub table_cell_padding: bool,
+    /// Line up table pipes when writing Markdown.
+    pub table_pipe_align: bool,
+    /// Write a footnote definition's first line blank when it holds flow content.
+    pub first_line_blank: bool,
+}
+
+impl Default for GfmOptions {
+    fn default() -> Self {
+        GfmOptions {
+            single_tilde: true,
+            table_cell_padding: true,
+            table_pipe_align: true,
+            first_line_blank: false,
+        }
+    }
+}
+
+/// What `md::gfm` shares with the parser and serializer: `Some` once GFM is used.
+#[derive(Clone, Debug, Default)]
+pub struct GfmSlot(pub Option<GfmOptions>);

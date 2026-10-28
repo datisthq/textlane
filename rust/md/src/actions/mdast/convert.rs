@@ -5,6 +5,9 @@ use textlane_core::hast;
 use textlane_core::mdast;
 
 use crate::models::options::ToHtmlOptions;
+use crate::utils::converter::footnote::{
+    append_footer, create_footer, find_footnote_definitions,
+};
 use crate::utils::converter::state::Converter;
 
 /// Turn mdast into hast, as remark-rehype does; several nodes come back in a root.
@@ -18,6 +21,8 @@ pub fn convert_mdast<'a>(
         options,
         loose_lists: vec![],
         definitions: find_definitions(node),
+        footnote_order: vec![],
+        footnote_counts: HashMap::new(),
     };
     let mut nodes = converter.convert(node);
     // Handlers that return several nodes, or text in place of a reference, return a list,
@@ -32,18 +37,23 @@ pub fn convert_mdast<'a>(
         }
         _ => false,
     };
-    if nodes.len() == 1
-        && !list
-        && let Some(node) = nodes.pop()
-    {
-        return node;
+    let mut tree = match nodes.pop() {
+        Some(node) if nodes.is_empty() && !list => node,
+        last => {
+            nodes.extend(last);
+            hast::Node::Root(hast::Root {
+                children: nodes,
+                position: None,
+                quirks_mode: None,
+                data: None,
+            })
+        }
+    };
+    let footnotes = find_footnote_definitions(node);
+    if let Some(footer) = create_footer(&mut converter, &footnotes) {
+        append_footer(&mut tree, footer);
     }
-    hast::Node::Root(hast::Root {
-        children: nodes,
-        position: None,
-        quirks_mode: None,
-        data: None,
-    })
+    tree
 }
 
 // Every definition in the tree, walked without recursing; the first of an identifier wins

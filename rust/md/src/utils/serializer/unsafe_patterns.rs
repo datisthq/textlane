@@ -41,13 +41,56 @@ const CODE_FENCED_INFO: &[&str] = &[
     "headingAtx",
 ];
 
-/// The built-in patterns, then `extra`, in the order upstream checks them.
-pub(crate) fn compile_patterns(extra: &[UnsafePattern]) -> Result<Vec<Pattern>, Error> {
+/// The built-in patterns, GFM's when `gfm` is set, then `extra`, in the order upstream
+/// checks them.
+pub(crate) fn compile_patterns(
+    gfm: bool,
+    extra: &[UnsafePattern],
+) -> Result<Vec<Pattern>, Error> {
     let mut patterns = Vec::new();
-    for pattern in create_default_patterns().iter().chain(extra) {
+    let gfm_patterns = if gfm { create_gfm_patterns() } else { vec![] };
+    for pattern in create_default_patterns()
+        .iter()
+        .chain(&gfm_patterns)
+        .chain(extra)
+    {
         patterns.push(compile_pattern(pattern)?);
     }
     Ok(patterns)
+}
+
+// In remark-gfm's order: autolink literals, footnotes, strikethrough, tables, task list
+// items; an earlier pattern decides how a character is escaped
+fn create_gfm_patterns() -> Vec<UnsafePattern> {
+    let phrasing = Some(&["phrasing"][..]);
+    let not_in_link = Some(&["autolink", "link", "image", "label"][..]);
+    let table_cell = Some(&["tableCell"][..]);
+    vec![
+        create(
+            '@',
+            Some("[+\\-.\\w]"),
+            Some("[\\-.\\w]"),
+            phrasing,
+            not_in_link,
+        ),
+        create('.', Some("[Ww]"), Some("[\\-.\\w]"), phrasing, not_in_link),
+        create(':', Some("[ps]"), Some("\\/"), phrasing, not_in_link),
+        create(
+            '[',
+            None,
+            None,
+            Some(&["label", "phrasing", "reference"]),
+            None,
+        ),
+        create('~', None, None, phrasing, Some(FULL_PHRASING_SPANS)),
+        create('\r', None, None, table_cell, None),
+        create('\n', None, None, table_cell, None),
+        create_at_break('|', None, Some("[\t :-]")),
+        create('|', None, None, table_cell, None),
+        create_at_break(':', None, Some("-")),
+        create_at_break('-', None, Some("[:|-]")),
+        create_at_break('-', None, Some("[:|-]")),
+    ]
 }
 
 fn create_default_patterns() -> Vec<UnsafePattern> {

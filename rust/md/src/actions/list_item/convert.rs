@@ -1,17 +1,22 @@
 use textlane_core::ArenaVec;
-use textlane_core::hast;
+use textlane_core::hast::{self, Element, Property, PropertyItem, PropertyValue};
 use textlane_core::mdast::{self, ListItem};
 
 use crate::utils::converter::state::Converter;
 
 /// A list item becomes `li`; in a tight list its paragraphs unwrap into it. `list_loose`
-/// is whether its list is loose, when it is in one.
+/// is whether its list is loose, when it is in one. A task item starts with a checkbox.
 pub(crate) fn convert_list_item<'a>(
     converter: &mut Converter<'a, '_>,
     node: &ListItem<'a>,
     list_loose: Option<bool>,
-    results: ArenaVec<'a, hast::Node<'a>>,
+    mut results: ArenaVec<'a, hast::Node<'a>>,
 ) -> hast::Node<'a> {
+    let mut properties = ArenaVec::new_in(converter.alloc);
+    if let Some(checked) = node.checked {
+        add_checkbox(converter, &mut results, checked);
+        properties.push(create_class_name(converter, "task-list-item"));
+    }
     let loose = list_loose.unwrap_or_else(|| is_item_loose(node));
     let tail_is_paragraph = results.last().is_some_and(is_paragraph);
     let any = !results.is_empty();
@@ -31,7 +36,60 @@ pub(crate) fn convert_list_item<'a>(
     if any && (loose || !tail_is_paragraph) {
         children.push(line_ending());
     }
-    converter.element("li", children, node.position)
+    converter.element_with("li", properties, children, node.position)
+}
+
+// Into the first paragraph, or a new one before the rest
+fn add_checkbox<'a>(
+    converter: &Converter<'a, '_>,
+    results: &mut ArenaVec<'a, hast::Node<'a>>,
+    checked: bool,
+) {
+    if !results.first().is_some_and(is_paragraph) {
+        let paragraph = converter.element("p", ArenaVec::new_in(converter.alloc), None);
+        results.insert(0, paragraph);
+    }
+    let Some(hast::Node::Element(paragraph)) = results.first_mut() else {
+        return;
+    };
+    if !paragraph.children.is_empty() {
+        paragraph.children.insert(0, converter.text(" "));
+    }
+    let mut properties = ArenaVec::with_capacity_in(3, converter.alloc);
+    properties.push(Property {
+        name: "type",
+        value: PropertyValue::String("checkbox"),
+    });
+    properties.push(Property {
+        name: "checked",
+        value: PropertyValue::Boolean(checked),
+    });
+    properties.push(Property {
+        name: "disabled",
+        value: PropertyValue::Boolean(true),
+    });
+    let input = hast::Node::Element(Element {
+        tag_name: "input",
+        properties,
+        children: ArenaVec::new_in(converter.alloc),
+        position: None,
+        content: None,
+        data: None,
+    });
+    paragraph.children.insert(0, input);
+}
+
+/// A `className` property of one class.
+pub(crate) fn create_class_name<'a>(
+    converter: &Converter<'a, '_>,
+    name: &'a str,
+) -> Property<'a> {
+    let mut list = ArenaVec::with_capacity_in(1, converter.alloc);
+    list.push(PropertyItem::String(name));
+    Property {
+        name: "className",
+        value: PropertyValue::List(list),
+    }
 }
 
 /// As mdast-util-to-hast: a list is loose when it or any of its items is.

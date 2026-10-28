@@ -28,6 +28,7 @@ fn open(tokenizer: &mut Tokenizer) -> State {
         start: (end - 5, end),
         inactive: false,
     });
+    tokenizer.tokenize_state.gfm_footnote_image = Some((end - 5, end));
     tokenizer.register_resolver_before(Resolver::Label);
     State::Ok
 }

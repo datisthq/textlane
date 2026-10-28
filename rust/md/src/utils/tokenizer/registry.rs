@@ -1,5 +1,7 @@
 use crate::actions::attention::resolve::resolve_attention;
 use crate::actions::data::resolve::resolve_data;
+use crate::actions::gfm_strikethrough::resolve::resolve_gfm_strikethrough;
+use crate::actions::gfm_table::resolve::resolve_gfm_table;
 use crate::actions::heading_atx::resolve::resolve_heading_atx;
 use crate::actions::heading_setext::resolve::resolve_heading_setext;
 use crate::actions::label_end::resolve::resolve_label;
@@ -23,6 +25,14 @@ pub(crate) fn call_resolver(
         Resolver::Content => Some(resolve_content(tokenizer)),
         Resolver::Data => {
             resolve_data(tokenizer);
+            None
+        }
+        Resolver::GfmTable => {
+            resolve_gfm_table(tokenizer);
+            None
+        }
+        Resolver::GfmStrikethrough => {
+            resolve_gfm_strikethrough(tokenizer);
             None
         }
         Resolver::ListItem => {

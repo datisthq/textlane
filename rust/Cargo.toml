@@ -26,6 +26,7 @@ regex = { version = "1.11.1", default-features = false, features = [
   "unicode",
 ] }
 stacker = "0.1.21"
+url = "2.5.4"
 
 [workspace.lints.rust]
 unsafe_code = "deny"

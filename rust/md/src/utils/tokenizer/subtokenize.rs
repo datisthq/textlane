@@ -1,5 +1,7 @@
+use crate::helpers::skip::skip_opt_back;
 use crate::models::construct::State;
-use crate::models::event::{ContentType, Event};
+use crate::models::event::{ContentType, Event, Kind};
+use crate::models::token::Name;
 use crate::utils::tokenizer::content::tokenize_content_definition_before;
 use crate::utils::tokenizer::driver::Tokenizer;
 use crate::utils::tokenizer::edit_map::EditMap;
@@ -53,6 +55,8 @@ pub(crate) fn subtokenize(
                 ContentType::String => tokenize_string,
                 _ => tokenize_text,
             });
+            tokenizer.tokenize_state.task_list_check_allowed =
+                parse_state.gfm.is_some() && starts_list_item(events, index);
             let mut link_index = Some(index);
             while let Some(index) = link_index {
                 let enter = &events[index];
@@ -77,6 +81,33 @@ pub(crate) fn subtokenize(
     }
     map.consume(events);
     value
+}
+
+// Text that opens a list item's first paragraph, as micromark's first content of an item:
+// after one blank line ending the prefix, and after definitions in the same content
+fn starts_list_item(events: &[Event], index: usize) -> bool {
+    let is_exit =
+        |at: usize, name| events[at].kind == Kind::Exit && events[at].name == name;
+    if index < 3
+        || events[index - 1].kind != Kind::Enter
+        || events[index - 1].name != Name::PARAGRAPH
+    {
+        return false;
+    }
+    let mut at = skip_opt_back(events, index - 2, &[Name::SPACE_OR_TAB]);
+    while is_exit(at, Name::LINE_ENDING) {
+        at = skip_opt_back(events, at, &[Name::LINE_ENDING]);
+        at = skip_opt_back(events, at, &[Name::SPACE_OR_TAB]);
+        if !is_exit(at, Name::DEFINITION) {
+            return false;
+        }
+        at = skip_opt_back(events, at, &[Name::DEFINITION]);
+        at = skip_opt_back(events, at, &[Name::SPACE_OR_TAB]);
+    }
+    if is_exit(at, Name::BLANK_LINE_ENDING) {
+        at = skip_opt_back(events, at, &[Name::BLANK_LINE_ENDING]);
+    }
+    is_exit(at, Name::LIST_ITEM_PREFIX)
 }
 
 /// Replace each linked chunk of `events` by the child events that fall inside it.

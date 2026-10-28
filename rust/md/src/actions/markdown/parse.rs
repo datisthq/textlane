@@ -1,17 +1,33 @@
 use textlane_core::Allocator;
+
+use crate::models::options::GfmOptions;
 use textlane_core::mdast::Node;
 
+use crate::plugins::gfm::actions::text::autolink::autolink_text;
 use crate::utils::compiler::handlers::compile_event;
 use crate::utils::compiler::stack::Compiler;
 use crate::utils::tokenizer::preprocess::tokenize_input;
 
 /// Parse Markdown into mdast, allocated in `alloc` and borrowing `input` where it can.
 pub fn parse_markdown<'a>(input: &'a str, alloc: &'a Allocator) -> Node<'a> {
-    let (events, prefixes) = tokenize_input(input);
+    parse_markdown_with(input, None, alloc)
+}
+
+/// Parse Markdown, with GFM's constructs when `gfm` is given.
+pub(crate) fn parse_markdown_with<'a>(
+    input: &'a str,
+    gfm: Option<&GfmOptions>,
+    alloc: &'a Allocator,
+) -> Node<'a> {
+    let (events, prefixes) = tokenize_input(input, gfm);
     let mut compiler = Compiler::new(&events, input, alloc, prefixes);
     for index in 0..events.len() {
         compiler.index = index;
         compile_event(&mut compiler);
     }
-    compiler.finish()
+    let mut root = compiler.finish();
+    if gfm.is_some() {
+        autolink_text(&mut root, alloc);
+    }
+    root
 }

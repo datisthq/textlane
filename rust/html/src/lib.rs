@@ -14,6 +14,11 @@ mod utils {
         pub(crate) mod modes;
         pub(crate) mod parser;
     }
+    pub(crate) mod converter {
+        pub(crate) mod state;
+        pub(crate) mod store;
+        pub(crate) mod wrap;
+    }
     pub(crate) mod tokenizer {
         pub(crate) mod entity;
         pub(crate) mod machine;
@@ -21,13 +26,102 @@ mod utils {
     }
 }
 mod actions {
+    pub(crate) mod a {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod base {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod blockquote {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod br {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod code {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod comment {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod del {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod dl {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod em {
+        pub(crate) mod convert;
+    }
     pub(crate) mod hast {
+        pub(crate) mod convert;
+        pub(crate) mod minify;
         pub(crate) mod sanitize;
         pub(crate) mod slug;
         pub(crate) mod stringify;
     }
+    pub(crate) mod heading {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod hr {
+        pub(crate) mod convert;
+    }
     pub(crate) mod html {
         pub(crate) mod parse;
+    }
+    pub(crate) mod iframe {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod img {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod inline_code {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod input {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod li {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod list {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod media {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod p {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod q {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod root {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod select {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod strong {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod table {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod table_cell {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod table_row {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod text {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod textarea {
+        pub(crate) mod convert;
+    }
+    pub(crate) mod wbr {
+        pub(crate) mod convert;
     }
 }
 mod helpers {
@@ -35,12 +129,16 @@ mod helpers {
     pub(crate) mod entities;
     pub(crate) mod foreign;
     pub(crate) mod omission;
+    pub(crate) mod phrasing;
     pub(crate) mod property;
     pub(crate) mod reason;
     pub(crate) mod schema;
+    pub(crate) mod selected;
     pub(crate) mod slug;
     pub(crate) mod slug_table;
     pub(crate) mod tag;
+    pub(crate) mod text;
+    pub(crate) mod value;
 }
 mod plugins {
     pub(crate) mod parse {
@@ -55,15 +153,19 @@ mod plugins {
     pub(crate) mod stringify {
         pub(crate) mod plugin;
     }
+    pub(crate) mod to_markdown {
+        pub(crate) mod plugin;
+    }
 }
 
 // models
 pub use models::options::{
     AttributeDefinition, ParseOptions, Primitive, SanitizeOptions, SlugOptions,
-    StringifyOptions,
+    StringifyOptions, ToMarkdownOptions,
 };
 
 // actions
+pub use actions::hast::convert::convert_hast;
 pub use actions::hast::sanitize::sanitize_hast;
 pub use actions::hast::slug::slug_hast;
 pub use actions::hast::stringify::stringify_hast;
@@ -74,3 +176,4 @@ pub use plugins::parse::plugin::{Parse, parse};
 pub use plugins::sanitize::plugin::{Sanitize, sanitize};
 pub use plugins::slug::plugin::{Slug, slug};
 pub use plugins::stringify::plugin::{Stringify, stringify};
+pub use plugins::to_markdown::plugin::{ToMarkdown, to_markdown};

@@ -3,6 +3,7 @@ use serde_json::{Map, Value};
 use crate::actions::position::serialize::serialize_position;
 use crate::models::error::Error;
 use crate::models::lines::Lines;
+use crate::models::mdast::AlignKind;
 use crate::models::mdast::Node;
 
 // JSON values nest and drop recursively, so trees deeper than this fail instead of
@@ -110,6 +111,33 @@ fn serialize_node(
         Node::Text(text) => {
             object.insert("value".into(), text.value.into());
             "text"
+        }
+        Node::Delete(_) => "delete",
+        Node::Table(table) => {
+            let align = table
+                .align
+                .iter()
+                .map(|align| match align {
+                    AlignKind::Left => Value::from("left"),
+                    AlignKind::Right => Value::from("right"),
+                    AlignKind::Center => Value::from("center"),
+                    AlignKind::None => Value::Null,
+                })
+                .collect();
+            object.insert("align".into(), Value::Array(align));
+            "table"
+        }
+        Node::TableRow(_) => "tableRow",
+        Node::TableCell(_) => "tableCell",
+        Node::FootnoteDefinition(definition) => {
+            object.insert("identifier".into(), definition.identifier.into());
+            object.insert("label".into(), definition.label.into());
+            "footnoteDefinition"
+        }
+        Node::FootnoteReference(reference) => {
+            object.insert("identifier".into(), reference.identifier.into());
+            object.insert("label".into(), reference.label.into());
+            "footnoteReference"
         }
     };
     object.insert("type".into(), kind.into());

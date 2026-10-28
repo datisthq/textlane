@@ -163,6 +163,8 @@ fn add_plugin(
         #[cfg(feature = "md")]
         "md.parse" => processor.with(textlane_md::parse(read_options(options)?)),
         #[cfg(feature = "md")]
+        "md.gfm" => processor.with(textlane_md::gfm(read_options(options)?)),
+        #[cfg(feature = "md")]
         "md.gemoji" => processor.with(textlane_md::gemoji()),
         #[cfg(feature = "md")]
         "md.stringify" => processor.with(textlane_md::stringify(read_options(options)?)),
@@ -176,6 +178,10 @@ fn add_plugin(
         }
         #[cfg(feature = "html")]
         "html.slug" => processor.with(textlane_html::slug(read_options(options)?)),
+        #[cfg(feature = "html")]
+        "html.toMarkdown" => {
+            processor.with(textlane_html::to_markdown(read_options(options)?))
+        }
         #[cfg(feature = "html")]
         "html.stringify" => {
             processor.with(textlane_html::stringify(read_options(options)?))

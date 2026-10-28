@@ -78,6 +78,7 @@ fn ok(tokenizer: &mut Tokenizer) -> State {
         end: (state.end, tokenizer.events.len() - 1),
     });
     state.end = 0;
+    state.gfm_footnote_image = None;
     tokenizer.register_resolver_before(Resolver::Label);
     State::Ok
 }

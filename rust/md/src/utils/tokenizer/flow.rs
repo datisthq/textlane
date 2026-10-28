@@ -1,6 +1,7 @@
 use crate::actions::blank_line::tokenize::tokenize_blank_line;
 use crate::actions::code_fenced::tokenize::tokenize_code_fenced;
 use crate::actions::code_indented::tokenize::tokenize_code_indented;
+use crate::actions::gfm_table::tokenize::tokenize_gfm_table;
 use crate::actions::heading_atx::tokenize::tokenize_heading_atx;
 use crate::actions::heading_setext::tokenize::tokenize_heading_setext;
 use crate::actions::html_flow::tokenize::tokenize_html_flow;
@@ -14,19 +15,19 @@ use crate::utils::tokenizer::driver::Tokenizer;
 pub(crate) fn tokenize_flow(tokenizer: &mut Tokenizer) -> State {
     match tokenizer.current {
         Some(b'#') => {
-            tokenizer.attempt(State::Next(after), State::Next(before_content));
+            tokenizer.attempt(State::Next(after), State::Next(before_gfm_table));
             State::Retry(tokenize_heading_atx)
         }
         Some(b'`' | b'~') => {
-            tokenizer.attempt(State::Next(after), State::Next(before_content));
+            tokenizer.attempt(State::Next(after), State::Next(before_gfm_table));
             State::Retry(tokenize_code_fenced)
         }
         Some(b'<') => {
-            tokenizer.attempt(State::Next(after), State::Next(before_content));
+            tokenizer.attempt(State::Next(after), State::Next(before_gfm_table));
             State::Retry(tokenize_html_flow)
         }
         Some(b'*' | b'_') => {
-            tokenizer.attempt(State::Next(after), State::Next(before_content));
+            tokenizer.attempt(State::Next(after), State::Next(before_gfm_table));
             State::Retry(tokenize_thematic_break)
         }
         _ => State::Retry(blank_line_before),
@@ -67,8 +68,13 @@ fn before_heading_setext(tokenizer: &mut Tokenizer) -> State {
 }
 
 fn before_thematic_break(tokenizer: &mut Tokenizer) -> State {
-    tokenizer.attempt(State::Next(after), State::Next(before_content));
+    tokenizer.attempt(State::Next(after), State::Next(before_gfm_table));
     State::Retry(tokenize_thematic_break)
+}
+
+fn before_gfm_table(tokenizer: &mut Tokenizer) -> State {
+    tokenizer.attempt(State::Next(after), State::Next(before_content));
+    State::Retry(tokenize_gfm_table)
 }
 
 fn before_content(tokenizer: &mut Tokenizer) -> State {

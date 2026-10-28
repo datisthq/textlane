@@ -119,6 +119,7 @@ pub(crate) fn is_phrasing(node: &Node) -> bool {
         node,
         Node::Break(_)
             | Node::Emphasis(_)
+            | Node::FootnoteReference(_)
             | Node::Image(_)
             | Node::ImageReference(_)
             | Node::InlineCode(_)

@@ -21,6 +21,8 @@ pub(crate) enum Resolver {
     Attention,
     Content,
     Data,
+    GfmTable,
+    GfmStrikethrough,
     HeadingAtx,
     HeadingSetext,
     Label,

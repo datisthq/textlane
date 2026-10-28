@@ -490,7 +490,7 @@ fn find_definition<'d>(
     if let Some(found) = definitions.iter().find(|definition| definition.name == key) {
         return Some(found);
     }
-    let is_data = key.len() > 4 && key[..4].eq_ignore_ascii_case("data");
+    let is_data = key.len() > 4 && key.as_bytes()[..4].eq_ignore_ascii_case(b"data");
     if is_data {
         return definitions
             .iter()

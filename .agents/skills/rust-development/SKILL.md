@@ -65,8 +65,11 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   pieces through a growable arena buffer, a label is matched against definitions in the
   length of the longest identifier (`ParseState::is_defined`), and a label's text is read
   only when it names a reference. Inline HTML remembers which kinds scanned to the end
-  unclosed (`html_text_unclosed`). The serializer never re-indents a container's text:
-  `utils/serializer/sink.rs` records each container as a layer and writes every prefix
+  unclosed (`html_text_unclosed`). A GFM literal autolink remembers where its last trail
+  check and failed domain ended (`literal_trail`, `literal_domain_failed`): a check or
+  domain starting in between ends the same way; the find-and-replace pass after parsing
+  shares one domain run and one atext run among the starts inside it. The serializer
+  never re-indents a container's text: `utils/serializer/sink.rs` records each container as a layer and writes every prefix
   once, deciding a blank line from the innermost prefix out. Nested emphasis renders into
   one shared token buffer, and a delimiter run's token list is shared, not copied per
   token. Time
@@ -85,10 +88,18 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   string content is never trimmed; a token's slice leaves out container prefixes of its later
   lines and reads NUL as U+FFFD, as micromark's chunks do; each line of a label or title is
   a string of its own, a title's indent after a line ending belongs to neither; a point
-  inside a tab is one column and one offset past the tab's start). The serializer reads
+  inside a tab is one column and one offset past the tab's start; GFM follows micromark's
+  extensions: an email literal tokenizes in text, without `mailto:` or `xmpp:`, then
+  mdast-util-gfm-autolink-literal's find-and-replace links what micromark left, and a task
+  check goes in the first content of an item: after one blank line ending, or definitions).
+  Attention and strikethrough classify a neighbour as micromark does a UTF-16 code unit
+  (`classify_character_unit`); the serializer reads
   characters as upstream reads UTF-16 code units: nothing, or an astral character, is
   neither whitespace nor punctuation (`classify_unit`), and a reference without a
-  `referenceType` is collapsed.
+  `referenceType` is collapsed. GFM footnote calls follow micromark, not markdown-rs: a
+  construct of their own at `[`, tried before a link start, that needs a definition the
+  document pass already found (`ParseState::gfm_footnote_definitions`), plus a `]` after a
+  failed label end that turns `![^a]` into `!` and a call (`gfm_footnote_image`).
   `helpers/entities.rs` and `helpers/unicode.rs` are tables generated from markdown-rs's,
   sorted for binary search
 - `html`'s parser is a port of parse5 7.3.0, the tree hast-util-from-parse5 and hastscript
@@ -106,6 +117,21 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   `html.sanitize` and `html.slug` port hast-util-sanitize and rehype-slug; the sanitizer
   walks with its own stack and counts open ancestors instead of searching them, and
   `helpers/slug_table.rs` is github-slugger's removal regex as generated code-point ranges
+  `html.toMarkdown` ports hast-util-to-mdast 10.1.2 with rehype-minify-whitespace run first
+  (`actions/hast/minify.rs`, which works out `collapsableAfter` for every node in one pass).
+  Handlers build into `utils/converter/store.rs`, a flat store that keeps per-subtree flags
+  (`flow` for `wrapNeeded`, `link`) and `<q>`'s quotes apart from text, then builds mdast and
+  merges texts as upstream's last `visit` does. Flow containers hand their already wrapped
+  content up as one `Fragment`, since `wrap(a ++ w) == wrap(a) ++ w`; only consumers that look
+  at single items expand it (`expand`). List spread and datalist options are memoized by
+  element address. Table spans clamp as browsers do (rowspan 65534, colspan 1000), one table adds
+  at most `MAX_ADDED_CELLS` empty cells, and each row's splices from rows above are replayed in
+  one pass (`replay_inserts`, a Fenwick tree), keeping upstream's index-based splices exact
+- `md.gfm` only puts `GfmOptions` in the `GfmSlot` slot; `md.parse` and `md.stringify` read it
+  when their factories run at freeze, so GFM's constructs, handlers and unsafe patterns are
+  on only with it. A GFM table is tried after each first byte's own flow constructs, as
+  micromark tries constructs keyed on `null`, and a row's indent sits before the row token.
+  At `[`, text tries the footnote call, then the task list check, then a link
 - `md` names entities by syntax construct or mdast node and verbs by layer: `tokenize` and
   `resolve` (micromark), `compile` (from-markdown), `stringify` (to-markdown), `convert`
   (to-hast), so `actions/heading/compile.rs` exports `compile_heading`. No file named after

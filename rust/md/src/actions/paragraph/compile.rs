@@ -1,6 +1,7 @@
 use textlane_core::ArenaVec;
 use textlane_core::mdast::{Node, Paragraph};
 
+use crate::actions::gfm_task_list_item_check::compile::strip_task_list_item_space;
 use crate::models::event::Kind;
 use crate::utils::compiler::stack::Compiler;
 
@@ -11,6 +12,9 @@ pub(crate) fn compile_paragraph(compiler: &mut Compiler, kind: Kind) {
             children: ArenaVec::new_in(compiler.alloc),
             position: None,
         })),
-        Kind::Exit => compiler.tail_pop(),
+        Kind::Exit => {
+            compiler.tail_pop();
+            strip_task_list_item_space(compiler);
+        }
     }
 }

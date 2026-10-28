@@ -96,6 +96,11 @@ mod actions {
         pub(crate) mod stringify;
         pub(crate) mod tokenize;
     }
+    pub(crate) mod delete {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
+    }
     pub(crate) mod destination {
         pub(crate) mod tokenize;
     }
@@ -103,6 +108,40 @@ mod actions {
         pub(crate) mod compile;
         pub(crate) mod convert;
         pub(crate) mod stringify;
+    }
+    pub(crate) mod footnote_definition {
+        pub(crate) mod compile;
+        pub(crate) mod stringify;
+    }
+    pub(crate) mod footnote_reference {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
+    }
+    pub(crate) mod gfm_autolink_literal {
+        pub(crate) mod compile;
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod gfm_footnote_call {
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod gfm_footnote_definition {
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod gfm_potential_footnote_call {
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod gfm_strikethrough {
+        pub(crate) mod resolve;
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod gfm_table {
+        pub(crate) mod resolve;
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod gfm_task_list_item_check {
+        pub(crate) mod compile;
+        pub(crate) mod tokenize;
     }
     pub(crate) mod hard_break {
         pub(crate) mod compile;
@@ -222,6 +261,19 @@ mod actions {
         pub(crate) mod convert;
         pub(crate) mod stringify;
     }
+    pub(crate) mod table {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
+    }
+    pub(crate) mod table_cell {
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
+    }
+    pub(crate) mod table_row {
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
+    }
     pub(crate) mod text {
         pub(crate) mod compile;
         pub(crate) mod convert;
@@ -247,11 +299,13 @@ mod helpers {
     pub(crate) mod entities;
     pub(crate) mod html;
     pub(crate) mod identifier;
+    pub(crate) mod literal;
     pub(crate) mod position;
     pub(crate) mod reference;
     pub(crate) mod skip;
     pub(crate) mod slice;
     pub(crate) mod spread;
+    pub(crate) mod table;
     pub(crate) mod unicode;
     pub(crate) mod uri;
 }
@@ -275,6 +329,11 @@ mod plugins {
         pub(crate) mod plugin;
     }
     pub(crate) mod gfm {
+        pub(crate) mod actions {
+            pub(crate) mod text {
+                pub(crate) mod autolink;
+            }
+        }
         pub(crate) mod plugin;
     }
     pub(crate) mod math {
@@ -296,7 +355,8 @@ mod plugins {
 
 // models
 pub use models::options::{
-    Names, ParseOptions, StringifyOptions, ToHtmlOptions, UnsafePattern,
+    GfmOptions, GfmSlot, Names, ParseOptions, StringifyOptions, ToHtmlOptions,
+    UnsafePattern,
 };
 
 // actions
@@ -306,6 +366,7 @@ pub use actions::mdast::convert::convert_mdast;
 
 // plugins
 pub use plugins::gemoji::plugin::{Gemoji, gemoji};
+pub use plugins::gfm::plugin::{Gfm, gfm};
 pub use plugins::parse::plugin::{Parse, parse};
 pub use plugins::stringify::plugin::{Stringify, stringify};
 pub use plugins::to_html::plugin::{ToHtml, to_html};

@@ -18,6 +18,7 @@ pub(crate) fn tokenize_label_start_link(tokenizer: &mut Tokenizer) -> State {
         start: (start, tokenizer.events.len() - 1),
         inactive: false,
     });
+    tokenizer.tokenize_state.gfm_footnote_image = None;
     tokenizer.register_resolver_before(Resolver::Label);
     State::Ok
 }

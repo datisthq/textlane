@@ -1,3 +1,4 @@
+use crate::models::options::GfmOptions;
 use std::cell::{OnceCell, RefCell};
 use std::collections::HashSet;
 
@@ -22,6 +23,12 @@ pub(crate) struct ParseState<'a> {
     /// Container prefixes, as where each prefixed line starts and where its content does:
     /// slices of tokens that span lines leave them out, as micromark's chunks do.
     pub(crate) prefixes: RefCell<Vec<(usize, usize)>>,
+    /// GFM's options, when its constructs are on.
+    pub(crate) gfm: Option<GfmOptions>,
+    /// The normalized labels of GFM footnote definitions, all found before any text.
+    pub(crate) gfm_footnote_definitions: HashSet<String>,
+    /// The most characters a footnote definition's label has.
+    pub(crate) gfm_footnote_chars_max: usize,
 }
 
 impl ParseState<'_> {
@@ -36,10 +43,18 @@ impl ParseState<'_> {
     /// Whether the label text from byte `start` to `end` matches a definition; it costs
     /// the length of the longest identifier, not of the label.
     pub(crate) fn is_defined(&self, start: usize, end: usize) -> bool {
-        if self.definitions.is_empty() {
-            return false;
-        }
-        let next = self.next_non_whitespace.get_or_init(|| {
+        self.is_in(&self.definitions, self.definition_chars_max, start, end)
+    }
+
+    /// Whether the label text from byte `start` to `end` matches a GFM footnote
+    /// definition, at the same cost as `is_defined`.
+    pub(crate) fn is_gfm_footnote_defined(&self, start: usize, end: usize) -> bool {
+        let set = &self.gfm_footnote_definitions;
+        self.is_in(set, self.gfm_footnote_chars_max, start, end)
+    }
+
+    fn read_next_non_whitespace(&self) -> &[u32] {
+        self.next_non_whitespace.get_or_init(|| {
             let mut next = vec![0u32; self.bytes.len() + 1];
             let mut at = self.bytes.len() as u32;
             next[self.bytes.len()] = at;
@@ -50,13 +65,23 @@ impl ParseState<'_> {
                 next[index] = at;
             }
             next
-        });
+        })
+    }
+
+    fn is_in(
+        &self,
+        set: &HashSet<String>,
+        chars_max: usize,
+        start: usize,
+        end: usize,
+    ) -> bool {
+        if set.is_empty() {
+            return false;
+        }
+        let next = self.read_next_non_whitespace();
         let is_whitespace = |byte: u8| matches!(byte, b'\t' | b'\n' | b'\r' | b' ');
         // A character takes at most four bytes, so a longer run is too long
-        let bytes_max = self
-            .definition_chars_max
-            .saturating_mul(4)
-            .saturating_add(4);
+        let bytes_max = chars_max.saturating_mul(4).saturating_add(4);
         let mut collapsed = String::new();
         let mut chars = 0;
         let mut index = next[start] as usize;
@@ -76,23 +101,29 @@ impl ParseState<'_> {
             }
             collapsed.push_str(run);
             chars += run.chars().count();
-            if chars > self.definition_chars_max {
+            if chars > chars_max {
                 return false;
             }
             index = (next[run_end] as usize).min(end);
         }
-        self.definitions.contains(&normalize_identifier(&collapsed))
+        set.contains(&normalize_identifier(&collapsed))
     }
 }
 
 /// Tokenize a document into its events, subtokenizing until no linked content is left.
-pub(crate) fn tokenize_input(value: &str) -> (Vec<Event>, Vec<(usize, usize)>) {
+pub(crate) fn tokenize_input(
+    value: &str,
+    gfm: Option<&GfmOptions>,
+) -> (Vec<Event>, Vec<(usize, usize)>) {
     let mut parse_state = ParseState {
         bytes: value.as_bytes(),
         definitions: HashSet::new(),
         definition_chars_max: 0,
         next_non_whitespace: OnceCell::new(),
         prefixes: RefCell::new(vec![]),
+        gfm: gfm.cloned(),
+        gfm_footnote_definitions: HashSet::new(),
+        gfm_footnote_chars_max: 0,
     };
     let start = Point {
         line: 1,
@@ -100,7 +131,7 @@ pub(crate) fn tokenize_input(value: &str) -> (Vec<Event>, Vec<(usize, usize)>) {
         index: 0,
         vs: 0,
     };
-    let (mut events, mut result) = {
+    let (mut events, mut result, footnotes) = {
         let mut tokenizer = Tokenizer::new(start, &parse_state);
         let state = tokenizer.push(
             (0, 0),
@@ -108,8 +139,16 @@ pub(crate) fn tokenize_input(value: &str) -> (Vec<Event>, Vec<(usize, usize)>) {
             State::Next(tokenize_document),
         );
         let result = tokenizer.flush(state, true);
-        (tokenizer.events, result)
+        let footnotes =
+            std::mem::take(&mut tokenizer.tokenize_state.gfm_footnote_definitions);
+        (tokenizer.events, result, footnotes)
     };
+    for label in footnotes {
+        parse_state.gfm_footnote_chars_max = parse_state
+            .gfm_footnote_chars_max
+            .max(label.chars().count());
+        parse_state.gfm_footnote_definitions.insert(label);
+    }
     loop {
         parse_state.add_definitions(std::mem::take(&mut result.definitions));
         if result.done {

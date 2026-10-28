@@ -3,6 +3,7 @@
 pub(crate) enum Layer {
     Blockquote,
     CodeIndented,
+    FootnoteDefinition { indent_first: bool },
     ListItem { bullet: String, size: usize },
 }
 
@@ -12,6 +13,11 @@ impl Layer {
             Layer::Blockquote => output.push_str(if blank { ">" } else { "> " }),
             Layer::CodeIndented => {
                 if !blank {
+                    output.push_str("    ");
+                }
+            }
+            Layer::FootnoteDefinition { indent_first } => {
+                if !blank && (line > 0 || *indent_first) {
                     output.push_str("    ");
                 }
             }
