@@ -112,11 +112,11 @@ Mirrors fairspec's `conformance/`:
 conformance/
   README.md
   test-schema.json               JSON Schema of a test file
-  tests/<area>/<feature>.json    e.g. core/use.json, md/gfm-table.json, html/sanitize.json
+  tests/<area>/<construct>.json  e.g. core/use.json, md/heading-atx.json, html/sanitize.json
   sources/                       importers that turn upstream tests into test files
 ```
 
-`<area>` is `core`, `md`, `html`, `mdx`, `prose`. The suite belongs to no package and is never
+`<area>` is `core`, `md`, `html`, `mdx`, `prose`; a file holds one construct with a group per source. The suite belongs to no package and is never
 shipped.
 
 ### Test files
