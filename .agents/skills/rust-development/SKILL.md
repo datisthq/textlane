@@ -45,6 +45,14 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   and the release-please `extra-files` (**`package-distribution`**)
 - In each crate, `src/actions/<entity>/<verb>.rs` exports `verb_noun`
   (`actions/package/version.rs` exports `read_version`); the module tree is declared inline in `lib.rs`, so there is no `mod.rs`
+- Beside `actions/`, as in fairspec: `models/` for types, `helpers/` for small free functions,
+  `plugins/<name>/` for one `.use()` stage each (`plugin.rs` plus its own `actions/`), and
+  `utils/<name>/` for a bounded internal system whose files are mutually recursive (`md`'s
+  `tokenizer`, `compiler`, `serializer`, `converter`); only it is exempt from one action per file
+- `md` names entities by syntax construct or mdast node and verbs by layer: `tokenize` and
+  `resolve` (micromark), `compile` (from-markdown), `stringify` (to-markdown), `convert`
+  (to-hast), so `actions/heading/compile.rs` exports `compile_heading`. No file named after
+  its parent module (`utils/tokenizer/tokenizer.rs`): clippy's `module_inception` rejects it
 - `textlane/src/bindings/node.rs` and `python.rs` only map crate functions to their
   language (`version()` in both); behaviour never lives there
 - Unit tests sit beside their module as `<module>_unit.rs`, wired in with
