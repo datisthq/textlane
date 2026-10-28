@@ -6,12 +6,70 @@
       "initial-version": "0.1.0",
       "include-component-in-tag": false,
       "extra-files": [
-        { "type": "toml", "path": "rust/Cargo.toml", "jsonpath": "$.package.version" },
-        { "type": "json", "path": "typescript/package.json", "jsonpath": "$.version" },
+        {
+          "type": "toml",
+          "path": "rust/Cargo.toml",
+          "jsonpath": "$.workspace.package.version"
+        },
+        {
+          "type": "toml",
+          "path": "rust/Cargo.toml",
+          "jsonpath": "$.workspace.dependencies['textlane-core'].version"
+        },
+        {
+          "type": "toml",
+          "path": "rust/Cargo.toml",
+          "jsonpath": "$.workspace.dependencies['textlane-markdown'].version"
+        },
+        {
+          "type": "toml",
+          "path": "rust/Cargo.toml",
+          "jsonpath": "$.workspace.dependencies['textlane-html'].version"
+        },
+        {
+          "type": "toml",
+          "path": "rust/Cargo.toml",
+          "jsonpath": "$.workspace.dependencies['textlane-prose'].version"
+        },
+        {
+          "type": "toml",
+          "path": "rust/Cargo.toml",
+          "jsonpath": "$.workspace.dependencies['textlane-javascript'].version"
+        },
+        {
+          "type": "json",
+          "path": "typescript/package.json",
+          "jsonpath": "$.version"
+        },
         {
           "type": "toml",
           "path": "rust/Cargo.lock",
           "jsonpath": "$.package[?(@.name.value=='textlane')].version"
+        },
+        {
+          "type": "toml",
+          "path": "rust/Cargo.lock",
+          "jsonpath": "$.package[?(@.name.value=='textlane-core')].version"
+        },
+        {
+          "type": "toml",
+          "path": "rust/Cargo.lock",
+          "jsonpath": "$.package[?(@.name.value=='textlane-markdown')].version"
+        },
+        {
+          "type": "toml",
+          "path": "rust/Cargo.lock",
+          "jsonpath": "$.package[?(@.name.value=='textlane-html')].version"
+        },
+        {
+          "type": "toml",
+          "path": "rust/Cargo.lock",
+          "jsonpath": "$.package[?(@.name.value=='textlane-prose')].version"
+        },
+        {
+          "type": "toml",
+          "path": "rust/Cargo.lock",
+          "jsonpath": "$.package[?(@.name.value=='textlane-javascript')].version"
         }
       ]
     }

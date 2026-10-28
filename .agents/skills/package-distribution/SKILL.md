@@ -5,7 +5,7 @@ description: Use when touching how textlane ships — the npm loader and its pla
 
 # Package distribution
 
-One crate, three registries, one version. Nothing here may change what the crate does.
+One workspace, three registries, one version. Nothing here may change what the crate does.
 
 ## npm: `textlane`
 
@@ -33,7 +33,7 @@ One crate, three registries, one version. Nothing here may change what the crate
 ## PyPI: `textlane`
 
 `python/pyproject.toml` is the whole package: maturin with `bindings = "pyo3"`,
-`features = ["python"]`, `module-name = "textlane"` and `manifest-path = "../rust/Cargo.toml"`,
+`features = ["python"]`, `module-name = "textlane"` and `manifest-path = "../rust/textlane/Cargo.toml"`,
 `dynamic = ["version"]` so the wheel takes the crate's version. PyO3's `abi3-py39` makes one
 wheel per platform serve every CPython from 3.9. A wheel holds the skills under
 `.data/data/share/textlane/skills/`, installed to `<venv>/share/textlane/skills`. maturin reads
@@ -46,7 +46,9 @@ outside `python/`. Check locally: `pnpm -C python build`, then
 
 ## crates.io: `textlane`
 
-`cargo publish` from `rust/`. The `include` list in `rust/Cargo.toml` keeps `src/`, `build.rs`,
+`cargo publish --workspace` from `rust/` publishes every member in dependency order, the domain
+crates before `textlane`. A binding never splits along them: one npm or PyPI package per domain
+would mean one addon each, and two addons cannot share a tree without serializing it. The `include` list in `rust/textlane/Cargo.toml` keeps `src/`, `build.rs`,
 `README.md` and `LICENSE.md`; a file the crate reads from outside them would compile here and
 fail for `cargo add`.
 
@@ -66,7 +68,8 @@ release-please re-creates the release and the fixed workflow publishes it.
 
 ## Versions
 
-One release-please component at `.`; `rust/Cargo.toml`, `rust/Cargo.lock` and
+One release-please component at `.`; `rust/Cargo.toml` (`workspace.package.version` and each
+member's pin in `workspace.dependencies`), `rust/Cargo.lock` (one entry per crate) and
 `typescript/package.json` are `extra-files`, `version.txt` the simple strategy's own file. Never
 bump any of them by hand. The lockfile entry needs `@.name.value` in its jsonpath, since
 release-please wraps TOML values; without it `cargo publish` finds a dirty lockfile and refuses.
@@ -74,7 +77,7 @@ release-please wraps TOML values; without it `cargo publish` finds a dirty lockf
 ## First publish
 
 Trusted publishing only covers packages that exist: the first npm publish of each platform
-package and the first `cargo publish` need tokens (`NPM_TOKEN`, `CARGO_REGISTRY_TOKEN`); PyPI
+package and the first `cargo publish` of each crate need tokens (`NPM_TOKEN`, `CARGO_REGISTRY_TOKEN`); PyPI
 accepts a pending trusted publisher for a new project. Publish a `0.0.0` placeholder by hand so
 release-please's first version still reaches CI; a token made for that first publish may lack
 `publish-update` and cannot publish later versions. Unscoped npm names can trip npm's spam

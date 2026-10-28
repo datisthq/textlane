@@ -345,6 +345,44 @@ dependencies = [
  "napi-build",
  "napi-derive",
  "pyo3",
+ "textlane-core",
+ "textlane-html",
+ "textlane-javascript",
+ "textlane-markdown",
+ "textlane-prose",
+]
+
+[[package]]
+name = "textlane-core"
+version = "0.0.0"
+
+[[package]]
+name = "textlane-html"
+version = "0.0.0"
+dependencies = [
+ "textlane-core",
+ "textlane-javascript",
+]
+
+[[package]]
+name = "textlane-javascript"
+version = "0.0.0"
+dependencies = [
+ "textlane-core",
+]
+
+[[package]]
+name = "textlane-markdown"
+version = "0.0.0"
+dependencies = [
+ "textlane-core",
+]
+
+[[package]]
+name = "textlane-prose"
+version = "0.0.0"
+dependencies = [
+ "textlane-core",
 ]
 
 [[package]]

@@ -1,0 +1,484 @@
+<title>Architecture</title>
+<meta
+  name="description"
+  content="Textlane's crates, their dependencies, the bindings and how MDX crosses domains."
+/>
+<meta name="order" content="1" />
+<meta name="date" content="2026-10-27" />
+<style>
+  figure.diagram {
+    margin: 1.5rem 0;
+    overflow-x: auto;
+  }
+  figure.diagram svg {
+    display: block;
+    width: 100%;
+    min-width: 640px;
+    height: auto;
+    font-family: var(--htmlpress-font);
+  }
+  figure.diagram figcaption {
+    color: var(--htmlpress-muted);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+  }
+  .diagram .band {
+    fill: var(--htmlpress-surface);
+    stroke: var(--htmlpress-border);
+  }
+  .diagram .tier {
+    fill: var(--htmlpress-muted);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+  }
+  .diagram .node rect {
+    fill: var(--htmlpress-bg);
+    stroke: var(--htmlpress-border);
+    stroke-width: 1.5;
+  }
+  .diagram .node.hub rect {
+    stroke: var(--htmlpress-accent);
+    stroke-width: 2;
+  }
+  .diagram .node.ext rect {
+    fill: none;
+    stroke-dasharray: 4 3;
+  }
+  .diagram .title {
+    fill: var(--htmlpress-text);
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+  .diagram .code {
+    fill: var(--htmlpress-text);
+    font-family: var(--htmlpress-mono);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .diagram .sub {
+    fill: var(--htmlpress-muted);
+    font-size: 11px;
+  }
+  .diagram .edge {
+    stroke: var(--htmlpress-muted);
+    stroke-width: 1.4;
+    fill: none;
+  }
+  .diagram .edge.opt {
+    stroke: var(--htmlpress-accent);
+    stroke-dasharray: 5 4;
+  }
+  .diagram .tree {
+    fill: var(--htmlpress-accent);
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .diagram .label {
+    fill: var(--htmlpress-muted);
+    font-size: 10.5px;
+  }
+  .diagram .head {
+    fill: var(--htmlpress-muted);
+  }
+  .diagram .head.opt {
+    fill: var(--htmlpress-accent);
+  }
+</style>
+
+<h1>Architecture</h1>
+<p>
+  Textlane replaces unified: one Rust workspace of a few large crates, one per content
+  domain, shipped as one <code>textlane</code> package to crates.io, npm and PyPI. Plugins
+  run natively; existing JavaScript plugins still join a pipeline. The first consumer is
+  livemark.
+</p>
+
+<htmlpress-grid cols="4">
+  <htmlpress-card>
+    <h3>6 crates</h3>
+    <p>textlane, core and four domains</p>
+  </htmlpress-card>
+  <htmlpress-card>
+    <h3>1 package</h3>
+    <p>per registry, a subpath per domain</p>
+  </htmlpress-card>
+  <htmlpress-card>
+    <h3>1 addon</h3>
+    <p>per platform, carrying every domain</p>
+  </htmlpress-card>
+  <htmlpress-card>
+    <h3>3 implementations</h3>
+    <p>Rust, Node and Python on one corpus</p>
+  </htmlpress-card>
+</htmlpress-grid>
+
+<h2>Crates and their dependencies</h2>
+<p>
+  <code>rust/Cargo.toml</code> is a virtual manifest; each crate is a sibling directory
+  named by its role, as in fairspec. All crates publish, lock-stepped at one version. The
+  dashed edge is optional, behind a feature.
+</p>
+<figure class="diagram">
+  <svg
+    viewBox="0 0 760 302"
+    role="img"
+    aria-label="textlane depends on four domain crates, markdown, prose, html and javascript, which each depend on textlane-core; html depends on javascript behind a feature; javascript depends on oxc; textlane re-exports core"
+  >
+    <defs>
+      <marker
+        id="dep"
+        viewBox="0 0 10 10"
+        refX="9"
+        refY="5"
+        markerWidth="7"
+        markerHeight="7"
+        orient="auto-start-reverse"
+      >
+        <path class="head" d="M0 0L10 5L0 10z" />
+      </marker>
+      <marker
+        id="dep-opt"
+        viewBox="0 0 10 10"
+        refX="9"
+        refY="5"
+        markerWidth="7"
+        markerHeight="7"
+        orient="auto-start-reverse"
+      >
+        <path class="head opt" d="M0 0L10 5L0 10z" />
+      </marker>
+    </defs>
+    <rect class="band" x="0" y="8" width="760" height="78" rx="10" />
+    <text class="tier" x="14" y="26">FAÇADE</text>
+    <rect class="band" x="0" y="112" width="760" height="78" rx="10" />
+    <text class="tier" x="14" y="130">DOMAINS</text>
+    <rect class="band" x="0" y="216" width="760" height="78" rx="10" />
+    <text class="tier" x="14" y="234">FOUNDATION</text>
+    <path class="edge" d="M400 72V100M160 100H640" />
+    <path class="edge" d="M160 100V124" marker-end="url(#dep)" />
+    <path class="edge" d="M320 100V124" marker-end="url(#dep)" />
+    <path class="edge" d="M480 100V124" marker-end="url(#dep)" />
+    <path class="edge" d="M640 100V124" marker-end="url(#dep)" />
+    <path class="edge" d="M160 172V204" />
+    <path class="edge" d="M320 172V204" />
+    <path class="edge" d="M480 172V204" />
+    <path class="edge" d="M640 172V204" />
+    <path class="edge" d="M160 204H640M400 204V228" marker-end="url(#dep)" />
+    <path class="edge opt" d="M320 48H52V252H310" marker-end="url(#dep-opt)" />
+    <text class="label" x="58" y="268">re-exports core's items</text>
+    <path class="edge" d="M680 172V228" marker-end="url(#dep)" />
+    <path class="edge opt" d="M550 148H568" marker-end="url(#dep-opt)" />
+    <text class="label" x="559" y="118" text-anchor="middle">feature</text>
+    <g class="node hub">
+      <rect x="320" y="24" width="160" height="48" rx="8" />
+      <text class="title" x="400" y="45" text-anchor="middle">textlane</text>
+      <text class="sub" x="400" y="60" text-anchor="middle">
+        processor · bridge · bindings
+      </text>
+    </g>
+    <g class="node">
+      <rect x="90" y="124" width="140" height="48" rx="8" />
+      <text class="title" x="160" y="145" text-anchor="middle">textlane-markdown</text>
+      <text class="sub" x="160" y="160" text-anchor="middle">markdown/</text>
+    </g>
+    <g class="node">
+      <rect x="250" y="124" width="140" height="48" rx="8" />
+      <text class="title" x="320" y="145" text-anchor="middle">textlane-prose</text>
+      <text class="sub" x="320" y="160" text-anchor="middle">prose/</text>
+    </g>
+    <g class="node">
+      <rect x="410" y="124" width="140" height="48" rx="8" />
+      <text class="title" x="480" y="145" text-anchor="middle">textlane-html</text>
+      <text class="sub" x="480" y="160" text-anchor="middle">html/</text>
+    </g>
+    <g class="node">
+      <rect x="570" y="124" width="140" height="48" rx="8" />
+      <text class="title" x="640" y="145" text-anchor="middle">textlane-javascript</text>
+      <text class="sub" x="640" y="160" text-anchor="middle">javascript/</text>
+    </g>
+    <g class="node hub">
+      <rect x="310" y="228" width="180" height="48" rx="8" />
+      <text class="title" x="400" y="249" text-anchor="middle">textlane-core</text>
+      <text class="sub" x="400" y="264" text-anchor="middle">
+        trees · file · plugin contract
+      </text>
+    </g>
+    <g class="node ext">
+      <rect x="620" y="228" width="110" height="48" rx="8" />
+      <text class="title" x="675" y="249" text-anchor="middle">oxc</text>
+      <text class="sub" x="675" y="264" text-anchor="middle">external</text>
+    </g>
+  </svg>
+  <figcaption>
+    Solid: a dependency. Accent dashes: behind a feature, or a re-export.
+  </figcaption>
+</figure>
+
+<h3>Rules</h3>
+<ul>
+  <li>
+    A domain crate depends on <code>textlane-core</code> only, never on another domain or
+    on <code>textlane</code>. Every tree type but JavaScript's lives in core, so the
+    bridges need no domain-to-domain edge.
+  </li>
+  <li>
+    The one exception: <code>html.toJavascript</code> builds oxc's tree, so
+    <code>html</code> depends on <code>javascript</code> behind its
+    <code>javascript</code> feature.
+  </li>
+  <li>
+    <code>textlane</code> re-exports core's items at its root and the domains as modules;
+    never as <code>textlane::core</code>, which clashes with Rust's built-in
+    <code>core</code>.
+  </li>
+  <li>
+    Features <code>markdown</code>, <code>html</code>, <code>prose</code> and
+    <code>javascript</code> are all default; <code>node</code> and
+    <code>python</code> enable every domain; <code>testing</code> adds the conformance
+    test plugins.
+  </li>
+</ul>
+
+<h2>What each crate holds</h2>
+<dl>
+  <dt><code>textlane</code></dt>
+  <dd>
+    The processor: <code>.use</code>, presets, freeze, <code>parse</code>,
+    <code>run</code>, <code>stringify</code>, <code>process</code>, sync and async. The
+    bridge that runs JavaScript and Python plugins. The napi and PyO3 bindings. Test
+    plugins behind <code>testing</code>.
+  </dd>
+  <dt><code>textlane-core</code></dt>
+  <dd>
+    unist conventions; mdast (with GFM, math, directive, frontmatter, definition list and
+    MDX nodes), hast and nlcst trees; the file (vfile) and its messages; the plugin
+    contract; visit, is and position utilities.
+  </dd>
+  <dt><code>textlane-markdown</code></dt>
+  <dd>
+    <code>parse</code>, <code>stringify</code>, <code>gfm</code>,
+    <code>frontmatter</code>, <code>directive</code>, <code>math</code>,
+    <code>definitionList</code>, <code>gemoji</code>, <code>toc</code>,
+    <code>mdx</code> (syntax only), <code>toHtml</code>, <code>toProse</code>.
+  </dd>
+  <dt><code>textlane-html</code></dt>
+  <dd>
+    <code>parse</code> (HTML5), <code>stringify</code>, <code>raw</code>,
+    <code>sanitize</code>, <code>slug</code>, <code>format</code>,
+    <code>toMarkdown</code>, <code>toProse</code>, <code>toJavascript</code> (feature);
+    later <code>katex</code> and <code>highlight</code>.
+  </dd>
+  <dt><code>textlane-javascript</code></dt>
+  <dd>
+    The JS tree on oxc (ESTree conversion for JavaScript recma plugins),
+    <code>parse</code>, the MDX transforms (document, JSX rewrite, build JSX),
+    <code>stringify</code> (codegen).
+  </dd>
+  <dt><code>textlane-prose</code></dt>
+  <dd>
+    <code>parse</code> (English, Latin), <code>stringify</code>, then
+    <code>smartypants</code>, <code>readability</code>, <code>spell</code>,
+    <code>repeatedWords</code>, <code>passive</code>, <code>equality</code>,
+    <code>contractions</code>, <code>indefiniteArticle</code>,
+    <code>sentenceSpacing</code>, <code>quotes</code>.
+  </dd>
+</dl>
+
+<h2>One package per registry</h2>
+<p>
+  Subpaths are views over one native addon. Separate npm or PyPI packages per domain would
+  each need their own addon, and two addons cannot share a tree without serializing it at
+  every boundary.
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Rust</th>
+      <th>npm</th>
+      <th>Python</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>textlane::{Processor, File, …}</code></td>
+      <td><code>textlane</code></td>
+      <td><code>textlane</code></td>
+    </tr>
+    <tr>
+      <td><code>textlane::markdown</code></td>
+      <td><code>textlane/markdown</code></td>
+      <td><code>textlane.markdown</code></td>
+    </tr>
+    <tr>
+      <td><code>textlane::html</code></td>
+      <td><code>textlane/html</code></td>
+      <td><code>textlane.html</code></td>
+    </tr>
+    <tr>
+      <td><code>textlane::javascript</code></td>
+      <td><code>textlane/javascript</code></td>
+      <td><code>textlane.javascript</code></td>
+    </tr>
+    <tr>
+      <td><code>textlane::prose</code></td>
+      <td><code>textlane/prose</code></td>
+      <td><code>textlane.prose</code></td>
+    </tr>
+  </tbody>
+</table>
+<pre
+  data-title="pipeline.ts"
+><code class="language-ts">import { textlane } from "textlane"
+import * as markdown from "textlane/markdown"
+import * as html from "textlane/html"
+
+const processor = textlane()
+  .use(markdown.parse())
+  .use(markdown.gfm())
+  .use(markdown.toHtml())
+  .use(html.sanitize())
+  .use(html.stringify())</code></pre>
+<p>
+  Names derive mechanically from Rust: <code>to_javascript</code> is
+  <code>toJavascript</code> through napi's default conversion and
+  <code>to_javascript</code> in Python. A domain name is one lowercase word in every
+  identifier. Plugin names, their options and node shapes are public API.
+</p>
+
+<h2>MDX across domains</h2>
+<p>
+  Livemark's <code>compileMDX</code> as a textlane pipeline. Syntax is Markdown's job;
+  compilation is JavaScript's. Each lane is the crate that owns the stage.
+</p>
+<figure class="diagram">
+  <svg
+    viewBox="0 0 1012 284"
+    role="img"
+    aria-label="MDX pipeline: markdown.parse with markdown.mdx, markdown.gfm and markdown.toHtml run in the markdown crate on mdast; html.slug and html.toJavascript run in the html crate on hast; the MDX transforms and javascript.stringify run in the javascript crate on the JS tree"
+  >
+    <defs>
+      <marker
+        id="mdx"
+        viewBox="0 0 10 10"
+        refX="9"
+        refY="5"
+        markerWidth="7"
+        markerHeight="7"
+        orient="auto-start-reverse"
+      >
+        <path class="head" d="M0 0L10 5L0 10z" />
+      </marker>
+      <marker
+        id="mdx-opt"
+        viewBox="0 0 10 10"
+        refX="9"
+        refY="5"
+        markerWidth="7"
+        markerHeight="7"
+        orient="auto-start-reverse"
+      >
+        <path class="head opt" d="M0 0L10 5L0 10z" />
+      </marker>
+    </defs>
+    <rect class="band" x="0" y="14" width="1012" height="82" rx="10" />
+    <text class="title" x="16" y="52">markdown</text>
+    <text class="sub" x="16" y="68">textlane-markdown</text>
+    <rect class="band" x="0" y="104" width="1012" height="82" rx="10" />
+    <text class="title" x="16" y="142">html</text>
+    <text class="sub" x="16" y="158">textlane-html</text>
+    <rect class="band" x="0" y="194" width="1012" height="82" rx="10" />
+    <text class="title" x="16" y="232">javascript</text>
+    <text class="sub" x="16" y="248">textlane-javascript</text>
+    <g class="node">
+      <rect x="150" y="34" width="140" height="42" rx="8" />
+      <text class="code" x="220" y="52" text-anchor="middle">markdown.parse</text>
+      <text class="sub" x="220" y="67" text-anchor="middle">+ markdown.mdx</text>
+    </g>
+    <g class="node">
+      <rect x="330" y="34" width="140" height="42" rx="8" />
+      <text class="code" x="400" y="52" text-anchor="middle">markdown.gfm …</text>
+      <text class="sub" x="400" y="67" text-anchor="middle">mdast transforms</text>
+    </g>
+    <g class="node">
+      <rect x="510" y="34" width="140" height="42" rx="8" />
+      <text class="code" x="580" y="52" text-anchor="middle">markdown.toHtml</text>
+      <text class="sub" x="580" y="67" text-anchor="middle">mdast → hast</text>
+    </g>
+    <g class="node">
+      <rect x="510" y="124" width="140" height="42" rx="8" />
+      <text class="code" x="580" y="142" text-anchor="middle">html.slug …</text>
+      <text class="sub" x="580" y="157" text-anchor="middle">hast transforms</text>
+    </g>
+    <g class="node">
+      <rect x="690" y="124" width="140" height="42" rx="8" />
+      <text class="code" x="760" y="142" text-anchor="middle">html.toJavascript</text>
+      <text class="sub" x="760" y="157" text-anchor="middle">hast → JS</text>
+    </g>
+    <g class="node">
+      <rect x="690" y="214" width="140" height="42" rx="8" />
+      <text class="code" x="760" y="232" text-anchor="middle">MDX transforms</text>
+      <text class="sub" x="760" y="247" text-anchor="middle">document · JSX</text>
+    </g>
+    <g class="node">
+      <rect x="850" y="214" width="156" height="42" rx="8" />
+      <text class="code" x="928" y="232" text-anchor="middle">javascript.stringify</text>
+      <text class="sub" x="928" y="247" text-anchor="middle">codegen → JS module</text>
+    </g>
+    <path class="edge" d="M290 55H330" marker-end="url(#mdx)" />
+    <text class="tree" x="310" y="48" text-anchor="middle">mdast</text>
+    <path class="edge" d="M470 55H510" marker-end="url(#mdx)" />
+    <text class="tree" x="490" y="48" text-anchor="middle">mdast</text>
+    <path class="edge" d="M580 76V124" marker-end="url(#mdx)" />
+    <text class="tree" x="588" y="104">hast</text>
+    <path class="edge" d="M650 145H690" marker-end="url(#mdx)" />
+    <text class="tree" x="670" y="138" text-anchor="middle">hast</text>
+    <path class="edge" d="M760 166V214" marker-end="url(#mdx)" />
+    <text class="tree" x="768" y="194">JS tree</text>
+    <path class="edge" d="M830 235H850" marker-end="url(#mdx)" />
+    <text class="tree" x="840" y="228" text-anchor="middle"></text>
+  </svg>
+  <figcaption>
+    Each lane is a crate; accent labels name the tree passed along each edge.
+  </figcaption>
+</figure>
+<p>
+  <code>markdown.mdx</code> finds JSX, expressions and ESM by balanced scanning and keeps
+  them as source strings, so <code>markdown</code> never compiles oxc. Only
+  <code>javascript</code>
+  parses them.
+</p>
+
+<h2>Hardest points</h2>
+<ol>
+  <li>
+    <strong>Reference expectations.</strong> micromark's tests assert micromark's own HTML
+    compiler, not the <code>toHtml</code> → <code>stringify</code> path; ~1k expectations
+    are regenerated through unified once.
+  </li>
+  <li>
+    <strong>One addon carries every domain.</strong> A tree passed between subpaths must
+    never cross a serialization boundary.
+  </li>
+  <li>
+    <strong>Core holds every tree type but JavaScript's.</strong> That keeps bridges free
+    of domain edges; <code>html.toJavascript</code> is the only exception.
+  </li>
+  <li>
+    <strong>Lifecycle as data.</strong> The core corpus depends on one set of test
+    plugins, identical in all three implementations.
+  </li>
+  <li>
+    <strong>Sanitization is security.</strong> One literal case per attack vector, run in
+    every target.
+  </li>
+  <li>
+    <strong>Licences.</strong> CommonMark spec text is CC-BY-SA 4.0, WPT BSD-3,
+    github-slugger ISC; each imported group keeps its source licence.
+  </li>
+</ol>
+
+<p>
+  Source: the design spec
+  <code>docs/superpowers/specs/2026-10-27-packages-and-conformance-design.md</code> and
+  the register on <a href="decisions.html">Decisions</a>.
+</p>

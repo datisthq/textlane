@@ -41,7 +41,7 @@ Pick the **highest** rung the diff reaches, and run everything that rung lists.
 2. **Logic** — an action or a binding. `pnpm -C rust check:lint` and `cargo test` on the
    module. A new or changed test runs on its own first and fails before the fix. A binding
    change adds the clippy run for its feature.
-3. **Build-shaped** — dependencies, `rust/Cargo.toml`, `rust/build.rs`, a `vite.config.ts`, a
+3. **Build-shaped** — dependencies, a `Cargo.toml` under `rust/`, `rust/textlane/build.rs`, a `vite.config.ts`, a
    `tsconfig`, the bindings or the release scripts. Run `pnpm test`, then `pnpm build`; for
    the bindings, the local checks in **`package-distribution`**.
 

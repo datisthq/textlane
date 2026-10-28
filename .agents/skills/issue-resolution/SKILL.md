@@ -37,7 +37,7 @@ Never work on the root checkout, and never switch its branch (**`worktree-workfl
 ## 4. Write the failing test first
 
 A unit test beside the module (`<module>_unit.rs`, like
-`rust/src/actions/package/version_unit.rs`) that fails **for the issue's reason**, calling the
+`rust/textlane/src/actions/package/version_unit.rs`) that fails **for the issue's reason**, calling the
 action on the issue's input and asserting on its result. Run it with `cargo test <name>` from `rust/` and watch it fail.
 
 ## 5. Fix it minimally, through the area skill

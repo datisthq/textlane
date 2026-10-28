@@ -1,0 +1,328 @@
+<title>Decisions</title>
+<meta
+  name="description"
+  content="What is settled about textlane's structure and conformance suite, who settled it and what was turned down."
+/>
+<meta name="order" content="2" />
+<meta name="date" content="2026-10-27" />
+
+<h1>Decisions</h1>
+<p>
+  What has been settled about textlane's structure and its conformance suite, who settled
+  it, and what was turned down. Sources: the "Review Unified Rust Architecture" planning
+  chat and the session that wrote the design spec. As of 2026-10-27.
+</p>
+
+<htmlpress-grid cols="3">
+  <htmlpress-card>
+    <h3>15 decided</h3>
+    <p>
+      <htmlpress-badge type="success">decided</htmlpress-badge> settled by the maintainer
+    </p>
+  </htmlpress-card>
+  <htmlpress-card>
+    <h3>5 agent's calls</h3>
+    <p>
+      <htmlpress-badge type="warning">my call</htmlpress-badge> settled by the agent, open
+      to change
+    </p>
+  </htmlpress-card>
+  <htmlpress-card>
+    <h3>5 open</h3>
+    <p><htmlpress-badge type="danger">open</htmlpress-badge> still to decide</p>
+  </htmlpress-card>
+</htmlpress-grid>
+
+<h2>Product and scope</h2>
+<dl>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Textlane is a unified
+    replacement whose first job is powering livemark
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Livemark's plugin set is the first compatibility target;
+      breadth comes after.
+    </p>
+    <p><strong>Rejected.</strong> Porting the whole ecosystem up front.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Textlane owns its Markdown
+    parser
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> The goal is to replace markdown-rs, not wrap it; MDX is
+      designed into the grammar from the start.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Building on markdown-rs, which stays a behavioural
+      reference and a test source.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> MDX, KaTeX and Shiki output
+    parity come later
+  </dt>
+  <dd>
+    <p><strong>Why.</strong> Package structure and conformance first.</p>
+    <p><strong>Rejected.</strong> Starting from livemark's <code>compileMDX</code>.</p>
+  </dd>
+</dl>
+
+<h2>Packages and names</h2>
+<dl>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> A cargo workspace of a few
+    large crates, one per domain
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Crate boundaries keep the tree crate separate and let Rust
+      users skip domains.
+    </p>
+    <p><strong>Rejected.</strong> One crate per plugin; one single crate.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Flat layout: a virtual
+    <code>rust/Cargo.toml</code> and one sibling directory per crate
+  </dt>
+  <dd>
+    <p><strong>Why.</strong> Matches fairspec; no root-package special case.</p>
+    <p>
+      <strong>Rejected.</strong> A root package with members under <code>crates/</code>.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> One package per registry, a
+    subpath per domain
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Each binding is one addon; separate addons cannot share a tree
+      without serializing it.
+    </p>
+    <p>
+      <strong>Rejected.</strong> <code>@textlane/markdown</code> and
+      <code>@textlane/html</code> as separate npm packages.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Crate names
+    <code>core</code>, <code>markdown</code>, <code>html</code>, <code>prose</code>,
+    <code>javascript</code>
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Name the content domain, not the tree; <code>core</code> also
+      holds the plugin contract every domain implements.
+    </p>
+    <p>
+      <strong>Rejected.</strong> <code>ast</code>, <code>model</code>, <code>data</code>,
+      <code>tree</code>; <code>md</code>; <code>text</code>, <code>language</code>,
+      <code>nlcst</code>, <code>article</code>; <code>ecmascript</code>; the upstream
+      remark, rehype, retext and recma prefixes.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Plugins are namespaced by
+    domain: <code>markdown.parse()</code>, <code>html.sanitize()</code>
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Large crates export clashing names (<code>parse</code>,
+      <code>stringify</code>); namespace imports keep them short.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Prefixed exports such as <code>markdownParse</code>;
+      <code>* as md</code>.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Bridges are
+    <code>source.toTarget</code> with full names, one lowercase word per domain:
+    <code>toHtml</code>, <code>toJavascript</code>
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Names derive mechanically: Rust <code>to_javascript</code>,
+      napi <code>toJavascript</code>, Python <code>to_javascript</code>.
+    </p>
+    <p>
+      <strong>Rejected.</strong> <code>toJs</code>; <code>toJavaScript</code>, which needs
+      a <code>js_name</code> override; <code>javascript.fromHtml</code>.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> MDX syntax in
+    <code>markdown</code>, compilation in <code>html.toJavascript</code> and
+    <code>javascript</code>
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Syntax changes how Markdown tokenizes; compiling is JS-tree
+      work, as upstream splits it across remark and recma. Only
+      <code>javascript</code> compiles oxc.
+    </p>
+    <p>
+      <strong>Rejected.</strong> A separate <code>mdx</code> crate; MDX compilation inside
+      <code>markdown</code> behind a feature.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Every tree type but
+    JavaScript's lives in <code>core</code>
+  </dt>
+  <dd>
+    <p><strong>Why.</strong> Bridges then need no domain-to-domain dependency.</p>
+    <p><strong>Rejected.</strong> Each domain owning its tree types.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> <code>html</code> depends on
+    <code>javascript</code> behind a feature, for <code>toJavascript</code>
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> The JS tree is oxc's and stays out of core; this is the one
+      allowed domain edge.
+    </p>
+    <p>
+      <strong>Rejected.</strong> The bridge living in <code>javascript</code> as
+      <code>fromHtml</code>.
+    </p>
+  </dd>
+</dl>
+
+<h2>Conformance suite</h2>
+<dl>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> One language-neutral corpus
+    in the style of JSON-Schema-Test-Suite, run by Rust, Node and Python
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> The suite is the contract; no expected results are copied per
+      implementation.
+    </p>
+    <p><strong>Rejected.</strong> Separate test suites per binding.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Cases are input, pipeline
+    and output only; each implementation keeps its own unit tests
+  </dt>
+  <dd>
+    <p><strong>Why.</strong> A pipeline library's contract is what it produces.</p>
+    <p><strong>Rejected.</strong> Asserting internals in the corpus.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Layout and format follow
+    fairspec's <code>conformance/</code>
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> One in-house convention: <code>test-schema.json</code>,
+      <code>tests/&lt;area&gt;/&lt;feature&gt;.json</code>, groups of tests.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Positions count UTF-16 code
+    units, as unified's do
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Upstream trees import verbatim; JS plugins see
+      unified-identical positions; the crate converts at the edge.
+    </p>
+    <p><strong>Rejected.</strong> Bytes; code points.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Importers may run unified
+    once to produce expectations; comparison is always exact
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> micromark asserts its own HTML compiler, which textlane does
+      not have; regenerated expectations are exactly what textlane must produce.
+    </p>
+    <p>
+      <strong>Rejected.</strong> An HTML-equivalence compare mode with a parser per
+      runner.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Test plugins are written
+    once in Rust, behind <code>textlane</code>'s <code>testing</code> feature
+  </dt>
+  <dd>
+    <p><strong>Why.</strong> One copy every runner reaches; nothing ships them.</p>
+    <p><strong>Rejected.</strong> Rewriting them in JavaScript and Python.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Phases 1–2 (workspace, suite
+    skeleton) are planned in full; phases 3–7 stay a roadmap
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Later phases are whole parsers; each is planned when it
+      starts.
+    </p>
+    <p><strong>Rejected.</strong> One plan for everything.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Runners skip lifecycle modes
+    they cannot express until the processor's async model exists
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Keeps the suite runnable before the processor is designed.
+    </p>
+  </dd>
+</dl>
+
+<h2>Open</h2>
+<dl>
+  <dt>
+    <htmlpress-badge type="danger">open</htmlpress-badge> The processor's async model:
+    runtime, awaiting a JS promise through napi, asyncio
+  </dt>
+  <dd>
+    <p>Shapes the processor's core types and which core cases each runner can run.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="danger">open</htmlpress-badge> Host-plugin bridge semantics: a
+    serialized copy per plugin run, or a live handle
+  </dt>
+  <dd>
+    <p>
+      Decides the cost of mixing JavaScript and Rust plugins and what JavaScript plugins
+      may rely on.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="danger">open</htmlpress-badge> Code highlighting: Shiki through
+    the bridge, or a Rust TextMate engine such as syntaxmate or syntect
+  </dt>
+  <dd>
+    <p>Decides whether a <code>textlane-code</code> crate exists.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="danger">open</htmlpress-badge> Whether WPT
+    <code>.dat</code> tree tests are vendored as-is or converted
+  </dt>
+  <dd><p>1,973 HTML parsing cases need either a loader or a converter.</p></dd>
+  <dt>
+    <htmlpress-badge type="danger">open</htmlpress-badge> Uninventoried sources: retext
+    (prose), <code>@mdx-js/mdx</code> and recma (javascript), the definition-list syntax
+    repos
+  </dt>
+  <dd>
+    <p>
+      Their phases start with a survey like the ones on
+      <a href="conformance.html">Conformance</a>.
+    </p>
+  </dd>
+</dl>
+
+<htmlpress-callout type="note">
+  <p>Kept by hand: add an entry when something is settled, and move it out of Open.</p>
+</htmlpress-callout>

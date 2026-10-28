@@ -1,0 +1,18 @@
+[package]
+name = "textlane-javascript"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "Textlane's JavaScript plugins: the JS tree on oxc, the MDX transforms and code generation"
+keywords = ["javascript", "ast", "textlane"]
+categories = ["text-processing", "parser-implementations"]
+
+[dependencies]
+textlane-core.workspace = true
+
+[lints]
+workspace = true

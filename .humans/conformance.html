@@ -1,0 +1,523 @@
+<title>Conformance</title>
+<meta
+  name="description"
+  content="Textlane's language-neutral conformance suite and the upstream unified tests it ports."
+/>
+<meta name="order" content="3" />
+<meta name="date" content="2026-10-27" />
+<style>
+  figure.diagram {
+    margin: 1.5rem 0;
+  }
+  figure.diagram svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    font-family: var(--htmlpress-font);
+  }
+  figure.diagram figcaption {
+    color: var(--htmlpress-muted);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+  }
+  .diagram .track {
+    fill: var(--htmlpress-surface);
+  }
+  .diagram .bar {
+    fill: var(--htmlpress-accent);
+  }
+  .diagram .bar.generated {
+    fill: var(--htmlpress-accent);
+    fill-opacity: 0.35;
+  }
+  .diagram .name {
+    fill: var(--htmlpress-text);
+    font-size: 13px;
+  }
+  .diagram .value {
+    fill: var(--htmlpress-muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+</style>
+
+<h1>Conformance</h1>
+<p>
+  One language-neutral corpus of pipeline cases (a pipeline, an input, the expected
+  result) that the Rust, Node and Python implementations all run, in the style of
+  JSON-Schema-Test-Suite. Most cases are ported from upstream unified packages. Counts
+  come from read-only shallow clones of each repo on 2026-10-27; no upstream code was run.
+</p>
+
+<htmlpress-grid cols="4">
+  <htmlpress-card>
+    <h3>~6.6k cases</h3>
+    <p>hand-written upstream cases after dedupe, WPT included</p>
+  </htmlpress-card>
+  <htmlpress-card>
+    <h3>~1.9k generated</h3>
+    <p>one per gemoji name, generated rather than stored</p>
+  </htmlpress-card>
+  <htmlpress-card>
+    <h3>50+ repos</h3>
+    <p>core, markdown, extensions and html surveyed</p>
+  </htmlpress-card>
+  <htmlpress-card>
+    <h3>~1.3k reference runs</h3>
+    <p>micromark-layer HTML and <code>h()</code> trees regenerated through unified</p>
+  </htmlpress-card>
+</htmlpress-grid>
+
+<h2>Cases by area</h2>
+<figure class="diagram">
+  <svg
+    viewBox="0 0 720 200"
+    role="img"
+    aria-label="Portable cases per area: core about 250, markdown 2,300, extensions 870, gemoji 1,900 generated, html 1,170, html parsing 1,973"
+  >
+    <text class="name" x="138" y="23" text-anchor="end">core</text>
+    <rect class="track" x="150" y="8" width="500" height="20" rx="4" />
+    <rect class="bar" x="150" y="8" width="54" height="20" rx="4" />
+    <text class="value" x="660" y="23">~250</text>
+    <text class="name" x="138" y="55" text-anchor="end">markdown</text>
+    <rect class="track" x="150" y="40" width="500" height="20" rx="4" />
+    <rect class="bar" x="150" y="40" width="500" height="20" rx="4" />
+    <text class="value" x="660" y="55">~2,300</text>
+    <text class="name" x="138" y="87" text-anchor="end">extensions</text>
+    <rect class="track" x="150" y="72" width="500" height="20" rx="4" />
+    <rect class="bar" x="150" y="72" width="189" height="20" rx="4" />
+    <text class="value" x="660" y="87">~870</text>
+    <text class="name" x="138" y="119" text-anchor="end">gemoji</text>
+    <rect class="track" x="150" y="104" width="500" height="20" rx="4" />
+    <rect class="bar generated" x="150" y="104" width="413" height="20" rx="4" />
+    <text class="value" x="660" y="119">~1,900</text>
+    <text class="name" x="138" y="151" text-anchor="end">html</text>
+    <rect class="track" x="150" y="136" width="500" height="20" rx="4" />
+    <rect class="bar" x="150" y="136" width="254" height="20" rx="4" />
+    <text class="value" x="660" y="151">~1,170</text>
+    <text class="name" x="138" y="183" text-anchor="end">html parsing (WPT)</text>
+    <rect class="track" x="150" y="168" width="500" height="20" rx="4" />
+    <rect class="bar" x="150" y="168" width="429" height="20" rx="4" />
+    <text class="value" x="660" y="183">~1,973</text>
+  </svg>
+  <figcaption>
+    Approximate portable cases per area; the pale bar is generated, not stored.
+  </figcaption>
+</figure>
+<p>
+  Not shown: html5lib's 6,827 tokenizer cases, used only if <code>html.tokenize</code> is
+  exposed. Not yet surveyed: prose (retext) and javascript (<code>@mdx-js/mdx</code>,
+  recma).
+</p>
+
+<h2>Layout and format</h2>
+<htmlpress-file-tree>
+  <ul>
+    <li>
+      conformance
+      <ul>
+        <li>README.md</li>
+        <li>test-schema.json — JSON Schema of a test file</li>
+        <li>
+          tests
+          <ul>
+            <li>
+              core
+              <ul>
+                <li>use.json</li>
+              </ul>
+            </li>
+            <li>
+              markdown
+              <ul>
+                <li>gfm-table.json</li>
+              </ul>
+            </li>
+            <li>
+              html
+              <ul>
+                <li>sanitize.json</li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>sources — importers that turn upstream tests into test files</li>
+      </ul>
+    </li>
+  </ul>
+</htmlpress-file-tree>
+<p>A file is an array of groups. A group fixes the pipeline; its tests vary the input.</p>
+<pre data-title="tests/markdown/heading-atx.json"><code class="language-json">[
+  {
+    "description": "atx headings",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c20",
+      "path": "test/io/flow/heading-atx.js",
+      "license": "MIT"
+    },
+    "pipeline": [["markdown.parse"], ["markdown.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "rank 1",
+        "input": "# a",
+        "expected": { "html": "&lt;h1&gt;a&lt;/h1&gt;" }
+      },
+      {
+        "description": "no rank 7",
+        "input": "####### foo",
+        "expected": { "html": "&lt;p&gt;####### foo&lt;/p&gt;" }
+      }
+    ]
+  }
+]</code></pre>
+<dl>
+  <dt><code>input</code> / <code>tree</code></dt>
+  <dd>A source string, or a JSON tree for stringify-only and transform cases.</dd>
+  <dt><code>expected.html</code>, <code>.markdown</code>, <code>.text</code></dt>
+  <dd>Serialized output, compared exactly.</dd>
+  <dt><code>expected.tree</code></dt>
+  <dd>
+    The resulting tree as JSON, positions in UTF-16 code units;
+    <code>positions: false</code> strips them.
+  </dd>
+  <dt><code>expected.messages</code></dt>
+  <dd>
+    Compared on <code>ruleId</code>, <code>source</code> and <code>place</code> only.
+  </dd>
+  <dt><code>expected.error</code></dt>
+  <dd>A stable code plus an optional substring, never a JS regex.</dd>
+  <dt><code>status: "deviation"</code></dt>
+  <dd>A deliberate difference from upstream, explained in <code>comment</code>.</dd>
+  <dt><code>operations</code></dt>
+  <dd>
+    Core lifecycle cases: <code>use</code>, <code>freeze</code>, <code>data</code>,
+    <code>parse</code>, <code>run</code>, <code>process</code>, each with
+    <code>api: sync | async</code>.
+  </dd>
+</dl>
+
+<h3>Runners</h3>
+<ul>
+  <li>
+    Rust: <code>rust/textlane/tests/conformance.rs</code>, run by <code>cargo test</code>
+  </li>
+  <li>
+    Node: <code>typescript/-test/conformance.unit.ts</code>, through the loader, on an
+    addon built with <code>--features node,testing</code>
+  </li>
+  <li>
+    Python: <code>python/-test/conformance_unit.py</code>, on a build with
+    <code>python,testing</code>
+  </li>
+  <li>
+    Each keeps its own skip list; a repo guard validates every file against
+    <code>test-schema.json</code>
+  </li>
+</ul>
+
+<h3>Test plugins</h3>
+<p>
+  unified's core tests are about lifecycle. They become data once every implementation has
+  the same built-in test plugins, written once in Rust behind <code>testing</code>:
+  <code>test.parseText</code>, <code>test.compileValue</code>,
+  <code>test.recordOptions</code>, <code>test.replaceTree</code>, <code>test.fail</code>,
+  <code>test.noop</code>, <code>test.appendNode</code>, <code>test.message</code>,
+  <code>test.setData</code>, <code>test.trace</code>, each with a <code>mode</code> (sync,
+  <code>next</code>, deferred, async, promise).
+</p>
+
+<h2>Upstream catalogue</h2>
+<p>
+  Portable means expressible as data without host-language code. Click a header to sort.
+</p>
+
+<h3>Core</h3>
+<htmlpress-table>
+  <table>
+    <thead>
+      <tr>
+        <th>Source</th>
+        <th>Cases</th>
+        <th>Portable</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>unifiedjs/unified</td>
+        <td>195</td>
+        <td>25% → 65%</td>
+        <td>with test plugins</td>
+      </tr>
+      <tr>
+        <td>vfile, vfile-message</td>
+        <td>27</td>
+        <td>70%</td>
+        <td>POSIX paths only</td>
+      </tr>
+      <tr>
+        <td>unist-util-visit(-parents)</td>
+        <td>73</td>
+        <td>55%</td>
+        <td>scripted visitor</td>
+      </tr>
+      <tr>
+        <td>unist-util-is, -position</td>
+        <td>53</td>
+        <td>70–95%</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>wooorm/trough</td>
+        <td>32</td>
+        <td>15%</td>
+        <td>Rust unit concern</td>
+      </tr>
+    </tbody>
+  </table>
+</htmlpress-table>
+
+<h3>Markdown</h3>
+<htmlpress-table>
+  <table>
+    <thead>
+      <tr>
+        <th>Source</th>
+        <th>Cases</th>
+        <th>Portable</th>
+        <th>Seeds</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>CommonMark spec 0.31.2 ¹</td>
+        <td>652</td>
+        <td>100%</td>
+        <td>parse → html</td>
+      </tr>
+      <tr>
+        <td>micromark <code>test/io</code></td>
+        <td>1100</td>
+        <td>95%</td>
+        <td>regenerated html</td>
+      </tr>
+      <tr>
+        <td>mdast-util-from-markdown</td>
+        <td>72</td>
+        <td>70%</td>
+        <td>trees, positions</td>
+      </tr>
+      <tr>
+        <td>mdast-util-to-markdown</td>
+        <td>470</td>
+        <td>93%</td>
+        <td>tree → markdown</td>
+      </tr>
+      <tr>
+        <td>markdown-rs</td>
+        <td>2480</td>
+        <td>85%</td>
+        <td>cross-check only</td>
+      </tr>
+      <tr>
+        <td>GFM syntax + spec</td>
+        <td>210</td>
+        <td>95%</td>
+        <td><code>markdown.gfm</code></td>
+      </tr>
+      <tr>
+        <td>GFM mdast + remark-gfm</td>
+        <td>140</td>
+        <td>85%</td>
+        <td>trees, round-trips</td>
+      </tr>
+      <tr>
+        <td>math</td>
+        <td>83</td>
+        <td>85%</td>
+        <td>no KaTeX output</td>
+      </tr>
+      <tr>
+        <td>directive</td>
+        <td>340</td>
+        <td>80%</td>
+        <td>handlers → trees</td>
+      </tr>
+      <tr>
+        <td>frontmatter</td>
+        <td>90</td>
+        <td>100%</td>
+        <td>option errors</td>
+      </tr>
+      <tr>
+        <td>remark-gemoji</td>
+        <td>1900</td>
+        <td>100%</td>
+        <td>generated</td>
+      </tr>
+      <tr>
+        <td>remark-definition-list</td>
+        <td>2</td>
+        <td>50%</td>
+        <td>survey syntax repos</td>
+      </tr>
+    </tbody>
+  </table>
+</htmlpress-table>
+
+<h3>HTML</h3>
+<htmlpress-table>
+  <table>
+    <thead>
+      <tr>
+        <th>Source</th>
+        <th>Cases</th>
+        <th>Portable</th>
+        <th>Seeds</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>mdast-util-to-hast</td>
+        <td>142</td>
+        <td>90%</td>
+        <td><code>markdown.toHtml</code></td>
+      </tr>
+      <tr>
+        <td>rehypejs/rehype</td>
+        <td>128</td>
+        <td>95%</td>
+        <td>parse, stringify</td>
+      </tr>
+      <tr>
+        <td>hast-util-to-html</td>
+        <td>360</td>
+        <td>97%</td>
+        <td>stringify options</td>
+      </tr>
+      <tr>
+        <td>hast-util-from-html</td>
+        <td>76</td>
+        <td>90%</td>
+        <td>parse errors</td>
+      </tr>
+      <tr>
+        <td>hast-util-raw</td>
+        <td>60</td>
+        <td>90%</td>
+        <td><code>html.raw</code></td>
+      </tr>
+      <tr>
+        <td>hast-util-sanitize</td>
+        <td>85</td>
+        <td>80%</td>
+        <td>one case per vector</td>
+      </tr>
+      <tr>
+        <td>rehype-slug, github-slugger ²</td>
+        <td>87</td>
+        <td>100%</td>
+        <td>ordered groups</td>
+      </tr>
+      <tr>
+        <td>html5lib serializer</td>
+        <td>230</td>
+        <td>100%</td>
+        <td>optional tags</td>
+      </tr>
+      <tr>
+        <td>WPT tree tests ³</td>
+        <td>1973</td>
+        <td>97%</td>
+        <td><code>html.parse</code></td>
+      </tr>
+      <tr>
+        <td>rehype-katex, shiki</td>
+        <td>27</td>
+        <td>0–30%</td>
+        <td>deferred</td>
+      </tr>
+    </tbody>
+  </table>
+</htmlpress-table>
+
+<p>
+  ¹ Spec text CC-BY-SA 4.0. ² ISC. ³ <code>html/syntax/parsing</code>, BSD-3. Everything
+  else MIT.
+</p>
+
+<h2>Importers</h2>
+<p>
+  <code>conformance/sources/&lt;source&gt;.ts</code> turns one upstream repo into test
+  files and records provenance. Inputs are extracted as data (acorn over
+  <code>assert.equal(micromark(…), …)</code> pairs, spec-text splitting, fixture copying);
+  a case whose options hold functions is skipped. Expectations come from upstream verbatim
+  where they describe textlane's path; otherwise from running the reference unified
+  packages once, pinned in the importer's lockfile:
+</p>
+<ul>
+  <li>
+    HTML regenerated through <code>remark-parse</code> → <code>remark-rehype</code> →
+    <code>rehype-stringify</code>
+  </li>
+  <li>hastscript <code>h()</code> trees expanded to literal JSON</li>
+  <li>trees made for inputs that only had HTML expectations</li>
+</ul>
+<htmlpress-callout type="info">
+  <p>Imported files are committed; importers are rerun deliberately, never in CI.</p>
+</htmlpress-callout>
+
+<h2>Phases</h2>
+<htmlpress-steps>
+  <ol>
+    <li>
+      <h3>Workspace</h3>
+      <p>
+        Finish the flat crates, add <code>prose</code> and <code>javascript</code>, wire
+        features, release config and docs.
+      </p>
+    </li>
+    <li>
+      <h3>Suite skeleton</h3>
+      <p>
+        <code>conformance/</code>, the schema and its guard, three runners in
+        <code>pnpm test</code>, one smoke group in all three languages.
+      </p>
+    </li>
+    <li>
+      <h3>Core</h3>
+      <p>Processor and test plugins; import unified, vfile and unist-util cases.</p>
+    </li>
+    <li>
+      <h3>Markdown</h3>
+      <p>
+        CommonMark spec, micromark io, from-markdown, to-markdown; then livemark's
+        extensions.
+      </p>
+    </li>
+    <li>
+      <h3>HTML</h3>
+      <p>
+        to-hast, to-html, rehype fixtures, sanitize, slug, raw; then WPT tree
+        construction.
+      </p>
+    </li>
+    <li>
+      <h3>Prose</h3>
+      <p>Survey, then import.</p>
+    </li>
+    <li>
+      <h3>MDX</h3>
+      <p>
+        Survey <code>@mdx-js/mdx</code>; <code>markdown.mdx</code>, then
+        <code>html.toJavascript</code> and the MDX transforms.
+      </p>
+    </li>
+  </ol>
+</htmlpress-steps>
+
+<p>
+  Counts are approximate: leaf test calls and assertions, counted from shallow clones. See
+  <a href="decisions.html">Decisions</a> for what is settled.
+</p>

@@ -1,0 +1,22 @@
+[package]
+name = "textlane-html"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "Textlane's HTML plugins: parsing, transforms, sanitizing and serializing"
+keywords = ["html", "ast", "textlane"]
+categories = ["text-processing", "parser-implementations"]
+
+[features]
+javascript = ["dep:textlane-javascript"]
+
+[dependencies]
+textlane-core.workspace = true
+textlane-javascript = { workspace = true, optional = true }
+
+[lints]
+workspace = true

@@ -23,12 +23,15 @@ pnpm test
 
 ```
 textlane/
-├── rust/                # the crate and the crates.io package `textlane`
-│   ├── src/
-│   │   ├── actions/     #   package/version
-│   │   ├── bindings/    #   node.rs (napi, `node` feature), python.rs (PyO3, `python` feature)
-│   │   └── lib.rs       #   the library façade
-│   ├── build.rs         #   napi setup under the `node` feature
+├── rust/                # the cargo workspace, one directory per crate
+│   ├── textlane/        #   the crates.io package `textlane`
+│   │   ├── src/
+│   │   │   ├── actions/  #   package/version
+│   │   │   ├── bindings/ #   node.rs (napi, `node` feature), python.rs (PyO3, `python` feature)
+│   │   │   └── lib.rs    #   the library façade
+│   │   └── build.rs     #   napi setup under the `node` feature
+│   ├── core/            #   textlane-core: trees, the file, the plugin contract
+│   ├── markdown/ html/ prose/ javascript/  # one textlane-<domain> crate each
 │   └── docs/            #   the docs site's Markdown pages, built with livemark
 ├── typescript/          # the npm package `textlane`: loads the native addon
 │   ├── actions/         #   resolveAddon — find the platform package's addon
@@ -50,19 +53,20 @@ All behaviour lives in `rust/`. The npm and PyPI packages only expose the same c
 
 Run these at the repo root; each chains into the sections with `pnpm -C <section>`.
 
-| Command            | What it does                                                     |
-| ------------------ | ---------------------------------------------------------------- |
-| `pnpm install`     | Install dependencies                                             |
-| `pnpm build`       | Build the release crate, the npm loader and the Python wheel     |
-| `pnpm check:types` | Type-check via `tsgo --noEmit` and `cargo check`                 |
-| `pnpm check:lint`  | Format check + lint (`vp fmt`, `vp lint`, `cargo fmt`, `clippy`) |
-| `pnpm check`       | `pnpm check:lint && pnpm check:types`                            |
-| `pnpm format`      | Auto-fix formatting (`vp fmt`, `cargo fmt`)                      |
-| `pnpm test:unit`   | Run the repo guards, the loader's tests and `cargo test`         |
-| `pnpm test`        | `pnpm check && pnpm test:unit`                                   |
-| `pnpm start`       | Serve the docs site with livemark and live reload                |
-| `pnpm build:docs`  | Production build of the docs site                                |
-| `pnpm scan`        | Secret and vulnerability scans (gitleaks, semgrep)               |
+| Command            | What it does                                                      |
+| ------------------ | ----------------------------------------------------------------- |
+| `pnpm install`     | Install dependencies                                              |
+| `pnpm build`       | Build the release crate, the npm loader and the Python wheel      |
+| `pnpm check:types` | Type-check via `tsgo --noEmit` and `cargo check`                  |
+| `pnpm check:lint`  | Format check + lint (`vp fmt`, `vp lint`, `cargo fmt`, `clippy`)  |
+| `pnpm check`       | `pnpm check:lint && pnpm check:types`                             |
+| `pnpm format`      | Auto-fix formatting (`vp fmt`, `cargo fmt`)                       |
+| `pnpm test:unit`   | Run the repo guards, the loader's tests and `cargo test`          |
+| `pnpm test`        | `pnpm check && pnpm test:unit`                                    |
+| `pnpm start`       | Serve the docs site with livemark and live reload                 |
+| `pnpm build:docs`  | Production build of the docs site                                 |
+| `pnpm read`        | Serve the design notes and decisions in `.humans/` with htmlpress |
+| `pnpm scan`        | Secret and vulnerability scans (gitleaks, semgrep)                |
 
 A change is ready to push when `pnpm test` is green.
 

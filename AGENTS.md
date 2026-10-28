@@ -1,10 +1,10 @@
 # textlane
 
-Textlane is a Rust-native text processing pipeline: a replacement for unified whose plugins run natively, with existing JavaScript plugins still able to join a pipeline. It is one Rust crate in `rust/`, shipped three ways: crates.io (`cargo add textlane`), npm (`textlane` in `typescript/`, a loader plus one prebuilt napi addon per platform) and PyPI (`textlane` in `python/`, PyO3 wheels built by maturin), all at one version. The repo root holds the tooling shared across them and textlane's own docs site, written in Markdown under `rust/docs/` and built with livemark.
+Textlane is a Rust-native text processing pipeline: a replacement for unified whose plugins run natively, with existing JavaScript plugins still able to join a pipeline. It is one cargo workspace in `rust/`, shipped three ways: crates.io (`cargo add textlane`), npm (`textlane` in `typescript/`, a loader plus one prebuilt napi addon per platform) and PyPI (`textlane` in `python/`, PyO3 wheels built by maturin), all at one version. The repo root holds the tooling shared across them and textlane's own docs site, written in Markdown under `rust/docs/` and built with livemark.
 
 ## Terminology
 
-- **crate** — the `textlane` library `rust/` compiles; the only place behaviour lives
+- **crate** — the `textlane` library in `rust/textlane/` and the crates beside it that it re-exports (`textlane-core` and one `textlane-<domain>` per domain: `markdown`, `html`, `prose`, `javascript`); the only place behaviour lives
 - **binding** — a package that only exposes the crate: `typescript/` for npm (a napi addon, the `node` feature), `python/` for PyPI (a PyO3 extension, the `python` feature). A binding never reimplements a plugin
 - **platform package** — `@textlane/<os>-<arch>`, one per entry in `PLATFORMS` (`typescript/settings.ts`), each carrying one `textlane.node` addon; the main `textlane` package pins them all as `optionalDependencies` at its own version
 - **pipeline** — a processor built with `.use()`: parse, transform and serialize stages run in order over a syntax tree
@@ -26,7 +26,7 @@ Textlane is a Rust-native text processing pipeline: a replacement for unified wh
 - **Behaviour lives in the crate only.** A binding loads the addon and maps types, nothing more; a feature added to `typescript/` or `python/` would exist for one language and not the others.
 - **Plugin names, their options and the AST node shapes are public API.** What `.use()` accepts, each plugin's options and the mdast/hast nodes a pipeline produces: renaming one silently breaks every pipeline and plugin relying on it. Treat it like an export change (**`change-review`**).
 - **A platform entry is a release contract.** `PLATFORMS` in `typescript/settings.ts` and the `addons` matrix in `.github/workflows/release.yaml` must list the same platforms with the same Rust targets; one missing from the matrix fails the npm pack (**`package-distribution`**).
-- Rust: each `actions/<entity>/<verb>.rs` holds one action, named `verb_noun` (`actions/package/version.rs` exports `read_version`); the module tree is declared inline in `rust/src/lib.rs`. TypeScript: the same `actions/<entity>/<verb>.ts` shape, full relative imports with the `.ts` extension, no barrels.
+- Rust: each `actions/<entity>/<verb>.rs` holds one action, named `verb_noun` (`actions/package/version.rs` exports `read_version`); the module tree is declared inline in each crate's `src/lib.rs`. TypeScript: the same `actions/<entity>/<verb>.ts` shape, full relative imports with the `.ts` extension, no barrels.
 - Don't destructure props in a TypeScript function signature — use `props.x`. Put higher-level items above the ones they compose, public before private.
 - **Comments must not outnumber code**, and one is at most ~3 lines. The bar is: **name the specific mistake this prevents** — if you cannot, delete it. A file with none is normal. Rationale and history belong in git; only a non-obvious invariant (an ordering types cannot express, a failure that looks like success, a deliberate deviation from a rule here) earns lines.
 - Doc comments only on public API — a brief line on what an exported item does; none on files.
@@ -43,7 +43,7 @@ Repo skills live in `.agents/skills/` (reached by Claude Code through the `.clau
 | ---------------------- | -------------------------------------------------------------------------- |
 | `change-review`        | reviewing a pull request or the working diff — also what CI review runs    |
 | `change-verification`  | checking a change works — the smallest lint/type/unit slice and a look     |
-| `human-documentation`  | the docs-truth pass before a commit, and where a fact belongs              |
+| `human-documentation`  | a page for people under `.humans/`, the docs-truth pass, where facts go    |
 | `issue-resolution`     | taking one issue or bug report to one tested commit in a worktree          |
 | `package-distribution` | the npm and PyPI bindings, platform packages and the release addons matrix |
 | `rust-development`     | working in `rust/` — layout, cargo commands, features, the bindings        |
@@ -61,6 +61,7 @@ Shipped skills live in `.skills/` and teach coding agents to **use** textlane; t
 
 - `pnpm install` — dependencies, lefthook, the `.claude/skills` symlink and `cargo fetch`
 - `pnpm start` — the livemark dev server over the docs site · `pnpm build:docs` — its production build into `.livemark/build`
+- `pnpm read` — the htmlpress dev server over `.humans/`, the design notes and decisions for people
 - `pnpm build` — the release crate (`cargo build --release`), the npm loader into `typescript/build/` with `tsgo`, then the wheel into `python/build/` with maturin (needs `uv`)
 - `pnpm test` — full gate: lint + type + unit · `pnpm check` — lint + type
 - `pnpm check:lint` — `vp fmt --check && vp lint`, then `cargo fmt --check` and clippy · `pnpm format` — `vp fmt`, `cargo fmt` · `pnpm check:types` — `tsgo --noEmit`, then `cargo check`
@@ -75,17 +76,18 @@ Shipped skills live in `.skills/` and teach coding agents to **use** textlane; t
 
 The root is a private pnpm workspace (`package.json`, `pnpm-workspace.yaml`): format, lint, the docs site, the repo guards and the scripts that chain each section with `pnpm -C <section>` — never `pnpm -r`.
 
-- `rust/` — the crates.io package and the crate, a cargo project on the toolchain `rust/rust-toolchain.toml` pins (**`rust-development`**)
-  - `src/actions/<entity>/<verb>.rs` — `package/version`
-  - `src/bindings/` — `node.rs` (napi, the `node` feature) and `python.rs` (PyO3, the `python` feature), each only mapping crate functions to its language; `build.rs` runs napi's setup under `node`; `src/lib.rs` the façade
+- `rust/` — the cargo workspace, a virtual `Cargo.toml` over one sibling directory per crate, on the toolchain `rust/rust-toolchain.toml` pins (**`rust-development`**)
+  - `textlane/` — the crates.io package `textlane`: `src/actions/<entity>/<verb>.rs` (`package/version`); `src/bindings/` — `node.rs` (napi, the `node` feature) and `python.rs` (PyO3, the `python` feature), each only mapping crate functions to its language; `build.rs` runs napi's setup under `node`; `src/lib.rs` the façade, re-exporting each domain crate as a module of its name
+  - `core/` — `textlane-core`: the unist, mdast and hast trees, the file and the plugin contract every other crate shares
+  - `markdown/`, `html/`, `prose/`, `javascript/` — `textlane-<domain>`, each domain's plugins; `html`'s `javascript` feature is the one domain-to-domain edge
   - Unit tests beside their module as `<module>_unit.rs`
   - `docs/` — the docs site's Markdown pages, outside the crate's `include`
 - `typescript/` — the npm package `textlane`: `index.ts` loads the addon `actions/addon/resolve.ts` finds; `settings.ts` lists the platforms; `scripts/` packs and publishes the platform packages into `typescript/compile/` (**`package-distribution`**)
-- `python/` — the PyPI package `textlane`: `pyproject.toml`, which points maturin at `rust/Cargo.toml` with `bindings = "pyo3"` and the `python` feature, and `scripts/copy-skills.sh`, which stages the shipped skills as wheel data
+- `python/` — the PyPI package `textlane`: `pyproject.toml`, which points maturin at `rust/textlane/Cargo.toml` with `bindings = "pyo3"` and the `python` feature, and `scripts/copy-skills.sh`, which stages the shipped skills as wheel data
 - `.skills/` — the shipped agent skills
-- `README.md`, `CONTRIBUTING.md` — the GitHub overview and the contributor guide; `rust/README.md`, `typescript/README.md` and `python/README.md` are each registry's page
+- `README.md`, `CONTRIBUTING.md` — the GitHub overview and the contributor guide; `rust/textlane/README.md`, `typescript/README.md` and `python/README.md` are each registry's page
 
-Dot-directories hold non-package code: `.agents/` repo skills, `.skills/` shipped skills, `.livemark/` the docs site's escapes, `.release/` release-please config, `.scripts/` repo-wide guards (`.scripts/-test/`) and the `pnpm squash` script, whose tests the root `vite.config.ts` runs.
+Dot-directories hold non-package code: `.agents/` repo skills, `.humans/` design notes, decisions and research for people (htmlpress pages, served by `pnpm read`), `.skills/` shipped skills, `.livemark/` the docs site's escapes, `.release/` release-please config, `.scripts/` repo-wide guards (`.scripts/-test/`) and the `pnpm squash` script, whose tests the root `vite.config.ts` runs.
 
 ## Conventions
 
@@ -102,7 +104,7 @@ Dot-directories hold non-package code: `.agents/` repo skills, `.skills/` shippe
 
 Conventional Commits drive [release-please](https://github.com/googleapis/release-please): a `feat` or `fix` landing on `main` opens a Release PR, and merging that PR cuts the version, tags it and publishes. Merging is the gate — nothing ships without it.
 
-- **One version for everything.** The repo is one release-please component at `.` (`release-type: simple`, `version.txt`), tagged `vX.Y.Z` with one root `CHANGELOG.md`; `rust/Cargo.toml` and `typescript/package.json` are its `extra-files`, and the wheel takes the crate's version through maturin. The manifest holds the current version and release-please maintains it — never hand-edit it
-- **IMPORTANT: only changes to what an installer gets use `feat` or `fix`** — `rust/src/`, the `[package]`, `[lib]`, `[features]` and `[dependencies]` tables of `rust/Cargo.toml`, `typescript/index.ts`, `typescript/actions/`, `typescript/settings.ts`, the `exports` and `files` of `typescript/package.json`, `python/pyproject.toml`, the shipped `.skills/`. Everything else MUST be `chore` or `docs`: CI and workflows, release config, dependencies, tooling, `AGENTS.md`, `.agents/skills/`, the READMEs, the docs site
+- **One version for everything.** The repo is one release-please component at `.` (`release-type: simple`, `version.txt`), tagged `vX.Y.Z` with one root `CHANGELOG.md`; `rust/Cargo.toml` (the workspace version and member pins), `rust/Cargo.lock` and `typescript/package.json` are its `extra-files`, and the wheel takes the crate's version through maturin. The manifest holds the current version and release-please maintains it — never hand-edit it
+- **IMPORTANT: only changes to what an installer gets use `feat` or `fix`** — each crate's `rust/<crate>/src/`, the `[package]`, `[lib]`, `[features]` and `[dependencies]` tables of its `Cargo.toml`, `[workspace.dependencies]` in `rust/Cargo.toml`, `typescript/index.ts`, `typescript/actions/`, `typescript/settings.ts`, the `exports` and `files` of `typescript/package.json`, `python/pyproject.toml`, the shipped `.skills/`. Everything else MUST be `chore` or `docs`: CI and workflows, release config, dependencies, tooling, `AGENTS.md`, `.agents/skills/`, the READMEs, the docs site
 - This is not a style preference. release-please reads the commit type: a `fix:` on a workflow file cuts a release and burns a version number on a change no consumer can observe. Version numbers can never be reused
 - When in doubt, ask whether the change alters what someone installing the package gets. If it does not, it is `chore`

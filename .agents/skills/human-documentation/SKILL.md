@@ -1,12 +1,40 @@
 ---
 name: human-documentation
-description: Use before committing a change — to find what AGENTS.md, CONTRIBUTING.md, the READMEs, the skills and the docs site now falsely claim after the diff — and when deciding where a new fact or rule belongs.
+description: Use when writing a design or decision page for people under `.humans/`, before committing — to find what AGENTS.md, the READMEs, the skills, the docs site and .humans now falsely claim — and when deciding where a fact belongs.
 ---
 
 # Documentation
 
 Keep every document true when the code changes, and put each fact where the next reader will
 find it.
+
+## Writing for `.humans/`
+
+`.humans/` holds what people read about how textlane is designed and why: `architecture.html`,
+`decisions.html` (the register of what is decided, the agent's calls, and what is open) and
+`conformance.html` (the suite and its upstream catalogue). It is not the docs site, which teaches
+users. `pnpm read` serves it with htmlpress; `.humans/htmlpress.yaml` holds the site title.
+
+- **Pages follow htmlpress's contract** (its `htmlpress-authoring` skill): a `<title>`,
+  `description`, `order` and `date` metas, one `<h1>`, then content only. No `<nav>`, no page
+  chrome, no styling of text: htmlpress's theme and components do that (`htmlpress-grid` and
+  `htmlpress-card` for headline numbers, `htmlpress-badge` for statuses, `htmlpress-steps`,
+  `htmlpress-callout`, `htmlpress-file-tree`, `htmlpress-table`).
+- **Tables hold short cells only.** htmlpress never wraps a cell and scrolls a wide table
+  sideways, so a row of prose becomes a `<dl>`: the item as `<dt>`, its why, rejected or
+  contents as `<dd>`.
+- **Diagrams are inline SVG**, not Mermaid: drawn by hand to show the real structure (tiers,
+  swim lanes per crate), styled from a page `<style>` scoped to `figure.diagram` that uses only
+  `--htmlpress-*` tokens, so light and dark follow the theme. Wide ones scroll inside their
+  `figure`.
+- **Statuses**: `success` decided, `warning` the agent's call, `danger` open.
+- **Numbers carry their date and source**, near the top.
+- **A decision changes `decisions.html` in the same commit** as the code or spec it decides:
+  add the entry with its status and the alternatives rejected, and move it out of Open.
+
+`.scripts/-test/docs.unit.ts` reads only Markdown, so paths and commands an HTML page names go
+unchecked: verify them by hand, and run `htmlpress build .humans --json` to confirm every page
+builds.
 
 ## Keeping the docs true
 
@@ -35,10 +63,12 @@ files, and is no longer true.
 - `AGENTS.md` — the only one, at the repo root.
 - the repo skills in `.agents/skills/` and the shipped ones in `.skills/`, including each
   `description`, which decides whether a skill gets picked up at all.
-- `README.md`, `rust/README.md`, `typescript/README.md`, `python/README.md` — the three package
+- `README.md`, `rust/textlane/README.md`, `typescript/README.md`, `python/README.md` — the three package
   READMEs share their usage section; change all three together.
 - `rust/docs/` — the user manual, in Markdown with livemark frontmatter; a page should build
   cleanly with `pnpm build:docs`.
+- `.humans/` — the design and decision pages; a changed decision or crate layout makes them
+  false like any other document.
 
 ## Where a fact belongs
 

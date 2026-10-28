@@ -4,7 +4,7 @@ import { describe, expect, it } from "vite-plus/test"
 
 const ROOT = resolve(import.meta.dirname, "..", "..")
 const REPO_SKILLS = join(ROOT, ".agents", "skills")
-const SECTIONS = ["typescript", "python", "rust"]
+const SECTIONS = ["typescript", "python", "rust/textlane"]
 const SHIPPED_SKILLS = [join(ROOT, ".skills")]
 
 describe("documentation stays true", () => {
@@ -35,7 +35,7 @@ describe("documentation stays true", () => {
       const text = readFileSync(join(ROOT, name, "README.md"), "utf8")
       return text.slice(text.indexOf("## Usage"))
     }
-    const drifted = SECTIONS.filter(name => usage(name) !== usage("rust"))
+    const drifted = SECTIONS.filter(name => usage(name) !== usage("rust/textlane"))
     expect(drifted).toEqual([])
   })
 

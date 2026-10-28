@@ -16,6 +16,8 @@ minimumReleaseAge: 10080
 # own publish -> consume loop would stall for a week. Unversioned entries cover every version.
 minimumReleaseAgeExclude:
   - fireargs
+  - gethtmlpress
+  - "@htmlpress/*"
   - livemark
 
 allowBuilds:

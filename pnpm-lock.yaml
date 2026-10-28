@@ -48,6 +48,9 @@ importers:
       cn:
         specifier: 0.2.4
         version: 0.2.4
+      gethtmlpress:
+        specifier: 0.2.0
+        version: 0.2.0
       lefthook:
         specifier: 2.1.1
         version: 2.1.1
@@ -743,6 +746,36 @@ packages:
     engines: {node: '>=20'}
     peerDependencies:
       hono: ^4 || ^5.0.0-0
+
+  '@htmlpress/darwin-arm64@0.2.0':
+    resolution: {integrity: sha512-SGIdwp2hdG5VpVPQtrYGC/Akmm/dwugF1MSEYm5Fy7SKtpoJj1b05pTVFiu4iNZ1Gc3FiPkqBziamfZUc2w7RA==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@htmlpress/darwin-x64@0.2.0':
+    resolution: {integrity: sha512-krfQiq6gtM5XunEpnJxwyY7wNSZIxRqcFCgupaCVTytD/PTWdhpcj08vEKygxlBXmL4PdG+OvHssUk1I6DEubw==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@htmlpress/linux-arm64@0.2.0':
+    resolution: {integrity: sha512-2dlWbFgyjMSlXPiYaDy1cLGJXE79Zk4WgD/A87ZmZ9OJbVYC78YDphRoWADw2yJRkcphwwbb7+jnNQH4VDWO1Q==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@htmlpress/linux-x64@0.2.0':
+    resolution: {integrity: sha512-k7upxO0SN5NTKZxKQ9XKEv0qYl7okEDoLoPLaES6ydvlZzyzMceJ1TqJ2p2HagYXJWD9ZKSX5pUV8DzCPKyxxA==}
+    cpu: [x64]
+    os: [linux]
+
+  '@htmlpress/win32-arm64@0.2.0':
+    resolution: {integrity: sha512-tbeuIBBHG+Xl1rXAgySJGdvntTlywujFNweL6LKNrSYQH/IxVSBvCAf9wqoxhrrYELix5WS/cdgS4ymGG8Uouw==}
+    cpu: [arm64]
+    os: [win32]
+
+  '@htmlpress/win32-x64@0.2.0':
+    resolution: {integrity: sha512-TWudAHByfIQBJR7wTQuPL7CLZGwh1tMl5FrIzFbe6q/Xg1Q9ZziRVbgSy1V9U8V7c6GBbZDHTggtJ3bARr+vZA==}
+    cpu: [x64]
+    os: [win32]
 
   '@iconify/types@2.0.0':
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
@@ -3634,6 +3667,11 @@ packages:
     resolution: {integrity: sha512-kVCxPF3vQM/N0B1PmoqVUqgHP+EeVjmZSQn+1oCRPxd2P21P2F19lIgbR3HBosbB1PUhOAoctJnfEn2GbN2eZA==}
     engines: {node: '>=18'}
 
+  gethtmlpress@0.2.0:
+    resolution: {integrity: sha512-u9sZ9N6b1jvmHHOpW5awrr41KG/TOkV794STnadHHwOEC3eHatRbiz9t7Suz30g6VOkzi+RPZAmEMK7mcLEYow==}
+    engines: {node: '>=20'}
+    hasBin: true
+
   github-slugger@2.0.0:
     resolution: {integrity: sha512-IaOQ9puYtjrkq7Y0Ygl9KDZnrf/aiUJYUpVf89y8kyaxbRG7Y1SrX/jaumrv81vc61+kiMempujsM3Yw7w5qcw==}
 
@@ -6294,6 +6332,24 @@ snapshots:
   '@hono/node-server@2.1.5(hono@4.13.13)':
     dependencies:
       hono: 4.13.13
+
+  '@htmlpress/darwin-arm64@0.2.0':
+    optional: true
+
+  '@htmlpress/darwin-x64@0.2.0':
+    optional: true
+
+  '@htmlpress/linux-arm64@0.2.0':
+    optional: true
+
+  '@htmlpress/linux-x64@0.2.0':
+    optional: true
+
+  '@htmlpress/win32-arm64@0.2.0':
+    optional: true
+
+  '@htmlpress/win32-x64@0.2.0':
+    optional: true
 
   '@iconify/types@2.0.0': {}
 
@@ -9097,6 +9153,15 @@ snapshots:
     dependencies:
       '@sec-ant/readable-stream': 0.4.1
       is-stream: 4.0.1
+
+  gethtmlpress@0.2.0:
+    optionalDependencies:
+      '@htmlpress/darwin-arm64': 0.2.0
+      '@htmlpress/darwin-x64': 0.2.0
+      '@htmlpress/linux-arm64': 0.2.0
+      '@htmlpress/linux-x64': 0.2.0
+      '@htmlpress/win32-arm64': 0.2.0
+      '@htmlpress/win32-x64': 0.2.0
 
   github-slugger@2.0.0: {}
 
