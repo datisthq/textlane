@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "import:commonmark": "node sources/commonmark.ts && vp fmt tests",
+    "import:directive": "node sources/directive.ts && vp fmt tests",
     "import:from-markdown": "node sources/from-markdown.ts && vp fmt tests",
     "import:gfm": "node sources/gfm.ts && vp fmt tests",
     "import:gfm-mdast": "node sources/gfm-mdast.ts && vp fmt tests",
@@ -16,7 +17,9 @@
     "commonmark.json": "0.31.0",
     "hast-util-from-html": "2.0.3",
     "hast-util-to-html": "9.0.5",
+    "mdast-util-directive": "3.1.1",
     "rehype-stringify": "10.0.1",
+    "remark-directive": "4.0.0",
     "remark-gfm": "4.0.1",
     "remark-parse": "11.0.0",
     "remark-rehype": "11.1.2",

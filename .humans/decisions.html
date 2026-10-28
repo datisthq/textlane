@@ -21,7 +21,7 @@
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>11 agent's calls</h3>
+    <h3>13 agent's calls</h3>
     <p>
       <htmlpress-badge type="warning">my call</htmlpress-badge> settled by the agent, open
       to change
@@ -438,6 +438,34 @@
       <strong>Rejected.</strong> Rendering every expectation through the lagging
       reference.
     </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge>
+    micromark-extension-directive's inputs port as tree cases, not HTML cases
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Unhandled directives vanish from micromark's HTML and fall
+      back to a <code>div</code> in unified's; the mdast is what livemark's directive
+      plugins consume.
+    </p>
+    <p>
+      <strong>Rejected.</strong> HTML cases that only test mdast-util-to-hast's
+      unknown-node fallback.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge>
+    <code>md.directive</code> options adopt mdast-util-directive's serializer names
+    (<code>quote</code>, <code>quoteSmart</code>, <code>preferUnquoted</code>,
+    <code>preferShortcut</code>, <code>collapseEmptyAttributes</code>)
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> remark-directive takes no options; the serializer that owns
+      them names them.
+    </p>
+    <p><strong>Rejected.</strong> Leaving the serializer options unreachable.</p>
   </dd>
   <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge> Each runner skips only

@@ -2,16 +2,13 @@ import { isDeepStrictEqual } from "node:util"
 import { existsSync, readdirSync, readFileSync } from "node:fs"
 import { join, resolve } from "node:path"
 import { parse } from "acorn"
-import type { AnyNode, CallExpression } from "acorn"
 import { ancestor } from "acorn-walk"
 import { writeGroups } from "../actions/group/write.ts"
-import { isStressInput } from "../actions/input/check.ts"
+import { createMdastPipeline, extractMdastCases } from "../actions/mdast/extract.ts"
+import type { MdastKind, MdastOptions, MdastSyntax } from "../actions/mdast/extract.ts"
 import { parseMarkdown, stringifyTree } from "../actions/markdown/render.ts"
 import { evaluateNode, isObject } from "../actions/node/evaluate.ts"
-import { resolveConstants } from "../actions/node/scope.ts"
 import { fetchSource } from "../actions/source/fetch.ts"
-import { isAssertEqual } from "../actions/test/assert.ts"
-import { findTestTitle } from "../actions/test/find.ts"
 
 const OUTPUT = resolve(import.meta.dirname, "..", "tests", "md")
 
@@ -77,12 +74,18 @@ const GFM_OPTIONS = new Set([
   "firstLineBlank",
 ])
 
-type Options = { gfm: Record<string, unknown>; stringify: Record<string, unknown> }
 type Group = {
   description: string
   source: { repository: string; commit: string; path: string; license: string }
   pipeline: unknown[]
   tests: object[]
+}
+
+const GFM: MdastSyntax = {
+  plugin: "md.gfm",
+  extension: "gfm",
+  isExtension: name => name.startsWith("gfm"),
+  options: GFM_OPTIONS,
 }
 
 const skipped = new Map<string, number>()
@@ -93,7 +96,8 @@ function importGfmMdast() {
   for (const repository of REPOSITORIES) {
     const root = fetchSource({ repository: repository.url, commit: repository.commit })
     const groups = new Map<string, Group>()
-    for (const found of extractCases(readFileSync(join(root, repository.test), "utf8"))) {
+    const source = readFileSync(join(root, repository.test), "utf8")
+    for (const found of extractMdastCases({ source, syntax: GFM, countSkip })) {
       const group = getGroup({
         groups,
         repository,
@@ -139,7 +143,7 @@ function importSpecRoundTrips() {
       continue
     }
     const input = String(example.input)
-    const md = stringifyTree({ tree: parseMarkdown(input, {}), gfm: {} })
+    const md = stringifyTree({ tree: parseMarkdown(input, { gfm: {} }), gfm: {} })
     byConstruct.set(construct, [
       ...(byConstruct.get(construct) ?? []),
       { description: `example ${index + 1}`, input, expected: { md } },
@@ -186,7 +190,7 @@ function importRemarkGfmFixtures() {
       continue
     }
     const input = readFileSync(join(root, name, "input.md"), "utf8")
-    const tree = parseMarkdown(input, gfm)
+    const tree = parseMarkdown(input, { gfm: gfm })
     const md = stringifyTree({ tree, gfm })
     if (
       !isDeepStrictEqual(
@@ -245,28 +249,17 @@ function importRemarkGfmFixtures() {
   }
 }
 
-type Kind = "tree" | "stringify" | "round trip"
-
 function getGroup(props: {
   groups: Map<string, Group>
   repository: (typeof REPOSITORIES)[number]
   path: string
-  kind: Kind
-  options: Options
+  kind: MdastKind
+  options: MdastOptions
 }) {
-  const gfm =
-    Object.keys(props.options.gfm).length > 0 ? ["md.gfm", props.options.gfm] : ["md.gfm"]
-  const stringify =
-    Object.keys(props.options.stringify).length > 0
-      ? ["md.stringify", props.options.stringify]
-      : ["md.stringify"]
-  const pipeline =
-    props.kind === "tree"
-      ? [["md.parse"], gfm]
-      : props.kind === "stringify"
-        ? [gfm, stringify]
-        : [["md.parse"], gfm, stringify]
-  const optionsKey = JSON.stringify({ ...props.options.gfm, ...props.options.stringify })
+  const optionsKey = JSON.stringify({
+    ...props.options.plugin,
+    ...props.options.stringify,
+  })
   const name = props.repository.url.split("/").pop() ?? props.repository.url
   const description = `${name} ${props.kind}${optionsKey === "{}" ? "" : ` ${optionsKey}`}`
   const existing = props.groups.get(description)
@@ -279,117 +272,15 @@ function getGroup(props: {
       path: props.path,
       license: "MIT",
     },
-    pipeline,
+    pipeline: createMdastPipeline({
+      syntax: GFM,
+      kind: props.kind,
+      options: props.options,
+    }),
     tests: [],
   }
   props.groups.set(description, group)
   return group
-}
-
-// `fromMarkdown(md, gfm)` is a tree case, `toMarkdown(tree, gfm)` a stringify case, and
-// `toMarkdown(fromMarkdown(md, …), …)` a round trip
-function extractCases(source: string) {
-  const program = parse(source, { ecmaVersion: "latest", sourceType: "module" })
-  const cases: { kind: Kind; options: Options; test: object }[] = []
-  const counts = new Map<string, number>()
-  ancestor(program, {
-    CallExpression(node, _state, ancestors) {
-      if (!isAssertEqual(node.callee)) return
-      const [call, expected] = node.arguments
-      if (call?.type !== "CallExpression") return
-      const constants = resolveConstants({ program, ancestors })
-      const title = findTestTitle(ancestors, constants) ?? "test"
-      const count = (counts.get(title) ?? 0) + 1
-      counts.set(title, count)
-      const description = count === 1 ? title : `${title} (${count})`
-      const found = readCall({ call, expected, constants })
-      if (found) cases.push({ ...found, test: { description, ...found.test } })
-    },
-  })
-  return cases
-}
-
-function readCall(props: {
-  call: CallExpression
-  expected: AnyNode | undefined
-  constants: Map<string, AnyNode>
-}) {
-  if (isCallTo(props.call, "fromMarkdown")) {
-    const input = evaluateNode(props.call.arguments[0], props.constants)
-    const options = readOptions(props.call.arguments[1], props.constants)
-    if (typeof input !== "string") return countSkip("not statically evaluable")
-    if (typeof options === "string") return countSkip(options)
-    if (isStressInput(input)) return countSkip("a stress test")
-    return {
-      kind: "tree" as const,
-      options,
-      test: { input, expected: { tree: parseMarkdown(input, options.gfm) } },
-    }
-  }
-  if (!isCallTo(props.call, "toMarkdown")) return undefined
-  const md = evaluateNode(props.expected, props.constants)
-  const options = readOptions(props.call.arguments[1], props.constants)
-  if (typeof md !== "string") return countSkip("not statically evaluable")
-  if (typeof options === "string") return countSkip(options)
-  const subject = props.call.arguments[0]
-  const parsed =
-    subject?.type === "Identifier" ? props.constants.get(subject.name) : subject
-  if (parsed?.type === "CallExpression" && isCallTo(parsed, "fromMarkdown")) {
-    const input = evaluateNode(parsed.arguments[0], props.constants)
-    if (typeof input !== "string") return countSkip("not statically evaluable")
-    return { kind: "round trip" as const, options, test: { input, expected: { md } } }
-  }
-  const tree = evaluateNode(subject, props.constants)
-  if (!isObject(tree)) return countSkip("a tree not statically evaluable")
-  return { kind: "stringify" as const, options, test: { tree, expected: { md } } }
-}
-
-// `{extensions: [gfmX(args?)], mdastExtensions: [gfmXFromMarkdown()], …}`; to-markdown's own
-// options pass through to `md.stringify`; a string result names why the case is skipped
-function readOptions(
-  node: AnyNode | undefined,
-  constants: Map<string, AnyNode>,
-): Options | string {
-  const target = node?.type === "Identifier" ? constants.get(node.name) : node
-  if (!target) return "no GFM extension enabled"
-  if (target.type !== "ObjectExpression") return "options not statically evaluable"
-  const options: Options = { gfm: {}, stringify: {} }
-  let enabled = false
-  for (const property of target.properties) {
-    if (property.type !== "Property" || property.key.type !== "Identifier")
-      return "options not statically evaluable"
-    const key = property.key.name
-    if (key !== "extensions" && key !== "mdastExtensions") {
-      const value = evaluateNode(property.value, constants)
-      if (value === undefined) return "options not statically evaluable"
-      options.stringify[key] = value
-      continue
-    }
-    if (property.value.type !== "ArrayExpression")
-      return "options not statically evaluable"
-    for (const element of property.value.elements) {
-      if (element?.type !== "CallExpression" || element.callee.type !== "Identifier")
-        return "options not statically evaluable"
-      if (!element.callee.name.startsWith("gfm"))
-        return `a non-GFM extension (${element.callee.name})`
-      enabled = true
-      const argument = element.arguments[0]
-        ? evaluateNode(element.arguments[0], constants)
-        : {}
-      if (!isObject(argument))
-        return "extension options not statically evaluable (functions)"
-      for (const [option, value] of Object.entries(argument)) {
-        if (!GFM_OPTIONS.has(option))
-          return `an extension option without a pipeline equivalent (${option})`
-        options.gfm[option] = value
-      }
-    }
-  }
-  return enabled ? options : "no GFM extension enabled"
-}
-
-function isCallTo(call: CallExpression, name: string) {
-  return call.callee.type === "Identifier" && call.callee.name === name
 }
 
 function countSkip(reason: string) {

@@ -1,4 +1,6 @@
 import rehypeStringify from "rehype-stringify"
+import { directiveToMarkdown } from "mdast-util-directive"
+import remarkDirective from "remark-directive"
 import remarkGfm from "remark-gfm"
 import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
@@ -40,23 +42,36 @@ export function renderMarkdown(props: RenderOptions & { markdown: string }) {
   return String(processor.processSync(props.markdown))
 }
 
-/** Parse Markdown to mdast, with positions, through the pinned remark-parse (and remark-gfm). */
-export function parseMarkdown(markdown: string, gfm?: Record<string, unknown>): object {
+/** Syntax extensions a tree case parses or serializes with, and their options. */
+export type Extensions = {
+  gfm?: Record<string, unknown>
+  directive?: Record<string, unknown>
+}
+
+/** Parse Markdown to mdast, with positions, through the pinned remark-parse and extensions. */
+export function parseMarkdown(markdown: string, extensions: Extensions = {}): object {
   const processor = unified()
     .use(remarkParse)
-    .use(gfm ? [[remarkGfm, gfm]] : [])
+    .use(extensions.gfm ? [[remarkGfm, extensions.gfm]] : [])
+    .use(extensions.directive ? [remarkDirective] : [])
   return JSON.parse(JSON.stringify(processor.parse(markdown)))
 }
 
-/** Serialize mdast to Markdown through the pinned remark-stringify (and remark-gfm). */
-export function stringifyTree(props: {
-  tree: object
-  gfm?: Record<string, unknown>
-  stringify?: Record<string, unknown>
-}) {
+/** Serialize mdast to Markdown through the pinned remark-stringify and extensions. */
+export function stringifyTree(
+  props: Extensions & { tree: object; stringify?: Record<string, unknown> },
+) {
   const processor = unified()
     .use(remarkStringify, props.stringify ?? {})
     .use(props.gfm ? [[remarkGfm, props.gfm]] : [])
+  // remark-directive takes no options, so its serializer is registered here with them
+  if (props.directive) {
+    const extensions = processor.data("toMarkdownExtensions") ?? []
+    processor.data("toMarkdownExtensions", [
+      ...extensions,
+      directiveToMarkdown(props.directive),
+    ])
+  }
   // A JSON tree is a valid mdast root; unified types roots, not plain objects
   return processor.stringify(JSON.parse(JSON.stringify(props.tree)))
 }

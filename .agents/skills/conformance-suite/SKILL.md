@@ -55,7 +55,9 @@ a test's `comment` only where it means something different.
 - `actions/source/fetch.ts` checks out a pinned commit into the git-ignored `conformance/.cache/`;
   `actions/group/write.ts` replaces one source's groups in a construct file and keeps the rest;
   `actions/markdown/render.ts` is the reference pipeline (`renderMarkdown`, `parseMarkdown`) and
-  its textlane equivalent; `actions/node/evaluate.ts` and `actions/test/find.ts` read upstream
+  its textlane equivalent; `actions/mdast/extract.ts` reads an mdast-util's
+  `fromMarkdown` / `toMarkdown` tests for any syntax plugin; `actions/node/evaluate.ts` and
+  `actions/test/find.ts` read upstream
   test files statically with acorn.
 - An importer skips, and counts, what a pipeline case cannot express: options with no textlane
   equivalent yet (micromark's construct switches, `defaultLineEnding`), input that is not
