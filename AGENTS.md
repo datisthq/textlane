@@ -4,7 +4,7 @@ Textlane is a Rust-native text processing pipeline: a replacement for unified wh
 
 ## Terminology
 
-- **crate** — the `textlane` library in `rust/textlane/` and the crates beside it that it re-exports (`textlane-core` and one `textlane-<domain>` per domain: `markdown`, `html`, `prose`, `javascript`); the only place behaviour lives
+- **crate** — the `textlane` library in `rust/textlane/` and the crates beside it that it re-exports (`textlane-core` and one `textlane-<domain>` per domain: `md`, `html`, `mdx`, `prose`); the only place behaviour lives
 - **binding** — a package that only exposes the crate: `typescript/` for npm (a napi addon, the `node` feature), `python/` for PyPI (a PyO3 extension, the `python` feature). A binding never reimplements a plugin
 - **platform package** — `@textlane/<os>-<arch>`, one per entry in `PLATFORMS` (`typescript/settings.ts`), each carrying one `textlane.node` addon; the main `textlane` package pins them all as `optionalDependencies` at its own version
 - **pipeline** — a processor built with `.use()`: parse, transform and serialize stages run in order over a syntax tree
@@ -79,7 +79,7 @@ The root is a private pnpm workspace (`package.json`, `pnpm-workspace.yaml`): fo
 - `rust/` — the cargo workspace, a virtual `Cargo.toml` over one sibling directory per crate, on the toolchain `rust/rust-toolchain.toml` pins (**`rust-development`**)
   - `textlane/` — the crates.io package `textlane`: `src/actions/<entity>/<verb>.rs` (`package/version`); `src/bindings/` — `node.rs` (napi, the `node` feature) and `python.rs` (PyO3, the `python` feature), each only mapping crate functions to its language; `build.rs` runs napi's setup under `node`; `src/lib.rs` the façade, re-exporting each domain crate as a module of its name
   - `core/` — `textlane-core`: the unist, mdast and hast trees, the file and the plugin contract every other crate shares
-  - `markdown/`, `html/`, `prose/`, `javascript/` — `textlane-<domain>`, each domain's plugins; `html`'s `javascript` feature is the one domain-to-domain edge
+  - `md/`, `html/`, `mdx/`, `prose/` — `textlane-<domain>`, each domain's plugins, depending on `textlane-core` only
   - Unit tests beside their module as `<module>_unit.rs`
   - `docs/` — the docs site's Markdown pages, outside the crate's `include`
 - `typescript/` — the npm package `textlane`: `index.ts` loads the addon `actions/addon/resolve.ts` finds; `settings.ts` lists the platforms; `scripts/` packs and publishes the platform packages into `typescript/compile/` (**`package-distribution`**)

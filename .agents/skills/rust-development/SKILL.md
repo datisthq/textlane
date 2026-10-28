@@ -28,11 +28,13 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
 
 - `rust/Cargo.toml` is a virtual manifest; each crate is a sibling directory named by its role,
   as in fairspec: `textlane/`, `core/` (`textlane-core`: the trees, the file and the plugin
-  contract every other crate shares), and one directory per domain: `markdown/`, `html/`,
-  `prose/`, `javascript/` (`textlane-<domain>`). A domain crate depends on `textlane-core`,
-  never on another domain or on `textlane`, which depends on them all. The one exception is
-  `html`'s `javascript` feature, for `html.toJavascript`, since the JS tree is oxc's and not in
-  core
+  contract every other crate shares), and one directory per domain: `md/`, `html/`, `mdx/`,
+  `prose/` (`textlane-<domain>`). A domain crate depends on `textlane-core`, never on another
+  domain or on `textlane`, which depends on them all. `mdx` compiles core's hast to a JS tree
+  on oxc, so oxc is its own dependency and never core's
+- A domain is named short (`md`, `html`, `mdx`, `prose`); its functions spell formats out in
+  full: `md.toHtml`, `html.toMarkdown`, `md.toProse`. Rust `to_markdown` becomes napi's
+  `toMarkdown` and Python's `to_markdown` with no `js_name` override
 - `textlane` re-exports each domain as a module of its name and, once `textlane-core` has
   items, those at its root; never as `textlane::core`, which would make every `core::` path in
   the crate ambiguous with Rust's built-in `core`. A glob re-export of a crate with no items
@@ -53,9 +55,8 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
 
 - The default features need neither Node nor Python: `cargo add textlane` must build without
   napi or PyO3. Every binding dependency is optional and enabled only by its feature.
-- `markdown`, `html`, `prose` and `javascript` (all default) gate the domain re-exports;
-  `javascript` also turns on `html`'s `javascript` feature. `node` and `python` enable every
-  domain, since each binding is one addon that must carry them all.
+- `md`, `html`, `mdx` and `prose` (all default) gate the domain re-exports. `node` and
+  `python` enable every domain, since each binding is one addon that must carry them all.
 - `node` pulls in napi, and `build.rs` runs napi-build only under it; `python` pulls in PyO3
   with `abi3-py39`. Each binding module is compiled only under its feature.
 - `pnpm -C rust check:lint` runs clippy three times: default features, `--features node` and

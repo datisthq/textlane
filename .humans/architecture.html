@@ -115,14 +115,13 @@
 <h2>Crates and their dependencies</h2>
 <p>
   <code>rust/Cargo.toml</code> is a virtual manifest; each crate is a sibling directory
-  named by its role, as in fairspec. All crates publish, lock-stepped at one version. The
-  dashed edge is optional, behind a feature.
+  named by its role, as in fairspec. All crates publish, lock-stepped at one version.
 </p>
 <figure class="diagram">
   <svg
     viewBox="0 0 760 302"
     role="img"
-    aria-label="textlane depends on four domain crates, markdown, prose, html and javascript, which each depend on textlane-core; html depends on javascript behind a feature; javascript depends on oxc; textlane re-exports core"
+    aria-label="textlane depends on four domain crates, md, html, prose and mdx, which each depend only on textlane-core; mdx also depends on oxc; textlane re-exports core"
   >
     <defs>
       <marker
@@ -156,19 +155,17 @@
     <text class="tier" x="14" y="234">FOUNDATION</text>
     <path class="edge" d="M400 72V100M160 100H640" />
     <path class="edge" d="M160 100V124" marker-end="url(#dep)" />
-    <path class="edge" d="M320 100V124" marker-end="url(#dep)" />
-    <path class="edge" d="M480 100V124" marker-end="url(#dep)" />
-    <path class="edge" d="M640 100V124" marker-end="url(#dep)" />
     <path class="edge" d="M160 172V204" />
+    <path class="edge" d="M320 100V124" marker-end="url(#dep)" />
     <path class="edge" d="M320 172V204" />
+    <path class="edge" d="M480 100V124" marker-end="url(#dep)" />
     <path class="edge" d="M480 172V204" />
+    <path class="edge" d="M640 100V124" marker-end="url(#dep)" />
     <path class="edge" d="M640 172V204" />
     <path class="edge" d="M160 204H640M400 204V228" marker-end="url(#dep)" />
     <path class="edge opt" d="M320 48H52V252H310" marker-end="url(#dep-opt)" />
     <text class="label" x="58" y="268">re-exports core's items</text>
     <path class="edge" d="M680 172V228" marker-end="url(#dep)" />
-    <path class="edge opt" d="M550 148H568" marker-end="url(#dep-opt)" />
-    <text class="label" x="559" y="118" text-anchor="middle">feature</text>
     <g class="node hub">
       <rect x="320" y="24" width="160" height="48" rx="8" />
       <text class="title" x="400" y="45" text-anchor="middle">textlane</text>
@@ -178,23 +175,23 @@
     </g>
     <g class="node">
       <rect x="90" y="124" width="140" height="48" rx="8" />
-      <text class="title" x="160" y="145" text-anchor="middle">textlane-markdown</text>
-      <text class="sub" x="160" y="160" text-anchor="middle">markdown/</text>
+      <text class="title" x="160" y="145" text-anchor="middle">textlane-md</text>
+      <text class="sub" x="160" y="160" text-anchor="middle">md/</text>
     </g>
     <g class="node">
       <rect x="250" y="124" width="140" height="48" rx="8" />
-      <text class="title" x="320" y="145" text-anchor="middle">textlane-prose</text>
-      <text class="sub" x="320" y="160" text-anchor="middle">prose/</text>
+      <text class="title" x="320" y="145" text-anchor="middle">textlane-html</text>
+      <text class="sub" x="320" y="160" text-anchor="middle">html/</text>
     </g>
     <g class="node">
       <rect x="410" y="124" width="140" height="48" rx="8" />
-      <text class="title" x="480" y="145" text-anchor="middle">textlane-html</text>
-      <text class="sub" x="480" y="160" text-anchor="middle">html/</text>
+      <text class="title" x="480" y="145" text-anchor="middle">textlane-prose</text>
+      <text class="sub" x="480" y="160" text-anchor="middle">prose/</text>
     </g>
     <g class="node">
       <rect x="570" y="124" width="140" height="48" rx="8" />
-      <text class="title" x="640" y="145" text-anchor="middle">textlane-javascript</text>
-      <text class="sub" x="640" y="160" text-anchor="middle">javascript/</text>
+      <text class="title" x="640" y="145" text-anchor="middle">textlane-mdx</text>
+      <text class="sub" x="640" y="160" text-anchor="middle">mdx/</text>
     </g>
     <g class="node hub">
       <rect x="310" y="228" width="180" height="48" rx="8" />
@@ -209,33 +206,28 @@
       <text class="sub" x="675" y="264" text-anchor="middle">external</text>
     </g>
   </svg>
-  <figcaption>
-    Solid: a dependency. Accent dashes: behind a feature, or a re-export.
-  </figcaption>
+  <figcaption>Solid: a dependency. Accent dashes: a re-export.</figcaption>
 </figure>
 
 <h3>Rules</h3>
 <ul>
   <li>
     A domain crate depends on <code>textlane-core</code> only, never on another domain or
-    on <code>textlane</code>. Every tree type but JavaScript's lives in core, so the
+    on <code>textlane</code>. Every tree type but the JS tree lives in core, so the
     bridges need no domain-to-domain edge.
   </li>
   <li>
-    The one exception: <code>html.toJavascript</code> builds oxc's tree, so
-    <code>html</code> depends on <code>javascript</code> behind its
-    <code>javascript</code> feature.
+    The JS tree is oxc's and lives in <code>mdx</code>, the only crate that compiles oxc.
   </li>
   <li>
-    <code>textlane</code> re-exports core's items at its root and the domains as modules;
-    never as <code>textlane::core</code>, which clashes with Rust's built-in
-    <code>core</code>.
+    <code>textlane</code> re-exports the domains as modules and, once it has items, core's
+    items at its root; never as <code>textlane::core</code>, which clashes with Rust's
+    built-in <code>core</code>.
   </li>
   <li>
-    Features <code>markdown</code>, <code>html</code>, <code>prose</code> and
-    <code>javascript</code> are all default; <code>node</code> and
-    <code>python</code> enable every domain; <code>testing</code> adds the conformance
-    test plugins.
+    Features <code>md</code>, <code>html</code>, <code>mdx</code> and
+    <code>prose</code> are all default; <code>node</code> and <code>python</code> enable
+    every domain.
   </li>
 </ul>
 
@@ -254,7 +246,7 @@
     MDX nodes), hast and nlcst trees; the file (vfile) and its messages; the plugin
     contract; visit, is and position utilities.
   </dd>
-  <dt><code>textlane-markdown</code></dt>
+  <dt><code>textlane-md</code></dt>
   <dd>
     <code>parse</code>, <code>stringify</code>, <code>gfm</code>,
     <code>frontmatter</code>, <code>directive</code>, <code>math</code>,
@@ -265,14 +257,14 @@
   <dd>
     <code>parse</code> (HTML5), <code>stringify</code>, <code>raw</code>,
     <code>sanitize</code>, <code>slug</code>, <code>format</code>,
-    <code>toMarkdown</code>, <code>toProse</code>, <code>toJavascript</code> (feature);
-    later <code>katex</code> and <code>highlight</code>.
+    <code>toMarkdown</code>, <code>toProse</code>; later <code>katex</code> and
+    <code>highlight</code>.
   </dd>
-  <dt><code>textlane-javascript</code></dt>
+  <dt><code>textlane-mdx</code></dt>
   <dd>
-    The JS tree on oxc (ESTree conversion for JavaScript recma plugins),
-    <code>parse</code>, the MDX transforms (document, JSX rewrite, build JSX),
-    <code>stringify</code> (codegen).
+    <code>compile</code>: hast into a JS tree on oxc, the MDX transforms (document, JSX
+    rewrite, build JSX) and code generation, with ESTree conversion so JavaScript recma
+    plugins can join.
   </dd>
   <dt><code>textlane-prose</code></dt>
   <dd>
@@ -305,9 +297,9 @@
       <td><code>textlane</code></td>
     </tr>
     <tr>
-      <td><code>textlane::markdown</code></td>
-      <td><code>textlane/markdown</code></td>
-      <td><code>textlane.markdown</code></td>
+      <td><code>textlane::md</code></td>
+      <td><code>textlane/md</code></td>
+      <td><code>textlane.md</code></td>
     </tr>
     <tr>
       <td><code>textlane::html</code></td>
@@ -315,9 +307,9 @@
       <td><code>textlane.html</code></td>
     </tr>
     <tr>
-      <td><code>textlane::javascript</code></td>
-      <td><code>textlane/javascript</code></td>
-      <td><code>textlane.javascript</code></td>
+      <td><code>textlane::mdx</code></td>
+      <td><code>textlane/mdx</code></td>
+      <td><code>textlane.mdx</code></td>
     </tr>
     <tr>
       <td><code>textlane::prose</code></td>
@@ -329,32 +321,35 @@
 <pre
   data-title="pipeline.ts"
 ><code class="language-ts">import { textlane } from "textlane"
-import * as markdown from "textlane/markdown"
+import * as md from "textlane/md"
 import * as html from "textlane/html"
 
 const processor = textlane()
-  .use(markdown.parse())
-  .use(markdown.gfm())
-  .use(markdown.toHtml())
+  .use(md.parse())
+  .use(md.gfm())
+  .use(md.toHtml())
   .use(html.sanitize())
   .use(html.stringify())</code></pre>
 <p>
-  Names derive mechanically from Rust: <code>to_javascript</code> is
-  <code>toJavascript</code> through napi's default conversion and
-  <code>to_javascript</code> in Python. A domain name is one lowercase word in every
-  identifier. Plugin names, their options and node shapes are public API.
+  Domains are named short, like file extensions; their functions spell formats out in
+  full:
+  <code>md.toHtml</code>, <code>html.toMarkdown</code>, <code>md.toProse</code>. Names
+  derive mechanically from Rust: <code>to_markdown</code> is
+  <code>toMarkdown</code> through napi's default conversion and
+  <code>to_markdown</code> in Python. Plugin names, their options and node shapes are
+  public API.
 </p>
 
 <h2>MDX across domains</h2>
 <p>
   Livemark's <code>compileMDX</code> as a textlane pipeline. Syntax is Markdown's job;
-  compilation is JavaScript's. Each lane is the crate that owns the stage.
+  compiling to JavaScript is MDX's. Each lane is the crate that owns the stage.
 </p>
 <figure class="diagram">
   <svg
-    viewBox="0 0 1012 284"
+    viewBox="0 0 900 284"
     role="img"
-    aria-label="MDX pipeline: markdown.parse with markdown.mdx, markdown.gfm and markdown.toHtml run in the markdown crate on mdast; html.slug and html.toJavascript run in the html crate on hast; the MDX transforms and javascript.stringify run in the javascript crate on the JS tree"
+    aria-label="MDX pipeline: md.parse with md.mdx, md.gfm and md.toHtml run in the md crate on mdast; html.slug runs in the html crate on hast; mdx.compile turns hast into a JS tree and generates the JS module"
   >
     <defs>
       <marker
@@ -380,72 +375,64 @@ const processor = textlane()
         <path class="head opt" d="M0 0L10 5L0 10z" />
       </marker>
     </defs>
-    <rect class="band" x="0" y="14" width="1012" height="82" rx="10" />
-    <text class="title" x="16" y="52">markdown</text>
-    <text class="sub" x="16" y="68">textlane-markdown</text>
-    <rect class="band" x="0" y="104" width="1012" height="82" rx="10" />
+    <rect class="band" x="0" y="14" width="900" height="82" rx="10" />
+    <text class="title" x="16" y="52">md</text>
+    <text class="sub" x="16" y="68">textlane-md</text>
+    <rect class="band" x="0" y="104" width="900" height="82" rx="10" />
     <text class="title" x="16" y="142">html</text>
     <text class="sub" x="16" y="158">textlane-html</text>
-    <rect class="band" x="0" y="194" width="1012" height="82" rx="10" />
-    <text class="title" x="16" y="232">javascript</text>
-    <text class="sub" x="16" y="248">textlane-javascript</text>
+    <rect class="band" x="0" y="194" width="900" height="82" rx="10" />
+    <text class="title" x="16" y="232">mdx</text>
+    <text class="sub" x="16" y="248">textlane-mdx</text>
     <g class="node">
-      <rect x="150" y="34" width="140" height="42" rx="8" />
-      <text class="code" x="220" y="52" text-anchor="middle">markdown.parse</text>
-      <text class="sub" x="220" y="67" text-anchor="middle">+ markdown.mdx</text>
+      <rect x="145" y="34" width="150" height="42" rx="8" />
+      <text class="code" x="220" y="52" text-anchor="middle">md.parse</text>
+      <text class="sub" x="220" y="67" text-anchor="middle">+ md.mdx</text>
     </g>
     <g class="node">
-      <rect x="330" y="34" width="140" height="42" rx="8" />
-      <text class="code" x="400" y="52" text-anchor="middle">markdown.gfm …</text>
-      <text class="sub" x="400" y="67" text-anchor="middle">mdast transforms</text>
+      <rect x="335" y="34" width="150" height="42" rx="8" />
+      <text class="code" x="410" y="52" text-anchor="middle">md.gfm …</text>
+      <text class="sub" x="410" y="67" text-anchor="middle">mdast transforms</text>
     </g>
     <g class="node">
-      <rect x="510" y="34" width="140" height="42" rx="8" />
-      <text class="code" x="580" y="52" text-anchor="middle">markdown.toHtml</text>
-      <text class="sub" x="580" y="67" text-anchor="middle">mdast → hast</text>
+      <rect x="525" y="34" width="150" height="42" rx="8" />
+      <text class="code" x="600" y="52" text-anchor="middle">md.toHtml</text>
+      <text class="sub" x="600" y="67" text-anchor="middle">mdast → hast</text>
     </g>
     <g class="node">
-      <rect x="510" y="124" width="140" height="42" rx="8" />
-      <text class="code" x="580" y="142" text-anchor="middle">html.slug …</text>
-      <text class="sub" x="580" y="157" text-anchor="middle">hast transforms</text>
+      <rect x="525" y="124" width="150" height="42" rx="8" />
+      <text class="code" x="600" y="142" text-anchor="middle">html.slug …</text>
+      <text class="sub" x="600" y="157" text-anchor="middle">hast transforms</text>
     </g>
     <g class="node">
-      <rect x="690" y="124" width="140" height="42" rx="8" />
-      <text class="code" x="760" y="142" text-anchor="middle">html.toJavascript</text>
-      <text class="sub" x="760" y="157" text-anchor="middle">hast → JS</text>
+      <rect x="525" y="214" width="150" height="42" rx="8" />
+      <text class="code" x="600" y="232" text-anchor="middle">mdx.compile</text>
+      <text class="sub" x="600" y="247" text-anchor="middle">hast → JS tree → code</text>
     </g>
-    <g class="node">
-      <rect x="690" y="214" width="140" height="42" rx="8" />
-      <text class="code" x="760" y="232" text-anchor="middle">MDX transforms</text>
-      <text class="sub" x="760" y="247" text-anchor="middle">document · JSX</text>
+    <g class="node ext">
+      <rect x="725" y="214" width="150" height="42" rx="8" />
+      <text class="code" x="800" y="232" text-anchor="middle">JS module</text>
+      <text class="sub" x="800" y="247" text-anchor="middle">the output</text>
     </g>
-    <g class="node">
-      <rect x="850" y="214" width="156" height="42" rx="8" />
-      <text class="code" x="928" y="232" text-anchor="middle">javascript.stringify</text>
-      <text class="sub" x="928" y="247" text-anchor="middle">codegen → JS module</text>
-    </g>
-    <path class="edge" d="M290 55H330" marker-end="url(#mdx)" />
-    <text class="tree" x="310" y="48" text-anchor="middle">mdast</text>
-    <path class="edge" d="M470 55H510" marker-end="url(#mdx)" />
-    <text class="tree" x="490" y="48" text-anchor="middle">mdast</text>
-    <path class="edge" d="M580 76V124" marker-end="url(#mdx)" />
-    <text class="tree" x="588" y="104">hast</text>
-    <path class="edge" d="M650 145H690" marker-end="url(#mdx)" />
-    <text class="tree" x="670" y="138" text-anchor="middle">hast</text>
-    <path class="edge" d="M760 166V214" marker-end="url(#mdx)" />
-    <text class="tree" x="768" y="194">JS tree</text>
-    <path class="edge" d="M830 235H850" marker-end="url(#mdx)" />
-    <text class="tree" x="840" y="228" text-anchor="middle"></text>
+    <path class="edge" d="M295 55H335" marker-end="url(#mdx)" />
+    <text class="tree" x="315" y="48" text-anchor="middle">mdast</text>
+    <path class="edge" d="M485 55H525" marker-end="url(#mdx)" />
+    <text class="tree" x="505" y="48" text-anchor="middle">mdast</text>
+    <path class="edge" d="M600 76V124" marker-end="url(#mdx)" />
+    <text class="tree" x="608" y="104">hast</text>
+    <path class="edge" d="M600 166V214" marker-end="url(#mdx)" />
+    <text class="tree" x="608" y="194">hast</text>
+    <path class="edge" d="M675 235H725" marker-end="url(#mdx)" />
+    <text class="tree" x="700" y="228" text-anchor="middle"></text>
   </svg>
   <figcaption>
     Each lane is a crate; accent labels name the tree passed along each edge.
   </figcaption>
 </figure>
 <p>
-  <code>markdown.mdx</code> finds JSX, expressions and ESM by balanced scanning and keeps
-  them as source strings, so <code>markdown</code> never compiles oxc. Only
-  <code>javascript</code>
-  parses them.
+  <code>md.mdx</code> finds JSX, expressions and ESM by balanced scanning and keeps them
+  as source strings, so <code>md</code> never compiles oxc. Only <code>mdx</code> parses
+  them.
 </p>
 
 <h2>Hardest points</h2>
@@ -460,8 +447,8 @@ const processor = textlane()
     never cross a serialization boundary.
   </li>
   <li>
-    <strong>Core holds every tree type but JavaScript's.</strong> That keeps bridges free
-    of domain edges; <code>html.toJavascript</code> is the only exception.
+    <strong>Core holds every tree type but the JS tree.</strong> That keeps every domain
+    depending on core alone; the JS tree stays inside <code>mdx</code> on oxc.
   </li>
   <li>
     <strong>Lifecycle as data.</strong> The core corpus depends on one set of test

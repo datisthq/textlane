@@ -106,8 +106,7 @@
 </figure>
 <p>
   Not shown: html5lib's 6,827 tokenizer cases, used only if <code>html.tokenize</code> is
-  exposed. Not yet surveyed: prose (retext) and javascript (<code>@mdx-js/mdx</code>,
-  recma).
+  exposed. Not yet surveyed: prose (retext) and mdx (<code>@mdx-js/mdx</code>, recma).
 </p>
 
 <h2>Layout and format</h2>
@@ -156,7 +155,7 @@
       "path": "test/io/flow/heading-atx.js",
       "license": "MIT"
     },
-    "pipeline": [["markdown.parse"], ["markdown.toHtml"], ["html.stringify"]],
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
     "tests": [
       {
         "description": "rank 1",
@@ -324,7 +323,7 @@
         <td>GFM syntax + spec</td>
         <td>210</td>
         <td>95%</td>
-        <td><code>markdown.gfm</code></td>
+        <td><code>md.gfm</code></td>
       </tr>
       <tr>
         <td>GFM mdast + remark-gfm</td>
@@ -382,7 +381,7 @@
         <td>mdast-util-to-hast</td>
         <td>142</td>
         <td>90%</td>
-        <td><code>markdown.toHtml</code></td>
+        <td><code>md.toHtml</code></td>
       </tr>
       <tr>
         <td>rehypejs/rehype</td>
@@ -474,8 +473,9 @@
     <li>
       <h3>Workspace</h3>
       <p>
-        Finish the flat crates, add <code>prose</code> and <code>javascript</code>, wire
-        features, release config and docs.
+        Done: the flat crates <code>textlane</code>, <code>core</code>, <code>md</code>,
+        <code>html</code>, <code>mdx</code>, <code>prose</code>, their features, release
+        config and docs.
       </p>
     </li>
     <li>
@@ -510,8 +510,8 @@
     <li>
       <h3>MDX</h3>
       <p>
-        Survey <code>@mdx-js/mdx</code>; <code>markdown.mdx</code>, then
-        <code>html.toJavascript</code> and the MDX transforms.
+        Survey <code>@mdx-js/mdx</code>; <code>md.mdx</code>, then
+        <code>mdx.compile</code>.
       </p>
     </li>
   </ol>

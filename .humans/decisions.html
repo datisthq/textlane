@@ -21,7 +21,7 @@
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>5 agent's calls</h3>
+    <h3>4 agent's calls</h3>
     <p>
       <htmlpress-badge type="warning">my call</htmlpress-badge> settled by the agent, open
       to change
@@ -109,24 +109,27 @@
   </dd>
   <dt>
     <htmlpress-badge type="success">decided</htmlpress-badge> Crate names
-    <code>core</code>, <code>markdown</code>, <code>html</code>, <code>prose</code>,
-    <code>javascript</code>
+    <code>core</code>, <code>md</code>, <code>html</code>, <code>mdx</code>,
+    <code>prose</code>
   </dt>
   <dd>
     <p>
-      <strong>Why.</strong> Name the content domain, not the tree; <code>core</code> also
-      holds the plugin contract every domain implements.
+      <strong>Why.</strong> Domains are named by their format, short like file extensions
+      (<code>md</code>, <code>html</code>, <code>mdx</code>), with <code>prose</code> for
+      natural language; <code>core</code> also holds the plugin contract every domain
+      implements.
     </p>
     <p>
       <strong>Rejected.</strong> <code>ast</code>, <code>model</code>, <code>data</code>,
-      <code>tree</code>; <code>md</code>; <code>text</code>, <code>language</code>,
-      <code>nlcst</code>, <code>article</code>; <code>ecmascript</code>; the upstream
+      <code>tree</code>; <code>markdown</code>; <code>javascript</code>,
+      <code>script</code>, <code>ecmascript</code>; <code>text</code>, <code>nl</code>,
+      <code>language</code>, <code>nlcst</code>, <code>article</code>; the upstream
       remark, rehype, retext and recma prefixes.
     </p>
   </dd>
   <dt>
     <htmlpress-badge type="success">decided</htmlpress-badge> Plugins are namespaced by
-    domain: <code>markdown.parse()</code>, <code>html.sanitize()</code>
+    domain: <code>md.parse()</code>, <code>html.sanitize()</code>
   </dt>
   <dd>
     <p>
@@ -139,57 +142,50 @@
     </p>
   </dd>
   <dt>
-    <htmlpress-badge type="success">decided</htmlpress-badge> Bridges are
-    <code>source.toTarget</code> with full names, one lowercase word per domain:
-    <code>toHtml</code>, <code>toJavascript</code>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Domains are named short;
+    functions spell formats out in full: <code>md.toHtml</code>,
+    <code>html.toMarkdown</code>, <code>md.toProse</code>
   </dt>
   <dd>
     <p>
-      <strong>Why.</strong> Names derive mechanically: Rust <code>to_javascript</code>,
-      napi <code>toJavascript</code>, Python <code>to_javascript</code>.
+      <strong>Why.</strong> Short namespaces read well in pipelines; full function names
+      stay clear and derive mechanically: Rust <code>to_markdown</code>, napi
+      <code>toMarkdown</code>, Python <code>to_markdown</code>.
     </p>
     <p>
-      <strong>Rejected.</strong> <code>toJs</code>; <code>toJavaScript</code>, which needs
-      a <code>js_name</code> override; <code>javascript.fromHtml</code>.
+      <strong>Rejected.</strong> Abbreviated bridges such as <code>toMd</code> or
+      <code>toJs</code>; <code>toJavaScript</code>, which needs a
+      <code>js_name</code> override.
     </p>
   </dd>
   <dt>
     <htmlpress-badge type="success">decided</htmlpress-badge> MDX syntax in
-    <code>markdown</code>, compilation in <code>html.toJavascript</code> and
-    <code>javascript</code>
+    <code>md</code> (<code>md.mdx</code>), compilation in the <code>mdx</code> crate
+    (<code>mdx.compile</code>)
   </dt>
   <dd>
     <p>
-      <strong>Why.</strong> Syntax changes how Markdown tokenizes; compiling is JS-tree
-      work, as upstream splits it across remark and recma. Only
-      <code>javascript</code> compiles oxc.
+      <strong>Why.</strong> Syntax changes how Markdown tokenizes; compiling hast to a JS
+      module is its own format's job, as <code>@mdx-js/mdx</code> is upstream. The JS tree
+      on oxc stays internal to <code>mdx</code>, and no domain depends on another.
     </p>
     <p>
-      <strong>Rejected.</strong> A separate <code>mdx</code> crate; MDX compilation inside
-      <code>markdown</code> behind a feature.
+      <strong>Rejected.</strong> A <code>javascript</code> (or <code>script</code>) crate
+      with <code>html.toJavascript</code>, which needed an <code>html</code> →
+      <code>javascript</code> edge and made a general JS tree public API; MDX compilation
+      inside <code>md</code> behind a feature.
     </p>
   </dd>
   <dt>
-    <htmlpress-badge type="warning">my call</htmlpress-badge> Every tree type but
-    JavaScript's lives in <code>core</code>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Every tree type but the JS
+    tree lives in <code>core</code>
   </dt>
   <dd>
-    <p><strong>Why.</strong> Bridges then need no domain-to-domain dependency.</p>
+    <p>
+      <strong>Why.</strong> Bridges then need no domain-to-domain dependency; the JS tree
+      is oxc's and stays inside <code>mdx</code>.
+    </p>
     <p><strong>Rejected.</strong> Each domain owning its tree types.</p>
-  </dd>
-  <dt>
-    <htmlpress-badge type="warning">my call</htmlpress-badge> <code>html</code> depends on
-    <code>javascript</code> behind a feature, for <code>toJavascript</code>
-  </dt>
-  <dd>
-    <p>
-      <strong>Why.</strong> The JS tree is oxc's and stays out of core; this is the one
-      allowed domain edge.
-    </p>
-    <p>
-      <strong>Rejected.</strong> The bridge living in <code>javascript</code> as
-      <code>fromHtml</code>.
-    </p>
   </dd>
 </dl>
 
@@ -312,8 +308,7 @@
   <dd><p>1,973 HTML parsing cases need either a loader or a converter.</p></dd>
   <dt>
     <htmlpress-badge type="danger">open</htmlpress-badge> Uninventoried sources: retext
-    (prose), <code>@mdx-js/mdx</code> and recma (javascript), the definition-list syntax
-    repos
+    (prose), <code>@mdx-js/mdx</code> and recma (mdx), the definition-list syntax repos
   </dt>
   <dd>
     <p>

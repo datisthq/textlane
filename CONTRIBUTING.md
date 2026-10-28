@@ -31,7 +31,7 @@ textlane/
 │   │   │   └── lib.rs    #   the library façade
 │   │   └── build.rs     #   napi setup under the `node` feature
 │   ├── core/            #   textlane-core: trees, the file, the plugin contract
-│   ├── markdown/ html/ prose/ javascript/  # one textlane-<domain> crate each
+│   ├── md/ html/ mdx/ prose/  # one textlane-<domain> crate each
 │   └── docs/            #   the docs site's Markdown pages, built with livemark
 ├── typescript/          # the npm package `textlane`: loads the native addon
 │   ├── actions/         #   resolveAddon — find the platform package's addon

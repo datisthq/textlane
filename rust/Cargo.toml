@@ -1,5 +1,5 @@
 [workspace]
-members = ["textlane", "core", "markdown", "html", "prose", "javascript"]
+members = ["textlane", "core", "md", "html", "mdx", "prose"]
 resolver = "3"
 
 [workspace.package]
@@ -13,10 +13,10 @@ homepage = "https://textlane.dev"
 
 [workspace.dependencies]
 textlane-core = { path = "core", version = "0.0.0" }
-textlane-markdown = { path = "markdown", version = "0.0.0" }
+textlane-md = { path = "md", version = "0.0.0" }
 textlane-html = { path = "html", version = "0.0.0" }
 textlane-prose = { path = "prose", version = "0.0.0" }
-textlane-javascript = { path = "javascript", version = "0.0.0" }
+textlane-mdx = { path = "mdx", version = "0.0.0" }
 
 [workspace.lints.rust]
 unsafe_code = "deny"

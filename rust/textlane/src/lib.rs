@@ -21,9 +21,9 @@ mod bindings {
 pub use actions::package::version::read_version;
 #[cfg(feature = "html")]
 pub use textlane_html as html;
-#[cfg(feature = "javascript")]
-pub use textlane_javascript as javascript;
-#[cfg(feature = "markdown")]
-pub use textlane_markdown as markdown;
+#[cfg(feature = "md")]
+pub use textlane_md as md;
+#[cfg(feature = "mdx")]
+pub use textlane_mdx as mdx;
 #[cfg(feature = "prose")]
 pub use textlane_prose as prose;

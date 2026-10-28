@@ -19,7 +19,7 @@
         {
           "type": "toml",
           "path": "rust/Cargo.toml",
-          "jsonpath": "$.workspace.dependencies['textlane-markdown'].version"
+          "jsonpath": "$.workspace.dependencies['textlane-md'].version"
         },
         {
           "type": "toml",
@@ -34,7 +34,7 @@
         {
           "type": "toml",
           "path": "rust/Cargo.toml",
-          "jsonpath": "$.workspace.dependencies['textlane-javascript'].version"
+          "jsonpath": "$.workspace.dependencies['textlane-mdx'].version"
         },
         {
           "type": "json",
@@ -54,7 +54,7 @@
         {
           "type": "toml",
           "path": "rust/Cargo.lock",
-          "jsonpath": "$.package[?(@.name.value=='textlane-markdown')].version"
+          "jsonpath": "$.package[?(@.name.value=='textlane-md')].version"
         },
         {
           "type": "toml",
@@ -69,7 +69,7 @@
         {
           "type": "toml",
           "path": "rust/Cargo.lock",
-          "jsonpath": "$.package[?(@.name.value=='textlane-javascript')].version"
+          "jsonpath": "$.package[?(@.name.value=='textlane-mdx')].version"
         }
       ]
     }

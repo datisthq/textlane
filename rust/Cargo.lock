@@ -347,8 +347,8 @@ dependencies = [
  "pyo3",
  "textlane-core",
  "textlane-html",
- "textlane-javascript",
- "textlane-markdown",
+ "textlane-md",
+ "textlane-mdx",
  "textlane-prose",
 ]
 
@@ -361,18 +361,17 @@ name = "textlane-html"
 version = "0.0.0"
 dependencies = [
  "textlane-core",
- "textlane-javascript",
 ]
 
 [[package]]
-name = "textlane-javascript"
+name = "textlane-md"
 version = "0.0.0"
 dependencies = [
  "textlane-core",
 ]
 
 [[package]]
-name = "textlane-markdown"
+name = "textlane-mdx"
 version = "0.0.0"
 dependencies = [
  "textlane-core",

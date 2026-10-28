@@ -17,28 +17,20 @@ include = ["src/**/*", "build.rs", "README.md", "LICENSE.md"]
 crate-type = ["lib", "cdylib"]
 
 [features]
-default = ["markdown", "html", "prose", "javascript"]
-markdown = ["dep:textlane-markdown"]
+default = ["md", "html", "mdx", "prose"]
+md = ["dep:textlane-md"]
 html = ["dep:textlane-html"]
+mdx = ["dep:textlane-mdx"]
 prose = ["dep:textlane-prose"]
-javascript = ["dep:textlane-javascript", "textlane-html?/javascript"]
-node = [
-  "markdown",
-  "html",
-  "prose",
-  "javascript",
-  "dep:napi",
-  "dep:napi-derive",
-  "dep:napi-build",
-]
-python = ["markdown", "html", "prose", "javascript", "dep:pyo3"]
+node = ["md", "html", "mdx", "prose", "dep:napi", "dep:napi-derive", "dep:napi-build"]
+python = ["md", "html", "mdx", "prose", "dep:pyo3"]
 
 [dependencies]
 textlane-core.workspace = true
-textlane-markdown = { workspace = true, optional = true }
+textlane-md = { workspace = true, optional = true }
 textlane-html = { workspace = true, optional = true }
+textlane-mdx = { workspace = true, optional = true }
 textlane-prose = { workspace = true, optional = true }
-textlane-javascript = { workspace = true, optional = true }
 napi = { version = "3.14.2", default-features = false, features = [
   "napi4",
 ], optional = true }

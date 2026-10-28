@@ -48,61 +48,58 @@ implementation keeps its own unit tests for internals.
 Shared metadata, member version pins (`[workspace.dependencies]`), lints and the release
 profile live there once. All crates are published, lock-stepped at one version.
 
-| crate                 | dir           | depends on                             | holds                                                                                                                                                                                                                                                                                                                    |
-| --------------------- | ------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `textlane`            | `textlane/`   | all below                              | the processor (`.use`, presets, freeze, `parse`/`run`/`stringify`/`process`, sync and async), the host-language plugin bridge, the `node`/`python` bindings, the conformance test plugins behind a `testing` feature; re-exports `core`'s items at its root and the domains as `markdown`, `html`, `prose`, `javascript` |
-| `textlane-core`       | `core/`       | —                                      | unist, mdast (with GFM, math, directive, frontmatter, definition list and MDX nodes), hast and nlcst trees; the file (vfile) and its messages; the plugin contract; visit/is/position utilities                                                                                                                          |
-| `textlane-markdown`   | `markdown/`   | core                                   | `parse`, `stringify`, `gfm`, `frontmatter`, `directive`, `math`, `definitionList`, `gemoji`, `toc`, `mdx` (syntax only: JSX, expressions and ESM found by balanced scanning, kept as source strings), `toHtml` (mdast → hast), `toProse` (mdast → nlcst)                                                                 |
-| `textlane-html`       | `html/`       | core (+ javascript under `javascript`) | `parse` (HTML5), `stringify`, `raw`, `sanitize`, `slug`, `format`, `toMarkdown` (hast → mdast), `toProse` (hast → nlcst), `toJavascript` (hast → JS; upstream rehype-recma) behind a `javascript` feature; later `katex` and `highlight` behind features                                                                 |
-| `textlane-javascript` | `javascript/` | core, oxc                              | the JS tree (oxc's AST, ESTree conversion for host recma plugins), `parse`, the MDX transforms (document, JSX rewrite, build JSX), `stringify` (codegen)                                                                                                                                                                 |
-| `textlane-prose`      | `prose/`      | core                                   | `parse` (English/Latin → paragraphs, sentences, words), `stringify`, then `smartypants`, `readability`, `spell`, `repeatedWords`, `passive`, `equality`, `contractions`, `indefiniteArticle`, `sentenceSpacing`, `quotes`                                                                                                |
+| crate            | dir         | depends on | holds                                                                                                                                                                                                                                                                                                       |
+| ---------------- | ----------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `textlane`       | `textlane/` | all below  | the processor (`.use`, presets, freeze, `parse`/`run`/`stringify`/`process`, sync and async), the host-language plugin bridge, the `node`/`python` bindings, the conformance test plugins behind a `testing` feature; re-exports `core`'s items at its root and the domains as `md`, `html`, `mdx`, `prose` |
+| `textlane-core`  | `core/`     | —          | unist, mdast (with GFM, math, directive, frontmatter, definition list and MDX nodes), hast and nlcst trees; the file (vfile) and its messages; the plugin contract; visit/is/position utilities                                                                                                             |
+| `textlane-md`    | `md/`       | core       | `parse`, `stringify`, `gfm`, `frontmatter`, `directive`, `math`, `definitionList`, `gemoji`, `toc`, `mdx` (syntax only: JSX, expressions and ESM found by balanced scanning, kept as source strings), `toHtml` (mdast → hast), `toProse` (mdast → nlcst)                                                    |
+| `textlane-html`  | `html/`     | core       | `parse` (HTML5), `stringify`, `raw`, `sanitize`, `slug`, `format`, `toMarkdown` (hast → mdast), `toProse` (hast → nlcst); later `katex` and `highlight` behind features                                                                                                                                     |
+| `textlane-mdx`   | `mdx/`      | core, oxc  | `compile`: hast into a JS tree on oxc (upstream rehype-recma), the MDX transforms (document, JSX rewrite, build JSX) and code generation; ESTree conversion so host recma plugins can join                                                                                                                  |
+| `textlane-prose` | `prose/`    | core       | `parse` (English/Latin → paragraphs, sentences, words), `stringify`, then `smartypants`, `readability`, `spell`, `repeatedWords`, `passive`, `equality`, `contractions`, `indefiniteArticle`, `sentenceSpacing`, `quotes`                                                                                   |
 
 Rules:
 
 - A domain crate depends on `textlane-core` only, never on another domain or on `textlane`.
-  Every tree type but JavaScript's lives in core, so the bridges (`markdown.toHtml`,
-  `html.toMarkdown`, `*.toProse`) need no domain-to-domain edge. The one exception is
-  `html.toJavascript`, which builds oxc's tree and so depends on `textlane-javascript` behind
-  `html`'s `javascript` feature (my call).
-- A bridge is named `source.toTarget` with full domain names, on the source domain:
-  `markdown.toHtml`, `html.toJavascript`, never `toJs`. A domain name is one lowercase word in
-  every identifier, so each name derives mechanically from the Rust one: `to_javascript` is
-  `toJavascript` through napi's default conversion and `to_javascript` in Python, with no
+  Every tree type but the JS tree lives in core, so the bridges (`md.toHtml`,
+  `html.toMarkdown`, `*.toProse`) need no domain-to-domain edge. The JS tree is oxc's and
+  stays inside `mdx`, the only crate that compiles oxc.
+- Domains are named short, like file extensions (`md`, `html`, `mdx`), with `prose` for
+  natural language; functions spell formats out in full: `md.toHtml`, `html.toMarkdown`,
+  `md.toProse`. Each name derives mechanically from the Rust one: `to_markdown` is
+  `toMarkdown` through napi's default conversion and `to_markdown` in Python, with no
   `js_name` overrides.
-- MDX is split by domain, as upstream splits it across remark and recma: its syntax lives in
-  `markdown` (it changes how Markdown tokenizes), its compilation in `javascript`. Livemark's
-  `compileMDX` becomes `markdown.parse` → `markdown.mdx` → … → `markdown.toHtml` → `html.*` →
-  `html.toJavascript` → `javascript.stringify`. Only `javascript` compiles oxc.
-- `textlane` features: `markdown`, `html`, `prose`, `javascript`, all default; `node` and
-  `python` enable every domain, since each binding is one addon; `testing` adds the test
-  plugins.
+- MDX is split by job, as upstream splits it between remark-mdx and `@mdx-js/mdx`: its syntax
+  lives in `md` (it changes how Markdown tokenizes), its compilation in `mdx`. Livemark's
+  `compileMDX` becomes `md.parse` → `md.mdx` → … → `md.toHtml` → `html.*` → `mdx.compile`.
+- `textlane` features: `md`, `html`, `mdx`, `prose`, all default; `node` and `python` enable
+  every domain, since each binding is one addon; `testing` adds the test plugins.
 - `textlane-core` is never re-exported as `textlane::core`, which would make every `core::`
   path ambiguous with Rust's built-in `core`.
 
 ### Bindings
 
-| Rust                                | npm                                                                  | Python                                               |
-| ----------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------- |
-| `textlane::{Processor, File, …}`    | `import { textlane } from "textlane"`                                | `from textlane import textlane`                      |
-| `textlane::markdown::parse()`       | `import * as markdown from "textlane/markdown"` → `markdown.parse()` | `from textlane import markdown` → `markdown.parse()` |
-| `textlane::html::sanitize()`        | `textlane/html`                                                      | `textlane.html`                                      |
-| `textlane::prose::parse()`          | `textlane/prose`                                                     | `textlane.prose`                                     |
-| `textlane::javascript::stringify()` | `textlane/javascript`                                                | `textlane.javascript`                                |
+| Rust                             | npm                                                | Python                                   |
+| -------------------------------- | -------------------------------------------------- | ---------------------------------------- |
+| `textlane::{Processor, File, …}` | `import { textlane } from "textlane"`              | `from textlane import textlane`          |
+| `textlane::md::parse()`          | `import * as md from "textlane/md"` → `md.parse()` | `from textlane import md` → `md.parse()` |
+| `textlane::html::sanitize()`     | `textlane/html`                                    | `textlane.html`                          |
+| `textlane::prose::parse()`       | `textlane/prose`                                   | `textlane.prose`                         |
+| `textlane::mdx::compile()`       | `textlane/mdx`                                     | `textlane.mdx`                           |
 
 ```ts
 import { textlane } from "textlane"
-import * as markdown from "textlane/markdown"
+import * as md from "textlane/md"
 import * as html from "textlane/html"
 
 const processor = textlane()
-  .use(markdown.parse())
-  .use(markdown.gfm())
-  .use(markdown.toHtml())
+  .use(md.parse())
+  .use(md.gfm())
+  .use(md.toHtml())
   .use(html.sanitize())
   .use(html.stringify())
 ```
 
-Plugin names (`markdown.gfm`), their options and the node shapes are public API: the corpus
+Plugin names (`md.gfm`), their options and the node shapes are public API: the corpus
 names them, so renaming one is a breaking change everywhere at once.
 
 ## Conformance suite
@@ -115,11 +112,11 @@ Mirrors fairspec's `conformance/`:
 conformance/
   README.md
   test-schema.json               JSON Schema of a test file
-  tests/<area>/<feature>.json    e.g. core/use.json, markdown/gfm-table.json, html/sanitize.json
+  tests/<area>/<feature>.json    e.g. core/use.json, md/gfm-table.json, html/sanitize.json
   sources/                       importers that turn upstream tests into test files
 ```
 
-`<area>` is `core`, `markdown`, `html`, `prose`, `javascript`. The suite belongs to no package and is never
+`<area>` is `core`, `md`, `html`, `mdx`, `prose`. The suite belongs to no package and is never
 shipped.
 
 ### Test files
@@ -136,7 +133,7 @@ An array of groups; a group fixes the pipeline, its tests vary the input:
       "path": "test/io/flow/heading-atx.js",
       "license": "MIT"
     },
-    "pipeline": [["markdown.parse"], ["markdown.toHtml"], ["html.stringify"]],
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
     "tests": [
       { "description": "rank 1", "input": "# a", "expected": { "html": "<h1>a</h1>" } },
       {
@@ -219,7 +216,7 @@ Every repo below is MIT unless noted. "Portable" means expressible as data (pipe
 | syntax-tree/unist-util-is, -position         | inline                       | 27 + 26          | ~70% / ~95%                       |                                                                                      |
 | wooorm/trough                                | inline                       | 32               | ~15%                              | JS middleware model; mostly a Rust unit concern                                      |
 
-### Markdown (`tests/markdown/`)
+### Markdown (`tests/md/`)
 
 | source                                                   | style                          | ~cases              | portable | seeds                                                                            |
 | -------------------------------------------------------- | ------------------------------ | ------------------- | -------- | -------------------------------------------------------------------------------- |
@@ -229,7 +226,7 @@ Every repo below is MIT unless noted. "Portable" means expressible as data (pipe
 | syntax-tree/mdast-util-to-markdown                       | inline, one 6.7k-line file     | ~470                | ~93%     | tree → markdown, serializer options, 46 round-trips                              |
 | syntax-tree/mdast-util-to-string                         | inline                         | 13                  | 100%     |                                                                                  |
 | wooorm/markdown-rs                                       | inline `cargo test`            | 2,480               | ~85%     | ~97% duplicates micromark; use for GFM/math/frontmatter and ~80 `to_mdast` trees |
-| GFM: github/cmark-gfm spec + micromark-extension-gfm-*   | spec + inline + fixtures       | ~210 html           | ~95%     | `markdown.gfm`; expectations regenerated through the reference pipeline          |
+| GFM: github/cmark-gfm spec + micromark-extension-gfm-*   | spec + inline + fixtures       | ~210 html           | ~95%     | `md.gfm`; expectations regenerated through the reference pipeline                |
 | GFM: mdast-util-gfm-*, remark-gfm                        | inline + fixture dirs          | ~140                | ~85%     | trees and round-trips                                                            |
 | math: mdast-util-math, remark-math                       | inline                         | 31 + 52             | ~85–90%  | micromark-math's HTML embeds KaTeX output: reuse inputs only                     |
 | directive: micromark-extension-directive                 | inline                         | 257                 | ~77%     | 196 default-option cases; 58 JS-handler cases become tree cases                  |
@@ -242,7 +239,7 @@ Every repo below is MIT unless noted. "Portable" means expressible as data (pipe
 
 | source                                           | style                                   | ~cases      | portable | seeds                                                                                            |
 | ------------------------------------------------ | --------------------------------------- | ----------- | -------- | ------------------------------------------------------------------------------------------------ |
-| syntax-tree/mdast-util-to-hast                   | inline, one file per node               | 142         | ~90%     | `markdown.toHtml`; expectations built with `h()` must be expanded once                           |
+| syntax-tree/mdast-util-to-hast                   | inline, one file per node               | 142         | ~90%     | `md.toHtml`; expectations built with `h()` must be expanded once                                 |
 | remarkjs/remark-rehype                           | inline                                  | 10          | ~30%     | ~3 string cases                                                                                  |
 | rehypejs/rehype                                  | 46 fixture dirs + 59 parse-error dirs   | 128         | ~95%     | `html.parse`, `html.stringify`, reparse invariant                                                |
 | syntax-tree/hast-util-to-html                    | inline, 37 files                        | ~360        | ~97%     | `html.stringify` option matrix                                                                   |
@@ -254,7 +251,7 @@ Every repo below is MIT unless noted. "Portable" means expressible as data (pipe
 | web-platform-tests `html/syntax/parsing` (BSD-3) | 62 `.dat` files                         | 1,973       | ~97%     | `html.parse` tree construction; read through a `.dat` loader                                     |
 | rehype-katex, @shikijs/rehype                    | computed at test time / theme snapshots | 10 + 17     | ~0–30%   | deferred; behaviour-only cases later                                                             |
 
-### JavaScript (`tests/javascript/`)
+### MDX (`tests/mdx/`)
 
 Not yet inventoried: `@mdx-js/mdx`'s compile fixtures, `hast-util-to-estree`, `recma-*`.
 
@@ -287,11 +284,10 @@ never in CI.
    reference pipeline and record its versions in `source`, or those cases fail on formatting
    alone.
 2. **One addon carries every domain.** npm/PyPI subpaths are views over one addon; a tree
-   handed between `textlane/markdown` and `textlane/html` must never cross a serialization
+   handed between `textlane/md` and `textlane/html` must never cross a serialization
    boundary.
-3. **Core holds every tree type.** Bridges stay dependency-free only while mdast, hast and
-   nlcst all live in `textlane-core`; the JS tree is the exception, oxc's AST inside
-   `javascript`, which is why `html.toJavascript` is the one bridge with a domain edge.
+3. **Core holds every tree type but the JS tree.** Bridges stay dependency-free only while
+   mdast, hast and nlcst all live in `textlane-core`; the JS tree is oxc's, kept inside `mdx`.
 4. **Lifecycle as data.** The core corpus depends on the test-plugin set being identical in
    all three implementations.
 5. **Sanitization is security.** `html.sanitize` cases are literal, one vector each, never
@@ -301,10 +297,10 @@ never in CI.
 
 ## Phases
 
-1. **Workspace.** Finish the uncommitted restructure already in `rust/` (`textlane`, `core`,
-   `markdown`, `html`) as the baseline, adding `prose` and `javascript` (empty domains), their
-   features, release-please `extra-files`, `cargo publish --workspace`; docs and skills updated. Bindings gain the `textlane/markdown`, `textlane/html`, `textlane/prose`
-   subpaths once each has an export.
+1. **Workspace.** Done: the flat crates `textlane`, `core`, `md`, `html`, `mdx`, `prose`
+   (empty domains), their features, release-please `extra-files`, `cargo publish --workspace`;
+   docs and skills updated. Bindings gain the `textlane/md`, `textlane/html`, `textlane/mdx`,
+   `textlane/prose` subpaths once each has an export.
 2. **Suite skeleton.** `conformance/` with `README.md`, `test-schema.json`, the schema guard,
    the three runners wired into `pnpm test`, and one smoke group through a stub pipeline in all
    three languages.
@@ -315,8 +311,7 @@ never in CI.
 5. **HTML.** to-hast, to-html, rehype fixtures, sanitize, slug, raw; then WPT tree
    construction.
 6. **Prose.** Inventory, then import.
-7. **MDX.** Inventory `@mdx-js/mdx`; `markdown.mdx()` syntax, then `html.toJavascript()` and
-   the MDX transforms.
+7. **MDX.** Inventory `@mdx-js/mdx`; `md.mdx()` syntax, then `mdx.compile()`.
 
 ## Left to the builder
 

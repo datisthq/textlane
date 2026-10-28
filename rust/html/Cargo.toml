@@ -11,12 +11,8 @@ description = "Textlane's HTML plugins: parsing, transforms, sanitizing and seri
 keywords = ["html", "ast", "textlane"]
 categories = ["text-processing", "parser-implementations"]
 
-[features]
-javascript = ["dep:textlane-javascript"]
-
 [dependencies]
 textlane-core.workspace = true
-textlane-javascript = { workspace = true, optional = true }
 
 [lints]
 workspace = true
