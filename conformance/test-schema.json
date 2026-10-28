@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://textlane.dev/conformance/test-schema.json",
+  "title": "Textlane conformance test file",
+  "description": "An array of groups. A group fixes the pipeline; each of its tests varies only the input and states the outcome. The layout follows JSON-Schema-Test-Suite.",
+  "type": "array",
+  "minItems": 1,
+  "items": { "$ref": "#/$defs/group" },
+  "$defs": {
+    "group": {
+      "type": "object",
+      "required": ["description", "pipeline", "tests"],
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "description": "What the group covers; unique within the file",
+          "type": "string",
+          "minLength": 1
+        },
+        "comment": {
+          "description": "Context for maintainers; never read by a runner",
+          "type": "string"
+        },
+        "specification": {
+          "description": "Links to the spec sections the group exercises",
+          "type": "array",
+          "items": { "type": "string", "format": "uri" }
+        },
+        "source": { "$ref": "#/$defs/source" },
+        "pipeline": {
+          "description": "The plugins to run, in order: a public plugin name and its options",
+          "type": "array",
+          "items": {
+            "type": "array",
+            "prefixItems": [{ "type": "string", "minLength": 1 }, {}],
+            "minItems": 1,
+            "maxItems": 2
+          }
+        },
+        "positions": {
+          "description": "Whether tree expectations compare positions; true by default",
+          "type": "boolean"
+        },
+        "tests": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/test" }
+        }
+      }
+    },
+    "source": {
+      "description": "Where an imported group came from; required for anything ported from upstream",
+      "type": "object",
+      "required": ["repository", "commit", "license"],
+      "additionalProperties": false,
+      "properties": {
+        "repository": { "type": "string", "format": "uri" },
+        "commit": { "type": "string", "minLength": 7 },
+        "path": { "type": "string" },
+        "test": { "type": "string" },
+        "license": { "type": "string" }
+      }
+    },
+    "test": {
+      "type": "object",
+      "required": ["description", "expected"],
+      "additionalProperties": false,
+      "oneOf": [{ "required": ["input"] }, { "required": ["tree"] }],
+      "properties": {
+        "description": { "type": "string", "minLength": 1 },
+        "comment": { "type": "string" },
+        "status": {
+          "description": "A deliberate difference from upstream, explained in the comment",
+          "enum": ["deviation"]
+        },
+        "input": { "description": "The source text", "type": "string" },
+        "tree": {
+          "description": "A tree for stringify-only and transform cases",
+          "type": "object"
+        },
+        "expected": { "$ref": "#/$defs/expected" }
+      }
+    },
+    "expected": {
+      "description": "Exactly one outcome",
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "description": "Serialized output, compared exactly",
+          "type": "string"
+        },
+        "tree": {
+          "description": "The resulting tree; positions count UTF-16 code units",
+          "type": "object"
+        },
+        "error": {
+          "description": "A failure: matched on its code, and on message only as a substring",
+          "type": "object",
+          "required": ["code"],
+          "additionalProperties": false,
+          "properties": {
+            "code": { "type": "string", "minLength": 1 },
+            "message": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

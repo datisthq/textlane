@@ -17,7 +17,7 @@ Run from the repo root; each wraps cargo in `rust/package.json`:
 pnpm -C rust setup          # cargo fetch
 pnpm -C rust check:lint     # cargo fmt --check + clippy -D warnings, default/node/python
 pnpm -C rust check:types    # cargo check --workspace --all-targets
-pnpm -C rust test:unit      # cargo test --workspace
+pnpm -C rust test:unit      # cargo test --workspace --features testing
 pnpm -C rust build          # cargo build --release into rust/target/release/
 ```
 
@@ -55,6 +55,9 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
 
 - The default features need neither Node nor Python: `cargo add textlane` must build without
   napi or PyO3. Every binding dependency is optional and enabled only by its feature.
+- `testing` adds `run_case` and the `test.*` plugins the conformance suite drives, and exposes
+  them through both bindings; it is never default and never published in an addon or wheel.
+  `rust/textlane/tests/conformance.rs` requires it (**`conformance-suite`**).
 - `md`, `html`, `mdx` and `prose` (all default) gate the domain re-exports. `node` and
   `python` enable every domain, since each binding is one addon that must carry them all.
 - `node` pulls in napi, and `build.rs` runs napi-build only under it; `python` pulls in PyO3

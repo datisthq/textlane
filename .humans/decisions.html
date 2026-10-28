@@ -21,7 +21,7 @@
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>4 agent's calls</h3>
+    <h3>6 agent's calls</h3>
     <p>
       <htmlpress-badge type="warning">my call</htmlpress-badge> settled by the agent, open
       to change
@@ -272,6 +272,29 @@
     <p>
       <strong>Why.</strong> Keeps the suite runnable before the processor is designed.
     </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Phase 2 drives the suite
+    through a stub: <code>run_case</code> with <code>test.parseText</code> and
+    <code>test.compileValue</code>, behind <code>testing</code>
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Proves the format, the schema guard and all three runners
+      before the processor and tree types are designed in phase 3; test files stay
+      unchanged when the stub goes.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Designing the processor and the tree types in phase 2.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Each runner skips only
+    through a <code>KNOWN_DIVERGENCES</code> map of group to open issue, as fairspec's do
+  </dt>
+  <dd>
+    <p><strong>Why.</strong> A skipped case always points at the fix that unblocks it.</p>
+    <p><strong>Rejected.</strong> Free-form skip lists.</p>
   </dd>
 </dl>
 

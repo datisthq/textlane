@@ -2,6 +2,10 @@
 //! run natively, with Node.js and Python bindings over the same crate.
 
 mod actions {
+    #[cfg(feature = "testing")]
+    pub(crate) mod case {
+        pub(crate) mod run;
+    }
     pub(crate) mod package {
         pub(crate) mod version;
     }
@@ -18,6 +22,8 @@ mod bindings {
     pub(crate) mod python;
 }
 
+#[cfg(feature = "testing")]
+pub use actions::case::run::run_case;
 pub use actions::package::version::read_version;
 #[cfg(feature = "html")]
 pub use textlane_html as html;

@@ -39,6 +39,7 @@ textlane/
 │   ├── scripts/         #   pack and publish the per-platform packages
 │   └── settings.ts      #   the platform list
 ├── python/              # the PyPI package `textlane`: maturin PyO3 wheels
+├── conformance/         # the language-neutral suite every implementation runs
 ├── .skills/             # shipped agent skills for people who use textlane
 ├── .agents/skills/      # repo skills for coding agents (see AGENTS.md)
 ├── .livemark/           # the docs site's livemark escapes
@@ -53,20 +54,20 @@ All behaviour lives in `rust/`. The npm and PyPI packages only expose the same c
 
 Run these at the repo root; each chains into the sections with `pnpm -C <section>`.
 
-| Command            | What it does                                                      |
-| ------------------ | ----------------------------------------------------------------- |
-| `pnpm install`     | Install dependencies                                              |
-| `pnpm build`       | Build the release crate, the npm loader and the Python wheel      |
-| `pnpm check:types` | Type-check via `tsgo --noEmit` and `cargo check`                  |
-| `pnpm check:lint`  | Format check + lint (`vp fmt`, `vp lint`, `cargo fmt`, `clippy`)  |
-| `pnpm check`       | `pnpm check:lint && pnpm check:types`                             |
-| `pnpm format`      | Auto-fix formatting (`vp fmt`, `cargo fmt`)                       |
-| `pnpm test:unit`   | Run the repo guards, the loader's tests and `cargo test`          |
-| `pnpm test`        | `pnpm check && pnpm test:unit`                                    |
-| `pnpm start`       | Serve the docs site with livemark and live reload                 |
-| `pnpm build:docs`  | Production build of the docs site                                 |
-| `pnpm read`        | Serve the design notes and decisions in `.humans/` with htmlpress |
-| `pnpm scan`        | Secret and vulnerability scans (gitleaks, semgrep)                |
+| Command            | What it does                                                                    |
+| ------------------ | ------------------------------------------------------------------------------- |
+| `pnpm install`     | Install dependencies                                                            |
+| `pnpm build`       | Build the release crate, the npm loader and the Python wheel                    |
+| `pnpm check:types` | Type-check via `tsgo --noEmit` and `cargo check`                                |
+| `pnpm check:lint`  | Format check + lint (`vp fmt`, `vp lint`, `cargo fmt`, `clippy`)                |
+| `pnpm check`       | `pnpm check:lint && pnpm check:types`                                           |
+| `pnpm format`      | Auto-fix formatting (`vp fmt`, `cargo fmt`)                                     |
+| `pnpm test:unit`   | Run the repo guards, the loader's tests, `cargo test` and the conformance suite |
+| `pnpm test`        | `pnpm check && pnpm test:unit`                                                  |
+| `pnpm start`       | Serve the docs site with livemark and live reload                               |
+| `pnpm build:docs`  | Production build of the docs site                                               |
+| `pnpm read`        | Serve the design notes and decisions in `.humans/` with htmlpress               |
+| `pnpm scan`        | Secret and vulnerability scans (gitleaks, semgrep)                              |
 
 A change is ready to push when `pnpm test` is green.
 

@@ -43,6 +43,7 @@ Repo skills live in `.agents/skills/` (reached by Claude Code through the `.clau
 | ---------------------- | -------------------------------------------------------------------------- |
 | `change-review`        | reviewing a pull request or the working diff — also what CI review runs    |
 | `change-verification`  | checking a change works — the smallest lint/type/unit slice and a look     |
+| `conformance-suite`    | adding or porting conformance cases, the runners and the `testing` feature |
 | `human-documentation`  | a page for people under `.humans/`, the docs-truth pass, where facts go    |
 | `issue-resolution`     | taking one issue or bug report to one tested commit in a worktree          |
 | `package-distribution` | the npm and PyPI bindings, platform packages and the release addons matrix |
@@ -65,7 +66,7 @@ Shipped skills live in `.skills/` and teach coding agents to **use** textlane; t
 - `pnpm build` — the release crate (`cargo build --release`), the npm loader into `typescript/build/` with `tsgo`, then the wheel into `python/build/` with maturin (needs `uv`)
 - `pnpm test` — full gate: lint + type + unit · `pnpm check` — lint + type
 - `pnpm check:lint` — `vp fmt --check && vp lint`, then `cargo fmt --check` and clippy · `pnpm format` — `vp fmt`, `cargo fmt` · `pnpm check:types` — `tsgo --noEmit`, then `cargo check`
-- `pnpm test:unit` — the repo guards, the loader's units, then `cargo test`. Single test: `cargo test name` from `rust/`, or `vp test path/to/file.unit.ts` from `typescript/`. While iterating, verify the slice the diff reaches, not the full gate (**`change-verification`**)
+- `pnpm test:unit` — the repo guards, the loader's units, `cargo test` with the `testing` feature, then the Python conformance runner (needs `uv`). Single test: `cargo test name` from `rust/`, or `vp test path/to/file.unit.ts` from `typescript/`. While iterating, verify the slice the diff reaches, not the full gate (**`change-verification`**)
 - `pnpm measure:coverage` — the unit tests with coverage
 - `pnpm scan:leaks` / `pnpm scan:vulns` / `pnpm scan` — gitleaks / semgrep / both
 - `pnpm update:deps` — bump npm dependencies past a 7-day cooldown
@@ -83,7 +84,8 @@ The root is a private pnpm workspace (`package.json`, `pnpm-workspace.yaml`): fo
   - Unit tests beside their module as `<module>_unit.rs`
   - `docs/` — the docs site's Markdown pages, outside the crate's `include`
 - `typescript/` — the npm package `textlane`: `index.ts` loads the addon `actions/addon/resolve.ts` finds; `settings.ts` lists the platforms; `scripts/` packs and publishes the platform packages into `typescript/compile/` (**`package-distribution`**)
-- `python/` — the PyPI package `textlane`: `pyproject.toml`, which points maturin at `rust/textlane/Cargo.toml` with `bindings = "pyo3"` and the `python` feature, and `scripts/copy-skills.sh`, which stages the shipped skills as wheel data
+- `conformance/` — the language-neutral conformance suite: `test-schema.json` and `tests/<area>/<feature>.json`, run by `rust/textlane/tests/conformance.rs`, `typescript/-test/conformance.unit.ts` and `python/-test/conformance_unit.py` (**`conformance-suite`**)
+- `python/` — the PyPI package `textlane`: `pyproject.toml`, which points maturin at `rust/textlane/Cargo.toml` with `bindings = "pyo3"` and the `python` feature, `scripts/copy-skills.sh`, which stages the shipped skills as wheel data, and `scripts/test.sh`, which builds a `testing` wheel and runs the conformance suite
 - `.skills/` — the shipped agent skills
 - `README.md`, `CONTRIBUTING.md` — the GitHub overview and the contributor guide; `rust/textlane/README.md`, `typescript/README.md` and `python/README.md` are each registry's page
 

@@ -301,9 +301,9 @@ never in CI.
    (empty domains), their features, release-please `extra-files`, `cargo publish --workspace`;
    docs and skills updated. Bindings gain the `textlane/md`, `textlane/html`, `textlane/mdx`,
    `textlane/prose` subpaths once each has an export.
-2. **Suite skeleton.** `conformance/` with `README.md`, `test-schema.json`, the schema guard,
-   the three runners wired into `pnpm test`, and one smoke group through a stub pipeline in all
-   three languages.
+2. **Suite skeleton.** Done: `conformance/` with `README.md`, `test-schema.json`, the schema
+   guard, the three runners wired into `pnpm test`, and a smoke group passing in all three
+   languages through stub test plugins (`run_case` behind `testing`).
 3. **Core.** Processor and test plugins; import unified, vfile and unist-util cases.
 4. **Markdown.** Importers for the CommonMark spec, micromark io, from-markdown and
    to-markdown; then livemark's extensions (GFM, directive, math, frontmatter, gemoji,

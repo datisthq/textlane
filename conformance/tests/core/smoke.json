@@ -1,0 +1,57 @@
+[
+  {
+    "description": "a parser alone yields a tree",
+    "comment": "Exercises the stub test plugins every implementation shares; real core cases arrive with the processor",
+    "pipeline": [["test.parseText"]],
+    "tests": [
+      {
+        "description": "a word becomes a text node",
+        "input": "alpha",
+        "expected": { "tree": { "type": "text", "value": "alpha" } }
+      },
+      {
+        "description": "an empty input becomes an empty text node",
+        "input": "",
+        "expected": { "tree": { "type": "text", "value": "" } }
+      }
+    ]
+  },
+  {
+    "description": "a parser and a compiler round-trip text",
+    "pipeline": [["test.parseText"], ["test.compileValue"]],
+    "tests": [
+      {
+        "description": "non-ASCII text survives",
+        "input": "naïve café 🚀",
+        "expected": { "text": "naïve café 🚀" }
+      }
+    ]
+  },
+  {
+    "description": "a compiler alone serializes a given tree",
+    "pipeline": [["test.compileValue"]],
+    "tests": [
+      {
+        "description": "a text node yields its value",
+        "tree": { "type": "text", "value": "beta" },
+        "expected": { "text": "beta" }
+      },
+      {
+        "description": "a node without a value yields nothing",
+        "tree": { "type": "root", "children": [] },
+        "expected": { "text": "" }
+      }
+    ]
+  },
+  {
+    "description": "a broken pipeline fails with a stable code",
+    "pipeline": [["test.missing"]],
+    "tests": [
+      {
+        "description": "an unknown plugin",
+        "input": "alpha",
+        "expected": { "error": { "code": "unknown-plugin", "message": "test.missing" } }
+      }
+    ]
+  }
+]
