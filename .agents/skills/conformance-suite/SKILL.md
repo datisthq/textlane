@@ -59,7 +59,10 @@ a test's `comment` only where it means something different.
   test files statically with acorn.
 - An importer skips, and counts, what a pipeline case cannot express: options with no textlane
   equivalent yet (micromark's construct switches, `defaultLineEnding`), input that is not
-  statically evaluable, and lone UTF-16 surrogates, which UTF-8 input cannot hold.
+  statically evaluable, lone UTF-16 surrogates, which UTF-8 input cannot hold, and stress tests
+  over 2,000 characters (`actions/input/check.ts`), which belong in benchmarks.
+- `actions/node/scope.ts` resolves an identifier in its test's own function before the module, so
+  one test's `const value` never leaks into another's case.
 
 ## Adding cases
 

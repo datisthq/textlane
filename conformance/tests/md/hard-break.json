@@ -2058,5 +2058,99 @@
         }
       }
     ]
+  },
+  {
+    "description": "to-markdown break",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.stringify"]],
+    "tests": [
+      {
+        "description": "should support a break",
+        "tree": {
+          "type": "break"
+        },
+        "expected": {
+          "md": "\\\n"
+        }
+      },
+      {
+        "description": "should serialize breaks in heading (atx) as a space",
+        "tree": {
+          "type": "heading",
+          "depth": 3,
+          "children": [
+            {
+              "type": "text",
+              "value": "a"
+            },
+            {
+              "type": "break"
+            },
+            {
+              "type": "text",
+              "value": "b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "### a b\n"
+        }
+      },
+      {
+        "description": "should serialize breaks in heading (atx) as a space (2)",
+        "tree": {
+          "type": "heading",
+          "depth": 3,
+          "children": [
+            {
+              "type": "text",
+              "value": "a "
+            },
+            {
+              "type": "break"
+            },
+            {
+              "type": "text",
+              "value": "b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "### a b\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown break round trip {\"setext\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.stringify",
+        {
+          "setext": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should serialize breaks in heading (setext)",
+        "input": "a  \nb\n=\n",
+        "expected": {
+          "md": "a\\\nb\n=\n"
+        }
+      }
+    ]
   }
 ]

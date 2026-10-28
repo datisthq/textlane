@@ -3572,5 +3572,426 @@
         }
       }
     ]
+  },
+  {
+    "description": "to-markdown image",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.stringify"]],
+    "tests": [
+      {
+        "description": "should support an image",
+        "tree": {
+          "type": "image"
+        },
+        "expected": {
+          "md": "![]()\n"
+        }
+      },
+      {
+        "description": "should support `alt`",
+        "tree": {
+          "type": "image",
+          "alt": "a"
+        },
+        "expected": {
+          "md": "![a]()\n"
+        }
+      },
+      {
+        "description": "should support a url",
+        "tree": {
+          "type": "image",
+          "url": "a"
+        },
+        "expected": {
+          "md": "![](a)\n"
+        }
+      },
+      {
+        "description": "should support a title",
+        "tree": {
+          "type": "image",
+          "url": "",
+          "title": "a"
+        },
+        "expected": {
+          "md": "![](<> \"a\")\n"
+        }
+      },
+      {
+        "description": "should support a url and title",
+        "tree": {
+          "type": "image",
+          "url": "a",
+          "title": "b"
+        },
+        "expected": {
+          "md": "![](a \"b\")\n"
+        }
+      },
+      {
+        "description": "should support an image w/ enclosed url w/ whitespace in url",
+        "tree": {
+          "type": "image",
+          "url": "b c"
+        },
+        "expected": {
+          "md": "![](<b c>)\n"
+        }
+      },
+      {
+        "description": "should escape an opening angle bracket in `url` in an enclosed url (2)",
+        "tree": {
+          "type": "image",
+          "url": "b <c"
+        },
+        "expected": {
+          "md": "![](<b \\<c>)\n"
+        }
+      },
+      {
+        "description": "should escape a closing angle bracket in `url` in an enclosed url (2)",
+        "tree": {
+          "type": "image",
+          "url": "b >c"
+        },
+        "expected": {
+          "md": "![](<b \\>c>)\n"
+        }
+      },
+      {
+        "description": "should escape a backslash in `url` in an enclosed url (2)",
+        "tree": {
+          "type": "image",
+          "url": "b \\+c"
+        },
+        "expected": {
+          "md": "![](<b \\\\+c>)\n"
+        }
+      },
+      {
+        "description": "should encode a line ending in `url` in an enclosed url (3)",
+        "tree": {
+          "type": "image",
+          "url": "b\nc"
+        },
+        "expected": {
+          "md": "![](<b&#xA;c>)\n"
+        }
+      },
+      {
+        "description": "should escape an opening paren in `url` in a raw url (2)",
+        "tree": {
+          "type": "image",
+          "url": "b(c"
+        },
+        "expected": {
+          "md": "![](b\\(c)\n"
+        }
+      },
+      {
+        "description": "should escape a closing paren in `url` in a raw url (2)",
+        "tree": {
+          "type": "image",
+          "url": "b)c"
+        },
+        "expected": {
+          "md": "![](b\\)c)\n"
+        }
+      },
+      {
+        "description": "should escape a backslash in `url` in a raw url (2)",
+        "tree": {
+          "type": "image",
+          "url": "b\\+c"
+        },
+        "expected": {
+          "md": "![](b\\\\+c)\n"
+        }
+      },
+      {
+        "description": "should support control characters in images",
+        "tree": {
+          "type": "image",
+          "url": "\f"
+        },
+        "expected": {
+          "md": "![](<\f>)\n"
+        }
+      },
+      {
+        "description": "should escape a double quote in `title`",
+        "tree": {
+          "type": "image",
+          "url": "",
+          "title": "b\"c"
+        },
+        "expected": {
+          "md": "![](<> \"b\\\"c\")\n"
+        }
+      },
+      {
+        "description": "should escape a backslash in `title`",
+        "tree": {
+          "type": "image",
+          "url": "",
+          "title": "b\\.c"
+        },
+        "expected": {
+          "md": "![](<> \"b\\\\.c\")\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown image {\"quote\":\"'\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "quote": "'"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support an image w/ title when `quote: \"'\"`",
+        "tree": {
+          "type": "image",
+          "url": "",
+          "title": "b"
+        },
+        "expected": {
+          "md": "![](<> 'b')\n"
+        }
+      },
+      {
+        "description": "should escape a quote in `title` in a title when `quote: \"'\"` (2)",
+        "tree": {
+          "type": "image",
+          "url": "",
+          "title": "'"
+        },
+        "expected": {
+          "md": "![](<> '\\'')\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown imageReference",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.stringify"]],
+    "tests": [
+      {
+        "description": "should support a link reference (nonsensical)",
+        "tree": {
+          "type": "imageReference"
+        },
+        "expected": {
+          "md": "![][]\n"
+        }
+      },
+      {
+        "description": "should support `alt` (2)",
+        "tree": {
+          "type": "imageReference",
+          "alt": "a"
+        },
+        "expected": {
+          "md": "![a][]\n"
+        }
+      },
+      {
+        "description": "should support an `identifier` (nonsensical)",
+        "tree": {
+          "type": "imageReference",
+          "identifier": "a"
+        },
+        "expected": {
+          "md": "![][a]\n"
+        }
+      },
+      {
+        "description": "should support a `label` (nonsensical)",
+        "tree": {
+          "type": "imageReference",
+          "label": "a"
+        },
+        "expected": {
+          "md": "![][a]\n"
+        }
+      },
+      {
+        "description": "should support `referenceType: \"shortcut\"`",
+        "tree": {
+          "type": "imageReference",
+          "alt": "A",
+          "identifier": "A",
+          "referenceType": "shortcut"
+        },
+        "expected": {
+          "md": "![A]\n"
+        }
+      },
+      {
+        "description": "should support `referenceType: \"collapsed\"`",
+        "tree": {
+          "type": "imageReference",
+          "alt": "A",
+          "identifier": "A",
+          "referenceType": "collapsed"
+        },
+        "expected": {
+          "md": "![A][]\n"
+        }
+      },
+      {
+        "description": "should support `referenceType: \"full\"` (default)",
+        "tree": {
+          "type": "imageReference",
+          "alt": "A",
+          "identifier": "A",
+          "referenceType": "full"
+        },
+        "expected": {
+          "md": "![A][A]\n"
+        }
+      },
+      {
+        "description": "should prefer label over identifier",
+        "tree": {
+          "type": "imageReference",
+          "alt": "&",
+          "label": "&",
+          "identifier": "&amp;",
+          "referenceType": "full"
+        },
+        "expected": {
+          "md": "![&][&]\n"
+        }
+      },
+      {
+        "description": "should decode `identifier` if w/o `label`",
+        "tree": {
+          "type": "imageReference",
+          "alt": "&",
+          "identifier": "&amp;",
+          "referenceType": "full"
+        },
+        "expected": {
+          "md": "![&][&]\n"
+        }
+      },
+      {
+        "description": "should support incorrect character references",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "imageReference",
+              "alt": "&a;",
+              "identifier": "&b;",
+              "referenceType": "full"
+            }
+          ]
+        },
+        "expected": {
+          "md": "![\\&a;][&b;]\n"
+        }
+      },
+      {
+        "description": "should unescape `identifier` if w/o `label`",
+        "tree": {
+          "type": "imageReference",
+          "alt": "+",
+          "identifier": "\\+",
+          "referenceType": "full"
+        },
+        "expected": {
+          "md": "![+][+]\n"
+        }
+      },
+      {
+        "description": "should use a collapsed reference if w/o `referenceType` and the label matches the reference",
+        "tree": {
+          "type": "imageReference",
+          "alt": "a",
+          "identifier": "a"
+        },
+        "expected": {
+          "md": "![a][]\n"
+        }
+      },
+      {
+        "description": "should use a full reference if w/o `referenceType` and the label does not match the reference",
+        "tree": {
+          "type": "imageReference",
+          "alt": "a",
+          "identifier": "b"
+        },
+        "expected": {
+          "md": "![a][b]\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown imageReference {\"unsafe\":[{\"character\":\"|\",\"inConstruct\":\"paragraph\"}]}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "unsafe": [
+            {
+              "character": "|",
+              "inConstruct": "paragraph"
+            }
+          ]
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support extension patterns in the reference",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "imageReference",
+              "alt": "x",
+              "identifier": "a|b",
+              "label": "a|b",
+              "referenceType": "full"
+            }
+          ]
+        },
+        "expected": {
+          "md": "![x][a\\|b]\n"
+        }
+      }
+    ]
   }
 ]

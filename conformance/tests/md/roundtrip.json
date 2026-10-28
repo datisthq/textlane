@@ -1,0 +1,188 @@
+[
+  {
+    "description": "to-markdown roundtrip round trip",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "should roundtrip spread items in block quotes",
+        "input": "> * Lorem ipsum dolor sit amet\n>\n> * consectetur adipisicing elit\n",
+        "expected": {
+          "md": "> * Lorem ipsum dolor sit amet\n>\n> * consectetur adipisicing elit\n"
+        }
+      },
+      {
+        "description": "should roundtrip spread items in sublists (1)",
+        "input": "* Lorem ipsum dolor sit amet\n\n  1. consectetur adipisicing elit\n\n  2. sed do eiusmod tempor incididunt\n",
+        "expected": {
+          "md": "* Lorem ipsum dolor sit amet\n\n  1. consectetur adipisicing elit\n\n  2. sed do eiusmod tempor incididunt\n"
+        }
+      },
+      {
+        "description": "should roundtrip spread items in sublists (2)",
+        "input": "* 1. Lorem ipsum dolor sit amet\n\n  2. consectetur adipisicing elit\n",
+        "expected": {
+          "md": "* 1. Lorem ipsum dolor sit amet\n\n  2. consectetur adipisicing elit\n"
+        }
+      },
+      {
+        "description": "should roundtrip spread items in sublists (3)",
+        "input": "* hello\n  * world\n    how\n\n    are\n    you\n\n  * today\n* hi\n",
+        "expected": {
+          "md": "* hello\n  * world\n    how\n\n    are\n    you\n\n  * today\n* hi\n"
+        }
+      },
+      {
+        "description": "should roundtrip autolinks w/ potentially escapable characters",
+        "input": "An autolink: <http://example.com/?foo=1&bar=2>.\n",
+        "expected": {
+          "md": "An autolink: <http://example.com/?foo=1&bar=2>.\n"
+        }
+      },
+      {
+        "description": "should roundtrip astral characters around attention",
+        "input": "&#x1F4A1;**&#x20;a&#x20;**&#x1F4A1;\n",
+        "expected": {
+          "md": "&#x1F4A1;**&#x20;a&#x20;**&#x1F4A1;\n"
+        }
+      },
+      {
+        "description": "should roundtrip autolinks w/ backslashes",
+        "input": "<aa:\\>\n",
+        "expected": {
+          "md": "<aa:\\>\n"
+        }
+      },
+      {
+        "description": "should roundtrip potential prototype injections",
+        "input": "A [primary][toString], [secondary][constructor], and [tertiary][__proto__] link.\n\n[toString]: http://primary.com\n\n[__proto__]: http://tertiary.com\n\n[constructor]: http://secondary.com\n",
+        "expected": {
+          "md": "A [primary][toString], [secondary][constructor], and [tertiary][__proto__] link.\n\n[toString]: http://primary.com\n\n[__proto__]: http://tertiary.com\n\n[constructor]: http://secondary.com\n"
+        }
+      },
+      {
+        "description": "should roundtrip empty lists",
+        "input": "* foo\n\n*\n\n* bar\n\n* baz\n\n*\n\n* qux quux\n",
+        "expected": {
+          "md": "* foo\n\n*\n\n* bar\n\n* baz\n\n*\n\n* qux quux\n"
+        }
+      },
+      {
+        "description": "should roundtrip empty lists (2)",
+        "input": "* a\n\n<!---->\n\n* b\n",
+        "expected": {
+          "md": "* a\n\n<!---->\n\n* b\n"
+        }
+      },
+      {
+        "description": "should roundtrip adjacent block quotes",
+        "input": "> a\n\n> b\n",
+        "expected": {
+          "md": "> a\n\n> b\n"
+        }
+      },
+      {
+        "description": "should roundtrip formatted URLs",
+        "input": "[**https://unifiedjs.com/**](https://unifiedjs.com/)\n",
+        "expected": {
+          "md": "[**https://unifiedjs.com/**](https://unifiedjs.com/)\n"
+        }
+      },
+      {
+        "description": "should roundtrip backslashes (1)",
+        "input": "\\ \\\\ \\\\\\ \\\\\\\\",
+        "expected": {
+          "md": "\\ \\ \\\\\\ \\\\\\\\\n"
+        }
+      },
+      {
+        "description": "should roundtrip backslashes (1) (2)",
+        "input": "\\ \\ \\\\\\ \\\\\\\\\n",
+        "expected": {
+          "md": "\\ \\ \\\\\\ \\\\\\\\\n"
+        }
+      },
+      {
+        "description": "should not collapse escapes (1)",
+        "input": "\\\\\\*a\n",
+        "expected": {
+          "md": "\\\\\\*a\n"
+        }
+      },
+      {
+        "description": "should roundtrip a sole blank line in fenced code",
+        "input": "```\n\t\n```\n",
+        "expected": {
+          "md": "```\n\t\n```\n"
+        }
+      },
+      {
+        "description": "should roundtrip an empty list item in two more lists",
+        "input": "* * -\n",
+        "expected": {
+          "md": "* * -\n"
+        }
+      },
+      {
+        "description": "should roundtrip a thematic break at the start of a list item",
+        "input": "- ***\n",
+        "expected": {
+          "md": "- ***\n"
+        }
+      },
+      {
+        "description": "should roundtrip a single encoded space",
+        "input": "&#x20;\n",
+        "expected": {
+          "md": "&#x20;\n"
+        }
+      },
+      {
+        "description": "should roundtrip a single encoded tab",
+        "input": "&#x9;\n",
+        "expected": {
+          "md": "&#x9;\n"
+        }
+      },
+      {
+        "description": "should roundtrip encoded spaces and tabs where needed",
+        "input": "&#x20; a &#x20;\n&#x9;\tb\t&#x9;\n",
+        "expected": {
+          "md": "&#x20; a &#x20;\n&#x9;\tb\t&#x9;\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown roundtrip round trip {\"fences\":false}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.stringify",
+        {
+          "fences": false
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should roundtrip indented blank lines in code",
+        "input": "    <h3>Header 3</h3>\n\n    <blockquote>\n        <p>This is a blockquote.</p>\n        \n        <p>This is the second paragraph in the blockquote.</p>\n        \n        <h2>This is an H2 in a blockquote</h2>\n    </blockquote>\n",
+        "expected": {
+          "md": "    <h3>Header 3</h3>\n\n    <blockquote>\n        <p>This is a blockquote.</p>\n        \n        <p>This is the second paragraph in the blockquote.</p>\n        \n        <h2>This is an H2 in a blockquote</h2>\n    </blockquote>\n"
+        }
+      }
+    ]
+  }
+]

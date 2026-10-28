@@ -5,10 +5,12 @@ import type { AnyNode } from "acorn"
 import { ancestor } from "acorn-walk"
 import { commonmark } from "commonmark.json"
 import { writeGroups } from "../actions/group/write.ts"
+import { isStressInput } from "../actions/input/check.ts"
 import { evaluateNode, isObject } from "../actions/node/evaluate.ts"
 import { findTestTitle } from "../actions/test/find.ts"
 import { normalizeHtml } from "../actions/html/normalize.ts"
 import { createPipeline, renderMarkdown } from "../actions/markdown/render.ts"
+import { resolveConstants } from "../actions/node/scope.ts"
 import { fetchSource } from "../actions/source/fetch.ts"
 
 const REPOSITORY = "https://github.com/micromark/micromark"
@@ -47,6 +49,10 @@ function importMicromark() {
     const name = relative(root, file).replace(/\\/g, "/")
     if (SKIPPED_FILES.has(name) || basename(name) === "index.js") continue
     for (const found of extractCases(name, readFileSync(file, "utf8"))) {
+      if (isStressInput(found.markdown)) {
+        countSkip("a stress test")
+        continue
+      }
       if (!found.markdown.isWellFormed()) {
         countSkip("a lone surrogate, which UTF-8 input cannot hold")
         continue
@@ -137,17 +143,11 @@ function readHtmlOption(found: Case) {
 
 function extractCases(name: string, source: string) {
   const program = parse(source, { ecmaVersion: "latest", sourceType: "module" })
-  const constants = new Map<string, AnyNode>()
-  ancestor(program, {
-    VariableDeclarator(node) {
-      if (node.id.type === "Identifier" && node.init)
-        constants.set(node.id.name, node.init)
-    },
-  })
   const cases: Case[] = []
   const counts = new Map<string, number>()
   ancestor(program, {
     CallExpression(node, _state, ancestors) {
+      const constants = resolveConstants({ program, ancestors })
       if (!isAssertEqual(node.callee)) return
       const [call, expected] = node.arguments
       if (call?.type !== "CallExpression" || call.callee.type !== "Identifier") return

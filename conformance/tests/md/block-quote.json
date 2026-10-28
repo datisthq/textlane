@@ -3200,5 +3200,713 @@
         }
       }
     ]
+  },
+  {
+    "description": "to-markdown blockquote",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.stringify"]],
+    "tests": [
+      {
+        "description": "should support a block quote",
+        "tree": {
+          "type": "blockquote"
+        },
+        "expected": {
+          "md": ">\n"
+        }
+      },
+      {
+        "description": "should support a block quote w/ a child",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> a\n"
+        }
+      },
+      {
+        "description": "should support a block quote w/ children",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "thematicBreak"
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> a\n>\n> ***\n>\n> b\n"
+        }
+      },
+      {
+        "description": "should support text w/ a line ending in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a\nb"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> a\n> b\n"
+        }
+      },
+      {
+        "description": "should support adjacent texts in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                },
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> ab\n"
+        }
+      },
+      {
+        "description": "should support a block quote in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a\nb"
+                }
+              ]
+            },
+            {
+              "type": "blockquote",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a\n"
+                    },
+                    {
+                      "type": "inlineCode",
+                      "value": "b\nc"
+                    },
+                    {
+                      "type": "text",
+                      "value": "\nd"
+                    }
+                  ]
+                },
+                {
+                  "type": "heading",
+                  "depth": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a b"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> a\n> b\n>\n> > a\n> > `b\n> > c`\n> > d\n> >\n> > # a b\n"
+        }
+      },
+      {
+        "description": "should support a break in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                },
+                {
+                  "type": "break"
+                },
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> a\\\n> b\n"
+        }
+      },
+      {
+        "description": "should support code (flow, fenced) in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "code",
+              "lang": "a\nb",
+              "value": "c\nd\n\ne"
+            }
+          ]
+        },
+        "expected": {
+          "md": "> ```a&#xA;b\n> c\n> d\n>\n> e\n> ```\n"
+        }
+      },
+      {
+        "description": "should support code (text) in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a\n"
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "b\nc"
+                },
+                {
+                  "type": "text",
+                  "value": "\nd"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> a\n> `b\n> c`\n> d\n"
+        }
+      },
+      {
+        "description": "should support padded code (text) in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a\n"
+                },
+                {
+                  "type": "inlineCode",
+                  "value": " b\nc "
+                },
+                {
+                  "type": "text",
+                  "value": "\nd"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> a\n> `  b\n> c  `\n> d\n"
+        }
+      },
+      {
+        "description": "should support a definition in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "definition",
+              "identifier": "a\nb",
+              "url": "c\nd",
+              "title": "e\nf"
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a\nb"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> [a\n> b]: <c&#xA;d> \"e\n> f\"\n>\n> a\n> b\n"
+        }
+      },
+      {
+        "description": "should support an emphasis in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a\n"
+                },
+                {
+                  "type": "emphasis",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "c\nd"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "\nd"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> a\n> *c\n> d*\n> d\n"
+        }
+      },
+      {
+        "description": "should support a heading (atx) in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "heading",
+              "depth": 3,
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a\nb"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> ### a&#xA;b\n"
+        }
+      },
+      {
+        "description": "should support html (flow) in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "html",
+              "value": "<div\nhidden>"
+            }
+          ]
+        },
+        "expected": {
+          "md": "> <div\n> hidden>\n"
+        }
+      },
+      {
+        "description": "should support html (text) in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a "
+                },
+                {
+                  "type": "html",
+                  "value": "<span\nhidden>"
+                },
+                {
+                  "type": "text",
+                  "value": "\nb"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> a <span\n> hidden>\n> b\n"
+        }
+      },
+      {
+        "description": "should support an image (resource) in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a\n"
+                },
+                {
+                  "type": "image",
+                  "url": "b\nc",
+                  "alt": "d\ne",
+                  "title": "f\ng"
+                },
+                {
+                  "type": "text",
+                  "value": "\nh"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> a\n> ![d\n> e](<b&#xA;c> \"f\n> g\")\n> h\n"
+        }
+      },
+      {
+        "description": "should support an image (reference) in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a\n"
+                },
+                {
+                  "type": "imageReference",
+                  "alt": "b\nc",
+                  "label": "d\ne",
+                  "identifier": "f",
+                  "referenceType": "collapsed"
+                },
+                {
+                  "type": "text",
+                  "value": "\ng"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> a\n> ![b\n> c][d\n> e]\n> g\n"
+        }
+      },
+      {
+        "description": "should support a link (resource) in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a\n"
+                },
+                {
+                  "type": "link",
+                  "url": "b\nc",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "d\ne"
+                    }
+                  ],
+                  "title": "f\ng"
+                },
+                {
+                  "type": "text",
+                  "value": "\nh"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> a\n> [d\n> e](<b&#xA;c> \"f\n> g\")\n> h\n"
+        }
+      },
+      {
+        "description": "should support a link (reference) in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a\n"
+                },
+                {
+                  "type": "linkReference",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "b\nc"
+                    }
+                  ],
+                  "label": "d\ne",
+                  "identifier": "f",
+                  "referenceType": "collapsed"
+                },
+                {
+                  "type": "text",
+                  "value": "\ng"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> a\n> [b\n> c][d\n> e]\n> g\n"
+        }
+      },
+      {
+        "description": "should support a list in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a\nb"
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "children": [
+                {
+                  "type": "listItem",
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "c\nd"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "children": [
+                    {
+                      "type": "thematicBreak"
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "e\nf"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> a\n> b\n>\n> - c\n>   d\n>\n> - ***\n>\n> - e\n>   f\n"
+        }
+      },
+      {
+        "description": "should support a strong in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a\n"
+                },
+                {
+                  "type": "strong",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "c\nd"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "\nd"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> a\n> **c\n> d**\n> d\n"
+        }
+      },
+      {
+        "description": "should support a thematic break in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "thematicBreak"
+            },
+            {
+              "type": "thematicBreak"
+            }
+          ]
+        },
+        "expected": {
+          "md": "> ***\n>\n> ***\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown blockquote {\"fences\":false}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "fences": false
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support code (flow, indented) in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "code",
+              "value": "a\nb\n\nc"
+            }
+          ]
+        },
+        "expected": {
+          "md": ">     a\n>     b\n>\n>     c\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown blockquote {\"setext\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "setext": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support a heading (setext) in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "heading",
+              "depth": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a\nb"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> a\n> b\n> =\n"
+        }
+      }
+    ]
   }
 ]

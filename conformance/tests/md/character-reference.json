@@ -1241,6 +1241,13 @@
     "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
     "tests": [
       {
+        "description": "should support named character references",
+        "input": "&nbsp; &amp; &copy; &AElig; &Dcaron;\n&frac34; &HilbertSpace; &DifferentialD;\n&ClockwiseContourIntegral; &ngE;",
+        "expected": {
+          "html": "<p>  &#x26; © Æ Ď\n¾ ℋ ⅆ\n∲ ≧̸</p>"
+        }
+      },
+      {
         "description": "should support decimal character references",
         "input": "&#35; &#1234; &#992; &#0;",
         "expected": {
@@ -1259,6 +1266,13 @@
         "input": "片&#xE0103;",
         "expected": {
           "html": "<p>片󠄃</p>"
+        }
+      },
+      {
+        "description": "should not support other things that look like character references",
+        "input": "&nbsp &x; &#; &#x;\n&#987654321;\n&#abcdef0;\n&ThisIsNotDefined; &hi?;",
+        "expected": {
+          "html": "<p>&#x26;nbsp &#x26;x; &#x26;#; &#x26;#x;\n&#x26;#987654321;\n&#x26;#abcdef0;\n&#x26;ThisIsNotDefined; &#x26;hi?;</p>"
         }
       },
       {

@@ -7380,5 +7380,769 @@
         }
       }
     ]
+  },
+  {
+    "description": "to-markdown list",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.stringify"]],
+    "tests": [
+      {
+        "description": "should support an empty list",
+        "tree": {
+          "type": "list"
+        },
+        "expected": {
+          "md": ""
+        }
+      },
+      {
+        "description": "should support a list w/ an item",
+        "tree": {
+          "type": "list",
+          "children": [
+            {
+              "type": "listItem"
+            }
+          ]
+        },
+        "expected": {
+          "md": "*\n"
+        }
+      },
+      {
+        "description": "should support a list w/ items",
+        "tree": {
+          "type": "list",
+          "children": [
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "thematicBreak"
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "b"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "- a\n\n- ***\n\n- b\n"
+        }
+      },
+      {
+        "description": "should not use blank lines between items for lists w/ `spread: false`",
+        "tree": {
+          "type": "list",
+          "spread": false,
+          "children": [
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "thematicBreak"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "- a\n- ***\n"
+        }
+      },
+      {
+        "description": "should support a list w/ `spread: false`, w/ a spread item",
+        "tree": {
+          "type": "list",
+          "spread": false,
+          "children": [
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a"
+                    }
+                  ]
+                },
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "b"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "thematicBreak"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "- a\n\n  b\n- ***\n"
+        }
+      },
+      {
+        "description": "should support a list w/ `ordered` and an empty item",
+        "tree": {
+          "type": "list",
+          "ordered": true,
+          "children": [
+            {
+              "type": "listItem",
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "md": "1.\n"
+        }
+      },
+      {
+        "description": "should support a list w/ `ordered`",
+        "tree": {
+          "type": "list",
+          "ordered": true,
+          "children": [
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "thematicBreak"
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "b"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "1. a\n\n2. ***\n\n3. b\n"
+        }
+      },
+      {
+        "description": "should support a list w/ `ordered` and `spread: false`",
+        "tree": {
+          "type": "list",
+          "ordered": true,
+          "spread": false,
+          "children": [
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "thematicBreak"
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "b"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "1. a\n2. ***\n3. b\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown list {\"incrementListMarker\":false}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "incrementListMarker": false
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support a list w/ `ordered` when `incrementListMarker: false`",
+        "tree": {
+          "type": "list",
+          "ordered": true,
+          "spread": false,
+          "children": [
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "thematicBreak"
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "b"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "1. a\n1. ***\n1. b\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown list {\"listItemIndent\":\"one\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "listItemIndent": "one"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support a list w/ `ordered` and `start`",
+        "tree": {
+          "type": "list",
+          "ordered": true,
+          "start": 0,
+          "children": [
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "thematicBreak"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "0. a\n\n1. ***\n"
+        }
+      },
+      {
+        "description": "should support a correct prefix and indent for items 9 and 10 when `listItemIndent: \"one\"`",
+        "tree": {
+          "type": "list",
+          "ordered": true,
+          "spread": false,
+          "start": 9,
+          "children": [
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a\nb"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "c\nd"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "9. a\n   b\n10. c\n    d\n"
+        }
+      },
+      {
+        "description": "should support a correct prefix and indent for items 99 and 100 when `listItemIndent: \"one\"`",
+        "tree": {
+          "type": "list",
+          "ordered": true,
+          "spread": false,
+          "start": 99,
+          "children": [
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a\nb"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "c\nd"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "99. a\n    b\n100. c\n     d\n"
+        }
+      },
+      {
+        "description": "should support a correct prefix and indent for items 999 and 1000 when `listItemIndent: \"one\"`",
+        "tree": {
+          "type": "list",
+          "ordered": true,
+          "spread": false,
+          "start": 999,
+          "children": [
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a\nb"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "c\nd"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "999. a\n     b\n1000. c\n      d\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown list {\"listItemIndent\":\"mixed\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "listItemIndent": "mixed"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support a correct prefix and indent `listItemIndent: \"mixed\"` and a tight list",
+        "tree": {
+          "type": "list",
+          "spread": false,
+          "children": [
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a\nb"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "c\nd"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* a\n  b\n* c\n  d\n"
+        }
+      },
+      {
+        "description": "should support a correct prefix and indent `listItemIndent: \"mixed\"` and a tight list (2)",
+        "tree": {
+          "type": "list",
+          "spread": true,
+          "children": [
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a\nb"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "c\nd"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "*   a\n    b\n\n*   c\n    d\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown list {\"listItemIndent\":\"tab\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "listItemIndent": "tab"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support a correct prefix and indent for items 9 and 10 when `listItemIndent: \"tab\"`",
+        "tree": {
+          "type": "list",
+          "ordered": true,
+          "spread": false,
+          "start": 9,
+          "children": [
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a\nb"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "c\nd"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "9.  a\n    b\n10. c\n    d\n"
+        }
+      },
+      {
+        "description": "should support a correct prefix and indent for items 99 and 100 when `listItemIndent: \"tab\"`",
+        "tree": {
+          "type": "list",
+          "ordered": true,
+          "spread": false,
+          "start": 99,
+          "children": [
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a\nb"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "c\nd"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "99. a\n    b\n100.    c\n        d\n"
+        }
+      },
+      {
+        "description": "should support a correct prefix and indent for items 999 and 1000 when `listItemIndent: \"tab\"`",
+        "tree": {
+          "type": "list",
+          "ordered": true,
+          "spread": false,
+          "start": 999,
+          "children": [
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a\nb"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "c\nd"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "999.    a\n        b\n1000.   c\n        d\n"
+        }
+      }
+    ]
   }
 ]

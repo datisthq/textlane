@@ -1,0 +1,1378 @@
+[
+  {
+    "description": "to-markdown escape",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.stringify"]],
+    "tests": [
+      {
+        "description": "should escape what would otherwise be a block quote in a paragraph",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "> a\n> b\nc >"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\> a\n\\> b\nc >\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be a block quote in a list item",
+        "tree": {
+          "type": "listItem",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "> a\n> b"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* \\> a\n  \\> b\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be a block quote in a block quote",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "> a\n> b"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> \\> a\n> \\> b\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be a break",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a\\\nb"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\\\\\nb\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be a named character reference",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "&amp"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\&amp\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be a numeric character reference",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "&#9;"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\&#9;\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be a character escape",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a\\+b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\\\\+b\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be a character escape of an autolink",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a\\"
+            },
+            {
+              "type": "link",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "https://a.b"
+                }
+              ],
+              "url": "https://a.b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\\\\<https://a.b>\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be code (flow)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "```js\n```"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\`\\`\\`js\n\\`\\`\\`\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be a definition",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "[a]: b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\[a]: b\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be emphasis (asterisk)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "*a*"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\*a\\*\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be emphasis (underscore)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "_a_"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\_a\\_\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be a heading (atx)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "# a"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\# a\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be a heading (setext, equals)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a\n="
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\n\\=\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be a heading (setext, dash)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a\n-"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\n\\-\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be html",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "<a\nb>"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\<a\nb>\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be code (text)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a `b`\n`c` d"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a \\`b\\`\n\\`c\\` d\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise turn a link into an image",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "!"
+            },
+            {
+              "type": "link",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ],
+              "url": "b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\![a](b)\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise turn a link reference into an image reference",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "!"
+            },
+            {
+              "type": "linkReference",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ],
+              "label": "b",
+              "identifier": "b",
+              "referenceType": "shortcut"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\![a][b]\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be an image (reference)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "![a][b]"
+            }
+          ]
+        },
+        "expected": {
+          "md": "!\\[a]\\[b]\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be an image (resource)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "![](a.jpg)"
+            }
+          ]
+        },
+        "expected": {
+          "md": "!\\[]\\(a.jpg)\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be a link (reference)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "[a][b]"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\[a]\\[b]\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be a link (resource)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "[](a.jpg)"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\[]\\(a.jpg)\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be a list item (plus)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "+ a\n+ b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\+ a\n\\+ b\n"
+        }
+      },
+      {
+        "description": "should not escape `+` when not followed by whitespace",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "+a"
+            }
+          ]
+        },
+        "expected": {
+          "md": "+a\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be a list item (dash)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "- a\n- b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\- a\n\\- b\n"
+        }
+      },
+      {
+        "description": "should not escape `-` when not followed by whitespace",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "-a"
+            }
+          ]
+        },
+        "expected": {
+          "md": "-a\n"
+        }
+      },
+      {
+        "description": "should escape `-` when followed by another `-` (as it looks like a thematic break, setext underline)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "--a"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\--a\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be a list item (asterisk)",
+        "tree": {
+          "type": "definition",
+          "identifier": "x",
+          "url": "y",
+          "title": "a\n* b\n* c"
+        },
+        "expected": {
+          "md": "[x]: y \"a\n\\* b\n\\* c\"\n"
+        }
+      },
+      {
+        "description": "should not escape `*` when not followed by whitespace",
+        "tree": {
+          "type": "definition",
+          "identifier": "x",
+          "url": "y",
+          "title": "a\n*b"
+        },
+        "expected": {
+          "md": "[x]: y \"a\n*b\"\n"
+        }
+      },
+      {
+        "description": "should escape `*` when followed by another `*` (as it looks like a thematic break)",
+        "tree": {
+          "type": "definition",
+          "identifier": "x",
+          "url": "y",
+          "title": "a\n**b"
+        },
+        "expected": {
+          "md": "[x]: y \"a\n\\**b\"\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be a list item (dot)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "1. a\n2. b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "1\\. a\n2\\. b\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be a list item (paren)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "1) a\n2) b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "1\\) a\n2\\) b\n"
+        }
+      },
+      {
+        "description": "should not escape what can’t be a list (dot)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "1.2.3. asd"
+            }
+          ]
+        },
+        "expected": {
+          "md": "1.2.3. asd\n"
+        }
+      },
+      {
+        "description": "should handle literal backslashes properly when before constructs (1)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "\\"
+            },
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\\\*a*\n"
+        }
+      },
+      {
+        "description": "should handle literal backslashes properly when before constructs (2)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "\\\\"
+            },
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\\\\\\\*a*\n"
+        }
+      },
+      {
+        "description": "should not escape `_` between letters",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a_b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a_b\n"
+        }
+      },
+      {
+        "description": "should not escape `_` between digits",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "1_000"
+            }
+          ]
+        },
+        "expected": {
+          "md": "1_000\n"
+        }
+      },
+      {
+        "description": "should not escape `_` between non-ASCII letters",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "é_é"
+            }
+          ]
+        },
+        "expected": {
+          "md": "é_é\n"
+        }
+      },
+      {
+        "description": "should escape `_` next to punctuation",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a._.b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a.\\_.b\n"
+        }
+      },
+      {
+        "description": "should escape `_` between a letter and whitespace",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a_ b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\\_ b\n"
+        }
+      },
+      {
+        "description": "should escape `_` between whitespace and a letter",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a _b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a \\_b\n"
+        }
+      },
+      {
+        "description": "should not escape several `_`s between letters",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a__b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a__b\n"
+        }
+      },
+      {
+        "description": "should escape `_`s next to punctuation",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a__.b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\\_\\_.b\n"
+        }
+      },
+      {
+        "description": "should escape a backslash before a letter that is encoded for attention",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "\\a"
+            },
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "!"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\\\&#x61;*!*\n"
+        }
+      },
+      {
+        "description": "should encode a line ending at the start of a paragraph",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "\na"
+            }
+          ]
+        },
+        "expected": {
+          "md": "&#xA;a\n"
+        }
+      },
+      {
+        "description": "should encode a line ending at the end of a paragraph",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a\n"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a&#xA;\n"
+        }
+      },
+      {
+        "description": "should encode a line ending at the end of a paragraph after a backslash",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "\\\n"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\\\&#xA;\n"
+        }
+      },
+      {
+        "description": "should encode line endings that would form a blank line",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a\n\nb"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a&#xA;&#xA;b\n"
+        }
+      },
+      {
+        "description": "should encode carriage returns that would form a blank line",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a\r\rb"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a&#xD;&#xD;b\n"
+        }
+      },
+      {
+        "description": "should not encode a carriage return + line feed",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a\r\nb"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\r\nb\n"
+        }
+      },
+      {
+        "description": "should encode carriage returns + line feeds that would form a blank line",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a\r\n\r\nb"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\r&#xA;&#xD;\nb\n"
+        }
+      },
+      {
+        "description": "should encode a line ending after a break",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "break"
+            },
+            {
+              "type": "text",
+              "value": "\nb"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\\n&#xA;b\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown escape {\"extensions\":[{\"tightDefinitions\":true}]}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "extensions": [
+            {
+              "tightDefinitions": true
+            }
+          ]
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support options in extensions",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "definition",
+              "url": "",
+              "label": "a",
+              "identifier": "a"
+            },
+            {
+              "type": "definition",
+              "url": "",
+              "label": "b",
+              "identifier": "b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "[a]: <>\n[b]: <>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown escape {\"strong\":\"*\",\"extensions\":[{\"strong\":\"_\"}]}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "strong": "*",
+          "extensions": [
+            {
+              "strong": "_"
+            }
+          ]
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should prefer main options over extension options",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "strong",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "**a**\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown escape {\"extensions\":[{\"strong\":\"*\",\"extensions\":[{\"strong\":\"_\"}]}]}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "extensions": [
+            {
+              "strong": "*",
+              "extensions": [
+                {
+                  "strong": "_"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should prefer extension options over subextension options",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "strong",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "**a**\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown escape {\"emphasis\":\"_\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "emphasis": "_"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should escape `_`s after attention",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "x"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "__a"
+            }
+          ]
+        },
+        "expected": {
+          "md": "_x_\\_\\_a\n"
+        }
+      },
+      {
+        "description": "should escape `_`s before attention",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a__"
+            },
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "x"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\\_\\__x_\n"
+        }
+      },
+      {
+        "description": "should escape `_` after a letter that is encoded for attention",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "d"
+            },
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a_bc"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "&#x64;_&#x61;\\_bc_\n"
+        }
+      },
+      {
+        "description": "should escape `_` before a letter that is encoded for attention",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "ab_c"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "d"
+            }
+          ]
+        },
+        "expected": {
+          "md": "_ab\\_&#x63;_&#x64;\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown escape {\"unsafe\":[{\"character\":\"a\",\"inConstruct\":\"phrasing\"}]}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "unsafe": [
+            {
+              "character": "a",
+              "inConstruct": "phrasing"
+            }
+          ]
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should escape `_` after an encoded letter",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a_b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "&#x61;\\_b\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown escape {\"unsafe\":[{\"character\":\"b\",\"inConstruct\":\"phrasing\"}]}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "unsafe": [
+            {
+              "character": "b",
+              "inConstruct": "phrasing"
+            }
+          ]
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should escape `_` before an encoded letter",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a_b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\\_&#x62;\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown escape {\"unsafe\":[{\"before\":\".\",\"character\":\"!\"}]}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "unsafe": [
+            {
+              "before": ".",
+              "character": "!"
+            }
+          ]
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should escape a character w/ a `before` condition after unsafe characters before the value",
+        "tree": {
+          "type": "emphasis",
+          "children": [
+            {
+              "type": "text",
+              "value": "!"
+            }
+          ]
+        },
+        "expected": {
+          "md": "*\\!*\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown escape {\"unsafe\":[{\"character\":\"!\",\"afterNode\":\"emphasis\"}]}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "unsafe": [
+            {
+              "character": "!",
+              "afterNode": "emphasis"
+            }
+          ]
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support `afterNode`",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "!"
+            },
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\!*a*\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown escape {\"unsafe\":[{\"character\":\"!\",\"beforeNode\":[\"emphasis\"]}]}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "unsafe": [
+            {
+              "character": "!",
+              "beforeNode": ["emphasis"]
+            }
+          ]
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support `beforeNode`",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "!"
+            }
+          ]
+        },
+        "expected": {
+          "md": "*a*\\!\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown escape {\"unsafe\":[{\"character\":\":\",\"after\":\"\\\\p{L}\",\"unicode\":true}]}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "unsafe": [
+            {
+              "character": ":",
+              "after": "\\p{L}",
+              "unicode": true
+            }
+          ]
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support `unicode`",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": ":á"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\:á\n"
+        }
+      }
+    ]
+  }
+]

@@ -3236,6 +3236,27 @@
     ],
     "tests": [
       {
+        "description": "should support raw pre tags (type 1)",
+        "input": "<pre language=\"haskell\"><code>\nimport Text.HTML.TagSoup\n\nmain :: IO ()\nmain = print $ parseTags tags\n</code></pre>\nokay",
+        "expected": {
+          "html": "<pre language=\"haskell\"><code>\nimport Text.HTML.TagSoup\n\nmain :: IO ()\nmain = print $ parseTags tags\n</code></pre>\n<p>okay</p>"
+        }
+      },
+      {
+        "description": "should support raw script tags",
+        "input": "<script type=\"text/javascript\">\n// JavaScript example\n\ndocument.getElementById(\"demo\").innerHTML = \"Hello JavaScript!\";\n</script>\nokay",
+        "expected": {
+          "html": "<script type=\"text/javascript\">\n// JavaScript example\n\ndocument.getElementById(\"demo\").innerHTML = \"Hello JavaScript!\";\n</script>\n<p>okay</p>"
+        }
+      },
+      {
+        "description": "should support raw style tags",
+        "input": "<style\n  type=\"text/css\">\nh1 {color:red;}\n\np {color:blue;}\n</style>\nokay",
+        "expected": {
+          "html": "<style\n  type=\"text/css\">\nh1 {color:red;}\n\np {color:blue;}\n</style>\n<p>okay</p>"
+        }
+      },
+      {
         "description": "should support raw tags w/o ending",
         "input": "<style\n  type=\"text/css\">\n\nfoo",
         "expected": {
@@ -3642,6 +3663,13 @@
         }
       },
       {
+        "description": "should support html of type 6 (1)",
+        "input": "<table>\n  <tr>\n    <td>\n           hi\n    </td>\n  </tr>\n</table>\n\nokay.",
+        "expected": {
+          "html": "<table>\n  <tr>\n    <td>\n           hi\n    </td>\n  </tr>\n</table>\n<p>okay.</p>"
+        }
+      },
+      {
         "description": "should support html of type 6 (2)",
         "input": " <div>\n  *hello*\n         <foo><a>",
         "expected": {
@@ -3786,6 +3814,13 @@
         "input": "<table>\n\n<tr>\n\n<td>\nHi\n</td>\n\n</tr>\n\n</table>",
         "expected": {
           "html": "<table>\n<tr>\n<td>\nHi\n</td>\n</tr>\n</table>"
+        }
+      },
+      {
+        "description": "should not support indented, blank-line delimited, adjacent html",
+        "input": "<table>\n\n  <tr>\n\n    <td>\n      Hi\n    </td>\n\n  </tr>\n\n</table>",
+        "expected": {
+          "html": "<table>\n  <tr>\n<pre><code>&#x3C;td>\n  Hi\n&#x3C;/td>\n</code></pre>\n  </tr>\n</table>"
         }
       },
       {
@@ -4413,6 +4448,174 @@
               }
             }
           }
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown html",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.stringify"]],
+    "tests": [
+      {
+        "description": "should support a void html",
+        "tree": {
+          "type": "html"
+        },
+        "expected": {
+          "md": ""
+        }
+      },
+      {
+        "description": "should support an empty html",
+        "tree": {
+          "type": "html",
+          "value": ""
+        },
+        "expected": {
+          "md": ""
+        }
+      },
+      {
+        "description": "should support html",
+        "tree": {
+          "type": "html",
+          "value": "a\nb"
+        },
+        "expected": {
+          "md": "a\nb\n"
+        }
+      },
+      {
+        "description": "should replace a line ending before html (text) with a space if it would start html (flow) of kinds 1 through 6",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a\n"
+            },
+            {
+              "type": "html",
+              "value": "<pre>"
+            },
+            {
+              "type": "text",
+              "value": "\r"
+            },
+            {
+              "type": "html",
+              "value": "<!--b-->"
+            },
+            {
+              "type": "text",
+              "value": "\r\n"
+            },
+            {
+              "type": "html",
+              "value": "<?c?>"
+            },
+            {
+              "type": "text",
+              "value": "\n"
+            },
+            {
+              "type": "html",
+              "value": "<!D>"
+            },
+            {
+              "type": "text",
+              "value": "\n"
+            },
+            {
+              "type": "html",
+              "value": "<![CDATA[e]]>"
+            },
+            {
+              "type": "text",
+              "value": "\n"
+            },
+            {
+              "type": "html",
+              "value": "<div>"
+            },
+            {
+              "type": "text",
+              "value": "\n"
+            },
+            {
+              "type": "html",
+              "value": "f"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a <pre> <!--b--> <?c?> <!D> <![CDATA[e]]> <div> f\n"
+        }
+      },
+      {
+        "description": "should keep a line ending before html (text) if it would start html (flow) of kind 7",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a\n"
+            },
+            {
+              "type": "html",
+              "value": "<b>"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\n<b>\n"
+        }
+      },
+      {
+        "description": "should keep a hard break before html (text) if it would start html (flow) of kind 7",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a"
+            },
+            {
+              "type": "break"
+            },
+            {
+              "type": "html",
+              "value": "<b>"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\\\n<b>\n"
+        }
+      },
+      {
+        "description": "should serialize html (text)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "html",
+              "value": "<x>"
+            },
+            {
+              "type": "text",
+              "value": "a"
+            }
+          ]
+        },
+        "expected": {
+          "md": "<x>a\n"
         }
       }
     ]

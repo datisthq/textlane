@@ -2226,5 +2226,368 @@
         }
       }
     ]
+  },
+  {
+    "description": "to-markdown code (flow)",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.stringify"]],
+    "tests": [
+      {
+        "description": "should support empty code",
+        "tree": {
+          "type": "code"
+        },
+        "expected": {
+          "md": "```\n```\n"
+        }
+      },
+      {
+        "description": "should support code w/ a value (fences)",
+        "tree": {
+          "type": "code",
+          "value": "a"
+        },
+        "expected": {
+          "md": "```\na\n```\n"
+        }
+      },
+      {
+        "description": "should support code w/ a lang",
+        "tree": {
+          "type": "code",
+          "lang": "a",
+          "value": ""
+        },
+        "expected": {
+          "md": "```a\n```\n"
+        }
+      },
+      {
+        "description": "should support (ignore) code w/ only a meta",
+        "tree": {
+          "type": "code",
+          "meta": "a",
+          "value": ""
+        },
+        "expected": {
+          "md": "```\n```\n"
+        }
+      },
+      {
+        "description": "should support code w/ lang and meta",
+        "tree": {
+          "type": "code",
+          "lang": "a",
+          "meta": "b",
+          "value": ""
+        },
+        "expected": {
+          "md": "```a b\n```\n"
+        }
+      },
+      {
+        "description": "should encode a space in `lang`",
+        "tree": {
+          "type": "code",
+          "lang": "a b",
+          "value": ""
+        },
+        "expected": {
+          "md": "```a&#x20;b\n```\n"
+        }
+      },
+      {
+        "description": "should encode a line ending in `lang`",
+        "tree": {
+          "type": "code",
+          "lang": "a\nb",
+          "value": ""
+        },
+        "expected": {
+          "md": "```a&#xA;b\n```\n"
+        }
+      },
+      {
+        "description": "should encode a grave accent in `lang`",
+        "tree": {
+          "type": "code",
+          "lang": "a`b",
+          "value": ""
+        },
+        "expected": {
+          "md": "```a&#x60;b\n```\n"
+        }
+      },
+      {
+        "description": "should escape a backslash in `lang`",
+        "tree": {
+          "type": "code",
+          "lang": "a\\-b",
+          "value": ""
+        },
+        "expected": {
+          "md": "```a\\\\-b\n```\n"
+        }
+      },
+      {
+        "description": "should escape an ampersand in `lang`",
+        "tree": {
+          "type": "code",
+          "lang": "&amp;",
+          "value": ""
+        },
+        "expected": {
+          "md": "```\\&amp;\n```\n"
+        }
+      },
+      {
+        "description": "should not encode a space in `meta`",
+        "tree": {
+          "type": "code",
+          "lang": "x",
+          "meta": "a b",
+          "value": ""
+        },
+        "expected": {
+          "md": "```x a b\n```\n"
+        }
+      },
+      {
+        "description": "should encode a line ending in `meta`",
+        "tree": {
+          "type": "code",
+          "lang": "x",
+          "meta": "a\nb",
+          "value": ""
+        },
+        "expected": {
+          "md": "```x a&#xA;b\n```\n"
+        }
+      },
+      {
+        "description": "should encode a grave accent in `meta`",
+        "tree": {
+          "type": "code",
+          "lang": "x",
+          "meta": "a`b",
+          "value": ""
+        },
+        "expected": {
+          "md": "```x a&#x60;b\n```\n"
+        }
+      },
+      {
+        "description": "should escape a backslash in `meta`",
+        "tree": {
+          "type": "code",
+          "lang": "x",
+          "meta": "a\\-b",
+          "value": ""
+        },
+        "expected": {
+          "md": "```x a\\\\-b\n```\n"
+        }
+      },
+      {
+        "description": "should escape an ampersand in `meta`",
+        "tree": {
+          "type": "code",
+          "lang": "x",
+          "meta": "&amp;",
+          "value": ""
+        },
+        "expected": {
+          "md": "```x \\&amp;\n```\n"
+        }
+      },
+      {
+        "description": "should use more grave accents for fences if there are streaks of grave accents in the value (fences)",
+        "tree": {
+          "type": "code",
+          "value": "```\nasd\n```"
+        },
+        "expected": {
+          "md": "````\n```\nasd\n```\n````\n"
+        }
+      },
+      {
+        "description": "should use a fence if there is an info",
+        "tree": {
+          "type": "code",
+          "lang": "a",
+          "value": "b"
+        },
+        "expected": {
+          "md": "```a\nb\n```\n"
+        }
+      },
+      {
+        "description": "should use a fence if there is only whitespace",
+        "tree": {
+          "type": "code",
+          "value": " "
+        },
+        "expected": {
+          "md": "```\n \n```\n"
+        }
+      },
+      {
+        "description": "should use a fence if there first line is blank (void)",
+        "tree": {
+          "type": "code",
+          "value": "\na"
+        },
+        "expected": {
+          "md": "```\n\na\n```\n"
+        }
+      },
+      {
+        "description": "should use a fence if there first line is blank (filled)",
+        "tree": {
+          "type": "code",
+          "value": " \na"
+        },
+        "expected": {
+          "md": "```\n \na\n```\n"
+        }
+      },
+      {
+        "description": "should use a fence if there last line is blank (void)",
+        "tree": {
+          "type": "code",
+          "value": "a\n"
+        },
+        "expected": {
+          "md": "```\na\n\n```\n"
+        }
+      },
+      {
+        "description": "should use a fence if there last line is blank (filled)",
+        "tree": {
+          "type": "code",
+          "value": "a\n "
+        },
+        "expected": {
+          "md": "```\na\n \n```\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown code (flow) {\"fences\":false}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "fences": false
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support code w/ a value (indent)",
+        "tree": {
+          "type": "code",
+          "value": "a"
+        },
+        "expected": {
+          "md": "    a\n"
+        }
+      },
+      {
+        "description": "should use an indent if the value is indented",
+        "tree": {
+          "type": "code",
+          "value": "  a\n\n b"
+        },
+        "expected": {
+          "md": "      a\n\n     b\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown code (flow) {\"fence\":\"~\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "fence": "~"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should escape an ampersand in `lang` when `fence: \"~\"`",
+        "tree": {
+          "type": "code",
+          "lang": "&amp;",
+          "value": ""
+        },
+        "expected": {
+          "md": "~~~\\&amp;\n~~~\n"
+        }
+      },
+      {
+        "description": "should escape an ampersand in `meta` when `fence: \"~\"`",
+        "tree": {
+          "type": "code",
+          "lang": "x",
+          "meta": "&amp;",
+          "value": ""
+        },
+        "expected": {
+          "md": "~~~x \\&amp;\n~~~\n"
+        }
+      },
+      {
+        "description": "should support fenced code w/ tildes when `fence: \"~\"`",
+        "tree": {
+          "type": "code",
+          "value": ""
+        },
+        "expected": {
+          "md": "~~~\n~~~\n"
+        }
+      },
+      {
+        "description": "should not encode a grave accent when using tildes for fences",
+        "tree": {
+          "type": "code",
+          "lang": "a`b",
+          "value": ""
+        },
+        "expected": {
+          "md": "~~~a`b\n~~~\n"
+        }
+      },
+      {
+        "description": "should use more tildes for fences if there are streaks of tildes in the value (fences)",
+        "tree": {
+          "type": "code",
+          "value": "~~~\nasd\n~~~"
+        },
+        "expected": {
+          "md": "~~~~\n~~~\nasd\n~~~\n~~~~\n"
+        }
+      }
+    ]
   }
 ]

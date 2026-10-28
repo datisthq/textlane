@@ -260,5 +260,56 @@
         }
       }
     ]
+  },
+  {
+    "description": "to-markdown text",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.stringify"]],
+    "tests": [
+      {
+        "description": "should support a void text",
+        "tree": {
+          "type": "text"
+        },
+        "expected": {
+          "md": ""
+        }
+      },
+      {
+        "description": "should support an empty text",
+        "tree": {
+          "type": "text",
+          "value": ""
+        },
+        "expected": {
+          "md": ""
+        }
+      },
+      {
+        "description": "should support text",
+        "tree": {
+          "type": "text",
+          "value": "a\nb"
+        },
+        "expected": {
+          "md": "a\nb\n"
+        }
+      },
+      {
+        "description": "should escape text given directly",
+        "tree": {
+          "type": "text",
+          "value": "*a*"
+        },
+        "expected": {
+          "md": "\\*a\\*\n"
+        }
+      }
+    ]
   }
 ]

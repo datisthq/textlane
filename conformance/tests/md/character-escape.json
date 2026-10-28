@@ -962,6 +962,13 @@
         }
       },
       {
+        "description": "should escape other constructs",
+        "input": "\\*not emphasized*\n\\<br/> not a tag\n\\[not a link](/foo)\n\\`not code`\n1\\. not a list\n\\* not a list\n\\# not a heading\n\\[foo]: /url \"not a reference\"\n\\&ouml; not a character entity",
+        "expected": {
+          "html": "<p>*not emphasized*\n&#x3C;br/> not a tag\n[not a link](/foo)\n`not code`\n1. not a list\n* not a list\n# not a heading\n[foo]: /url \"not a reference\"\n&#x26;ouml; not a character entity</p>"
+        }
+      },
+      {
         "description": "should escape a line break",
         "input": "foo\\\nbar",
         "expected": {

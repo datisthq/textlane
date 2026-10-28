@@ -21,7 +21,7 @@
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>8 agent's calls</h3>
+    <h3>9 agent's calls</h3>
     <p>
       <htmlpress-badge type="warning">my call</htmlpress-badge> settled by the agent, open
       to change
@@ -395,6 +395,20 @@
       the option they need is designed.
     </p>
     <p><strong>Rejected.</strong> Inventing public options to carry them now.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge>
+    <code>md.stringify</code> options keep mdast-util-to-markdown's names
+    (<code>bullet</code>, <code>fence</code>, <code>setext</code>,
+    <code>listItemIndent</code>, <code>unsafe</code>…)
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> They are remark-stringify's public options already, so ported
+      cases and migrating users need no mapping; the same choice
+      <code>allowDangerousHtml</code> made.
+    </p>
+    <p><strong>Rejected.</strong> Renaming them now, before any implementation exists.</p>
   </dd>
   <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge> Each runner skips only

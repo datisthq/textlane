@@ -14284,5 +14284,861 @@
         }
       }
     ]
+  },
+  {
+    "description": "to-markdown emphasis",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.stringify"]],
+    "tests": [
+      {
+        "description": "should support an empty emphasis",
+        "tree": {
+          "type": "emphasis"
+        },
+        "expected": {
+          "md": "**\n"
+        }
+      },
+      {
+        "description": "should support an emphasis w/ children",
+        "tree": {
+          "type": "emphasis",
+          "children": [
+            {
+              "type": "text",
+              "value": "a"
+            }
+          ]
+        },
+        "expected": {
+          "md": "*a*\n"
+        }
+      },
+      {
+        "description": "should escape in emphasis given directly",
+        "tree": {
+          "type": "emphasis",
+          "children": [
+            {
+              "type": "text",
+              "value": "*"
+            }
+          ]
+        },
+        "expected": {
+          "md": "*\\**\n"
+        }
+      },
+      {
+        "description": "should serialize emphasis outside phrasing",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "*"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> *\\**\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown emphasis {\"emphasis\":\"_\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "emphasis": "_"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support an emphasis w/ underscores when `emphasis: \"_\"`",
+        "tree": {
+          "type": "emphasis",
+          "children": [
+            {
+              "type": "text",
+              "value": "a"
+            }
+          ]
+        },
+        "expected": {
+          "md": "_a_\n"
+        }
+      },
+      {
+        "description": "should keep astral characters whole when encoding the start of emphasis",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a"
+            },
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "💡b"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "&#x61;_&#x1F4A1;b_\n"
+        }
+      },
+      {
+        "description": "should keep astral characters whole when encoding the end of emphasis",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b💡"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "a"
+            }
+          ]
+        },
+        "expected": {
+          "md": "_b&#x1F4A1;_&#x61;\n"
+        }
+      },
+      {
+        "description": "should not encode characters in empty emphasis",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a"
+            },
+            {
+              "type": "emphasis",
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "&#x61;__&#x62;\n"
+        }
+      },
+      {
+        "description": "should encode after the opening of emphasis, not a line ending before it",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "break"
+            },
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": " x"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\\n_&#x20;x_\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown strong",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.stringify"]],
+    "tests": [
+      {
+        "description": "should support an empty strong",
+        "tree": {
+          "type": "strong"
+        },
+        "expected": {
+          "md": "****\n"
+        }
+      },
+      {
+        "description": "should support a strong w/ children",
+        "tree": {
+          "type": "strong",
+          "children": [
+            {
+              "type": "text",
+              "value": "a"
+            }
+          ]
+        },
+        "expected": {
+          "md": "**a**\n"
+        }
+      },
+      {
+        "description": "should keep astral characters whole when encoding before strong",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "💡"
+            },
+            {
+              "type": "strong",
+              "children": [
+                {
+                  "type": "text",
+                  "value": " a"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "&#x1F4A1;**&#x20;a**\n"
+        }
+      },
+      {
+        "description": "should keep astral characters whole when encoding after strong",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "strong",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "💡"
+            }
+          ]
+        },
+        "expected": {
+          "md": "**a&#x20;**&#x1F4A1;\n"
+        }
+      },
+      {
+        "description": "should encode the character before strong ignoring empty text",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a"
+            },
+            {
+              "type": "text",
+              "value": ""
+            },
+            {
+              "type": "strong",
+              "children": [
+                {
+                  "type": "text",
+                  "value": " b"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "&#x61;**&#x20;b**\n"
+        }
+      },
+      {
+        "description": "should encode after the opening of strong, not a line ending before it",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "break"
+            },
+            {
+              "type": "strong",
+              "children": [
+                {
+                  "type": "text",
+                  "value": " x"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\\n**&#x20;x**\n"
+        }
+      },
+      {
+        "description": "should serialize strong outside phrasing",
+        "tree": {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "strong",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "*"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "> **\\***\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown strong {\"strong\":\"_\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "strong": "_"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support a strong w/ underscores when `emphasis: \"_\"`",
+        "tree": {
+          "type": "strong",
+          "children": [
+            {
+              "type": "text",
+              "value": "a"
+            }
+          ]
+        },
+        "expected": {
+          "md": "__a__\n"
+        }
+      },
+      {
+        "description": "should keep astral characters whole when encoding the start of strong",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a"
+            },
+            {
+              "type": "strong",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "💡b"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "&#x61;__&#x1F4A1;b__\n"
+        }
+      },
+      {
+        "description": "should keep astral characters whole when encoding the end of strong",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "strong",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b💡"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "a"
+            }
+          ]
+        },
+        "expected": {
+          "md": "__b&#x1F4A1;__&#x61;\n"
+        }
+      },
+      {
+        "description": "should not encode characters in empty strong",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a"
+            },
+            {
+              "type": "strong",
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "&#x61;____&#x62;\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown attention",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.stringify"]],
+    "tests": [
+      {
+        "description": "should use the other marker for emphasis next to emphasis",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "*a*_b_\n"
+        }
+      },
+      {
+        "description": "should use the other marker for emphasis in emphasis",
+        "tree": {
+          "type": "emphasis",
+          "children": [
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "*_a_*\n"
+        }
+      },
+      {
+        "description": "should use the other marker for strong next to strong",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "strong",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "strong",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "**a**__b__\n"
+        }
+      },
+      {
+        "description": "should use the other marker for emphasis in strong",
+        "tree": {
+          "type": "strong",
+          "children": [
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "**_a_**\n"
+        }
+      },
+      {
+        "description": "should use the same marker for strong in emphasis, as that forms",
+        "tree": {
+          "type": "emphasis",
+          "children": [
+            {
+              "type": "strong",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "***a***\n"
+        }
+      },
+      {
+        "description": "should use other markers for several nodes",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            },
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "c"
+                }
+              ]
+            },
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "d"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "*a*_b_*c*_d_\n"
+        }
+      },
+      {
+        "description": "should use the other marker for strong if the rule of 3 would pair it wrongly",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "strong",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "."
+                }
+              ]
+            },
+            {
+              "type": "strong",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "*"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "**.**__\\*__\n"
+        }
+      },
+      {
+        "description": "should keep the markers if other markers do not help",
+        "tree": {
+          "type": "emphasis",
+          "children": [
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "emphasis",
+                  "children": [
+                    {
+                      "type": "emphasis",
+                      "children": [
+                        {
+                          "type": "emphasis",
+                          "children": [
+                            {
+                              "type": "emphasis",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "value": "x"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "******x******\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown attention {\"emphasis\":\"_\",\"strong\":\"_\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "emphasis": "_",
+          "strong": "_"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should use the same marker for strong in emphasis w/ `_`",
+        "tree": {
+          "type": "emphasis",
+          "children": [
+            {
+              "type": "strong",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "___a___\n"
+        }
+      },
+      {
+        "description": "should use the other marker if underscores cannot form between words",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "strong",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "__a__*b*\n"
+        }
+      },
+      {
+        "description": "should use other markers if sequences would pair partially",
+        "tree": {
+          "type": "strong",
+          "children": [
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "strong",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": ".a"
+                    }
+                  ]
+                },
+                {
+                  "type": "emphasis",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "b"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "**___.a__*b*_**\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown attention {\"emphasis\":\"_\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "emphasis": "_"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should keep the configured marker first",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "_a_*b*\n"
+        }
+      }
+    ]
   }
 ]

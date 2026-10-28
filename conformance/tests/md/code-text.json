@@ -2277,5 +2277,196 @@
         }
       }
     ]
+  },
+  {
+    "description": "to-markdown code (text)",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.stringify"]],
+    "tests": [
+      {
+        "description": "should support an empty code text",
+        "tree": {
+          "type": "inlineCode"
+        },
+        "expected": {
+          "md": "``\n"
+        }
+      },
+      {
+        "description": "should support a code text",
+        "tree": {
+          "type": "inlineCode",
+          "value": "a"
+        },
+        "expected": {
+          "md": "`a`\n"
+        }
+      },
+      {
+        "description": "should support a space",
+        "tree": {
+          "type": "inlineCode",
+          "value": " "
+        },
+        "expected": {
+          "md": "` `\n"
+        }
+      },
+      {
+        "description": "should support an eol",
+        "tree": {
+          "type": "inlineCode",
+          "value": "\n"
+        },
+        "expected": {
+          "md": "`\n`\n"
+        }
+      },
+      {
+        "description": "should support several spaces",
+        "tree": {
+          "type": "inlineCode",
+          "value": "  "
+        },
+        "expected": {
+          "md": "`  `\n"
+        }
+      },
+      {
+        "description": "should use a fence of two grave accents if the value contains one",
+        "tree": {
+          "type": "inlineCode",
+          "value": "a`b"
+        },
+        "expected": {
+          "md": "``a`b``\n"
+        }
+      },
+      {
+        "description": "should use a fence of one grave accent if the value contains two",
+        "tree": {
+          "type": "inlineCode",
+          "value": "a``b"
+        },
+        "expected": {
+          "md": "`a``b`\n"
+        }
+      },
+      {
+        "description": "should use a fence of three grave accents if the value contains two and one",
+        "tree": {
+          "type": "inlineCode",
+          "value": "a``b`c"
+        },
+        "expected": {
+          "md": "```a``b`c```\n"
+        }
+      },
+      {
+        "description": "should pad w/ a space if the value starts w/ a grave accent",
+        "tree": {
+          "type": "inlineCode",
+          "value": "`a"
+        },
+        "expected": {
+          "md": "`` `a ``\n"
+        }
+      },
+      {
+        "description": "should pad w/ a space if the value ends w/ a grave accent",
+        "tree": {
+          "type": "inlineCode",
+          "value": "a`"
+        },
+        "expected": {
+          "md": "`` a` ``\n"
+        }
+      },
+      {
+        "description": "should pad w/ a space if the value starts and ends w/ a space",
+        "tree": {
+          "type": "inlineCode",
+          "value": " a "
+        },
+        "expected": {
+          "md": "`  a  `\n"
+        }
+      },
+      {
+        "description": "should not pad w/ spaces if the value ends w/ a non-space",
+        "tree": {
+          "type": "inlineCode",
+          "value": " a"
+        },
+        "expected": {
+          "md": "` a`\n"
+        }
+      },
+      {
+        "description": "should not pad w/ spaces if the value starts w/ a non-space",
+        "tree": {
+          "type": "inlineCode",
+          "value": "a "
+        },
+        "expected": {
+          "md": "`a `\n"
+        }
+      },
+      {
+        "description": "should prevent breaking out of code (-)",
+        "tree": {
+          "type": "inlineCode",
+          "value": "a\n- b"
+        },
+        "expected": {
+          "md": "`a - b`\n"
+        }
+      },
+      {
+        "description": "should prevent breaking out of code (#)",
+        "tree": {
+          "type": "inlineCode",
+          "value": "a\n#"
+        },
+        "expected": {
+          "md": "`a #`\n"
+        }
+      },
+      {
+        "description": "should prevent breaking out of code (\\d\\.)",
+        "tree": {
+          "type": "inlineCode",
+          "value": "a\n1. "
+        },
+        "expected": {
+          "md": "`a 1. `\n"
+        }
+      },
+      {
+        "description": "should prevent breaking out of code (cr)",
+        "tree": {
+          "type": "inlineCode",
+          "value": "a\r- b"
+        },
+        "expected": {
+          "md": "`a - b`\n"
+        }
+      },
+      {
+        "description": "should prevent breaking out of code (crlf)",
+        "tree": {
+          "type": "inlineCode",
+          "value": "a\r\n- b"
+        },
+        "expected": {
+          "md": "`a - b`\n"
+        }
+      }
+    ]
   }
 ]

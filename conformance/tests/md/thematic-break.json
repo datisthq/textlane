@@ -2070,5 +2070,138 @@
         }
       }
     ]
+  },
+  {
+    "description": "to-markdown thematic break",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.stringify"]],
+    "tests": [
+      {
+        "description": "should support a thematic break",
+        "tree": {
+          "type": "thematicBreak"
+        },
+        "expected": {
+          "md": "***\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown thematic break {\"rule\":\"-\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "rule": "-"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support a thematic break w/ dashes when `rule: \"-\"`",
+        "tree": {
+          "type": "thematicBreak"
+        },
+        "expected": {
+          "md": "---\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown thematic break {\"rule\":\"_\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "rule": "_"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support a thematic break w/ underscores when `rule: \"_\"`",
+        "tree": {
+          "type": "thematicBreak"
+        },
+        "expected": {
+          "md": "___\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown thematic break {\"ruleRepetition\":5}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "ruleRepetition": 5
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support a thematic break w/ more repetitions w/ `ruleRepetition`",
+        "tree": {
+          "type": "thematicBreak"
+        },
+        "expected": {
+          "md": "*****\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown thematic break {\"ruleSpaces\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "ruleSpaces": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support a thematic break w/ spaces w/ `ruleSpaces`",
+        "tree": {
+          "type": "thematicBreak"
+        },
+        "expected": {
+          "md": "* * *\n"
+        }
+      }
+    ]
   }
 ]

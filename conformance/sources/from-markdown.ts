@@ -2,12 +2,13 @@ import { isDeepStrictEqual } from "node:util"
 import { readdirSync, readFileSync } from "node:fs"
 import { basename, join, resolve } from "node:path"
 import { parse } from "acorn"
-import type { AnyNode } from "acorn"
 import { ancestor } from "acorn-walk"
 import { commonmark } from "commonmark.json"
 import { writeGroups } from "../actions/group/write.ts"
+import { isStressInput } from "../actions/input/check.ts"
 import { parseMarkdown } from "../actions/markdown/render.ts"
 import { evaluateNode } from "../actions/node/evaluate.ts"
+import { resolveConstants } from "../actions/node/scope.ts"
 import { fetchSource } from "../actions/source/fetch.ts"
 import { findTestTitle } from "../actions/test/find.ts"
 
@@ -119,22 +120,17 @@ function readFixtures(directory: string) {
 // Only `fromMarkdown(<literal>)`: a second argument carries extensions or an encoding
 function extractInputs(source: string) {
   const program = parse(source, { ecmaVersion: "latest", sourceType: "module" })
-  const constants = new Map<string, AnyNode>()
-  ancestor(program, {
-    VariableDeclarator(node) {
-      if (node.id.type === "Identifier" && node.init)
-        constants.set(node.id.name, node.init)
-    },
-  })
   const inputs: { title: string; input: string }[] = []
   ancestor(program, {
     CallExpression(node, _state, ancestors) {
+      const constants = resolveConstants({ program, ancestors })
       if (node.callee.type !== "Identifier" || node.callee.name !== "fromMarkdown") return
       const title = findTestTitle(ancestors, constants)
       if (!title?.startsWith("should parse")) return
       const input = evaluateNode(node.arguments[0], constants)
       if (node.arguments.length > 1) return countSkip("options or an encoding")
       if (typeof input !== "string") return countSkip("not statically evaluable")
+      if (isStressInput(input)) return countSkip("a stress test")
       inputs.push({ title, input })
     },
   })

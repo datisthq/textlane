@@ -913,5 +913,131 @@
         }
       }
     ]
+  },
+  {
+    "description": "to-markdown paragraph",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.stringify"]],
+    "tests": [
+      {
+        "description": "should support an empty paragraph",
+        "tree": {
+          "type": "paragraph"
+        },
+        "expected": {
+          "md": ""
+        }
+      },
+      {
+        "description": "should support a paragraph",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a\nb"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\nb\n"
+        }
+      },
+      {
+        "description": "should encode spaces at the start of paragraphs",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "  a"
+            }
+          ]
+        },
+        "expected": {
+          "md": "&#x20; a\n"
+        }
+      },
+      {
+        "description": "should encode spaces at the end of paragraphs",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a  "
+            }
+          ]
+        },
+        "expected": {
+          "md": "a &#x20;\n"
+        }
+      },
+      {
+        "description": "should encode tabs at the start of paragraphs",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "\t\ta"
+            }
+          ]
+        },
+        "expected": {
+          "md": "&#x9;\ta\n"
+        }
+      },
+      {
+        "description": "should encode tabs at the end of paragraphs",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a\t\t"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\t&#x9;\n"
+        }
+      },
+      {
+        "description": "should encode spaces around line endings in paragraphs",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a  \n  b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a &#x20;\n&#x20; b\n"
+        }
+      },
+      {
+        "description": "should encode spaces around line endings in paragraphs (2)",
+        "tree": {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "a\t\t\n\t\tb"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\t&#x9;\n&#x9;\tb\n"
+        }
+      }
+    ]
   }
 ]

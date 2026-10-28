@@ -32,5 +32,439 @@
         }
       }
     ]
+  },
+  {
+    "description": "to-markdown core",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.stringify"]],
+    "tests": [
+      {
+        "description": "should support a `root`",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "thematicBreak"
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\n\n***\n\nb\n"
+        }
+      },
+      {
+        "description": "should not use blank lines between nodes when given phrasing",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "a"
+            },
+            {
+              "type": "break"
+            },
+            {
+              "type": "text",
+              "value": "b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\\\nb\n"
+        }
+      },
+      {
+        "description": "should support adjacent definitions",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "definition",
+              "identifier": "b",
+              "url": ""
+            },
+            {
+              "type": "definition",
+              "identifier": "c",
+              "url": ""
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "d"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\n\n[b]: <>\n\n[c]: <>\n\nd\n"
+        }
+      },
+      {
+        "description": "should use a different marker for adjacent lists",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "children": [
+                {
+                  "type": "listItem",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "children": [
+                {
+                  "type": "listItem",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "children": [
+                {
+                  "type": "listItem",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "children": [
+                {
+                  "type": "listItem",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "d"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\n\n*\n\n-\n\n1.\n\n1)\n\nd\n"
+        }
+      },
+      {
+        "description": "should not honour `spread: false` for two paragraphs",
+        "tree": {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* a\n\n  b\n"
+        }
+      },
+      {
+        "description": "should not honour `spread: false` for a paragraph and a definition",
+        "tree": {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "definition",
+              "identifier": "b",
+              "label": "c",
+              "url": "d"
+            }
+          ]
+        },
+        "expected": {
+          "md": "* a\n\n  [c]: d\n"
+        }
+      },
+      {
+        "description": "should honour `spread: false` for a paragraph and a heading",
+        "tree": {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "depth": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* a\n  # b\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown core {\"tightDefinitions\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "tightDefinitions": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support tight adjacent definitions when `tightDefinitions: true`",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "definition",
+              "identifier": "b",
+              "url": ""
+            },
+            {
+              "type": "definition",
+              "identifier": "c",
+              "url": ""
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "d"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "a\n\n[b]: <>\n[c]: <>\n\nd\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown core {\"fences\":false}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "fences": false
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should inject HTML comments between lists and an indented code",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "code",
+              "value": "a"
+            },
+            {
+              "type": "list",
+              "children": [
+                {
+                  "type": "listItem",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "code",
+              "value": "b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "    a\n\n*\n\n<!---->\n\n    b\n"
+        }
+      },
+      {
+        "description": "should inject HTML comments between adjacent indented code",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "code",
+              "value": "a"
+            },
+            {
+              "type": "code",
+              "value": "b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "    a\n\n<!---->\n\n    b\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown core {\"setext\":true}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "setext": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should not honour `spread: false` for a paragraph and a setext heading",
+        "tree": {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "depth": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* a\n\n  b\n  =\n"
+        }
+      }
+    ]
   }
 ]

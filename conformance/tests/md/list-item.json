@@ -7457,5 +7457,884 @@
         }
       }
     ]
+  },
+  {
+    "description": "to-markdown listItem",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.stringify"]],
+    "tests": [
+      {
+        "description": "should support a list item",
+        "tree": {
+          "type": "listItem"
+        },
+        "expected": {
+          "md": "*\n"
+        }
+      },
+      {
+        "description": "should support a list item w/ a child",
+        "tree": {
+          "type": "listItem",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* a\n"
+        }
+      },
+      {
+        "description": "should support a list item w/ children",
+        "tree": {
+          "type": "listItem",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "thematicBreak"
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* a\n\n  ***\n\n  b\n"
+        }
+      },
+      {
+        "description": "should use a blank line between a paragraph and html that cannot interrupt it, in a tight list item",
+        "tree": {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "html",
+              "value": "<b>"
+            }
+          ]
+        },
+        "expected": {
+          "md": "* a\n\n  <b>\n"
+        }
+      },
+      {
+        "description": "should not use a blank line between a paragraph and html that can interrupt it, in a tight list item",
+        "tree": {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "html",
+              "value": "<div>"
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            },
+            {
+              "type": "html",
+              "value": "<!-- c -->"
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "d"
+                }
+              ]
+            },
+            {
+              "type": "html",
+              "value": "<pre>e</pre>"
+            }
+          ]
+        },
+        "expected": {
+          "md": "* a\n  <div>\n\n  b\n  <!-- c -->\n  d\n  <pre>e</pre>\n"
+        }
+      },
+      {
+        "description": "should compare tag names case-insensitively, in a tight list item",
+        "tree": {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "html",
+              "value": "<DIV>"
+            }
+          ]
+        },
+        "expected": {
+          "md": "* a\n  <DIV>\n"
+        }
+      },
+      {
+        "description": "should use a blank line after html that ends at a blank line, in a tight list item",
+        "tree": {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "html",
+              "value": "<b>"
+            },
+            {
+              "type": "html",
+              "value": "<div>"
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* <b>\n\n  <div>\n\n  a\n"
+        }
+      },
+      {
+        "description": "should use a blank line after a closing tag with a raw name (kind 7, not 1), in a tight list item",
+        "tree": {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "html",
+              "value": "</pre>"
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* </pre>\n\n  a\n"
+        }
+      },
+      {
+        "description": "should use a blank line after a self-closing tag with a raw name (kind 7, not 1), in a tight list item",
+        "tree": {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "html",
+              "value": "<pre/>"
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* <pre/>\n\n  a\n"
+        }
+      },
+      {
+        "description": "should not use a blank line after html that ends by itself, in a tight list item",
+        "tree": {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "html",
+              "value": "<!-- a -->"
+            },
+            {
+              "type": "html",
+              "value": "<?b?>"
+            },
+            {
+              "type": "html",
+              "value": "<pre>c</pre>"
+            },
+            {
+              "type": "html",
+              "value": "<!D>"
+            },
+            {
+              "type": "html",
+              "value": "<![CDATA[e]]>"
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "f"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* <!-- a -->\n  <?b?>\n  <pre>c</pre>\n  <!D>\n  <![CDATA[e]]>\n  f\n"
+        }
+      },
+      {
+        "description": "should use blank lines around html of unknown kind, in a tight list item",
+        "tree": {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "html",
+              "value": "<1"
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            },
+            {
+              "type": "html",
+              "value": "<!1"
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "c"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* a\n\n  <1\n\n  b\n\n  <!1\n\n  c\n"
+        }
+      },
+      {
+        "description": "should use a blank line between a paragraph and a list that cannot interrupt it, in a tight list item",
+        "tree": {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "start": 2,
+              "children": [
+                {
+                  "type": "listItem",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* a\n\n  2.\n"
+        }
+      },
+      {
+        "description": "should use a blank line between a definition and what cannot interrupt a paragraph, in a tight list item",
+        "tree": {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "definition",
+              "identifier": "a",
+              "url": "b"
+            },
+            {
+              "type": "html",
+              "value": "<b>"
+            },
+            {
+              "type": "definition",
+              "identifier": "c",
+              "url": "d"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "start": 2,
+              "children": [
+                {
+                  "type": "listItem",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* [a]: b\n\n  <b>\n\n  [c]: d\n\n  2.\n"
+        }
+      },
+      {
+        "description": "should use a blank line between a block quote and a paragraph, in a tight list item",
+        "tree": {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "blockquote",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* > a\n\n  b\n"
+        }
+      },
+      {
+        "description": "should use a blank line between a block quote ending in a definition and a paragraph, in a tight list item",
+        "tree": {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "blockquote",
+              "children": [
+                {
+                  "type": "definition",
+                  "identifier": "a",
+                  "url": "b"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "c"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* > [a]: b\n\n  c\n"
+        }
+      },
+      {
+        "description": "should use a blank line between block quotes, in a tight list item",
+        "tree": {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "blockquote",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "blockquote",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "b"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* > a\n\n  > b\n"
+        }
+      },
+      {
+        "description": "should not use blank lines between child blocks for items w/ `spread: false`",
+        "tree": {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "thematicBreak"
+            }
+          ]
+        },
+        "expected": {
+          "md": "* a\n  ***\n"
+        }
+      },
+      {
+        "description": "should use a different bullet than a thematic rule marker, if the first child of a list item is a thematic break (1)",
+        "tree": {
+          "type": "list",
+          "children": [
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "thematicBreak"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "- ***\n"
+        }
+      },
+      {
+        "description": "should use a different bullet than a thematic rule marker, if the first child of a list item is a thematic break (2)",
+        "tree": {
+          "type": "list",
+          "children": [
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "a"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "children": [
+                {
+                  "type": "thematicBreak"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "- a\n\n- ***\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown listItem {\"bullet\":\"+\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "bullet": "+"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should serialize an item w/ a plus as bullet when `bullet: \"+\"`",
+        "tree": {
+          "type": "listItem",
+          "children": []
+        },
+        "expected": {
+          "md": "+\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown listItem {\"rule\":\"-\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "rule": "-"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should use a blank line between a paragraph and a rule that would underline it, in a tight list item",
+        "tree": {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "thematicBreak"
+            }
+          ]
+        },
+        "expected": {
+          "md": "* a\n\n  ---\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown listItem {\"fences\":false}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "fences": false
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should use a blank line between a paragraph and indented code, in a tight list item",
+        "tree": {
+          "type": "listItem",
+          "spread": false,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "code",
+              "value": "b"
+            }
+          ]
+        },
+        "expected": {
+          "md": "* a\n\n      b\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown listItem {\"listItemIndent\":\"one\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "listItemIndent": "one"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should use one space after the bullet for `listItemIndent: \"one\"`",
+        "tree": {
+          "type": "listItem",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "thematicBreak"
+            }
+          ]
+        },
+        "expected": {
+          "md": "* a\n\n  ***\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown listItem {\"listItemIndent\":\"mixed\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "listItemIndent": "mixed"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should use one space after the bullet for `listItemIndent: \"mixed\"`, when the item is not spread",
+        "tree": {
+          "type": "listItem",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* a\n"
+        }
+      },
+      {
+        "description": "should use a tab stop of spaces after the bullet for `listItemIndent: \"mixed\"`, when the item is spread",
+        "tree": {
+          "type": "listItem",
+          "spread": true,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "thematicBreak"
+            }
+          ]
+        },
+        "expected": {
+          "md": "*   a\n\n    ***\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown listItem {\"bulletOrdered\":\")\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "bulletOrdered": ")"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support `bulletOrdered`",
+        "tree": {
+          "type": "list",
+          "ordered": true,
+          "children": [
+            {
+              "type": "listItem",
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "md": "1)\n"
+        }
+      },
+      {
+        "description": "should use a different bullet for adjacent ordered lists",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "list",
+              "ordered": true,
+              "children": [
+                {
+                  "type": "listItem",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "children": [
+                {
+                  "type": "listItem",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "1)\n\n1.\n"
+        }
+      }
+    ]
   }
 ]

@@ -5,7 +5,8 @@
   "scripts": {
     "import:commonmark": "node sources/commonmark.ts && vp fmt tests",
     "import:from-markdown": "node sources/from-markdown.ts && vp fmt tests",
-    "import:micromark": "node sources/micromark.ts && vp fmt tests"
+    "import:micromark": "node sources/micromark.ts && vp fmt tests",
+    "import:to-markdown": "node sources/to-markdown.ts && vp fmt tests"
   },
   "devDependencies": {
     "acorn": "8.19.0",

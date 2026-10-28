@@ -3627,5 +3627,361 @@
         }
       }
     ]
+  },
+  {
+    "description": "to-markdown definition",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.stringify"]],
+    "tests": [
+      {
+        "description": "should support a definition w/o label",
+        "tree": {
+          "type": "definition"
+        },
+        "expected": {
+          "md": "[]: <>\n"
+        }
+      },
+      {
+        "description": "should support a definition w/ label",
+        "tree": {
+          "type": "definition",
+          "label": "a",
+          "url": ""
+        },
+        "expected": {
+          "md": "[a]: <>\n"
+        }
+      },
+      {
+        "description": "should escape a backslash in `label`",
+        "tree": {
+          "type": "definition",
+          "label": "\\",
+          "url": ""
+        },
+        "expected": {
+          "md": "[\\\\]: <>\n"
+        }
+      },
+      {
+        "description": "should escape an opening bracket in `label`",
+        "tree": {
+          "type": "definition",
+          "label": "[",
+          "url": ""
+        },
+        "expected": {
+          "md": "[\\[]: <>\n"
+        }
+      },
+      {
+        "description": "should escape a closing bracket in `label`",
+        "tree": {
+          "type": "definition",
+          "label": "]",
+          "url": ""
+        },
+        "expected": {
+          "md": "[\\]]: <>\n"
+        }
+      },
+      {
+        "description": "should support a definition w/ identifier",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": ""
+        },
+        "expected": {
+          "md": "[a]: <>\n"
+        }
+      },
+      {
+        "description": "should escape a backslash in `identifier`",
+        "tree": {
+          "type": "definition",
+          "identifier": "\\",
+          "url": ""
+        },
+        "expected": {
+          "md": "[\\\\]: <>\n"
+        }
+      },
+      {
+        "description": "should escape an opening bracket in `identifier`",
+        "tree": {
+          "type": "definition",
+          "identifier": "[",
+          "url": ""
+        },
+        "expected": {
+          "md": "[\\[]: <>\n"
+        }
+      },
+      {
+        "description": "should escape a closing bracket in `identifier`",
+        "tree": {
+          "type": "definition",
+          "identifier": "]",
+          "url": ""
+        },
+        "expected": {
+          "md": "[\\]]: <>\n"
+        }
+      },
+      {
+        "description": "should support a definition w/ url",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": "b"
+        },
+        "expected": {
+          "md": "[a]: b\n"
+        }
+      },
+      {
+        "description": "should support a definition w/ enclosed url w/ whitespace in url",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": "b c"
+        },
+        "expected": {
+          "md": "[a]: <b c>\n"
+        }
+      },
+      {
+        "description": "should escape an opening angle bracket in `url` in an enclosed url",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": "b <c"
+        },
+        "expected": {
+          "md": "[a]: <b \\<c>\n"
+        }
+      },
+      {
+        "description": "should escape a closing angle bracket in `url` in an enclosed url",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": "b >c"
+        },
+        "expected": {
+          "md": "[a]: <b \\>c>\n"
+        }
+      },
+      {
+        "description": "should escape a backslash in `url` in an enclosed url",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": "b \\.c"
+        },
+        "expected": {
+          "md": "[a]: <b \\\\.c>\n"
+        }
+      },
+      {
+        "description": "should escape an ampersand in `url` in an enclosed url",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": "b &amp;"
+        },
+        "expected": {
+          "md": "[a]: <b \\&amp;>\n"
+        }
+      },
+      {
+        "description": "should encode a line ending in `url` in an enclosed url",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": "b\nc"
+        },
+        "expected": {
+          "md": "[a]: <b&#xA;c>\n"
+        }
+      },
+      {
+        "description": "should encode a line ending in `url` in an enclosed url (2)",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": "\f"
+        },
+        "expected": {
+          "md": "[a]: <\f>\n"
+        }
+      },
+      {
+        "description": "should escape an opening paren in `url` in a raw url",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": "b(c"
+        },
+        "expected": {
+          "md": "[a]: b\\(c\n"
+        }
+      },
+      {
+        "description": "should escape a closing paren in `url` in a raw url",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": "b)c"
+        },
+        "expected": {
+          "md": "[a]: b\\)c\n"
+        }
+      },
+      {
+        "description": "should escape a backslash in `url` in a raw url",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": "b\\?c"
+        },
+        "expected": {
+          "md": "[a]: b\\\\?c\n"
+        }
+      },
+      {
+        "description": "should escape an ampersand in `url` in a raw url",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": "&amp;"
+        },
+        "expected": {
+          "md": "[a]: \\&amp;\n"
+        }
+      },
+      {
+        "description": "should support a definition w/ title",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": "",
+          "title": "b"
+        },
+        "expected": {
+          "md": "[a]: <> \"b\"\n"
+        }
+      },
+      {
+        "description": "should support a definition w/ url & title",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": "b",
+          "title": "c"
+        },
+        "expected": {
+          "md": "[a]: b \"c\"\n"
+        }
+      },
+      {
+        "description": "should escape a quote in `title` in a title",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": "",
+          "title": "\""
+        },
+        "expected": {
+          "md": "[a]: <> \"\\\"\"\n"
+        }
+      },
+      {
+        "description": "should escape a backslash in `title` in a title",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": "",
+          "title": "\\"
+        },
+        "expected": {
+          "md": "[a]: <> \"\\\\\"\n"
+        }
+      },
+      {
+        "description": "should escape an ampersand in `title` in a title",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": "",
+          "title": "&amp;"
+        },
+        "expected": {
+          "md": "[a]: <> \"\\&amp;\"\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown definition {\"quote\":\"'\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "quote": "'"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support a definition w/ title when `quote: \"'\"`",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": "",
+          "title": "b"
+        },
+        "expected": {
+          "md": "[a]: <> 'b'\n"
+        }
+      },
+      {
+        "description": "should escape a quote in `title` in a title when `quote: \"'\"`",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": "",
+          "title": "'"
+        },
+        "expected": {
+          "md": "[a]: <> '\\''\n"
+        }
+      },
+      {
+        "description": "should escape an ampersand in `title` in a title when `quote: \"'\"`",
+        "tree": {
+          "type": "definition",
+          "identifier": "a",
+          "url": "",
+          "title": "&amp;"
+        },
+        "expected": {
+          "md": "[a]: <> '\\&amp;'\n"
+        }
+      }
+    ]
   }
 ]
