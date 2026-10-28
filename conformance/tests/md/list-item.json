@@ -6766,6 +6766,355 @@
     ]
   },
   {
+    "description": "List items (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#list-items"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 253",
+        "input": "A paragraph\nwith two lines.\n\n    indented code\n\n> A block quote.\n",
+        "expected": {
+          "md": "A paragraph\nwith two lines.\n\n```\nindented code\n```\n\n> A block quote.\n"
+        }
+      },
+      {
+        "description": "example 254",
+        "input": "1.  A paragraph\n    with two lines.\n\n        indented code\n\n    > A block quote.\n",
+        "expected": {
+          "md": "1. A paragraph\n   with two lines.\n\n   ```\n   indented code\n   ```\n\n   > A block quote.\n"
+        }
+      },
+      {
+        "description": "example 255",
+        "input": "- one\n\n two\n",
+        "expected": {
+          "md": "* one\n\ntwo\n"
+        }
+      },
+      {
+        "description": "example 256",
+        "input": "- one\n\n  two\n",
+        "expected": {
+          "md": "* one\n\n  two\n"
+        }
+      },
+      {
+        "description": "example 257",
+        "input": " -    one\n\n     two\n",
+        "expected": {
+          "md": "* one\n\n```\n two\n```\n"
+        }
+      },
+      {
+        "description": "example 258",
+        "input": " -    one\n\n      two\n",
+        "expected": {
+          "md": "* one\n\n  two\n"
+        }
+      },
+      {
+        "description": "example 259",
+        "input": "   > > 1.  one\n>>\n>>     two\n",
+        "expected": {
+          "md": "> > 1. one\n> >\n> >    two\n"
+        }
+      },
+      {
+        "description": "example 260",
+        "input": ">>- one\n>>\n  >  > two\n",
+        "expected": {
+          "md": "> > * one\n> >\n> > two\n"
+        }
+      },
+      {
+        "description": "example 261",
+        "input": "-one\n\n2.two\n",
+        "expected": {
+          "md": "-one\n\n2.two\n"
+        }
+      },
+      {
+        "description": "example 262",
+        "input": "- foo\n\n\n  bar\n",
+        "expected": {
+          "md": "* foo\n\n  bar\n"
+        }
+      },
+      {
+        "description": "example 263",
+        "input": "1.  foo\n\n    ```\n    bar\n    ```\n\n    baz\n\n    > bam\n",
+        "expected": {
+          "md": "1. foo\n\n   ```\n   bar\n   ```\n\n   baz\n\n   > bam\n"
+        }
+      },
+      {
+        "description": "example 264",
+        "input": "- Foo\n\n      bar\n\n\n      baz\n",
+        "expected": {
+          "md": "* Foo\n\n  ```\n  bar\n\n\n  baz\n  ```\n"
+        }
+      },
+      {
+        "description": "example 265",
+        "input": "123456789. ok\n",
+        "expected": {
+          "md": "123456789. ok\n"
+        }
+      },
+      {
+        "description": "example 266",
+        "input": "1234567890. not ok\n",
+        "expected": {
+          "md": "1234567890\\. not ok\n"
+        }
+      },
+      {
+        "description": "example 267",
+        "input": "0. ok\n",
+        "expected": {
+          "md": "0. ok\n"
+        }
+      },
+      {
+        "description": "example 268",
+        "input": "003. ok\n",
+        "expected": {
+          "md": "3. ok\n"
+        }
+      },
+      {
+        "description": "example 269",
+        "input": "-1. not ok\n",
+        "expected": {
+          "md": "-1. not ok\n"
+        }
+      },
+      {
+        "description": "example 270",
+        "input": "- foo\n\n      bar\n",
+        "expected": {
+          "md": "* foo\n\n  ```\n  bar\n  ```\n"
+        }
+      },
+      {
+        "description": "example 271",
+        "input": "  10.  foo\n\n           bar\n",
+        "expected": {
+          "md": "10. foo\n\n    ```\n    bar\n    ```\n"
+        }
+      },
+      {
+        "description": "example 272",
+        "input": "    indented code\n\nparagraph\n\n    more code\n",
+        "expected": {
+          "md": "```\nindented code\n```\n\nparagraph\n\n```\nmore code\n```\n"
+        }
+      },
+      {
+        "description": "example 273",
+        "input": "1.     indented code\n\n   paragraph\n\n       more code\n",
+        "expected": {
+          "md": "1. ```\n   indented code\n   ```\n\n   paragraph\n\n   ```\n   more code\n   ```\n"
+        }
+      },
+      {
+        "description": "example 274",
+        "input": "1.      indented code\n\n   paragraph\n\n       more code\n",
+        "expected": {
+          "md": "1. ```\n    indented code\n   ```\n\n   paragraph\n\n   ```\n   more code\n   ```\n"
+        }
+      },
+      {
+        "description": "example 275",
+        "input": "   foo\n\nbar\n",
+        "expected": {
+          "md": "foo\n\nbar\n"
+        }
+      },
+      {
+        "description": "example 276",
+        "input": "-    foo\n\n  bar\n",
+        "expected": {
+          "md": "* foo\n\nbar\n"
+        }
+      },
+      {
+        "description": "example 277",
+        "input": "-  foo\n\n   bar\n",
+        "expected": {
+          "md": "* foo\n\n  bar\n"
+        }
+      },
+      {
+        "description": "example 278",
+        "input": "-\n  foo\n-\n  ```\n  bar\n  ```\n-\n      baz\n",
+        "expected": {
+          "md": "* foo\n* ```\n  bar\n  ```\n* ```\n  baz\n  ```\n"
+        }
+      },
+      {
+        "description": "example 279",
+        "input": "-   \n  foo\n",
+        "expected": {
+          "md": "* foo\n"
+        }
+      },
+      {
+        "description": "example 280",
+        "input": "-\n\n  foo\n",
+        "expected": {
+          "md": "*\n\nfoo\n"
+        }
+      },
+      {
+        "description": "example 281",
+        "input": "- foo\n-\n- bar\n",
+        "expected": {
+          "md": "* foo\n*\n* bar\n"
+        }
+      },
+      {
+        "description": "example 282",
+        "input": "- foo\n-   \n- bar\n",
+        "expected": {
+          "md": "* foo\n*\n* bar\n"
+        }
+      },
+      {
+        "description": "example 283",
+        "input": "1. foo\n2.\n3. bar\n",
+        "expected": {
+          "md": "1. foo\n2.\n3. bar\n"
+        }
+      },
+      {
+        "description": "example 284",
+        "input": "*\n",
+        "expected": {
+          "md": "*\n"
+        }
+      },
+      {
+        "description": "example 285",
+        "input": "foo\n*\n\nfoo\n1.\n",
+        "expected": {
+          "md": "foo\n\\*\n\nfoo\n1\\.\n"
+        }
+      },
+      {
+        "description": "example 286",
+        "input": " 1.  A paragraph\n     with two lines.\n\n         indented code\n\n     > A block quote.\n",
+        "expected": {
+          "md": "1. A paragraph\n   with two lines.\n\n   ```\n   indented code\n   ```\n\n   > A block quote.\n"
+        }
+      },
+      {
+        "description": "example 287",
+        "input": "  1.  A paragraph\n      with two lines.\n\n          indented code\n\n      > A block quote.\n",
+        "expected": {
+          "md": "1. A paragraph\n   with two lines.\n\n   ```\n   indented code\n   ```\n\n   > A block quote.\n"
+        }
+      },
+      {
+        "description": "example 288",
+        "input": "   1.  A paragraph\n       with two lines.\n\n           indented code\n\n       > A block quote.\n",
+        "expected": {
+          "md": "1. A paragraph\n   with two lines.\n\n   ```\n   indented code\n   ```\n\n   > A block quote.\n"
+        }
+      },
+      {
+        "description": "example 289",
+        "input": "    1.  A paragraph\n        with two lines.\n\n            indented code\n\n        > A block quote.\n",
+        "expected": {
+          "md": "```\n1.  A paragraph\n    with two lines.\n\n        indented code\n\n    > A block quote.\n```\n"
+        }
+      },
+      {
+        "description": "example 290",
+        "input": "  1.  A paragraph\nwith two lines.\n\n          indented code\n\n      > A block quote.\n",
+        "expected": {
+          "md": "1. A paragraph\n   with two lines.\n\n   ```\n   indented code\n   ```\n\n   > A block quote.\n"
+        }
+      },
+      {
+        "description": "example 291",
+        "input": "  1.  A paragraph\n    with two lines.\n",
+        "expected": {
+          "md": "1. A paragraph\n   with two lines.\n"
+        }
+      },
+      {
+        "description": "example 292",
+        "input": "> 1. > Blockquote\ncontinued here.\n",
+        "expected": {
+          "md": "> 1. > Blockquote\n>    > continued here.\n"
+        }
+      },
+      {
+        "description": "example 293",
+        "input": "> 1. > Blockquote\n> continued here.\n",
+        "expected": {
+          "md": "> 1. > Blockquote\n>    > continued here.\n"
+        }
+      },
+      {
+        "description": "example 294",
+        "input": "- foo\n  - bar\n    - baz\n      - boo\n",
+        "expected": {
+          "md": "* foo\n  * bar\n    * baz\n      * boo\n"
+        }
+      },
+      {
+        "description": "example 295",
+        "input": "- foo\n - bar\n  - baz\n   - boo\n",
+        "expected": {
+          "md": "* foo\n* bar\n* baz\n* boo\n"
+        }
+      },
+      {
+        "description": "example 296",
+        "input": "10) foo\n    - bar\n",
+        "expected": {
+          "md": "10. foo\n    * bar\n"
+        }
+      },
+      {
+        "description": "example 297",
+        "input": "10) foo\n   - bar\n",
+        "expected": {
+          "md": "10. foo\n\n* bar\n"
+        }
+      },
+      {
+        "description": "example 298",
+        "input": "- - foo\n",
+        "expected": {
+          "md": "* * foo\n"
+        }
+      },
+      {
+        "description": "example 299",
+        "input": "1. - 2. foo\n",
+        "expected": {
+          "md": "1. * 2. foo\n"
+        }
+      },
+      {
+        "description": "example 300",
+        "input": "- # Foo\n- Bar\n  ---\n  baz\n",
+        "expected": {
+          "md": "* # Foo\n* ## Bar\n  baz\n"
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark document/list-item",
     "source": {
       "repository": "https://github.com/micromark/micromark",

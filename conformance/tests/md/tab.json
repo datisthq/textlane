@@ -994,6 +994,96 @@
     ]
   },
   {
+    "description": "Tabs (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#tabs"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 1",
+        "input": "\tfoo\tbaz\t\tbim\n",
+        "expected": {
+          "md": "```\nfoo\tbaz\t\tbim\n```\n"
+        }
+      },
+      {
+        "description": "example 2",
+        "input": "  \tfoo\tbaz\t\tbim\n",
+        "expected": {
+          "md": "```\nfoo\tbaz\t\tbim\n```\n"
+        }
+      },
+      {
+        "description": "example 3",
+        "input": "    a\ta\n    ὐ\ta\n",
+        "expected": {
+          "md": "```\na\ta\nὐ\ta\n```\n"
+        }
+      },
+      {
+        "description": "example 4",
+        "input": "  - foo\n\n\tbar\n",
+        "expected": {
+          "md": "* foo\n\n  bar\n"
+        }
+      },
+      {
+        "description": "example 5",
+        "input": "- foo\n\n\t\tbar\n",
+        "expected": {
+          "md": "* foo\n\n  ```\n    bar\n  ```\n"
+        }
+      },
+      {
+        "description": "example 6",
+        "input": ">\t\tfoo\n",
+        "expected": {
+          "md": "> ```\n>   foo\n> ```\n"
+        }
+      },
+      {
+        "description": "example 7",
+        "input": "-\t\tfoo\n",
+        "expected": {
+          "md": "* ```\n    foo\n  ```\n"
+        }
+      },
+      {
+        "description": "example 8",
+        "input": "    foo\n\tbar\n",
+        "expected": {
+          "md": "```\nfoo\nbar\n```\n"
+        }
+      },
+      {
+        "description": "example 9",
+        "input": " - foo\n   - bar\n\t - baz\n",
+        "expected": {
+          "md": "* foo\n  * bar\n    * baz\n"
+        }
+      },
+      {
+        "description": "example 10",
+        "input": "#\tFoo\n",
+        "expected": {
+          "md": "# Foo\n"
+        }
+      },
+      {
+        "description": "example 11",
+        "input": "*\t*\t*\t\n",
+        "expected": {
+          "md": "***\n"
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark misc/tab",
     "source": {
       "repository": "https://github.com/micromark/micromark",

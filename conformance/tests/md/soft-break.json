@@ -166,6 +166,33 @@
     ]
   },
   {
+    "description": "Soft line breaks (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#soft-line-breaks"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 648",
+        "input": "foo\nbaz\n",
+        "expected": {
+          "md": "foo\nbaz\n"
+        }
+      },
+      {
+        "description": "example 649",
+        "input": "foo \n baz\n",
+        "expected": {
+          "md": "foo\nbaz\n"
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark text/soft-break",
     "source": {
       "repository": "https://github.com/micromark/micromark",

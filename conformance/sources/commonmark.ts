@@ -6,6 +6,7 @@ import {
   createPipeline,
   parseMarkdown,
   renderMarkdown,
+  stringifyTree,
 } from "../actions/markdown/render.ts"
 
 const SPEC_VERSION = "0.31.2"
@@ -72,8 +73,14 @@ function writeSections() {
       pipeline: [["md.parse"]],
       tests: examples.map(example => createTreeTest(example)),
     }
+    const roundTrip = {
+      description: `${section} (round trip)`,
+      ...shared,
+      pipeline: [["md.parse"], ["md.stringify"]],
+      tests: examples.map(example => createRoundTripTest(example)),
+    }
     const path = join(OUTPUT, `${construct}.json`)
-    writeGroups({ path, repository: REPOSITORY, groups: [html, tree] })
+    writeGroups({ path, repository: REPOSITORY, groups: [html, tree, roundTrip] })
   }
 }
 
@@ -108,5 +115,14 @@ function createTreeTest(example: Example) {
     description: `example ${example.number}`,
     input: example.markdown,
     expected: { tree: parseMarkdown(example.markdown) },
+  }
+}
+
+// The serializer over every spec construct, as parsed: what the pinned remark-stringify writes
+function createRoundTripTest(example: Example) {
+  return {
+    description: `example ${example.number}`,
+    input: example.markdown,
+    expected: { md: stringifyTree({ tree: parseMarkdown(example.markdown) }) },
   }
 }

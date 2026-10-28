@@ -1446,6 +1446,152 @@
     ]
   },
   {
+    "description": "Autolinks (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#autolinks"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 594",
+        "input": "<http://foo.bar.baz>\n",
+        "expected": {
+          "md": "<http://foo.bar.baz>\n"
+        }
+      },
+      {
+        "description": "example 595",
+        "input": "<https://foo.bar.baz/test?q=hello&id=22&boolean>\n",
+        "expected": {
+          "md": "<https://foo.bar.baz/test?q=hello&id=22&boolean>\n"
+        }
+      },
+      {
+        "description": "example 596",
+        "input": "<irc://foo.bar:2233/baz>\n",
+        "expected": {
+          "md": "<irc://foo.bar:2233/baz>\n"
+        }
+      },
+      {
+        "description": "example 597",
+        "input": "<MAILTO:FOO@BAR.BAZ>\n",
+        "expected": {
+          "md": "<MAILTO:FOO@BAR.BAZ>\n"
+        }
+      },
+      {
+        "description": "example 598",
+        "input": "<a+b+c:d>\n",
+        "expected": {
+          "md": "<a+b+c:d>\n"
+        }
+      },
+      {
+        "description": "example 599",
+        "input": "<made-up-scheme://foo,bar>\n",
+        "expected": {
+          "md": "<made-up-scheme://foo,bar>\n"
+        }
+      },
+      {
+        "description": "example 600",
+        "input": "<https://../>\n",
+        "expected": {
+          "md": "<https://../>\n"
+        }
+      },
+      {
+        "description": "example 601",
+        "input": "<localhost:5001/foo>\n",
+        "expected": {
+          "md": "<localhost:5001/foo>\n"
+        }
+      },
+      {
+        "description": "example 602",
+        "input": "<https://foo.bar/baz bim>\n",
+        "expected": {
+          "md": "\\<https://foo.bar/baz bim>\n"
+        }
+      },
+      {
+        "description": "example 603",
+        "input": "<https://example.com/\\[\\>\n",
+        "expected": {
+          "md": "<https://example.com/\\[\\>\n"
+        }
+      },
+      {
+        "description": "example 604",
+        "input": "<foo@bar.example.com>\n",
+        "expected": {
+          "md": "<foo@bar.example.com>\n"
+        }
+      },
+      {
+        "description": "example 605",
+        "input": "<foo+special@Bar.baz-bar0.com>\n",
+        "expected": {
+          "md": "<foo+special@Bar.baz-bar0.com>\n"
+        }
+      },
+      {
+        "description": "example 606",
+        "input": "<foo\\+@bar.example.com>\n",
+        "expected": {
+          "md": "\\<foo+@bar.example.com>\n"
+        }
+      },
+      {
+        "description": "example 607",
+        "input": "<>\n",
+        "expected": {
+          "md": "<>\n"
+        }
+      },
+      {
+        "description": "example 608",
+        "input": "< https://foo.bar >\n",
+        "expected": {
+          "md": "< https://foo.bar >\n"
+        }
+      },
+      {
+        "description": "example 609",
+        "input": "<m:abc>\n",
+        "expected": {
+          "md": "\\<m:abc>\n"
+        }
+      },
+      {
+        "description": "example 610",
+        "input": "<foo.bar.baz>\n",
+        "expected": {
+          "md": "\\<foo.bar.baz>\n"
+        }
+      },
+      {
+        "description": "example 611",
+        "input": "https://example.com\n",
+        "expected": {
+          "md": "https://example.com\n"
+        }
+      },
+      {
+        "description": "example 612",
+        "input": "foo@bar.example.com\n",
+        "expected": {
+          "md": "foo@bar.example.com\n"
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark text/autolink",
     "source": {
       "repository": "https://github.com/micromark/micromark",

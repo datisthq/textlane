@@ -692,6 +692,75 @@
     ]
   },
   {
+    "description": "Paragraphs (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#paragraphs"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 219",
+        "input": "aaa\n\nbbb\n",
+        "expected": {
+          "md": "aaa\n\nbbb\n"
+        }
+      },
+      {
+        "description": "example 220",
+        "input": "aaa\nbbb\n\nccc\nddd\n",
+        "expected": {
+          "md": "aaa\nbbb\n\nccc\nddd\n"
+        }
+      },
+      {
+        "description": "example 221",
+        "input": "aaa\n\n\nbbb\n",
+        "expected": {
+          "md": "aaa\n\nbbb\n"
+        }
+      },
+      {
+        "description": "example 222",
+        "input": "  aaa\n bbb\n",
+        "expected": {
+          "md": "aaa\nbbb\n"
+        }
+      },
+      {
+        "description": "example 223",
+        "input": "aaa\n             bbb\n                                       ccc\n",
+        "expected": {
+          "md": "aaa\nbbb\nccc\n"
+        }
+      },
+      {
+        "description": "example 224",
+        "input": "   aaa\nbbb\n",
+        "expected": {
+          "md": "aaa\nbbb\n"
+        }
+      },
+      {
+        "description": "example 225",
+        "input": "    aaa\nbbb\n",
+        "expected": {
+          "md": "```\naaa\n```\n\nbbb\n"
+        }
+      },
+      {
+        "description": "example 226",
+        "input": "aaa     \nbbb     \n",
+        "expected": {
+          "md": "aaa\\\nbbb\n"
+        }
+      }
+    ]
+  },
+  {
     "description": "from-markdown",
     "source": {
       "repository": "https://github.com/syntax-tree/mdast-util-from-markdown",

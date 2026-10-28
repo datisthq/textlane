@@ -1231,6 +1231,140 @@
     ]
   },
   {
+    "description": "Entity and numeric character references (round trip)",
+    "specification": [
+      "https://spec.commonmark.org/0.31.2/#entity-and-numeric-character-references"
+    ],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 25",
+        "input": "&nbsp; &amp; &copy; &AElig; &Dcaron;\n&frac34; &HilbertSpace; &DifferentialD;\n&ClockwiseContourIntegral; &ngE;\n",
+        "expected": {
+          "md": "  & © Æ Ď\n¾ ℋ ⅆ\n∲ ≧̸\n"
+        }
+      },
+      {
+        "description": "example 26",
+        "input": "&#35; &#1234; &#992; &#0;\n",
+        "expected": {
+          "md": "\\# Ӓ Ϡ �\n"
+        }
+      },
+      {
+        "description": "example 27",
+        "input": "&#X22; &#XD06; &#xcab;\n",
+        "expected": {
+          "md": "\" ആ ಫ\n"
+        }
+      },
+      {
+        "description": "example 28",
+        "input": "&nbsp &x; &#; &#x;\n&#87654321;\n&#abcdef0;\n&ThisIsNotDefined; &hi?;\n",
+        "expected": {
+          "md": "\\&nbsp \\&x; \\&#; \\&#x;\n\\&#87654321;\n\\&#abcdef0;\n\\&ThisIsNotDefined; \\&hi?;\n"
+        }
+      },
+      {
+        "description": "example 29",
+        "input": "&copy\n",
+        "expected": {
+          "md": "\\&copy\n"
+        }
+      },
+      {
+        "description": "example 30",
+        "input": "&MadeUpEntity;\n",
+        "expected": {
+          "md": "\\&MadeUpEntity;\n"
+        }
+      },
+      {
+        "description": "example 31",
+        "input": "<a href=\"&ouml;&ouml;.html\">\n",
+        "expected": {
+          "md": "<a href=\"&ouml;&ouml;.html\">\n"
+        }
+      },
+      {
+        "description": "example 32",
+        "input": "[foo](/f&ouml;&ouml; \"f&ouml;&ouml;\")\n",
+        "expected": {
+          "md": "[foo](/föö \"föö\")\n"
+        }
+      },
+      {
+        "description": "example 33",
+        "input": "[foo]\n\n[foo]: /f&ouml;&ouml; \"f&ouml;&ouml;\"\n",
+        "expected": {
+          "md": "[foo]\n\n[foo]: /föö \"föö\"\n"
+        }
+      },
+      {
+        "description": "example 34",
+        "input": "``` f&ouml;&ouml;\nfoo\n```\n",
+        "expected": {
+          "md": "```föö\nfoo\n```\n"
+        }
+      },
+      {
+        "description": "example 35",
+        "input": "`f&ouml;&ouml;`\n",
+        "expected": {
+          "md": "`f&ouml;&ouml;`\n"
+        }
+      },
+      {
+        "description": "example 36",
+        "input": "    f&ouml;f&ouml;\n",
+        "expected": {
+          "md": "```\nf&ouml;f&ouml;\n```\n"
+        }
+      },
+      {
+        "description": "example 37",
+        "input": "&#42;foo&#42;\n*foo*\n",
+        "expected": {
+          "md": "\\*foo\\*\n*foo*\n"
+        }
+      },
+      {
+        "description": "example 38",
+        "input": "&#42; foo\n\n* foo\n",
+        "expected": {
+          "md": "\\* foo\n\n* foo\n"
+        }
+      },
+      {
+        "description": "example 39",
+        "input": "foo&#10;&#10;bar\n",
+        "expected": {
+          "md": "foo&#xA;&#xA;bar\n"
+        }
+      },
+      {
+        "description": "example 40",
+        "input": "&#9;foo\n",
+        "expected": {
+          "md": "&#x9;foo\n"
+        }
+      },
+      {
+        "description": "example 41",
+        "input": "[a](url &quot;tit&quot;)\n",
+        "expected": {
+          "md": "\\[a]\\(url \"tit\")\n"
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark text/character-reference",
     "source": {
       "repository": "https://github.com/micromark/micromark",

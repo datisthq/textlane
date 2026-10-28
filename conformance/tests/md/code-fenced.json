@@ -1693,6 +1693,222 @@
     ]
   },
   {
+    "description": "Fenced code blocks (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#fenced-code-blocks"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 119",
+        "input": "```\n<\n >\n```\n",
+        "expected": {
+          "md": "```\n<\n >\n```\n"
+        }
+      },
+      {
+        "description": "example 120",
+        "input": "~~~\n<\n >\n~~~\n",
+        "expected": {
+          "md": "```\n<\n >\n```\n"
+        }
+      },
+      {
+        "description": "example 121",
+        "input": "``\nfoo\n``\n",
+        "expected": {
+          "md": "`foo`\n"
+        }
+      },
+      {
+        "description": "example 122",
+        "input": "```\naaa\n~~~\n```\n",
+        "expected": {
+          "md": "```\naaa\n~~~\n```\n"
+        }
+      },
+      {
+        "description": "example 123",
+        "input": "~~~\naaa\n```\n~~~\n",
+        "expected": {
+          "md": "````\naaa\n```\n````\n"
+        }
+      },
+      {
+        "description": "example 124",
+        "input": "````\naaa\n```\n``````\n",
+        "expected": {
+          "md": "````\naaa\n```\n````\n"
+        }
+      },
+      {
+        "description": "example 125",
+        "input": "~~~~\naaa\n~~~\n~~~~\n",
+        "expected": {
+          "md": "```\naaa\n~~~\n```\n"
+        }
+      },
+      {
+        "description": "example 126",
+        "input": "```\n",
+        "expected": {
+          "md": "```\n```\n"
+        }
+      },
+      {
+        "description": "example 127",
+        "input": "`````\n\n```\naaa\n",
+        "expected": {
+          "md": "````\n\n```\naaa\n````\n"
+        }
+      },
+      {
+        "description": "example 128",
+        "input": "> ```\n> aaa\n\nbbb\n",
+        "expected": {
+          "md": "> ```\n> aaa\n> ```\n\nbbb\n"
+        }
+      },
+      {
+        "description": "example 129",
+        "input": "```\n\n  \n```\n",
+        "expected": {
+          "md": "```\n\n  \n```\n"
+        }
+      },
+      {
+        "description": "example 130",
+        "input": "```\n```\n",
+        "expected": {
+          "md": "```\n```\n"
+        }
+      },
+      {
+        "description": "example 131",
+        "input": " ```\n aaa\naaa\n```\n",
+        "expected": {
+          "md": "```\naaa\naaa\n```\n"
+        }
+      },
+      {
+        "description": "example 132",
+        "input": "  ```\naaa\n  aaa\naaa\n  ```\n",
+        "expected": {
+          "md": "```\naaa\naaa\naaa\n```\n"
+        }
+      },
+      {
+        "description": "example 133",
+        "input": "   ```\n   aaa\n    aaa\n  aaa\n   ```\n",
+        "expected": {
+          "md": "```\naaa\n aaa\naaa\n```\n"
+        }
+      },
+      {
+        "description": "example 134",
+        "input": "    ```\n    aaa\n    ```\n",
+        "expected": {
+          "md": "````\n```\naaa\n```\n````\n"
+        }
+      },
+      {
+        "description": "example 135",
+        "input": "```\naaa\n  ```\n",
+        "expected": {
+          "md": "```\naaa\n```\n"
+        }
+      },
+      {
+        "description": "example 136",
+        "input": "   ```\naaa\n  ```\n",
+        "expected": {
+          "md": "```\naaa\n```\n"
+        }
+      },
+      {
+        "description": "example 137",
+        "input": "```\naaa\n    ```\n",
+        "expected": {
+          "md": "````\naaa\n    ```\n````\n"
+        }
+      },
+      {
+        "description": "example 138",
+        "input": "``` ```\naaa\n",
+        "expected": {
+          "md": "` `\naaa\n"
+        }
+      },
+      {
+        "description": "example 139",
+        "input": "~~~~~~\naaa\n~~~ ~~\n",
+        "expected": {
+          "md": "```\naaa\n~~~ ~~\n```\n"
+        }
+      },
+      {
+        "description": "example 140",
+        "input": "foo\n```\nbar\n```\nbaz\n",
+        "expected": {
+          "md": "foo\n\n```\nbar\n```\n\nbaz\n"
+        }
+      },
+      {
+        "description": "example 141",
+        "input": "foo\n---\n~~~\nbar\n~~~\n# baz\n",
+        "expected": {
+          "md": "## foo\n\n```\nbar\n```\n\n# baz\n"
+        }
+      },
+      {
+        "description": "example 142",
+        "input": "```ruby\ndef foo(x)\n  return 3\nend\n```\n",
+        "expected": {
+          "md": "```ruby\ndef foo(x)\n  return 3\nend\n```\n"
+        }
+      },
+      {
+        "description": "example 143",
+        "input": "~~~~    ruby startline=3 $%@#$\ndef foo(x)\n  return 3\nend\n~~~~~~~\n",
+        "expected": {
+          "md": "```ruby startline=3 $%@#$\ndef foo(x)\n  return 3\nend\n```\n"
+        }
+      },
+      {
+        "description": "example 144",
+        "input": "````;\n````\n",
+        "expected": {
+          "md": "```;\n```\n"
+        }
+      },
+      {
+        "description": "example 145",
+        "input": "``` aa ```\nfoo\n",
+        "expected": {
+          "md": "`aa`\nfoo\n"
+        }
+      },
+      {
+        "description": "example 146",
+        "input": "~~~ aa ``` ~~~\nfoo\n~~~\n",
+        "expected": {
+          "md": "```aa &#x60;&#x60;&#x60; ~~~\nfoo\n```\n"
+        }
+      },
+      {
+        "description": "example 147",
+        "input": "```\n``` aaa\n```\n",
+        "expected": {
+          "md": "````\n``` aaa\n````\n"
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark flow/code-fenced",
     "source": {
       "repository": "https://github.com/micromark/micromark",

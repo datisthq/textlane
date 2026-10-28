@@ -1646,6 +1646,152 @@
     ]
   },
   {
+    "description": "Thematic breaks (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#thematic-breaks"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 43",
+        "input": "***\n---\n___\n",
+        "expected": {
+          "md": "***\n\n***\n\n***\n"
+        }
+      },
+      {
+        "description": "example 44",
+        "input": "+++\n",
+        "expected": {
+          "md": "+++\n"
+        }
+      },
+      {
+        "description": "example 45",
+        "input": "===\n",
+        "expected": {
+          "md": "\\===\n"
+        }
+      },
+      {
+        "description": "example 46",
+        "input": "--\n**\n__\n",
+        "expected": {
+          "md": "\\--\n\\*\\*\n\\_\\_\n"
+        }
+      },
+      {
+        "description": "example 47",
+        "input": " ***\n  ***\n   ***\n",
+        "expected": {
+          "md": "***\n\n***\n\n***\n"
+        }
+      },
+      {
+        "description": "example 48",
+        "input": "    ***\n",
+        "expected": {
+          "md": "```\n***\n```\n"
+        }
+      },
+      {
+        "description": "example 49",
+        "input": "Foo\n    ***\n",
+        "expected": {
+          "md": "Foo\n\\*\\*\\*\n"
+        }
+      },
+      {
+        "description": "example 50",
+        "input": "_____________________________________\n",
+        "expected": {
+          "md": "***\n"
+        }
+      },
+      {
+        "description": "example 51",
+        "input": " - - -\n",
+        "expected": {
+          "md": "***\n"
+        }
+      },
+      {
+        "description": "example 52",
+        "input": " **  * ** * ** * **\n",
+        "expected": {
+          "md": "***\n"
+        }
+      },
+      {
+        "description": "example 53",
+        "input": "-     -      -      -\n",
+        "expected": {
+          "md": "***\n"
+        }
+      },
+      {
+        "description": "example 54",
+        "input": "- - - -    \n",
+        "expected": {
+          "md": "***\n"
+        }
+      },
+      {
+        "description": "example 55",
+        "input": "_ _ _ _ a\n\na------\n\n---a---\n",
+        "expected": {
+          "md": "\\_ \\_ \\_ \\_ a\n\na------\n\n\\---a---\n"
+        }
+      },
+      {
+        "description": "example 56",
+        "input": " *-*\n",
+        "expected": {
+          "md": "*-*\n"
+        }
+      },
+      {
+        "description": "example 57",
+        "input": "- foo\n***\n- bar\n",
+        "expected": {
+          "md": "* foo\n\n***\n\n* bar\n"
+        }
+      },
+      {
+        "description": "example 58",
+        "input": "Foo\n***\nbar\n",
+        "expected": {
+          "md": "Foo\n\n***\n\nbar\n"
+        }
+      },
+      {
+        "description": "example 59",
+        "input": "Foo\n---\nbar\n",
+        "expected": {
+          "md": "## Foo\n\nbar\n"
+        }
+      },
+      {
+        "description": "example 60",
+        "input": "* Foo\n* * *\n* Bar\n",
+        "expected": {
+          "md": "* Foo\n\n***\n\n* Bar\n"
+        }
+      },
+      {
+        "description": "example 61",
+        "input": "- Foo\n- * * *\n",
+        "expected": {
+          "md": "- Foo\n- ***\n"
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark flow/thematic-break",
     "source": {
       "repository": "https://github.com/micromark/micromark",

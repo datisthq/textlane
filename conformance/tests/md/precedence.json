@@ -192,5 +192,25 @@
         }
       }
     ]
+  },
+  {
+    "description": "Precedence (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#precedence"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 42",
+        "input": "- `one\n- two`\n",
+        "expected": {
+          "md": "* \\`one\n* two\\`\n"
+        }
+      }
+    ]
   }
 ]

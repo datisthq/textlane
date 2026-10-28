@@ -2591,6 +2591,194 @@
     ]
   },
   {
+    "description": "Block quotes (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#block-quotes"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 228",
+        "input": "> # Foo\n> bar\n> baz\n",
+        "expected": {
+          "md": "> # Foo\n>\n> bar\n> baz\n"
+        }
+      },
+      {
+        "description": "example 229",
+        "input": "># Foo\n>bar\n> baz\n",
+        "expected": {
+          "md": "> # Foo\n>\n> bar\n> baz\n"
+        }
+      },
+      {
+        "description": "example 230",
+        "input": "   > # Foo\n   > bar\n > baz\n",
+        "expected": {
+          "md": "> # Foo\n>\n> bar\n> baz\n"
+        }
+      },
+      {
+        "description": "example 231",
+        "input": "    > # Foo\n    > bar\n    > baz\n",
+        "expected": {
+          "md": "```\n> # Foo\n> bar\n> baz\n```\n"
+        }
+      },
+      {
+        "description": "example 232",
+        "input": "> # Foo\n> bar\nbaz\n",
+        "expected": {
+          "md": "> # Foo\n>\n> bar\n> baz\n"
+        }
+      },
+      {
+        "description": "example 233",
+        "input": "> bar\nbaz\n> foo\n",
+        "expected": {
+          "md": "> bar\n> baz\n> foo\n"
+        }
+      },
+      {
+        "description": "example 234",
+        "input": "> foo\n---\n",
+        "expected": {
+          "md": "> foo\n\n***\n"
+        }
+      },
+      {
+        "description": "example 235",
+        "input": "> - foo\n- bar\n",
+        "expected": {
+          "md": "> * foo\n\n* bar\n"
+        }
+      },
+      {
+        "description": "example 236",
+        "input": ">     foo\n    bar\n",
+        "expected": {
+          "md": "> ```\n> foo\n> ```\n\n```\nbar\n```\n"
+        }
+      },
+      {
+        "description": "example 237",
+        "input": "> ```\nfoo\n```\n",
+        "expected": {
+          "md": "> ```\n> ```\n\nfoo\n\n```\n```\n"
+        }
+      },
+      {
+        "description": "example 238",
+        "input": "> foo\n    - bar\n",
+        "expected": {
+          "md": "> foo\n> \\- bar\n"
+        }
+      },
+      {
+        "description": "example 239",
+        "input": ">\n",
+        "expected": {
+          "md": ">\n"
+        }
+      },
+      {
+        "description": "example 240",
+        "input": ">\n>  \n> \n",
+        "expected": {
+          "md": ">\n"
+        }
+      },
+      {
+        "description": "example 241",
+        "input": ">\n> foo\n>  \n",
+        "expected": {
+          "md": "> foo\n"
+        }
+      },
+      {
+        "description": "example 242",
+        "input": "> foo\n\n> bar\n",
+        "expected": {
+          "md": "> foo\n\n> bar\n"
+        }
+      },
+      {
+        "description": "example 243",
+        "input": "> foo\n> bar\n",
+        "expected": {
+          "md": "> foo\n> bar\n"
+        }
+      },
+      {
+        "description": "example 244",
+        "input": "> foo\n>\n> bar\n",
+        "expected": {
+          "md": "> foo\n>\n> bar\n"
+        }
+      },
+      {
+        "description": "example 245",
+        "input": "foo\n> bar\n",
+        "expected": {
+          "md": "foo\n\n> bar\n"
+        }
+      },
+      {
+        "description": "example 246",
+        "input": "> aaa\n***\n> bbb\n",
+        "expected": {
+          "md": "> aaa\n\n***\n\n> bbb\n"
+        }
+      },
+      {
+        "description": "example 247",
+        "input": "> bar\nbaz\n",
+        "expected": {
+          "md": "> bar\n> baz\n"
+        }
+      },
+      {
+        "description": "example 248",
+        "input": "> bar\n\nbaz\n",
+        "expected": {
+          "md": "> bar\n\nbaz\n"
+        }
+      },
+      {
+        "description": "example 249",
+        "input": "> bar\n>\nbaz\n",
+        "expected": {
+          "md": "> bar\n\nbaz\n"
+        }
+      },
+      {
+        "description": "example 250",
+        "input": "> > > foo\nbar\n",
+        "expected": {
+          "md": "> > > foo\n> > > bar\n"
+        }
+      },
+      {
+        "description": "example 251",
+        "input": ">>> foo\n> bar\n>>baz\n",
+        "expected": {
+          "md": "> > > foo\n> > > bar\n> > > baz\n"
+        }
+      },
+      {
+        "description": "example 252",
+        "input": ">     code\n\n>    not code\n",
+        "expected": {
+          "md": "> ```\n> code\n> ```\n\n> not code\n"
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark document/block-quote",
     "source": {
       "repository": "https://github.com/micromark/micromark",

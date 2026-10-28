@@ -117,5 +117,25 @@
         }
       }
     ]
+  },
+  {
+    "description": "Inlines (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#inlines"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 327",
+        "input": "`hi`lo`\n",
+        "expected": {
+          "md": "`hi`lo\\`\n"
+        }
+      }
+    ]
   }
 ]

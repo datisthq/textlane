@@ -2940,6 +2940,208 @@
     ]
   },
   {
+    "description": "Link reference definitions (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#link-reference-definitions"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 192",
+        "input": "[foo]: /url \"title\"\n\n[foo]\n",
+        "expected": {
+          "md": "[foo]: /url \"title\"\n\n[foo]\n"
+        }
+      },
+      {
+        "description": "example 193",
+        "input": "   [foo]: \n      /url  \n           'the title'  \n\n[foo]\n",
+        "expected": {
+          "md": "[foo]: /url \"the title\"\n\n[foo]\n"
+        }
+      },
+      {
+        "description": "example 194",
+        "input": "[Foo*bar\\]]:my_(url) 'title (with parens)'\n\n[Foo*bar\\]]\n",
+        "expected": {
+          "md": "[Foo*bar\\]]: my_\\(url\\) \"title (with parens)\"\n\n[Foo\\*bar\\]][Foo*bar\\]]\n"
+        }
+      },
+      {
+        "description": "example 195",
+        "input": "[Foo bar]:\n<my url>\n'title'\n\n[Foo bar]\n",
+        "expected": {
+          "md": "[Foo bar]: <my url> \"title\"\n\n[Foo bar]\n"
+        }
+      },
+      {
+        "description": "example 196",
+        "input": "[foo]: /url '\ntitle\nline1\nline2\n'\n\n[foo]\n",
+        "expected": {
+          "md": "[foo]: /url \"\ntitle\nline1\nline2\n\"\n\n[foo]\n"
+        }
+      },
+      {
+        "description": "example 197",
+        "input": "[foo]: /url 'title\n\nwith blank line'\n\n[foo]\n",
+        "expected": {
+          "md": "\\[foo]: /url 'title\n\nwith blank line'\n\n\\[foo]\n"
+        }
+      },
+      {
+        "description": "example 198",
+        "input": "[foo]:\n/url\n\n[foo]\n",
+        "expected": {
+          "md": "[foo]: /url\n\n[foo]\n"
+        }
+      },
+      {
+        "description": "example 199",
+        "input": "[foo]:\n\n[foo]\n",
+        "expected": {
+          "md": "\\[foo]:\n\n\\[foo]\n"
+        }
+      },
+      {
+        "description": "example 200",
+        "input": "[foo]: <>\n\n[foo]\n",
+        "expected": {
+          "md": "[foo]: <>\n\n[foo]\n"
+        }
+      },
+      {
+        "description": "example 201",
+        "input": "[foo]: <bar>(baz)\n\n[foo]\n",
+        "expected": {
+          "md": "\\[foo]: <bar>(baz)\n\n\\[foo]\n"
+        }
+      },
+      {
+        "description": "example 202",
+        "input": "[foo]: /url\\bar\\*baz \"foo\\\"bar\\baz\"\n\n[foo]\n",
+        "expected": {
+          "md": "[foo]: /url\\bar*baz \"foo\\\"bar\\baz\"\n\n[foo]\n"
+        }
+      },
+      {
+        "description": "example 203",
+        "input": "[foo]\n\n[foo]: url\n",
+        "expected": {
+          "md": "[foo]\n\n[foo]: url\n"
+        }
+      },
+      {
+        "description": "example 204",
+        "input": "[foo]\n\n[foo]: first\n[foo]: second\n",
+        "expected": {
+          "md": "[foo]\n\n[foo]: first\n\n[foo]: second\n"
+        }
+      },
+      {
+        "description": "example 205",
+        "input": "[FOO]: /url\n\n[Foo]\n",
+        "expected": {
+          "md": "[FOO]: /url\n\n[Foo]\n"
+        }
+      },
+      {
+        "description": "example 206",
+        "input": "[ΑΓΩ]: /φου\n\n[αγω]\n",
+        "expected": {
+          "md": "[ΑΓΩ]: /φου\n\n[αγω]\n"
+        }
+      },
+      {
+        "description": "example 207",
+        "input": "[foo]: /url\n",
+        "expected": {
+          "md": "[foo]: /url\n"
+        }
+      },
+      {
+        "description": "example 208",
+        "input": "[\nfoo\n]: /url\nbar\n",
+        "expected": {
+          "md": "[\nfoo\n]: /url\n\nbar\n"
+        }
+      },
+      {
+        "description": "example 209",
+        "input": "[foo]: /url \"title\" ok\n",
+        "expected": {
+          "md": "\\[foo]: /url \"title\" ok\n"
+        }
+      },
+      {
+        "description": "example 210",
+        "input": "[foo]: /url\n\"title\" ok\n",
+        "expected": {
+          "md": "[foo]: /url\n\n\"title\" ok\n"
+        }
+      },
+      {
+        "description": "example 211",
+        "input": "    [foo]: /url \"title\"\n\n[foo]\n",
+        "expected": {
+          "md": "```\n[foo]: /url \"title\"\n```\n\n\\[foo]\n"
+        }
+      },
+      {
+        "description": "example 212",
+        "input": "```\n[foo]: /url\n```\n\n[foo]\n",
+        "expected": {
+          "md": "```\n[foo]: /url\n```\n\n\\[foo]\n"
+        }
+      },
+      {
+        "description": "example 213",
+        "input": "Foo\n[bar]: /baz\n\n[bar]\n",
+        "expected": {
+          "md": "Foo\n\\[bar]: /baz\n\n\\[bar]\n"
+        }
+      },
+      {
+        "description": "example 214",
+        "input": "# [Foo]\n[foo]: /url\n> bar\n",
+        "expected": {
+          "md": "# [Foo]\n\n[foo]: /url\n\n> bar\n"
+        }
+      },
+      {
+        "description": "example 215",
+        "input": "[foo]: /url\nbar\n===\n[foo]\n",
+        "expected": {
+          "md": "[foo]: /url\n\n# bar\n\n[foo]\n"
+        }
+      },
+      {
+        "description": "example 216",
+        "input": "[foo]: /url\n===\n[foo]\n",
+        "expected": {
+          "md": "[foo]: /url\n\n\\===\n[foo]\n"
+        }
+      },
+      {
+        "description": "example 217",
+        "input": "[foo]: /foo-url \"foo\"\n[bar]: /bar-url\n  \"bar\"\n[baz]: /baz-url\n\n[foo],\n[bar],\n[baz]\n",
+        "expected": {
+          "md": "[foo]: /foo-url \"foo\"\n\n[bar]: /bar-url \"bar\"\n\n[baz]: /baz-url\n\n[foo],\n[bar],\n[baz]\n"
+        }
+      },
+      {
+        "description": "example 218",
+        "input": "[foo]\n\n> [foo]: /url\n",
+        "expected": {
+          "md": "[foo]\n\n> [foo]: /url\n"
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark content/definition",
     "source": {
       "repository": "https://github.com/micromark/micromark",

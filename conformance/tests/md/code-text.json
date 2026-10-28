@@ -1621,6 +1621,173 @@
     ]
   },
   {
+    "description": "Code spans (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#code-spans"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 328",
+        "input": "`foo`\n",
+        "expected": {
+          "md": "`foo`\n"
+        }
+      },
+      {
+        "description": "example 329",
+        "input": "`` foo ` bar ``\n",
+        "expected": {
+          "md": "``foo ` bar``\n"
+        }
+      },
+      {
+        "description": "example 330",
+        "input": "` `` `\n",
+        "expected": {
+          "md": "` `` `\n"
+        }
+      },
+      {
+        "description": "example 331",
+        "input": "`  ``  `\n",
+        "expected": {
+          "md": "`  ``  `\n"
+        }
+      },
+      {
+        "description": "example 332",
+        "input": "` a`\n",
+        "expected": {
+          "md": "` a`\n"
+        }
+      },
+      {
+        "description": "example 333",
+        "input": "` b `\n",
+        "expected": {
+          "md": "` b `\n"
+        }
+      },
+      {
+        "description": "example 334",
+        "input": "` `\n`  `\n",
+        "expected": {
+          "md": "` `\n`  `\n"
+        }
+      },
+      {
+        "description": "example 335",
+        "input": "``\nfoo\nbar  \nbaz\n``\n",
+        "expected": {
+          "md": "`foo\nbar  \nbaz`\n"
+        }
+      },
+      {
+        "description": "example 336",
+        "input": "``\nfoo \n``\n",
+        "expected": {
+          "md": "`foo `\n"
+        }
+      },
+      {
+        "description": "example 337",
+        "input": "`foo   bar \nbaz`\n",
+        "expected": {
+          "md": "`foo   bar \nbaz`\n"
+        }
+      },
+      {
+        "description": "example 338",
+        "input": "`foo\\`bar`\n",
+        "expected": {
+          "md": "`foo\\`bar\\`\n"
+        }
+      },
+      {
+        "description": "example 339",
+        "input": "``foo`bar``\n",
+        "expected": {
+          "md": "``foo`bar``\n"
+        }
+      },
+      {
+        "description": "example 340",
+        "input": "` foo `` bar `\n",
+        "expected": {
+          "md": "`foo `` bar`\n"
+        }
+      },
+      {
+        "description": "example 341",
+        "input": "*foo`*`\n",
+        "expected": {
+          "md": "\\*foo`*`\n"
+        }
+      },
+      {
+        "description": "example 342",
+        "input": "[not a `link](/foo`)\n",
+        "expected": {
+          "md": "\\[not a `link](/foo`)\n"
+        }
+      },
+      {
+        "description": "example 343",
+        "input": "`<a href=\"`\">`\n",
+        "expected": {
+          "md": "`<a href=\"`\">\\`\n"
+        }
+      },
+      {
+        "description": "example 344",
+        "input": "<a href=\"`\">`\n",
+        "expected": {
+          "md": "<a href=\"`\">\\`\n"
+        }
+      },
+      {
+        "description": "example 345",
+        "input": "`<https://foo.bar.`baz>`\n",
+        "expected": {
+          "md": "`<https://foo.bar.`baz>\\`\n"
+        }
+      },
+      {
+        "description": "example 346",
+        "input": "<https://foo.bar.`baz>`\n",
+        "expected": {
+          "md": "<https://foo.bar.`baz>\\`\n"
+        }
+      },
+      {
+        "description": "example 347",
+        "input": "```foo``\n",
+        "expected": {
+          "md": "\\`\\`\\`foo\\`\\`\n"
+        }
+      },
+      {
+        "description": "example 348",
+        "input": "`foo\n",
+        "expected": {
+          "md": "\\`foo\n"
+        }
+      },
+      {
+        "description": "example 349",
+        "input": "`foo``bar``\n",
+        "expected": {
+          "md": "\\`foo`bar`\n"
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark text/code",
     "source": {
       "repository": "https://github.com/micromark/micromark",

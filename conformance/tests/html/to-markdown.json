@@ -9177,5 +9177,85 @@
         }
       }
     ]
+  },
+  {
+    "description": "rehype-remark",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-remark",
+      "commit": "f740c02d583318904be6cd4b3539e7350983ece8",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["html.parse"], ["html.toMarkdown"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "should mutate",
+        "input": "<h2>Hello, world!</h2>",
+        "expected": {
+          "md": "## Hello, world!\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-remark (2)",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-remark",
+      "commit": "f740c02d583318904be6cd4b3539e7350983ece8",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.toMarkdown",
+        {
+          "document": false
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should support `document: false`",
+        "input": "<i>Hello</i>, <b>world</b>!",
+        "expected": {
+          "md": "*Hello*, **world**!\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-remark (3)",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-remark",
+      "commit": "f740c02d583318904be6cd4b3539e7350983ece8",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      ["html.toMarkdown"],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should default to `document: true`",
+        "input": "<i>Hello</i>, <b>world</b>!",
+        "expected": {
+          "md": "*Hello*, **world**!\n"
+        }
+      }
+    ]
   }
 ]

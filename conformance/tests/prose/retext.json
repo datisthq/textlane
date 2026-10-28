@@ -1,0 +1,134 @@
+[
+  {
+    "description": "retext",
+    "source": {
+      "repository": "https://github.com/retextjs/retext",
+      "commit": "04580e54d857f86405c1b109f5205be58f1285f8",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["prose.parse"], ["prose.stringify"]],
+    "tests": [
+      {
+        "description": "should parse",
+        "input": "Alfred",
+        "expected": {
+          "tree": {
+            "type": "RootNode",
+            "children": [
+              {
+                "type": "ParagraphNode",
+                "children": [
+                  {
+                    "type": "SentenceNode",
+                    "children": [
+                      {
+                        "type": "WordNode",
+                        "children": [
+                          {
+                            "type": "TextNode",
+                            "value": "Alfred",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 7,
+                                "offset": 6
+                              }
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 7,
+                            "offset": 6
+                          }
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 7,
+                        "offset": 6
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 7,
+                    "offset": 6
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 7,
+                "offset": 6
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "should stringify",
+        "tree": {
+          "type": "RootNode",
+          "children": [
+            {
+              "type": "ParagraphNode",
+              "children": [
+                {
+                  "type": "SentenceNode",
+                  "children": [
+                    {
+                      "type": "WordNode",
+                      "children": [
+                        {
+                          "type": "TextNode",
+                          "value": "Alfred"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "Alfred"
+        }
+      }
+    ]
+  }
+]

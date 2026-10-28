@@ -184,5 +184,1621 @@
         }
       }
     ]
+  },
+  {
+    "description": "to-markdown roundtrip (tree round trip)",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.stringify"]],
+    "tests": [
+      {
+        "description": "should not collapse escapes (2)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "\\*a\\*"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\\\\\*a\\\\\\*\n"
+        }
+      },
+      {
+        "description": "should roundtrip adjacent ordered lists",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "list",
+              "ordered": true,
+              "start": 1,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "a"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "start": 1,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "b"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "1. a\n\n1) b\n"
+        }
+      },
+      {
+        "description": "should roundtrip different ordered lists and lists that could turn into thematic breaks (1)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "list",
+              "ordered": true,
+              "start": 1,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "thematicBreak"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "start": 1,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "list",
+                      "ordered": true,
+                      "start": 1,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": [
+                            {
+                              "type": "list",
+                              "ordered": true,
+                              "start": 1,
+                              "spread": false,
+                              "children": [
+                                {
+                                  "type": "listItem",
+                                  "spread": false,
+                                  "checked": null,
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "start": 1,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "b"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "1. ***\n\n1) 1) 1)\n\n1. b\n"
+        }
+      },
+      {
+        "description": "should roundtrip different ordered lists and lists that could turn into thematic breaks (2)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "list",
+              "ordered": true,
+              "start": 1,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "list",
+                      "ordered": true,
+                      "start": 1,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": [
+                            {
+                              "type": "list",
+                              "ordered": true,
+                              "start": 1,
+                              "spread": false,
+                              "children": [
+                                {
+                                  "type": "listItem",
+                                  "spread": false,
+                                  "checked": null,
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "start": 1,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "thematicBreak"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "start": 1,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "b"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "1. 1. 1.\n\n1) ***\n\n1. b\n"
+        }
+      },
+      {
+        "description": "should roundtrip different ordered lists and lists that could turn into thematic breaks (3)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "list",
+              "ordered": true,
+              "start": 1,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "list",
+                      "ordered": true,
+                      "start": 1,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": [
+                            {
+                              "type": "list",
+                              "ordered": true,
+                              "start": 1,
+                              "spread": false,
+                              "children": [
+                                {
+                                  "type": "listItem",
+                                  "spread": false,
+                                  "checked": null,
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "list",
+                      "ordered": true,
+                      "start": 1,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "1. 1. 1.\n2. 1.\n"
+        }
+      },
+      {
+        "description": "should roundtrip different ordered lists and lists that could turn into thematic breaks (4)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "list",
+              "ordered": true,
+              "start": 1,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "list",
+                      "ordered": true,
+                      "start": 1,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": [
+                            {
+                              "type": "list",
+                              "ordered": true,
+                              "start": 1,
+                              "spread": false,
+                              "children": [
+                                {
+                                  "type": "listItem",
+                                  "spread": false,
+                                  "checked": null,
+                                  "children": []
+                                },
+                                {
+                                  "type": "listItem",
+                                  "spread": false,
+                                  "checked": null,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "type": "list",
+                              "ordered": true,
+                              "start": 1,
+                              "spread": false,
+                              "children": [
+                                {
+                                  "type": "listItem",
+                                  "spread": false,
+                                  "checked": null,
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "list",
+                      "ordered": true,
+                      "start": 1,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "1. 1. 1.\n      2.\n      1)\n   1)\n"
+        }
+      },
+      {
+        "description": "should roundtrip different ordered lists and lists that could turn into thematic breaks (5)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "list",
+              "ordered": true,
+              "start": 1,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "list",
+                      "ordered": true,
+                      "start": 1,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": [
+                            {
+                              "type": "list",
+                              "ordered": true,
+                              "start": 1,
+                              "spread": false,
+                              "children": [
+                                {
+                                  "type": "listItem",
+                                  "spread": false,
+                                  "checked": null,
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": [
+                            {
+                              "type": "list",
+                              "ordered": true,
+                              "start": 1,
+                              "spread": false,
+                              "children": [
+                                {
+                                  "type": "listItem",
+                                  "spread": false,
+                                  "checked": null,
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "type": "list",
+                      "ordered": true,
+                      "start": 1,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "1. 1. 1.\n   2. 1.\n   3.\n   1)\n"
+        }
+      },
+      {
+        "description": "should roundtrip different ordered lists and lists that could turn into thematic breaks (6)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "list",
+              "ordered": true,
+              "start": 1,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "list",
+                      "ordered": true,
+                      "start": 1,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "list",
+                      "ordered": true,
+                      "start": 1,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "type": "list",
+                      "ordered": true,
+                      "start": 1,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "type": "list",
+                      "ordered": true,
+                      "start": 1,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "1. 1.\n2. 1.\n   1)\n   1.\n"
+        }
+      },
+      {
+        "description": "should roundtrip asterisks (tree)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Separate paragraphs:"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a * is this emphasis? *"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a ** is this emphasis? **"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a *** is this emphasis? ***"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a ** is this emphasis? **"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a ** is this emphasis? **"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a *** is this emphasis? ***"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a "
+                },
+                {
+                  "type": "emphasis",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "*"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": " is this emphasis? "
+                },
+                {
+                  "type": "emphasis",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "*"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "One paragraph:"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a * is this emphasis? *\na ** is this emphasis? **\na *** is this emphasis? ***\na "
+                },
+                {
+                  "type": "emphasis",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "* is this emphasis? "
+                    },
+                    {
+                      "type": "emphasis",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "*\na *"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "value": " is this emphasis? *"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "\na *** is this emphasis? ***\na "
+                },
+                {
+                  "type": "emphasis",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "*"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": " is this emphasis? "
+                },
+                {
+                  "type": "emphasis",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "*"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "Separate paragraphs:\n\na \\* is this emphasis? \\*\n\na \\*\\* is this emphasis? \\*\\*\n\na \\*\\*\\* is this emphasis? \\*\\*\\*\n\na \\*\\* is this emphasis? \\*\\*\n\na \\*\\* is this emphasis? \\*\\*\n\na \\*\\*\\* is this emphasis? \\*\\*\\*\n\na *\\** is this emphasis? *\\**\n\nOne paragraph:\n\na \\* is this emphasis? \\*\na \\*\\* is this emphasis? \\*\\*\na \\*\\*\\* is this emphasis? \\*\\*\\*\na *\\* is this emphasis? *\\*\na \\** is this emphasis? \\**\na \\*\\*\\* is this emphasis? \\*\\*\\*\na *\\** is this emphasis? *\\**\n"
+        }
+      },
+      {
+        "description": "should roundtrip underscores (tree)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Separate paragraphs:"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a _ is this emphasis? _"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a __ is this emphasis? __"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a ___ is this emphasis? ___"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a __ is this emphasis? __"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a __ is this emphasis? __"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a ___ is this emphasis? ___"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a "
+                },
+                {
+                  "type": "emphasis",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "_"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": " is this emphasis? "
+                },
+                {
+                  "type": "emphasis",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "_"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "One paragraph:"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a _ is this emphasis? _\na __ is this emphasis? __\na ___ is this emphasis? ___\na "
+                },
+                {
+                  "type": "emphasis",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "_ is this emphasis? "
+                    },
+                    {
+                      "type": "emphasis",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "_\na _"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "value": " is this emphasis? _"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "\na ___ is this emphasis? ___\na "
+                },
+                {
+                  "type": "emphasis",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "_"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": " is this emphasis? "
+                },
+                {
+                  "type": "emphasis",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "_"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "Separate paragraphs:\n\na \\_ is this emphasis? \\_\n\na \\_\\_ is this emphasis? \\_\\_\n\na \\_\\_\\_ is this emphasis? \\_\\_\\_\n\na \\_\\_ is this emphasis? \\_\\_\n\na \\_\\_ is this emphasis? \\_\\_\n\na \\_\\_\\_ is this emphasis? \\_\\_\\_\n\na *\\_* is this emphasis? *\\_*\n\nOne paragraph:\n\na \\_ is this emphasis? \\_\na \\_\\_ is this emphasis? \\_\\_\na \\_\\_\\_ is this emphasis? \\_\\_\\_\na *\\_ is this emphasis? *\\_\na \\_* is this emphasis? \\_*\na \\_\\_\\_ is this emphasis? \\_\\_\\_\na *\\_* is this emphasis? *\\_*\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "to-markdown roundtrip (tree round trip) {\"bullet\":\"*\",\"bulletOther\":\"-\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-to-markdown",
+      "commit": "a31fe0608ff3c68f92f79bc5acc35235d8b69cee",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.stringify",
+        {
+          "bullet": "*",
+          "bulletOther": "-"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should roundtrip different lists w/ `bulletOther`",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "list",
+              "ordered": false,
+              "start": null,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "a"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "ordered": false,
+              "start": null,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "b"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* a\n\n- b\n"
+        }
+      },
+      {
+        "description": "should roundtrip different lists w/ `bulletOther` and lists that could turn into thematic breaks (1)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "list",
+              "ordered": false,
+              "start": null,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "thematicBreak"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "ordered": false,
+              "start": null,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "list",
+                      "ordered": false,
+                      "start": null,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": [
+                            {
+                              "type": "list",
+                              "ordered": false,
+                              "start": null,
+                              "spread": false,
+                              "children": [
+                                {
+                                  "type": "listItem",
+                                  "spread": false,
+                                  "checked": null,
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "ordered": false,
+              "start": null,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "b"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "- ***\n\n* * -\n\n- b\n"
+        }
+      },
+      {
+        "description": "should roundtrip different lists w/ `bulletOther` and lists that could turn into thematic breaks (2)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "list",
+              "ordered": false,
+              "start": null,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "list",
+                      "ordered": false,
+                      "start": null,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": [
+                            {
+                              "type": "list",
+                              "ordered": false,
+                              "start": null,
+                              "spread": false,
+                              "children": [
+                                {
+                                  "type": "listItem",
+                                  "spread": false,
+                                  "checked": null,
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "ordered": false,
+              "start": null,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "thematicBreak"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "ordered": false,
+              "start": null,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "b"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* * -\n\n- ***\n\n* b\n"
+        }
+      },
+      {
+        "description": "should roundtrip different lists w/ `bulletOther` and lists that could turn into thematic breaks (3)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "list",
+              "ordered": false,
+              "start": null,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "list",
+                      "ordered": false,
+                      "start": null,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": [
+                            {
+                              "type": "list",
+                              "ordered": false,
+                              "start": null,
+                              "spread": false,
+                              "children": [
+                                {
+                                  "type": "listItem",
+                                  "spread": false,
+                                  "checked": null,
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "list",
+                      "ordered": false,
+                      "start": null,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* * -\n* *\n"
+        }
+      },
+      {
+        "description": "should roundtrip different lists w/ `bulletOther` and lists that could turn into thematic breaks (4)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "list",
+              "ordered": false,
+              "start": null,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "list",
+                      "ordered": false,
+                      "start": null,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": [
+                            {
+                              "type": "list",
+                              "ordered": false,
+                              "start": null,
+                              "spread": false,
+                              "children": [
+                                {
+                                  "type": "listItem",
+                                  "spread": false,
+                                  "checked": null,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "type": "list",
+                              "ordered": false,
+                              "start": null,
+                              "spread": false,
+                              "children": [
+                                {
+                                  "type": "listItem",
+                                  "spread": false,
+                                  "checked": null,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "type": "list",
+                              "ordered": false,
+                              "start": null,
+                              "spread": false,
+                              "children": [
+                                {
+                                  "type": "listItem",
+                                  "spread": false,
+                                  "checked": null,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "type": "list",
+                              "ordered": false,
+                              "start": null,
+                              "spread": false,
+                              "children": [
+                                {
+                                  "type": "listItem",
+                                  "spread": false,
+                                  "checked": null,
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* * -\n    *\n    -\n    *\n"
+        }
+      },
+      {
+        "description": "should roundtrip different lists w/ `bulletOther` and lists that could turn into thematic breaks (5)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "list",
+              "ordered": false,
+              "start": null,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "list",
+                      "ordered": false,
+                      "start": null,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": [
+                            {
+                              "type": "list",
+                              "ordered": false,
+                              "start": null,
+                              "spread": false,
+                              "children": [
+                                {
+                                  "type": "listItem",
+                                  "spread": false,
+                                  "checked": null,
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": [
+                            {
+                              "type": "list",
+                              "ordered": false,
+                              "start": null,
+                              "spread": false,
+                              "children": [
+                                {
+                                  "type": "listItem",
+                                  "spread": false,
+                                  "checked": null,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "type": "list",
+                              "ordered": false,
+                              "start": null,
+                              "spread": false,
+                              "children": [
+                                {
+                                  "type": "listItem",
+                                  "spread": false,
+                                  "checked": null,
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "type": "list",
+                              "ordered": false,
+                              "start": null,
+                              "spread": false,
+                              "children": [
+                                {
+                                  "type": "listItem",
+                                  "spread": false,
+                                  "checked": null,
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* * -\n  * *\n    -\n    *\n"
+        }
+      },
+      {
+        "description": "should roundtrip different lists w/ `bulletOther` and lists that could turn into thematic breaks (6)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "list",
+              "ordered": false,
+              "start": null,
+              "spread": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "list",
+                      "ordered": false,
+                      "start": null,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "list",
+                      "ordered": false,
+                      "start": null,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "type": "list",
+                      "ordered": false,
+                      "start": null,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "type": "list",
+                      "ordered": false,
+                      "start": null,
+                      "spread": false,
+                      "children": [
+                        {
+                          "type": "listItem",
+                          "spread": false,
+                          "checked": null,
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "md": "* *\n* *\n  -\n  *\n"
+        }
+      }
+    ]
   }
 ]

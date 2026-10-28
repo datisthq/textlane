@@ -5,6 +5,7 @@ import type { AnyNode, CallExpression } from "acorn"
 import { ancestor } from "acorn-walk"
 import { writeGroups } from "../actions/group/write.ts"
 import { isStressInput } from "../actions/input/check.ts"
+import { parseMarkdown, stringifyTree } from "../actions/markdown/render.ts"
 import { evaluateNode, isObject } from "../actions/node/evaluate.ts"
 import { resolveConstants } from "../actions/node/scope.ts"
 import { fetchSource } from "../actions/source/fetch.ts"
@@ -64,6 +65,45 @@ function importToMarkdown() {
     CallExpression(node, _state, ancestors) {
       if (!isAssertEqual(node.callee)) return
       const [call, expected] = node.arguments
+      // The round trip sits on either side of the assertion
+      const scope = resolveConstants({ program, ancestors })
+      const treeRoundTrip =
+        readTreeRoundTrip(call, scope) ?? readTreeRoundTrip(expected, scope)
+      if (treeRoundTrip) {
+        const topName = findTopTest(ancestors) ?? "roundtrip"
+        const construct = CONSTRUCTS[topName] ?? "roundtrip"
+        const optionsKey =
+          Object.keys(treeRoundTrip.options).length > 0
+            ? ` ${JSON.stringify(treeRoundTrip.options)}`
+            : ""
+        const description = `to-markdown ${topName} (tree round trip)${optionsKey}`
+        const byGroup = groups.get(construct) ?? new Map<string, Group>()
+        groups.set(construct, byGroup)
+        const stringify = optionsKey
+          ? ["md.stringify", treeRoundTrip.options]
+          : ["md.stringify"]
+        const group = byGroup.get(description) ?? {
+          description,
+          source: {
+            repository: REPOSITORY,
+            commit: COMMIT,
+            path: "test/index.js",
+            license: "MIT",
+          },
+          pipeline: [stringify],
+          tests: [],
+        }
+        const title =
+          findTestTitle(ancestors, resolveConstants({ program, ancestors })) ?? topName
+        group.tests.push({
+          description: title,
+          tree: treeRoundTrip.tree,
+          expected: { md: treeRoundTrip.md },
+        })
+        byGroup.set(description, group)
+        written += 1
+        return
+      }
       if (call?.type !== "CallExpression" || !isCallTo(call, "to")) return
       const topName = findTopTest(ancestors)
       const construct = topName ? CONSTRUCTS[topName] : undefined
@@ -94,6 +134,35 @@ function importToMarkdown() {
   }
   console.log(`to-markdown: ${written} cases in ${groups.size} files`)
   for (const [reason, count] of skipped) console.log(`  skipped ${count}: ${reason}`)
+}
+
+// `removePosition(from(to(from(markdown), options?)))` asserts a tree survives serializing; a
+// pipeline cannot re-parse, so the serializing half is the case: the parsed tree in, Markdown out
+function readTreeRoundTrip(node: AnyNode | undefined, constants: Map<string, AnyNode>) {
+  if (node?.type !== "CallExpression" || !isCallTo(node, "removePosition"))
+    return undefined
+  const reparse = node.arguments[0]
+  if (reparse?.type !== "CallExpression" || !isCallTo(reparse, "from")) return undefined
+  const serialize = reparse.arguments[0]
+  if (serialize?.type !== "CallExpression" || !isCallTo(serialize, "to")) return undefined
+  const subject = serialize.arguments[0]
+  const parsed = subject?.type === "Identifier" ? constants.get(subject.name) : subject
+  if (parsed?.type !== "CallExpression" || !isCallTo(parsed, "from")) return undefined
+  const input = evaluateNode(parsed.arguments[0], constants)
+  const options = serialize.arguments[1]
+    ? evaluateNode(serialize.arguments[1], constants)
+    : {}
+  if (typeof input !== "string" || !isObject(options)) return undefined
+  const tree = JSON.parse(
+    JSON.stringify(parseMarkdown(input), (key, value) =>
+      key === "position" ? undefined : value,
+    ),
+  )
+  return {
+    tree,
+    options: { ...options },
+    md: stringifyTree({ tree, stringify: { ...options } }),
+  }
 }
 
 // `to(tree, options?)` stringifies a tree; `to(from(markdown), options?)` round-trips text

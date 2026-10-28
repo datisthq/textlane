@@ -229,6 +229,40 @@
     ]
   },
   {
+    "description": "Textual content (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#textual-content"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 650",
+        "input": "hello $.;'there\n",
+        "expected": {
+          "md": "hello $.;'there\n"
+        }
+      },
+      {
+        "description": "example 651",
+        "input": "Foo χρῆν\n",
+        "expected": {
+          "md": "Foo χρῆν\n"
+        }
+      },
+      {
+        "description": "example 652",
+        "input": "Multiple     spaces\n",
+        "expected": {
+          "md": "Multiple     spaces\n"
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark text/text",
     "source": {
       "repository": "https://github.com/micromark/micromark",

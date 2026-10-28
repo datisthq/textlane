@@ -1,0 +1,161 @@
+[
+  {
+    "description": "html5lib serializer options {\"omitOptionalTags\":true,\"preferUnquoted\":true,\"quote\":\"'\"}",
+    "comment": "Rebuilt from html5lib token streams; an end tag with no start wraps the siblings before it, and the reference prints the tags a stream leaves outside",
+    "source": {
+      "repository": "https://github.com/html5lib/html5lib-tests",
+      "commit": "c777c408b61078ea2eb4acefc2535f54dbc8b28a",
+      "path": "serializer/options.test",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true,
+          "preferUnquoted": true,
+          "quote": "'"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "quote_char=\"'\"",
+        "comment": "html5lib expects \"<span title='test &#39;with&#39; quote_char'>\"",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "span",
+              "properties": {
+                "title": "test 'with' quote_char"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<span title='test &#x27;with&#x27; quote_char'></span>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "html5lib serializer options {\"omitOptionalTags\":true,\"quoteSmart\":true}",
+    "comment": "Rebuilt from html5lib token streams; an end tag with no start wraps the siblings before it, and the reference prints the tags a stream leaves outside",
+    "source": {
+      "repository": "https://github.com/html5lib/html5lib-tests",
+      "commit": "c777c408b61078ea2eb4acefc2535f54dbc8b28a",
+      "path": "serializer/options.test",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true,
+          "quoteSmart": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "quote_attr_values=true",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "button",
+              "properties": {
+                "disabled": true
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<button disabled></button>"
+        }
+      },
+      {
+        "description": "quote_attr_values=true with irrelevant",
+        "comment": "html5lib expects \"<div irrelevant>\"",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "div",
+              "properties": {
+                "irrelevant": "irrelevant"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<div irrelevant=\"irrelevant\"></div>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "html5lib serializer options {\"omitOptionalTags\":true,\"preferUnquoted\":true,\"quoteSmart\":true,\"closeSelfClosing\":true}",
+    "comment": "Rebuilt from html5lib token streams; an end tag with no start wraps the siblings before it, and the reference prints the tags a stream leaves outside",
+    "source": {
+      "repository": "https://github.com/html5lib/html5lib-tests",
+      "commit": "c777c408b61078ea2eb4acefc2535f54dbc8b28a",
+      "path": "serializer/options.test",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true,
+          "preferUnquoted": true,
+          "quoteSmart": true,
+          "closeSelfClosing": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "use_trailing_solidus=true with void element",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "img",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<img />"
+        }
+      },
+      {
+        "description": "use_trailing_solidus=true with non-void element",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "div",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<div></div>"
+        }
+      }
+    ]
+  }
+]

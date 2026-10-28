@@ -1589,6 +1589,159 @@
     ]
   },
   {
+    "description": "Raw HTML (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#raw-html"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 613",
+        "input": "<a><bab><c2c>\n",
+        "expected": {
+          "md": "<a><bab><c2c>\n"
+        }
+      },
+      {
+        "description": "example 614",
+        "input": "<a/><b2/>\n",
+        "expected": {
+          "md": "<a/><b2/>\n"
+        }
+      },
+      {
+        "description": "example 615",
+        "input": "<a  /><b2\ndata=\"foo\" >\n",
+        "expected": {
+          "md": "<a  /><b2\ndata=\"foo\" >\n"
+        }
+      },
+      {
+        "description": "example 616",
+        "input": "<a foo=\"bar\" bam = 'baz <em>\"</em>'\n_boolean zoop:33=zoop:33 />\n",
+        "expected": {
+          "md": "<a foo=\"bar\" bam = 'baz <em>\"</em>'\n_boolean zoop:33=zoop:33 />\n"
+        }
+      },
+      {
+        "description": "example 617",
+        "input": "Foo <responsive-image src=\"foo.jpg\" />\n",
+        "expected": {
+          "md": "Foo <responsive-image src=\"foo.jpg\" />\n"
+        }
+      },
+      {
+        "description": "example 618",
+        "input": "<33> <__>\n",
+        "expected": {
+          "md": "<33> <\\_\\_>\n"
+        }
+      },
+      {
+        "description": "example 619",
+        "input": "<a h*#ref=\"hi\">\n",
+        "expected": {
+          "md": "\\<a h\\*#ref=\"hi\">\n"
+        }
+      },
+      {
+        "description": "example 620",
+        "input": "<a href=\"hi'> <a href=hi'>\n",
+        "expected": {
+          "md": "\\<a href=\"hi'> \\<a href=hi'>\n"
+        }
+      },
+      {
+        "description": "example 621",
+        "input": "< a><\nfoo><bar/ >\n<foo bar=baz\nbim!bop />\n",
+        "expected": {
+          "md": "< a><\nfoo>\\<bar/ >\n\\<foo bar=baz\nbim!bop />\n"
+        }
+      },
+      {
+        "description": "example 622",
+        "input": "<a href='bar'title=title>\n",
+        "expected": {
+          "md": "\\<a href='bar'title=title>\n"
+        }
+      },
+      {
+        "description": "example 623",
+        "input": "</a></foo >\n",
+        "expected": {
+          "md": "</a></foo >\n"
+        }
+      },
+      {
+        "description": "example 624",
+        "input": "</a href=\"foo\">\n",
+        "expected": {
+          "md": "\\</a href=\"foo\">\n"
+        }
+      },
+      {
+        "description": "example 625",
+        "input": "foo <!-- this is a --\ncomment - with hyphens -->\n",
+        "expected": {
+          "md": "foo <!-- this is a --\ncomment - with hyphens -->\n"
+        }
+      },
+      {
+        "description": "example 626",
+        "input": "foo <!--> foo -->\n\nfoo <!---> foo -->\n",
+        "expected": {
+          "md": "foo <!--> foo -->\n\nfoo <!---> foo -->\n"
+        }
+      },
+      {
+        "description": "example 627",
+        "input": "foo <?php echo $a; ?>\n",
+        "expected": {
+          "md": "foo <?php echo $a; ?>\n"
+        }
+      },
+      {
+        "description": "example 628",
+        "input": "foo <!ELEMENT br EMPTY>\n",
+        "expected": {
+          "md": "foo <!ELEMENT br EMPTY>\n"
+        }
+      },
+      {
+        "description": "example 629",
+        "input": "foo <![CDATA[>&<]]>\n",
+        "expected": {
+          "md": "foo <![CDATA[>&<]]>\n"
+        }
+      },
+      {
+        "description": "example 630",
+        "input": "foo <a href=\"&ouml;\">\n",
+        "expected": {
+          "md": "foo <a href=\"&ouml;\">\n"
+        }
+      },
+      {
+        "description": "example 631",
+        "input": "foo <a href=\"\\*\">\n",
+        "expected": {
+          "md": "foo <a href=\"\\*\">\n"
+        }
+      },
+      {
+        "description": "example 632",
+        "input": "<a href=\"\\\"\">\n",
+        "expected": {
+          "md": "\\<a href=\"\"\">\n"
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark text/html with dangerous HTML allowed",
     "source": {
       "repository": "https://github.com/micromark/micromark",

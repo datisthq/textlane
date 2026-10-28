@@ -938,6 +938,110 @@
     ]
   },
   {
+    "description": "Backslash escapes (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#backslash-escapes"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 12",
+        "input": "\\!\\\"\\#\\$\\%\\&\\'\\(\\)\\*\\+\\,\\-\\.\\/\\:\\;\\<\\=\\>\\?\\@\\[\\\\\\]\\^\\_\\`\\{\\|\\}\\~\n",
+        "expected": {
+          "md": "!\"#$%&'()\\*+,-./:;<=>?@\\[\\\\]^\\_\\`{|}~\n"
+        }
+      },
+      {
+        "description": "example 13",
+        "input": "\\\t\\A\\a\\ \\3\\φ\\«\n",
+        "expected": {
+          "md": "\\\t\\A\\a\\ \\3\\φ\\«\n"
+        }
+      },
+      {
+        "description": "example 14",
+        "input": "\\*not emphasized*\n\\<br/> not a tag\n\\[not a link](/foo)\n\\`not code`\n1\\. not a list\n\\* not a list\n\\# not a heading\n\\[foo]: /url \"not a reference\"\n\\&ouml; not a character entity\n",
+        "expected": {
+          "md": "\\*not emphasized\\*\n\\<br/> not a tag\n\\[not a link]\\(/foo)\n\\`not code\\`\n1\\. not a list\n\\* not a list\n\\# not a heading\n\\[foo]: /url \"not a reference\"\n\\&ouml; not a character entity\n"
+        }
+      },
+      {
+        "description": "example 15",
+        "input": "\\\\*emphasis*\n",
+        "expected": {
+          "md": "\\\\*emphasis*\n"
+        }
+      },
+      {
+        "description": "example 16",
+        "input": "foo\\\nbar\n",
+        "expected": {
+          "md": "foo\\\nbar\n"
+        }
+      },
+      {
+        "description": "example 17",
+        "input": "`` \\[\\` ``\n",
+        "expected": {
+          "md": "`` \\[\\` ``\n"
+        }
+      },
+      {
+        "description": "example 18",
+        "input": "    \\[\\]\n",
+        "expected": {
+          "md": "```\n\\[\\]\n```\n"
+        }
+      },
+      {
+        "description": "example 19",
+        "input": "~~~\n\\[\\]\n~~~\n",
+        "expected": {
+          "md": "```\n\\[\\]\n```\n"
+        }
+      },
+      {
+        "description": "example 20",
+        "input": "<https://example.com?find=\\*>\n",
+        "expected": {
+          "md": "<https://example.com?find=\\*>\n"
+        }
+      },
+      {
+        "description": "example 21",
+        "input": "<a href=\"/bar\\/)\">\n",
+        "expected": {
+          "md": "<a href=\"/bar\\/)\">\n"
+        }
+      },
+      {
+        "description": "example 22",
+        "input": "[foo](/bar\\* \"ti\\*tle\")\n",
+        "expected": {
+          "md": "[foo](/bar* \"ti*tle\")\n"
+        }
+      },
+      {
+        "description": "example 23",
+        "input": "[foo]\n\n[foo]: /bar\\* \"ti\\*tle\"\n",
+        "expected": {
+          "md": "[foo]\n\n[foo]: /bar* \"ti*tle\"\n"
+        }
+      },
+      {
+        "description": "example 24",
+        "input": "``` foo\\+bar\nfoo\n```\n",
+        "expected": {
+          "md": "```foo+bar\nfoo\n```\n"
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark text/character-escape",
     "source": {
       "repository": "https://github.com/micromark/micromark",

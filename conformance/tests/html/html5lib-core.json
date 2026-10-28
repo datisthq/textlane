@@ -1,0 +1,383 @@
+[
+  {
+    "description": "html5lib serializer core {\"omitOptionalTags\":true,\"preferUnquoted\":true,\"quoteSmart\":true}",
+    "comment": "Rebuilt from html5lib token streams; an end tag with no start wraps the siblings before it, and the reference prints the tags a stream leaves outside",
+    "source": {
+      "repository": "https://github.com/html5lib/html5lib-tests",
+      "commit": "c777c408b61078ea2eb4acefc2535f54dbc8b28a",
+      "path": "serializer/core.test",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true,
+          "preferUnquoted": true,
+          "quoteSmart": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "proper attribute value escaping",
+        "comment": "html5lib expects \"<span title='test \\\"with\\\" &amp;quot;'>\"",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "span",
+              "properties": {
+                "title": "test \"with\" &quot;"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<span title='test &#x22;with&#x22; &#x26;quot;'></span>"
+        }
+      },
+      {
+        "description": "proper attribute value non-quoting",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "span",
+              "properties": {
+                "title": "foo"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<span title=foo></span>"
+        }
+      },
+      {
+        "description": "proper attribute value non-quoting (with <)",
+        "comment": "html5lib expects \"<span title=foo&lt;bar>\"",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "span",
+              "properties": {
+                "title": "foo<bar"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<span title=\"foo<bar\"></span>"
+        }
+      },
+      {
+        "description": "proper attribute value quoting (with =)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "span",
+              "properties": {
+                "title": "foo=bar"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<span title=\"foo=bar\"></span>"
+        }
+      },
+      {
+        "description": "proper attribute value quoting (with >)",
+        "comment": "html5lib expects \"<span title=\\\"foo&gt;bar\\\">\"",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "span",
+              "properties": {
+                "title": "foo>bar"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<span title=\"foo>bar\"></span>"
+        }
+      },
+      {
+        "description": "proper attribute value quoting (with \")",
+        "comment": "html5lib expects \"<span title='foo\\\"bar'>\"",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "span",
+              "properties": {
+                "title": "foo\"bar"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<span title='foo&#x22;bar'></span>"
+        }
+      },
+      {
+        "description": "proper attribute value quoting (with ')",
+        "comment": "html5lib expects \"<span title=\\\"foo'bar\\\">\"",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "span",
+              "properties": {
+                "title": "foo'bar"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<span title=\"foo&#x27;bar\"></span>"
+        }
+      },
+      {
+        "description": "proper attribute value quoting (with both \" and ')",
+        "comment": "html5lib expects \"<span title=\\\"foo'bar&quot;baz\\\">\"",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "span",
+              "properties": {
+                "title": "foo'bar\"baz"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<span title=\"foo&#x27;bar&#x22;baz\"></span>"
+        }
+      },
+      {
+        "description": "proper attribute value quoting (with space)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "span",
+              "properties": {
+                "title": "foo bar"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<span title=\"foo bar\"></span>"
+        }
+      },
+      {
+        "description": "proper attribute value quoting (with tab)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "span",
+              "properties": {
+                "title": "foo\tbar"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<span title=\"foo\tbar\"></span>"
+        }
+      },
+      {
+        "description": "proper attribute value quoting (with LF)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "span",
+              "properties": {
+                "title": "foo\nbar"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<span title=\"foo\nbar\"></span>"
+        }
+      },
+      {
+        "description": "proper attribute value quoting (with CR)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "span",
+              "properties": {
+                "title": "foo\rbar"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<span title=\"foo\rbar\"></span>"
+        }
+      },
+      {
+        "description": "proper attribute value non-quoting (with linetab)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "span",
+              "properties": {
+                "title": "foo\u000bbar"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<span title=foo\u000bbar></span>"
+        }
+      },
+      {
+        "description": "proper attribute value quoting (with form feed)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "span",
+              "properties": {
+                "title": "foo\fbar"
+              },
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<span title=\"foo\fbar\"></span>"
+        }
+      },
+      {
+        "description": "void element (as EmptyTag token)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "img",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<img>"
+        }
+      },
+      {
+        "description": "void element (as StartTag token)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "img",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<img>"
+        }
+      },
+      {
+        "description": "character data",
+        "comment": "html5lib expects \"a&lt;b&gt;c&amp;d\"",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "a<b>c&d"
+            }
+          ]
+        },
+        "expected": {
+          "html": "a&#x3C;b>c&#x26;d"
+        }
+      },
+      {
+        "description": "rcdata",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "script",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a<b>c&d"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<script>a<b>c&d</script>"
+        }
+      },
+      {
+        "description": "doctype",
+        "comment": "html5lib expects \"<!DOCTYPE HTML>\"",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "doctype"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<!doctype html>"
+        }
+      }
+    ]
+  }
+]

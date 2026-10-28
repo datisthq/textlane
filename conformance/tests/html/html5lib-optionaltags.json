@@ -1,0 +1,4021 @@
+[
+  {
+    "description": "html5lib serializer optionaltags {\"omitOptionalTags\":true,\"preferUnquoted\":true,\"quoteSmart\":true}",
+    "comment": "Rebuilt from html5lib token streams; an end tag with no start wraps the siblings before it, and the reference prints the tags a stream leaves outside",
+    "source": {
+      "repository": "https://github.com/html5lib/html5lib-tests",
+      "commit": "c777c408b61078ea2eb4acefc2535f54dbc8b28a",
+      "path": "serializer/optionaltags.test",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.stringify",
+        {
+          "omitOptionalTags": true,
+          "preferUnquoted": true,
+          "quoteSmart": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "html start-tag followed by text, with attributes",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "html",
+              "properties": {
+                "lang": "en"
+              },
+              "children": [
+                {
+                  "type": "text",
+                  "value": "foo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<html lang=en>foo"
+        }
+      },
+      {
+        "description": "html start-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "html",
+              "properties": {},
+              "children": [
+                {
+                  "type": "comment",
+                  "value": "foo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<html><!--foo-->"
+        }
+      },
+      {
+        "description": "html start-tag followed by space character",
+        "comment": "html5lib expects \"<html> foo\"",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "html",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": " foo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": " foo"
+        }
+      },
+      {
+        "description": "html start-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "html",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "foo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "foo"
+        }
+      },
+      {
+        "description": "html start-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "html",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "foo",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo></foo>"
+        }
+      },
+      {
+        "description": "html start-tag followed by end-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "html",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "foo",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo></foo>"
+        }
+      },
+      {
+        "description": "html start-tag at EOF (shouldn't ever happen?!)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "html",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "html end-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "html",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "</html><!--foo-->"
+        }
+      },
+      {
+        "description": "html end-tag followed by space character",
+        "comment": "html5lib expects \"</html> foo\"",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "html",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": " foo"
+        }
+      },
+      {
+        "description": "html end-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "html",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "foo"
+        }
+      },
+      {
+        "description": "html end-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "html",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo></foo>"
+        }
+      },
+      {
+        "description": "html end-tag followed by end-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "html",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo></foo>"
+        }
+      },
+      {
+        "description": "html end-tag at EOF",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "html",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "head start-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "head",
+              "properties": {},
+              "children": [
+                {
+                  "type": "comment",
+                  "value": "foo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<head><!--foo-->"
+        }
+      },
+      {
+        "description": "head start-tag followed by space character",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "head",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": " foo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<head> foo"
+        }
+      },
+      {
+        "description": "head start-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "head",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "foo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<head>foo"
+        }
+      },
+      {
+        "description": "head start-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "head",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "foo",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo></foo>"
+        }
+      },
+      {
+        "description": "head start-tag followed by end-tag (shouldn't ever happen?!)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "head",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "foo",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo></foo>"
+        }
+      },
+      {
+        "description": "empty head element",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "head",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "head start-tag followed by empty-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "head",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "foo",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo></foo>"
+        }
+      },
+      {
+        "description": "head start-tag at EOF (shouldn't ever happen?!)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "head",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "head end-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "head",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "</head><!--foo-->"
+        }
+      },
+      {
+        "description": "head end-tag followed by space character",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "head",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "</head> foo"
+        }
+      },
+      {
+        "description": "head end-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "head",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "foo"
+        }
+      },
+      {
+        "description": "head end-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "head",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo></foo>"
+        }
+      },
+      {
+        "description": "head end-tag followed by end-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "head",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo></foo>"
+        }
+      },
+      {
+        "description": "head end-tag at EOF",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "head",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "body start-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "body",
+              "properties": {},
+              "children": [
+                {
+                  "type": "comment",
+                  "value": "foo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<body><!--foo-->"
+        }
+      },
+      {
+        "description": "body start-tag followed by space character",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "body",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": " foo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<body> foo"
+        }
+      },
+      {
+        "description": "body start-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "body",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "foo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "foo"
+        }
+      },
+      {
+        "description": "body start-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "body",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "foo",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo></foo>"
+        }
+      },
+      {
+        "description": "body start-tag followed by end-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "body",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "foo",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo></foo>"
+        }
+      },
+      {
+        "description": "body start-tag at EOF (shouldn't ever happen?!)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "body",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "body end-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "body",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "</body><!--foo-->"
+        }
+      },
+      {
+        "description": "body end-tag followed by space character",
+        "comment": "html5lib expects \"</body> foo\"",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "body",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": " foo"
+        }
+      },
+      {
+        "description": "body end-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "body",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "foo"
+        }
+      },
+      {
+        "description": "body end-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "body",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo></foo>"
+        }
+      },
+      {
+        "description": "body end-tag followed by end-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "body",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo></foo>"
+        }
+      },
+      {
+        "description": "body end-tag at EOF",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "body",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "li end-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<li></li><!--foo-->"
+        }
+      },
+      {
+        "description": "li end-tag followed by space character",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<li></li> foo"
+        }
+      },
+      {
+        "description": "li end-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<li></li>foo"
+        }
+      },
+      {
+        "description": "li end-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<li></li><foo></foo>"
+        }
+      },
+      {
+        "description": "li end-tag followed by li start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<li><li>"
+        }
+      },
+      {
+        "description": "li end-tag followed by end-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "li",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo><li></foo>"
+        }
+      },
+      {
+        "description": "li end-tag at EOF",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "li",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<li>"
+        }
+      },
+      {
+        "description": "dt end-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dt",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dt></dt><!--foo-->"
+        }
+      },
+      {
+        "description": "dt end-tag followed by space character",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dt",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dt></dt> foo"
+        }
+      },
+      {
+        "description": "dt end-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dt",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dt></dt>foo"
+        }
+      },
+      {
+        "description": "dt end-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dt",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dt></dt><foo></foo>"
+        }
+      },
+      {
+        "description": "dt end-tag followed by dt start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dt",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "dt",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dt><dt></dt>"
+        }
+      },
+      {
+        "description": "dt end-tag followed by dd start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dt",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "dd",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dt><dd>"
+        }
+      },
+      {
+        "description": "dt end-tag followed by end-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "dt",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo><dt></dt></foo>"
+        }
+      },
+      {
+        "description": "dt end-tag at EOF",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dt",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dt></dt>"
+        }
+      },
+      {
+        "description": "dd end-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dd",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dd></dd><!--foo-->"
+        }
+      },
+      {
+        "description": "dd end-tag followed by space character",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dd",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dd></dd> foo"
+        }
+      },
+      {
+        "description": "dd end-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dd",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dd></dd>foo"
+        }
+      },
+      {
+        "description": "dd end-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dd",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dd></dd><foo></foo>"
+        }
+      },
+      {
+        "description": "dd end-tag followed by dd start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dd",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "dd",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dd><dd>"
+        }
+      },
+      {
+        "description": "dd end-tag followed by dt start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dd",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "dt",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dd><dt></dt>"
+        }
+      },
+      {
+        "description": "dd end-tag followed by end-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "dd",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo><dd></foo>"
+        }
+      },
+      {
+        "description": "dd end-tag at EOF",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "dd",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<dd>"
+        }
+      },
+      {
+        "description": "p end-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p></p><!--foo-->"
+        }
+      },
+      {
+        "description": "p end-tag followed by space character",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p></p> foo"
+        }
+      },
+      {
+        "description": "p end-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p></p>foo"
+        }
+      },
+      {
+        "description": "p end-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p></p><foo></foo>"
+        }
+      },
+      {
+        "description": "p end-tag followed by address start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "address",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><address></address>"
+        }
+      },
+      {
+        "description": "p end-tag followed by article start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "article",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><article></article>"
+        }
+      },
+      {
+        "description": "p end-tag followed by aside start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "aside",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><aside></aside>"
+        }
+      },
+      {
+        "description": "p end-tag followed by blockquote start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "blockquote",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><blockquote></blockquote>"
+        }
+      },
+      {
+        "description": "p end-tag followed by datagrid start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "datagrid",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p></p><datagrid></datagrid>"
+        }
+      },
+      {
+        "description": "p end-tag followed by dialog start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "dialog",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p></p><dialog></dialog>"
+        }
+      },
+      {
+        "description": "p end-tag followed by dir start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "dir",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p></p><dir></dir>"
+        }
+      },
+      {
+        "description": "p end-tag followed by div start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "div",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><div></div>"
+        }
+      },
+      {
+        "description": "p end-tag followed by dl start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "dl",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><dl></dl>"
+        }
+      },
+      {
+        "description": "p end-tag followed by fieldset start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "fieldset",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><fieldset></fieldset>"
+        }
+      },
+      {
+        "description": "p end-tag followed by footer start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "footer",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><footer></footer>"
+        }
+      },
+      {
+        "description": "p end-tag followed by form start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "form",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><form></form>"
+        }
+      },
+      {
+        "description": "p end-tag followed by h1 start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "h1",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><h1></h1>"
+        }
+      },
+      {
+        "description": "p end-tag followed by h2 start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "h2",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><h2></h2>"
+        }
+      },
+      {
+        "description": "p end-tag followed by h3 start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "h3",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><h3></h3>"
+        }
+      },
+      {
+        "description": "p end-tag followed by h4 start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "h4",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><h4></h4>"
+        }
+      },
+      {
+        "description": "p end-tag followed by h5 start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "h5",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><h5></h5>"
+        }
+      },
+      {
+        "description": "p end-tag followed by h6 start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "h6",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><h6></h6>"
+        }
+      },
+      {
+        "description": "p end-tag followed by header start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "header",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><header></header>"
+        }
+      },
+      {
+        "description": "p end-tag followed by hr empty-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "hr",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><hr>"
+        }
+      },
+      {
+        "description": "p end-tag followed by menu start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "menu",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><menu></menu>"
+        }
+      },
+      {
+        "description": "p end-tag followed by nav start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "nav",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><nav></nav>"
+        }
+      },
+      {
+        "description": "p end-tag followed by ol start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "ol",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><ol></ol>"
+        }
+      },
+      {
+        "description": "p end-tag followed by p start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><p>"
+        }
+      },
+      {
+        "description": "p end-tag followed by pre start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "pre",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><pre></pre>"
+        }
+      },
+      {
+        "description": "p end-tag followed by section start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "section",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><section></section>"
+        }
+      },
+      {
+        "description": "p end-tag followed by table start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "table",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><table></table>"
+        }
+      },
+      {
+        "description": "p end-tag followed by ul start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "ul",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p><ul></ul>"
+        }
+      },
+      {
+        "description": "p end-tag followed by end-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "p",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo><p></foo>"
+        }
+      },
+      {
+        "description": "p end-tag at EOF",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<p>"
+        }
+      },
+      {
+        "description": "optgroup end-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "optgroup",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<optgroup></optgroup><!--foo-->"
+        }
+      },
+      {
+        "description": "optgroup end-tag followed by space character",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "optgroup",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<optgroup></optgroup> foo"
+        }
+      },
+      {
+        "description": "optgroup end-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "optgroup",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<optgroup></optgroup>foo"
+        }
+      },
+      {
+        "description": "optgroup end-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "optgroup",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<optgroup></optgroup><foo></foo>"
+        }
+      },
+      {
+        "description": "optgroup end-tag followed by optgroup start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "optgroup",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "optgroup",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<optgroup><optgroup>"
+        }
+      },
+      {
+        "description": "optgroup end-tag followed by end-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "optgroup",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo><optgroup></foo>"
+        }
+      },
+      {
+        "description": "optgroup end-tag at EOF",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "optgroup",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<optgroup>"
+        }
+      },
+      {
+        "description": "option end-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "option",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<option></option><!--foo-->"
+        }
+      },
+      {
+        "description": "option end-tag followed by space character",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "option",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<option></option> foo"
+        }
+      },
+      {
+        "description": "option end-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "option",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<option></option>foo"
+        }
+      },
+      {
+        "description": "option end-tag followed by optgroup start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "option",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "optgroup",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<option><optgroup>"
+        }
+      },
+      {
+        "description": "option end-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "option",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<option></option><foo></foo>"
+        }
+      },
+      {
+        "description": "option end-tag followed by option start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "option",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "option",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<option><option>"
+        }
+      },
+      {
+        "description": "option end-tag followed by end-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "option",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo><option></foo>"
+        }
+      },
+      {
+        "description": "option end-tag at EOF",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "option",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<option>"
+        }
+      },
+      {
+        "description": "colgroup start-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "colgroup",
+              "properties": {},
+              "children": [
+                {
+                  "type": "comment",
+                  "value": "foo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<colgroup><!--foo-->"
+        }
+      },
+      {
+        "description": "colgroup start-tag followed by space character",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "colgroup",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": " foo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<colgroup> foo"
+        }
+      },
+      {
+        "description": "colgroup start-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "colgroup",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "foo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<colgroup>foo"
+        }
+      },
+      {
+        "description": "colgroup start-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "colgroup",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "foo",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<colgroup><foo></foo>"
+        }
+      },
+      {
+        "description": "first colgroup in a table with a col child",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "table",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "colgroup",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "element",
+                      "tagName": "col",
+                      "properties": {},
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><col></table>"
+        }
+      },
+      {
+        "description": "colgroup with a col child, following another colgroup",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "colgroup",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "colgroup",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "col",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<colgroup><colgroup><col>"
+        }
+      },
+      {
+        "description": "colgroup start-tag followed by end-tag",
+        "comment": "html5lib expects \"<colgroup></foo>\"",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "colgroup",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "foo",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<colgroup><foo></foo>"
+        }
+      },
+      {
+        "description": "colgroup start-tag at EOF",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "colgroup",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<colgroup>"
+        }
+      },
+      {
+        "description": "colgroup end-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "colgroup",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<colgroup></colgroup><!--foo-->"
+        }
+      },
+      {
+        "description": "colgroup end-tag followed by space character",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "colgroup",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<colgroup></colgroup> foo"
+        }
+      },
+      {
+        "description": "colgroup end-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "colgroup",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<colgroup>foo"
+        }
+      },
+      {
+        "description": "colgroup end-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "colgroup",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<colgroup><foo></foo>"
+        }
+      },
+      {
+        "description": "colgroup end-tag followed by end-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "colgroup",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo><colgroup></foo>"
+        }
+      },
+      {
+        "description": "colgroup end-tag at EOF",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "colgroup",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<colgroup>"
+        }
+      },
+      {
+        "description": "thead end-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "thead",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<thead></thead><!--foo-->"
+        }
+      },
+      {
+        "description": "thead end-tag followed by space character",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "thead",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<thead></thead> foo"
+        }
+      },
+      {
+        "description": "thead end-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "thead",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<thead></thead>foo"
+        }
+      },
+      {
+        "description": "thead end-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "thead",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<thead></thead><foo></foo>"
+        }
+      },
+      {
+        "description": "thead end-tag followed by tbody start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "thead",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<thead><tbody>"
+        }
+      },
+      {
+        "description": "thead end-tag followed by tfoot start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "thead",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "tfoot",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<thead><tfoot>"
+        }
+      },
+      {
+        "description": "thead end-tag followed by end-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "thead",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo><thead></thead></foo>"
+        }
+      },
+      {
+        "description": "thead end-tag at EOF",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "thead",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<thead></thead>"
+        }
+      },
+      {
+        "description": "tbody start-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": [
+                {
+                  "type": "comment",
+                  "value": "foo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tbody><!--foo-->"
+        }
+      },
+      {
+        "description": "tbody start-tag followed by space character",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": " foo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tbody> foo"
+        }
+      },
+      {
+        "description": "tbody start-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "foo"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tbody>foo"
+        }
+      },
+      {
+        "description": "tbody start-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "foo",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tbody><foo></foo>"
+        }
+      },
+      {
+        "description": "first tbody in a table with a tr child",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "table",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "tbody",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "element",
+                      "tagName": "tr",
+                      "properties": {},
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<table><tr></table>"
+        }
+      },
+      {
+        "description": "tbody with a tr child, following another tbody",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "tr",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tbody><tbody><tr>"
+        }
+      },
+      {
+        "description": "tbody with a tr child, following a thead",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "thead",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "tr",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<thead><tbody><tr>"
+        }
+      },
+      {
+        "description": "tbody with a tr child, following a tfoot",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tfoot",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "tr",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tfoot></tfoot><tr>"
+        }
+      },
+      {
+        "description": "tbody start-tag followed by end-tag",
+        "comment": "html5lib expects \"<tbody></foo>\"",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "foo",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tbody><foo></foo>"
+        }
+      },
+      {
+        "description": "tbody start-tag at EOF",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tbody>"
+        }
+      },
+      {
+        "description": "tbody end-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tbody></tbody><!--foo-->"
+        }
+      },
+      {
+        "description": "tbody end-tag followed by space character",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tbody></tbody> foo"
+        }
+      },
+      {
+        "description": "tbody end-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tbody></tbody>foo"
+        }
+      },
+      {
+        "description": "tbody end-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tbody></tbody><foo></foo>"
+        }
+      },
+      {
+        "description": "tbody end-tag followed by tbody start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tbody><tbody>"
+        }
+      },
+      {
+        "description": "tbody end-tag followed by tfoot start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "tfoot",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tbody><tfoot>"
+        }
+      },
+      {
+        "description": "tbody end-tag followed by end-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "tbody",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo><tbody></foo>"
+        }
+      },
+      {
+        "description": "tbody end-tag at EOF",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tbody>"
+        }
+      },
+      {
+        "description": "tfoot end-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tfoot",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tfoot></tfoot><!--foo-->"
+        }
+      },
+      {
+        "description": "tfoot end-tag followed by space character",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tfoot",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tfoot></tfoot> foo"
+        }
+      },
+      {
+        "description": "tfoot end-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tfoot",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tfoot></tfoot>foo"
+        }
+      },
+      {
+        "description": "tfoot end-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tfoot",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tfoot></tfoot><foo></foo>"
+        }
+      },
+      {
+        "description": "tfoot end-tag followed by tbody start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tfoot",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "tbody",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tfoot></tfoot><tbody>"
+        }
+      },
+      {
+        "description": "tfoot end-tag followed by end-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "tfoot",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo><tfoot></foo>"
+        }
+      },
+      {
+        "description": "tfoot end-tag at EOF",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tfoot",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tfoot>"
+        }
+      },
+      {
+        "description": "tr end-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tr",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tr></tr><!--foo-->"
+        }
+      },
+      {
+        "description": "tr end-tag followed by space character",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tr",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tr></tr> foo"
+        }
+      },
+      {
+        "description": "tr end-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tr",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tr></tr>foo"
+        }
+      },
+      {
+        "description": "tr end-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tr",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tr></tr><foo></foo>"
+        }
+      },
+      {
+        "description": "tr end-tag followed by tr start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tr",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "tr",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tr><tr>"
+        }
+      },
+      {
+        "description": "tr end-tag followed by end-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "tr",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo><tr></foo>"
+        }
+      },
+      {
+        "description": "tr end-tag at EOF",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "tr",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<tr>"
+        }
+      },
+      {
+        "description": "td end-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "td",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<td></td><!--foo-->"
+        }
+      },
+      {
+        "description": "td end-tag followed by space character",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "td",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<td></td> foo"
+        }
+      },
+      {
+        "description": "td end-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "td",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<td></td>foo"
+        }
+      },
+      {
+        "description": "td end-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "td",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<td></td><foo></foo>"
+        }
+      },
+      {
+        "description": "td end-tag followed by td start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "td",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "td",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<td><td>"
+        }
+      },
+      {
+        "description": "td end-tag followed by th start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "td",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "th",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<td><th>"
+        }
+      },
+      {
+        "description": "td end-tag followed by end-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "td",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo><td></foo>"
+        }
+      },
+      {
+        "description": "td end-tag at EOF",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "td",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<td>"
+        }
+      },
+      {
+        "description": "th end-tag followed by comment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "th",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "comment",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<th></th><!--foo-->"
+        }
+      },
+      {
+        "description": "th end-tag followed by space character",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "th",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<th></th> foo"
+        }
+      },
+      {
+        "description": "th end-tag followed by text",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "th",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "foo"
+            }
+          ]
+        },
+        "expected": {
+          "html": "<th></th>foo"
+        }
+      },
+      {
+        "description": "th end-tag followed by start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "th",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<th></th><foo></foo>"
+        }
+      },
+      {
+        "description": "th end-tag followed by th start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "th",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "th",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<th><th>"
+        }
+      },
+      {
+        "description": "th end-tag followed by td start-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "th",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "td",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<th><td>"
+        }
+      },
+      {
+        "description": "th end-tag followed by end-tag",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "foo",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "th",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "html": "<foo><th></foo>"
+        }
+      },
+      {
+        "description": "th end-tag at EOF",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "th",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "html": "<th>"
+        }
+      }
+    ]
+  }
+]

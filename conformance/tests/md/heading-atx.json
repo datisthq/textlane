@@ -1741,6 +1741,145 @@
     ]
   },
   {
+    "description": "ATX headings (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#atx-headings"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 62",
+        "input": "# foo\n## foo\n### foo\n#### foo\n##### foo\n###### foo\n",
+        "expected": {
+          "md": "# foo\n\n## foo\n\n### foo\n\n#### foo\n\n##### foo\n\n###### foo\n"
+        }
+      },
+      {
+        "description": "example 63",
+        "input": "####### foo\n",
+        "expected": {
+          "md": "\\####### foo\n"
+        }
+      },
+      {
+        "description": "example 64",
+        "input": "#5 bolt\n\n#hashtag\n",
+        "expected": {
+          "md": "\\#5 bolt\n\n\\#hashtag\n"
+        }
+      },
+      {
+        "description": "example 65",
+        "input": "\\## foo\n",
+        "expected": {
+          "md": "\\## foo\n"
+        }
+      },
+      {
+        "description": "example 66",
+        "input": "# foo *bar* \\*baz\\*\n",
+        "expected": {
+          "md": "# foo *bar* \\*baz\\*\n"
+        }
+      },
+      {
+        "description": "example 67",
+        "input": "#                  foo                     \n",
+        "expected": {
+          "md": "# foo\n"
+        }
+      },
+      {
+        "description": "example 68",
+        "input": " ### foo\n  ## foo\n   # foo\n",
+        "expected": {
+          "md": "### foo\n\n## foo\n\n# foo\n"
+        }
+      },
+      {
+        "description": "example 69",
+        "input": "    # foo\n",
+        "expected": {
+          "md": "```\n# foo\n```\n"
+        }
+      },
+      {
+        "description": "example 70",
+        "input": "foo\n    # bar\n",
+        "expected": {
+          "md": "foo\n\\# bar\n"
+        }
+      },
+      {
+        "description": "example 71",
+        "input": "## foo ##\n  ###   bar    ###\n",
+        "expected": {
+          "md": "## foo\n\n### bar\n"
+        }
+      },
+      {
+        "description": "example 72",
+        "input": "# foo ##################################\n##### foo ##\n",
+        "expected": {
+          "md": "# foo\n\n##### foo\n"
+        }
+      },
+      {
+        "description": "example 73",
+        "input": "### foo ###     \n",
+        "expected": {
+          "md": "### foo\n"
+        }
+      },
+      {
+        "description": "example 74",
+        "input": "### foo ### b\n",
+        "expected": {
+          "md": "### foo ### b\n"
+        }
+      },
+      {
+        "description": "example 75",
+        "input": "# foo#\n",
+        "expected": {
+          "md": "# foo\\#\n"
+        }
+      },
+      {
+        "description": "example 76",
+        "input": "### foo \\###\n## foo #\\##\n# foo \\#\n",
+        "expected": {
+          "md": "### foo ##\\#\n\n## foo ##\\#\n\n# foo \\#\n"
+        }
+      },
+      {
+        "description": "example 77",
+        "input": "****\n## foo\n****\n",
+        "expected": {
+          "md": "***\n\n## foo\n\n***\n"
+        }
+      },
+      {
+        "description": "example 78",
+        "input": "Foo bar\n# baz\nBar foo\n",
+        "expected": {
+          "md": "Foo bar\n\n# baz\n\nBar foo\n"
+        }
+      },
+      {
+        "description": "example 79",
+        "input": "## \n#\n### ###\n",
+        "expected": {
+          "md": "##\n\n#\n\n###\n"
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark flow/heading-atx",
     "source": {
       "repository": "https://github.com/micromark/micromark",

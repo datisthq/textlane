@@ -9260,6 +9260,649 @@
     ]
   },
   {
+    "description": "Links (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#links"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 482",
+        "input": "[link](/uri \"title\")\n",
+        "expected": {
+          "md": "[link](/uri \"title\")\n"
+        }
+      },
+      {
+        "description": "example 483",
+        "input": "[link](/uri)\n",
+        "expected": {
+          "md": "[link](/uri)\n"
+        }
+      },
+      {
+        "description": "example 484",
+        "input": "[](./target.md)\n",
+        "expected": {
+          "md": "[](./target.md)\n"
+        }
+      },
+      {
+        "description": "example 485",
+        "input": "[link]()\n",
+        "expected": {
+          "md": "[link]()\n"
+        }
+      },
+      {
+        "description": "example 486",
+        "input": "[link](<>)\n",
+        "expected": {
+          "md": "[link]()\n"
+        }
+      },
+      {
+        "description": "example 487",
+        "input": "[]()\n",
+        "expected": {
+          "md": "[]()\n"
+        }
+      },
+      {
+        "description": "example 488",
+        "input": "[link](/my uri)\n",
+        "expected": {
+          "md": "\\[link]\\(/my uri)\n"
+        }
+      },
+      {
+        "description": "example 489",
+        "input": "[link](</my uri>)\n",
+        "expected": {
+          "md": "[link](</my uri>)\n"
+        }
+      },
+      {
+        "description": "example 490",
+        "input": "[link](foo\nbar)\n",
+        "expected": {
+          "md": "\\[link]\\(foo\nbar)\n"
+        }
+      },
+      {
+        "description": "example 491",
+        "input": "[link](<foo\nbar>)\n",
+        "expected": {
+          "md": "\\[link]\\(<foo\nbar>)\n"
+        }
+      },
+      {
+        "description": "example 492",
+        "input": "[a](<b)c>)\n",
+        "expected": {
+          "md": "[a](b\\)c)\n"
+        }
+      },
+      {
+        "description": "example 493",
+        "input": "[link](<foo\\>)\n",
+        "expected": {
+          "md": "\\[link]\\(\\<foo>)\n"
+        }
+      },
+      {
+        "description": "example 494",
+        "input": "[a](<b)c\n[a](<b)c>\n[a](<b>c)\n",
+        "expected": {
+          "md": "\\[a]\\(\\<b)c\n\\[a]\\(\\<b)c>\n\\[a]\\(<b>c)\n"
+        }
+      },
+      {
+        "description": "example 495",
+        "input": "[link](\\(foo\\))\n",
+        "expected": {
+          "md": "[link](\\(foo\\))\n"
+        }
+      },
+      {
+        "description": "example 496",
+        "input": "[link](foo(and(bar)))\n",
+        "expected": {
+          "md": "[link](foo\\(and\\(bar\\)\\))\n"
+        }
+      },
+      {
+        "description": "example 497",
+        "input": "[link](foo(and(bar))\n",
+        "expected": {
+          "md": "\\[link]\\(foo(and(bar))\n"
+        }
+      },
+      {
+        "description": "example 498",
+        "input": "[link](foo\\(and\\(bar\\))\n",
+        "expected": {
+          "md": "[link](foo\\(and\\(bar\\))\n"
+        }
+      },
+      {
+        "description": "example 499",
+        "input": "[link](<foo(and(bar)>)\n",
+        "expected": {
+          "md": "[link](foo\\(and\\(bar\\))\n"
+        }
+      },
+      {
+        "description": "example 500",
+        "input": "[link](foo\\)\\:)\n",
+        "expected": {
+          "md": "[link](foo\\):)\n"
+        }
+      },
+      {
+        "description": "example 501",
+        "input": "[link](#fragment)\n\n[link](https://example.com#fragment)\n\n[link](https://example.com?foo=3#frag)\n",
+        "expected": {
+          "md": "[link](#fragment)\n\n[link](https://example.com#fragment)\n\n[link](https://example.com?foo=3#frag)\n"
+        }
+      },
+      {
+        "description": "example 502",
+        "input": "[link](foo\\bar)\n",
+        "expected": {
+          "md": "[link](foo\\bar)\n"
+        }
+      },
+      {
+        "description": "example 503",
+        "input": "[link](foo%20b&auml;)\n",
+        "expected": {
+          "md": "[link](foo%20bä)\n"
+        }
+      },
+      {
+        "description": "example 504",
+        "input": "[link](\"title\")\n",
+        "expected": {
+          "md": "[link](\"title\")\n"
+        }
+      },
+      {
+        "description": "example 505",
+        "input": "[link](/url \"title\")\n[link](/url 'title')\n[link](/url (title))\n",
+        "expected": {
+          "md": "[link](/url \"title\")\n[link](/url \"title\")\n[link](/url \"title\")\n"
+        }
+      },
+      {
+        "description": "example 506",
+        "input": "[link](/url \"title \\\"&quot;\")\n",
+        "expected": {
+          "md": "[link](/url \"title \\\"\\\"\")\n"
+        }
+      },
+      {
+        "description": "example 507",
+        "input": "[link](/url \"title\")\n",
+        "expected": {
+          "md": "[link](/url \"title\")\n"
+        }
+      },
+      {
+        "description": "example 508",
+        "input": "[link](/url \"title \"and\" title\")\n",
+        "expected": {
+          "md": "\\[link]\\(/url \"title \"and\" title\")\n"
+        }
+      },
+      {
+        "description": "example 509",
+        "input": "[link](/url 'title \"and\" title')\n",
+        "expected": {
+          "md": "[link](/url \"title \\\"and\\\" title\")\n"
+        }
+      },
+      {
+        "description": "example 510",
+        "input": "[link](   /uri\n  \"title\"  )\n",
+        "expected": {
+          "md": "[link](/uri \"title\")\n"
+        }
+      },
+      {
+        "description": "example 511",
+        "input": "[link] (/uri)\n",
+        "expected": {
+          "md": "\\[link] (/uri)\n"
+        }
+      },
+      {
+        "description": "example 512",
+        "input": "[link [foo [bar]]](/uri)\n",
+        "expected": {
+          "md": "[link \\[foo \\[bar\\]\\]](/uri)\n"
+        }
+      },
+      {
+        "description": "example 513",
+        "input": "[link] bar](/uri)\n",
+        "expected": {
+          "md": "\\[link] bar]\\(/uri)\n"
+        }
+      },
+      {
+        "description": "example 514",
+        "input": "[link [bar](/uri)\n",
+        "expected": {
+          "md": "\\[link [bar](/uri)\n"
+        }
+      },
+      {
+        "description": "example 515",
+        "input": "[link \\[bar](/uri)\n",
+        "expected": {
+          "md": "[link \\[bar](/uri)\n"
+        }
+      },
+      {
+        "description": "example 516",
+        "input": "[link *foo **bar** `#`*](/uri)\n",
+        "expected": {
+          "md": "[link *foo **bar** `#`*](/uri)\n"
+        }
+      },
+      {
+        "description": "example 517",
+        "input": "[![moon](moon.jpg)](/uri)\n",
+        "expected": {
+          "md": "[![moon](moon.jpg)](/uri)\n"
+        }
+      },
+      {
+        "description": "example 518",
+        "input": "[foo [bar](/uri)](/uri)\n",
+        "expected": {
+          "md": "\\[foo [bar](/uri)]\\(/uri)\n"
+        }
+      },
+      {
+        "description": "example 519",
+        "input": "[foo *[bar [baz](/uri)](/uri)*](/uri)\n",
+        "expected": {
+          "md": "\\[foo *\\[bar [baz](/uri)]\\(/uri)*]\\(/uri)\n"
+        }
+      },
+      {
+        "description": "example 520",
+        "input": "![[[foo](uri1)](uri2)](uri3)\n",
+        "expected": {
+          "md": "![\\[foo\\](uri2)](uri3)\n"
+        }
+      },
+      {
+        "description": "example 521",
+        "input": "*[foo*](/uri)\n",
+        "expected": {
+          "md": "\\*[foo\\*](/uri)\n"
+        }
+      },
+      {
+        "description": "example 522",
+        "input": "[foo *bar](baz*)\n",
+        "expected": {
+          "md": "[foo \\*bar](baz*)\n"
+        }
+      },
+      {
+        "description": "example 523",
+        "input": "*foo [bar* baz]\n",
+        "expected": {
+          "md": "*foo \\[bar* baz]\n"
+        }
+      },
+      {
+        "description": "example 524",
+        "input": "[foo <bar attr=\"](baz)\">\n",
+        "expected": {
+          "md": "\\[foo <bar attr=\"](baz)\">\n"
+        }
+      },
+      {
+        "description": "example 525",
+        "input": "[foo`](/uri)`\n",
+        "expected": {
+          "md": "\\[foo`](/uri)`\n"
+        }
+      },
+      {
+        "description": "example 526",
+        "input": "[foo<https://example.com/?search=](uri)>\n",
+        "expected": {
+          "md": "\\[foo<https://example.com/?search=](uri)>\n"
+        }
+      },
+      {
+        "description": "example 527",
+        "input": "[foo][bar]\n\n[bar]: /url \"title\"\n",
+        "expected": {
+          "md": "[foo][bar]\n\n[bar]: /url \"title\"\n"
+        }
+      },
+      {
+        "description": "example 528",
+        "input": "[link [foo [bar]]][ref]\n\n[ref]: /uri\n",
+        "expected": {
+          "md": "[link \\[foo \\[bar\\]\\]][ref]\n\n[ref]: /uri\n"
+        }
+      },
+      {
+        "description": "example 529",
+        "input": "[link \\[bar][ref]\n\n[ref]: /uri\n",
+        "expected": {
+          "md": "[link \\[bar][ref]\n\n[ref]: /uri\n"
+        }
+      },
+      {
+        "description": "example 530",
+        "input": "[link *foo **bar** `#`*][ref]\n\n[ref]: /uri\n",
+        "expected": {
+          "md": "[link *foo **bar** `#`*][ref]\n\n[ref]: /uri\n"
+        }
+      },
+      {
+        "description": "example 531",
+        "input": "[![moon](moon.jpg)][ref]\n\n[ref]: /uri\n",
+        "expected": {
+          "md": "[![moon](moon.jpg)][ref]\n\n[ref]: /uri\n"
+        }
+      },
+      {
+        "description": "example 532",
+        "input": "[foo [bar](/uri)][ref]\n\n[ref]: /uri\n",
+        "expected": {
+          "md": "\\[foo [bar](/uri)][ref]\n\n[ref]: /uri\n"
+        }
+      },
+      {
+        "description": "example 533",
+        "input": "[foo *bar [baz][ref]*][ref]\n\n[ref]: /uri\n",
+        "expected": {
+          "md": "\\[foo *bar [baz][ref]*][ref]\n\n[ref]: /uri\n"
+        }
+      },
+      {
+        "description": "example 534",
+        "input": "*[foo*][ref]\n\n[ref]: /uri\n",
+        "expected": {
+          "md": "\\*[foo\\*][ref]\n\n[ref]: /uri\n"
+        }
+      },
+      {
+        "description": "example 535",
+        "input": "[foo *bar][ref]*\n\n[ref]: /uri\n",
+        "expected": {
+          "md": "[foo \\*bar][ref]\\*\n\n[ref]: /uri\n"
+        }
+      },
+      {
+        "description": "example 536",
+        "input": "[foo <bar attr=\"][ref]\">\n\n[ref]: /uri\n",
+        "expected": {
+          "md": "\\[foo <bar attr=\"][ref]\">\n\n[ref]: /uri\n"
+        }
+      },
+      {
+        "description": "example 537",
+        "input": "[foo`][ref]`\n\n[ref]: /uri\n",
+        "expected": {
+          "md": "\\[foo`][ref]`\n\n[ref]: /uri\n"
+        }
+      },
+      {
+        "description": "example 538",
+        "input": "[foo<https://example.com/?search=][ref]>\n\n[ref]: /uri\n",
+        "expected": {
+          "md": "\\[foo<https://example.com/?search=][ref]>\n\n[ref]: /uri\n"
+        }
+      },
+      {
+        "description": "example 539",
+        "input": "[foo][BaR]\n\n[bar]: /url \"title\"\n",
+        "expected": {
+          "md": "[foo][BaR]\n\n[bar]: /url \"title\"\n"
+        }
+      },
+      {
+        "description": "example 540",
+        "input": "[ẞ]\n\n[SS]: /url\n",
+        "expected": {
+          "md": "[ẞ]\n\n[SS]: /url\n"
+        }
+      },
+      {
+        "description": "example 541",
+        "input": "[Foo\n  bar]: /url\n\n[Baz][Foo bar]\n",
+        "expected": {
+          "md": "[Foo\n  bar]: /url\n\n[Baz][Foo bar]\n"
+        }
+      },
+      {
+        "description": "example 542",
+        "input": "[foo] [bar]\n\n[bar]: /url \"title\"\n",
+        "expected": {
+          "md": "\\[foo] [bar]\n\n[bar]: /url \"title\"\n"
+        }
+      },
+      {
+        "description": "example 543",
+        "input": "[foo]\n[bar]\n\n[bar]: /url \"title\"\n",
+        "expected": {
+          "md": "\\[foo]\n[bar]\n\n[bar]: /url \"title\"\n"
+        }
+      },
+      {
+        "description": "example 544",
+        "input": "[foo]: /url1\n\n[foo]: /url2\n\n[bar][foo]\n",
+        "expected": {
+          "md": "[foo]: /url1\n\n[foo]: /url2\n\n[bar][foo]\n"
+        }
+      },
+      {
+        "description": "example 545",
+        "input": "[bar][foo\\!]\n\n[foo!]: /url\n",
+        "expected": {
+          "md": "\\[bar]\\[foo!]\n\n[foo!]: /url\n"
+        }
+      },
+      {
+        "description": "example 546",
+        "input": "[foo][ref[]\n\n[ref[]: /uri\n",
+        "expected": {
+          "md": "\\[foo]\\[ref\\[]\n\n\\[ref\\[]: /uri\n"
+        }
+      },
+      {
+        "description": "example 547",
+        "input": "[foo][ref[bar]]\n\n[ref[bar]]: /uri\n",
+        "expected": {
+          "md": "\\[foo]\\[ref\\[bar]]\n\n\\[ref\\[bar]]: /uri\n"
+        }
+      },
+      {
+        "description": "example 548",
+        "input": "[[[foo]]]\n\n[[[foo]]]: /url\n",
+        "expected": {
+          "md": "\\[\\[\\[foo]]]\n\n\\[\\[\\[foo]]]: /url\n"
+        }
+      },
+      {
+        "description": "example 549",
+        "input": "[foo][ref\\[]\n\n[ref\\[]: /uri\n",
+        "expected": {
+          "md": "[foo][ref\\[]\n\n[ref\\[]: /uri\n"
+        }
+      },
+      {
+        "description": "example 550",
+        "input": "[bar\\\\]: /uri\n\n[bar\\\\]\n",
+        "expected": {
+          "md": "[bar\\\\]: /uri\n\n[bar\\\\]\n"
+        }
+      },
+      {
+        "description": "example 551",
+        "input": "[]\n\n[]: /uri\n",
+        "expected": {
+          "md": "\\[]\n\n\\[]: /uri\n"
+        }
+      },
+      {
+        "description": "example 552",
+        "input": "[\n ]\n\n[\n ]: /uri\n",
+        "expected": {
+          "md": "\\[\n]\n\n\\[\n]: /uri\n"
+        }
+      },
+      {
+        "description": "example 553",
+        "input": "[foo][]\n\n[foo]: /url \"title\"\n",
+        "expected": {
+          "md": "[foo][]\n\n[foo]: /url \"title\"\n"
+        }
+      },
+      {
+        "description": "example 554",
+        "input": "[*foo* bar][]\n\n[*foo* bar]: /url \"title\"\n",
+        "expected": {
+          "md": "[*foo* bar][]\n\n[*foo* bar]: /url \"title\"\n"
+        }
+      },
+      {
+        "description": "example 555",
+        "input": "[Foo][]\n\n[foo]: /url \"title\"\n",
+        "expected": {
+          "md": "[Foo][]\n\n[foo]: /url \"title\"\n"
+        }
+      },
+      {
+        "description": "example 556",
+        "input": "[foo] \n[]\n\n[foo]: /url \"title\"\n",
+        "expected": {
+          "md": "[foo]\n\\[]\n\n[foo]: /url \"title\"\n"
+        }
+      },
+      {
+        "description": "example 557",
+        "input": "[foo]\n\n[foo]: /url \"title\"\n",
+        "expected": {
+          "md": "[foo]\n\n[foo]: /url \"title\"\n"
+        }
+      },
+      {
+        "description": "example 558",
+        "input": "[*foo* bar]\n\n[*foo* bar]: /url \"title\"\n",
+        "expected": {
+          "md": "[*foo* bar]\n\n[*foo* bar]: /url \"title\"\n"
+        }
+      },
+      {
+        "description": "example 559",
+        "input": "[[*foo* bar]]\n\n[*foo* bar]: /url \"title\"\n",
+        "expected": {
+          "md": "\\[[*foo* bar]]\n\n[*foo* bar]: /url \"title\"\n"
+        }
+      },
+      {
+        "description": "example 560",
+        "input": "[[bar [foo]\n\n[foo]: /url\n",
+        "expected": {
+          "md": "\\[\\[bar [foo]\n\n[foo]: /url\n"
+        }
+      },
+      {
+        "description": "example 561",
+        "input": "[Foo]\n\n[foo]: /url \"title\"\n",
+        "expected": {
+          "md": "[Foo]\n\n[foo]: /url \"title\"\n"
+        }
+      },
+      {
+        "description": "example 562",
+        "input": "[foo] bar\n\n[foo]: /url\n",
+        "expected": {
+          "md": "[foo] bar\n\n[foo]: /url\n"
+        }
+      },
+      {
+        "description": "example 563",
+        "input": "\\[foo]\n\n[foo]: /url \"title\"\n",
+        "expected": {
+          "md": "\\[foo]\n\n[foo]: /url \"title\"\n"
+        }
+      },
+      {
+        "description": "example 564",
+        "input": "[foo*]: /url\n\n*[foo*]\n",
+        "expected": {
+          "md": "[foo*]: /url\n\n\\*[foo\\*][foo*]\n"
+        }
+      },
+      {
+        "description": "example 565",
+        "input": "[foo][bar]\n\n[foo]: /url1\n[bar]: /url2\n",
+        "expected": {
+          "md": "[foo][bar]\n\n[foo]: /url1\n\n[bar]: /url2\n"
+        }
+      },
+      {
+        "description": "example 566",
+        "input": "[foo][]\n\n[foo]: /url1\n",
+        "expected": {
+          "md": "[foo][]\n\n[foo]: /url1\n"
+        }
+      },
+      {
+        "description": "example 567",
+        "input": "[foo]()\n\n[foo]: /url1\n",
+        "expected": {
+          "md": "[foo]()\n\n[foo]: /url1\n"
+        }
+      },
+      {
+        "description": "example 568",
+        "input": "[foo](not a link)\n\n[foo]: /url1\n",
+        "expected": {
+          "md": "[foo]\\(not a link)\n\n[foo]: /url1\n"
+        }
+      },
+      {
+        "description": "example 569",
+        "input": "[foo][bar][baz]\n\n[baz]: /url\n",
+        "expected": {
+          "md": "\\[foo][bar][baz]\n\n[baz]: /url\n"
+        }
+      },
+      {
+        "description": "example 570",
+        "input": "[foo][bar][baz]\n\n[baz]: /url1\n[bar]: /url2\n",
+        "expected": {
+          "md": "[foo][bar][baz]\n\n[baz]: /url1\n\n[bar]: /url2\n"
+        }
+      },
+      {
+        "description": "example 571",
+        "input": "[foo][bar][baz]\n\n[baz]: /url1\n[foo]: /url2\n",
+        "expected": {
+          "md": "\\[foo][bar][baz]\n\n[baz]: /url1\n\n[foo]: /url2\n"
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark text/link-reference",
     "source": {
       "repository": "https://github.com/micromark/micromark",

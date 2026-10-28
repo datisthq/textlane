@@ -978,6 +978,103 @@
     ]
   },
   {
+    "description": "Indented code blocks (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#indented-code-blocks"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 107",
+        "input": "    a simple\n      indented code block\n",
+        "expected": {
+          "md": "```\na simple\n  indented code block\n```\n"
+        }
+      },
+      {
+        "description": "example 108",
+        "input": "  - foo\n\n    bar\n",
+        "expected": {
+          "md": "* foo\n\n  bar\n"
+        }
+      },
+      {
+        "description": "example 109",
+        "input": "1.  foo\n\n    - bar\n",
+        "expected": {
+          "md": "1. foo\n\n   * bar\n"
+        }
+      },
+      {
+        "description": "example 110",
+        "input": "    <a/>\n    *hi*\n\n    - one\n",
+        "expected": {
+          "md": "```\n<a/>\n*hi*\n\n- one\n```\n"
+        }
+      },
+      {
+        "description": "example 111",
+        "input": "    chunk1\n\n    chunk2\n  \n \n \n    chunk3\n",
+        "expected": {
+          "md": "```\nchunk1\n\nchunk2\n\n\n\nchunk3\n```\n"
+        }
+      },
+      {
+        "description": "example 112",
+        "input": "    chunk1\n      \n      chunk2\n",
+        "expected": {
+          "md": "```\nchunk1\n  \n  chunk2\n```\n"
+        }
+      },
+      {
+        "description": "example 113",
+        "input": "Foo\n    bar\n\n",
+        "expected": {
+          "md": "Foo\nbar\n"
+        }
+      },
+      {
+        "description": "example 114",
+        "input": "    foo\nbar\n",
+        "expected": {
+          "md": "```\nfoo\n```\n\nbar\n"
+        }
+      },
+      {
+        "description": "example 115",
+        "input": "# Heading\n    foo\nHeading\n------\n    foo\n----\n",
+        "expected": {
+          "md": "# Heading\n\n```\nfoo\n```\n\n## Heading\n\n```\nfoo\n```\n\n***\n"
+        }
+      },
+      {
+        "description": "example 116",
+        "input": "        foo\n    bar\n",
+        "expected": {
+          "md": "```\n    foo\nbar\n```\n"
+        }
+      },
+      {
+        "description": "example 117",
+        "input": "\n    \n    foo\n    \n\n",
+        "expected": {
+          "md": "```\nfoo\n```\n"
+        }
+      },
+      {
+        "description": "example 118",
+        "input": "    foo  \n",
+        "expected": {
+          "md": "```\nfoo  \n```\n"
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark flow/code-indented",
     "source": {
       "repository": "https://github.com/micromark/micromark",

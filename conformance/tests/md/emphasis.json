@@ -12383,6 +12383,943 @@
     ]
   },
   {
+    "description": "Emphasis and strong emphasis (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#emphasis-and-strong-emphasis"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 350",
+        "input": "*foo bar*\n",
+        "expected": {
+          "md": "*foo bar*\n"
+        }
+      },
+      {
+        "description": "example 351",
+        "input": "a * foo bar*\n",
+        "expected": {
+          "md": "a \\* foo bar\\*\n"
+        }
+      },
+      {
+        "description": "example 352",
+        "input": "a*\"foo\"*\n",
+        "expected": {
+          "md": "a\\*\"foo\"\\*\n"
+        }
+      },
+      {
+        "description": "example 353",
+        "input": "* a *\n",
+        "expected": {
+          "md": "\\* a \\*\n"
+        }
+      },
+      {
+        "description": "example 354",
+        "input": "*$*alpha.\n\n*£*bravo.\n\n*€*charlie.\n",
+        "expected": {
+          "md": "\\*$\\*alpha.\n\n\\*£\\*bravo.\n\n\\*€\\*charlie.\n"
+        }
+      },
+      {
+        "description": "example 355",
+        "input": "foo*bar*\n",
+        "expected": {
+          "md": "foo*bar*\n"
+        }
+      },
+      {
+        "description": "example 356",
+        "input": "5*6*78\n",
+        "expected": {
+          "md": "5*6*78\n"
+        }
+      },
+      {
+        "description": "example 357",
+        "input": "_foo bar_\n",
+        "expected": {
+          "md": "*foo bar*\n"
+        }
+      },
+      {
+        "description": "example 358",
+        "input": "_ foo bar_\n",
+        "expected": {
+          "md": "\\_ foo bar\\_\n"
+        }
+      },
+      {
+        "description": "example 359",
+        "input": "a_\"foo\"_\n",
+        "expected": {
+          "md": "a\\_\"foo\"\\_\n"
+        }
+      },
+      {
+        "description": "example 360",
+        "input": "foo_bar_\n",
+        "expected": {
+          "md": "foo_bar\\_\n"
+        }
+      },
+      {
+        "description": "example 361",
+        "input": "5_6_78\n",
+        "expected": {
+          "md": "5_6_78\n"
+        }
+      },
+      {
+        "description": "example 362",
+        "input": "пристаням_стремятся_\n",
+        "expected": {
+          "md": "пристаням_стремятся\\_\n"
+        }
+      },
+      {
+        "description": "example 363",
+        "input": "aa_\"bb\"_cc\n",
+        "expected": {
+          "md": "aa\\_\"bb\"\\_cc\n"
+        }
+      },
+      {
+        "description": "example 364",
+        "input": "foo-_(bar)_\n",
+        "expected": {
+          "md": "foo-*(bar)*\n"
+        }
+      },
+      {
+        "description": "example 365",
+        "input": "_foo*\n",
+        "expected": {
+          "md": "\\_foo\\*\n"
+        }
+      },
+      {
+        "description": "example 366",
+        "input": "*foo bar *\n",
+        "expected": {
+          "md": "\\*foo bar \\*\n"
+        }
+      },
+      {
+        "description": "example 367",
+        "input": "*foo bar\n*\n",
+        "expected": {
+          "md": "\\*foo bar\n\\*\n"
+        }
+      },
+      {
+        "description": "example 368",
+        "input": "*(*foo)\n",
+        "expected": {
+          "md": "\\*(\\*foo)\n"
+        }
+      },
+      {
+        "description": "example 369",
+        "input": "*(*foo*)*\n",
+        "expected": {
+          "md": "*(*foo*)*\n"
+        }
+      },
+      {
+        "description": "example 370",
+        "input": "*foo*bar\n",
+        "expected": {
+          "md": "*foo*bar\n"
+        }
+      },
+      {
+        "description": "example 371",
+        "input": "_foo bar _\n",
+        "expected": {
+          "md": "\\_foo bar \\_\n"
+        }
+      },
+      {
+        "description": "example 372",
+        "input": "_(_foo)\n",
+        "expected": {
+          "md": "\\_(\\_foo)\n"
+        }
+      },
+      {
+        "description": "example 373",
+        "input": "_(_foo_)_\n",
+        "expected": {
+          "md": "*(*foo*)*\n"
+        }
+      },
+      {
+        "description": "example 374",
+        "input": "_foo_bar\n",
+        "expected": {
+          "md": "\\_foo_bar\n"
+        }
+      },
+      {
+        "description": "example 375",
+        "input": "_пристаням_стремятся\n",
+        "expected": {
+          "md": "\\_пристаням_стремятся\n"
+        }
+      },
+      {
+        "description": "example 376",
+        "input": "_foo_bar_baz_\n",
+        "expected": {
+          "md": "*foo_bar_baz*\n"
+        }
+      },
+      {
+        "description": "example 377",
+        "input": "_(bar)_.\n",
+        "expected": {
+          "md": "*(bar)*.\n"
+        }
+      },
+      {
+        "description": "example 378",
+        "input": "**foo bar**\n",
+        "expected": {
+          "md": "**foo bar**\n"
+        }
+      },
+      {
+        "description": "example 379",
+        "input": "** foo bar**\n",
+        "expected": {
+          "md": "\\*\\* foo bar\\*\\*\n"
+        }
+      },
+      {
+        "description": "example 380",
+        "input": "a**\"foo\"**\n",
+        "expected": {
+          "md": "a\\*\\*\"foo\"\\*\\*\n"
+        }
+      },
+      {
+        "description": "example 381",
+        "input": "foo**bar**\n",
+        "expected": {
+          "md": "foo**bar**\n"
+        }
+      },
+      {
+        "description": "example 382",
+        "input": "__foo bar__\n",
+        "expected": {
+          "md": "**foo bar**\n"
+        }
+      },
+      {
+        "description": "example 383",
+        "input": "__ foo bar__\n",
+        "expected": {
+          "md": "\\_\\_ foo bar\\_\\_\n"
+        }
+      },
+      {
+        "description": "example 384",
+        "input": "__\nfoo bar__\n",
+        "expected": {
+          "md": "\\_\\_\nfoo bar\\_\\_\n"
+        }
+      },
+      {
+        "description": "example 385",
+        "input": "a__\"foo\"__\n",
+        "expected": {
+          "md": "a\\_\\_\"foo\"\\_\\_\n"
+        }
+      },
+      {
+        "description": "example 386",
+        "input": "foo__bar__\n",
+        "expected": {
+          "md": "foo__bar\\_\\_\n"
+        }
+      },
+      {
+        "description": "example 387",
+        "input": "5__6__78\n",
+        "expected": {
+          "md": "5__6__78\n"
+        }
+      },
+      {
+        "description": "example 388",
+        "input": "пристаням__стремятся__\n",
+        "expected": {
+          "md": "пристаням__стремятся\\_\\_\n"
+        }
+      },
+      {
+        "description": "example 389",
+        "input": "__foo, __bar__, baz__\n",
+        "expected": {
+          "md": "**foo, **bar**, baz**\n"
+        }
+      },
+      {
+        "description": "example 390",
+        "input": "foo-__(bar)__\n",
+        "expected": {
+          "md": "foo-**(bar)**\n"
+        }
+      },
+      {
+        "description": "example 391",
+        "input": "**foo bar **\n",
+        "expected": {
+          "md": "\\*\\*foo bar \\*\\*\n"
+        }
+      },
+      {
+        "description": "example 392",
+        "input": "**(**foo)\n",
+        "expected": {
+          "md": "\\*\\*(\\*\\*foo)\n"
+        }
+      },
+      {
+        "description": "example 393",
+        "input": "*(**foo**)*\n",
+        "expected": {
+          "md": "*(**foo**)*\n"
+        }
+      },
+      {
+        "description": "example 394",
+        "input": "**Gomphocarpus (*Gomphocarpus physocarpus*, syn.\n*Asclepias physocarpa*)**\n",
+        "expected": {
+          "md": "**Gomphocarpus (*Gomphocarpus physocarpus*, syn.\n*Asclepias physocarpa*)**\n"
+        }
+      },
+      {
+        "description": "example 395",
+        "input": "**foo \"*bar*\" foo**\n",
+        "expected": {
+          "md": "**foo \"*bar*\" foo**\n"
+        }
+      },
+      {
+        "description": "example 396",
+        "input": "**foo**bar\n",
+        "expected": {
+          "md": "**foo**bar\n"
+        }
+      },
+      {
+        "description": "example 397",
+        "input": "__foo bar __\n",
+        "expected": {
+          "md": "\\_\\_foo bar \\_\\_\n"
+        }
+      },
+      {
+        "description": "example 398",
+        "input": "__(__foo)\n",
+        "expected": {
+          "md": "\\_\\_(\\_\\_foo)\n"
+        }
+      },
+      {
+        "description": "example 399",
+        "input": "_(__foo__)_\n",
+        "expected": {
+          "md": "*(**foo**)*\n"
+        }
+      },
+      {
+        "description": "example 400",
+        "input": "__foo__bar\n",
+        "expected": {
+          "md": "\\_\\_foo__bar\n"
+        }
+      },
+      {
+        "description": "example 401",
+        "input": "__пристаням__стремятся\n",
+        "expected": {
+          "md": "\\_\\_пристаням__стремятся\n"
+        }
+      },
+      {
+        "description": "example 402",
+        "input": "__foo__bar__baz__\n",
+        "expected": {
+          "md": "**foo__bar__baz**\n"
+        }
+      },
+      {
+        "description": "example 403",
+        "input": "__(bar)__.\n",
+        "expected": {
+          "md": "**(bar)**.\n"
+        }
+      },
+      {
+        "description": "example 404",
+        "input": "*foo [bar](/url)*\n",
+        "expected": {
+          "md": "*foo [bar](/url)*\n"
+        }
+      },
+      {
+        "description": "example 405",
+        "input": "*foo\nbar*\n",
+        "expected": {
+          "md": "*foo\nbar*\n"
+        }
+      },
+      {
+        "description": "example 406",
+        "input": "_foo __bar__ baz_\n",
+        "expected": {
+          "md": "*foo **bar** baz*\n"
+        }
+      },
+      {
+        "description": "example 407",
+        "input": "_foo _bar_ baz_\n",
+        "expected": {
+          "md": "*foo *bar* baz*\n"
+        }
+      },
+      {
+        "description": "example 408",
+        "input": "__foo_ bar_\n",
+        "expected": {
+          "md": "**foo* bar*\n"
+        }
+      },
+      {
+        "description": "example 409",
+        "input": "*foo *bar**\n",
+        "expected": {
+          "md": "*foo *bar**\n"
+        }
+      },
+      {
+        "description": "example 410",
+        "input": "*foo **bar** baz*\n",
+        "expected": {
+          "md": "*foo **bar** baz*\n"
+        }
+      },
+      {
+        "description": "example 411",
+        "input": "*foo**bar**baz*\n",
+        "expected": {
+          "md": "*foo**bar**baz*\n"
+        }
+      },
+      {
+        "description": "example 412",
+        "input": "*foo**bar*\n",
+        "expected": {
+          "md": "*foo\\*\\*bar*\n"
+        }
+      },
+      {
+        "description": "example 413",
+        "input": "***foo** bar*\n",
+        "expected": {
+          "md": "***foo** bar*\n"
+        }
+      },
+      {
+        "description": "example 414",
+        "input": "*foo **bar***\n",
+        "expected": {
+          "md": "*foo **bar***\n"
+        }
+      },
+      {
+        "description": "example 415",
+        "input": "*foo**bar***\n",
+        "expected": {
+          "md": "*foo**bar***\n"
+        }
+      },
+      {
+        "description": "example 416",
+        "input": "foo***bar***baz\n",
+        "expected": {
+          "md": "fo&#x6F;***bar***&#x62;az\n"
+        }
+      },
+      {
+        "description": "example 417",
+        "input": "foo******bar*********baz\n",
+        "expected": {
+          "md": "fo&#x6F;******bar******\\*\\*\\*baz\n"
+        }
+      },
+      {
+        "description": "example 418",
+        "input": "*foo **bar *baz* bim** bop*\n",
+        "expected": {
+          "md": "*foo **bar *baz* bim** bop*\n"
+        }
+      },
+      {
+        "description": "example 419",
+        "input": "*foo [*bar*](/url)*\n",
+        "expected": {
+          "md": "*foo [*bar*](/url)*\n"
+        }
+      },
+      {
+        "description": "example 420",
+        "input": "** is not an empty emphasis\n",
+        "expected": {
+          "md": "\\*\\* is not an empty emphasis\n"
+        }
+      },
+      {
+        "description": "example 421",
+        "input": "**** is not an empty strong emphasis\n",
+        "expected": {
+          "md": "\\*\\*\\*\\* is not an empty strong emphasis\n"
+        }
+      },
+      {
+        "description": "example 422",
+        "input": "**foo [bar](/url)**\n",
+        "expected": {
+          "md": "**foo [bar](/url)**\n"
+        }
+      },
+      {
+        "description": "example 423",
+        "input": "**foo\nbar**\n",
+        "expected": {
+          "md": "**foo\nbar**\n"
+        }
+      },
+      {
+        "description": "example 424",
+        "input": "__foo _bar_ baz__\n",
+        "expected": {
+          "md": "**foo *bar* baz**\n"
+        }
+      },
+      {
+        "description": "example 425",
+        "input": "__foo __bar__ baz__\n",
+        "expected": {
+          "md": "**foo **bar** baz**\n"
+        }
+      },
+      {
+        "description": "example 426",
+        "input": "____foo__ bar__\n",
+        "expected": {
+          "md": "****foo** bar**\n"
+        }
+      },
+      {
+        "description": "example 427",
+        "input": "**foo **bar****\n",
+        "expected": {
+          "md": "**foo **bar****\n"
+        }
+      },
+      {
+        "description": "example 428",
+        "input": "**foo *bar* baz**\n",
+        "expected": {
+          "md": "**foo *bar* baz**\n"
+        }
+      },
+      {
+        "description": "example 429",
+        "input": "**foo*bar*baz**\n",
+        "expected": {
+          "md": "**foo*bar*baz**\n"
+        }
+      },
+      {
+        "description": "example 430",
+        "input": "***foo* bar**\n",
+        "expected": {
+          "md": "***foo* bar**\n"
+        }
+      },
+      {
+        "description": "example 431",
+        "input": "**foo *bar***\n",
+        "expected": {
+          "md": "**foo *bar***\n"
+        }
+      },
+      {
+        "description": "example 432",
+        "input": "**foo *bar **baz**\nbim* bop**\n",
+        "expected": {
+          "md": "**foo *bar **baz**\nbim* bop**\n"
+        }
+      },
+      {
+        "description": "example 433",
+        "input": "**foo [*bar*](/url)**\n",
+        "expected": {
+          "md": "**foo [*bar*](/url)**\n"
+        }
+      },
+      {
+        "description": "example 434",
+        "input": "__ is not an empty emphasis\n",
+        "expected": {
+          "md": "\\_\\_ is not an empty emphasis\n"
+        }
+      },
+      {
+        "description": "example 435",
+        "input": "____ is not an empty strong emphasis\n",
+        "expected": {
+          "md": "\\_\\_\\_\\_ is not an empty strong emphasis\n"
+        }
+      },
+      {
+        "description": "example 436",
+        "input": "foo ***\n",
+        "expected": {
+          "md": "foo \\*\\*\\*\n"
+        }
+      },
+      {
+        "description": "example 437",
+        "input": "foo *\\**\n",
+        "expected": {
+          "md": "foo *\\**\n"
+        }
+      },
+      {
+        "description": "example 438",
+        "input": "foo *_*\n",
+        "expected": {
+          "md": "foo *\\_*\n"
+        }
+      },
+      {
+        "description": "example 439",
+        "input": "foo *****\n",
+        "expected": {
+          "md": "foo \\*\\*\\*\\*\\*\n"
+        }
+      },
+      {
+        "description": "example 440",
+        "input": "foo **\\***\n",
+        "expected": {
+          "md": "foo **\\***\n"
+        }
+      },
+      {
+        "description": "example 441",
+        "input": "foo **_**\n",
+        "expected": {
+          "md": "foo **\\_**\n"
+        }
+      },
+      {
+        "description": "example 442",
+        "input": "**foo*\n",
+        "expected": {
+          "md": "\\**foo*\n"
+        }
+      },
+      {
+        "description": "example 443",
+        "input": "*foo**\n",
+        "expected": {
+          "md": "*foo*\\*\n"
+        }
+      },
+      {
+        "description": "example 444",
+        "input": "***foo**\n",
+        "expected": {
+          "md": "\\***foo**\n"
+        }
+      },
+      {
+        "description": "example 445",
+        "input": "****foo*\n",
+        "expected": {
+          "md": "\\*\\*\\**foo*\n"
+        }
+      },
+      {
+        "description": "example 446",
+        "input": "**foo***\n",
+        "expected": {
+          "md": "**foo**\\*\n"
+        }
+      },
+      {
+        "description": "example 447",
+        "input": "*foo****\n",
+        "expected": {
+          "md": "*foo*\\*\\*\\*\n"
+        }
+      },
+      {
+        "description": "example 448",
+        "input": "foo ___\n",
+        "expected": {
+          "md": "foo \\_\\_\\_\n"
+        }
+      },
+      {
+        "description": "example 449",
+        "input": "foo _\\__\n",
+        "expected": {
+          "md": "foo *\\_*\n"
+        }
+      },
+      {
+        "description": "example 450",
+        "input": "foo _*_\n",
+        "expected": {
+          "md": "foo *\\**\n"
+        }
+      },
+      {
+        "description": "example 451",
+        "input": "foo _____\n",
+        "expected": {
+          "md": "foo \\_\\_\\_\\_\\_\n"
+        }
+      },
+      {
+        "description": "example 452",
+        "input": "foo __\\___\n",
+        "expected": {
+          "md": "foo **\\_**\n"
+        }
+      },
+      {
+        "description": "example 453",
+        "input": "foo __*__\n",
+        "expected": {
+          "md": "foo **\\***\n"
+        }
+      },
+      {
+        "description": "example 454",
+        "input": "__foo_\n",
+        "expected": {
+          "md": "\\_*foo*\n"
+        }
+      },
+      {
+        "description": "example 455",
+        "input": "_foo__\n",
+        "expected": {
+          "md": "*foo*\\_\n"
+        }
+      },
+      {
+        "description": "example 456",
+        "input": "___foo__\n",
+        "expected": {
+          "md": "\\_**foo**\n"
+        }
+      },
+      {
+        "description": "example 457",
+        "input": "____foo_\n",
+        "expected": {
+          "md": "\\_\\_\\_*foo*\n"
+        }
+      },
+      {
+        "description": "example 458",
+        "input": "__foo___\n",
+        "expected": {
+          "md": "**foo**\\_\n"
+        }
+      },
+      {
+        "description": "example 459",
+        "input": "_foo____\n",
+        "expected": {
+          "md": "*foo*\\_\\_\\_\n"
+        }
+      },
+      {
+        "description": "example 460",
+        "input": "**foo**\n",
+        "expected": {
+          "md": "**foo**\n"
+        }
+      },
+      {
+        "description": "example 461",
+        "input": "*_foo_*\n",
+        "expected": {
+          "md": "*_foo_*\n"
+        }
+      },
+      {
+        "description": "example 462",
+        "input": "__foo__\n",
+        "expected": {
+          "md": "**foo**\n"
+        }
+      },
+      {
+        "description": "example 463",
+        "input": "_*foo*_\n",
+        "expected": {
+          "md": "*_foo_*\n"
+        }
+      },
+      {
+        "description": "example 464",
+        "input": "****foo****\n",
+        "expected": {
+          "md": "****foo****\n"
+        }
+      },
+      {
+        "description": "example 465",
+        "input": "____foo____\n",
+        "expected": {
+          "md": "****foo****\n"
+        }
+      },
+      {
+        "description": "example 466",
+        "input": "******foo******\n",
+        "expected": {
+          "md": "******foo******\n"
+        }
+      },
+      {
+        "description": "example 467",
+        "input": "***foo***\n",
+        "expected": {
+          "md": "***foo***\n"
+        }
+      },
+      {
+        "description": "example 468",
+        "input": "_____foo_____\n",
+        "expected": {
+          "md": "*****foo*****\n"
+        }
+      },
+      {
+        "description": "example 469",
+        "input": "*foo _bar* baz_\n",
+        "expected": {
+          "md": "*foo \\_bar* baz\\_\n"
+        }
+      },
+      {
+        "description": "example 470",
+        "input": "*foo __bar *baz bim__ bam*\n",
+        "expected": {
+          "md": "*foo **bar \\*baz bim** bam*\n"
+        }
+      },
+      {
+        "description": "example 471",
+        "input": "**foo **bar baz**\n",
+        "expected": {
+          "md": "\\*\\*foo **bar baz**\n"
+        }
+      },
+      {
+        "description": "example 472",
+        "input": "*foo *bar baz*\n",
+        "expected": {
+          "md": "\\*foo *bar baz*\n"
+        }
+      },
+      {
+        "description": "example 473",
+        "input": "*[bar*](/url)\n",
+        "expected": {
+          "md": "\\*[bar\\*](/url)\n"
+        }
+      },
+      {
+        "description": "example 474",
+        "input": "_foo [bar_](/url)\n",
+        "expected": {
+          "md": "\\_foo [bar\\_](/url)\n"
+        }
+      },
+      {
+        "description": "example 475",
+        "input": "*<img src=\"foo\" title=\"*\"/>\n",
+        "expected": {
+          "md": "\\*<img src=\"foo\" title=\"*\"/>\n"
+        }
+      },
+      {
+        "description": "example 476",
+        "input": "**<a href=\"**\">\n",
+        "expected": {
+          "md": "\\*\\*<a href=\"**\">\n"
+        }
+      },
+      {
+        "description": "example 477",
+        "input": "__<a href=\"__\">\n",
+        "expected": {
+          "md": "\\_\\_<a href=\"__\">\n"
+        }
+      },
+      {
+        "description": "example 478",
+        "input": "*a `*`*\n",
+        "expected": {
+          "md": "*a `*`*\n"
+        }
+      },
+      {
+        "description": "example 479",
+        "input": "_a `_`_\n",
+        "expected": {
+          "md": "*a `_`*\n"
+        }
+      },
+      {
+        "description": "example 480",
+        "input": "**a<https://foo.bar/?q=**>\n",
+        "expected": {
+          "md": "\\*\\*a<https://foo.bar/?q=**>\n"
+        }
+      },
+      {
+        "description": "example 481",
+        "input": "__a<https://foo.bar/?q=__>\n",
+        "expected": {
+          "md": "\\_\\_a<https://foo.bar/?q=__>\n"
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark text/emphasis",
     "source": {
       "repository": "https://github.com/micromark/micromark",

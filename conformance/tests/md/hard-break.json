@@ -1238,6 +1238,124 @@
     ]
   },
   {
+    "description": "Hard line breaks (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#hard-line-breaks"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 633",
+        "input": "foo  \nbaz\n",
+        "expected": {
+          "md": "foo\\\nbaz\n"
+        }
+      },
+      {
+        "description": "example 634",
+        "input": "foo\\\nbaz\n",
+        "expected": {
+          "md": "foo\\\nbaz\n"
+        }
+      },
+      {
+        "description": "example 635",
+        "input": "foo       \nbaz\n",
+        "expected": {
+          "md": "foo\\\nbaz\n"
+        }
+      },
+      {
+        "description": "example 636",
+        "input": "foo  \n     bar\n",
+        "expected": {
+          "md": "foo\\\nbar\n"
+        }
+      },
+      {
+        "description": "example 637",
+        "input": "foo\\\n     bar\n",
+        "expected": {
+          "md": "foo\\\nbar\n"
+        }
+      },
+      {
+        "description": "example 638",
+        "input": "*foo  \nbar*\n",
+        "expected": {
+          "md": "*foo\\\nbar*\n"
+        }
+      },
+      {
+        "description": "example 639",
+        "input": "*foo\\\nbar*\n",
+        "expected": {
+          "md": "*foo\\\nbar*\n"
+        }
+      },
+      {
+        "description": "example 640",
+        "input": "`code  \nspan`\n",
+        "expected": {
+          "md": "`code  \nspan`\n"
+        }
+      },
+      {
+        "description": "example 641",
+        "input": "`code\\\nspan`\n",
+        "expected": {
+          "md": "`code\\\nspan`\n"
+        }
+      },
+      {
+        "description": "example 642",
+        "input": "<a href=\"foo  \nbar\">\n",
+        "expected": {
+          "md": "<a href=\"foo  \nbar\">\n"
+        }
+      },
+      {
+        "description": "example 643",
+        "input": "<a href=\"foo\\\nbar\">\n",
+        "expected": {
+          "md": "<a href=\"foo\\\nbar\">\n"
+        }
+      },
+      {
+        "description": "example 644",
+        "input": "foo\\\n",
+        "expected": {
+          "md": "foo\\\\\n"
+        }
+      },
+      {
+        "description": "example 645",
+        "input": "foo  \n",
+        "expected": {
+          "md": "foo\n"
+        }
+      },
+      {
+        "description": "example 646",
+        "input": "### foo\\\n",
+        "expected": {
+          "md": "### foo\\\\\n"
+        }
+      },
+      {
+        "description": "example 647",
+        "input": "### foo  \n",
+        "expected": {
+          "md": "### foo\n"
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark text/hard-break",
     "source": {
       "repository": "https://github.com/micromark/micromark",

@@ -135,5 +135,25 @@
         }
       }
     ]
+  },
+  {
+    "description": "Blank lines (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#blank-lines"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 227",
+        "input": "  \n\naaa\n  \n\n# aaa\n\n  \n",
+        "expected": {
+          "md": "aaa\n\n# aaa\n"
+        }
+      }
+    ]
   }
 ]

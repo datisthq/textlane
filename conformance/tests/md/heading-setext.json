@@ -2600,6 +2600,208 @@
     ]
   },
   {
+    "description": "Setext headings (round trip)",
+    "specification": ["https://spec.commonmark.org/0.31.2/#setext-headings"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [["md.parse"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "example 80",
+        "input": "Foo *bar*\n=========\n\nFoo *bar*\n---------\n",
+        "expected": {
+          "md": "# Foo *bar*\n\n## Foo *bar*\n"
+        }
+      },
+      {
+        "description": "example 81",
+        "input": "Foo *bar\nbaz*\n====\n",
+        "expected": {
+          "md": "Foo *bar\nbaz*\n====\n"
+        }
+      },
+      {
+        "description": "example 82",
+        "input": "  Foo *bar\nbaz*\t\n====\n",
+        "expected": {
+          "md": "Foo *bar\nbaz*\n====\n"
+        }
+      },
+      {
+        "description": "example 83",
+        "input": "Foo\n-------------------------\n\nFoo\n=\n",
+        "expected": {
+          "md": "## Foo\n\n# Foo\n"
+        }
+      },
+      {
+        "description": "example 84",
+        "input": "   Foo\n---\n\n  Foo\n-----\n\n  Foo\n  ===\n",
+        "expected": {
+          "md": "## Foo\n\n## Foo\n\n# Foo\n"
+        }
+      },
+      {
+        "description": "example 85",
+        "input": "    Foo\n    ---\n\n    Foo\n---\n",
+        "expected": {
+          "md": "```\nFoo\n---\n\nFoo\n```\n\n***\n"
+        }
+      },
+      {
+        "description": "example 86",
+        "input": "Foo\n   ----      \n",
+        "expected": {
+          "md": "## Foo\n"
+        }
+      },
+      {
+        "description": "example 87",
+        "input": "Foo\n    ---\n",
+        "expected": {
+          "md": "Foo\n\\---\n"
+        }
+      },
+      {
+        "description": "example 88",
+        "input": "Foo\n= =\n\nFoo\n--- -\n",
+        "expected": {
+          "md": "Foo\n\\= =\n\nFoo\n\n***\n"
+        }
+      },
+      {
+        "description": "example 89",
+        "input": "Foo  \n-----\n",
+        "expected": {
+          "md": "## Foo\n"
+        }
+      },
+      {
+        "description": "example 90",
+        "input": "Foo\\\n----\n",
+        "expected": {
+          "md": "## Foo\\\\\n"
+        }
+      },
+      {
+        "description": "example 91",
+        "input": "`Foo\n----\n`\n\n<a title=\"a lot\n---\nof dashes\"/>\n",
+        "expected": {
+          "md": "## \\`Foo\n\n\\`\n\n## \\<a title=\"a lot\n\nof dashes\"/>\n"
+        }
+      },
+      {
+        "description": "example 92",
+        "input": "> Foo\n---\n",
+        "expected": {
+          "md": "> Foo\n\n***\n"
+        }
+      },
+      {
+        "description": "example 93",
+        "input": "> foo\nbar\n===\n",
+        "expected": {
+          "md": "> foo\n> bar\n> \\===\n"
+        }
+      },
+      {
+        "description": "example 94",
+        "input": "- Foo\n---\n",
+        "expected": {
+          "md": "* Foo\n\n***\n"
+        }
+      },
+      {
+        "description": "example 95",
+        "input": "Foo\nBar\n---\n",
+        "expected": {
+          "md": "Foo\nBar\n---\n"
+        }
+      },
+      {
+        "description": "example 96",
+        "input": "---\nFoo\n---\nBar\n---\nBaz\n",
+        "expected": {
+          "md": "***\n\n## Foo\n\n## Bar\n\nBaz\n"
+        }
+      },
+      {
+        "description": "example 97",
+        "input": "\n====\n",
+        "expected": {
+          "md": "\\====\n"
+        }
+      },
+      {
+        "description": "example 98",
+        "input": "---\n---\n",
+        "expected": {
+          "md": "***\n\n***\n"
+        }
+      },
+      {
+        "description": "example 99",
+        "input": "- foo\n-----\n",
+        "expected": {
+          "md": "* foo\n\n***\n"
+        }
+      },
+      {
+        "description": "example 100",
+        "input": "    foo\n---\n",
+        "expected": {
+          "md": "```\nfoo\n```\n\n***\n"
+        }
+      },
+      {
+        "description": "example 101",
+        "input": "> foo\n-----\n",
+        "expected": {
+          "md": "> foo\n\n***\n"
+        }
+      },
+      {
+        "description": "example 102",
+        "input": "\\> foo\n------\n",
+        "expected": {
+          "md": "## > foo\n"
+        }
+      },
+      {
+        "description": "example 103",
+        "input": "Foo\n\nbar\n---\nbaz\n",
+        "expected": {
+          "md": "Foo\n\n## bar\n\nbaz\n"
+        }
+      },
+      {
+        "description": "example 104",
+        "input": "Foo\nbar\n\n---\n\nbaz\n",
+        "expected": {
+          "md": "Foo\nbar\n\n***\n\nbaz\n"
+        }
+      },
+      {
+        "description": "example 105",
+        "input": "Foo\nbar\n* * *\nbaz\n",
+        "expected": {
+          "md": "Foo\nbar\n\n***\n\nbaz\n"
+        }
+      },
+      {
+        "description": "example 106",
+        "input": "Foo\nbar\n\\---\nbaz\n",
+        "expected": {
+          "md": "Foo\nbar\n\\---\nbaz\n"
+        }
+      }
+    ]
+  },
+  {
     "description": "micromark flow/heading-setext",
     "source": {
       "repository": "https://github.com/micromark/micromark",
