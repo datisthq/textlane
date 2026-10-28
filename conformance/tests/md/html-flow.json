@@ -1,0 +1,1357 @@
+[
+  {
+    "description": "HTML blocks",
+    "specification": ["https://spec.commonmark.org/0.31.2/#html-blocks"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 148",
+        "input": "<table><tr><td>\n<pre>\n**Hello**,\n\n_world_.\n</pre>\n</td></tr></table>\n",
+        "expected": {
+          "html": "<table><tr><td>\n<pre>\n**Hello**,\n<p><em>world</em>.\n</pre></p>\n</td></tr></table>"
+        }
+      },
+      {
+        "description": "example 149",
+        "input": "<table>\n  <tr>\n    <td>\n           hi\n    </td>\n  </tr>\n</table>\n\nokay.\n",
+        "expected": {
+          "html": "<table>\n  <tr>\n    <td>\n           hi\n    </td>\n  </tr>\n</table>\n<p>okay.</p>"
+        }
+      },
+      {
+        "description": "example 150",
+        "input": " <div>\n  *hello*\n         <foo><a>\n",
+        "expected": {
+          "html": " <div>\n  *hello*\n         <foo><a>"
+        }
+      },
+      {
+        "description": "example 151",
+        "input": "</div>\n*foo*\n",
+        "expected": {
+          "html": "</div>\n*foo*"
+        }
+      },
+      {
+        "description": "example 152",
+        "input": "<DIV CLASS=\"foo\">\n\n*Markdown*\n\n</DIV>\n",
+        "expected": {
+          "html": "<DIV CLASS=\"foo\">\n<p><em>Markdown</em></p>\n</DIV>"
+        }
+      },
+      {
+        "description": "example 153",
+        "input": "<div id=\"foo\"\n  class=\"bar\">\n</div>\n",
+        "expected": {
+          "html": "<div id=\"foo\"\n  class=\"bar\">\n</div>"
+        }
+      },
+      {
+        "description": "example 154",
+        "input": "<div id=\"foo\" class=\"bar\n  baz\">\n</div>\n",
+        "expected": {
+          "html": "<div id=\"foo\" class=\"bar\n  baz\">\n</div>"
+        }
+      },
+      {
+        "description": "example 155",
+        "input": "<div>\n*foo*\n\n*bar*\n",
+        "expected": {
+          "html": "<div>\n*foo*\n<p><em>bar</em></p>"
+        }
+      },
+      {
+        "description": "example 156",
+        "input": "<div id=\"foo\"\n*hi*\n",
+        "expected": {
+          "html": "<div id=\"foo\"\n*hi*"
+        }
+      },
+      {
+        "description": "example 157",
+        "input": "<div class\nfoo\n",
+        "expected": {
+          "html": "<div class\nfoo"
+        }
+      },
+      {
+        "description": "example 158",
+        "input": "<div *???-&&&-<---\n*foo*\n",
+        "expected": {
+          "html": "<div *???-&&&-<---\n*foo*"
+        }
+      },
+      {
+        "description": "example 159",
+        "input": "<div><a href=\"bar\">*foo*</a></div>\n",
+        "expected": {
+          "html": "<div><a href=\"bar\">*foo*</a></div>"
+        }
+      },
+      {
+        "description": "example 160",
+        "input": "<table><tr><td>\nfoo\n</td></tr></table>\n",
+        "expected": {
+          "html": "<table><tr><td>\nfoo\n</td></tr></table>"
+        }
+      },
+      {
+        "description": "example 161",
+        "input": "<div></div>\n``` c\nint x = 33;\n```\n",
+        "expected": {
+          "html": "<div></div>\n``` c\nint x = 33;\n```"
+        }
+      },
+      {
+        "description": "example 162",
+        "input": "<a href=\"foo\">\n*bar*\n</a>\n",
+        "expected": {
+          "html": "<a href=\"foo\">\n*bar*\n</a>"
+        }
+      },
+      {
+        "description": "example 163",
+        "input": "<Warning>\n*bar*\n</Warning>\n",
+        "expected": {
+          "html": "<Warning>\n*bar*\n</Warning>"
+        }
+      },
+      {
+        "description": "example 164",
+        "input": "<i class=\"foo\">\n*bar*\n</i>\n",
+        "expected": {
+          "html": "<i class=\"foo\">\n*bar*\n</i>"
+        }
+      },
+      {
+        "description": "example 165",
+        "input": "</ins>\n*bar*\n",
+        "expected": {
+          "html": "</ins>\n*bar*"
+        }
+      },
+      {
+        "description": "example 166",
+        "input": "<del>\n*foo*\n</del>\n",
+        "expected": {
+          "html": "<del>\n*foo*\n</del>"
+        }
+      },
+      {
+        "description": "example 167",
+        "input": "<del>\n\n*foo*\n\n</del>\n",
+        "expected": {
+          "html": "<del>\n<p><em>foo</em></p>\n</del>"
+        }
+      },
+      {
+        "description": "example 168",
+        "input": "<del>*foo*</del>\n",
+        "expected": {
+          "html": "<p><del><em>foo</em></del></p>"
+        }
+      },
+      {
+        "description": "example 169",
+        "input": "<pre language=\"haskell\"><code>\nimport Text.HTML.TagSoup\n\nmain :: IO ()\nmain = print $ parseTags tags\n</code></pre>\nokay\n",
+        "expected": {
+          "html": "<pre language=\"haskell\"><code>\nimport Text.HTML.TagSoup\n\nmain :: IO ()\nmain = print $ parseTags tags\n</code></pre>\n<p>okay</p>"
+        }
+      },
+      {
+        "description": "example 170",
+        "input": "<script type=\"text/javascript\">\n// JavaScript example\n\ndocument.getElementById(\"demo\").innerHTML = \"Hello JavaScript!\";\n</script>\nokay\n",
+        "expected": {
+          "html": "<script type=\"text/javascript\">\n// JavaScript example\n\ndocument.getElementById(\"demo\").innerHTML = \"Hello JavaScript!\";\n</script>\n<p>okay</p>"
+        }
+      },
+      {
+        "description": "example 171",
+        "input": "<textarea>\n\n*foo*\n\n_bar_\n\n</textarea>\n",
+        "expected": {
+          "html": "<textarea>\n\n*foo*\n\n_bar_\n\n</textarea>"
+        }
+      },
+      {
+        "description": "example 172",
+        "input": "<style\n  type=\"text/css\">\nh1 {color:red;}\n\np {color:blue;}\n</style>\nokay\n",
+        "expected": {
+          "html": "<style\n  type=\"text/css\">\nh1 {color:red;}\n\np {color:blue;}\n</style>\n<p>okay</p>"
+        }
+      },
+      {
+        "description": "example 173",
+        "input": "<style\n  type=\"text/css\">\n\nfoo\n",
+        "expected": {
+          "html": "<style\n  type=\"text/css\">\n\nfoo\n"
+        }
+      },
+      {
+        "description": "example 174",
+        "input": "> <div>\n> foo\n\nbar\n",
+        "expected": {
+          "html": "<blockquote>\n<div>\nfoo\n</blockquote>\n<p>bar</p>"
+        }
+      },
+      {
+        "description": "example 175",
+        "input": "- <div>\n- foo\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<div>\n</li>\n<li>foo</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 176",
+        "input": "<style>p{color:red;}</style>\n*foo*\n",
+        "expected": {
+          "html": "<style>p{color:red;}</style>\n<p><em>foo</em></p>"
+        }
+      },
+      {
+        "description": "example 177",
+        "input": "<!-- foo -->*bar*\n*baz*\n",
+        "expected": {
+          "html": "<!-- foo -->*bar*\n<p><em>baz</em></p>"
+        }
+      },
+      {
+        "description": "example 178",
+        "input": "<script>\nfoo\n</script>1. *bar*\n",
+        "expected": {
+          "html": "<script>\nfoo\n</script>1. *bar*"
+        }
+      },
+      {
+        "description": "example 179",
+        "input": "<!-- Foo\n\nbar\n   baz -->\nokay\n",
+        "expected": {
+          "html": "<!-- Foo\n\nbar\n   baz -->\n<p>okay</p>"
+        }
+      },
+      {
+        "description": "example 180",
+        "input": "<?php\n\n  echo '>';\n\n?>\nokay\n",
+        "expected": {
+          "html": "<?php\n\n  echo '>';\n\n?>\n<p>okay</p>"
+        }
+      },
+      {
+        "description": "example 181",
+        "input": "<!DOCTYPE html>\n",
+        "expected": {
+          "html": "<!DOCTYPE html>"
+        }
+      },
+      {
+        "description": "example 182",
+        "input": "<![CDATA[\nfunction matchwo(a,b)\n{\n  if (a < b && a < 0) then {\n    return 1;\n\n  } else {\n\n    return 0;\n  }\n}\n]]>\nokay\n",
+        "expected": {
+          "html": "<![CDATA[\nfunction matchwo(a,b)\n{\n  if (a < b && a < 0) then {\n    return 1;\n\n  } else {\n\n    return 0;\n  }\n}\n]]>\n<p>okay</p>"
+        }
+      },
+      {
+        "description": "example 183",
+        "input": "  <!-- foo -->\n\n    <!-- foo -->\n",
+        "expected": {
+          "html": "  <!-- foo -->\n<pre><code>&#x3C;!-- foo -->\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 184",
+        "input": "  <div>\n\n    <div>\n",
+        "expected": {
+          "html": "  <div>\n<pre><code>&#x3C;div>\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 185",
+        "input": "Foo\n<div>\nbar\n</div>\n",
+        "expected": {
+          "html": "<p>Foo</p>\n<div>\nbar\n</div>"
+        }
+      },
+      {
+        "description": "example 186",
+        "input": "<div>\nbar\n</div>\n*foo*\n",
+        "expected": {
+          "html": "<div>\nbar\n</div>\n*foo*"
+        }
+      },
+      {
+        "description": "example 187",
+        "input": "Foo\n<a href=\"bar\">\nbaz\n",
+        "expected": {
+          "html": "<p>Foo\n<a href=\"bar\">\nbaz</p>"
+        }
+      },
+      {
+        "description": "example 188",
+        "input": "<div>\n\n*Emphasized* text.\n\n</div>\n",
+        "expected": {
+          "html": "<div>\n<p><em>Emphasized</em> text.</p>\n</div>"
+        }
+      },
+      {
+        "description": "example 189",
+        "input": "<div>\n*Emphasized* text.\n</div>\n",
+        "expected": {
+          "html": "<div>\n*Emphasized* text.\n</div>"
+        }
+      },
+      {
+        "description": "example 190",
+        "input": "<table>\n\n<tr>\n\n<td>\nHi\n</td>\n\n</tr>\n\n</table>\n",
+        "expected": {
+          "html": "<table>\n<tr>\n<td>\nHi\n</td>\n</tr>\n</table>"
+        }
+      },
+      {
+        "description": "example 191",
+        "input": "<table>\n\n  <tr>\n\n    <td>\n      Hi\n    </td>\n\n  </tr>\n\n</table>\n",
+        "expected": {
+          "html": "<table>\n  <tr>\n<pre><code>&#x3C;td>\n  Hi\n&#x3C;/td>\n</code></pre>\n  </tr>\n</table>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark flow/html with dangerous HTML allowed",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/flow/html.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support raw tags w/o ending",
+        "input": "<style\n  type=\"text/css\">\n\nfoo",
+        "expected": {
+          "html": "<style\n  type=\"text/css\">\n\nfoo"
+        }
+      },
+      {
+        "description": "should support raw tags w/ start and end on a single line",
+        "input": "<style>p{color:red;}</style>\n*foo*",
+        "expected": {
+          "html": "<style>p{color:red;}</style>\n<p><em>foo</em></p>"
+        }
+      },
+      {
+        "description": "should support raw tags w/ more data on ending line",
+        "input": "<script>\nfoo\n</script>1. *bar*",
+        "expected": {
+          "html": "<script>\nfoo\n</script>1. *bar*"
+        }
+      },
+      {
+        "description": "should support an eof directly after a raw tag name",
+        "input": "<script",
+        "expected": {
+          "html": "<script"
+        }
+      },
+      {
+        "description": "should not support a raw closing tag",
+        "input": "</script\nmore",
+        "expected": {
+          "html": "<p>&#x3C;/script\nmore</p>"
+        }
+      },
+      {
+        "description": "should not support an eof after a self-closing slash",
+        "input": "<script/",
+        "expected": {
+          "html": "<p>&#x3C;script/</p>"
+        }
+      },
+      {
+        "description": "should not support a line ending after a self-closing slash",
+        "input": "<script/\n*asd*",
+        "expected": {
+          "html": "<p>&#x3C;script/\n<em>asd</em></p>"
+        }
+      },
+      {
+        "description": "should support an eof after a self-closing tag",
+        "input": "<script/>",
+        "expected": {
+          "html": "<script/>"
+        }
+      },
+      {
+        "description": "should support a line ending after a self-closing tag",
+        "input": "<script/>\na",
+        "expected": {
+          "html": "<script/>\na"
+        }
+      },
+      {
+        "description": "should not support other characters after a self-closing tag",
+        "input": "<script/>a",
+        "expected": {
+          "html": "<p><script/>a</p>"
+        }
+      },
+      {
+        "description": "should support a textarea",
+        "input": "<textarea>\n# hi!\n</textarea>\n# ?",
+        "expected": {
+          "html": "<textarea>\n# hi!\n</textarea>\n<h1>?</h1>"
+        }
+      },
+      {
+        "description": "should ignore long closing tags (coverage for max size)",
+        "input": "<textarea>\n# hi!\n</xxxxxxxxx>\n# ?",
+        "expected": {
+          "html": "<textarea>\n# hi!\n</xxxxxxxxx>\n# ?"
+        }
+      },
+      {
+        "description": "should support other characters after a raw opening tag",
+        "input": "<script>a",
+        "expected": {
+          "html": "<script>a"
+        }
+      },
+      {
+        "description": "should support interrupting paragraphs w/ raw tags",
+        "input": "Foo\n<script",
+        "expected": {
+          "html": "<p>Foo</p>\n<script"
+        }
+      },
+      {
+        "description": "should support blank lines in raw",
+        "input": "<script>\n  \n  \n</script>",
+        "expected": {
+          "html": "<script>\n  \n  \n</script>"
+        }
+      },
+      {
+        "description": "should not support lazyness (1)",
+        "input": "> <script>\na",
+        "expected": {
+          "html": "<blockquote>\n<script>\n</blockquote>\n<p>a</p>"
+        }
+      },
+      {
+        "description": "should not support lazyness (2)",
+        "input": "> a\n<script>",
+        "expected": {
+          "html": "<blockquote>\n<p>a</p>\n</blockquote>\n<script>"
+        }
+      },
+      {
+        "description": "should support comments (type 2)",
+        "input": "<!-- Foo\n\nbar\n   baz -->\nokay",
+        "expected": {
+          "html": "<!-- Foo\n\nbar\n   baz -->\n<p>okay</p>"
+        }
+      },
+      {
+        "description": "should support comments w/ start and end on a single line",
+        "input": "<!-- foo -->*bar*\n*baz*",
+        "expected": {
+          "html": "<!-- foo -->*bar*\n<p><em>baz</em></p>"
+        }
+      },
+      {
+        "description": "should not support a single dash to start comments",
+        "input": "<!-asd-->",
+        "expected": {
+          "html": "<p>&#x3C;!-asd--></p>"
+        }
+      },
+      {
+        "description": "should support comments where the start dashes are the end dashes (1)",
+        "input": "<!-->",
+        "expected": {
+          "html": "<!-->"
+        }
+      },
+      {
+        "description": "should support comments where the start dashes are the end dashes (2)",
+        "input": "<!--->",
+        "expected": {
+          "html": "<!--->"
+        }
+      },
+      {
+        "description": "should support empty comments",
+        "input": "<!---->",
+        "expected": {
+          "html": "<!---->"
+        }
+      },
+      {
+        "description": "should not end a comment at one dash (`->`)",
+        "input": "<!--\n->\n\"",
+        "expected": {
+          "html": "<!--\n->\n\""
+        }
+      },
+      {
+        "description": "should end a comment at two dashes (`-->`)",
+        "input": "<!--\n-->\n\"",
+        "expected": {
+          "html": "<!--\n-->\n<p>\"</p>"
+        }
+      },
+      {
+        "description": "should end a comment at three dashes (`--->`)",
+        "input": "<!--\n--->\n\"",
+        "expected": {
+          "html": "<!--\n--->\n<p>\"</p>"
+        }
+      },
+      {
+        "description": "should end a comment at four dashes (`---->`)",
+        "input": "<!--\n---->\n\"",
+        "expected": {
+          "html": "<!--\n---->\n<p>\"</p>"
+        }
+      },
+      {
+        "description": "should support comments w/ indent",
+        "input": "  <!-- foo -->",
+        "expected": {
+          "html": "  <!-- foo -->"
+        }
+      },
+      {
+        "description": "should not support comments w/ a 4 character indent",
+        "input": "    <!-- foo -->",
+        "expected": {
+          "html": "<pre><code>&#x3C;!-- foo -->\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support interrupting paragraphs w/ comments",
+        "input": "Foo\n<!--",
+        "expected": {
+          "html": "<p>Foo</p>\n<!--"
+        }
+      },
+      {
+        "description": "should support blank lines in comments",
+        "input": "<!--\n  \n  \n-->",
+        "expected": {
+          "html": "<!--\n  \n  \n-->"
+        }
+      },
+      {
+        "description": "should not support lazyness (1) (2)",
+        "input": "> <!--\na",
+        "expected": {
+          "html": "<blockquote>\n<!--\n</blockquote>\n<p>a</p>"
+        }
+      },
+      {
+        "description": "should not support lazyness (2) (2)",
+        "input": "> a\n<!--",
+        "expected": {
+          "html": "<blockquote>\n<p>a</p>\n</blockquote>\n<!--"
+        }
+      },
+      {
+        "description": "should support instructions (type 3)",
+        "input": "<?php\n\n  echo '>';\n\n?>\nokay",
+        "expected": {
+          "html": "<?php\n\n  echo '>';\n\n?>\n<p>okay</p>"
+        }
+      },
+      {
+        "description": "should support empty instructions where the `?` is part of both the start and the end",
+        "input": "<?>",
+        "expected": {
+          "html": "<?>"
+        }
+      },
+      {
+        "description": "should support empty instructions",
+        "input": "<??>",
+        "expected": {
+          "html": "<??>"
+        }
+      },
+      {
+        "description": "should support interrupting paragraphs w/ instructions",
+        "input": "Foo\n<?",
+        "expected": {
+          "html": "<p>Foo</p>\n<?"
+        }
+      },
+      {
+        "description": "should support blank lines in instructions",
+        "input": "<?\n  \n  \n?>",
+        "expected": {
+          "html": "<?\n  \n  \n?>"
+        }
+      },
+      {
+        "description": "should not support lazyness (1) (3)",
+        "input": "> <?\na",
+        "expected": {
+          "html": "<blockquote>\n<?\n</blockquote>\n<p>a</p>"
+        }
+      },
+      {
+        "description": "should not support lazyness (2) (3)",
+        "input": "> a\n<?",
+        "expected": {
+          "html": "<blockquote>\n<p>a</p>\n</blockquote>\n<?"
+        }
+      },
+      {
+        "description": "should support declarations (type 4)",
+        "input": "<!DOCTYPE html>",
+        "expected": {
+          "html": "<!DOCTYPE html>"
+        }
+      },
+      {
+        "description": "should not support declarations that start w/o an alpha",
+        "input": "<!123>",
+        "expected": {
+          "html": "<p>&#x3C;!123></p>"
+        }
+      },
+      {
+        "description": "should not support declarations w/o an identifier",
+        "input": "<!>",
+        "expected": {
+          "html": "<p>&#x3C;!></p>"
+        }
+      },
+      {
+        "description": "should support declarations w/o a single alpha as identifier",
+        "input": "<!a>",
+        "expected": {
+          "html": "<!a>"
+        }
+      },
+      {
+        "description": "should support interrupting paragraphs w/ declarations",
+        "input": "Foo\n<!d",
+        "expected": {
+          "html": "<p>Foo</p>\n<!d"
+        }
+      },
+      {
+        "description": "should support blank lines in declarations",
+        "input": "<!a\n  \n  \n>",
+        "expected": {
+          "html": "<!a\n  \n  \n>"
+        }
+      },
+      {
+        "description": "should not support lazyness (1) (4)",
+        "input": "> <!a\nb",
+        "expected": {
+          "html": "<blockquote>\n<!a\n</blockquote>\n<p>b</p>"
+        }
+      },
+      {
+        "description": "should not support lazyness (2) (4)",
+        "input": "> a\n<!b",
+        "expected": {
+          "html": "<blockquote>\n<p>a</p>\n</blockquote>\n<!b"
+        }
+      },
+      {
+        "description": "should support cdata (type 5)",
+        "input": "<![CDATA[\nfunction matchwo(a,b)\n{\n  if (a < b && a < 0) then {\n    return 1;\n\n  } else {\n\n    return 0;\n  }\n}\n]]>\nokay",
+        "expected": {
+          "html": "<![CDATA[\nfunction matchwo(a,b)\n{\n  if (a < b && a < 0) then {\n    return 1;\n\n  } else {\n\n    return 0;\n  }\n}\n]]>\n<p>okay</p>"
+        }
+      },
+      {
+        "description": "should support empty cdata",
+        "input": "<![CDATA[]]>",
+        "expected": {
+          "html": "<![CDATA[]]>"
+        }
+      },
+      {
+        "description": "should not support cdata w/ a missing `[`",
+        "input": "<![CDATA]]>",
+        "expected": {
+          "html": "<p>&#x3C;![CDATA]]></p>"
+        }
+      },
+      {
+        "description": "should support cdata w/ a single `]` as content",
+        "input": "<![CDATA[]]]>",
+        "expected": {
+          "html": "<![CDATA[]]]>"
+        }
+      },
+      {
+        "description": "should support interrupting paragraphs w/ cdata",
+        "input": "Foo\n<![CDATA[",
+        "expected": {
+          "html": "<p>Foo</p>\n<![CDATA["
+        }
+      },
+      {
+        "description": "should not support lowercase cdata",
+        "input": "<![cdata[]]>",
+        "expected": {
+          "html": "<p>&#x3C;![cdata[]]></p>"
+        }
+      },
+      {
+        "description": "should support blank lines in cdata",
+        "input": "<![CDATA[\n  \n  \n]]>",
+        "expected": {
+          "html": "<![CDATA[\n  \n  \n]]>"
+        }
+      },
+      {
+        "description": "should not support lazyness (1) (5)",
+        "input": "> <![CDATA[\na",
+        "expected": {
+          "html": "<blockquote>\n<![CDATA[\n</blockquote>\n<p>a</p>"
+        }
+      },
+      {
+        "description": "should not support lazyness (2) (5)",
+        "input": "> a\n<![CDATA[",
+        "expected": {
+          "html": "<blockquote>\n<p>a</p>\n</blockquote>\n<![CDATA["
+        }
+      },
+      {
+        "description": "should support html (basic)",
+        "input": "<table><tr><td>\n<pre>\n**Hello**,\n\n_world_.\n</pre>\n</td></tr></table>",
+        "expected": {
+          "html": "<table><tr><td>\n<pre>\n**Hello**,\n<p><em>world</em>.\n</pre></p>\n</td></tr></table>"
+        }
+      },
+      {
+        "description": "should support html of type 6 (2)",
+        "input": " <div>\n  *hello*\n         <foo><a>",
+        "expected": {
+          "html": " <div>\n  *hello*\n         <foo><a>"
+        }
+      },
+      {
+        "description": "should support html starting w/ a closing tag",
+        "input": "</div>\n*foo*",
+        "expected": {
+          "html": "</div>\n*foo*"
+        }
+      },
+      {
+        "description": "should support html w/ markdown in between",
+        "input": "<DIV CLASS=\"foo\">\n\n*Markdown*\n\n</DIV>",
+        "expected": {
+          "html": "<DIV CLASS=\"foo\">\n<p><em>Markdown</em></p>\n</DIV>"
+        }
+      },
+      {
+        "description": "should support html w/ line endings (1)",
+        "input": "<div id=\"foo\"\n  class=\"bar\">\n</div>",
+        "expected": {
+          "html": "<div id=\"foo\"\n  class=\"bar\">\n</div>"
+        }
+      },
+      {
+        "description": "should support html w/ line endings (2)",
+        "input": "<div id=\"foo\" class=\"bar\n  baz\">\n</div>",
+        "expected": {
+          "html": "<div id=\"foo\" class=\"bar\n  baz\">\n</div>"
+        }
+      },
+      {
+        "description": "should support an unclosed html element",
+        "input": "<div>\n*foo*\n\n*bar*",
+        "expected": {
+          "html": "<div>\n*foo*\n<p><em>bar</em></p>"
+        }
+      },
+      {
+        "description": "should support garbage html (1)",
+        "input": "<div id=\"foo\"\n*hi*",
+        "expected": {
+          "html": "<div id=\"foo\"\n*hi*"
+        }
+      },
+      {
+        "description": "should support garbage html (2)",
+        "input": "<div class\nfoo",
+        "expected": {
+          "html": "<div class\nfoo"
+        }
+      },
+      {
+        "description": "should support garbage html (3)",
+        "input": "<div *???-&&&-<---\n*foo*",
+        "expected": {
+          "html": "<div *???-&&&-<---\n*foo*"
+        }
+      },
+      {
+        "description": "should support other tags in the opening (1)",
+        "input": "<div><a href=\"bar\">*foo*</a></div>",
+        "expected": {
+          "html": "<div><a href=\"bar\">*foo*</a></div>"
+        }
+      },
+      {
+        "description": "should support other tags in the opening (2)",
+        "input": "<table><tr><td>\nfoo\n</td></tr></table>",
+        "expected": {
+          "html": "<table><tr><td>\nfoo\n</td></tr></table>"
+        }
+      },
+      {
+        "description": "should include everything ’till a blank line",
+        "input": "<div></div>\n``` c\nint x = 33;\n```",
+        "expected": {
+          "html": "<div></div>\n``` c\nint x = 33;\n```"
+        }
+      },
+      {
+        "description": "should support basic tags w/o ending in containers (1)",
+        "input": "> <div>\n> foo\n\nbar",
+        "expected": {
+          "html": "<blockquote>\n<div>\nfoo\n</blockquote>\n<p>bar</p>"
+        }
+      },
+      {
+        "description": "should support basic tags w/o ending in containers (2)",
+        "input": "- <div>\n- foo",
+        "expected": {
+          "html": "<ul>\n<li>\n<div>\n</li>\n<li>foo</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support basic tags w/ indent",
+        "input": "  <div>",
+        "expected": {
+          "html": "  <div>"
+        }
+      },
+      {
+        "description": "should not support basic tags w/ a 4 character indent",
+        "input": "    <div>",
+        "expected": {
+          "html": "<pre><code>&#x3C;div>\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support interrupting paragraphs w/ basic tags",
+        "input": "Foo\n<div>\nbar\n</div>",
+        "expected": {
+          "html": "<p>Foo</p>\n<div>\nbar\n</div>"
+        }
+      },
+      {
+        "description": "should require a blank line to end",
+        "input": "<div>\nbar\n</div>\n*foo*",
+        "expected": {
+          "html": "<div>\nbar\n</div>\n*foo*"
+        }
+      },
+      {
+        "description": "should support interleaving w/ blank lines",
+        "input": "<div>\n\n*Emphasized* text.\n\n</div>",
+        "expected": {
+          "html": "<div>\n<p><em>Emphasized</em> text.</p>\n</div>"
+        }
+      },
+      {
+        "description": "should not support interleaving w/o blank lines",
+        "input": "<div>\n*Emphasized* text.\n</div>",
+        "expected": {
+          "html": "<div>\n*Emphasized* text.\n</div>"
+        }
+      },
+      {
+        "description": "should support blank lines between adjacent html",
+        "input": "<table>\n\n<tr>\n\n<td>\nHi\n</td>\n\n</tr>\n\n</table>",
+        "expected": {
+          "html": "<table>\n<tr>\n<td>\nHi\n</td>\n</tr>\n</table>"
+        }
+      },
+      {
+        "description": "should not support basic tags w/ an incorrect name start character",
+        "input": "</1>",
+        "expected": {
+          "html": "<p>&#x3C;/1></p>"
+        }
+      },
+      {
+        "description": "should support an eof directly after a basic tag name",
+        "input": "<div",
+        "expected": {
+          "html": "<div"
+        }
+      },
+      {
+        "description": "should support a line ending directly after a tag name",
+        "input": "<div\n",
+        "expected": {
+          "html": "<div"
+        }
+      },
+      {
+        "description": "should support an eof after a space directly after a tag name",
+        "input": "<div ",
+        "expected": {
+          "html": "<div "
+        }
+      },
+      {
+        "description": "should not support an eof directly after a self-closing slash",
+        "input": "<div/",
+        "expected": {
+          "html": "<p>&#x3C;div/</p>"
+        }
+      },
+      {
+        "description": "should not support a line ending after a self-closing slash (2)",
+        "input": "<div/\n*asd*",
+        "expected": {
+          "html": "<p>&#x3C;div/\n<em>asd</em></p>"
+        }
+      },
+      {
+        "description": "should support an eof after a self-closing tag (2)",
+        "input": "<div/>",
+        "expected": {
+          "html": "<div/>"
+        }
+      },
+      {
+        "description": "should support a line ending after a self-closing tag (2)",
+        "input": "<div/>\na",
+        "expected": {
+          "html": "<div/>\na"
+        }
+      },
+      {
+        "description": "should support another character after a self-closing tag",
+        "input": "<div/>a",
+        "expected": {
+          "html": "<div/>a"
+        }
+      },
+      {
+        "description": "should support another character after a basic opening tag",
+        "input": "<div>a",
+        "expected": {
+          "html": "<div>a"
+        }
+      },
+      {
+        "description": "should support interrupting paragraphs w/ self-closing basic tags",
+        "input": "Foo\n<div/>",
+        "expected": {
+          "html": "<p>Foo</p>\n<div/>"
+        }
+      },
+      {
+        "description": "should not support blank lines in basic",
+        "input": "<div\n  \n  \n>",
+        "expected": {
+          "html": "<div\n<blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should not support lazyness (1) (6)",
+        "input": "> <div\na",
+        "expected": {
+          "html": "<blockquote>\n<div\n</blockquote>\n<p>a</p>"
+        }
+      },
+      {
+        "description": "should not support lazyness (2) (6)",
+        "input": "> a\n<div",
+        "expected": {
+          "html": "<blockquote>\n<p>a</p>\n</blockquote>\n<div"
+        }
+      },
+      {
+        "description": "should support complete tags (type 7)",
+        "input": "<a href=\"foo\">\n*bar*\n</a>",
+        "expected": {
+          "html": "<a href=\"foo\">\n*bar*\n</a>"
+        }
+      },
+      {
+        "description": "should support non-html tag names",
+        "input": "<Warning>\n*bar*\n</Warning>",
+        "expected": {
+          "html": "<Warning>\n*bar*\n</Warning>"
+        }
+      },
+      {
+        "description": "should support non-“block” html tag names (1)",
+        "input": "<i class=\"foo\">\n*bar*\n</i>",
+        "expected": {
+          "html": "<i class=\"foo\">\n*bar*\n</i>"
+        }
+      },
+      {
+        "description": "should support non-“block” html tag names (2)",
+        "input": "<del>\n*foo*\n</del>",
+        "expected": {
+          "html": "<del>\n*foo*\n</del>"
+        }
+      },
+      {
+        "description": "should support closing tags",
+        "input": "</ins>\n*bar*",
+        "expected": {
+          "html": "</ins>\n*bar*"
+        }
+      },
+      {
+        "description": "should support interleaving",
+        "input": "<del>\n\n*foo*\n\n</del>",
+        "expected": {
+          "html": "<del>\n<p><em>foo</em></p>\n</del>"
+        }
+      },
+      {
+        "description": "should not support interleaving w/o blank lines (2)",
+        "input": "<del>*foo*</del>",
+        "expected": {
+          "html": "<p><del><em>foo</em></del></p>"
+        }
+      },
+      {
+        "description": "should support interleaving w/ whitespace-only blank lines",
+        "input": "<div>\n  \nasd",
+        "expected": {
+          "html": "<div>\n<p>asd</p>"
+        }
+      },
+      {
+        "description": "should not support interrupting paragraphs w/ complete tags",
+        "input": "Foo\n<a href=\"bar\">\nbaz",
+        "expected": {
+          "html": "<p>Foo\n<a href=\"bar\">\nbaz</p>"
+        }
+      },
+      {
+        "description": "should not support an eof directly after a tag name",
+        "input": "<x",
+        "expected": {
+          "html": "<p>&#x3C;x</p>"
+        }
+      },
+      {
+        "description": "should not support an eof directly after a self-closing slash (2)",
+        "input": "<x/",
+        "expected": {
+          "html": "<p>&#x3C;x/</p>"
+        }
+      },
+      {
+        "description": "should not support a line ending directly after a tag name",
+        "input": "<x\n",
+        "expected": {
+          "html": "<p>&#x3C;x</p>"
+        }
+      },
+      {
+        "description": "should not support an eof after a space directly after a tag name",
+        "input": "<x ",
+        "expected": {
+          "html": "<p>&#x3C;x</p>"
+        }
+      },
+      {
+        "description": "should not support a line ending after a self-closing slash (3)",
+        "input": "<x/\n*asd*",
+        "expected": {
+          "html": "<p>&#x3C;x/\n<em>asd</em></p>"
+        }
+      },
+      {
+        "description": "should support an eof after a self-closing tag (3)",
+        "input": "<x/>",
+        "expected": {
+          "html": "<x/>"
+        }
+      },
+      {
+        "description": "should support a line ending after a self-closing tag (3)",
+        "input": "<x/>\na",
+        "expected": {
+          "html": "<x/>\na"
+        }
+      },
+      {
+        "description": "should not support another character after a self-closing tag",
+        "input": "<x/>a",
+        "expected": {
+          "html": "<p><x/>a</p>"
+        }
+      },
+      {
+        "description": "should not support another character after an opening tag",
+        "input": "<x>a",
+        "expected": {
+          "html": "<p><x>a</p>"
+        }
+      },
+      {
+        "description": "should support boolean attributes in a complete tag",
+        "input": "<x y>",
+        "expected": {
+          "html": "<x y>"
+        }
+      },
+      {
+        "description": "should not support a line ending before an attribute name",
+        "input": "<x\ny>",
+        "expected": {
+          "html": "<p><x\ny></p>"
+        }
+      },
+      {
+        "description": "should not support a line ending w/ whitespace before an attribute name",
+        "input": "<x\n  y>",
+        "expected": {
+          "html": "<p><x\ny></p>"
+        }
+      },
+      {
+        "description": "should not support a line ending w/ whitespace and another line ending before an attribute name",
+        "input": "<x\n  \ny>",
+        "expected": {
+          "html": "<p>&#x3C;x</p>\n<p>y></p>"
+        }
+      },
+      {
+        "description": "should not support a line ending between attribute names",
+        "input": "<x y\nz>",
+        "expected": {
+          "html": "<p><x y\nz></p>"
+        }
+      },
+      {
+        "description": "should support whitespace between attribute names",
+        "input": "<x y   z>",
+        "expected": {
+          "html": "<x y   z>"
+        }
+      },
+      {
+        "description": "should not support a colon in a tag name",
+        "input": "<x:y>",
+        "expected": {
+          "html": "<p>&#x3C;x:y></p>"
+        }
+      },
+      {
+        "description": "should not support an underscore in a tag name",
+        "input": "<x_y>",
+        "expected": {
+          "html": "<p>&#x3C;x_y></p>"
+        }
+      },
+      {
+        "description": "should not support a dot in a tag name",
+        "input": "<x.y>",
+        "expected": {
+          "html": "<p>&#x3C;x.y></p>"
+        }
+      },
+      {
+        "description": "should support a colon to start an attribute name",
+        "input": "<x :y>",
+        "expected": {
+          "html": "<x :y>"
+        }
+      },
+      {
+        "description": "should support an underscore to start an attribute name",
+        "input": "<x _y>",
+        "expected": {
+          "html": "<x _y>"
+        }
+      },
+      {
+        "description": "should not support a dot to start an attribute name",
+        "input": "<x .y>",
+        "expected": {
+          "html": "<p>&#x3C;x .y></p>"
+        }
+      },
+      {
+        "description": "should support a colon to end an attribute name",
+        "input": "<x y:>",
+        "expected": {
+          "html": "<x y:>"
+        }
+      },
+      {
+        "description": "should support an underscore to end an attribute name",
+        "input": "<x y_>",
+        "expected": {
+          "html": "<x y_>"
+        }
+      },
+      {
+        "description": "should support a dot to end an attribute name",
+        "input": "<x y.>",
+        "expected": {
+          "html": "<x y.>"
+        }
+      },
+      {
+        "description": "should support numbers to end an attribute name",
+        "input": "<x y123>",
+        "expected": {
+          "html": "<x y123>"
+        }
+      },
+      {
+        "description": "should support a dash to end an attribute name",
+        "input": "<x data->",
+        "expected": {
+          "html": "<x data->"
+        }
+      },
+      {
+        "description": "should not upport an initializer w/o a value",
+        "input": "<x y=>",
+        "expected": {
+          "html": "<p>&#x3C;x y=></p>"
+        }
+      },
+      {
+        "description": "should not support an equals to as an initializer",
+        "input": "<x y==>",
+        "expected": {
+          "html": "<p>&#x3C;x y==></p>"
+        }
+      },
+      {
+        "description": "should support a single character as an unquoted attribute value",
+        "input": "<x y=z>",
+        "expected": {
+          "html": "<x y=z>"
+        }
+      },
+      {
+        "description": "should support an empty double quoted attribute value",
+        "input": "<x y=\"\">",
+        "expected": {
+          "html": "<x y=\"\">"
+        }
+      },
+      {
+        "description": "should support an empty single quoted attribute value",
+        "input": "<x y=''>",
+        "expected": {
+          "html": "<x y=''>"
+        }
+      },
+      {
+        "description": "should not support a line ending in a double quoted attribute value",
+        "input": "<x y=\"\n\">",
+        "expected": {
+          "html": "<p><x y=\"\n\"></p>"
+        }
+      },
+      {
+        "description": "should not support a line ending in a single quoted attribute value",
+        "input": "<x y='\n'>",
+        "expected": {
+          "html": "<p><x y='\n'></p>"
+        }
+      },
+      {
+        "description": "should not support a line ending in/after an unquoted attribute value",
+        "input": "<w x=y\nz>",
+        "expected": {
+          "html": "<p><w x=y\nz></p>"
+        }
+      },
+      {
+        "description": "should not support a double quote in/after an unquoted attribute value",
+        "input": "<w x=y\"z>",
+        "expected": {
+          "html": "<p>&#x3C;w x=y\"z></p>"
+        }
+      },
+      {
+        "description": "should not support a single quote in/after an unquoted attribute value",
+        "input": "<w x=y'z>",
+        "expected": {
+          "html": "<p>&#x3C;w x=y'z></p>"
+        }
+      },
+      {
+        "description": "should not support an attribute after a double quoted attribute value",
+        "input": "<x y=\"\"z>",
+        "expected": {
+          "html": "<p>&#x3C;x y=\"\"z></p>"
+        }
+      },
+      {
+        "description": "should not support blank lines in complete",
+        "input": "<x>\n  \n  \n>",
+        "expected": {
+          "html": "<x>\n<blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should not support lazyness (1) (7)",
+        "input": "> <a>\n*bar*",
+        "expected": {
+          "html": "<blockquote>\n<a>\n</blockquote>\n<p><em>bar</em></p>"
+        }
+      },
+      {
+        "description": "should not support lazyness (2) (7)",
+        "input": "> a\n<a>",
+        "expected": {
+          "html": "<blockquote>\n<p>a</p>\n</blockquote>\n<a>"
+        }
+      }
+    ]
+  }
+]

@@ -80,3 +80,6 @@ tmuxp.yaml
 .worktrees/
 python/textlane.data/
 .superpowers/
+
+# Upstream checkouts the conformance importers read
+conformance/.cache/

@@ -1,0 +1,524 @@
+[
+  {
+    "description": "Setext headings",
+    "specification": ["https://spec.commonmark.org/0.31.2/#setext-headings"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 80",
+        "input": "Foo *bar*\n=========\n\nFoo *bar*\n---------\n",
+        "expected": {
+          "html": "<h1>Foo <em>bar</em></h1>\n<h2>Foo <em>bar</em></h2>"
+        }
+      },
+      {
+        "description": "example 81",
+        "input": "Foo *bar\nbaz*\n====\n",
+        "expected": {
+          "html": "<h1>Foo <em>bar\nbaz</em></h1>"
+        }
+      },
+      {
+        "description": "example 82",
+        "input": "  Foo *bar\nbaz*\t\n====\n",
+        "expected": {
+          "html": "<h1>Foo <em>bar\nbaz</em></h1>"
+        }
+      },
+      {
+        "description": "example 83",
+        "input": "Foo\n-------------------------\n\nFoo\n=\n",
+        "expected": {
+          "html": "<h2>Foo</h2>\n<h1>Foo</h1>"
+        }
+      },
+      {
+        "description": "example 84",
+        "input": "   Foo\n---\n\n  Foo\n-----\n\n  Foo\n  ===\n",
+        "expected": {
+          "html": "<h2>Foo</h2>\n<h2>Foo</h2>\n<h1>Foo</h1>"
+        }
+      },
+      {
+        "description": "example 85",
+        "input": "    Foo\n    ---\n\n    Foo\n---\n",
+        "expected": {
+          "html": "<pre><code>Foo\n---\n\nFoo\n</code></pre>\n<hr>"
+        }
+      },
+      {
+        "description": "example 86",
+        "input": "Foo\n   ----      \n",
+        "expected": {
+          "html": "<h2>Foo</h2>"
+        }
+      },
+      {
+        "description": "example 87",
+        "input": "Foo\n    ---\n",
+        "expected": {
+          "html": "<p>Foo\n---</p>"
+        }
+      },
+      {
+        "description": "example 88",
+        "input": "Foo\n= =\n\nFoo\n--- -\n",
+        "expected": {
+          "html": "<p>Foo\n= =</p>\n<p>Foo</p>\n<hr>"
+        }
+      },
+      {
+        "description": "example 89",
+        "input": "Foo  \n-----\n",
+        "expected": {
+          "html": "<h2>Foo</h2>"
+        }
+      },
+      {
+        "description": "example 90",
+        "input": "Foo\\\n----\n",
+        "expected": {
+          "html": "<h2>Foo\\</h2>"
+        }
+      },
+      {
+        "description": "example 91",
+        "input": "`Foo\n----\n`\n\n<a title=\"a lot\n---\nof dashes\"/>\n",
+        "expected": {
+          "html": "<h2>`Foo</h2>\n<p>`</p>\n<h2>&#x3C;a title=\"a lot</h2>\n<p>of dashes\"/></p>"
+        }
+      },
+      {
+        "description": "example 92",
+        "input": "> Foo\n---\n",
+        "expected": {
+          "html": "<blockquote>\n<p>Foo</p>\n</blockquote>\n<hr>"
+        }
+      },
+      {
+        "description": "example 93",
+        "input": "> foo\nbar\n===\n",
+        "expected": {
+          "html": "<blockquote>\n<p>foo\nbar\n===</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 94",
+        "input": "- Foo\n---\n",
+        "expected": {
+          "html": "<ul>\n<li>Foo</li>\n</ul>\n<hr>"
+        }
+      },
+      {
+        "description": "example 95",
+        "input": "Foo\nBar\n---\n",
+        "expected": {
+          "html": "<h2>Foo\nBar</h2>"
+        }
+      },
+      {
+        "description": "example 96",
+        "input": "---\nFoo\n---\nBar\n---\nBaz\n",
+        "expected": {
+          "html": "<hr>\n<h2>Foo</h2>\n<h2>Bar</h2>\n<p>Baz</p>"
+        }
+      },
+      {
+        "description": "example 97",
+        "input": "\n====\n",
+        "expected": {
+          "html": "<p>====</p>"
+        }
+      },
+      {
+        "description": "example 98",
+        "input": "---\n---\n",
+        "expected": {
+          "html": "<hr>\n<hr>"
+        }
+      },
+      {
+        "description": "example 99",
+        "input": "- foo\n-----\n",
+        "expected": {
+          "html": "<ul>\n<li>foo</li>\n</ul>\n<hr>"
+        }
+      },
+      {
+        "description": "example 100",
+        "input": "    foo\n---\n",
+        "expected": {
+          "html": "<pre><code>foo\n</code></pre>\n<hr>"
+        }
+      },
+      {
+        "description": "example 101",
+        "input": "> foo\n-----\n",
+        "expected": {
+          "html": "<blockquote>\n<p>foo</p>\n</blockquote>\n<hr>"
+        }
+      },
+      {
+        "description": "example 102",
+        "input": "\\> foo\n------\n",
+        "expected": {
+          "html": "<h2>> foo</h2>"
+        }
+      },
+      {
+        "description": "example 103",
+        "input": "Foo\n\nbar\n---\nbaz\n",
+        "expected": {
+          "html": "<p>Foo</p>\n<h2>bar</h2>\n<p>baz</p>"
+        }
+      },
+      {
+        "description": "example 104",
+        "input": "Foo\nbar\n\n---\n\nbaz\n",
+        "expected": {
+          "html": "<p>Foo\nbar</p>\n<hr>\n<p>baz</p>"
+        }
+      },
+      {
+        "description": "example 105",
+        "input": "Foo\nbar\n* * *\nbaz\n",
+        "expected": {
+          "html": "<p>Foo\nbar</p>\n<hr>\n<p>baz</p>"
+        }
+      },
+      {
+        "description": "example 106",
+        "input": "Foo\nbar\n\\---\nbaz\n",
+        "expected": {
+          "html": "<p>Foo\nbar\n---\nbaz</p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark flow/heading-setext",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/flow/heading-setext.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should support a heading w/ an equals to (rank of 1)",
+        "input": "Foo *bar*\n=========",
+        "expected": {
+          "html": "<h1>Foo <em>bar</em></h1>"
+        }
+      },
+      {
+        "description": "should support a heading w/ a dash (rank of 2)",
+        "input": "Foo *bar*\n---------",
+        "expected": {
+          "html": "<h2>Foo <em>bar</em></h2>"
+        }
+      },
+      {
+        "description": "should support line endings in setext headings",
+        "input": "Foo *bar\nbaz*\n====",
+        "expected": {
+          "html": "<h1>Foo <em>bar\nbaz</em></h1>"
+        }
+      },
+      {
+        "description": "should not include initial and final whitespace around content",
+        "input": "  Foo *bar\nbaz*\t\n====",
+        "expected": {
+          "html": "<h1>Foo <em>bar\nbaz</em></h1>"
+        }
+      },
+      {
+        "description": "should support long underlines",
+        "input": "Foo\n-------------------------",
+        "expected": {
+          "html": "<h2>Foo</h2>"
+        }
+      },
+      {
+        "description": "should support short underlines",
+        "input": "Foo\n=",
+        "expected": {
+          "html": "<h1>Foo</h1>"
+        }
+      },
+      {
+        "description": "should support indented content w/ 1 space",
+        "input": " Foo\n  ===",
+        "expected": {
+          "html": "<h1>Foo</h1>"
+        }
+      },
+      {
+        "description": "should support indented content w/ 2 spaces",
+        "input": "  Foo\n---",
+        "expected": {
+          "html": "<h2>Foo</h2>"
+        }
+      },
+      {
+        "description": "should support indented content w/ 3 spaces",
+        "input": "   Foo\n---",
+        "expected": {
+          "html": "<h2>Foo</h2>"
+        }
+      },
+      {
+        "description": "should not support too much indented content (1)",
+        "input": "    Foo\n    ---",
+        "expected": {
+          "html": "<pre><code>Foo\n---\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support too much indented content (2)",
+        "input": "    Foo\n---",
+        "expected": {
+          "html": "<pre><code>Foo\n</code></pre>\n<hr>"
+        }
+      },
+      {
+        "description": "should support initial and final whitespace around the underline",
+        "input": "Foo\n   ----      ",
+        "expected": {
+          "html": "<h2>Foo</h2>"
+        }
+      },
+      {
+        "description": "should support whitespace before underline",
+        "input": "Foo\n   =",
+        "expected": {
+          "html": "<h1>Foo</h1>"
+        }
+      },
+      {
+        "description": "should not support too much whitespace before underline (1)",
+        "input": "Foo\n    =",
+        "expected": {
+          "html": "<p>Foo\n=</p>"
+        }
+      },
+      {
+        "description": "should not support too much whitespace before underline (2)",
+        "input": "Foo\n\t=",
+        "expected": {
+          "html": "<p>Foo\n=</p>"
+        }
+      },
+      {
+        "description": "should not support whitespace in the underline (1)",
+        "input": "Foo\n= =",
+        "expected": {
+          "html": "<p>Foo\n= =</p>"
+        }
+      },
+      {
+        "description": "should not support whitespace in the underline (2)",
+        "input": "Foo\n--- -",
+        "expected": {
+          "html": "<p>Foo</p>\n<hr>"
+        }
+      },
+      {
+        "description": "should not support a hard break w/ spaces at the end",
+        "input": "Foo  \n-----",
+        "expected": {
+          "html": "<h2>Foo</h2>"
+        }
+      },
+      {
+        "description": "should not support a hard break w/ backslash at the end",
+        "input": "Foo\\\n-----",
+        "expected": {
+          "html": "<h2>Foo\\</h2>"
+        }
+      },
+      {
+        "description": "should precede over inline constructs (1)",
+        "input": "`Foo\n----\n`",
+        "expected": {
+          "html": "<h2>`Foo</h2>\n<p>`</p>"
+        }
+      },
+      {
+        "description": "should precede over inline constructs (2)",
+        "input": "<a title=\"a lot\n---\nof dashes\"/>",
+        "expected": {
+          "html": "<h2>&#x3C;a title=\"a lot</h2>\n<p>of dashes\"/></p>"
+        }
+      },
+      {
+        "description": "should not allow underline to be lazy (1)",
+        "input": "> Foo\n---",
+        "expected": {
+          "html": "<blockquote>\n<p>Foo</p>\n</blockquote>\n<hr>"
+        }
+      },
+      {
+        "description": "should not allow underline to be lazy (2)",
+        "input": "> foo\nbar\n===",
+        "expected": {
+          "html": "<blockquote>\n<p>foo\nbar\n===</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should not allow underline to be lazy (3)",
+        "input": "- Foo\n---",
+        "expected": {
+          "html": "<ul>\n<li>Foo</li>\n</ul>\n<hr>"
+        }
+      },
+      {
+        "description": "should support line endings in setext headings (2)",
+        "input": "Foo\nBar\n---",
+        "expected": {
+          "html": "<h2>Foo\nBar</h2>"
+        }
+      },
+      {
+        "description": "should support adjacent setext headings",
+        "input": "---\nFoo\n---\nBar\n---\nBaz",
+        "expected": {
+          "html": "<hr>\n<h2>Foo</h2>\n<h2>Bar</h2>\n<p>Baz</p>"
+        }
+      },
+      {
+        "description": "should not support empty setext headings",
+        "input": "\n====",
+        "expected": {
+          "html": "<p>====</p>"
+        }
+      },
+      {
+        "description": "should prefer other constructs over setext headings (1)",
+        "input": "---\n---",
+        "expected": {
+          "html": "<hr>\n<hr>"
+        }
+      },
+      {
+        "description": "should prefer other constructs over setext headings (2)",
+        "input": "- foo\n-----",
+        "expected": {
+          "html": "<ul>\n<li>foo</li>\n</ul>\n<hr>"
+        }
+      },
+      {
+        "description": "should prefer other constructs over setext headings (3)",
+        "input": "    foo\n---",
+        "expected": {
+          "html": "<pre><code>foo\n</code></pre>\n<hr>"
+        }
+      },
+      {
+        "description": "should prefer other constructs over setext headings (4)",
+        "input": "> foo\n-----",
+        "expected": {
+          "html": "<blockquote>\n<p>foo</p>\n</blockquote>\n<hr>"
+        }
+      },
+      {
+        "description": "should support starting w/ character escapes",
+        "input": "\\> foo\n------",
+        "expected": {
+          "html": "<h2>> foo</h2>"
+        }
+      },
+      {
+        "description": "paragraph and heading interplay (1)",
+        "input": "Foo\nbar\n---\nbaz",
+        "expected": {
+          "html": "<h2>Foo\nbar</h2>\n<p>baz</p>"
+        }
+      },
+      {
+        "description": "paragraph and heading interplay (2)",
+        "input": "Foo\n\nbar\n---\nbaz",
+        "expected": {
+          "html": "<p>Foo</p>\n<h2>bar</h2>\n<p>baz</p>"
+        }
+      },
+      {
+        "description": "paragraph and heading interplay (3)",
+        "input": "Foo\nbar\n\n---\n\nbaz",
+        "expected": {
+          "html": "<p>Foo\nbar</p>\n<hr>\n<p>baz</p>"
+        }
+      },
+      {
+        "description": "paragraph and heading interplay (4)",
+        "input": "Foo\nbar\n* * *\nbaz",
+        "expected": {
+          "html": "<p>Foo\nbar</p>\n<hr>\n<p>baz</p>"
+        }
+      },
+      {
+        "description": "paragraph and heading interplay (5)",
+        "input": "Foo\nbar\n\\---\nbaz",
+        "expected": {
+          "html": "<p>Foo\nbar\n---\nbaz</p>"
+        }
+      },
+      {
+        "description": "should support a hard break w/ spaces in between",
+        "input": "Foo  \nbar\n-----",
+        "expected": {
+          "html": "<h2>Foo<br>\nbar</h2>"
+        }
+      },
+      {
+        "description": "should support a hard break w/ backslash in between",
+        "input": "Foo\\\nbar\n-----",
+        "expected": {
+          "html": "<h2>Foo<br>\nbar</h2>"
+        }
+      },
+      {
+        "description": "should prefer a setext heading over an interrupting list",
+        "input": "a\n-\nb",
+        "expected": {
+          "html": "<h2>a</h2>\n<p>b</p>"
+        }
+      },
+      {
+        "description": "should not support lazyness (1)",
+        "input": "> ===\na",
+        "expected": {
+          "html": "<blockquote>\n<p>===\na</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should not support lazyness (2)",
+        "input": "> a\n===",
+        "expected": {
+          "html": "<blockquote>\n<p>a\n===</p>\n</blockquote>"
+        }
+      }
+    ]
+  }
+]

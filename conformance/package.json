@@ -3,9 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "import:commonmark": "node sources/commonmark.ts && vp fmt tests"
+    "import:commonmark": "node sources/commonmark.ts && vp fmt tests",
+    "import:micromark": "node sources/micromark.ts && vp fmt tests"
   },
   "devDependencies": {
+    "acorn": "8.19.0",
+    "acorn-walk": "8.3.5",
     "commonmark.json": "0.31.0",
     "hast-util-from-html": "2.0.3",
     "hast-util-to-html": "9.0.5",

@@ -1,0 +1,236 @@
+[
+  {
+    "description": "micromark misc/dangerous-protocols",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/misc/dangerous-protocols.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should be safe by default",
+        "comment": "micromark renders: <p><a href=\"\">javascript:alert(1)</a></p>",
+        "input": "<javascript:alert(1)>",
+        "expected": {
+          "html": "<p><a href=\"javascript:alert(1)\">javascript:alert(1)</a></p>"
+        }
+      },
+      {
+        "description": "should allow `http:`",
+        "input": "<http://a>",
+        "expected": {
+          "html": "<p><a href=\"http://a\">http://a</a></p>"
+        }
+      },
+      {
+        "description": "should allow `https:`",
+        "input": "<https://a>",
+        "expected": {
+          "html": "<p><a href=\"https://a\">https://a</a></p>"
+        }
+      },
+      {
+        "description": "should allow `irc:`",
+        "input": "<irc:///help>",
+        "expected": {
+          "html": "<p><a href=\"irc:///help\">irc:///help</a></p>"
+        }
+      },
+      {
+        "description": "should allow `mailto:`",
+        "input": "<mailto:a>",
+        "expected": {
+          "html": "<p><a href=\"mailto:a\">mailto:a</a></p>"
+        }
+      },
+      {
+        "description": "should be safe by default (2)",
+        "comment": "micromark renders: <p><img src=\"\" alt=\"\" /></p>",
+        "input": "![](javascript:alert(1))",
+        "expected": {
+          "html": "<p><img src=\"javascript:alert(1)\" alt=\"\"></p>"
+        }
+      },
+      {
+        "description": "should allow `http:` (2)",
+        "input": "![](http://a)",
+        "expected": {
+          "html": "<p><img src=\"http://a\" alt=\"\"></p>"
+        }
+      },
+      {
+        "description": "should allow `https:` (2)",
+        "input": "![](https://a)",
+        "expected": {
+          "html": "<p><img src=\"https://a\" alt=\"\"></p>"
+        }
+      },
+      {
+        "description": "should not allow `irc:`",
+        "comment": "micromark renders: <p><img src=\"\" alt=\"\" /></p>",
+        "input": "![](irc:///help)",
+        "expected": {
+          "html": "<p><img src=\"irc:///help\" alt=\"\"></p>"
+        }
+      },
+      {
+        "description": "should not allow `mailto:`",
+        "comment": "micromark renders: <p><img src=\"\" alt=\"\" /></p>",
+        "input": "![](mailto:a)",
+        "expected": {
+          "html": "<p><img src=\"mailto:a\" alt=\"\"></p>"
+        }
+      },
+      {
+        "description": "should allow a hash",
+        "input": "![](#a)",
+        "expected": {
+          "html": "<p><img src=\"#a\" alt=\"\"></p>"
+        }
+      },
+      {
+        "description": "should allow a search",
+        "input": "![](?a)",
+        "expected": {
+          "html": "<p><img src=\"?a\" alt=\"\"></p>"
+        }
+      },
+      {
+        "description": "should allow an absolute",
+        "input": "![](/a)",
+        "expected": {
+          "html": "<p><img src=\"/a\" alt=\"\"></p>"
+        }
+      },
+      {
+        "description": "should allow an relative",
+        "input": "![](./a)",
+        "expected": {
+          "html": "<p><img src=\"./a\" alt=\"\"></p>"
+        }
+      },
+      {
+        "description": "should allow an upwards relative",
+        "input": "![](../a)",
+        "expected": {
+          "html": "<p><img src=\"../a\" alt=\"\"></p>"
+        }
+      },
+      {
+        "description": "should allow a colon in a hash",
+        "input": "![](a#b:c)",
+        "expected": {
+          "html": "<p><img src=\"a#b:c\" alt=\"\"></p>"
+        }
+      },
+      {
+        "description": "should allow a colon in a search",
+        "input": "![](a?b:c)",
+        "expected": {
+          "html": "<p><img src=\"a?b:c\" alt=\"\"></p>"
+        }
+      },
+      {
+        "description": "should allow a colon in a path",
+        "input": "![](a/b:c)",
+        "expected": {
+          "html": "<p><img src=\"a/b:c\" alt=\"\"></p>"
+        }
+      },
+      {
+        "description": "should be safe by default (3)",
+        "comment": "micromark renders: <p><a href=\"\"></a></p>",
+        "input": "[](javascript:alert(1))",
+        "expected": {
+          "html": "<p><a href=\"javascript:alert(1)\"></a></p>"
+        }
+      },
+      {
+        "description": "should allow `http:` (3)",
+        "input": "[](http://a)",
+        "expected": {
+          "html": "<p><a href=\"http://a\"></a></p>"
+        }
+      },
+      {
+        "description": "should allow `https:` (3)",
+        "input": "[](https://a)",
+        "expected": {
+          "html": "<p><a href=\"https://a\"></a></p>"
+        }
+      },
+      {
+        "description": "should allow `irc:` (2)",
+        "input": "[](irc:///help)",
+        "expected": {
+          "html": "<p><a href=\"irc:///help\"></a></p>"
+        }
+      },
+      {
+        "description": "should allow `mailto:` (2)",
+        "input": "[](mailto:a)",
+        "expected": {
+          "html": "<p><a href=\"mailto:a\"></a></p>"
+        }
+      },
+      {
+        "description": "should allow a hash (2)",
+        "input": "[](#a)",
+        "expected": {
+          "html": "<p><a href=\"#a\"></a></p>"
+        }
+      },
+      {
+        "description": "should allow a search (2)",
+        "input": "[](?a)",
+        "expected": {
+          "html": "<p><a href=\"?a\"></a></p>"
+        }
+      },
+      {
+        "description": "should allow an absolute (2)",
+        "input": "[](/a)",
+        "expected": {
+          "html": "<p><a href=\"/a\"></a></p>"
+        }
+      },
+      {
+        "description": "should allow an relative (2)",
+        "input": "[](./a)",
+        "expected": {
+          "html": "<p><a href=\"./a\"></a></p>"
+        }
+      },
+      {
+        "description": "should allow an upwards relative (2)",
+        "input": "[](../a)",
+        "expected": {
+          "html": "<p><a href=\"../a\"></a></p>"
+        }
+      },
+      {
+        "description": "should allow a colon in a hash (2)",
+        "input": "[](a#b:c)",
+        "expected": {
+          "html": "<p><a href=\"a#b:c\"></a></p>"
+        }
+      },
+      {
+        "description": "should allow a colon in a search (2)",
+        "input": "[](a?b:c)",
+        "expected": {
+          "html": "<p><a href=\"a?b:c\"></a></p>"
+        }
+      },
+      {
+        "description": "should allow a colon in a path (2)",
+        "input": "[](a/b:c)",
+        "expected": {
+          "html": "<p><a href=\"a/b:c\"></a></p>"
+        }
+      }
+    ]
+  }
+]

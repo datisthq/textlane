@@ -1,0 +1,391 @@
+[
+  {
+    "description": "ATX headings",
+    "specification": ["https://spec.commonmark.org/0.31.2/#atx-headings"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 62",
+        "input": "# foo\n## foo\n### foo\n#### foo\n##### foo\n###### foo\n",
+        "expected": {
+          "html": "<h1>foo</h1>\n<h2>foo</h2>\n<h3>foo</h3>\n<h4>foo</h4>\n<h5>foo</h5>\n<h6>foo</h6>"
+        }
+      },
+      {
+        "description": "example 63",
+        "input": "####### foo\n",
+        "expected": {
+          "html": "<p>####### foo</p>"
+        }
+      },
+      {
+        "description": "example 64",
+        "input": "#5 bolt\n\n#hashtag\n",
+        "expected": {
+          "html": "<p>#5 bolt</p>\n<p>#hashtag</p>"
+        }
+      },
+      {
+        "description": "example 65",
+        "input": "\\## foo\n",
+        "expected": {
+          "html": "<p>## foo</p>"
+        }
+      },
+      {
+        "description": "example 66",
+        "input": "# foo *bar* \\*baz\\*\n",
+        "expected": {
+          "html": "<h1>foo <em>bar</em> *baz*</h1>"
+        }
+      },
+      {
+        "description": "example 67",
+        "input": "#                  foo                     \n",
+        "expected": {
+          "html": "<h1>foo</h1>"
+        }
+      },
+      {
+        "description": "example 68",
+        "input": " ### foo\n  ## foo\n   # foo\n",
+        "expected": {
+          "html": "<h3>foo</h3>\n<h2>foo</h2>\n<h1>foo</h1>"
+        }
+      },
+      {
+        "description": "example 69",
+        "input": "    # foo\n",
+        "expected": {
+          "html": "<pre><code># foo\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 70",
+        "input": "foo\n    # bar\n",
+        "expected": {
+          "html": "<p>foo\n# bar</p>"
+        }
+      },
+      {
+        "description": "example 71",
+        "input": "## foo ##\n  ###   bar    ###\n",
+        "expected": {
+          "html": "<h2>foo</h2>\n<h3>bar</h3>"
+        }
+      },
+      {
+        "description": "example 72",
+        "input": "# foo ##################################\n##### foo ##\n",
+        "expected": {
+          "html": "<h1>foo</h1>\n<h5>foo</h5>"
+        }
+      },
+      {
+        "description": "example 73",
+        "input": "### foo ###     \n",
+        "expected": {
+          "html": "<h3>foo</h3>"
+        }
+      },
+      {
+        "description": "example 74",
+        "input": "### foo ### b\n",
+        "expected": {
+          "html": "<h3>foo ### b</h3>"
+        }
+      },
+      {
+        "description": "example 75",
+        "input": "# foo#\n",
+        "expected": {
+          "html": "<h1>foo#</h1>"
+        }
+      },
+      {
+        "description": "example 76",
+        "input": "### foo \\###\n## foo #\\##\n# foo \\#\n",
+        "expected": {
+          "html": "<h3>foo ###</h3>\n<h2>foo ###</h2>\n<h1>foo #</h1>"
+        }
+      },
+      {
+        "description": "example 77",
+        "input": "****\n## foo\n****\n",
+        "expected": {
+          "html": "<hr>\n<h2>foo</h2>\n<hr>"
+        }
+      },
+      {
+        "description": "example 78",
+        "input": "Foo bar\n# baz\nBar foo\n",
+        "expected": {
+          "html": "<p>Foo bar</p>\n<h1>baz</h1>\n<p>Bar foo</p>"
+        }
+      },
+      {
+        "description": "example 79",
+        "input": "## \n#\n### ###\n",
+        "expected": {
+          "html": "<h2></h2>\n<h1></h1>\n<h3></h3>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark flow/heading-atx",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/flow/heading-atx.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should support a heading w/ rank 1",
+        "input": "# foo",
+        "expected": {
+          "html": "<h1>foo</h1>"
+        }
+      },
+      {
+        "description": "should support a heading w/ rank 2",
+        "input": "## foo",
+        "expected": {
+          "html": "<h2>foo</h2>"
+        }
+      },
+      {
+        "description": "should support a heading w/ rank 3",
+        "input": "### foo",
+        "expected": {
+          "html": "<h3>foo</h3>"
+        }
+      },
+      {
+        "description": "should support a heading w/ rank 4",
+        "input": "#### foo",
+        "expected": {
+          "html": "<h4>foo</h4>"
+        }
+      },
+      {
+        "description": "should support a heading w/ rank 5",
+        "input": "##### foo",
+        "expected": {
+          "html": "<h5>foo</h5>"
+        }
+      },
+      {
+        "description": "should support a heading w/ rank 6",
+        "input": "###### foo",
+        "expected": {
+          "html": "<h6>foo</h6>"
+        }
+      },
+      {
+        "description": "should not support a heading w/ rank 7",
+        "input": "####### foo",
+        "expected": {
+          "html": "<p>####### foo</p>"
+        }
+      },
+      {
+        "description": "should not support a heading for a number sign not followed by whitespace (1)",
+        "input": "#5 bolt",
+        "expected": {
+          "html": "<p>#5 bolt</p>"
+        }
+      },
+      {
+        "description": "should not support a heading for a number sign not followed by whitespace (2)",
+        "input": "#hashtag",
+        "expected": {
+          "html": "<p>#hashtag</p>"
+        }
+      },
+      {
+        "description": "should not support a heading for an escaped number sign",
+        "input": "\\## foo",
+        "expected": {
+          "html": "<p>## foo</p>"
+        }
+      },
+      {
+        "description": "should support text content in headings",
+        "input": "# foo *bar* \\*baz\\*",
+        "expected": {
+          "html": "<h1>foo <em>bar</em> *baz*</h1>"
+        }
+      },
+      {
+        "description": "should support arbitrary initial and final whitespace",
+        "input": "#                  foo                     ",
+        "expected": {
+          "html": "<h1>foo</h1>"
+        }
+      },
+      {
+        "description": "should support an initial space",
+        "input": " ### foo",
+        "expected": {
+          "html": "<h3>foo</h3>"
+        }
+      },
+      {
+        "description": "should support two initial spaces",
+        "input": "  ## foo",
+        "expected": {
+          "html": "<h2>foo</h2>"
+        }
+      },
+      {
+        "description": "should support three initial spaces",
+        "input": "   # foo",
+        "expected": {
+          "html": "<h1>foo</h1>"
+        }
+      },
+      {
+        "description": "should not support four initial spaces",
+        "input": "    # foo",
+        "expected": {
+          "html": "<pre><code># foo\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support four initial spaces when interrupting",
+        "input": "foo\n    # bar",
+        "expected": {
+          "html": "<p>foo\n# bar</p>"
+        }
+      },
+      {
+        "description": "should support a closing sequence (1)",
+        "input": "## foo ##",
+        "expected": {
+          "html": "<h2>foo</h2>"
+        }
+      },
+      {
+        "description": "should support a closing sequence (2)",
+        "input": "  ###   bar    ###",
+        "expected": {
+          "html": "<h3>bar</h3>"
+        }
+      },
+      {
+        "description": "should support a closing sequence w/ an arbitrary number of number signs (1)",
+        "input": "# foo ##################################",
+        "expected": {
+          "html": "<h1>foo</h1>"
+        }
+      },
+      {
+        "description": "should support a closing sequence w/ an arbitrary number of number signs (2)",
+        "input": "##### foo ##",
+        "expected": {
+          "html": "<h5>foo</h5>"
+        }
+      },
+      {
+        "description": "should support trailing whitespace after a closing sequence",
+        "input": "### foo ###     ",
+        "expected": {
+          "html": "<h3>foo</h3>"
+        }
+      },
+      {
+        "description": "should not support other content after a closing sequence",
+        "input": "### foo ### b",
+        "expected": {
+          "html": "<h3>foo ### b</h3>"
+        }
+      },
+      {
+        "description": "should not support a closing sequence w/o whitespace before it",
+        "input": "# foo#",
+        "expected": {
+          "html": "<h1>foo#</h1>"
+        }
+      },
+      {
+        "description": "should not support an “escaped” closing sequence (1)",
+        "input": "### foo \\###",
+        "expected": {
+          "html": "<h3>foo ###</h3>"
+        }
+      },
+      {
+        "description": "should not support an “escaped” closing sequence (2)",
+        "input": "## foo #\\##",
+        "expected": {
+          "html": "<h2>foo ###</h2>"
+        }
+      },
+      {
+        "description": "should not support an “escaped” closing sequence (3)",
+        "input": "# foo \\#",
+        "expected": {
+          "html": "<h1>foo #</h1>"
+        }
+      },
+      {
+        "description": "should support atx headings when not surrounded by blank lines",
+        "input": "****\n## foo\n****",
+        "expected": {
+          "html": "<hr>\n<h2>foo</h2>\n<hr>"
+        }
+      },
+      {
+        "description": "should support atx headings interrupting paragraphs",
+        "input": "Foo bar\n# baz\nBar foo",
+        "expected": {
+          "html": "<p>Foo bar</p>\n<h1>baz</h1>\n<p>Bar foo</p>"
+        }
+      },
+      {
+        "description": "should support empty atx headings",
+        "input": "## \n#\n### ###",
+        "expected": {
+          "html": "<h2></h2>\n<h1></h1>\n<h3></h3>"
+        }
+      },
+      {
+        "description": "should not support lazyness (1)",
+        "input": "> #\na",
+        "expected": {
+          "html": "<blockquote>\n<h1></h1>\n</blockquote>\n<p>a</p>"
+        }
+      },
+      {
+        "description": "should not support lazyness (2)",
+        "input": "> a\n#",
+        "expected": {
+          "html": "<blockquote>\n<p>a</p>\n</blockquote>\n<h1></h1>"
+        }
+      }
+    ]
+  }
+]

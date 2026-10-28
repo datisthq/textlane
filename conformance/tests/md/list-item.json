@@ -1,0 +1,1058 @@
+[
+  {
+    "description": "List items",
+    "specification": ["https://spec.commonmark.org/0.31.2/#list-items"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 253",
+        "input": "A paragraph\nwith two lines.\n\n    indented code\n\n> A block quote.\n",
+        "expected": {
+          "html": "<p>A paragraph\nwith two lines.</p>\n<pre><code>indented code\n</code></pre>\n<blockquote>\n<p>A block quote.</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 254",
+        "input": "1.  A paragraph\n    with two lines.\n\n        indented code\n\n    > A block quote.\n",
+        "expected": {
+          "html": "<ol>\n<li>\n<p>A paragraph\nwith two lines.</p>\n<pre><code>indented code\n</code></pre>\n<blockquote>\n<p>A block quote.</p>\n</blockquote>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 255",
+        "input": "- one\n\n two\n",
+        "expected": {
+          "html": "<ul>\n<li>one</li>\n</ul>\n<p>two</p>"
+        }
+      },
+      {
+        "description": "example 256",
+        "input": "- one\n\n  two\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>one</p>\n<p>two</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 257",
+        "input": " -    one\n\n     two\n",
+        "expected": {
+          "html": "<ul>\n<li>one</li>\n</ul>\n<pre><code> two\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 258",
+        "input": " -    one\n\n      two\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>one</p>\n<p>two</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 259",
+        "input": "   > > 1.  one\n>>\n>>     two\n",
+        "expected": {
+          "html": "<blockquote>\n<blockquote>\n<ol>\n<li>\n<p>one</p>\n<p>two</p>\n</li>\n</ol>\n</blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 260",
+        "input": ">>- one\n>>\n  >  > two\n",
+        "expected": {
+          "html": "<blockquote>\n<blockquote>\n<ul>\n<li>one</li>\n</ul>\n<p>two</p>\n</blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 261",
+        "input": "-one\n\n2.two\n",
+        "expected": {
+          "html": "<p>-one</p>\n<p>2.two</p>"
+        }
+      },
+      {
+        "description": "example 262",
+        "input": "- foo\n\n\n  bar\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>foo</p>\n<p>bar</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 263",
+        "input": "1.  foo\n\n    ```\n    bar\n    ```\n\n    baz\n\n    > bam\n",
+        "expected": {
+          "html": "<ol>\n<li>\n<p>foo</p>\n<pre><code>bar\n</code></pre>\n<p>baz</p>\n<blockquote>\n<p>bam</p>\n</blockquote>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 264",
+        "input": "- Foo\n\n      bar\n\n\n      baz\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>Foo</p>\n<pre><code>bar\n\n\nbaz\n</code></pre>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 265",
+        "input": "123456789. ok\n",
+        "expected": {
+          "html": "<ol start=\"123456789\">\n<li>ok</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 266",
+        "input": "1234567890. not ok\n",
+        "expected": {
+          "html": "<p>1234567890. not ok</p>"
+        }
+      },
+      {
+        "description": "example 267",
+        "input": "0. ok\n",
+        "expected": {
+          "html": "<ol start=\"0\">\n<li>ok</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 268",
+        "input": "003. ok\n",
+        "expected": {
+          "html": "<ol start=\"3\">\n<li>ok</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 269",
+        "input": "-1. not ok\n",
+        "expected": {
+          "html": "<p>-1. not ok</p>"
+        }
+      },
+      {
+        "description": "example 270",
+        "input": "- foo\n\n      bar\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>foo</p>\n<pre><code>bar\n</code></pre>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 271",
+        "input": "  10.  foo\n\n           bar\n",
+        "expected": {
+          "html": "<ol start=\"10\">\n<li>\n<p>foo</p>\n<pre><code>bar\n</code></pre>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 272",
+        "input": "    indented code\n\nparagraph\n\n    more code\n",
+        "expected": {
+          "html": "<pre><code>indented code\n</code></pre>\n<p>paragraph</p>\n<pre><code>more code\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 273",
+        "input": "1.     indented code\n\n   paragraph\n\n       more code\n",
+        "expected": {
+          "html": "<ol>\n<li>\n<pre><code>indented code\n</code></pre>\n<p>paragraph</p>\n<pre><code>more code\n</code></pre>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 274",
+        "input": "1.      indented code\n\n   paragraph\n\n       more code\n",
+        "expected": {
+          "html": "<ol>\n<li>\n<pre><code> indented code\n</code></pre>\n<p>paragraph</p>\n<pre><code>more code\n</code></pre>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 275",
+        "input": "   foo\n\nbar\n",
+        "expected": {
+          "html": "<p>foo</p>\n<p>bar</p>"
+        }
+      },
+      {
+        "description": "example 276",
+        "input": "-    foo\n\n  bar\n",
+        "expected": {
+          "html": "<ul>\n<li>foo</li>\n</ul>\n<p>bar</p>"
+        }
+      },
+      {
+        "description": "example 277",
+        "input": "-  foo\n\n   bar\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>foo</p>\n<p>bar</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 278",
+        "input": "-\n  foo\n-\n  ```\n  bar\n  ```\n-\n      baz\n",
+        "expected": {
+          "html": "<ul>\n<li>foo</li>\n<li>\n<pre><code>bar\n</code></pre>\n</li>\n<li>\n<pre><code>baz\n</code></pre>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 279",
+        "input": "-   \n  foo\n",
+        "expected": {
+          "html": "<ul>\n<li>foo</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 280",
+        "input": "-\n\n  foo\n",
+        "expected": {
+          "html": "<ul>\n<li></li>\n</ul>\n<p>foo</p>"
+        }
+      },
+      {
+        "description": "example 281",
+        "input": "- foo\n-\n- bar\n",
+        "expected": {
+          "html": "<ul>\n<li>foo</li>\n<li></li>\n<li>bar</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 282",
+        "input": "- foo\n-   \n- bar\n",
+        "expected": {
+          "html": "<ul>\n<li>foo</li>\n<li></li>\n<li>bar</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 283",
+        "input": "1. foo\n2.\n3. bar\n",
+        "expected": {
+          "html": "<ol>\n<li>foo</li>\n<li></li>\n<li>bar</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 284",
+        "input": "*\n",
+        "expected": {
+          "html": "<ul>\n<li></li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 285",
+        "input": "foo\n*\n\nfoo\n1.\n",
+        "expected": {
+          "html": "<p>foo\n*</p>\n<p>foo\n1.</p>"
+        }
+      },
+      {
+        "description": "example 286",
+        "input": " 1.  A paragraph\n     with two lines.\n\n         indented code\n\n     > A block quote.\n",
+        "expected": {
+          "html": "<ol>\n<li>\n<p>A paragraph\nwith two lines.</p>\n<pre><code>indented code\n</code></pre>\n<blockquote>\n<p>A block quote.</p>\n</blockquote>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 287",
+        "input": "  1.  A paragraph\n      with two lines.\n\n          indented code\n\n      > A block quote.\n",
+        "expected": {
+          "html": "<ol>\n<li>\n<p>A paragraph\nwith two lines.</p>\n<pre><code>indented code\n</code></pre>\n<blockquote>\n<p>A block quote.</p>\n</blockquote>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 288",
+        "input": "   1.  A paragraph\n       with two lines.\n\n           indented code\n\n       > A block quote.\n",
+        "expected": {
+          "html": "<ol>\n<li>\n<p>A paragraph\nwith two lines.</p>\n<pre><code>indented code\n</code></pre>\n<blockquote>\n<p>A block quote.</p>\n</blockquote>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 289",
+        "input": "    1.  A paragraph\n        with two lines.\n\n            indented code\n\n        > A block quote.\n",
+        "expected": {
+          "html": "<pre><code>1.  A paragraph\n    with two lines.\n\n        indented code\n\n    > A block quote.\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 290",
+        "input": "  1.  A paragraph\nwith two lines.\n\n          indented code\n\n      > A block quote.\n",
+        "expected": {
+          "html": "<ol>\n<li>\n<p>A paragraph\nwith two lines.</p>\n<pre><code>indented code\n</code></pre>\n<blockquote>\n<p>A block quote.</p>\n</blockquote>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 291",
+        "input": "  1.  A paragraph\n    with two lines.\n",
+        "expected": {
+          "html": "<ol>\n<li>A paragraph\nwith two lines.</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 292",
+        "input": "> 1. > Blockquote\ncontinued here.\n",
+        "expected": {
+          "html": "<blockquote>\n<ol>\n<li>\n<blockquote>\n<p>Blockquote\ncontinued here.</p>\n</blockquote>\n</li>\n</ol>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 293",
+        "input": "> 1. > Blockquote\n> continued here.\n",
+        "expected": {
+          "html": "<blockquote>\n<ol>\n<li>\n<blockquote>\n<p>Blockquote\ncontinued here.</p>\n</blockquote>\n</li>\n</ol>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 294",
+        "input": "- foo\n  - bar\n    - baz\n      - boo\n",
+        "expected": {
+          "html": "<ul>\n<li>foo\n<ul>\n<li>bar\n<ul>\n<li>baz\n<ul>\n<li>boo</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 295",
+        "input": "- foo\n - bar\n  - baz\n   - boo\n",
+        "expected": {
+          "html": "<ul>\n<li>foo</li>\n<li>bar</li>\n<li>baz</li>\n<li>boo</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 296",
+        "input": "10) foo\n    - bar\n",
+        "expected": {
+          "html": "<ol start=\"10\">\n<li>foo\n<ul>\n<li>bar</li>\n</ul>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 297",
+        "input": "10) foo\n   - bar\n",
+        "expected": {
+          "html": "<ol start=\"10\">\n<li>foo</li>\n</ol>\n<ul>\n<li>bar</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 298",
+        "input": "- - foo\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<ul>\n<li>foo</li>\n</ul>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 299",
+        "input": "1. - 2. foo\n",
+        "expected": {
+          "html": "<ol>\n<li>\n<ul>\n<li>\n<ol start=\"2\">\n<li>foo</li>\n</ol>\n</li>\n</ul>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 300",
+        "input": "- # Foo\n- Bar\n  ---\n  baz\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<h1>Foo</h1>\n</li>\n<li>\n<h2>Bar</h2>\nbaz</li>\n</ul>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark document/list-item",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/document/list-item.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should support documents",
+        "input": "A paragraph\nwith two lines.\n\n    indented code\n\n> A block quote.",
+        "expected": {
+          "html": "<p>A paragraph\nwith two lines.</p>\n<pre><code>indented code\n</code></pre>\n<blockquote>\n<p>A block quote.</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should support documents in list items",
+        "input": "1.  a\n    b.\n\n        c\n\n    > d.",
+        "expected": {
+          "html": "<ol>\n<li>\n<p>a\nb.</p>\n<pre><code>c\n</code></pre>\n<blockquote>\n<p>d.</p>\n</blockquote>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should not support 1 space for a two-character list prefix",
+        "input": "- one\n\n two",
+        "expected": {
+          "html": "<ul>\n<li>one</li>\n</ul>\n<p>two</p>"
+        }
+      },
+      {
+        "description": "should support blank lines in list items",
+        "input": "- a\n\n  b",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>a</p>\n<p>b</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support indented code after lists",
+        "input": " -    one\n\n     two",
+        "expected": {
+          "html": "<ul>\n<li>one</li>\n</ul>\n<pre><code> two\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support proper indent mixed w/ block quotes (1)",
+        "input": "   > > 1.  one\n>>\n>>     two",
+        "expected": {
+          "html": "<blockquote>\n<blockquote>\n<ol>\n<li>\n<p>one</p>\n<p>two</p>\n</li>\n</ol>\n</blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should support proper indent mixed w/ block quotes (2)",
+        "input": ">>- one\n>>\n  >  > two",
+        "expected": {
+          "html": "<blockquote>\n<blockquote>\n<ul>\n<li>one</li>\n</ul>\n<p>two</p>\n</blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should not support a missing space after marker",
+        "input": "-one\n\n2.two",
+        "expected": {
+          "html": "<p>-one</p>\n<p>2.two</p>"
+        }
+      },
+      {
+        "description": "should support multiple blank lines between items",
+        "input": "- foo\n\n\n  bar",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>foo</p>\n<p>bar</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support flow in items",
+        "input": "1.  foo\n\n    ```\n    bar\n    ```\n\n    baz\n\n    > bam",
+        "expected": {
+          "html": "<ol>\n<li>\n<p>foo</p>\n<pre><code>bar\n</code></pre>\n<p>baz</p>\n<blockquote>\n<p>bam</p>\n</blockquote>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should support blank lines in indented code in items",
+        "input": "- Foo\n\n      bar\n\n\n      baz",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>Foo</p>\n<pre><code>bar\n\n\nbaz\n</code></pre>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support start on the first list item",
+        "input": "123456789. ok",
+        "expected": {
+          "html": "<ol start=\"123456789\">\n<li>ok</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should not support ordered item values over 10 digits",
+        "input": "1234567890. not ok",
+        "expected": {
+          "html": "<p>1234567890. not ok</p>"
+        }
+      },
+      {
+        "description": "should support ordered item values of `0`",
+        "input": "0. ok",
+        "expected": {
+          "html": "<ol start=\"0\">\n<li>ok</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should support ordered item values starting w/ `0`s",
+        "input": "003. ok",
+        "expected": {
+          "html": "<ol start=\"3\">\n<li>ok</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should not support “negative” ordered item values",
+        "input": "-1. not ok",
+        "expected": {
+          "html": "<p>-1. not ok</p>"
+        }
+      },
+      {
+        "description": "should support indented code in list items (1)",
+        "input": "- foo\n\n      bar",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>foo</p>\n<pre><code>bar\n</code></pre>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support indented code in list items (2)",
+        "input": "  10.  foo\n\n           bar",
+        "expected": {
+          "html": "<ol start=\"10\">\n<li>\n<p>foo</p>\n<pre><code>bar\n</code></pre>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should support indented code in list items (3)",
+        "input": "    indented code\n\nparagraph\n\n    more code",
+        "expected": {
+          "html": "<pre><code>indented code\n</code></pre>\n<p>paragraph</p>\n<pre><code>more code\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support indented code in list items (4)",
+        "input": "1.     indented code\n\n   paragraph\n\n       more code",
+        "expected": {
+          "html": "<ol>\n<li>\n<pre><code>indented code\n</code></pre>\n<p>paragraph</p>\n<pre><code>more code\n</code></pre>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should support indented code in list items (5)",
+        "input": "1.      indented code\n\n   paragraph\n\n       more code",
+        "expected": {
+          "html": "<ol>\n<li>\n<pre><code> indented code\n</code></pre>\n<p>paragraph</p>\n<pre><code>more code\n</code></pre>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should support indented code in list items (6)",
+        "input": "   foo\n\nbar",
+        "expected": {
+          "html": "<p>foo</p>\n<p>bar</p>"
+        }
+      },
+      {
+        "description": "should support indented code in list items (7)",
+        "input": "-    foo\n\n  bar",
+        "expected": {
+          "html": "<ul>\n<li>foo</li>\n</ul>\n<p>bar</p>"
+        }
+      },
+      {
+        "description": "should support indented code in list items (8)",
+        "input": "-  foo\n\n   bar",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>foo</p>\n<p>bar</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support blank first lines (1)",
+        "input": "-\n  foo\n-\n  ```\n  bar\n  ```\n-\n      baz",
+        "expected": {
+          "html": "<ul>\n<li>foo</li>\n<li>\n<pre><code>bar\n</code></pre>\n</li>\n<li>\n<pre><code>baz\n</code></pre>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support blank first lines (2)",
+        "input": "-   \n  foo",
+        "expected": {
+          "html": "<ul>\n<li>foo</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support empty only items",
+        "input": "-\n\n  foo",
+        "expected": {
+          "html": "<ul>\n<li></li>\n</ul>\n<p>foo</p>"
+        }
+      },
+      {
+        "description": "should support empty continued items",
+        "input": "- foo\n-\n- bar",
+        "expected": {
+          "html": "<ul>\n<li>foo</li>\n<li></li>\n<li>bar</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support blank continued items",
+        "input": "- foo\n-   \n- bar",
+        "expected": {
+          "html": "<ul>\n<li>foo</li>\n<li></li>\n<li>bar</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support empty continued items (ordered)",
+        "input": "1. foo\n2.\n3. bar",
+        "expected": {
+          "html": "<ol>\n<li>foo</li>\n<li></li>\n<li>bar</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should support a single empty item",
+        "input": "*",
+        "expected": {
+          "html": "<ul>\n<li></li>\n</ul>"
+        }
+      },
+      {
+        "description": "should not support empty items to interrupt paragraphs",
+        "input": "foo\n*\n\nfoo\n1.",
+        "expected": {
+          "html": "<p>foo\n*</p>\n<p>foo\n1.</p>"
+        }
+      },
+      {
+        "description": "should support indenting w/ 1 space",
+        "input": " 1.  A paragraph\n     with two lines.\n\n         indented code\n\n     > A block quote.",
+        "expected": {
+          "html": "<ol>\n<li>\n<p>A paragraph\nwith two lines.</p>\n<pre><code>indented code\n</code></pre>\n<blockquote>\n<p>A block quote.</p>\n</blockquote>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should support indenting w/ 2 spaces",
+        "input": "  1.  A paragraph\n      with two lines.\n\n          indented code\n\n      > A block quote.",
+        "expected": {
+          "html": "<ol>\n<li>\n<p>A paragraph\nwith two lines.</p>\n<pre><code>indented code\n</code></pre>\n<blockquote>\n<p>A block quote.</p>\n</blockquote>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should support indenting w/ 3 spaces",
+        "input": "   1.  A paragraph\n       with two lines.\n\n           indented code\n\n       > A block quote.",
+        "expected": {
+          "html": "<ol>\n<li>\n<p>A paragraph\nwith two lines.</p>\n<pre><code>indented code\n</code></pre>\n<blockquote>\n<p>A block quote.</p>\n</blockquote>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should not support indenting w/ 4 spaces",
+        "input": "    1.  A paragraph\n        with two lines.\n\n            indented code\n\n        > A block quote.",
+        "expected": {
+          "html": "<pre><code>1.  A paragraph\n    with two lines.\n\n        indented code\n\n    > A block quote.\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support lazy lines",
+        "input": "  1.  A paragraph\nwith two lines.\n\n          indented code\n\n      > A block quote.",
+        "expected": {
+          "html": "<ol>\n<li>\n<p>A paragraph\nwith two lines.</p>\n<pre><code>indented code\n</code></pre>\n<blockquote>\n<p>A block quote.</p>\n</blockquote>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should support partially lazy lines",
+        "input": "  1.  A paragraph\n    with two lines.",
+        "expected": {
+          "html": "<ol>\n<li>A paragraph\nwith two lines.</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should support lazy lines combined w/ other containers",
+        "input": "> 1. > Blockquote\ncontinued here.",
+        "expected": {
+          "html": "<blockquote>\n<ol>\n<li>\n<blockquote>\n<p>Blockquote\ncontinued here.</p>\n</blockquote>\n</li>\n</ol>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should support partially continued, partially lazy lines combined w/ other containers",
+        "input": "> 1. > Blockquote\n> continued here.",
+        "expected": {
+          "html": "<blockquote>\n<ol>\n<li>\n<blockquote>\n<p>Blockquote\ncontinued here.</p>\n</blockquote>\n</li>\n</ol>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should support sublists w/ enough spaces (1)",
+        "input": "- foo\n  - bar\n    - baz\n      - boo",
+        "expected": {
+          "html": "<ul>\n<li>foo\n<ul>\n<li>bar\n<ul>\n<li>baz\n<ul>\n<li>boo</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should not support sublists w/ too few spaces",
+        "input": "- foo\n - bar\n  - baz\n   - boo",
+        "expected": {
+          "html": "<ul>\n<li>foo</li>\n<li>bar</li>\n<li>baz</li>\n<li>boo</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support sublists w/ enough spaces (2)",
+        "input": "10) foo\n    - bar",
+        "expected": {
+          "html": "<ol start=\"10\">\n<li>foo\n<ul>\n<li>bar</li>\n</ul>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should not support sublists w/ too few spaces (2)",
+        "input": "10) foo\n   - bar",
+        "expected": {
+          "html": "<ol start=\"10\">\n<li>foo</li>\n</ol>\n<ul>\n<li>bar</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support sublists (1)",
+        "input": "- - foo",
+        "expected": {
+          "html": "<ul>\n<li>\n<ul>\n<li>foo</li>\n</ul>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support sublists (2)",
+        "input": "1. - 2. foo",
+        "expected": {
+          "html": "<ol>\n<li>\n<ul>\n<li>\n<ol start=\"2\">\n<li>foo</li>\n</ol>\n</li>\n</ul>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should support headings in list items",
+        "input": "- # Foo\n- Bar\n  ---\n  baz",
+        "expected": {
+          "html": "<ul>\n<li>\n<h1>Foo</h1>\n</li>\n<li>\n<h2>Bar</h2>\nbaz</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support a new list by changing the marker (unordered)",
+        "input": "- foo\n- bar\n+ baz",
+        "expected": {
+          "html": "<ul>\n<li>foo</li>\n<li>bar</li>\n</ul>\n<ul>\n<li>baz</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support a new list by changing the marker (ordered)",
+        "input": "1. foo\n2. bar\n3) baz",
+        "expected": {
+          "html": "<ol>\n<li>foo</li>\n<li>bar</li>\n</ol>\n<ol start=\"3\">\n<li>baz</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should support interrupting a paragraph",
+        "input": "Foo\n- bar\n- baz",
+        "expected": {
+          "html": "<p>Foo</p>\n<ul>\n<li>bar</li>\n<li>baz</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should not support interrupting a paragraph with a non-1 numbered item",
+        "input": "a\n2. b",
+        "expected": {
+          "html": "<p>a\n2. b</p>"
+        }
+      },
+      {
+        "description": "should “interrupt” a blank line (1)",
+        "input": "\n2. a",
+        "expected": {
+          "html": "<ol start=\"2\">\n<li>a</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should “interrupt” a blank line (2)",
+        "input": "a\n\n2. b",
+        "expected": {
+          "html": "<p>a</p>\n<ol start=\"2\">\n<li>b</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should support interrupting a paragraph with a 1 numbered item",
+        "input": "a\n1. b",
+        "expected": {
+          "html": "<p>a</p>\n<ol>\n<li>b</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should support blank lines between items (1)",
+        "input": "- foo\n\n- bar\n\n\n- baz",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>foo</p>\n</li>\n<li>\n<p>bar</p>\n</li>\n<li>\n<p>baz</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support blank lines between items (2)",
+        "input": "- foo\n  - bar\n    - baz\n\n\n      bim",
+        "expected": {
+          "html": "<ul>\n<li>foo\n<ul>\n<li>bar\n<ul>\n<li>\n<p>baz</p>\n<p>bim</p>\n</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should not support lists in lists w/ too few spaces (1)",
+        "input": "- a\n - b\n  - c\n   - d\n  - e\n - f\n- g",
+        "expected": {
+          "html": "<ul>\n<li>a</li>\n<li>b</li>\n<li>c</li>\n<li>d</li>\n<li>e</li>\n<li>f</li>\n<li>g</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should not support lists in lists w/ too few spaces (2)",
+        "input": "1. a\n\n  2. b\n\n   3. c",
+        "expected": {
+          "html": "<ol>\n<li>\n<p>a</p>\n</li>\n<li>\n<p>b</p>\n</li>\n<li>\n<p>c</p>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should not support lists in lists w/ too few spaces (3)",
+        "input": "- a\n - b\n  - c\n   - d\n    - e",
+        "expected": {
+          "html": "<ul>\n<li>a</li>\n<li>b</li>\n<li>c</li>\n<li>d\n- e</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should not support lists in lists w/ too few spaces (3) (2)",
+        "input": "1. a\n\n  2. b\n\n    3. c",
+        "expected": {
+          "html": "<ol>\n<li>\n<p>a</p>\n</li>\n<li>\n<p>b</p>\n</li>\n</ol>\n<pre><code>3. c\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support loose lists w/ a blank line between (1)",
+        "input": "- a\n- b\n\n- c",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>a</p>\n</li>\n<li>\n<p>b</p>\n</li>\n<li>\n<p>c</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support loose lists w/ a blank line between (2)",
+        "input": "* a\n*\n\n* c",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>a</p>\n</li>\n<li></li>\n<li>\n<p>c</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support loose lists w/ a blank line in an item (1)",
+        "input": "- a\n- b\n\n  c\n- d",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>a</p>\n</li>\n<li>\n<p>b</p>\n<p>c</p>\n</li>\n<li>\n<p>d</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support loose lists w/ a blank line in an item (2)",
+        "input": "- a\n- b\n\n  [ref]: /url\n- d",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>a</p>\n</li>\n<li>\n<p>b</p>\n</li>\n<li>\n<p>d</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support tight lists w/ a blank line in fenced code",
+        "input": "- a\n- ```\n  b\n\n\n  ```\n- c",
+        "expected": {
+          "html": "<ul>\n<li>a</li>\n<li>\n<pre><code>b\n\n\n</code></pre>\n</li>\n<li>c</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support tight lists w/ a blank line in a sublist",
+        "input": "- a\n  - b\n\n    c\n- d",
+        "expected": {
+          "html": "<ul>\n<li>a\n<ul>\n<li>\n<p>b</p>\n<p>c</p>\n</li>\n</ul>\n</li>\n<li>d</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support tight lists w/ a blank line in a block quote",
+        "input": "* a\n  > b\n  >\n* c",
+        "expected": {
+          "html": "<ul>\n<li>a\n<blockquote>\n<p>b</p>\n</blockquote>\n</li>\n<li>c</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support tight lists w/ flow w/o blank line",
+        "input": "- a\n  > b\n  ```\n  c\n  ```\n- d",
+        "expected": {
+          "html": "<ul>\n<li>a\n<blockquote>\n<p>b</p>\n</blockquote>\n<pre><code>c\n</code></pre>\n</li>\n<li>d</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support tight lists w/ a single content",
+        "input": "- a",
+        "expected": {
+          "html": "<ul>\n<li>a</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support tight lists w/ a sublist",
+        "input": "- a\n  - b",
+        "expected": {
+          "html": "<ul>\n<li>a\n<ul>\n<li>b</li>\n</ul>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support loose lists w/ a blank line in an item",
+        "input": "1. ```\n   foo\n   ```\n\n   bar",
+        "expected": {
+          "html": "<ol>\n<li>\n<pre><code>foo\n</code></pre>\n<p>bar</p>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should support loose lists w/ tight sublists (1)",
+        "input": "* foo\n  * bar\n\n  baz",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>foo</p>\n<ul>\n<li>bar</li>\n</ul>\n<p>baz</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support loose lists w/ tight sublists (2)",
+        "input": "- a\n  - b\n  - c\n\n- d\n  - e\n  - f",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>a</p>\n<ul>\n<li>b</li>\n<li>c</li>\n</ul>\n</li>\n<li>\n<p>d</p>\n<ul>\n<li>e</li>\n<li>f</li>\n</ul>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support continued list items after an empty list item w/ many blank lines",
+        "input": "* a\n*\n\n  \n\t\n* b",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>a</p>\n</li>\n<li></li>\n<li>\n<p>b</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support blank lines in code after an initial blank line",
+        "comment": "micromark renders: <ul>\n<li>\n<pre><code class=\"language-p\">\n</code></pre>\n</li>\n</ul>",
+        "input": "*\n  ~~~p\n\n  ~~~",
+        "expected": {
+          "html": "<ul>\n<li>\n<pre><code class=\"language-p\"></code></pre>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should ignore line endings after tight items ending in tags",
+        "input": "* a tight item that ends with an html element: `x`\n\nParagraph",
+        "expected": {
+          "html": "<ul>\n<li>a tight item that ends with an html element: <code>x</code></li>\n</ul>\n<p>Paragraph</p>"
+        }
+      },
+      {
+        "description": "should support empty items in a spread list",
+        "input": "*   foo\n\n*\n\n*   bar",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>foo</p>\n</li>\n<li></li>\n<li>\n<p>bar</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should remove indent of code (fenced) in list (0 space)",
+        "comment": "micromark renders: <ul>\n<li>\n<pre><code>\n</code></pre>\n</li>\n</ul>",
+        "input": "- ```\n\n  ```",
+        "expected": {
+          "html": "<ul>\n<li>\n<pre><code></code></pre>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should remove indent of code (fenced) in list (1 space)",
+        "comment": "micromark renders: <ul>\n<li>\n<pre><code>\n</code></pre>\n</li>\n</ul>",
+        "input": "- ```\n \n  ```",
+        "expected": {
+          "html": "<ul>\n<li>\n<pre><code></code></pre>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should remove indent of code (fenced) in list (2 spaces)",
+        "comment": "micromark renders: <ul>\n<li>\n<pre><code>\n</code></pre>\n</li>\n</ul>",
+        "input": "- ```\n  \n  ```",
+        "expected": {
+          "html": "<ul>\n<li>\n<pre><code></code></pre>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should remove indent of code (fenced) in list (3 spaces)",
+        "input": "- ```\n   \n  ```",
+        "expected": {
+          "html": "<ul>\n<li>\n<pre><code> \n</code></pre>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should remove indent of code (fenced) in list (4 spaces)",
+        "input": "- ```\n    \n  ```",
+        "expected": {
+          "html": "<ul>\n<li>\n<pre><code>  \n</code></pre>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should remove indent of code (fenced) in list (1 tab)",
+        "input": "- ```\n\t\n  ```",
+        "expected": {
+          "html": "<ul>\n<li>\n<pre><code>  \n</code></pre>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support complex nested and empty lists (1)",
+        "input": "- +\n-",
+        "expected": {
+          "html": "<ul>\n<li>\n<ul>\n<li></li>\n</ul>\n</li>\n<li></li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support complex nested and empty lists (2)",
+        "input": "- 1.\n-",
+        "expected": {
+          "html": "<ul>\n<li>\n<ol>\n<li></li>\n</ol>\n</li>\n<li></li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support complex nested and empty lists (3)",
+        "input": "* - +\n* -",
+        "expected": {
+          "html": "<ul>\n<li>\n<ul>\n<li>\n<ul>\n<li></li>\n</ul>\n</li>\n</ul>\n</li>\n<li>\n<ul>\n<li></li>\n</ul>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should ignore trailing whitespace (1)",
+        "input": "* a\n* b\n\n\n",
+        "expected": {
+          "html": "<ul>\n<li>a</li>\n<li>b</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should ignore trailing whitespace (2)",
+        "input": "* a\n* b\n \n\n",
+        "expected": {
+          "html": "<ul>\n<li>a</li>\n<li>b</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should ignore trailing whitespace (3)",
+        "input": "* a\n* b\n\n \n",
+        "expected": {
+          "html": "<ul>\n<li>a</li>\n<li>b</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should ignore trailing whitespace (4)",
+        "input": "* a\n* b\n \n \n",
+        "expected": {
+          "html": "<ul>\n<li>a</li>\n<li>b</li>\n</ul>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark document/list-item with dangerous HTML allowed",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/document/list-item.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support HTML comments between lists",
+        "input": "- foo\n- bar\n\n<!-- -->\n\n- baz\n- bim",
+        "expected": {
+          "html": "<ul>\n<li>foo</li>\n<li>bar</li>\n</ul>\n<!-- -->\n<ul>\n<li>baz</li>\n<li>bim</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should support HTML comments between lists and indented code",
+        "input": "-   foo\n\n    notcode\n\n-   foo\n\n<!-- -->\n\n    code",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>foo</p>\n<p>notcode</p>\n</li>\n<li>\n<p>foo</p>\n</li>\n</ul>\n<!-- -->\n<pre><code>code\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support the common list breaking comment method",
+        "input": "* a\n\n<!---->\n\n* b",
+        "expected": {
+          "html": "<ul>\n<li>a</li>\n</ul>\n<!---->\n<ul>\n<li>b</li>\n</ul>"
+        }
+      }
+    ]
+  }
+]

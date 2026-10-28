@@ -1,0 +1,440 @@
+[
+  {
+    "description": "Autolinks",
+    "specification": ["https://spec.commonmark.org/0.31.2/#autolinks"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 594",
+        "input": "<http://foo.bar.baz>\n",
+        "expected": {
+          "html": "<p><a href=\"http://foo.bar.baz\">http://foo.bar.baz</a></p>"
+        }
+      },
+      {
+        "description": "example 595",
+        "input": "<https://foo.bar.baz/test?q=hello&id=22&boolean>\n",
+        "expected": {
+          "html": "<p><a href=\"https://foo.bar.baz/test?q=hello&#x26;id=22&#x26;boolean\">https://foo.bar.baz/test?q=hello&#x26;id=22&#x26;boolean</a></p>"
+        }
+      },
+      {
+        "description": "example 596",
+        "input": "<irc://foo.bar:2233/baz>\n",
+        "expected": {
+          "html": "<p><a href=\"irc://foo.bar:2233/baz\">irc://foo.bar:2233/baz</a></p>"
+        }
+      },
+      {
+        "description": "example 597",
+        "input": "<MAILTO:FOO@BAR.BAZ>\n",
+        "expected": {
+          "html": "<p><a href=\"MAILTO:FOO@BAR.BAZ\">MAILTO:FOO@BAR.BAZ</a></p>"
+        }
+      },
+      {
+        "description": "example 598",
+        "input": "<a+b+c:d>\n",
+        "expected": {
+          "html": "<p><a href=\"a+b+c:d\">a+b+c:d</a></p>"
+        }
+      },
+      {
+        "description": "example 599",
+        "input": "<made-up-scheme://foo,bar>\n",
+        "expected": {
+          "html": "<p><a href=\"made-up-scheme://foo,bar\">made-up-scheme://foo,bar</a></p>"
+        }
+      },
+      {
+        "description": "example 600",
+        "input": "<https://../>\n",
+        "expected": {
+          "html": "<p><a href=\"https://../\">https://../</a></p>"
+        }
+      },
+      {
+        "description": "example 601",
+        "input": "<localhost:5001/foo>\n",
+        "expected": {
+          "html": "<p><a href=\"localhost:5001/foo\">localhost:5001/foo</a></p>"
+        }
+      },
+      {
+        "description": "example 602",
+        "input": "<https://foo.bar/baz bim>\n",
+        "expected": {
+          "html": "<p>&#x3C;https://foo.bar/baz bim></p>"
+        }
+      },
+      {
+        "description": "example 603",
+        "input": "<https://example.com/\\[\\>\n",
+        "expected": {
+          "html": "<p><a href=\"https://example.com/%5C%5B%5C\">https://example.com/\\[\\</a></p>"
+        }
+      },
+      {
+        "description": "example 604",
+        "input": "<foo@bar.example.com>\n",
+        "expected": {
+          "html": "<p><a href=\"mailto:foo@bar.example.com\">foo@bar.example.com</a></p>"
+        }
+      },
+      {
+        "description": "example 605",
+        "input": "<foo+special@Bar.baz-bar0.com>\n",
+        "expected": {
+          "html": "<p><a href=\"mailto:foo+special@Bar.baz-bar0.com\">foo+special@Bar.baz-bar0.com</a></p>"
+        }
+      },
+      {
+        "description": "example 606",
+        "input": "<foo\\+@bar.example.com>\n",
+        "expected": {
+          "html": "<p>&#x3C;foo+@bar.example.com></p>"
+        }
+      },
+      {
+        "description": "example 607",
+        "input": "<>\n",
+        "expected": {
+          "html": "<p>&#x3C;></p>"
+        }
+      },
+      {
+        "description": "example 608",
+        "input": "< https://foo.bar >\n",
+        "expected": {
+          "html": "<p>&#x3C; https://foo.bar ></p>"
+        }
+      },
+      {
+        "description": "example 609",
+        "input": "<m:abc>\n",
+        "expected": {
+          "html": "<p>&#x3C;m:abc></p>"
+        }
+      },
+      {
+        "description": "example 610",
+        "input": "<foo.bar.baz>\n",
+        "expected": {
+          "html": "<p>&#x3C;foo.bar.baz></p>"
+        }
+      },
+      {
+        "description": "example 611",
+        "input": "https://example.com\n",
+        "expected": {
+          "html": "<p>https://example.com</p>"
+        }
+      },
+      {
+        "description": "example 612",
+        "input": "foo@bar.example.com\n",
+        "expected": {
+          "html": "<p>foo@bar.example.com</p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark text/autolink",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/text/autolink.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should support protocol autolinks (1)",
+        "input": "<http://foo.bar.baz>",
+        "expected": {
+          "html": "<p><a href=\"http://foo.bar.baz\">http://foo.bar.baz</a></p>"
+        }
+      },
+      {
+        "description": "should support protocol autolinks (2)",
+        "input": "<http://foo.bar.baz/test?q=hello&id=22&boolean>",
+        "expected": {
+          "html": "<p><a href=\"http://foo.bar.baz/test?q=hello&#x26;id=22&#x26;boolean\">http://foo.bar.baz/test?q=hello&#x26;id=22&#x26;boolean</a></p>"
+        }
+      },
+      {
+        "description": "should support protocol autolinks w/ non-HTTP schemes",
+        "input": "<irc://foo.bar:2233/baz>",
+        "expected": {
+          "html": "<p><a href=\"irc://foo.bar:2233/baz\">irc://foo.bar:2233/baz</a></p>"
+        }
+      },
+      {
+        "description": "should support protocol autolinks in uppercase",
+        "input": "<MAILTO:FOO@BAR.BAZ>",
+        "expected": {
+          "html": "<p><a href=\"MAILTO:FOO@BAR.BAZ\">MAILTO:FOO@BAR.BAZ</a></p>"
+        }
+      },
+      {
+        "description": "should support protocol autolinks w/ incorrect URIs (1)",
+        "input": "<a+b+c:d>",
+        "expected": {
+          "html": "<p><a href=\"a+b+c:d\">a+b+c:d</a></p>"
+        }
+      },
+      {
+        "description": "should support protocol autolinks w/ incorrect URIs (2)",
+        "input": "<made-up-scheme://foo,bar>",
+        "expected": {
+          "html": "<p><a href=\"made-up-scheme://foo,bar\">made-up-scheme://foo,bar</a></p>"
+        }
+      },
+      {
+        "description": "should support protocol autolinks w/ incorrect URIs (3)",
+        "input": "<http://../>",
+        "expected": {
+          "html": "<p><a href=\"http://../\">http://../</a></p>"
+        }
+      },
+      {
+        "description": "should support protocol autolinks w/ incorrect URIs (4)",
+        "input": "<localhost:5001/foo>",
+        "expected": {
+          "html": "<p><a href=\"localhost:5001/foo\">localhost:5001/foo</a></p>"
+        }
+      },
+      {
+        "description": "should not support protocol autolinks w/ spaces",
+        "input": "<http://foo.bar/baz bim>",
+        "expected": {
+          "html": "<p>&#x3C;http://foo.bar/baz bim></p>"
+        }
+      },
+      {
+        "description": "should not support character escapes in protocol autolinks",
+        "input": "<http://example.com/\\[\\>",
+        "expected": {
+          "html": "<p><a href=\"http://example.com/%5C%5B%5C\">http://example.com/\\[\\</a></p>"
+        }
+      },
+      {
+        "description": "should support email autolinks (1)",
+        "input": "<foo@bar.example.com>",
+        "expected": {
+          "html": "<p><a href=\"mailto:foo@bar.example.com\">foo@bar.example.com</a></p>"
+        }
+      },
+      {
+        "description": "should support email autolinks (2)",
+        "input": "<foo+special@Bar.baz-bar0.com>",
+        "expected": {
+          "html": "<p><a href=\"mailto:foo+special@Bar.baz-bar0.com\">foo+special@Bar.baz-bar0.com</a></p>"
+        }
+      },
+      {
+        "description": "should support email autolinks (3)",
+        "input": "<a@b.c>",
+        "expected": {
+          "html": "<p><a href=\"mailto:a@b.c\">a@b.c</a></p>"
+        }
+      },
+      {
+        "description": "should not support character escapes in email autolinks",
+        "input": "<foo\\+@bar.example.com>",
+        "expected": {
+          "html": "<p>&#x3C;foo+@bar.example.com></p>"
+        }
+      },
+      {
+        "description": "should not support empty autolinks",
+        "input": "<>",
+        "expected": {
+          "html": "<p>&#x3C;></p>"
+        }
+      },
+      {
+        "description": "should not support autolinks w/ space",
+        "input": "< http://foo.bar >",
+        "expected": {
+          "html": "<p>&#x3C; http://foo.bar ></p>"
+        }
+      },
+      {
+        "description": "should not support autolinks w/ a single character for a scheme",
+        "input": "<m:abc>",
+        "expected": {
+          "html": "<p>&#x3C;m:abc></p>"
+        }
+      },
+      {
+        "description": "should not support autolinks w/o a colon or at sign",
+        "input": "<foo.bar.baz>",
+        "expected": {
+          "html": "<p>&#x3C;foo.bar.baz></p>"
+        }
+      },
+      {
+        "description": "should not support protocol autolinks w/o angle brackets",
+        "input": "http://example.com",
+        "expected": {
+          "html": "<p>http://example.com</p>"
+        }
+      },
+      {
+        "description": "should not support email autolinks w/o angle brackets",
+        "input": "foo@bar.example.com",
+        "expected": {
+          "html": "<p>foo@bar.example.com</p>"
+        }
+      },
+      {
+        "description": "should support autolinks w/ atext (1)",
+        "input": "<*@example.com>",
+        "expected": {
+          "html": "<p><a href=\"mailto:*@example.com\">*@example.com</a></p>"
+        }
+      },
+      {
+        "description": "should support autolinks w/ atext (2)",
+        "input": "<a*@example.com>",
+        "expected": {
+          "html": "<p><a href=\"mailto:a*@example.com\">a*@example.com</a></p>"
+        }
+      },
+      {
+        "description": "should support autolinks w/ atext (3)",
+        "input": "<aa*@example.com>",
+        "expected": {
+          "html": "<p><a href=\"mailto:aa*@example.com\">aa*@example.com</a></p>"
+        }
+      },
+      {
+        "description": "should support non-atext in email autolinks local part (1)",
+        "input": "<aaa©@example.com>",
+        "expected": {
+          "html": "<p>&#x3C;aaa©@example.com></p>"
+        }
+      },
+      {
+        "description": "should support non-atext in email autolinks local part (2)",
+        "input": "<a*a©@example.com>",
+        "expected": {
+          "html": "<p>&#x3C;a*a©@example.com></p>"
+        }
+      },
+      {
+        "description": "should not support a dot after an at sign in email autolinks",
+        "input": "<asd@.example.com>",
+        "expected": {
+          "html": "<p>&#x3C;asd@.example.com></p>"
+        }
+      },
+      {
+        "description": "should not support a dot after another dot in email autolinks",
+        "input": "<asd@e..xample.com>",
+        "expected": {
+          "html": "<p>&#x3C;asd@e..xample.com></p>"
+        }
+      },
+      {
+        "description": "should support 63 character in email autolinks domains",
+        "input": "<asd@012345678901234567890123456789012345678901234567890123456789012>",
+        "expected": {
+          "html": "<p><a href=\"mailto:asd@012345678901234567890123456789012345678901234567890123456789012\">asd@012345678901234567890123456789012345678901234567890123456789012</a></p>"
+        }
+      },
+      {
+        "description": "should not support 64 character in email autolinks domains",
+        "input": "<asd@0123456789012345678901234567890123456789012345678901234567890123>",
+        "expected": {
+          "html": "<p>&#x3C;asd@0123456789012345678901234567890123456789012345678901234567890123></p>"
+        }
+      },
+      {
+        "description": "should support a TLD after a 63 character domain in email autolinks",
+        "input": "<asd@012345678901234567890123456789012345678901234567890123456789012.a>",
+        "expected": {
+          "html": "<p><a href=\"mailto:asd@012345678901234567890123456789012345678901234567890123456789012.a\">asd@012345678901234567890123456789012345678901234567890123456789012.a</a></p>"
+        }
+      },
+      {
+        "description": "should not support a TLD after a 64 character domain in email autolinks",
+        "input": "<asd@0123456789012345678901234567890123456789012345678901234567890123.a>",
+        "expected": {
+          "html": "<p>&#x3C;asd@0123456789012345678901234567890123456789012345678901234567890123.a></p>"
+        }
+      },
+      {
+        "description": "should support a 63 character TLD in email autolinks",
+        "input": "<asd@a.012345678901234567890123456789012345678901234567890123456789012>",
+        "expected": {
+          "html": "<p><a href=\"mailto:asd@a.012345678901234567890123456789012345678901234567890123456789012\">asd@a.012345678901234567890123456789012345678901234567890123456789012</a></p>"
+        }
+      },
+      {
+        "description": "should not support a 64 character TLD in email autolinks",
+        "input": "<asd@a.0123456789012345678901234567890123456789012345678901234567890123>",
+        "expected": {
+          "html": "<p>&#x3C;asd@a.0123456789012345678901234567890123456789012345678901234567890123></p>"
+        }
+      },
+      {
+        "description": "should not support a dash after `@` in email autolinks",
+        "input": "<asd@-example.com>",
+        "expected": {
+          "html": "<p>&#x3C;asd@-example.com></p>"
+        }
+      },
+      {
+        "description": "should support a dash after other domain characters in email autolinks",
+        "input": "<asd@e-xample.com>",
+        "expected": {
+          "html": "<p><a href=\"mailto:asd@e-xample.com\">asd@e-xample.com</a></p>"
+        }
+      },
+      {
+        "description": "should support a dash after another dash in email autolinks",
+        "input": "<asd@e--xample.com>",
+        "expected": {
+          "html": "<p><a href=\"mailto:asd@e--xample.com\">asd@e--xample.com</a></p>"
+        }
+      },
+      {
+        "description": "should not support a dash before a dot in email autolinks",
+        "input": "<asd@example-.com>",
+        "expected": {
+          "html": "<p>&#x3C;asd@example-.com></p>"
+        }
+      },
+      {
+        "description": "should not support an at sign at the start of email autolinks",
+        "input": "<@example.com>",
+        "expected": {
+          "html": "<p>&#x3C;@example.com></p>"
+        }
+      }
+    ]
+  }
+]

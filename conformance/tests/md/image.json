@@ -1,0 +1,405 @@
+[
+  {
+    "description": "Images",
+    "specification": ["https://spec.commonmark.org/0.31.2/#images"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 572",
+        "input": "![foo](/url \"title\")\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "example 573",
+        "input": "![foo *bar*]\n\n[foo *bar*]: train.jpg \"train & tracks\"\n",
+        "expected": {
+          "html": "<p><img src=\"train.jpg\" alt=\"foo bar\" title=\"train &#x26; tracks\"></p>"
+        }
+      },
+      {
+        "description": "example 574",
+        "input": "![foo ![bar](/url)](/url2)\n",
+        "expected": {
+          "html": "<p><img src=\"/url2\" alt=\"foo bar\"></p>"
+        }
+      },
+      {
+        "description": "example 575",
+        "input": "![foo [bar](/url)](/url2)\n",
+        "expected": {
+          "html": "<p><img src=\"/url2\" alt=\"foo bar\"></p>"
+        }
+      },
+      {
+        "description": "example 576",
+        "input": "![foo *bar*][]\n\n[foo *bar*]: train.jpg \"train & tracks\"\n",
+        "expected": {
+          "html": "<p><img src=\"train.jpg\" alt=\"foo bar\" title=\"train &#x26; tracks\"></p>"
+        }
+      },
+      {
+        "description": "example 577",
+        "input": "![foo *bar*][foobar]\n\n[FOOBAR]: train.jpg \"train & tracks\"\n",
+        "expected": {
+          "html": "<p><img src=\"train.jpg\" alt=\"foo bar\" title=\"train &#x26; tracks\"></p>"
+        }
+      },
+      {
+        "description": "example 578",
+        "input": "![foo](train.jpg)\n",
+        "expected": {
+          "html": "<p><img src=\"train.jpg\" alt=\"foo\"></p>"
+        }
+      },
+      {
+        "description": "example 579",
+        "input": "My ![foo bar](/path/to/train.jpg  \"title\"   )\n",
+        "expected": {
+          "html": "<p>My <img src=\"/path/to/train.jpg\" alt=\"foo bar\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "example 580",
+        "input": "![foo](<url>)\n",
+        "expected": {
+          "html": "<p><img src=\"url\" alt=\"foo\"></p>"
+        }
+      },
+      {
+        "description": "example 581",
+        "input": "![](/url)\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"\"></p>"
+        }
+      },
+      {
+        "description": "example 582",
+        "input": "![foo][bar]\n\n[bar]: /url\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo\"></p>"
+        }
+      },
+      {
+        "description": "example 583",
+        "input": "![foo][bar]\n\n[BAR]: /url\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo\"></p>"
+        }
+      },
+      {
+        "description": "example 584",
+        "input": "![foo][]\n\n[foo]: /url \"title\"\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "example 585",
+        "input": "![*foo* bar][]\n\n[*foo* bar]: /url \"title\"\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo bar\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "example 586",
+        "input": "![Foo][]\n\n[foo]: /url \"title\"\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"Foo\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "example 587",
+        "input": "![foo] \n[]\n\n[foo]: /url \"title\"\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo\" title=\"title\">\n[]</p>"
+        }
+      },
+      {
+        "description": "example 588",
+        "input": "![foo]\n\n[foo]: /url \"title\"\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "example 589",
+        "input": "![*foo* bar]\n\n[*foo* bar]: /url \"title\"\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo bar\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "example 590",
+        "input": "![[foo]]\n\n[[foo]]: /url \"title\"\n",
+        "expected": {
+          "html": "<p>![[foo]]</p>\n<p>[[foo]]: /url \"title\"</p>"
+        }
+      },
+      {
+        "description": "example 591",
+        "input": "![Foo]\n\n[foo]: /url \"title\"\n",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"Foo\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "example 592",
+        "input": "!\\[foo]\n\n[foo]: /url \"title\"\n",
+        "expected": {
+          "html": "<p>![foo]</p>"
+        }
+      },
+      {
+        "description": "example 593",
+        "input": "\\![foo]\n\n[foo]: /url \"title\"\n",
+        "expected": {
+          "html": "<p>!<a href=\"/url\" title=\"title\">foo</a></p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark text/image",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/text/image.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should support image w/ resource",
+        "input": "![foo](/url \"title\")",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "should support image as shortcut reference",
+        "input": "[foo *bar*]: train.jpg \"train & tracks\"\n\n![foo *bar*]",
+        "expected": {
+          "html": "<p><img src=\"train.jpg\" alt=\"foo bar\" title=\"train &#x26; tracks\"></p>"
+        }
+      },
+      {
+        "description": "should “support” images in images",
+        "input": "![foo ![bar](/url)](/url2)",
+        "expected": {
+          "html": "<p><img src=\"/url2\" alt=\"foo bar\"></p>"
+        }
+      },
+      {
+        "description": "should “support” links in images",
+        "input": "![foo [bar](/url)](/url2)",
+        "expected": {
+          "html": "<p><img src=\"/url2\" alt=\"foo bar\"></p>"
+        }
+      },
+      {
+        "description": "should support “content” in images",
+        "input": "[foo *bar*]: train.jpg \"train & tracks\"\n\n![foo *bar*][]",
+        "expected": {
+          "html": "<p><img src=\"train.jpg\" alt=\"foo bar\" title=\"train &#x26; tracks\"></p>"
+        }
+      },
+      {
+        "description": "should support “content” in images (2)",
+        "input": "[FOOBAR]: train.jpg \"train & tracks\"\n\n![foo *bar*][foobar]",
+        "expected": {
+          "html": "<p><img src=\"train.jpg\" alt=\"foo bar\" title=\"train &#x26; tracks\"></p>"
+        }
+      },
+      {
+        "description": "should support images w/o title",
+        "input": "![foo](train.jpg)",
+        "expected": {
+          "html": "<p><img src=\"train.jpg\" alt=\"foo\"></p>"
+        }
+      },
+      {
+        "description": "should support images w/ lots of whitespace",
+        "input": "My ![foo bar](/path/to/train.jpg  \"title\"   )",
+        "expected": {
+          "html": "<p>My <img src=\"/path/to/train.jpg\" alt=\"foo bar\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "should support images w/ enclosed destinations",
+        "input": "![foo](<url>)",
+        "expected": {
+          "html": "<p><img src=\"url\" alt=\"foo\"></p>"
+        }
+      },
+      {
+        "description": "should support images w/ empty labels",
+        "input": "![](/url)",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"\"></p>"
+        }
+      },
+      {
+        "description": "should support full references (1)",
+        "input": "[bar]: /url\n\n![foo][bar]",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo\"></p>"
+        }
+      },
+      {
+        "description": "should support full references (2)",
+        "input": "[BAR]: /url\n\n![foo][bar]",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo\"></p>"
+        }
+      },
+      {
+        "description": "should support collapsed references (1)",
+        "input": "[foo]: /url \"title\"\n\n![foo][]",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "should support collapsed references (2)",
+        "input": "[*foo* bar]: /url \"title\"\n\n![*foo* bar][]",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo bar\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "should support case-insensitive labels",
+        "input": "[foo]: /url \"title\"\n\n![Foo][]",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"Foo\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "should not support whitespace between sets of brackets",
+        "input": "[foo]: /url \"title\"\n\n![foo] \n[]",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo\" title=\"title\">\n[]</p>"
+        }
+      },
+      {
+        "description": "should support shortcut references (1)",
+        "input": "[foo]: /url \"title\"\n\n![foo]",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "should support shortcut references (2)",
+        "input": "[*foo* bar]: /url \"title\"\n\n![*foo* bar]",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"foo bar\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "should not support link labels w/ unescaped brackets",
+        "input": "[[foo]]: /url \"title\"\n\n![[foo]]",
+        "expected": {
+          "html": "<p>[[foo]]: /url \"title\"</p>\n<p>![[foo]]</p>"
+        }
+      },
+      {
+        "description": "should support case-insensitive label matching",
+        "input": "[foo]: /url \"title\"\n\n![Foo]",
+        "expected": {
+          "html": "<p><img src=\"/url\" alt=\"Foo\" title=\"title\"></p>"
+        }
+      },
+      {
+        "description": "should “support” an escaped bracket instead of an image",
+        "input": "[foo]: /url \"title\"\n\n!\\[foo]",
+        "expected": {
+          "html": "<p>![foo]</p>"
+        }
+      },
+      {
+        "description": "should support an escaped bang instead of an image, but still have a link",
+        "input": "[foo]: /url \"title\"\n\n\\![foo]",
+        "expected": {
+          "html": "<p>!<a href=\"/url\" title=\"title\">foo</a></p>"
+        }
+      },
+      {
+        "description": "should support images w/o destination",
+        "input": "![foo]()",
+        "expected": {
+          "html": "<p><img src=\"\" alt=\"foo\"></p>"
+        }
+      },
+      {
+        "description": "should support images w/ explicit empty destination",
+        "input": "![foo](<>)",
+        "expected": {
+          "html": "<p><img src=\"\" alt=\"foo\"></p>"
+        }
+      },
+      {
+        "description": "should support images w/o alt",
+        "input": "![](example.png)",
+        "expected": {
+          "html": "<p><img src=\"example.png\" alt=\"\"></p>"
+        }
+      },
+      {
+        "description": "should support images w/ empty title (1)",
+        "input": "![alpha](bravo.png \"\")",
+        "expected": {
+          "html": "<p><img src=\"bravo.png\" alt=\"alpha\"></p>"
+        }
+      },
+      {
+        "description": "should support images w/ empty title (2)",
+        "input": "![alpha](bravo.png '')",
+        "expected": {
+          "html": "<p><img src=\"bravo.png\" alt=\"alpha\"></p>"
+        }
+      },
+      {
+        "description": "should support images w/ empty title (3)",
+        "input": "![alpha](bravo.png ())",
+        "expected": {
+          "html": "<p><img src=\"bravo.png\" alt=\"alpha\"></p>"
+        }
+      },
+      {
+        "description": "should support character references in images",
+        "input": "![&amp;&copy;&](example.com/&amp;&copy;& \"&amp;&copy;&\")",
+        "expected": {
+          "html": "<p><img src=\"example.com/&#x26;%C2%A9&#x26;\" alt=\"&#x26;©&#x26;\" title=\"&#x26;©&#x26;\"></p>"
+        }
+      },
+      {
+        "description": "should ignore an empty title",
+        "input": "![](<> \"\")",
+        "expected": {
+          "html": "<p><img src=\"\" alt=\"\"></p>"
+        }
+      }
+    ]
+  }
+]

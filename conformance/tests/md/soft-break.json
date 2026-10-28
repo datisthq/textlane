@@ -39,5 +39,31 @@
         }
       }
     ]
+  },
+  {
+    "description": "micromark text/soft-break",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/text/soft-break.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should support line endings",
+        "input": "foo\nbaz",
+        "expected": {
+          "html": "<p>foo\nbaz</p>"
+        }
+      },
+      {
+        "description": "should trim spaces around line endings",
+        "input": "foo \n baz",
+        "expected": {
+          "html": "<p>foo\nbaz</p>"
+        }
+      }
+    ]
   }
 ]

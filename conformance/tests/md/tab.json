@@ -1,0 +1,445 @@
+[
+  {
+    "description": "Tabs",
+    "specification": ["https://spec.commonmark.org/0.31.2/#tabs"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 1",
+        "input": "\tfoo\tbaz\t\tbim\n",
+        "expected": {
+          "html": "<pre><code>foo\tbaz\t\tbim\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 2",
+        "input": "  \tfoo\tbaz\t\tbim\n",
+        "expected": {
+          "html": "<pre><code>foo\tbaz\t\tbim\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 3",
+        "input": "    a\ta\n    ὐ\ta\n",
+        "expected": {
+          "html": "<pre><code>a\ta\nὐ\ta\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 4",
+        "input": "  - foo\n\n\tbar\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>foo</p>\n<p>bar</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 5",
+        "input": "- foo\n\n\t\tbar\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>foo</p>\n<pre><code>  bar\n</code></pre>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 6",
+        "input": ">\t\tfoo\n",
+        "expected": {
+          "html": "<blockquote>\n<pre><code>  foo\n</code></pre>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 7",
+        "input": "-\t\tfoo\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<pre><code>  foo\n</code></pre>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 8",
+        "input": "    foo\n\tbar\n",
+        "expected": {
+          "html": "<pre><code>foo\nbar\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 9",
+        "input": " - foo\n   - bar\n\t - baz\n",
+        "expected": {
+          "html": "<ul>\n<li>foo\n<ul>\n<li>bar\n<ul>\n<li>baz</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 10",
+        "input": "#\tFoo\n",
+        "expected": {
+          "html": "<h1>Foo</h1>"
+        }
+      },
+      {
+        "description": "example 11",
+        "input": "*\t*\t*\t\n",
+        "expected": {
+          "html": "<hr>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark misc/tab",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/misc/tab.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should support a 4*SP to start code",
+        "input": "    x",
+        "expected": {
+          "html": "<pre><code>x\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support a HT to start code",
+        "input": "\tx",
+        "expected": {
+          "html": "<pre><code>x\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support a SP + HT to start code",
+        "input": " \tx",
+        "expected": {
+          "html": "<pre><code>x\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support a 2*SP + HT to start code",
+        "input": "  \tx",
+        "expected": {
+          "html": "<pre><code>x\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support a 3*SP + HT to start code",
+        "input": "   \tx",
+        "expected": {
+          "html": "<pre><code>x\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support a 4*SP to start code, and leave the next HT as code data",
+        "input": "    \tx",
+        "expected": {
+          "html": "<pre><code>\tx\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support a 3*SP + HT to start an ATX heading",
+        "input": "   \t# x",
+        "expected": {
+          "html": "<pre><code># x\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support a 3*SP + HT to start a block quote",
+        "input": "   \t> x",
+        "expected": {
+          "html": "<pre><code>> x\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support a 3*SP + HT to start a list item",
+        "input": "   \t- x",
+        "expected": {
+          "html": "<pre><code>- x\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support a 3*SP + HT to start a thematic break",
+        "input": "   \t---",
+        "expected": {
+          "html": "<pre><code>---\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support a 3*SP + HT to start a fenced code",
+        "input": "   \t```",
+        "expected": {
+          "html": "<pre><code>```\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support a 3*SP + HT to start HTML",
+        "input": "   \t<div>",
+        "expected": {
+          "html": "<pre><code>&#x3C;div>\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support tabs around ATX heading sequences",
+        "input": "#\tx\t#\t",
+        "expected": {
+          "html": "<h1>x</h1>"
+        }
+      },
+      {
+        "description": "should support arbitrary tabs around ATX heading sequences",
+        "input": "#\t\tx\t\t#\t\t",
+        "expected": {
+          "html": "<h1>x</h1>"
+        }
+      },
+      {
+        "description": "should support tabs around fenced code fences, info, and meta",
+        "input": "```\tx\ty\t\n```\t",
+        "expected": {
+          "html": "<pre><code class=\"language-x\"></code></pre>"
+        }
+      },
+      {
+        "description": "should support arbitrary tabs around fenced code fences, info, and meta",
+        "input": "```\t\tx\t\ty\t\t\n```\t\t",
+        "expected": {
+          "html": "<pre><code class=\"language-x\"></code></pre>"
+        }
+      },
+      {
+        "description": "should not support tabs before fenced code closing fences",
+        "input": "```x\n\t```",
+        "expected": {
+          "html": "<pre><code class=\"language-x\">\t```\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support tabs in thematic breaks",
+        "input": "*\t*\t*\t",
+        "expected": {
+          "html": "<hr>"
+        }
+      },
+      {
+        "description": "should support arbitrary tabs in thematic breaks",
+        "input": "*\t\t*\t\t*\t\t",
+        "expected": {
+          "html": "<hr>"
+        }
+      },
+      {
+        "description": "should not support a tab to start an autolink w/ protocol’s rest",
+        "input": "<http:\t>",
+        "expected": {
+          "html": "<p>&#x3C;http:\t></p>"
+        }
+      },
+      {
+        "description": "should not support a tab in an autolink w/ protocol’s rest",
+        "input": "<http:x\t>",
+        "expected": {
+          "html": "<p>&#x3C;http:x\t></p>"
+        }
+      },
+      {
+        "description": "should not support a tab in an email autolink’s local part",
+        "input": "<example\t@x.com>",
+        "expected": {
+          "html": "<p>&#x3C;example\t@x.com></p>"
+        }
+      },
+      {
+        "description": "should not support a tab in an email autolink’s label",
+        "input": "<example@x\ty.com>",
+        "expected": {
+          "html": "<p>&#x3C;example@x\ty.com></p>"
+        }
+      },
+      {
+        "description": "should not support character escaped tab",
+        "input": "\\\tx",
+        "expected": {
+          "html": "<p>\\\tx</p>"
+        }
+      },
+      {
+        "description": "should support character reference resolving to a tab",
+        "input": "&#9;",
+        "expected": {
+          "html": "<p>\t</p>"
+        }
+      },
+      {
+        "description": "should support a tab starting code",
+        "input": "`\tx`",
+        "expected": {
+          "html": "<p><code>\tx</code></p>"
+        }
+      },
+      {
+        "description": "should support a tab ending code",
+        "input": "`x\t`",
+        "expected": {
+          "html": "<p><code>x\t</code></p>"
+        }
+      },
+      {
+        "description": "should support tabs around code",
+        "input": "`\tx\t`",
+        "expected": {
+          "html": "<p><code>\tx\t</code></p>"
+        }
+      },
+      {
+        "description": "should support a tab starting, and a space ending, code",
+        "input": "`\tx `",
+        "expected": {
+          "html": "<p><code>\tx </code></p>"
+        }
+      },
+      {
+        "description": "should support a space starting, and a tab ending, code",
+        "input": "` x\t`",
+        "expected": {
+          "html": "<p><code> x\t</code></p>"
+        }
+      },
+      {
+        "description": "should support a trailing tab at a line ending in a paragraph",
+        "input": "x\t\ny",
+        "expected": {
+          "html": "<p>x\ny</p>"
+        }
+      },
+      {
+        "description": "should support an initial tab after a line ending in a paragraph",
+        "input": "x\n\ty",
+        "expected": {
+          "html": "<p>x\ny</p>"
+        }
+      },
+      {
+        "description": "should support an initial tab in a link label",
+        "input": "x[\ty](z)",
+        "expected": {
+          "html": "<p>x<a href=\"z\">\ty</a></p>"
+        }
+      },
+      {
+        "description": "should support a final tab in a link label",
+        "input": "x[y\t](z)",
+        "expected": {
+          "html": "<p>x<a href=\"z\">y\t</a></p>"
+        }
+      },
+      {
+        "description": "should support a tab in a link label",
+        "input": "[x\ty](z)",
+        "expected": {
+          "html": "<p><a href=\"z\">x\ty</a></p>"
+        }
+      },
+      {
+        "description": "should support a tab starting a link resource",
+        "input": "[x](\ty)",
+        "expected": {
+          "html": "<p><a href=\"y\">x</a></p>"
+        }
+      },
+      {
+        "description": "should support a tab ending a link resource",
+        "input": "[x](y\t)",
+        "expected": {
+          "html": "<p><a href=\"y\">x</a></p>"
+        }
+      },
+      {
+        "description": "should support a tab between a link destination and title",
+        "input": "[x](y\t\"z\")",
+        "expected": {
+          "html": "<p><a href=\"y\" title=\"z\">x</a></p>"
+        }
+      },
+      {
+        "description": "should support a tab in fenced code",
+        "input": "```\n\tx",
+        "expected": {
+          "html": "<pre><code>\tx\n</code></pre>"
+        }
+      },
+      {
+        "description": "should strip 1 space from an initial tab in fenced code if the opening fence is indented as such",
+        "input": " ```\n\tx",
+        "expected": {
+          "html": "<pre><code>   x\n</code></pre>"
+        }
+      },
+      {
+        "description": "should strip 2 spaces from an initial tab in fenced code if the opening fence is indented as such",
+        "input": "  ```\n\tx",
+        "expected": {
+          "html": "<pre><code>  x\n</code></pre>"
+        }
+      },
+      {
+        "description": "should strip 3 spaces from an initial tab in fenced code if the opening fence is indented as such",
+        "input": "   ```\n\tx",
+        "expected": {
+          "html": "<pre><code> x\n</code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark misc/tab with dangerous HTML allowed",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/misc/tab.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support tabs in HTML (if whitespace is allowed)",
+        "input": "<x\ty\tz\t=\t\"\tx\t\">",
+        "expected": {
+          "html": "<x\ty\tz\t=\t\"\tx\t\">"
+        }
+      }
+    ]
+  }
+]

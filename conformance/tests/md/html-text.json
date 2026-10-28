@@ -1,0 +1,669 @@
+[
+  {
+    "description": "Raw HTML",
+    "specification": ["https://spec.commonmark.org/0.31.2/#raw-html"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 613",
+        "input": "<a><bab><c2c>\n",
+        "expected": {
+          "html": "<p><a><bab><c2c></p>"
+        }
+      },
+      {
+        "description": "example 614",
+        "input": "<a/><b2/>\n",
+        "expected": {
+          "html": "<p><a/><b2/></p>"
+        }
+      },
+      {
+        "description": "example 615",
+        "input": "<a  /><b2\ndata=\"foo\" >\n",
+        "expected": {
+          "html": "<p><a  /><b2\ndata=\"foo\" ></p>"
+        }
+      },
+      {
+        "description": "example 616",
+        "input": "<a foo=\"bar\" bam = 'baz <em>\"</em>'\n_boolean zoop:33=zoop:33 />\n",
+        "expected": {
+          "html": "<p><a foo=\"bar\" bam = 'baz <em>\"</em>'\n_boolean zoop:33=zoop:33 /></p>"
+        }
+      },
+      {
+        "description": "example 617",
+        "input": "Foo <responsive-image src=\"foo.jpg\" />\n",
+        "expected": {
+          "html": "<p>Foo <responsive-image src=\"foo.jpg\" /></p>"
+        }
+      },
+      {
+        "description": "example 618",
+        "input": "<33> <__>\n",
+        "expected": {
+          "html": "<p>&#x3C;33> &#x3C;__></p>"
+        }
+      },
+      {
+        "description": "example 619",
+        "input": "<a h*#ref=\"hi\">\n",
+        "expected": {
+          "html": "<p>&#x3C;a h*#ref=\"hi\"></p>"
+        }
+      },
+      {
+        "description": "example 620",
+        "input": "<a href=\"hi'> <a href=hi'>\n",
+        "expected": {
+          "html": "<p>&#x3C;a href=\"hi'> &#x3C;a href=hi'></p>"
+        }
+      },
+      {
+        "description": "example 621",
+        "input": "< a><\nfoo><bar/ >\n<foo bar=baz\nbim!bop />\n",
+        "expected": {
+          "html": "<p>&#x3C; a>&#x3C;\nfoo>&#x3C;bar/ >\n&#x3C;foo bar=baz\nbim!bop /></p>"
+        }
+      },
+      {
+        "description": "example 622",
+        "input": "<a href='bar'title=title>\n",
+        "expected": {
+          "html": "<p>&#x3C;a href='bar'title=title></p>"
+        }
+      },
+      {
+        "description": "example 623",
+        "input": "</a></foo >\n",
+        "expected": {
+          "html": "<p></a></foo ></p>"
+        }
+      },
+      {
+        "description": "example 624",
+        "input": "</a href=\"foo\">\n",
+        "expected": {
+          "html": "<p>&#x3C;/a href=\"foo\"></p>"
+        }
+      },
+      {
+        "description": "example 625",
+        "input": "foo <!-- this is a --\ncomment - with hyphens -->\n",
+        "expected": {
+          "html": "<p>foo <!-- this is a --\ncomment - with hyphens --></p>"
+        }
+      },
+      {
+        "description": "example 626",
+        "input": "foo <!--> foo -->\n\nfoo <!---> foo -->\n",
+        "expected": {
+          "html": "<p>foo <!--> foo --></p>\n<p>foo <!---> foo --></p>"
+        }
+      },
+      {
+        "description": "example 627",
+        "input": "foo <?php echo $a; ?>\n",
+        "expected": {
+          "html": "<p>foo <?php echo $a; ?></p>"
+        }
+      },
+      {
+        "description": "example 628",
+        "input": "foo <!ELEMENT br EMPTY>\n",
+        "expected": {
+          "html": "<p>foo <!ELEMENT br EMPTY></p>"
+        }
+      },
+      {
+        "description": "example 629",
+        "input": "foo <![CDATA[>&<]]>\n",
+        "expected": {
+          "html": "<p>foo <![CDATA[>&<]]></p>"
+        }
+      },
+      {
+        "description": "example 630",
+        "input": "foo <a href=\"&ouml;\">\n",
+        "expected": {
+          "html": "<p>foo <a href=\"&ouml;\"></p>"
+        }
+      },
+      {
+        "description": "example 631",
+        "input": "foo <a href=\"\\*\">\n",
+        "expected": {
+          "html": "<p>foo <a href=\"\\*\"></p>"
+        }
+      },
+      {
+        "description": "example 632",
+        "input": "<a href=\"\\\"\">\n",
+        "expected": {
+          "html": "<p>&#x3C;a href=\"\"\"></p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark text/html with dangerous HTML allowed",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/text/html.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support opening tags",
+        "input": "<a><bab><c2c>",
+        "expected": {
+          "html": "<p><a><bab><c2c></p>"
+        }
+      },
+      {
+        "description": "should support self-closing tags",
+        "input": "<a/><b2/>",
+        "expected": {
+          "html": "<p><a/><b2/></p>"
+        }
+      },
+      {
+        "description": "should support whitespace in tags",
+        "input": "<a  /><b2\ndata=\"foo\" >",
+        "expected": {
+          "html": "<p><a  /><b2\ndata=\"foo\" ></p>"
+        }
+      },
+      {
+        "description": "should support attributes on tags",
+        "input": "<a foo=\"bar\" bam = 'baz <em>\"</em>'\n_boolean zoop:33=zoop:33 />",
+        "expected": {
+          "html": "<p><a foo=\"bar\" bam = 'baz <em>\"</em>'\n_boolean zoop:33=zoop:33 /></p>"
+        }
+      },
+      {
+        "description": "should support non-html tags",
+        "input": "Foo <responsive-image src=\"foo.jpg\" />",
+        "expected": {
+          "html": "<p>Foo <responsive-image src=\"foo.jpg\" /></p>"
+        }
+      },
+      {
+        "description": "should not support nonconforming tag names",
+        "input": "<33> <__>",
+        "expected": {
+          "html": "<p>&#x3C;33> &#x3C;__></p>"
+        }
+      },
+      {
+        "description": "should not support nonconforming attribute names",
+        "input": "<a h*#ref=\"hi\">",
+        "expected": {
+          "html": "<p>&#x3C;a h*#ref=\"hi\"></p>"
+        }
+      },
+      {
+        "description": "should not support nonconforming attribute values",
+        "input": "<a href=\"hi'> <a href=hi'>",
+        "expected": {
+          "html": "<p>&#x3C;a href=\"hi'> &#x3C;a href=hi'></p>"
+        }
+      },
+      {
+        "description": "should not support nonconforming whitespace",
+        "input": "< a><\nfoo><bar/ >\n<foo bar=baz\nbim!bop />",
+        "expected": {
+          "html": "<p>&#x3C; a>&#x3C;\nfoo>&#x3C;bar/ >\n&#x3C;foo bar=baz\nbim!bop /></p>"
+        }
+      },
+      {
+        "description": "should not support missing whitespace",
+        "input": "<a href='bar'title=title>",
+        "expected": {
+          "html": "<p>&#x3C;a href='bar'title=title></p>"
+        }
+      },
+      {
+        "description": "should support closing tags",
+        "input": "</a></foo >",
+        "expected": {
+          "html": "<p></a></foo ></p>"
+        }
+      },
+      {
+        "description": "should not support closing tags w/ attributes",
+        "input": "</a href=\"foo\">",
+        "expected": {
+          "html": "<p>&#x3C;/a href=\"foo\"></p>"
+        }
+      },
+      {
+        "description": "should support comments",
+        "input": "foo <!-- this is a\ncomment - with hyphen -->",
+        "expected": {
+          "html": "<p>foo <!-- this is a\ncomment - with hyphen --></p>"
+        }
+      },
+      {
+        "description": "should support comments w/ two dashes inside",
+        "input": "foo <!-- not a comment -- two hyphens -->",
+        "expected": {
+          "html": "<p>foo <!-- not a comment -- two hyphens --></p>"
+        }
+      },
+      {
+        "description": "should support nonconforming comments (1)",
+        "input": "foo <!--> foo -->",
+        "expected": {
+          "html": "<p>foo <!--> foo --></p>"
+        }
+      },
+      {
+        "description": "should support nonconforming comments (2)",
+        "input": "foo <!-- foo--->",
+        "expected": {
+          "html": "<p>foo <!-- foo---></p>"
+        }
+      },
+      {
+        "description": "should support instructions",
+        "input": "foo <?php echo $a; ?>",
+        "expected": {
+          "html": "<p>foo <?php echo $a; ?></p>"
+        }
+      },
+      {
+        "description": "should support declarations",
+        "input": "foo <!ELEMENT br EMPTY>",
+        "expected": {
+          "html": "<p>foo <!ELEMENT br EMPTY></p>"
+        }
+      },
+      {
+        "description": "should support cdata",
+        "input": "foo <![CDATA[>&<]]>",
+        "expected": {
+          "html": "<p>foo <![CDATA[>&<]]></p>"
+        }
+      },
+      {
+        "description": "should support (ignore) character references",
+        "input": "foo <a href=\"&ouml;\">",
+        "expected": {
+          "html": "<p>foo <a href=\"&ouml;\"></p>"
+        }
+      },
+      {
+        "description": "should not support character escapes (1)",
+        "input": "foo <a href=\"\\*\">",
+        "expected": {
+          "html": "<p>foo <a href=\"\\*\"></p>"
+        }
+      },
+      {
+        "description": "should not support character escapes (2)",
+        "input": "<a href=\"\\\"\">",
+        "expected": {
+          "html": "<p>&#x3C;a href=\"\"\"></p>"
+        }
+      },
+      {
+        "description": "should not support non-comment, non-cdata, and non-named declaration",
+        "input": "foo <!1>",
+        "expected": {
+          "html": "<p>foo &#x3C;!1></p>"
+        }
+      },
+      {
+        "description": "should not support comments w/ not enough dashes",
+        "input": "foo <!-not enough!-->",
+        "expected": {
+          "html": "<p>foo &#x3C;!-not enough!--></p>"
+        }
+      },
+      {
+        "description": "should support comments that start w/ a dash, if it’s not followed by a greater than",
+        "input": "foo <!---ok-->",
+        "expected": {
+          "html": "<p>foo <!---ok--></p>"
+        }
+      },
+      {
+        "description": "should support comments that start w/ `->`",
+        "input": "foo <!--->",
+        "expected": {
+          "html": "<p>foo <!---></p>"
+        }
+      },
+      {
+        "description": "should support `->` in a comment",
+        "input": "foo <!-- -> -->",
+        "expected": {
+          "html": "<p>foo <!-- -> --></p>"
+        }
+      },
+      {
+        "description": "should not support eof in a comment (1)",
+        "input": "foo <!--",
+        "expected": {
+          "html": "<p>foo &#x3C;!--</p>"
+        }
+      },
+      {
+        "description": "should not support eof in a comment (2)",
+        "input": "foo <!--a",
+        "expected": {
+          "html": "<p>foo &#x3C;!--a</p>"
+        }
+      },
+      {
+        "description": "should not support eof in a comment (3)",
+        "input": "foo <!--a-",
+        "expected": {
+          "html": "<p>foo &#x3C;!--a-</p>"
+        }
+      },
+      {
+        "description": "should not support eof in a comment (4)",
+        "input": "foo <!--a--",
+        "expected": {
+          "html": "<p>foo &#x3C;!--a--</p>"
+        }
+      },
+      {
+        "description": "should not support lowercase “cdata”",
+        "input": "foo <![cdata[]]>",
+        "expected": {
+          "html": "<p>foo &#x3C;![cdata[]]></p>"
+        }
+      },
+      {
+        "description": "should not support eof in a CDATA (1)",
+        "input": "foo <![CDATA",
+        "expected": {
+          "html": "<p>foo &#x3C;![CDATA</p>"
+        }
+      },
+      {
+        "description": "should not support eof in a CDATA (2)",
+        "input": "foo <![CDATA[",
+        "expected": {
+          "html": "<p>foo &#x3C;![CDATA[</p>"
+        }
+      },
+      {
+        "description": "should not support eof in a CDATA (3)",
+        "input": "foo <![CDATA[]",
+        "expected": {
+          "html": "<p>foo &#x3C;![CDATA[]</p>"
+        }
+      },
+      {
+        "description": "should not support eof in a CDATA (4)",
+        "input": "foo <![CDATA[]]",
+        "expected": {
+          "html": "<p>foo &#x3C;![CDATA[]]</p>"
+        }
+      },
+      {
+        "description": "should not support eof in a CDATA (5)",
+        "input": "foo <![CDATA[asd",
+        "expected": {
+          "html": "<p>foo &#x3C;![CDATA[asd</p>"
+        }
+      },
+      {
+        "description": "should support end-like constructs in CDATA",
+        "input": "foo <![CDATA[]]]]>",
+        "expected": {
+          "html": "<p>foo <![CDATA[]]]]></p>"
+        }
+      },
+      {
+        "description": "should not support eof in declarations",
+        "input": "foo <!doctype",
+        "expected": {
+          "html": "<p>foo &#x3C;!doctype</p>"
+        }
+      },
+      {
+        "description": "should not support eof in instructions (1)",
+        "input": "foo <?php",
+        "expected": {
+          "html": "<p>foo &#x3C;?php</p>"
+        }
+      },
+      {
+        "description": "should not support eof in instructions (2)",
+        "input": "foo <?php?",
+        "expected": {
+          "html": "<p>foo &#x3C;?php?</p>"
+        }
+      },
+      {
+        "description": "should support question marks in instructions",
+        "input": "foo <???>",
+        "expected": {
+          "html": "<p>foo <???></p>"
+        }
+      },
+      {
+        "description": "should not support closing tags that don’t start w/ alphas",
+        "input": "foo </3>",
+        "expected": {
+          "html": "<p>foo &#x3C;/3></p>"
+        }
+      },
+      {
+        "description": "should support dashes in closing tags",
+        "input": "foo </a->",
+        "expected": {
+          "html": "<p>foo </a-></p>"
+        }
+      },
+      {
+        "description": "should support whitespace after closing tag names",
+        "input": "foo </a   >",
+        "expected": {
+          "html": "<p>foo </a   ></p>"
+        }
+      },
+      {
+        "description": "should not support other characters after closing tag names",
+        "input": "foo </a!>",
+        "expected": {
+          "html": "<p>foo &#x3C;/a!></p>"
+        }
+      },
+      {
+        "description": "should support dashes in opening tags",
+        "input": "foo <a->",
+        "expected": {
+          "html": "<p>foo <a-></p>"
+        }
+      },
+      {
+        "description": "should support whitespace after opening tag names",
+        "input": "foo <a   >",
+        "expected": {
+          "html": "<p>foo <a   ></p>"
+        }
+      },
+      {
+        "description": "should not support other characters after opening tag names",
+        "input": "foo <a!>",
+        "expected": {
+          "html": "<p>foo &#x3C;a!></p>"
+        }
+      },
+      {
+        "description": "should not support other characters in opening tags (1)",
+        "input": "foo <a !>",
+        "expected": {
+          "html": "<p>foo &#x3C;a !></p>"
+        }
+      },
+      {
+        "description": "should not support other characters in opening tags (2)",
+        "input": "foo <a b!>",
+        "expected": {
+          "html": "<p>foo &#x3C;a b!></p>"
+        }
+      },
+      {
+        "description": "should support a self-closing slash after an attribute name",
+        "input": "foo <a b/>",
+        "expected": {
+          "html": "<p>foo <a b/></p>"
+        }
+      },
+      {
+        "description": "should support a greater than after an attribute name",
+        "input": "foo <a b>",
+        "expected": {
+          "html": "<p>foo <a b></p>"
+        }
+      },
+      {
+        "description": "should not support less than to start an unquoted attribute value",
+        "input": "foo <a b=<>",
+        "expected": {
+          "html": "<p>foo &#x3C;a b=&#x3C;></p>"
+        }
+      },
+      {
+        "description": "should not support greater than to start an unquoted attribute value",
+        "input": "foo <a b=>>",
+        "expected": {
+          "html": "<p>foo &#x3C;a b=>></p>"
+        }
+      },
+      {
+        "description": "should not support equals to to start an unquoted attribute value",
+        "input": "foo <a b==>",
+        "expected": {
+          "html": "<p>foo &#x3C;a b==></p>"
+        }
+      },
+      {
+        "description": "should not support eof in double quoted attribute value",
+        "input": "foo <a b=\"asd",
+        "expected": {
+          "html": "<p>foo &#x3C;a b=\"asd</p>"
+        }
+      },
+      {
+        "description": "should not support eof in single quoted attribute value",
+        "input": "foo <a b='asd",
+        "expected": {
+          "html": "<p>foo &#x3C;a b='asd</p>"
+        }
+      },
+      {
+        "description": "should not support eof in unquoted attribute value",
+        "input": "foo <a b=asd",
+        "expected": {
+          "html": "<p>foo &#x3C;a b=asd</p>"
+        }
+      },
+      {
+        "description": "should support an eol before an attribute value",
+        "input": "foo <a b=\nasd>",
+        "expected": {
+          "html": "<p>foo <a b=\nasd></p>"
+        }
+      },
+      {
+        "description": "should support starting a line w/ a tag if followed by anything other than an eol (after optional space/tabs)",
+        "input": "<x> a",
+        "expected": {
+          "html": "<p><x> a</p>"
+        }
+      },
+      {
+        "description": "should support an EOF before an attribute value",
+        "input": "<span foo=",
+        "expected": {
+          "html": "<p>&#x3C;span foo=</p>"
+        }
+      },
+      {
+        "description": "should support an EOL in a declaration",
+        "input": "a <!b\nc>",
+        "expected": {
+          "html": "<p>a <!b\nc></p>"
+        }
+      },
+      {
+        "description": "should support an EOL in cdata",
+        "input": "a <![CDATA[\n]]>",
+        "expected": {
+          "html": "<p>a <![CDATA[\n]]></p>"
+        }
+      },
+      {
+        "description": "should support an EOL in an instruction",
+        "input": "a <?\n?>",
+        "expected": {
+          "html": "<p>a <?\n?></p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark text/html",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/text/html.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should not support grave accent to start an unquoted attribute value",
+        "input": "foo <a b=`>",
+        "expected": {
+          "html": "<p>foo &#x3C;a b=`></p>"
+        }
+      }
+    ]
+  }
+]

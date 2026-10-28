@@ -1,0 +1,44 @@
+[
+  {
+    "description": "micromark misc/default-line-ending",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/misc/default-line-ending.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should use `\\n` default",
+        "input": "> a",
+        "expected": {
+          "html": "<blockquote>\n<p>a</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should infer the first line ending (1)",
+        "input": "> a\n",
+        "expected": {
+          "html": "<blockquote>\n<p>a</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should infer the first line ending (2)",
+        "comment": "micromark renders: <blockquote>\r<p>a</p>\r</blockquote>\r",
+        "input": "> a\r",
+        "expected": {
+          "html": "<blockquote>\n<p>a</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should infer the first line ending (3)",
+        "comment": "micromark renders: <blockquote>\r\n<p>a</p>\r\n</blockquote>\r\n",
+        "input": "> a\r\n",
+        "expected": {
+          "html": "<blockquote>\n<p>a</p>\n</blockquote>"
+        }
+      }
+    ]
+  }
+]

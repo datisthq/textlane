@@ -116,5 +116,113 @@
         }
       }
     ]
+  },
+  {
+    "description": "micromark text/character-escape",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/text/character-escape.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should support escaped ascii punctuation",
+        "input": "\\!\\\"\\#\\$\\%\\&\\'\\(\\)\\*\\+\\,\\-\\.\\/\\:\\;\\<\\=\\>\\?\\@\\[\\\\\\]\\^\\_\\`\\{\\|\\}\\~",
+        "expected": {
+          "html": "<p>!\"#$%&#x26;'()*+,-./:;&#x3C;=>?@[\\]^_`{|}~</p>"
+        }
+      },
+      {
+        "description": "should not support other characters after a backslash",
+        "input": "\\→\\A\\a\\ \\3\\φ\\«",
+        "expected": {
+          "html": "<p>\\→\\A\\a\\ \\3\\φ\\«</p>"
+        }
+      },
+      {
+        "description": "should escape a line break",
+        "input": "foo\\\nbar",
+        "expected": {
+          "html": "<p>foo<br>\nbar</p>"
+        }
+      },
+      {
+        "description": "should not escape in text code",
+        "input": "`` \\[\\` ``",
+        "expected": {
+          "html": "<p><code>\\[\\`</code></p>"
+        }
+      },
+      {
+        "description": "should not escape in indented code",
+        "input": "    \\[\\]",
+        "expected": {
+          "html": "<pre><code>\\[\\]\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not escape in autolink",
+        "input": "<http://example.com?find=\\*>",
+        "expected": {
+          "html": "<p><a href=\"http://example.com?find=%5C*\">http://example.com?find=\\*</a></p>"
+        }
+      },
+      {
+        "description": "should escape in resource and title",
+        "input": "[foo](/bar\\* \"ti\\*tle\")",
+        "expected": {
+          "html": "<p><a href=\"/bar*\" title=\"ti*tle\">foo</a></p>"
+        }
+      },
+      {
+        "description": "should escape in definition resource and title",
+        "input": "[foo]: /bar\\* \"ti\\*tle\"\n\n[foo]",
+        "expected": {
+          "html": "<p><a href=\"/bar*\" title=\"ti*tle\">foo</a></p>"
+        }
+      },
+      {
+        "description": "should escape in fenced code info",
+        "input": "``` foo\\+bar\nfoo\n```",
+        "expected": {
+          "html": "<pre><code class=\"language-foo+bar\">foo\n</code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark text/character-escape with dangerous HTML allowed",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/text/character-escape.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should not escape in flow html",
+        "input": "<a href=\"/bar\\/)\">",
+        "expected": {
+          "html": "<a href=\"/bar\\/)\">"
+        }
+      }
+    ]
   }
 ]

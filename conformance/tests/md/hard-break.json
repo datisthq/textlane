@@ -1,0 +1,307 @@
+[
+  {
+    "description": "Hard line breaks",
+    "specification": ["https://spec.commonmark.org/0.31.2/#hard-line-breaks"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 633",
+        "input": "foo  \nbaz\n",
+        "expected": {
+          "html": "<p>foo<br>\nbaz</p>"
+        }
+      },
+      {
+        "description": "example 634",
+        "input": "foo\\\nbaz\n",
+        "expected": {
+          "html": "<p>foo<br>\nbaz</p>"
+        }
+      },
+      {
+        "description": "example 635",
+        "input": "foo       \nbaz\n",
+        "expected": {
+          "html": "<p>foo<br>\nbaz</p>"
+        }
+      },
+      {
+        "description": "example 636",
+        "input": "foo  \n     bar\n",
+        "expected": {
+          "html": "<p>foo<br>\nbar</p>"
+        }
+      },
+      {
+        "description": "example 637",
+        "input": "foo\\\n     bar\n",
+        "expected": {
+          "html": "<p>foo<br>\nbar</p>"
+        }
+      },
+      {
+        "description": "example 638",
+        "input": "*foo  \nbar*\n",
+        "expected": {
+          "html": "<p><em>foo<br>\nbar</em></p>"
+        }
+      },
+      {
+        "description": "example 639",
+        "input": "*foo\\\nbar*\n",
+        "expected": {
+          "html": "<p><em>foo<br>\nbar</em></p>"
+        }
+      },
+      {
+        "description": "example 640",
+        "input": "`code  \nspan`\n",
+        "expected": {
+          "html": "<p><code>code   span</code></p>"
+        }
+      },
+      {
+        "description": "example 641",
+        "input": "`code\\\nspan`\n",
+        "expected": {
+          "html": "<p><code>code\\ span</code></p>"
+        }
+      },
+      {
+        "description": "example 642",
+        "input": "<a href=\"foo  \nbar\">\n",
+        "expected": {
+          "html": "<p><a href=\"foo  \nbar\"></p>"
+        }
+      },
+      {
+        "description": "example 643",
+        "input": "<a href=\"foo\\\nbar\">\n",
+        "expected": {
+          "html": "<p><a href=\"foo\\\nbar\"></p>"
+        }
+      },
+      {
+        "description": "example 644",
+        "input": "foo\\\n",
+        "expected": {
+          "html": "<p>foo\\</p>"
+        }
+      },
+      {
+        "description": "example 645",
+        "input": "foo  \n",
+        "expected": {
+          "html": "<p>foo</p>"
+        }
+      },
+      {
+        "description": "example 646",
+        "input": "### foo\\\n",
+        "expected": {
+          "html": "<h3>foo\\</h3>"
+        }
+      },
+      {
+        "description": "example 647",
+        "input": "### foo  \n",
+        "expected": {
+          "html": "<h3>foo</h3>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark text/hard-break",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/text/hard-break.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should support two trailing spaces to form a hard break",
+        "input": "foo  \nbaz",
+        "expected": {
+          "html": "<p>foo<br>\nbaz</p>"
+        }
+      },
+      {
+        "description": "should support a backslash to form a hard break",
+        "input": "foo\\\nbaz",
+        "expected": {
+          "html": "<p>foo<br>\nbaz</p>"
+        }
+      },
+      {
+        "description": "should support multiple trailing spaces",
+        "input": "foo       \nbaz",
+        "expected": {
+          "html": "<p>foo<br>\nbaz</p>"
+        }
+      },
+      {
+        "description": "should support leading spaces after a trailing hard break",
+        "input": "foo  \n     bar",
+        "expected": {
+          "html": "<p>foo<br>\nbar</p>"
+        }
+      },
+      {
+        "description": "should support leading spaces after an escape hard break",
+        "input": "foo\\\n     bar",
+        "expected": {
+          "html": "<p>foo<br>\nbar</p>"
+        }
+      },
+      {
+        "description": "should support trailing hard breaks in emphasis",
+        "input": "*foo  \nbar*",
+        "expected": {
+          "html": "<p><em>foo<br>\nbar</em></p>"
+        }
+      },
+      {
+        "description": "should support escape hard breaks in emphasis",
+        "input": "*foo\\\nbar*",
+        "expected": {
+          "html": "<p><em>foo<br>\nbar</em></p>"
+        }
+      },
+      {
+        "description": "should not support trailing hard breaks in code",
+        "input": "`code  \ntext`",
+        "expected": {
+          "html": "<p><code>code   text</code></p>"
+        }
+      },
+      {
+        "description": "should not support escape hard breaks in code",
+        "input": "``code\\\ntext``",
+        "expected": {
+          "html": "<p><code>code\\ text</code></p>"
+        }
+      },
+      {
+        "description": "should not support trailing hard breaks at the end of a paragraph",
+        "input": "foo  ",
+        "expected": {
+          "html": "<p>foo</p>"
+        }
+      },
+      {
+        "description": "should not support escape hard breaks at the end of a paragraph",
+        "input": "foo\\",
+        "expected": {
+          "html": "<p>foo\\</p>"
+        }
+      },
+      {
+        "description": "should not support escape hard breaks at the end of a heading",
+        "input": "### foo\\",
+        "expected": {
+          "html": "<h3>foo\\</h3>"
+        }
+      },
+      {
+        "description": "should not support trailing hard breaks at the end of a heading",
+        "input": "### foo  ",
+        "expected": {
+          "html": "<h3>foo</h3>"
+        }
+      },
+      {
+        "description": "should support a mixed line suffix (1)",
+        "input": "aaa  \t\nbb",
+        "expected": {
+          "html": "<p>aaa\nbb</p>"
+        }
+      },
+      {
+        "description": "should support a mixed line suffix (2)",
+        "input": "aaa\t  \nbb",
+        "expected": {
+          "html": "<p>aaa\nbb</p>"
+        }
+      },
+      {
+        "description": "should support a mixed line suffix (3)",
+        "input": "aaa  \t  \nbb",
+        "expected": {
+          "html": "<p>aaa\nbb</p>"
+        }
+      },
+      {
+        "description": "should support a hard break after a replacement character",
+        "input": "aaa\u0000  \nbb",
+        "expected": {
+          "html": "<p>aaa�<br>\nbb</p>"
+        }
+      },
+      {
+        "description": "should support a line suffix after a replacement character",
+        "input": "aaa\u0000\t\nbb",
+        "expected": {
+          "html": "<p>aaa�\nbb</p>"
+        }
+      },
+      {
+        "description": "should support a hard break after a span",
+        "input": "*a*  \nbb",
+        "expected": {
+          "html": "<p><em>a</em><br>\nbb</p>"
+        }
+      },
+      {
+        "description": "should support a line suffix after a span",
+        "input": "*a*\t\nbb",
+        "expected": {
+          "html": "<p><em>a</em>\nbb</p>"
+        }
+      },
+      {
+        "description": "should support a mixed line suffix after a span (1)",
+        "input": "*a*  \t\nbb",
+        "expected": {
+          "html": "<p><em>a</em>\nbb</p>"
+        }
+      },
+      {
+        "description": "should support a mixed line suffix after a span (2)",
+        "input": "*a*\t  \nbb",
+        "expected": {
+          "html": "<p><em>a</em>\nbb</p>"
+        }
+      },
+      {
+        "description": "should support a mixed line suffix after a span (3)",
+        "input": "*a*  \t  \nbb",
+        "expected": {
+          "html": "<p><em>a</em>\nbb</p>"
+        }
+      }
+    ]
+  }
+]

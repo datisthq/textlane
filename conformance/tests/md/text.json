@@ -46,5 +46,38 @@
         }
       }
     ]
+  },
+  {
+    "description": "micromark text/text",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/text/text.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should support ascii text",
+        "input": "hello $.;'there",
+        "expected": {
+          "html": "<p>hello $.;'there</p>"
+        }
+      },
+      {
+        "description": "should support unicode text",
+        "input": "Foo χρῆν",
+        "expected": {
+          "html": "<p>Foo χρῆν</p>"
+        }
+      },
+      {
+        "description": "should preserve internal spaces verbatim",
+        "input": "Multiple     spaces",
+        "expected": {
+          "html": "<p>Multiple     spaces</p>"
+        }
+      }
+    ]
   }
 ]

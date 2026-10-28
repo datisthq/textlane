@@ -1,0 +1,697 @@
+[
+  {
+    "description": "Link reference definitions",
+    "specification": ["https://spec.commonmark.org/0.31.2/#link-reference-definitions"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 192",
+        "input": "[foo]: /url \"title\"\n\n[foo]\n",
+        "expected": {
+          "html": "<p><a href=\"/url\" title=\"title\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 193",
+        "input": "   [foo]: \n      /url  \n           'the title'  \n\n[foo]\n",
+        "expected": {
+          "html": "<p><a href=\"/url\" title=\"the title\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 194",
+        "input": "[Foo*bar\\]]:my_(url) 'title (with parens)'\n\n[Foo*bar\\]]\n",
+        "expected": {
+          "html": "<p><a href=\"my_(url)\" title=\"title (with parens)\">Foo*bar]</a></p>"
+        }
+      },
+      {
+        "description": "example 195",
+        "input": "[Foo bar]:\n<my url>\n'title'\n\n[Foo bar]\n",
+        "expected": {
+          "html": "<p><a href=\"my%20url\" title=\"title\">Foo bar</a></p>"
+        }
+      },
+      {
+        "description": "example 196",
+        "input": "[foo]: /url '\ntitle\nline1\nline2\n'\n\n[foo]\n",
+        "expected": {
+          "html": "<p><a href=\"/url\" title=\"\ntitle\nline1\nline2\n\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 197",
+        "input": "[foo]: /url 'title\n\nwith blank line'\n\n[foo]\n",
+        "expected": {
+          "html": "<p>[foo]: /url 'title</p>\n<p>with blank line'</p>\n<p>[foo]</p>"
+        }
+      },
+      {
+        "description": "example 198",
+        "input": "[foo]:\n/url\n\n[foo]\n",
+        "expected": {
+          "html": "<p><a href=\"/url\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 199",
+        "input": "[foo]:\n\n[foo]\n",
+        "expected": {
+          "html": "<p>[foo]:</p>\n<p>[foo]</p>"
+        }
+      },
+      {
+        "description": "example 200",
+        "input": "[foo]: <>\n\n[foo]\n",
+        "expected": {
+          "html": "<p><a href=\"\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 201",
+        "input": "[foo]: <bar>(baz)\n\n[foo]\n",
+        "expected": {
+          "html": "<p>[foo]: <bar>(baz)</p>\n<p>[foo]</p>"
+        }
+      },
+      {
+        "description": "example 202",
+        "input": "[foo]: /url\\bar\\*baz \"foo\\\"bar\\baz\"\n\n[foo]\n",
+        "expected": {
+          "html": "<p><a href=\"/url%5Cbar*baz\" title=\"foo&#x22;bar\\baz\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 203",
+        "input": "[foo]\n\n[foo]: url\n",
+        "expected": {
+          "html": "<p><a href=\"url\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 204",
+        "input": "[foo]\n\n[foo]: first\n[foo]: second\n",
+        "expected": {
+          "html": "<p><a href=\"first\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 205",
+        "input": "[FOO]: /url\n\n[Foo]\n",
+        "expected": {
+          "html": "<p><a href=\"/url\">Foo</a></p>"
+        }
+      },
+      {
+        "description": "example 206",
+        "input": "[ΑΓΩ]: /φου\n\n[αγω]\n",
+        "expected": {
+          "html": "<p><a href=\"/%CF%86%CE%BF%CF%85\">αγω</a></p>"
+        }
+      },
+      {
+        "description": "example 207",
+        "input": "[foo]: /url\n",
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "example 208",
+        "input": "[\nfoo\n]: /url\nbar\n",
+        "expected": {
+          "html": "<p>bar</p>"
+        }
+      },
+      {
+        "description": "example 209",
+        "input": "[foo]: /url \"title\" ok\n",
+        "expected": {
+          "html": "<p>[foo]: /url \"title\" ok</p>"
+        }
+      },
+      {
+        "description": "example 210",
+        "input": "[foo]: /url\n\"title\" ok\n",
+        "expected": {
+          "html": "<p>\"title\" ok</p>"
+        }
+      },
+      {
+        "description": "example 211",
+        "input": "    [foo]: /url \"title\"\n\n[foo]\n",
+        "expected": {
+          "html": "<pre><code>[foo]: /url \"title\"\n</code></pre>\n<p>[foo]</p>"
+        }
+      },
+      {
+        "description": "example 212",
+        "input": "```\n[foo]: /url\n```\n\n[foo]\n",
+        "expected": {
+          "html": "<pre><code>[foo]: /url\n</code></pre>\n<p>[foo]</p>"
+        }
+      },
+      {
+        "description": "example 213",
+        "input": "Foo\n[bar]: /baz\n\n[bar]\n",
+        "expected": {
+          "html": "<p>Foo\n[bar]: /baz</p>\n<p>[bar]</p>"
+        }
+      },
+      {
+        "description": "example 214",
+        "input": "# [Foo]\n[foo]: /url\n> bar\n",
+        "expected": {
+          "html": "<h1><a href=\"/url\">Foo</a></h1>\n<blockquote>\n<p>bar</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 215",
+        "input": "[foo]: /url\nbar\n===\n[foo]\n",
+        "expected": {
+          "html": "<h1>bar</h1>\n<p><a href=\"/url\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 216",
+        "input": "[foo]: /url\n===\n[foo]\n",
+        "expected": {
+          "html": "<p>===\n<a href=\"/url\">foo</a></p>"
+        }
+      },
+      {
+        "description": "example 217",
+        "input": "[foo]: /foo-url \"foo\"\n[bar]: /bar-url\n  \"bar\"\n[baz]: /baz-url\n\n[foo],\n[bar],\n[baz]\n",
+        "expected": {
+          "html": "<p><a href=\"/foo-url\" title=\"foo\">foo</a>,\n<a href=\"/bar-url\" title=\"bar\">bar</a>,\n<a href=\"/baz-url\">baz</a></p>"
+        }
+      },
+      {
+        "description": "example 218",
+        "input": "[foo]\n\n> [foo]: /url\n",
+        "expected": {
+          "html": "<p><a href=\"/url\">foo</a></p>\n<blockquote>\n</blockquote>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark content/definition",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/content/definition.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should support link definitions",
+        "input": "[foo]: /url \"title\"\n\n[foo]",
+        "expected": {
+          "html": "<p><a href=\"/url\" title=\"title\">foo</a></p>"
+        }
+      },
+      {
+        "description": "should not support blank lines before destination",
+        "input": "[foo]:\n\n/url\n\n[foo]",
+        "expected": {
+          "html": "<p>[foo]:</p>\n<p>/url</p>\n<p>[foo]</p>"
+        }
+      },
+      {
+        "description": "should support whitespace and line endings in definitions",
+        "input": "   [foo]: \n      /url  \n           'the title'  \n\n[foo]",
+        "expected": {
+          "html": "<p><a href=\"/url\" title=\"the title\">foo</a></p>"
+        }
+      },
+      {
+        "description": "should support complex definitions (1)",
+        "input": "[Foo*bar\\]]:my_(url) 'title (with parens)'\n\n[Foo*bar\\]]",
+        "expected": {
+          "html": "<p><a href=\"my_(url)\" title=\"title (with parens)\">Foo*bar]</a></p>"
+        }
+      },
+      {
+        "description": "should support complex definitions (2)",
+        "input": "[Foo bar]:\n<my url>\n'title'\n\n[Foo bar]",
+        "expected": {
+          "html": "<p><a href=\"my%20url\" title=\"title\">Foo bar</a></p>"
+        }
+      },
+      {
+        "description": "should support line endings in titles",
+        "input": "[foo]: /url '\ntitle\nline1\nline2\n'\n\n[foo]",
+        "expected": {
+          "html": "<p><a href=\"/url\" title=\"\ntitle\nline1\nline2\n\">foo</a></p>"
+        }
+      },
+      {
+        "description": "should not support blank lines in titles",
+        "input": "[foo]: /url 'title\n\nwith blank line'\n\n[foo]",
+        "expected": {
+          "html": "<p>[foo]: /url 'title</p>\n<p>with blank line'</p>\n<p>[foo]</p>"
+        }
+      },
+      {
+        "description": "should support definitions w/o title",
+        "input": "[foo]:\n/url\n\n[foo]",
+        "expected": {
+          "html": "<p><a href=\"/url\">foo</a></p>"
+        }
+      },
+      {
+        "description": "should not support definitions w/o destination",
+        "input": "[foo]:\n\n[foo]",
+        "expected": {
+          "html": "<p>[foo]:</p>\n<p>[foo]</p>"
+        }
+      },
+      {
+        "description": "should support definitions w/ explicit empty destinations",
+        "input": "[foo]: <>\n\n[foo]",
+        "expected": {
+          "html": "<p><a href=\"\">foo</a></p>"
+        }
+      },
+      {
+        "description": "should support character escapes in destinations and titles",
+        "input": "[foo]: /url\\bar\\*baz \"foo\\\"bar\\baz\"\n\n[foo]",
+        "expected": {
+          "html": "<p><a href=\"/url%5Cbar*baz\" title=\"foo&#x22;bar\\baz\">foo</a></p>"
+        }
+      },
+      {
+        "description": "should support a link before a definition",
+        "input": "[foo]\n\n[foo]: url",
+        "expected": {
+          "html": "<p><a href=\"url\">foo</a></p>"
+        }
+      },
+      {
+        "description": "should match w/ the first definition",
+        "input": "[foo]: first\n[foo]: second\n\n[foo]",
+        "expected": {
+          "html": "<p><a href=\"first\">foo</a></p>"
+        }
+      },
+      {
+        "description": "should match w/ case-insensitive (1)",
+        "input": "[FOO]: /url\n\n[Foo]",
+        "expected": {
+          "html": "<p><a href=\"/url\">Foo</a></p>"
+        }
+      },
+      {
+        "description": "should match w/ case-insensitive (2)",
+        "input": "[ΑΓΩ]: /φου\n\n[αγω]",
+        "expected": {
+          "html": "<p><a href=\"/%CF%86%CE%BF%CF%85\">αγω</a></p>"
+        }
+      },
+      {
+        "description": "should not contribute anything w/o reference (1)",
+        "input": "[foo]: /url",
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "should not contribute anything w/o reference (2)",
+        "input": "[\nfoo\n]: /url\nbar",
+        "expected": {
+          "html": "<p>bar</p>"
+        }
+      },
+      {
+        "description": "should support whitespace after title",
+        "input": "[foo]: /url \"title\"  \n\n[foo]",
+        "expected": {
+          "html": "<p><a href=\"/url\" title=\"title\">foo</a></p>"
+        }
+      },
+      {
+        "description": "should support whitespace after title on a separate line",
+        "input": "[foo]: /url\n\"title\"  \n\n[foo]",
+        "expected": {
+          "html": "<p><a href=\"/url\" title=\"title\">foo</a></p>"
+        }
+      },
+      {
+        "description": "should not support non-whitespace content after definitions (1)",
+        "input": "[foo]: /url \"title\" ok",
+        "expected": {
+          "html": "<p>[foo]: /url \"title\" ok</p>"
+        }
+      },
+      {
+        "description": "should not support non-whitespace content after definitions (2)",
+        "input": "[foo]: /url\n\"title\" ok",
+        "expected": {
+          "html": "<p>\"title\" ok</p>"
+        }
+      },
+      {
+        "description": "should prefer indented code over definitions",
+        "input": "    [foo]: /url \"title\"\n\n[foo]",
+        "expected": {
+          "html": "<pre><code>[foo]: /url \"title\"\n</code></pre>\n<p>[foo]</p>"
+        }
+      },
+      {
+        "description": "should not support definitions in fenced code",
+        "input": "```\n[foo]: /url\n```\n\n[foo]",
+        "expected": {
+          "html": "<pre><code>[foo]: /url\n</code></pre>\n<p>[foo]</p>"
+        }
+      },
+      {
+        "description": "should not support definitions in paragraphs",
+        "input": "Foo\n[bar]: /baz\n\n[bar]",
+        "expected": {
+          "html": "<p>Foo\n[bar]: /baz</p>\n<p>[bar]</p>"
+        }
+      },
+      {
+        "description": "should not support definitions in headings",
+        "input": "# [Foo]\n[foo]: /url\n> bar",
+        "expected": {
+          "html": "<h1><a href=\"/url\">Foo</a></h1>\n<blockquote>\n<p>bar</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should support setext headings after definitions",
+        "input": "[foo]: /url\nbar\n===\n[foo]",
+        "expected": {
+          "html": "<h1>bar</h1>\n<p><a href=\"/url\">foo</a></p>"
+        }
+      },
+      {
+        "description": "should not support setext heading underlines after definitions",
+        "input": "[foo]: /url\n===\n[foo]",
+        "expected": {
+          "html": "<p>===\n<a href=\"/url\">foo</a></p>"
+        }
+      },
+      {
+        "description": "should support definitions after definitions",
+        "input": "[foo]: /foo-url \"foo\"\n[bar]: /bar-url\n  \"bar\"\n[baz]: /baz-url\n\n[foo],\n[bar],\n[baz]",
+        "expected": {
+          "html": "<p><a href=\"/foo-url\" title=\"foo\">foo</a>,\n<a href=\"/bar-url\" title=\"bar\">bar</a>,\n<a href=\"/baz-url\">baz</a></p>"
+        }
+      },
+      {
+        "description": "should support definitions in block quotes",
+        "input": "> [foo]: /url\n\n[foo]",
+        "expected": {
+          "html": "<blockquote>\n</blockquote>\n<p><a href=\"/url\">foo</a></p>"
+        }
+      },
+      {
+        "description": "should match w/ character escapes",
+        "input": "[\\[\\+\\]]: example.com\n\nLink: [\\[\\+\\]].",
+        "expected": {
+          "html": "<p>Link: <a href=\"example.com\">[+]</a>.</p>"
+        }
+      },
+      {
+        "description": "should support character escapes & references in unenclosed destinations",
+        "input": "[x]: \\\"&#x20;\\(\\)\\\"\n\n[x]",
+        "expected": {
+          "html": "<p><a href=\"%22%20()%22\">x</a></p>"
+        }
+      },
+      {
+        "description": "should support character escapes & references in enclosed destinations",
+        "input": "[x]: <\\>&#x20;\\+\\>>\n\n[x]",
+        "expected": {
+          "html": "<p><a href=\"%3E%20+%3E\">x</a></p>"
+        }
+      },
+      {
+        "description": "should not support a line ending at start of enclosed destination",
+        "input": "[x]: <\n\n[x]",
+        "expected": {
+          "html": "<p>[x]: &#x3C;</p>\n<p>[x]</p>"
+        }
+      },
+      {
+        "description": "should not support a line ending in enclosed destination",
+        "input": "[x]: <x\n\n[x]",
+        "expected": {
+          "html": "<p>[x]: &#x3C;x</p>\n<p>[x]</p>"
+        }
+      },
+      {
+        "description": "should not support ascii control characters at the start of destination",
+        "input": "[x]: \u000ba\n\n[x]",
+        "expected": {
+          "html": "<p>[x]: \u000ba</p>\n<p>[x]</p>"
+        }
+      },
+      {
+        "description": "should not support ascii control characters in destination",
+        "input": "[x]: a\u000bb\n\n[x]",
+        "expected": {
+          "html": "<p>[x]: a\u000bb</p>\n<p>[x]</p>"
+        }
+      },
+      {
+        "description": "should support ascii control characters at the start of enclosed destination",
+        "input": "[x]: <\u000ba>\n\n[x]",
+        "expected": {
+          "html": "<p><a href=\"%0Ba\">x</a></p>"
+        }
+      },
+      {
+        "description": "should support ascii control characters in enclosed destinations",
+        "input": "[x]: <a\u000bb>\n\n[x]",
+        "expected": {
+          "html": "<p><a href=\"a%0Bb\">x</a></p>"
+        }
+      },
+      {
+        "description": "should support character escapes at the start of a title",
+        "input": "[x]: a \"\\\"\"\n\n[x]",
+        "expected": {
+          "html": "<p><a href=\"a\" title=\"&#x22;\">x</a></p>"
+        }
+      },
+      {
+        "description": "should support double quoted titles",
+        "input": "[x]: a \"\\'\"\n\n[x]",
+        "expected": {
+          "html": "<p><a href=\"a\" title=\"&#x27;\">x</a></p>"
+        }
+      },
+      {
+        "description": "should support single quoted titles",
+        "input": "[x]: a '\"'\n\n[x]",
+        "expected": {
+          "html": "<p><a href=\"a\" title=\"&#x22;\">x</a></p>"
+        }
+      },
+      {
+        "description": "should support paren enclosed titles",
+        "input": "[x]: a (\"')\n\n[x]",
+        "expected": {
+          "html": "<p><a href=\"a\" title=\"&#x22;&#x27;\">x</a></p>"
+        }
+      },
+      {
+        "description": "should not support more opening than closing parens in the destination",
+        "input": "[x]: a(()\n\n[x]",
+        "expected": {
+          "html": "<p>[x]: a(()</p>\n<p>[x]</p>"
+        }
+      },
+      {
+        "description": "should support balanced opening and closing parens in the destination",
+        "input": "[x]: a(())\n\n[x]",
+        "expected": {
+          "html": "<p><a href=\"a(())\">x</a></p>"
+        }
+      },
+      {
+        "description": "should not support more closing than opening parens in the destination",
+        "input": "[x]: a())\n\n[x]",
+        "expected": {
+          "html": "<p>[x]: a())</p>\n<p>[x]</p>"
+        }
+      },
+      {
+        "description": "should support trailing whitespace after a destination",
+        "input": "[x]: a  \t\n\n[x]",
+        "expected": {
+          "html": "<p><a href=\"a\">x</a></p>"
+        }
+      },
+      {
+        "description": "should support trailing whitespace after a title",
+        "input": "[x]: a \"x\" \t\n\n[x]",
+        "expected": {
+          "html": "<p><a href=\"a\" title=\"x\">x</a></p>"
+        }
+      },
+      {
+        "description": "should support character references in definitions",
+        "input": "[&amp;&copy;&]: example.com/&amp;&copy;& \"&amp;&copy;&\"\n\n[&amp;&copy;&]",
+        "expected": {
+          "html": "<p><a href=\"example.com/&#x26;%C2%A9&#x26;\" title=\"&#x26;©&#x26;\">&#x26;©&#x26;</a></p>"
+        }
+      },
+      {
+        "description": "should support a line ending before a destination",
+        "input": "[x]:\nexample.com\n\n[x]",
+        "expected": {
+          "html": "<p><a href=\"example.com\">x</a></p>"
+        }
+      },
+      {
+        "description": "should support whitespace before a destination",
+        "input": "[x]: \t\nexample.com\n\n[x]",
+        "expected": {
+          "html": "<p><a href=\"example.com\">x</a></p>"
+        }
+      },
+      {
+        "description": "should ignore an empty title",
+        "input": "[x]: <> \"\"\n[][x]",
+        "expected": {
+          "html": "<p><a href=\"\"></a></p>"
+        }
+      },
+      {
+        "description": "should not support an extra left paren (`(`) in a raw destination",
+        "input": "[a]\n\n[a]: b(c",
+        "expected": {
+          "html": "<p>[a]</p>\n<p>[a]: b(c</p>"
+        }
+      },
+      {
+        "description": "should not support an extra right paren (`)`) in a raw destination",
+        "input": "[a]\n\n[a]: b)c",
+        "expected": {
+          "html": "<p>[a]</p>\n<p>[a]: b)c</p>"
+        }
+      },
+      {
+        "description": "should support 4 or more sets of parens in a raw destination (link resources don’t)",
+        "input": "[a]\n\n[a]: a(1(2(3(4()))))b",
+        "expected": {
+          "html": "<p><a href=\"a(1(2(3(4()))))b\">a</a></p>"
+        }
+      },
+      {
+        "description": "should not support a final (unbalanced) right paren in a raw destination",
+        "input": "[a]\n\n[a]: aaa)",
+        "expected": {
+          "html": "<p>[a]</p>\n<p>[a]: aaa)</p>"
+        }
+      },
+      {
+        "description": "should not support a final (unbalanced) right paren in a raw destination “before” a title",
+        "input": "[a]\n\n[a]: aaa) \"a\"",
+        "expected": {
+          "html": "<p>[a]</p>\n<p>[a]: aaa) \"a\"</p>"
+        }
+      },
+      {
+        "description": "should support subsequent indented definitions",
+        "input": " [a]: b \"c\"\n  [d]: e\n   [f]: g \"h\"\n    [i]: j\n\t[k]: l (m)\n\t n [k] o",
+        "expected": {
+          "html": "<p>n <a href=\"l\" title=\"m\">k</a> o</p>"
+        }
+      },
+      {
+        "description": "should support line prefixes in definition labels",
+        "input": "[a\n  b]: c\n\n[a\n  b]",
+        "expected": {
+          "html": "<p><a href=\"c\">a\nb</a></p>"
+        }
+      },
+      {
+        "description": "should not support definitions w/ only a closing paren as a raw destination",
+        "input": "[a]: )\n\n[a]",
+        "expected": {
+          "html": "<p>[a]: )</p>\n<p>[a]</p>"
+        }
+      },
+      {
+        "description": "should not support definitions w/ closing paren + more text as a raw destination",
+        "input": "[a]: )b\n\n[a]",
+        "expected": {
+          "html": "<p>[a]: )b</p>\n<p>[a]</p>"
+        }
+      },
+      {
+        "description": "should not support definitions w/ text + a closing paren as a raw destination",
+        "input": "[a]: b)\n\n[a]",
+        "expected": {
+          "html": "<p>[a]: b)</p>\n<p>[a]</p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark content/definition with dangerous HTML allowed",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/content/definition.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should not support definitions w/ no whitespace between destination and title",
+        "input": "[foo]: <bar>(baz)\n\n[foo]",
+        "expected": {
+          "html": "<p>[foo]: <bar>(baz)</p>\n<p>[foo]</p>"
+        }
+      },
+      {
+        "description": "should not support a less than in an enclosed destination",
+        "input": "[a]\n\n[a]: <b<c>",
+        "expected": {
+          "html": "<p>[a]</p>\n<p>[a]: &#x3C;b<c></p>"
+        }
+      }
+    ]
+  }
+]

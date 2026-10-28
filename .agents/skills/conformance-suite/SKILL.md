@@ -52,10 +52,18 @@ textlane's pipeline produces (micromark's own HTML compiler, `h()` trees), the i
 the input once through the pinned unified packages instead. Record the spec or upstream output in
 a test's `comment` only where it means something different.
 
+- `actions/source/fetch.ts` checks out a pinned commit into the git-ignored `conformance/.cache/`;
+  `actions/group/write.ts` replaces one source's groups in a construct file and keeps the rest;
+  `actions/markdown/render.ts` is the reference pipeline and its textlane equivalent.
+- An importer skips, and counts, what a pipeline case cannot express: options with no textlane
+  equivalent yet (micromark's construct switches, `defaultLineEnding`), input that is not
+  statically evaluable, and lone UTF-16 surrogates, which UTF-8 input cannot hold.
+
 ## Adding cases
 
-1. Put the group in `conformance/tests/<area>/<feature>.json`; `<area>` is `core`, `md`,
-   `html`, `mdx` or `prose`. Group descriptions are unique within a file.
+1. Put the group in `conformance/tests/<area>/<construct>.json`; `<area>` is `core`, `md`,
+   `html`, `mdx` or `prose`, and a file holds one construct with a group per source (micromark's
+   test-file names decide construct names in `md`). Group descriptions are unique within a file.
 2. Anything ported from upstream carries `source` (repository, commit, path, test, licence).
 3. Run the schema guard, then the Rust runner; the Node and Python runners read the same files.
 4. A case the crate cannot pass yet goes in `conformance/pending.json`. A case one runner

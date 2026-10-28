@@ -1,0 +1,42 @@
+[
+  {
+    "description": "micromark misc/url",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/misc/url.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should support incorrect percentage encoded values (1)",
+        "input": "[](<%>)",
+        "expected": {
+          "html": "<p><a href=\"%25\"></a></p>"
+        }
+      },
+      {
+        "description": "should support incorrect percentage encoded values (2)",
+        "input": "[](<%%20>)",
+        "expected": {
+          "html": "<p><a href=\"%25%20\"></a></p>"
+        }
+      },
+      {
+        "description": "should support incorrect percentage encoded values (3)",
+        "input": "[](<%a%20>)",
+        "expected": {
+          "html": "<p><a href=\"%25a%20\"></a></p>"
+        }
+      },
+      {
+        "description": "should support an emoji",
+        "input": "[](<🤔>)",
+        "expected": {
+          "html": "<p><a href=\"%F0%9F%A4%94\"></a></p>"
+        }
+      }
+    ]
+  }
+]

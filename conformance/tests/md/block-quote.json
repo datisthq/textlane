@@ -1,0 +1,405 @@
+[
+  {
+    "description": "Block quotes",
+    "specification": ["https://spec.commonmark.org/0.31.2/#block-quotes"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 228",
+        "input": "> # Foo\n> bar\n> baz\n",
+        "expected": {
+          "html": "<blockquote>\n<h1>Foo</h1>\n<p>bar\nbaz</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 229",
+        "input": "># Foo\n>bar\n> baz\n",
+        "expected": {
+          "html": "<blockquote>\n<h1>Foo</h1>\n<p>bar\nbaz</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 230",
+        "input": "   > # Foo\n   > bar\n > baz\n",
+        "expected": {
+          "html": "<blockquote>\n<h1>Foo</h1>\n<p>bar\nbaz</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 231",
+        "input": "    > # Foo\n    > bar\n    > baz\n",
+        "expected": {
+          "html": "<pre><code>> # Foo\n> bar\n> baz\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 232",
+        "input": "> # Foo\n> bar\nbaz\n",
+        "expected": {
+          "html": "<blockquote>\n<h1>Foo</h1>\n<p>bar\nbaz</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 233",
+        "input": "> bar\nbaz\n> foo\n",
+        "expected": {
+          "html": "<blockquote>\n<p>bar\nbaz\nfoo</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 234",
+        "input": "> foo\n---\n",
+        "expected": {
+          "html": "<blockquote>\n<p>foo</p>\n</blockquote>\n<hr>"
+        }
+      },
+      {
+        "description": "example 235",
+        "input": "> - foo\n- bar\n",
+        "expected": {
+          "html": "<blockquote>\n<ul>\n<li>foo</li>\n</ul>\n</blockquote>\n<ul>\n<li>bar</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 236",
+        "input": ">     foo\n    bar\n",
+        "expected": {
+          "html": "<blockquote>\n<pre><code>foo\n</code></pre>\n</blockquote>\n<pre><code>bar\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 237",
+        "input": "> ```\nfoo\n```\n",
+        "expected": {
+          "html": "<blockquote>\n<pre><code></code></pre>\n</blockquote>\n<p>foo</p>\n<pre><code></code></pre>"
+        }
+      },
+      {
+        "description": "example 238",
+        "input": "> foo\n    - bar\n",
+        "expected": {
+          "html": "<blockquote>\n<p>foo\n- bar</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 239",
+        "input": ">\n",
+        "expected": {
+          "html": "<blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 240",
+        "input": ">\n>  \n> \n",
+        "expected": {
+          "html": "<blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 241",
+        "input": ">\n> foo\n>  \n",
+        "expected": {
+          "html": "<blockquote>\n<p>foo</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 242",
+        "input": "> foo\n\n> bar\n",
+        "expected": {
+          "html": "<blockquote>\n<p>foo</p>\n</blockquote>\n<blockquote>\n<p>bar</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 243",
+        "input": "> foo\n> bar\n",
+        "expected": {
+          "html": "<blockquote>\n<p>foo\nbar</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 244",
+        "input": "> foo\n>\n> bar\n",
+        "expected": {
+          "html": "<blockquote>\n<p>foo</p>\n<p>bar</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 245",
+        "input": "foo\n> bar\n",
+        "expected": {
+          "html": "<p>foo</p>\n<blockquote>\n<p>bar</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 246",
+        "input": "> aaa\n***\n> bbb\n",
+        "expected": {
+          "html": "<blockquote>\n<p>aaa</p>\n</blockquote>\n<hr>\n<blockquote>\n<p>bbb</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 247",
+        "input": "> bar\nbaz\n",
+        "expected": {
+          "html": "<blockquote>\n<p>bar\nbaz</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 248",
+        "input": "> bar\n\nbaz\n",
+        "expected": {
+          "html": "<blockquote>\n<p>bar</p>\n</blockquote>\n<p>baz</p>"
+        }
+      },
+      {
+        "description": "example 249",
+        "input": "> bar\n>\nbaz\n",
+        "expected": {
+          "html": "<blockquote>\n<p>bar</p>\n</blockquote>\n<p>baz</p>"
+        }
+      },
+      {
+        "description": "example 250",
+        "input": "> > > foo\nbar\n",
+        "expected": {
+          "html": "<blockquote>\n<blockquote>\n<blockquote>\n<p>foo\nbar</p>\n</blockquote>\n</blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 251",
+        "input": ">>> foo\n> bar\n>>baz\n",
+        "expected": {
+          "html": "<blockquote>\n<blockquote>\n<blockquote>\n<p>foo\nbar\nbaz</p>\n</blockquote>\n</blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "example 252",
+        "input": ">     code\n\n>    not code\n",
+        "expected": {
+          "html": "<blockquote>\n<pre><code>code\n</code></pre>\n</blockquote>\n<blockquote>\n<p>not code</p>\n</blockquote>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark document/block-quote",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/document/block-quote.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should support block quotes",
+        "input": "> # a\n> b\n> c",
+        "expected": {
+          "html": "<blockquote>\n<h1>a</h1>\n<p>b\nc</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should support block quotes w/o space",
+        "input": "># a\n>b\n> c",
+        "expected": {
+          "html": "<blockquote>\n<h1>a</h1>\n<p>b\nc</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should support prefixing block quotes w/ spaces",
+        "input": "   > # a\n   > b\n > c",
+        "expected": {
+          "html": "<blockquote>\n<h1>a</h1>\n<p>b\nc</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should not support block quotes w/ 4 spaces",
+        "input": "    > # a\n    > b\n    > c",
+        "expected": {
+          "html": "<pre><code>> # a\n> b\n> c\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support lazy content lines",
+        "input": "> # a\n> b\nc",
+        "expected": {
+          "html": "<blockquote>\n<h1>a</h1>\n<p>b\nc</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should support lazy content lines inside block quotes",
+        "input": "> a\nb\n> c",
+        "expected": {
+          "html": "<blockquote>\n<p>a\nb\nc</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should support setext headings underlines in block quotes",
+        "input": "> a\n> ---",
+        "expected": {
+          "html": "<blockquote>\n<h2>a</h2>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should not support lazy setext headings underlines in block quotes",
+        "input": "> a\n---",
+        "expected": {
+          "html": "<blockquote>\n<p>a</p>\n</blockquote>\n<hr>"
+        }
+      },
+      {
+        "description": "should support lists in block quotes",
+        "input": "> - a\n> - b",
+        "expected": {
+          "html": "<blockquote>\n<ul>\n<li>a</li>\n<li>b</li>\n</ul>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should not support lazy lists in block quotes",
+        "input": "> - a\n- b",
+        "expected": {
+          "html": "<blockquote>\n<ul>\n<li>a</li>\n</ul>\n</blockquote>\n<ul>\n<li>b</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should not support lazy indented code in block quotes",
+        "input": ">     a\n    b",
+        "expected": {
+          "html": "<blockquote>\n<pre><code>a\n</code></pre>\n</blockquote>\n<pre><code>b\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support lazy fenced code in block quotes",
+        "input": "> ```\na\n```",
+        "expected": {
+          "html": "<blockquote>\n<pre><code></code></pre>\n</blockquote>\n<p>a</p>\n<pre><code></code></pre>"
+        }
+      },
+      {
+        "description": "should not support lazy indented code (or lazy list) in block quotes",
+        "input": "> a\n    - b",
+        "expected": {
+          "html": "<blockquote>\n<p>a\n- b</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should support empty block quotes (1)",
+        "input": ">",
+        "expected": {
+          "html": "<blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should support empty block quotes (2)",
+        "input": ">\n>  \n> ",
+        "expected": {
+          "html": "<blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should support initial or final lazy empty block quote lines",
+        "input": ">\n> a\n>  ",
+        "expected": {
+          "html": "<blockquote>\n<p>a</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should support adjacent block quotes",
+        "input": "> a\n\n> b",
+        "expected": {
+          "html": "<blockquote>\n<p>a</p>\n</blockquote>\n<blockquote>\n<p>b</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should support a paragraph in a block quote",
+        "input": "> a\n> b",
+        "expected": {
+          "html": "<blockquote>\n<p>a\nb</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should support adjacent paragraphs in block quotes",
+        "input": "> a\n>\n> b",
+        "expected": {
+          "html": "<blockquote>\n<p>a</p>\n<p>b</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should support interrupting paragraphs w/ block quotes",
+        "input": "a\n> b",
+        "expected": {
+          "html": "<p>a</p>\n<blockquote>\n<p>b</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should support interrupting block quotes w/ thematic breaks",
+        "input": "> a\n***\n> b",
+        "expected": {
+          "html": "<blockquote>\n<p>a</p>\n</blockquote>\n<hr>\n<blockquote>\n<p>b</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should not support interrupting block quotes w/ paragraphs",
+        "input": "> a\nb",
+        "expected": {
+          "html": "<blockquote>\n<p>a\nb</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should support interrupting block quotes w/ blank lines",
+        "input": "> a\n\nb",
+        "expected": {
+          "html": "<blockquote>\n<p>a</p>\n</blockquote>\n<p>b</p>"
+        }
+      },
+      {
+        "description": "should not support interrupting a blank line in a block quotes w/ paragraphs",
+        "input": "> a\n>\nb",
+        "expected": {
+          "html": "<blockquote>\n<p>a</p>\n</blockquote>\n<p>b</p>"
+        }
+      },
+      {
+        "description": "should not support interrupting many block quotes w/ paragraphs (1)",
+        "input": "> > > a\nb",
+        "expected": {
+          "html": "<blockquote>\n<blockquote>\n<blockquote>\n<p>a\nb</p>\n</blockquote>\n</blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should not support interrupting many block quotes w/ paragraphs (2)",
+        "input": ">>> a\n> b\n>>c",
+        "expected": {
+          "html": "<blockquote>\n<blockquote>\n<blockquote>\n<p>a\nb\nc</p>\n</blockquote>\n</blockquote>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should support 5 spaces for indented code, not 4",
+        "input": ">     a\n\n>    b",
+        "expected": {
+          "html": "<blockquote>\n<pre><code>a\n</code></pre>\n</blockquote>\n<blockquote>\n<p>b</p>\n</blockquote>"
+        }
+      }
+    ]
+  }
+]

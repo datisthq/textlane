@@ -1,0 +1,35 @@
+[
+  {
+    "description": "micromark misc/zero",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/misc/zero.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should replace `\\0` w/ a replacement characters (`�`)",
+        "input": "asd\u0000asd",
+        "expected": {
+          "html": "<p>asd�asd</p>"
+        }
+      },
+      {
+        "description": "should replace NUL in a character reference",
+        "input": "&#0;",
+        "expected": {
+          "html": "<p>�</p>"
+        }
+      },
+      {
+        "description": "should not support NUL in a character escape",
+        "input": "\\0",
+        "expected": {
+          "html": "<p>\\0</p>"
+        }
+      }
+    ]
+  }
+]

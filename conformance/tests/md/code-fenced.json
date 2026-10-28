@@ -1,0 +1,532 @@
+[
+  {
+    "description": "Fenced code blocks",
+    "specification": ["https://spec.commonmark.org/0.31.2/#fenced-code-blocks"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 119",
+        "input": "```\n<\n >\n```\n",
+        "expected": {
+          "html": "<pre><code>&#x3C;\n >\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 120",
+        "input": "~~~\n<\n >\n~~~\n",
+        "expected": {
+          "html": "<pre><code>&#x3C;\n >\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 121",
+        "input": "``\nfoo\n``\n",
+        "expected": {
+          "html": "<p><code>foo</code></p>"
+        }
+      },
+      {
+        "description": "example 122",
+        "input": "```\naaa\n~~~\n```\n",
+        "expected": {
+          "html": "<pre><code>aaa\n~~~\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 123",
+        "input": "~~~\naaa\n```\n~~~\n",
+        "expected": {
+          "html": "<pre><code>aaa\n```\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 124",
+        "input": "````\naaa\n```\n``````\n",
+        "expected": {
+          "html": "<pre><code>aaa\n```\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 125",
+        "input": "~~~~\naaa\n~~~\n~~~~\n",
+        "expected": {
+          "html": "<pre><code>aaa\n~~~\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 126",
+        "input": "```\n",
+        "expected": {
+          "html": "<pre><code></code></pre>"
+        }
+      },
+      {
+        "description": "example 127",
+        "input": "`````\n\n```\naaa\n",
+        "expected": {
+          "html": "<pre><code>\n```\naaa\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 128",
+        "input": "> ```\n> aaa\n\nbbb\n",
+        "expected": {
+          "html": "<blockquote>\n<pre><code>aaa\n</code></pre>\n</blockquote>\n<p>bbb</p>"
+        }
+      },
+      {
+        "description": "example 129",
+        "input": "```\n\n  \n```\n",
+        "expected": {
+          "html": "<pre><code>\n  \n</code></pre>"
+        }
+      },
+      {
+        "description": "example 130",
+        "input": "```\n```\n",
+        "expected": {
+          "html": "<pre><code></code></pre>"
+        }
+      },
+      {
+        "description": "example 131",
+        "input": " ```\n aaa\naaa\n```\n",
+        "expected": {
+          "html": "<pre><code>aaa\naaa\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 132",
+        "input": "  ```\naaa\n  aaa\naaa\n  ```\n",
+        "expected": {
+          "html": "<pre><code>aaa\naaa\naaa\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 133",
+        "input": "   ```\n   aaa\n    aaa\n  aaa\n   ```\n",
+        "expected": {
+          "html": "<pre><code>aaa\n aaa\naaa\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 134",
+        "input": "    ```\n    aaa\n    ```\n",
+        "expected": {
+          "html": "<pre><code>```\naaa\n```\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 135",
+        "input": "```\naaa\n  ```\n",
+        "expected": {
+          "html": "<pre><code>aaa\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 136",
+        "input": "   ```\naaa\n  ```\n",
+        "expected": {
+          "html": "<pre><code>aaa\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 137",
+        "input": "```\naaa\n    ```\n",
+        "expected": {
+          "html": "<pre><code>aaa\n    ```\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 138",
+        "input": "``` ```\naaa\n",
+        "expected": {
+          "html": "<p><code> </code>\naaa</p>"
+        }
+      },
+      {
+        "description": "example 139",
+        "input": "~~~~~~\naaa\n~~~ ~~\n",
+        "expected": {
+          "html": "<pre><code>aaa\n~~~ ~~\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 140",
+        "input": "foo\n```\nbar\n```\nbaz\n",
+        "expected": {
+          "html": "<p>foo</p>\n<pre><code>bar\n</code></pre>\n<p>baz</p>"
+        }
+      },
+      {
+        "description": "example 141",
+        "input": "foo\n---\n~~~\nbar\n~~~\n# baz\n",
+        "expected": {
+          "html": "<h2>foo</h2>\n<pre><code>bar\n</code></pre>\n<h1>baz</h1>"
+        }
+      },
+      {
+        "description": "example 142",
+        "input": "```ruby\ndef foo(x)\n  return 3\nend\n```\n",
+        "expected": {
+          "html": "<pre><code class=\"language-ruby\">def foo(x)\n  return 3\nend\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 143",
+        "input": "~~~~    ruby startline=3 $%@#$\ndef foo(x)\n  return 3\nend\n~~~~~~~\n",
+        "expected": {
+          "html": "<pre><code class=\"language-ruby\">def foo(x)\n  return 3\nend\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 144",
+        "input": "````;\n````\n",
+        "expected": {
+          "html": "<pre><code class=\"language-;\"></code></pre>"
+        }
+      },
+      {
+        "description": "example 145",
+        "input": "``` aa ```\nfoo\n",
+        "expected": {
+          "html": "<p><code>aa</code>\nfoo</p>"
+        }
+      },
+      {
+        "description": "example 146",
+        "input": "~~~ aa ``` ~~~\nfoo\n~~~\n",
+        "expected": {
+          "html": "<pre><code class=\"language-aa\">foo\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 147",
+        "input": "```\n``` aaa\n```\n",
+        "expected": {
+          "html": "<pre><code>``` aaa\n</code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark flow/code-fenced",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/flow/code-fenced.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should support fenced code w/ grave accents",
+        "input": "```\n<\n >\n```",
+        "expected": {
+          "html": "<pre><code>&#x3C;\n >\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support fenced code w/ tildes",
+        "input": "~~~\n<\n >\n~~~",
+        "expected": {
+          "html": "<pre><code>&#x3C;\n >\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support fenced code w/ less than three markers",
+        "input": "``\nfoo\n``",
+        "expected": {
+          "html": "<p><code>foo</code></p>"
+        }
+      },
+      {
+        "description": "should not support a tilde closing sequence for a grave accent opening sequence",
+        "input": "```\naaa\n~~~\n```",
+        "expected": {
+          "html": "<pre><code>aaa\n~~~\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support a grave accent closing sequence for a tilde opening sequence",
+        "input": "~~~\naaa\n```\n~~~",
+        "expected": {
+          "html": "<pre><code>aaa\n```\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support a closing sequence longer, but not shorter than, the opening",
+        "input": "````\naaa\n```\n``````",
+        "expected": {
+          "html": "<pre><code>aaa\n```\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support a closing sequence equal to, but not shorter than, the opening",
+        "input": "~~~~\naaa\n~~~\n~~~~",
+        "expected": {
+          "html": "<pre><code>aaa\n~~~\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support an eof right after an opening sequence",
+        "input": "```",
+        "expected": {
+          "html": "<pre><code></code></pre>"
+        }
+      },
+      {
+        "description": "should support an eof somewhere in content",
+        "input": "`````\n\n```\naaa\n",
+        "expected": {
+          "html": "<pre><code>\n```\naaa\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support no closing sequence in a block quote",
+        "input": "> ```\n> aaa\n\nbbb",
+        "expected": {
+          "html": "<blockquote>\n<pre><code>aaa\n</code></pre>\n</blockquote>\n<p>bbb</p>"
+        }
+      },
+      {
+        "description": "should support blank lines in fenced code",
+        "input": "```\n\n  \n```",
+        "expected": {
+          "html": "<pre><code>\n  \n</code></pre>"
+        }
+      },
+      {
+        "description": "should support empty fenced code",
+        "input": "```\n```",
+        "expected": {
+          "html": "<pre><code></code></pre>"
+        }
+      },
+      {
+        "description": "should remove up to one space from the content if the opening sequence is indented w/ 1 space",
+        "input": " ```\n aaa\naaa\n```",
+        "expected": {
+          "html": "<pre><code>aaa\naaa\n</code></pre>"
+        }
+      },
+      {
+        "description": "should remove up to two space from the content if the opening sequence is indented w/ 2 spaces",
+        "input": "  ```\naaa\n  aaa\naaa\n  ```",
+        "expected": {
+          "html": "<pre><code>aaa\naaa\naaa\n</code></pre>"
+        }
+      },
+      {
+        "description": "should remove up to three space from the content if the opening sequence is indented w/ 3 spaces",
+        "input": "   ```\n   aaa\n    aaa\n  aaa\n   ```",
+        "expected": {
+          "html": "<pre><code>aaa\n aaa\naaa\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support indenteding the opening sequence w/ 4 spaces",
+        "input": "    ```\n    aaa\n    ```",
+        "expected": {
+          "html": "<pre><code>```\naaa\n```\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support an indented closing sequence",
+        "input": "```\naaa\n  ```",
+        "expected": {
+          "html": "<pre><code>aaa\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support a differently indented closing sequence than the opening sequence",
+        "input": "   ```\naaa\n  ```",
+        "expected": {
+          "html": "<pre><code>aaa\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support an indented closing sequence w/ 4 spaces",
+        "input": "```\naaa\n    ```\n",
+        "expected": {
+          "html": "<pre><code>aaa\n    ```\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support grave accents in the opening fence after the opening sequence",
+        "input": "``` ```\naaa",
+        "expected": {
+          "html": "<p><code> </code>\naaa</p>"
+        }
+      },
+      {
+        "description": "should not support spaces in the closing sequence",
+        "input": "~~~~~~\naaa\n~~~ ~~\n",
+        "expected": {
+          "html": "<pre><code>aaa\n~~~ ~~\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support interrupting paragraphs",
+        "input": "foo\n```\nbar\n```\nbaz",
+        "expected": {
+          "html": "<p>foo</p>\n<pre><code>bar\n</code></pre>\n<p>baz</p>"
+        }
+      },
+      {
+        "description": "should support interrupting other content",
+        "input": "foo\n---\n~~~\nbar\n~~~\n# baz",
+        "expected": {
+          "html": "<h2>foo</h2>\n<pre><code>bar\n</code></pre>\n<h1>baz</h1>"
+        }
+      },
+      {
+        "description": "should support the info string as a `language-` class (1)",
+        "input": "```ruby\ndef foo(x)\n  return 3\nend\n```",
+        "expected": {
+          "html": "<pre><code class=\"language-ruby\">def foo(x)\n  return 3\nend\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support the info string as a `language-` class (2)",
+        "input": "````;\n````",
+        "expected": {
+          "html": "<pre><code class=\"language-;\"></code></pre>"
+        }
+      },
+      {
+        "description": "should support the info string as a `language-` class, but not the meta string",
+        "input": "~~~~    ruby startline=3 $%@#$\ndef foo(x)\n  return 3\nend\n~~~~~~~",
+        "expected": {
+          "html": "<pre><code class=\"language-ruby\">def foo(x)\n  return 3\nend\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support grave accents in the meta string",
+        "input": "``` aa ```\nfoo",
+        "expected": {
+          "html": "<p><code>aa</code>\nfoo</p>"
+        }
+      },
+      {
+        "description": "should support grave accents and tildes in the meta string of tilde fenced code",
+        "input": "~~~ aa ``` ~~~\nfoo\n~~~",
+        "expected": {
+          "html": "<pre><code class=\"language-aa\">foo\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support info string on closing sequences",
+        "input": "```\n``` aaa\n```",
+        "expected": {
+          "html": "<pre><code>``` aaa\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support an eof after whitespace, after the start fence sequence",
+        "input": "```  ",
+        "expected": {
+          "html": "<pre><code></code></pre>"
+        }
+      },
+      {
+        "description": "should support whitespace between the sequence and the info string",
+        "input": "```  js\nalert(1)\n```",
+        "expected": {
+          "html": "<pre><code class=\"language-js\">alert(1)\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support an eof after the info string",
+        "input": "```js",
+        "expected": {
+          "html": "<pre><code class=\"language-js\"></code></pre>"
+        }
+      },
+      {
+        "description": "should support whitespace after the info string",
+        "input": "```  js \nalert(1)\n```",
+        "expected": {
+          "html": "<pre><code class=\"language-js\">alert(1)\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support an eof after whitespace in content",
+        "input": "```\n  ",
+        "expected": {
+          "html": "<pre><code>  \n</code></pre>"
+        }
+      },
+      {
+        "description": "should support an eof in the prefix, in content",
+        "input": "  ```\n ",
+        "expected": {
+          "html": "<pre><code></code></pre>"
+        }
+      },
+      {
+        "description": "should support character escapes and character references in info strings",
+        "input": "```j\\+s&copy;",
+        "expected": {
+          "html": "<pre><code class=\"language-j+s©\"></code></pre>"
+        }
+      },
+      {
+        "description": "should not support a closing sequence w/ too much indent, regardless of opening sequence (1)",
+        "input": "   ```\naaa\n    ```",
+        "expected": {
+          "html": "<pre><code>aaa\n ```\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support a closing sequence w/ too much indent, regardless of opening sequence (2)",
+        "comment": "micromark renders: <blockquote>\n<pre><code>\n\n\n</code></pre>\n</blockquote>\n<p>a</p>",
+        "input": "> ```\n>\n>\n>\n\na",
+        "expected": {
+          "html": "<blockquote>\n<pre><code>\n\n</code></pre>\n</blockquote>\n<p>a</p>"
+        }
+      },
+      {
+        "description": "should not support lazyness (1)",
+        "input": "> ```a\nb",
+        "expected": {
+          "html": "<blockquote>\n<pre><code class=\"language-a\"></code></pre>\n</blockquote>\n<p>b</p>"
+        }
+      },
+      {
+        "description": "should not support lazyness (2)",
+        "input": "> a\n```b",
+        "expected": {
+          "html": "<blockquote>\n<p>a</p>\n</blockquote>\n<pre><code class=\"language-b\"></code></pre>"
+        }
+      },
+      {
+        "description": "should not support lazyness (3)",
+        "input": "> ```a\n```",
+        "expected": {
+          "html": "<blockquote>\n<pre><code class=\"language-a\"></code></pre>\n</blockquote>\n<pre><code></code></pre>"
+        }
+      }
+    ]
+  }
+]

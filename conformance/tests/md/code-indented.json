@@ -1,0 +1,251 @@
+[
+  {
+    "description": "Indented code blocks",
+    "specification": ["https://spec.commonmark.org/0.31.2/#indented-code-blocks"],
+    "source": {
+      "repository": "https://github.com/commonmark/commonmark-spec",
+      "version": "0.31.2",
+      "path": "spec.txt",
+      "license": "CC-BY-SA-4.0"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "example 107",
+        "input": "    a simple\n      indented code block\n",
+        "expected": {
+          "html": "<pre><code>a simple\n  indented code block\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 108",
+        "input": "  - foo\n\n    bar\n",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>foo</p>\n<p>bar</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "example 109",
+        "input": "1.  foo\n\n    - bar\n",
+        "expected": {
+          "html": "<ol>\n<li>\n<p>foo</p>\n<ul>\n<li>bar</li>\n</ul>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "example 110",
+        "input": "    <a/>\n    *hi*\n\n    - one\n",
+        "expected": {
+          "html": "<pre><code>&#x3C;a/>\n*hi*\n\n- one\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 111",
+        "input": "    chunk1\n\n    chunk2\n  \n \n \n    chunk3\n",
+        "expected": {
+          "html": "<pre><code>chunk1\n\nchunk2\n\n\n\nchunk3\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 112",
+        "input": "    chunk1\n      \n      chunk2\n",
+        "expected": {
+          "html": "<pre><code>chunk1\n  \n  chunk2\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 113",
+        "input": "Foo\n    bar\n\n",
+        "expected": {
+          "html": "<p>Foo\nbar</p>"
+        }
+      },
+      {
+        "description": "example 114",
+        "input": "    foo\nbar\n",
+        "expected": {
+          "html": "<pre><code>foo\n</code></pre>\n<p>bar</p>"
+        }
+      },
+      {
+        "description": "example 115",
+        "input": "# Heading\n    foo\nHeading\n------\n    foo\n----\n",
+        "expected": {
+          "html": "<h1>Heading</h1>\n<pre><code>foo\n</code></pre>\n<h2>Heading</h2>\n<pre><code>foo\n</code></pre>\n<hr>"
+        }
+      },
+      {
+        "description": "example 116",
+        "input": "        foo\n    bar\n",
+        "expected": {
+          "html": "<pre><code>    foo\nbar\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 117",
+        "input": "\n    \n    foo\n    \n\n",
+        "expected": {
+          "html": "<pre><code>foo\n</code></pre>"
+        }
+      },
+      {
+        "description": "example 118",
+        "input": "    foo  \n",
+        "expected": {
+          "html": "<pre><code>foo  \n</code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark flow/code-indented",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/flow/code-indented.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should support indented code",
+        "input": "    a simple\n      indented code block",
+        "expected": {
+          "html": "<pre><code>a simple\n  indented code block\n</code></pre>"
+        }
+      },
+      {
+        "description": "should prefer list item content over indented code (1)",
+        "input": "  - foo\n\n    bar",
+        "expected": {
+          "html": "<ul>\n<li>\n<p>foo</p>\n<p>bar</p>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should prefer list item content over indented code (2)",
+        "input": "1.  foo\n\n    - bar",
+        "expected": {
+          "html": "<ol>\n<li>\n<p>foo</p>\n<ul>\n<li>bar</li>\n</ul>\n</li>\n</ol>"
+        }
+      },
+      {
+        "description": "should support blank lines in indented code (1)",
+        "input": "    <a/>\n    *hi*\n\n    - one",
+        "expected": {
+          "html": "<pre><code>&#x3C;a/>\n*hi*\n\n- one\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support blank lines in indented code (2)",
+        "input": "    chunk1\n\n    chunk2\n  \n \n \n    chunk3",
+        "expected": {
+          "html": "<pre><code>chunk1\n\nchunk2\n\n\n\nchunk3\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support blank lines in indented code (3)",
+        "input": "    chunk1\n      \n      chunk2",
+        "expected": {
+          "html": "<pre><code>chunk1\n  \n  chunk2\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support interrupting paragraphs",
+        "input": "Foo\n    bar",
+        "expected": {
+          "html": "<p>Foo\nbar</p>"
+        }
+      },
+      {
+        "description": "should support paragraphs directly after indented code",
+        "input": "    foo\nbar",
+        "expected": {
+          "html": "<pre><code>foo\n</code></pre>\n<p>bar</p>"
+        }
+      },
+      {
+        "description": "should mix w/ other content",
+        "input": "# Heading\n    foo\nHeading\n------\n    foo\n----",
+        "expected": {
+          "html": "<h1>Heading</h1>\n<pre><code>foo\n</code></pre>\n<h2>Heading</h2>\n<pre><code>foo\n</code></pre>\n<hr>"
+        }
+      },
+      {
+        "description": "should support extra whitespace on the first line",
+        "input": "        foo\n    bar",
+        "expected": {
+          "html": "<pre><code>    foo\nbar\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support initial blank lines",
+        "input": "\n    \n    foo\n    ",
+        "expected": {
+          "html": "<pre><code>foo\n</code></pre>"
+        }
+      },
+      {
+        "description": "should support trailing whitespace",
+        "input": "    foo  ",
+        "expected": {
+          "html": "<pre><code>foo  \n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support lazyness (1)",
+        "input": ">     a\nb",
+        "expected": {
+          "html": "<blockquote>\n<pre><code>a\n</code></pre>\n</blockquote>\n<p>b</p>"
+        }
+      },
+      {
+        "description": "should not support lazyness (2)",
+        "input": "> a\n    b",
+        "expected": {
+          "html": "<blockquote>\n<p>a\nb</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should not support lazyness (3)",
+        "input": "> a\n     b",
+        "expected": {
+          "html": "<blockquote>\n<p>a\nb</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should not support lazyness (4)",
+        "input": "> a\n      b",
+        "expected": {
+          "html": "<blockquote>\n<p>a\nb</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "should not support lazyness (6)",
+        "input": ">     a\n     b",
+        "expected": {
+          "html": "<blockquote>\n<pre><code>a\n</code></pre>\n</blockquote>\n<pre><code> b\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support lazyness (7)",
+        "input": ">     a\n      b",
+        "expected": {
+          "html": "<blockquote>\n<pre><code>a\n</code></pre>\n</blockquote>\n<pre><code>  b\n</code></pre>"
+        }
+      }
+    ]
+  }
+]

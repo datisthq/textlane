@@ -1,0 +1,63 @@
+[
+  {
+    "description": "micromark misc/dangerous-html",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/misc/dangerous-html.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should be safe by default for flow",
+        "comment": "micromark renders: &lt;x&gt;",
+        "input": "<x>",
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "should be safe by default for text",
+        "comment": "micromark renders: <p>a&lt;b&gt;</p>",
+        "input": "a<b>",
+        "expected": {
+          "html": "<p>a</p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark misc/dangerous-html with dangerous HTML allowed",
+    "source": {
+      "repository": "https://github.com/micromark/micromark",
+      "commit": "6577c200155e9c6b85a42b26d298f8affc348f2f",
+      "path": "test/io/misc/dangerous-html.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should be unsafe w/ `allowDangerousHtml`",
+        "input": "<x>",
+        "expected": {
+          "html": "<x>"
+        }
+      }
+    ]
+  }
+]

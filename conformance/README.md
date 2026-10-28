@@ -12,9 +12,10 @@ and the layout fairspec's suite.
 ```
 conformance/
   test-schema.json             JSON Schema of a test file
-  tests/<area>/<feature>.json  one area per domain: core, md, html, mdx, prose
+  tests/<area>/<construct>.json  one area per domain (core, md, html, mdx, prose), one file per construct
   pending.json                 what the crate does not pass yet, shared by every runner
   sources/<source>.ts          importers that turn an upstream suite into test files
+  .cache/                      pinned upstream checkouts the importers read; git-ignored
 ```
 
 ## Test files
@@ -55,8 +56,8 @@ case exercise the pipeline itself.
 
 ## Pending
 
-The suite is filled before the implementation: `pending.json` maps a file (`md/commonmark-tabs`),
-a group (`…#Tabs`) or a whole area (`md/*`) to why it does not pass yet. Every runner still runs
+The suite is filled before the implementation: `pending.json` maps a file (`md/heading-atx`),
+a group (`md/tab#Tabs`) or a whole area (`md/*`) to why it does not pass yet. Every runner still runs
 pending cases and tolerates their failures; an entry whose cases all pass fails the run until it
 is removed, so the list only shrinks as the crate grows. A runner's own `KNOWN_DIVERGENCES`, an
 entry mapped to an open issue, is for a difference in that runner alone.
@@ -69,6 +70,11 @@ every `pending.json` entry against the files and groups that exist.
 `pnpm -C conformance import:<source>` rewrites that source's files from a pinned upstream
 release; importers are run deliberately and their output committed, never run in CI.
 
-| source       | writes                       | expectations                                        |
-| ------------ | ---------------------------- | --------------------------------------------------- |
-| `commonmark` | `tests/md/commonmark-*.json` | the spec's 652 examples rendered by unified, pinned |
+| source       | reads                  | expectations                                                                             |
+| ------------ | ---------------------- | ---------------------------------------------------------------------------------------- |
+| `commonmark` | the 26 spec sections   | the spec's 652 examples rendered by unified, pinned                                      |
+| `micromark`  | `test/io` at `6577c20` | 1,089 cases rendered by unified; micromark's own HTML kept in `comment` where it differs |
+
+A file holds one construct (`md/heading-atx`), named as micromark names its test files, with a
+group per source: the spec section, then each upstream test file. An importer replaces only its
+own source's groups, so sources merge into the same files in a stable order.

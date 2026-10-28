@@ -15,20 +15,20 @@
 
 <htmlpress-grid cols="3">
   <htmlpress-card>
-    <h3>18 decided</h3>
+    <h3>20 decided</h3>
     <p>
       <htmlpress-badge type="success">decided</htmlpress-badge> settled by the maintainer
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>7 agent's calls</h3>
+    <h3>8 agent's calls</h3>
     <p>
       <htmlpress-badge type="warning">my call</htmlpress-badge> settled by the agent, open
       to change
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>5 open</h3>
+    <h3>4 open</h3>
     <p><htmlpress-badge type="danger">open</htmlpress-badge> still to decide</p>
   </htmlpress-card>
 </htmlpress-grid>
@@ -259,6 +259,36 @@
     <p><strong>Rejected.</strong> One group per example.</p>
   </dd>
   <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Test files are named by
+    construct (<code>md/heading-atx</code>), with a group per source inside
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> unified groups its tests by construct within each package; one
+      file then holds all coverage of a construct, and provenance stays in each group's
+      <code>source</code>.
+    </p>
+    <p>
+      <strong>Rejected.</strong> One file per upstream source and section
+      (<code>md/commonmark-atx-headings</code>).
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> WPT tree-construction and
+    html5lib serializer cases are converted into test files; the html5lib tokenizer suite
+    is not ported
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Conversion follows the same importer pattern; the tokenizer is
+      internal, not a plugin.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Vendoring <code>.dat</code> files behind a loader;
+      porting the 6,827 tokenizer cases.
+    </p>
+  </dd>
+  <dt>
     <htmlpress-badge type="success">decided</htmlpress-badge> The corpus is filled before
     the implementation; <code>conformance/pending.json</code> marks what the crate does
     not pass yet
@@ -340,6 +370,18 @@
     <p><strong>Rejected.</strong> Report-only, which lets the list go stale.</p>
   </dd>
   <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Importers skip what a
+    pipeline case cannot express (options without a textlane equivalent, non-literal
+    input, lone surrogates) and report the counts
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Keeps imported cases honest; the skipped ones come back when
+      the option they need is designed.
+    </p>
+    <p><strong>Rejected.</strong> Inventing public options to carry them now.</p>
+  </dd>
+  <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge> Each runner skips only
     through a <code>KNOWN_DIVERGENCES</code> map of group to open issue, as fairspec's do
   </dt>
@@ -375,11 +417,6 @@
   <dd>
     <p>Decides whether a <code>textlane-code</code> crate exists.</p>
   </dd>
-  <dt>
-    <htmlpress-badge type="danger">open</htmlpress-badge> Whether WPT
-    <code>.dat</code> tree tests are vendored as-is or converted
-  </dt>
-  <dd><p>1,973 HTML parsing cases need either a loader or a converter.</p></dd>
   <dt>
     <htmlpress-badge type="danger">open</htmlpress-badge> Uninventoried sources: retext
     (prose), <code>@mdx-js/mdx</code> and recma (mdx), the definition-list syntax repos
