@@ -1,0 +1,210 @@
+[
+  {
+    "description": "rehype-format fixtures",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-format",
+      "commit": "0d505500b2cf862ffa42af44ecd7527151b52a6c",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [["html.parse"], ["html.format"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "fixture aria",
+        "input": "<!doctype html>\n<html lang=\"en\"><meta charset=\"utf-8\"><title>ARIA</title>\n<form>\n<fieldset><legend>Login</legend>\n<div>\n<label for=\"username\">Username</label>\n<input id=\"username\" aria-describedby=\"username-tip\" required>\n<div role=\"tooltip\" id=\"username-tip\">Your username is your email address</div>\n</div>\n<div>\n<label for=\"password\">Password</label>\n<input id=\"password\" aria-describedby=\"password-tip\" required>\n<div role=\"tooltip\" id=\"password-tip\">Was emailed to you when you signed up</div>\n</div>\n</fieldset>\n</form>\n",
+        "expected": {
+          "html": "<!doctype html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>ARIA</title>\n  </head>\n  <body>\n    <form>\n      <fieldset>\n        <legend>Login</legend>\n        <div>\n          <label for=\"username\">Username</label>\n          <input id=\"username\" aria-describedby=\"username-tip\" required>\n          <div role=\"tooltip\" id=\"username-tip\">Your username is your email address</div>\n        </div>\n        <div>\n          <label for=\"password\">Password</label>\n          <input id=\"password\" aria-describedby=\"password-tip\" required>\n          <div role=\"tooltip\" id=\"password-tip\">Was emailed to you when you signed up</div>\n        </div>\n      </fieldset>\n    </form>\n  </body>\n</html>\n"
+        }
+      },
+      {
+        "description": "fixture blanks-default",
+        "input": "<!doctype html>\n<html>\n<head>\n<title>\nFoo\n</title>\n</head>\n<body>\n<main>\n<p>Bar</p>\n</main>\n</body>\n</html>\n",
+        "expected": {
+          "html": "<!doctype html>\n<html>\n  <head>\n    <title>Foo</title>\n  </head>\n  <body>\n    <main>\n      <p>Bar</p>\n    </main>\n  </body>\n</html>\n"
+        }
+      },
+      {
+        "description": "fixture comments",
+        "input": "<!doctype html>\n<title>Comments</title>\n<foo> <!-- comment --> </foo>\n<div><!-- comment\ncomment --></div>\n<p><span>span</span><!-- comment\ncomment --><em>em</em></p>\n",
+        "expected": {
+          "html": "<!doctype html>\n<html>\n  <head>\n    <title>Comments</title>\n  </head>\n  <body>\n    <foo><!-- comment --></foo>\n    <div>\n      <!-- comment\n      comment -->\n    </div>\n    <p>\n      <span>span</span><!-- comment\n      comment --><em>em</em>\n    </p>\n  </body>\n</html>\n"
+        }
+      },
+      {
+        "description": "fixture example",
+        "input": "<!doCTYPE HTML><html>\n <head>\n    <title>Hello!</title>\n<meta charset=utf8>\n      </head>\n  <body><section>    <p>hi there</p>\n     </section>\n </body>\n</html>\n",
+        "expected": {
+          "html": "<!doctype html>\n<html>\n  <head>\n    <title>Hello!</title>\n    <meta charset=\"utf8\">\n  </head>\n  <body>\n    <section>\n      <p>hi there</p>\n    </section>\n  </body>\n</html>\n"
+        }
+      },
+      {
+        "description": "fixture html-in-svg-in-html",
+        "input": "<!doctype html>\n<meta charset=\"utf-8\"><title>SVG</title>\n<h1>HTML in SVG in HTML</h1>\n<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"400\" height=\"300\" viewBox=\"0 0 400 300\">\n<switch>\n<foreignObject width=\"200\" height=\"100\" requiredExtensions=\"http://www.w3.org/1999/xhtml\"><p xmlns=\"http://www.w3.org/1999/xhtml\">Here is an HTML paragraph that requires word wrap</p></foreignObject>\n<text font-size=\"16\"><tspan x=\"0\" y=\"14\">Here is an SVG paragraph</tspan><tspan x=\"0\" y=\"32\">that requires word wrap.</tspan></text>\n</switch>\n</svg>\n",
+        "expected": {
+          "html": "<!doctype html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>SVG</title>\n  </head>\n  <body>\n    <h1>HTML in SVG in HTML</h1>\n    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"400\" height=\"300\" viewBox=\"0 0 400 300\">\n      <switch>\n        <foreignObject width=\"200\" height=\"100\" requiredExtensions=\"http://www.w3.org/1999/xhtml\">\n          <p xmlns=\"http://www.w3.org/1999/xhtml\">Here is an HTML paragraph that requires word wrap</p>\n        </foreignObject>\n        <text font-size=\"16\">\n          <tspan x=\"0\" y=\"14\">Here is an SVG paragraph</tspan>\n          <tspan x=\"0\" y=\"32\">that requires word wrap.</tspan>\n        </text>\n      </switch>\n    </svg>\n  </body>\n</html>\n"
+        }
+      },
+      {
+        "description": "fixture indent-default",
+        "input": "<!doctype html><p>Foo\n<strong>bar</strong></p>\n",
+        "expected": {
+          "html": "<!doctype html>\n<html>\n  <head></head>\n  <body>\n    <p>\n      Foo\n      <strong>bar</strong>\n    </p>\n  </body>\n</html>\n"
+        }
+      },
+      {
+        "description": "fixture indent-initial-default",
+        "input": "<!doctype html>\n<html>\n<head>\n<title>\nFoo\n</title>\n</head>\n<body>\n<p>Bar</p>\n</body>\n</html>\n",
+        "expected": {
+          "html": "<!doctype html>\n<html>\n  <head>\n    <title>Foo</title>\n  </head>\n  <body>\n    <p>Bar</p>\n  </body>\n</html>\n"
+        }
+      },
+      {
+        "description": "fixture mathml",
+        "input": "<!doctype html>\n<title>MathML</title>\n<h1>The quadratic formula</h1>\n<p>\n<math>\n<mi>x</mi>\n<mo>=</mo>\n<mfrac>\n<mrow>\n<mo form=\"prefix\">−</mo> <mi>b</mi>\n<mo>±</mo>\n<msqrt>\n<msup> <mi>b</mi> <mn>2</mn> </msup>\n<mo>−</mo>\n<mn>4</mn> <mo>⁢</mo> <mi>a</mi> <mo>⁢</mo> <mi>c</mi>\n</msqrt>\n</mrow>\n<mrow>\n<mn>2</mn> <mo>⁢</mo> <mi>a</mi>\n</mrow>\n</mfrac>\n</math>\n</p>\n",
+        "expected": {
+          "html": "<!doctype html>\n<html>\n  <head>\n    <title>MathML</title>\n  </head>\n  <body>\n    <h1>The quadratic formula</h1>\n    <p>\n      <math>\n        <mi>x</mi>\n        <mo>=</mo>\n        <mfrac>\n          <mrow>\n            <mo form=\"prefix\">−</mo>\n            <mi>b</mi>\n            <mo>±</mo>\n            <msqrt>\n              <msup>\n                <mi>b</mi>\n                <mn>2</mn>\n              </msup>\n              <mo>−</mo>\n              <mn>4</mn>\n              <mo>⁢</mo>\n              <mi>a</mi>\n              <mo>⁢</mo>\n              <mi>c</mi>\n            </msqrt>\n          </mrow>\n          <mrow>\n            <mn>2</mn>\n            <mo>⁢</mo>\n            <mi>a</mi>\n          </mrow>\n        </mfrac>\n      </math>\n    </p>\n  </body>\n</html>\n"
+        }
+      },
+      {
+        "description": "fixture phrasing-in-head",
+        "input": "<!doctype html>\n<title>Alpha</title>\n<link rel=\"stylesheet\" href=\"bravo.css\">\n<h1>Charlie</h1>\n",
+        "expected": {
+          "html": "<!doctype html>\n<html>\n  <head>\n    <title>Alpha</title>\n    <link rel=\"stylesheet\" href=\"bravo.css\">\n  </head>\n  <body>\n    <h1>Charlie</h1>\n  </body>\n</html>\n"
+        }
+      },
+      {
+        "description": "fixture svg",
+        "input": "<!doctype html>\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 200 200\">\n<title>Variable: shape</title>\n<rect x=\"55\" y=\"35\" width=\"40\" height=\"40\"/>\n<circle cx=\"75\" cy=\"110\" r=\"25\"/>\n<path d=\"M 50 145 L 100 145 L 75 185 z\"/>\n</svg>\n",
+        "expected": {
+          "html": "<!doctype html>\n<html>\n  <head></head>\n  <body>\n    <svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 200 200\">\n      <title>Variable: shape</title>\n      <rect x=\"55\" y=\"35\" width=\"40\" height=\"40\"></rect>\n      <circle cx=\"75\" cy=\"110\" r=\"25\"></circle>\n      <path d=\"M 50 145 L 100 145 L 75 185 z\"></path>\n    </svg>\n  </body>\n</html>\n"
+        }
+      },
+      {
+        "description": "fixture white-space",
+        "input": "<!doctype html>\n<html>\n<head><title>Hi!</title></head>\n<body>\n<p>Some <code>  code  </code>, <em> emphasis </em>, and <br> <strong> importance </strong>\n.</p>\n\n<h1>\n  Lorem ipsum dolor sit amet,\n  consectetur adipisicing elit,\n  sed do eiusmod tempor incididunt\n  ut labore et dolore magna aliqua.\n  Ut enim ad minim veniam, quis\n  nostrud exercitation ullamco\n  laboris nisi ut aliquip ex ea\n  commodo consequat. Duis aute\n  irure dolor in reprehenderit in\n  voluptate velit esse cillum dolore\n  eu fugiat nulla pariatur.\n  Lorem ipsum dolor sit amet,\n  consectetur adipisicing elit,\n  sed do eiusmod tempor incididunt\n  ut labore et dolore magna aliqua.\n  Ut enim ad minim veniam, quis\n  nostrud exercitation ullamco\n  laboris nisi ut aliquip ex ea\n  commodo consequat. Duis aute\n  irure dolor in reprehenderit in\n  voluptate velit esse cillum dolore\n  eu fugiat nulla pariatur.\n</h1>\n\n<pre>\n\n  foo\n\n\nbar\n\n</pre>\n\n<section>\n  <p>\n    hello there!\n <span>this is great</span></p></section>\n </body></html>\n",
+        "expected": {
+          "html": "<!doctype html>\n<html>\n  <head>\n    <title>Hi!</title>\n  </head>\n  <body>\n    <p>Some <code>code </code>, <em>emphasis </em>, and<br><strong>importance </strong>.</p>\n    <h1>\n      Lorem ipsum dolor sit amet,\n      consectetur adipisicing elit,\n      sed do eiusmod tempor incididunt\n      ut labore et dolore magna aliqua.\n      Ut enim ad minim veniam, quis\n      nostrud exercitation ullamco\n      laboris nisi ut aliquip ex ea\n      commodo consequat. Duis aute\n      irure dolor in reprehenderit in\n      voluptate velit esse cillum dolore\n      eu fugiat nulla pariatur.\n      Lorem ipsum dolor sit amet,\n      consectetur adipisicing elit,\n      sed do eiusmod tempor incididunt\n      ut labore et dolore magna aliqua.\n      Ut enim ad minim veniam, quis\n      nostrud exercitation ullamco\n      laboris nisi ut aliquip ex ea\n      commodo consequat. Duis aute\n      irure dolor in reprehenderit in\n      voluptate velit esse cillum dolore\n      eu fugiat nulla pariatur.\n    </h1>\n    <pre>\n  foo\n\n\nbar\n\n</pre>\n    <section>\n      <p>\n        hello there!\n        <span>this is great</span>\n      </p>\n    </section>\n  </body>\n</html>\n"
+        }
+      },
+      {
+        "description": "fixture xhtml",
+        "input": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<title>Example document</title>\n<p>Example paragraph</p>\n",
+        "expected": {
+          "html": "<!--?xml version=\"1.0\" encoding=\"UTF-8\"?-->\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n  <head>\n    <title>Example document</title>\n  </head>\n  <body>\n    <p>Example paragraph</p>\n  </body>\n</html>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-format fixtures {\"blanks\":[\"head\",\"body\",\"main\"]}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-format",
+      "commit": "0d505500b2cf862ffa42af44ecd7527151b52a6c",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["html.parse"],
+      [
+        "html.format",
+        {
+          "blanks": ["head", "body", "main"]
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture blanks-head-body-main",
+        "input": "<!doctype html>\n<html>\n<head>\n<title>\nFoo\n</title>\n</head>\n<body>\n<main>\n<p>Bar</p>\n</main>\n</body>\n</html>\n",
+        "expected": {
+          "html": "<!doctype html>\n<html>\n  <head>\n    <title>Foo</title>\n  </head>\n\n  <body>\n    <main>\n      <p>Bar</p>\n    </main>\n  </body>\n</html>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-format fixtures {\"indent\":\"\\t\"}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-format",
+      "commit": "0d505500b2cf862ffa42af44ecd7527151b52a6c",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["html.parse"],
+      [
+        "html.format",
+        {
+          "indent": "\t"
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture indent-character",
+        "input": "<!doctype html><p>Foo\n<strong>bar</strong></p>\n",
+        "expected": {
+          "html": "<!doctype html>\n<html>\n\t<head></head>\n\t<body>\n\t\t<p>\n\t\t\tFoo\n\t\t\t<strong>bar</strong>\n\t\t</p>\n\t</body>\n</html>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-format fixtures {\"indentInitial\":false}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-format",
+      "commit": "0d505500b2cf862ffa42af44ecd7527151b52a6c",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["html.parse"],
+      [
+        "html.format",
+        {
+          "indentInitial": false
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture indent-initial-false",
+        "input": "<!doctype html>\n<html>\n<head>\n<title>\nFoo\n</title>\n</head>\n<body>\n<p>Bar</p>\n</body>\n</html>\n",
+        "expected": {
+          "html": "<!doctype html>\n<html>\n<head>\n  <title>Foo</title>\n</head>\n<body>\n  <p>Bar</p>\n</body>\n</html>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-format fixtures {\"indent\":4}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-format",
+      "commit": "0d505500b2cf862ffa42af44ecd7527151b52a6c",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["html.parse"],
+      [
+        "html.format",
+        {
+          "indent": 4
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture indent-number",
+        "input": "<!doctype html><p>Foo\n<strong>bar</strong></p>\n",
+        "expected": {
+          "html": "<!doctype html>\n<html>\n    <head></head>\n    <body>\n        <p>\n            Foo\n            <strong>bar</strong>\n        </p>\n    </body>\n</html>\n"
+        }
+      }
+    ]
+  }
+]

@@ -100,6 +100,7 @@ release; importers are run deliberately and their output committed, never run in
 | `html-transforms` | hast-util-raw, hast-util-sanitize, rehype-sanitize, rehype-slug, github-slugger | 222 `html.raw`, `html.sanitize` (each URL vector a literal case) and `html.slug` cases                                                                                  |
 | `wpt`             | web-platform-tests tree construction, sparse checkout                           | 1,738 `html.parse` cases, trees without positions (`positions: false`); fragment and scripting-off cases skipped                                                        |
 | `unified`         | unified's test files, as operations                                             | 82 core lifecycle cases authored as data, each citing the unified test it ports; expectations from running them through the pinned unified with JavaScript test plugins |
+| `html-convert`    | hast-util-to-mdast, rehype-format                                               | 241 `html.toMarkdown` Markdown and tree cases (stringified with GFM and fenced code, as upstream's harness does) and 16 `html.format` cases                             |
 
 A file holds one construct (`md/heading-atx`), named as micromark names its test files, with a
 group per source: the spec section, then each upstream test file. An importer replaces only its
