@@ -1,6 +1,8 @@
 import rehypeStringify from "rehype-stringify"
 import { directiveToMarkdown } from "mdast-util-directive"
 import remarkDirective from "remark-directive"
+import remarkFrontmatter from "remark-frontmatter"
+import type { Options as FrontmatterOptions } from "remark-frontmatter"
 import remarkGfm from "remark-gfm"
 import remarkMath from "remark-math"
 import remarkParse from "remark-parse"
@@ -11,6 +13,8 @@ import { unified } from "unified"
 /** How a Markdown case is rendered: raw HTML handling, GFM and `md.toHtml` options. */
 export type RenderOptions = {
   allowDangerousHtml: boolean
+  // `null` enables a plugin whose options are not an object with its defaults
+  frontmatter?: FrontmatterOptions | null
   gfm?: Record<string, unknown>
   math?: Record<string, unknown>
   toHtml?: Record<string, unknown>
@@ -24,6 +28,9 @@ export function createPipeline(props: RenderOptions) {
   }
   return [
     ["md.parse"],
+    ...(props.frontmatter !== undefined
+      ? [withOptions("md.frontmatter", props.frontmatter)]
+      : []),
     ...(props.gfm ? [withOptions("md.gfm", props.gfm)] : []),
     ...(props.math ? [withOptions("md.math", props.math)] : []),
     withOptions("md.toHtml", toHtml),
@@ -39,6 +46,11 @@ export function renderMarkdown(props: RenderOptions & { markdown: string }) {
   const html = { allowDangerousHtml: props.allowDangerousHtml }
   const processor = unified()
     .use(remarkParse)
+    .use(
+      props.frontmatter !== undefined
+        ? [[remarkFrontmatter, props.frontmatter ?? undefined]]
+        : [],
+    )
     .use(props.gfm ? [[remarkGfm, props.gfm]] : [])
     .use(props.math ? [[remarkMath, props.math]] : [])
     .use(remarkRehype, { ...props.toHtml, ...html })
@@ -51,6 +63,7 @@ export type Extensions = {
   gfm?: Record<string, unknown>
   directive?: Record<string, unknown>
   math?: Record<string, unknown>
+  frontmatter?: FrontmatterOptions | null
 }
 
 /** Parse Markdown to mdast, with positions, through the pinned remark-parse and extensions. */
@@ -60,6 +73,11 @@ export function parseMarkdown(markdown: string, extensions: Extensions = {}): ob
     .use(extensions.gfm ? [[remarkGfm, extensions.gfm]] : [])
     .use(extensions.directive ? [remarkDirective] : [])
     .use(extensions.math ? [[remarkMath, extensions.math]] : [])
+    .use(
+      extensions.frontmatter !== undefined
+        ? [[remarkFrontmatter, extensions.frontmatter ?? undefined]]
+        : [],
+    )
   return JSON.parse(JSON.stringify(processor.parse(markdown)))
 }
 
@@ -71,6 +89,11 @@ export function stringifyTree(
     .use(remarkStringify, props.stringify ?? {})
     .use(props.gfm ? [[remarkGfm, props.gfm]] : [])
     .use(props.math ? [[remarkMath, props.math]] : [])
+    .use(
+      props.frontmatter !== undefined
+        ? [[remarkFrontmatter, props.frontmatter ?? undefined]]
+        : [],
+    )
   // remark-directive takes no options, so its serializer is registered here with them
   if (props.directive) {
     const extensions = processor.data("toMarkdownExtensions") ?? []
@@ -83,6 +106,8 @@ export function stringifyTree(
   return processor.stringify(JSON.parse(JSON.stringify(props.tree)))
 }
 
-function withOptions(name: string, options: Record<string, unknown>) {
-  return Object.keys(options).length === 0 ? [name] : [name, options]
+function withOptions(name: string, options: unknown) {
+  const empty =
+    options === null || (typeof options === "object" && Object.keys(options).length === 0)
+  return empty ? [name] : [name, options]
 }

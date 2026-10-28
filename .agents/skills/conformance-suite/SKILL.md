@@ -70,6 +70,13 @@ a test's `comment` only where it means something different.
 - `actions/node/scope.ts` resolves an identifier in its test's own function before the module, so
   one test's `const value` never leaks into another's case.
 
+## Errors
+
+An invalid plugin option is `expected.error` with the code `invalid-options`, shared by every
+plugin, and upstream's message (from its `assert.throws` pattern, `^Error: ` and escapes dropped)
+as the substring a runner matches. Error codes are public API: add a new one only for a new kind
+of failure, never per message.
+
 ## Adding cases
 
 1. Put the group in `conformance/tests/<area>/<construct>.json`; `<area>` is `core`, `md`,

@@ -21,7 +21,7 @@
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>14 agent's calls</h3>
+    <h3>15 agent's calls</h3>
     <p>
       <htmlpress-badge type="warning">my call</htmlpress-badge> settled by the agent, open
       to change
@@ -481,6 +481,19 @@
     <p><strong>Rejected.</strong> Freezing KaTeX's output into the corpus.</p>
   </dd>
   <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Invalid plugin options fail
+    with one shared error code, <code>invalid-options</code>, and upstream's message as
+    the substring to match; <code>md.frontmatter</code> takes remark-frontmatter's options
+    whole (a preset, a matter or a list)
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Error codes are public API: one per kind of failure keeps them
+      stable while messages stay free to change.
+    </p>
+    <p><strong>Rejected.</strong> A code per upstream message.</p>
+  </dd>
+  <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge> Each runner skips only
     through a <code>KNOWN_DIVERGENCES</code> map of group to open issue, as fairspec's do
   </dt>
@@ -516,8 +529,8 @@
   </dt>
   <dd>
     <p>
-      Until then the reference and 21 verbatim stringify expectations disagree; afterwards
-      none should.
+      Until then the reference and 22 verbatim stringify expectations disagree (21 in
+      to-markdown, 1 in frontmatter); afterwards none should.
     </p>
   </dd>
   <dt>

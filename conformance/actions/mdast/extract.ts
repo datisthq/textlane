@@ -14,16 +14,28 @@ export type MdastSyntax = {
   plugin: string
   extension: keyof Extensions
   isExtension: (name: string) => boolean
-  options: Set<string>
+  // Named object options, or the extension's one argument taken whole (frontmatter's matters)
+  options: Set<string> | "positional"
 }
 
 /** A case's kind: a tree from Markdown, Markdown from a tree, or Markdown back to Markdown. */
 export type MdastKind = "tree" | "stringify" | "round trip"
 
 /** Options read from a test: the syntax plugin's and to-markdown's own. */
-export type MdastOptions = {
-  plugin: Record<string, unknown>
-  stringify: Record<string, unknown>
+export type MdastOptions = { plugin: unknown; stringify: Record<string, unknown> }
+
+/** A group-description suffix naming a case's options, empty when it has none. */
+export function describeMdastOptions(options: MdastOptions) {
+  if (isObject(options.plugin) || options.plugin === undefined) {
+    const plugin = isObject(options.plugin) ? options.plugin : {}
+    const key = JSON.stringify({ ...plugin, ...options.stringify })
+    return key === "{}" ? "" : ` ${key}`
+  }
+  const stringify =
+    Object.keys(options.stringify).length > 0
+      ? ` ${JSON.stringify(options.stringify)}`
+      : ""
+  return ` ${JSON.stringify(options.plugin)}${stringify}`
 }
 
 /** Read an mdast-util's test file: `fromMarkdown(md, ext)` is a tree case, `toMarkdown(tree,
@@ -79,7 +91,7 @@ function readCall(props: {
     if (typeof input !== "string") return props.countSkip("not statically evaluable")
     if (typeof options === "string") return props.countSkip(options)
     if (isStressInput(input)) return props.countSkip("a stress test")
-    const tree = parseMarkdown(input, { [props.syntax.extension]: options.plugin })
+    const tree = parseMarkdown(input, toExtensions(props.syntax, options.plugin))
     return { kind: "tree" as const, options, test: { input, expected: { tree } } }
   }
   if (!isCallTo(props.call, "toMarkdown")) return undefined
@@ -111,7 +123,9 @@ function readOptions(props: {
     props.node?.type === "Identifier" ? props.constants.get(props.node.name) : props.node
   if (!target) return "no extension enabled"
   if (target.type !== "ObjectExpression") return "options not statically evaluable"
-  const options: MdastOptions = { plugin: {}, stringify: {} }
+  const named: Record<string, unknown> = {}
+  const positional = props.syntax.options === "positional"
+  const options: MdastOptions = { plugin: positional ? undefined : named, stringify: {} }
   let enabled = false
   for (const property of target.properties) {
     if (property.type !== "Property" || property.key.type !== "Identifier") {
@@ -133,24 +147,47 @@ function readOptions(props: {
       const name = element.callee.name
       if (!props.syntax.isExtension(name)) return `another syntax extension (${name})`
       enabled = true
-      const argument = element.arguments[0]
-        ? evaluateNode(element.arguments[0], props.constants)
-        : {}
+      const raw = element.arguments[0]
+      const argument = raw ? evaluateNode(raw, props.constants) : undefined
+      if (raw && argument === undefined)
+        return "extension options not statically evaluable (functions)"
+      if (props.syntax.options === "positional") {
+        options.plugin ??= argument
+        continue
+      }
+      if (argument === undefined) continue
       if (!isObject(argument))
         return "extension options not statically evaluable (functions)"
       for (const [option, value] of Object.entries(argument)) {
         if (!props.syntax.options.has(option)) {
           return `an extension option without a pipeline equivalent (${option})`
         }
-        options.plugin[option] = value
+        named[option] = value
       }
     }
   }
   return enabled ? options : "no extension enabled"
 }
 
-function withOptions(name: string, options: Record<string, unknown>) {
-  return Object.keys(options).length > 0 ? [name, options] : [name]
+function withOptions(name: string, options: unknown) {
+  if (options === undefined || options === null) return [name]
+  if (isObject(options) && Object.keys(options).length === 0) return [name]
+  return [name, options]
+}
+
+// Typed reference options for the syntax under test; frontmatter's `null` means its defaults
+function toExtensions(syntax: MdastSyntax, plugin: unknown): Extensions {
+  if (syntax.extension === "frontmatter") {
+    return { frontmatter: isFrontmatterOptions(plugin) ? plugin : null }
+  }
+  return { [syntax.extension]: isObject(plugin) ? { ...plugin } : {} }
+}
+
+/** Whether a value has the shape remark-frontmatter accepts: a preset, a matter, or a list. */
+export function isFrontmatterOptions(
+  value: unknown,
+): value is NonNullable<Extensions["frontmatter"]> {
+  return typeof value === "string" || Array.isArray(value) || isObject(value)
 }
 
 function isCallTo(call: CallExpression, name: string) {

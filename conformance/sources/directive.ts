@@ -6,7 +6,11 @@ import { ancestor } from "acorn-walk"
 import { writeGroups } from "../actions/group/write.ts"
 import { isStressInput } from "../actions/input/check.ts"
 import { parseMarkdown, stringifyTree } from "../actions/markdown/render.ts"
-import { createMdastPipeline, extractMdastCases } from "../actions/mdast/extract.ts"
+import {
+  createMdastPipeline,
+  describeMdastOptions,
+  extractMdastCases,
+} from "../actions/mdast/extract.ts"
 import type { MdastSyntax } from "../actions/mdast/extract.ts"
 import { evaluateNode } from "../actions/node/evaluate.ts"
 import { resolveConstants } from "../actions/node/scope.ts"
@@ -98,12 +102,9 @@ function importDirective() {
     syntax: DIRECTIVE,
     countSkip,
   })) {
-    const optionsKey = JSON.stringify({
-      ...found.options.plugin,
-      ...found.options.stringify,
-    })
+    const optionsSuffix = describeMdastOptions(found.options)
     add({
-      description: `mdast-util-directive ${found.kind}${optionsKey === "{}" ? "" : ` ${optionsKey}`}`,
+      description: `mdast-util-directive ${found.kind}${optionsSuffix}`,
       source: {
         repository: MDAST.url,
         commit: MDAST.commit,

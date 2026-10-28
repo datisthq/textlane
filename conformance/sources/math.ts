@@ -11,7 +11,11 @@ import {
   renderMarkdown,
   stringifyTree,
 } from "../actions/markdown/render.ts"
-import { createMdastPipeline, extractMdastCases } from "../actions/mdast/extract.ts"
+import {
+  createMdastPipeline,
+  describeMdastOptions,
+  extractMdastCases,
+} from "../actions/mdast/extract.ts"
 import type { MdastSyntax } from "../actions/mdast/extract.ts"
 import { evaluateNode, isObject } from "../actions/node/evaluate.ts"
 import { resolveConstants } from "../actions/node/scope.ts"
@@ -34,11 +38,12 @@ const REMARK = {
 }
 
 // `md.math` options keep remark-math's names
+const MATH_OPTIONS = new Set(["singleDollarTextMath"])
 const MATH: MdastSyntax = {
   plugin: "md.math",
   extension: "math",
   isExtension: name => name.startsWith("math"),
-  options: new Set(["singleDollarTextMath"]),
+  options: MATH_OPTIONS,
 }
 
 type Source = { repository: string; commit: string; path: string; license: string }
@@ -70,11 +75,8 @@ function importMath() {
     syntax: MATH,
     countSkip,
   })) {
-    const optionsKey = JSON.stringify({
-      ...found.options.plugin,
-      ...found.options.stringify,
-    })
-    const description = `mdast-util-math ${found.kind}${optionsKey === "{}" ? "" : ` ${optionsKey}`}`
+    const optionsSuffix = describeMdastOptions(found.options)
+    const description = `mdast-util-math ${found.kind}${optionsSuffix}`
     const source = {
       repository: MDAST.url,
       commit: MDAST.commit,
@@ -247,7 +249,7 @@ function readMicromarkMath(
         ? evaluateNode(element.arguments[0], constants)
         : {}
       if (!isObject(options)) return "extension options not statically evaluable"
-      const unknown = Object.keys(options).filter(key => !MATH.options.has(key))
+      const unknown = Object.keys(options).filter(key => !MATH_OPTIONS.has(key))
       if (unknown.length > 0)
         return `an extension option without a pipeline equivalent (${unknown.join(", ")})`
       return { ...options }

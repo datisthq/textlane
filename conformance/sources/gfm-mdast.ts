@@ -4,7 +4,11 @@ import { join, resolve } from "node:path"
 import { parse } from "acorn"
 import { ancestor } from "acorn-walk"
 import { writeGroups } from "../actions/group/write.ts"
-import { createMdastPipeline, extractMdastCases } from "../actions/mdast/extract.ts"
+import {
+  createMdastPipeline,
+  describeMdastOptions,
+  extractMdastCases,
+} from "../actions/mdast/extract.ts"
 import type { MdastKind, MdastOptions, MdastSyntax } from "../actions/mdast/extract.ts"
 import { parseMarkdown, stringifyTree } from "../actions/markdown/render.ts"
 import { evaluateNode, isObject } from "../actions/node/evaluate.ts"
@@ -256,12 +260,9 @@ function getGroup(props: {
   kind: MdastKind
   options: MdastOptions
 }) {
-  const optionsKey = JSON.stringify({
-    ...props.options.plugin,
-    ...props.options.stringify,
-  })
+  const optionsSuffix = describeMdastOptions(props.options)
   const name = props.repository.url.split("/").pop() ?? props.repository.url
-  const description = `${name} ${props.kind}${optionsKey === "{}" ? "" : ` ${optionsKey}`}`
+  const description = `${name} ${props.kind}${optionsSuffix}`
   const existing = props.groups.get(description)
   if (existing) return existing
   const group: Group = {

@@ -1,0 +1,3301 @@
+[
+  {
+    "description": "micromark-extension-frontmatter",
+    "source": {
+      "repository": "https://github.com/micromark/micromark-extension-frontmatter",
+      "commit": "f05bf24461d31041f37f4562fd48877af4dcc67b",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.frontmatter"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "should not support a single yaml fence (thematic break)",
+        "input": "---",
+        "expected": {
+          "html": "<hr>"
+        }
+      },
+      {
+        "description": "should support empty yaml",
+        "input": "---\n---",
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "should support yaml w/ content",
+        "input": "---\na\n\nb\n---",
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "should support content after yaml",
+        "input": "---\na\n\nb\n---\n# Heading\n***\n    code",
+        "expected": {
+          "html": "<h1>Heading</h1>\n<hr>\n<pre><code>code\n</code></pre>"
+        }
+      },
+      {
+        "description": "should not support a prefix (indent) before a yaml opening fence",
+        "input": " ---\n---",
+        "expected": {
+          "html": "<hr>\n<hr>"
+        }
+      },
+      {
+        "description": "should not support a prefix (indent) before a yaml closing fence",
+        "input": "---\n ---",
+        "expected": {
+          "html": "<hr>\n<hr>"
+        }
+      },
+      {
+        "description": "should parse an arbitrary suffix after the opening and closing fence of yaml",
+        "input": "---  \n---\t ",
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "should not support other characters after the suffix on the opening fence of yaml",
+        "input": "--- --\n---",
+        "expected": {
+          "html": "<hr>\n<hr>"
+        }
+      },
+      {
+        "description": "should not support other characters after the suffix on the closing fence of yaml",
+        "input": "---\n--- x",
+        "expected": {
+          "html": "<hr>\n<p>--- x</p>"
+        }
+      },
+      {
+        "description": "should not support an opening yaml fence of more than 3 characters",
+        "input": "----\n---",
+        "expected": {
+          "html": "<hr>\n<hr>"
+        }
+      },
+      {
+        "description": "should not support a closing yaml fence of more than 3 characters",
+        "input": "---\n----",
+        "expected": {
+          "html": "<hr>\n<hr>"
+        }
+      },
+      {
+        "description": "should not support an opening yaml fence of less than 3 characters",
+        "input": "--\n---",
+        "expected": {
+          "html": "<h2>--</h2>"
+        }
+      },
+      {
+        "description": "should not support a closing yaml fence of less than 3 characters",
+        "input": "---\n--",
+        "expected": {
+          "html": "<hr>\n<p>--</p>"
+        }
+      },
+      {
+        "description": "should support content in yaml",
+        "input": "---\na\nb\n---",
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "should support blank lines in yaml",
+        "input": "---\na\n\nb\n---",
+        "expected": {
+          "html": ""
+        }
+      },
+      {
+        "description": "should not support yaml frontmatter in the middle",
+        "input": "# Hello\n---\na\n\nb\n---\n+++",
+        "expected": {
+          "html": "<h1>Hello</h1>\n<hr>\n<p>a</p>\n<h2>b</h2>\n<p>+++</p>"
+        }
+      },
+      {
+        "description": "should not support frontmatter w/o closing",
+        "input": "---\nasd",
+        "expected": {
+          "html": "<hr>\n<p>asd</p>"
+        }
+      },
+      {
+        "description": "should not support frontmatter in a container (list)",
+        "input": "* ---\n  asd\n  ---",
+        "expected": {
+          "html": "<ul>\n<li>\n<hr>\n<h2>asd</h2>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "should not support frontmatter in a container (block quote)",
+        "input": "> ---\n  asd\n  ---",
+        "expected": {
+          "html": "<blockquote>\n<hr>\n</blockquote>\n<h2>asd</h2>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark-extension-frontmatter \"toml\"",
+    "source": {
+      "repository": "https://github.com/micromark/micromark-extension-frontmatter",
+      "commit": "f05bf24461d31041f37f4562fd48877af4dcc67b",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.frontmatter", "toml"],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should support toml",
+        "input": "+++\na\n\nb\n+++\na\n=",
+        "expected": {
+          "html": "<h1>a</h1>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark-extension-frontmatter {\"type\":\"custom\",\"marker\":{\"open\":\"<\",\"close\":\">\"}}",
+    "source": {
+      "repository": "https://github.com/micromark/micromark-extension-frontmatter",
+      "commit": "f05bf24461d31041f37f4562fd48877af4dcc67b",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        {
+          "type": "custom",
+          "marker": {
+            "open": "<",
+            "close": ">"
+          }
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should support a custom matter (1)",
+        "comment": "micromark renders: ",
+        "input": "<<<\na\n\nb\n>>>",
+        "expected": {
+          "html": "a\n\nb"
+        }
+      },
+      {
+        "description": "should support a custom matter (2)",
+        "comment": "micromark renders: ",
+        "input": "<<<\na\n\nb\n>>>",
+        "expected": {
+          "html": "a\n\nb"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark-extension-frontmatter {\"type\":\"json\",\"fence\":{\"open\":\"{\",\"close\":\"}\"}}",
+    "source": {
+      "repository": "https://github.com/micromark/micromark-extension-frontmatter",
+      "commit": "f05bf24461d31041f37f4562fd48877af4dcc67b",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        {
+          "type": "json",
+          "fence": {
+            "open": "{",
+            "close": "}"
+          }
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should support a custom matter (3)",
+        "comment": "micromark renders: ",
+        "input": "{\na\n\nb\n}",
+        "expected": {
+          "html": "a\n\nb"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark-extension-frontmatter {\"type\":\"yaml\",\"marker\":\"-\",\"anywhere\":true}",
+    "source": {
+      "repository": "https://github.com/micromark/micromark-extension-frontmatter",
+      "commit": "f05bf24461d31041f37f4562fd48877af4dcc67b",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        {
+          "type": "yaml",
+          "marker": "-",
+          "anywhere": true
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should support custom matters anywhere",
+        "input": "# Hello\n---\na\n\nb\n---\n+++",
+        "expected": {
+          "html": "<h1>Hello</h1>\n<p>+++</p>"
+        }
+      },
+      {
+        "description": "should prefer anywhere matter that could also be seen as headings (setext)",
+        "input": "a\n---\nb\n---",
+        "expected": {
+          "html": "<p>a</p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark-extension-frontmatter [{\"type\":\"custom\",\"marker\":{\"open\":\"-\",\"close\":\".\"}},\"yaml\"]",
+    "source": {
+      "repository": "https://github.com/micromark/micromark-extension-frontmatter",
+      "commit": "f05bf24461d31041f37f4562fd48877af4dcc67b",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        [
+          {
+            "type": "custom",
+            "marker": {
+              "open": "-",
+              "close": "."
+            }
+          },
+          "yaml"
+        ]
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should support two matters w/ the same start, but different ends",
+        "comment": "micromark renders: ",
+        "input": "---\nasd\n...",
+        "expected": {
+          "html": "asd"
+        }
+      }
+    ]
+  },
+  {
+    "description": "micromark-extension-frontmatter invalid options",
+    "source": {
+      "repository": "https://github.com/micromark/micromark-extension-frontmatter",
+      "commit": "f05bf24461d31041f37f4562fd48877af4dcc67b",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.frontmatter", [1]]],
+    "tests": [
+      {
+        "description": "should throw if not given a preset or a matter",
+        "input": "",
+        "expected": {
+          "error": {
+            "code": "invalid-options",
+            "message": "Expected matter to be an object, not `1`"
+          }
+        }
+      },
+      {
+        "description": "should throw if given an unknown preset",
+        "input": "",
+        "expected": {
+          "error": {
+            "code": "invalid-options",
+            "message": "Missing matter definition for `jsonml`"
+          }
+        }
+      },
+      {
+        "description": "should throw if given a matter without `type`",
+        "input": "",
+        "expected": {
+          "error": {
+            "code": "invalid-options",
+            "message": "Missing `type` in matter `{\"marker\":\"*\"}`"
+          }
+        }
+      },
+      {
+        "description": "should throw if given a matter without `marker`",
+        "input": "",
+        "expected": {
+          "error": {
+            "code": "invalid-options",
+            "message": "Missing `marker` or `fence` in matter `{\"type\":\"jsonml\"}`"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-frontmatter round trip {\"type\":\"funky\",\"marker\":\"*\"}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-frontmatter",
+      "commit": "d76616b88bdafdbbcd97247c4d3a8a41cc71ae48",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        {
+          "type": "funky",
+          "marker": "*"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should support regexp special characters as markers",
+        "input": "***\na\n***\n\n*a",
+        "expected": {
+          "md": "***\na\n***\n\n\\*a\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-frontmatter stringify",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-frontmatter",
+      "commit": "d76616b88bdafdbbcd97247c4d3a8a41cc71ae48",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.frontmatter"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "should serialize empty yaml",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "yaml",
+              "value": ""
+            }
+          ]
+        },
+        "expected": {
+          "md": "---\n---\n"
+        }
+      },
+      {
+        "description": "should support content in yaml",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "yaml",
+              "value": "a\nb"
+            }
+          ]
+        },
+        "expected": {
+          "md": "---\na\nb\n---\n"
+        }
+      },
+      {
+        "description": "should support blank lines in yaml",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "yaml",
+              "value": "a\n\nb"
+            }
+          ]
+        },
+        "expected": {
+          "md": "---\na\n\nb\n---\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-frontmatter stringify \"toml\"",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-frontmatter",
+      "commit": "d76616b88bdafdbbcd97247c4d3a8a41cc71ae48",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.frontmatter", "toml"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "should support blank lines in yaml (2)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "toml",
+              "value": "a\n\nb"
+            }
+          ]
+        },
+        "expected": {
+          "md": "+++\na\n\nb\n+++\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-frontmatter stringify {\"type\":\"custom\",\"marker\":{\"open\":\"<\",\"close\":\">\"}}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-frontmatter",
+      "commit": "d76616b88bdafdbbcd97247c4d3a8a41cc71ae48",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.frontmatter",
+        {
+          "type": "custom",
+          "marker": {
+            "open": "<",
+            "close": ">"
+          }
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should support a custom matter (1)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "custom",
+              "value": "a\n\nb"
+            }
+          ]
+        },
+        "expected": {
+          "md": "<<<\na\n\nb\n>>>\n"
+        }
+      },
+      {
+        "description": "should escape what would otherwise be custom matter",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "text",
+              "value": "<<<\na\n\nb\n>>>"
+            }
+          ]
+        },
+        "expected": {
+          "md": "\\<<<\na\n\nb\n\\>>>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "mdast-util-frontmatter stringify {\"type\":\"json\",\"fence\":{\"open\":\"{\",\"close\":\"}\"}}",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-frontmatter",
+      "commit": "d76616b88bdafdbbcd97247c4d3a8a41cc71ae48",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "md.frontmatter",
+        {
+          "type": "json",
+          "fence": {
+            "open": "{",
+            "close": "}"
+          }
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should support a custom matter (2)",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "json",
+              "value": "a\n\nb"
+            }
+          ]
+        },
+        "expected": {
+          "md": "{\na\n\nb\n}\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter invalid options",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.frontmatter", ["jsonml"]]],
+    "tests": [
+      {
+        "description": "should throw if given an unknown preset",
+        "input": "",
+        "expected": {
+          "error": {
+            "code": "invalid-options",
+            "message": "Missing matter definition for `jsonml`"
+          }
+        }
+      },
+      {
+        "description": "should throw if given a matter without `type`",
+        "input": "",
+        "expected": {
+          "error": {
+            "code": "invalid-options",
+            "message": "Missing `type` in matter `{\"marker\":\"*\"}`"
+          }
+        }
+      },
+      {
+        "description": "should throw if given a matter without `marker`",
+        "input": "",
+        "expected": {
+          "error": {
+            "code": "invalid-options",
+            "message": "Missing `marker` or `fence` in matter `{\"type\":\"jsonml\"}`"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (tree) {\"type\":\"jsonml\",\"marker\":\"*\"}",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        {
+          "type": "jsonml",
+          "marker": "*"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "fixture config-options-as-matter",
+        "input": "***\n***\n\n# Empty\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "jsonml",
+                "value": "",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 4,
+                    "offset": 7
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Empty",
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 3,
+                        "offset": 11
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 8,
+                        "offset": 16
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 4,
+                    "column": 1,
+                    "offset": 9
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 8,
+                    "offset": 16
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 17
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (output) {\"type\":\"jsonml\",\"marker\":\"*\"}",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        {
+          "type": "jsonml",
+          "marker": "*"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture config-options-as-matter",
+        "input": "***\n***\n\n# Empty\n",
+        "expected": {
+          "md": "***\n***\n\n# Empty\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (tree) \"yaml\"",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.frontmatter", "yaml"]],
+    "tests": [
+      {
+        "description": "fixture config-options-as-string",
+        "input": "---\n---\n\n# Empty\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "yaml",
+                "value": "",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 4,
+                    "offset": 7
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Empty",
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 3,
+                        "offset": 11
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 8,
+                        "offset": 16
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 4,
+                    "column": 1,
+                    "offset": 9
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 8,
+                    "offset": 16
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 17
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (output) \"yaml\"",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.frontmatter", "yaml"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "fixture config-options-as-string",
+        "input": "---\n---\n\n# Empty\n",
+        "expected": {
+          "md": "---\n---\n\n# Empty\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (tree)",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.frontmatter"]],
+    "tests": [
+      {
+        "description": "fixture core-yaml-delayed",
+        "input": "\n\n---\ntitle: post\n---\n\n# Later (whitespace before yaml)\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "thematicBreak",
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 2
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 4,
+                    "offset": 5
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 2,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "title: post",
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 1,
+                        "offset": 6
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 12,
+                        "offset": 17
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 4,
+                    "column": 1,
+                    "offset": 6
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 4,
+                    "offset": 21
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Later (whitespace before yaml)",
+                    "position": {
+                      "start": {
+                        "line": 7,
+                        "column": 3,
+                        "offset": 25
+                      },
+                      "end": {
+                        "line": 7,
+                        "column": 33,
+                        "offset": 55
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 7,
+                    "column": 1,
+                    "offset": 23
+                  },
+                  "end": {
+                    "line": 7,
+                    "column": 33,
+                    "offset": 55
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 8,
+                "column": 1,
+                "offset": 56
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "fixture core-yaml-not-at-top",
+        "input": "# Two horizontal rules\n\n---\nA horizontal rule\n---\n\nand another.\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Two horizontal rules",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 23,
+                        "offset": 22
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 23,
+                    "offset": 22
+                  }
+                }
+              },
+              {
+                "type": "thematicBreak",
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 24
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 4,
+                    "offset": 27
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 2,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "A horizontal rule",
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 1,
+                        "offset": 28
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 18,
+                        "offset": 45
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 4,
+                    "column": 1,
+                    "offset": 28
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 4,
+                    "offset": 49
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "and another.",
+                    "position": {
+                      "start": {
+                        "line": 7,
+                        "column": 1,
+                        "offset": 51
+                      },
+                      "end": {
+                        "line": 7,
+                        "column": 13,
+                        "offset": 63
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 7,
+                    "column": 1,
+                    "offset": 51
+                  },
+                  "end": {
+                    "line": 7,
+                    "column": 13,
+                    "offset": 63
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 8,
+                "column": 1,
+                "offset": 64
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "fixture custom-default",
+        "input": "***\n{\n  \"hello\": \"World!\"\n}\n***\n\n# Default\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "thematicBreak",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 4,
+                    "offset": 3
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "{\n\"hello\": \"World!\"\n}",
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 1,
+                        "offset": 4
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 2,
+                        "offset": 27
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 2,
+                    "column": 1,
+                    "offset": 4
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 2,
+                    "offset": 27
+                  }
+                }
+              },
+              {
+                "type": "thematicBreak",
+                "position": {
+                  "start": {
+                    "line": 5,
+                    "column": 1,
+                    "offset": 28
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 4,
+                    "offset": 31
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Default",
+                    "position": {
+                      "start": {
+                        "line": 7,
+                        "column": 3,
+                        "offset": 35
+                      },
+                      "end": {
+                        "line": 7,
+                        "column": 10,
+                        "offset": 42
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 7,
+                    "column": 1,
+                    "offset": 33
+                  },
+                  "end": {
+                    "line": 7,
+                    "column": 10,
+                    "offset": 42
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 8,
+                "column": 1,
+                "offset": 43
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "fixture toml-default",
+        "input": "+++\ntitle= \"Title\"\n+++\n\n# Default\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "+++\ntitle= \"Title\"\n+++",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 4,
+                        "offset": 22
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 4,
+                    "offset": 22
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Default",
+                    "position": {
+                      "start": {
+                        "line": 5,
+                        "column": 3,
+                        "offset": 26
+                      },
+                      "end": {
+                        "line": 5,
+                        "column": 10,
+                        "offset": 33
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 5,
+                    "column": 1,
+                    "offset": 24
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 10,
+                    "offset": 33
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 6,
+                "column": 1,
+                "offset": 34
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "fixture toml-unconfigured",
+        "input": "+++\n+++\n\n# Empty\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "+++\n+++",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 4,
+                        "offset": 7
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 4,
+                    "offset": 7
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Empty",
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 3,
+                        "offset": 11
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 8,
+                        "offset": 16
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 4,
+                    "column": 1,
+                    "offset": 9
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 8,
+                    "offset": 16
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 17
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "fixture yaml-advanced",
+        "input": "---\ninvoice: 34843\ndate   : 2001-01-23\nbill-to: &id001\n    given  : Chris\n    family : Dumars\n    address:\n        lines: |\n            458 Walkman Dr.\n            Suite #292\n        city    : Royal Oak\n        state   : MI\n        postal  : 48046\nship-to: *id001\nproduct:\n    - sku         : BL394D\n      quantity    : 4\n      description : Basketball\n      price       : 450.00\n    - sku         : BL4438H\n      quantity    : 1\n      description : Super Hoop\n      price       : 2392.00\ntax  : 251.42\ntotal: 4443.52\ncomments: >\n    Late afternoon is best.\n    Backup contact is Nancy\n    Billsmer @ 338-4338.\n---\n\n# Big document\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "yaml",
+                "value": "invoice: 34843\ndate   : 2001-01-23\nbill-to: &id001\n    given  : Chris\n    family : Dumars\n    address:\n        lines: |\n            458 Walkman Dr.\n            Suite #292\n        city    : Royal Oak\n        state   : MI\n        postal  : 48046\nship-to: *id001\nproduct:\n    - sku         : BL394D\n      quantity    : 4\n      description : Basketball\n      price       : 450.00\n    - sku         : BL4438H\n      quantity    : 1\n      description : Super Hoop\n      price       : 2392.00\ntax  : 251.42\ntotal: 4443.52\ncomments: >\n    Late afternoon is best.\n    Backup contact is Nancy\n    Billsmer @ 338-4338.",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 30,
+                    "column": 4,
+                    "offset": 614
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Big document",
+                    "position": {
+                      "start": {
+                        "line": 32,
+                        "column": 3,
+                        "offset": 618
+                      },
+                      "end": {
+                        "line": 32,
+                        "column": 15,
+                        "offset": 630
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 32,
+                    "column": 1,
+                    "offset": 616
+                  },
+                  "end": {
+                    "line": 32,
+                    "column": 15,
+                    "offset": 630
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 33,
+                "column": 1,
+                "offset": 631
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "fixture yaml-closed-incorrectly",
+        "input": "---\n\n# Incorrect ---\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "thematicBreak",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 4,
+                    "offset": 3
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Incorrect ---",
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 3,
+                        "offset": 7
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 16,
+                        "offset": 20
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 5
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 16,
+                    "offset": 20
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 21
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "fixture yaml-deep",
+        "input": "---\ntitle: post\nobject:\n  key: value ---\n---\n\n# Deep\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "yaml",
+                "value": "title: post\nobject:\n  key: value ---",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 4,
+                    "offset": 44
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Deep",
+                    "position": {
+                      "start": {
+                        "line": 7,
+                        "column": 3,
+                        "offset": 48
+                      },
+                      "end": {
+                        "line": 7,
+                        "column": 7,
+                        "offset": 52
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 7,
+                    "column": 1,
+                    "offset": 46
+                  },
+                  "end": {
+                    "line": 7,
+                    "column": 7,
+                    "offset": 52
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 8,
+                "column": 1,
+                "offset": 53
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "fixture yaml-default",
+        "input": "---\ntitle: example\n---\n\n# Default\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "yaml",
+                "value": "title: example",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 4,
+                    "offset": 22
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Default",
+                    "position": {
+                      "start": {
+                        "line": 5,
+                        "column": 3,
+                        "offset": 26
+                      },
+                      "end": {
+                        "line": 5,
+                        "column": 10,
+                        "offset": 33
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 5,
+                    "column": 1,
+                    "offset": 24
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 10,
+                    "offset": 33
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 6,
+                "column": 1,
+                "offset": 34
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "fixture yaml-empty",
+        "input": "---\n---\n\n# Empty\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "yaml",
+                "value": "",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 4,
+                    "offset": 7
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Empty",
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 3,
+                        "offset": 11
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 8,
+                        "offset": 16
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 4,
+                    "column": 1,
+                    "offset": 9
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 8,
+                    "offset": 16
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 17
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "fixture yaml-unclosed",
+        "input": "---\n\n# Unclosed\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "thematicBreak",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 4,
+                    "offset": 3
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Unclosed",
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 3,
+                        "offset": 7
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 11,
+                        "offset": 15
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 5
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 11,
+                    "offset": 15
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 1,
+                "offset": 16
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (output)",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.frontmatter"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "fixture core-yaml-delayed",
+        "input": "\n\n---\ntitle: post\n---\n\n# Later (whitespace before yaml)\n",
+        "expected": {
+          "md": "***\n\n## title: post\n\n# Later (whitespace before yaml)\n"
+        }
+      },
+      {
+        "description": "fixture core-yaml-not-at-top",
+        "input": "# Two horizontal rules\n\n---\nA horizontal rule\n---\n\nand another.\n",
+        "expected": {
+          "md": "# Two horizontal rules\n\n***\n\n## A horizontal rule\n\nand another.\n"
+        }
+      },
+      {
+        "description": "fixture custom-default",
+        "input": "***\n{\n  \"hello\": \"World!\"\n}\n***\n\n# Default\n",
+        "expected": {
+          "md": "***\n\n{\n\"hello\": \"World!\"\n}\n\n***\n\n# Default\n"
+        }
+      },
+      {
+        "description": "fixture toml-default",
+        "input": "+++\ntitle= \"Title\"\n+++\n\n# Default\n",
+        "expected": {
+          "md": "+++\ntitle= \"Title\"\n+++\n\n# Default\n"
+        }
+      },
+      {
+        "description": "fixture toml-unconfigured",
+        "input": "+++\n+++\n\n# Empty\n",
+        "expected": {
+          "md": "+++\n+++\n\n# Empty\n"
+        }
+      },
+      {
+        "description": "fixture yaml-advanced",
+        "input": "---\ninvoice: 34843\ndate   : 2001-01-23\nbill-to: &id001\n    given  : Chris\n    family : Dumars\n    address:\n        lines: |\n            458 Walkman Dr.\n            Suite #292\n        city    : Royal Oak\n        state   : MI\n        postal  : 48046\nship-to: *id001\nproduct:\n    - sku         : BL394D\n      quantity    : 4\n      description : Basketball\n      price       : 450.00\n    - sku         : BL4438H\n      quantity    : 1\n      description : Super Hoop\n      price       : 2392.00\ntax  : 251.42\ntotal: 4443.52\ncomments: >\n    Late afternoon is best.\n    Backup contact is Nancy\n    Billsmer @ 338-4338.\n---\n\n# Big document\n",
+        "expected": {
+          "md": "---\ninvoice: 34843\ndate   : 2001-01-23\nbill-to: &id001\n    given  : Chris\n    family : Dumars\n    address:\n        lines: |\n            458 Walkman Dr.\n            Suite #292\n        city    : Royal Oak\n        state   : MI\n        postal  : 48046\nship-to: *id001\nproduct:\n    - sku         : BL394D\n      quantity    : 4\n      description : Basketball\n      price       : 450.00\n    - sku         : BL4438H\n      quantity    : 1\n      description : Super Hoop\n      price       : 2392.00\ntax  : 251.42\ntotal: 4443.52\ncomments: >\n    Late afternoon is best.\n    Backup contact is Nancy\n    Billsmer @ 338-4338.\n---\n\n# Big document\n"
+        }
+      },
+      {
+        "description": "fixture yaml-closed-incorrectly",
+        "input": "---\n\n# Incorrect ---\n",
+        "expected": {
+          "md": "***\n\n# Incorrect ---\n"
+        }
+      },
+      {
+        "description": "fixture yaml-deep",
+        "input": "---\ntitle: post\nobject:\n  key: value ---\n---\n\n# Deep\n",
+        "expected": {
+          "md": "---\ntitle: post\nobject:\n  key: value ---\n---\n\n# Deep\n"
+        }
+      },
+      {
+        "description": "fixture yaml-default",
+        "input": "---\ntitle: example\n---\n\n# Default\n",
+        "expected": {
+          "md": "---\ntitle: example\n---\n\n# Default\n"
+        }
+      },
+      {
+        "description": "fixture yaml-empty",
+        "input": "---\n---\n\n# Empty\n",
+        "expected": {
+          "md": "---\n---\n\n# Empty\n"
+        }
+      },
+      {
+        "description": "fixture yaml-unclosed",
+        "input": "---\n\n# Unclosed\n",
+        "expected": {
+          "md": "***\n\n# Unclosed\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (tree) [{\"type\":\"jsonml\",\"marker\":\"*\"}]",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        [
+          {
+            "type": "jsonml",
+            "marker": "*"
+          }
+        ]
+      ]
+    ],
+    "tests": [
+      {
+        "description": "fixture custom-deep",
+        "input": "***\n{\n  title: \"Custom\",\n  // A comment ***\n}\n***\n\n# Deep\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "jsonml",
+                "value": "{\n  title: \"Custom\",\n  // A comment ***\n}",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 6,
+                    "column": 4,
+                    "offset": 49
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Deep",
+                    "position": {
+                      "start": {
+                        "line": 8,
+                        "column": 3,
+                        "offset": 53
+                      },
+                      "end": {
+                        "line": 8,
+                        "column": 7,
+                        "offset": 57
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 8,
+                    "column": 1,
+                    "offset": 51
+                  },
+                  "end": {
+                    "line": 8,
+                    "column": 7,
+                    "offset": 57
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 9,
+                "column": 1,
+                "offset": 58
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "fixture custom-empty",
+        "input": "***\n***\n\n# Empty\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "jsonml",
+                "value": "",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 4,
+                    "offset": 7
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Empty",
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 3,
+                        "offset": 11
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 8,
+                        "offset": 16
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 4,
+                    "column": 1,
+                    "offset": 9
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 8,
+                    "offset": 16
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 17
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (output) [{\"type\":\"jsonml\",\"marker\":\"*\"}]",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        [
+          {
+            "type": "jsonml",
+            "marker": "*"
+          }
+        ]
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture custom-deep",
+        "input": "***\n{\n  title: \"Custom\",\n  // A comment ***\n}\n***\n\n# Deep\n",
+        "expected": {
+          "md": "***\n{\n  title: \"Custom\",\n  // A comment ***\n}\n***\n\n# Deep\n"
+        }
+      },
+      {
+        "description": "fixture custom-empty",
+        "input": "***\n***\n\n# Empty\n",
+        "expected": {
+          "md": "***\n***\n\n# Empty\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (tree) [{\"type\":\"jsonml\",\"fence\":\"+++\"}]",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        [
+          {
+            "type": "jsonml",
+            "fence": "+++"
+          }
+        ]
+      ]
+    ],
+    "tests": [
+      {
+        "description": "fixture custom-fence",
+        "input": "+++\n{\n  title: \"Custom\",\n  // A comment ***\n}\n+++\n\n# Deep\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "jsonml",
+                "value": "{\n  title: \"Custom\",\n  // A comment ***\n}",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 6,
+                    "column": 4,
+                    "offset": 49
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Deep",
+                    "position": {
+                      "start": {
+                        "line": 8,
+                        "column": 3,
+                        "offset": 53
+                      },
+                      "end": {
+                        "line": 8,
+                        "column": 7,
+                        "offset": 57
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 8,
+                    "column": 1,
+                    "offset": 51
+                  },
+                  "end": {
+                    "line": 8,
+                    "column": 7,
+                    "offset": 57
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 9,
+                "column": 1,
+                "offset": 58
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (output) [{\"type\":\"jsonml\",\"fence\":\"+++\"}]",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        [
+          {
+            "type": "jsonml",
+            "fence": "+++"
+          }
+        ]
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture custom-fence",
+        "input": "+++\n{\n  title: \"Custom\",\n  // A comment ***\n}\n+++\n\n# Deep\n",
+        "expected": {
+          "md": "+++\n{\n  title: \"Custom\",\n  // A comment ***\n}\n+++\n\n# Deep\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (tree) [{\"type\":\"jsonml\",\"fence\":\"=f-e*n_c$e\"}]",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        [
+          {
+            "type": "jsonml",
+            "fence": "=f-e*n_c$e"
+          }
+        ]
+      ]
+    ],
+    "tests": [
+      {
+        "description": "fixture custom-fence-long",
+        "input": "=f-e*n_c$e\n{\n  title: \"Custom\",\n  // A comment ***\n}\n=f-e*n_c$e\n\n# Deep\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "jsonml",
+                "value": "{\n  title: \"Custom\",\n  // A comment ***\n}",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 6,
+                    "column": 11,
+                    "offset": 63
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Deep",
+                    "position": {
+                      "start": {
+                        "line": 8,
+                        "column": 3,
+                        "offset": 67
+                      },
+                      "end": {
+                        "line": 8,
+                        "column": 7,
+                        "offset": 71
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 8,
+                    "column": 1,
+                    "offset": 65
+                  },
+                  "end": {
+                    "line": 8,
+                    "column": 7,
+                    "offset": 71
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 9,
+                "column": 1,
+                "offset": 72
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (output) [{\"type\":\"jsonml\",\"fence\":\"=f-e*n_c$e\"}]",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        [
+          {
+            "type": "jsonml",
+            "fence": "=f-e*n_c$e"
+          }
+        ]
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture custom-fence-long",
+        "input": "=f-e*n_c$e\n{\n  title: \"Custom\",\n  // A comment ***\n}\n=f-e*n_c$e\n\n# Deep\n",
+        "expected": {
+          "md": "=f-e*n_c$e\n{\n  title: \"Custom\",\n  // A comment ***\n}\n=f-e*n_c$e\n\n# Deep\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (tree) [{\"type\":\"jsonml\",\"fence\":{\"open\":\"$$OPEN\",\"close\":\"CLOSE##\"}}]",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        [
+          {
+            "type": "jsonml",
+            "fence": {
+              "open": "$$OPEN",
+              "close": "CLOSE##"
+            }
+          }
+        ]
+      ]
+    ],
+    "tests": [
+      {
+        "description": "fixture custom-fence-openclose",
+        "input": "$$OPEN\n{\n  title: \"Custom\",\n  // A comment ***\n}\nCLOSE##\n\n# Deep\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "jsonml",
+                "value": "{\n  title: \"Custom\",\n  // A comment ***\n}",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 6,
+                    "column": 8,
+                    "offset": 56
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Deep",
+                    "position": {
+                      "start": {
+                        "line": 8,
+                        "column": 3,
+                        "offset": 60
+                      },
+                      "end": {
+                        "line": 8,
+                        "column": 7,
+                        "offset": 64
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 8,
+                    "column": 1,
+                    "offset": 58
+                  },
+                  "end": {
+                    "line": 8,
+                    "column": 7,
+                    "offset": 64
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 9,
+                "column": 1,
+                "offset": 65
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (output) [{\"type\":\"jsonml\",\"fence\":{\"open\":\"$$OPEN\",\"close\":\"CLOSE##\"}}]",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        [
+          {
+            "type": "jsonml",
+            "fence": {
+              "open": "$$OPEN",
+              "close": "CLOSE##"
+            }
+          }
+        ]
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture custom-fence-openclose",
+        "input": "$$OPEN\n{\n  title: \"Custom\",\n  // A comment ***\n}\nCLOSE##\n\n# Deep\n",
+        "expected": {
+          "md": "$$OPEN\n{\n  title: \"Custom\",\n  // A comment ***\n}\nCLOSE##\n\n# Deep\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (tree) [{\"type\":\"jsonml\",\"fence\":\"==\"}]",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        [
+          {
+            "type": "jsonml",
+            "fence": "=="
+          }
+        ]
+      ]
+    ],
+    "tests": [
+      {
+        "description": "fixture custom-fence-short",
+        "input": "==\n{\n  title: \"Custom\",\n  // A comment ***\n}\n==\n\n# Deep\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "jsonml",
+                "value": "{\n  title: \"Custom\",\n  // A comment ***\n}",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 6,
+                    "column": 3,
+                    "offset": 47
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Deep",
+                    "position": {
+                      "start": {
+                        "line": 8,
+                        "column": 3,
+                        "offset": 51
+                      },
+                      "end": {
+                        "line": 8,
+                        "column": 7,
+                        "offset": 55
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 8,
+                    "column": 1,
+                    "offset": 49
+                  },
+                  "end": {
+                    "line": 8,
+                    "column": 7,
+                    "offset": 55
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 9,
+                "column": 1,
+                "offset": 56
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (output) [{\"type\":\"jsonml\",\"fence\":\"==\"}]",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        [
+          {
+            "type": "jsonml",
+            "fence": "=="
+          }
+        ]
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture custom-fence-short",
+        "input": "==\n{\n  title: \"Custom\",\n  // A comment ***\n}\n==\n\n# Deep\n",
+        "expected": {
+          "md": "==\n{\n  title: \"Custom\",\n  // A comment ***\n}\n==\n\n# Deep\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (tree) [{\"type\":\"jsonml\",\"marker\":{\"open\":\"<\",\"close\":\">\"}}]",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        [
+          {
+            "type": "jsonml",
+            "marker": {
+              "open": "<",
+              "close": ">"
+            }
+          }
+        ]
+      ]
+    ],
+    "tests": [
+      {
+        "description": "fixture custom-marker-openclose",
+        "input": "<<<\n{\n  title: \"Custom\",\n  // A comment ***\n}\n>>>\n\n# Deep\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "jsonml",
+                "value": "{\n  title: \"Custom\",\n  // A comment ***\n}",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 6,
+                    "column": 4,
+                    "offset": 49
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Deep",
+                    "position": {
+                      "start": {
+                        "line": 8,
+                        "column": 3,
+                        "offset": 53
+                      },
+                      "end": {
+                        "line": 8,
+                        "column": 7,
+                        "offset": 57
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 8,
+                    "column": 1,
+                    "offset": 51
+                  },
+                  "end": {
+                    "line": 8,
+                    "column": 7,
+                    "offset": 57
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 9,
+                "column": 1,
+                "offset": 58
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (output) [{\"type\":\"jsonml\",\"marker\":{\"open\":\"<\",\"close\":\">\"}}]",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        [
+          {
+            "type": "jsonml",
+            "marker": {
+              "open": "<",
+              "close": ">"
+            }
+          }
+        ]
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture custom-marker-openclose",
+        "input": "<<<\n{\n  title: \"Custom\",\n  // A comment ***\n}\n>>>\n\n# Deep\n",
+        "expected": {
+          "md": "<<<\n{\n  title: \"Custom\",\n  // A comment ***\n}\n>>>\n\n# Deep\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (tree) {\"type\":\"yaml\",\"marker\":\"-\",\"anywhere\":true}",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        {
+          "type": "yaml",
+          "marker": "-",
+          "anywhere": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "fixture custom-yaml-anywhere",
+        "input": "# YAML not at the top\n\n---\ntitle: post\n---\n\nsome text\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "YAML not at the top",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 3,
+                        "offset": 2
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 22,
+                        "offset": 21
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 22,
+                    "offset": 21
+                  }
+                }
+              },
+              {
+                "type": "yaml",
+                "value": "title: post",
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 23
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 4,
+                    "offset": 42
+                  }
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "some text",
+                    "position": {
+                      "start": {
+                        "line": 7,
+                        "column": 1,
+                        "offset": 44
+                      },
+                      "end": {
+                        "line": 7,
+                        "column": 10,
+                        "offset": 53
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 7,
+                    "column": 1,
+                    "offset": 44
+                  },
+                  "end": {
+                    "line": 7,
+                    "column": 10,
+                    "offset": 53
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 8,
+                "column": 1,
+                "offset": 54
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (output) {\"type\":\"yaml\",\"marker\":\"-\",\"anywhere\":true}",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        {
+          "type": "yaml",
+          "marker": "-",
+          "anywhere": true
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture custom-yaml-anywhere",
+        "input": "# YAML not at the top\n\n---\ntitle: post\n---\n\nsome text\n",
+        "expected": {
+          "md": "# YAML not at the top\n\n---\ntitle: post\n---\n\nsome text\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (tree) [\"toml\"]",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.frontmatter", ["toml"]]],
+    "tests": [
+      {
+        "description": "fixture toml-advanced",
+        "input": "+++\ntitle = \"TOML Example\"\n\n[owner]\nname = \"Tom Preston-Werner\"\ndob = 1979-05-27T07:32:00-08:00 # First class dates\n\n[database]\nserver = \"192.168.1.1\"\nports = [ 8001, 8001, 8002 ]\nconnection_max = 5000\nenabled = true\n\n[servers]\n\n  # Indentation (tabs and/or spaces) is allowed but not required\n  [servers.alpha]\n  ip = \"10.0.0.1\"\n  dc = \"eqdc10\"\n\n  [servers.beta]\n  ip = \"10.0.0.2\"\n  dc = \"eqdc10\"\n\n[clients]\ndata = [ [\"gamma\", \"delta\"], [1, 2] ]\n\n# Line breaks are OK when inside arrays\nhosts = [\n  \"alpha\",\n  \"omega\"\n]\n+++\n\n# Big document\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "toml",
+                "value": "title = \"TOML Example\"\n\n[owner]\nname = \"Tom Preston-Werner\"\ndob = 1979-05-27T07:32:00-08:00 # First class dates\n\n[database]\nserver = \"192.168.1.1\"\nports = [ 8001, 8001, 8002 ]\nconnection_max = 5000\nenabled = true\n\n[servers]\n\n  # Indentation (tabs and/or spaces) is allowed but not required\n  [servers.alpha]\n  ip = \"10.0.0.1\"\n  dc = \"eqdc10\"\n\n  [servers.beta]\n  ip = \"10.0.0.2\"\n  dc = \"eqdc10\"\n\n[clients]\ndata = [ [\"gamma\", \"delta\"], [1, 2] ]\n\n# Line breaks are OK when inside arrays\nhosts = [\n  \"alpha\",\n  \"omega\"\n]",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 33,
+                    "column": 4,
+                    "offset": 524
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Big document",
+                    "position": {
+                      "start": {
+                        "line": 35,
+                        "column": 3,
+                        "offset": 528
+                      },
+                      "end": {
+                        "line": 35,
+                        "column": 15,
+                        "offset": 540
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 35,
+                    "column": 1,
+                    "offset": 526
+                  },
+                  "end": {
+                    "line": 35,
+                    "column": 15,
+                    "offset": 540
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 36,
+                "column": 1,
+                "offset": 541
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "fixture toml-deep",
+        "input": "+++\ntitle = \"Example\"\n  # A comment +++\n+++\n\n# Deep\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "toml",
+                "value": "title = \"Example\"\n  # A comment +++",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 4,
+                    "offset": 43
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Deep",
+                    "position": {
+                      "start": {
+                        "line": 6,
+                        "column": 3,
+                        "offset": 47
+                      },
+                      "end": {
+                        "line": 6,
+                        "column": 7,
+                        "offset": 51
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 6,
+                    "column": 1,
+                    "offset": 45
+                  },
+                  "end": {
+                    "line": 6,
+                    "column": 7,
+                    "offset": 51
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 7,
+                "column": 1,
+                "offset": 52
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "fixture toml-empty",
+        "input": "+++\n+++\n\n# Empty\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "toml",
+                "value": "",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 4,
+                    "offset": 7
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Empty",
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 3,
+                        "offset": 11
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 8,
+                        "offset": 16
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 4,
+                    "column": 1,
+                    "offset": 9
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 8,
+                    "offset": 16
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 17
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "fixture yaml-unconfigured",
+        "input": "---\n---\n\n# Empty\n",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "thematicBreak",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 4,
+                    "offset": 3
+                  }
+                }
+              },
+              {
+                "type": "thematicBreak",
+                "position": {
+                  "start": {
+                    "line": 2,
+                    "column": 1,
+                    "offset": 4
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 4,
+                    "offset": 7
+                  }
+                }
+              },
+              {
+                "type": "heading",
+                "depth": 1,
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Empty",
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 3,
+                        "offset": 11
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 8,
+                        "offset": 16
+                      }
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 4,
+                    "column": 1,
+                    "offset": 9
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 8,
+                    "offset": 16
+                  }
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 5,
+                "column": 1,
+                "offset": 17
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-frontmatter fixtures (output) [\"toml\"]",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-frontmatter",
+      "commit": "1125009e530386bc8c2ba497087f7f2a3ae99ddf",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.frontmatter", ["toml"]], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "fixture toml-advanced",
+        "input": "+++\ntitle = \"TOML Example\"\n\n[owner]\nname = \"Tom Preston-Werner\"\ndob = 1979-05-27T07:32:00-08:00 # First class dates\n\n[database]\nserver = \"192.168.1.1\"\nports = [ 8001, 8001, 8002 ]\nconnection_max = 5000\nenabled = true\n\n[servers]\n\n  # Indentation (tabs and/or spaces) is allowed but not required\n  [servers.alpha]\n  ip = \"10.0.0.1\"\n  dc = \"eqdc10\"\n\n  [servers.beta]\n  ip = \"10.0.0.2\"\n  dc = \"eqdc10\"\n\n[clients]\ndata = [ [\"gamma\", \"delta\"], [1, 2] ]\n\n# Line breaks are OK when inside arrays\nhosts = [\n  \"alpha\",\n  \"omega\"\n]\n+++\n\n# Big document\n",
+        "expected": {
+          "md": "+++\ntitle = \"TOML Example\"\n\n[owner]\nname = \"Tom Preston-Werner\"\ndob = 1979-05-27T07:32:00-08:00 # First class dates\n\n[database]\nserver = \"192.168.1.1\"\nports = [ 8001, 8001, 8002 ]\nconnection_max = 5000\nenabled = true\n\n[servers]\n\n  # Indentation (tabs and/or spaces) is allowed but not required\n  [servers.alpha]\n  ip = \"10.0.0.1\"\n  dc = \"eqdc10\"\n\n  [servers.beta]\n  ip = \"10.0.0.2\"\n  dc = \"eqdc10\"\n\n[clients]\ndata = [ [\"gamma\", \"delta\"], [1, 2] ]\n\n# Line breaks are OK when inside arrays\nhosts = [\n  \"alpha\",\n  \"omega\"\n]\n+++\n\n# Big document\n"
+        }
+      },
+      {
+        "description": "fixture toml-deep",
+        "input": "+++\ntitle = \"Example\"\n  # A comment +++\n+++\n\n# Deep\n",
+        "expected": {
+          "md": "+++\ntitle = \"Example\"\n  # A comment +++\n+++\n\n# Deep\n"
+        }
+      },
+      {
+        "description": "fixture toml-empty",
+        "input": "+++\n+++\n\n# Empty\n",
+        "expected": {
+          "md": "+++\n+++\n\n# Empty\n"
+        }
+      },
+      {
+        "description": "fixture yaml-unconfigured",
+        "input": "---\n---\n\n# Empty\n",
+        "expected": {
+          "md": "***\n\n***\n\n# Empty\n"
+        }
+      }
+    ]
+  }
+]
