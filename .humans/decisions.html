@@ -216,6 +216,40 @@
       <code>match</code>; a fresh line-based block parser.
     </p>
   </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> <code>md.stringify</code>
+    ports mdast-util-to-markdown 2.2.1 handler for handler, recursing per tree level on a
+    stack that grows onto the heap (<code>stacker</code>)
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Its handlers build each node's output from their children's,
+      so an explicit stack would turn every handler into a state machine; growing the
+      stack keeps the port line for line and still survives 100,000-deep input.
+    </p>
+    <p>
+      <strong>Rejected.</strong> An explicit frame machine, as conversion and
+      <code>html.stringify</code> use; a depth limit with a <code>tree-too-deep</code>
+      error.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> <code>md.stringify</code>
+    stays linear where upstream is quadratic: container prefixes are applied once at the
+    end, and choosing emphasis markers has a work budget
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Upstream re-indents every container's text and re-renders a
+      whole paragraph for each marker it tries, so nesting or runs of adjacent emphasis
+      cost seconds per few kilobytes. Past the budget (4 renders per token, plus a
+      constant) the markers already fixed stand; no corpus case comes near it.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Upstream's unbounded loop; an incremental pairing check,
+      far more code for the same output.
+    </p>
+  </dd>
 </dl>
 
 <h2>Conformance suite</h2>

@@ -141,6 +141,10 @@ fn add_plugin(
         #[cfg(feature = "md")]
         "md.parse" => processor.with(textlane_md::parse(read_options(options)?)),
         #[cfg(feature = "md")]
+        "md.gemoji" => processor.with(textlane_md::gemoji()),
+        #[cfg(feature = "md")]
+        "md.stringify" => processor.with(textlane_md::stringify(read_options(options)?)),
+        #[cfg(feature = "md")]
         "md.toHtml" => processor.with(textlane_md::to_html(read_options(options)?)),
         #[cfg(feature = "html")]
         "html.stringify" => {

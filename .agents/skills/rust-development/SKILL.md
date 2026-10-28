@@ -51,8 +51,11 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   `tokenizer`, `compiler`, `serializer`, `converter`); only it is exempt from one action per file
 - Trees live in one `bumpalo` arena per document (`textlane_core::Allocator`, `ArenaVec`);
   strings borrow the input or the arena. Input decides how deep a tree nests, so nothing
-  walks one by recursion: `ArenaVec` never drops its items, conversion and `html.stringify`
-  keep an explicit stack, and JSON stops at 1000 levels with `tree-too-deep`. Watch for
+  walks one by recursion on the plain stack: `ArenaVec` never drops its items, conversion
+  and `html.stringify` keep an explicit stack, `md.stringify`'s handlers recurse inside
+  `stacker::maybe_grow`, and JSON stops at 1000 levels with `tree-too-deep`. Data built
+  while walking must not nest either (`md.stringify` keeps emphasis in one flat store),
+  or dropping it recurses. Watch for
   quadratic passes too: `processor_unit.rs` runs 100,000-deep and 50,000-run inputs,
   and unclosed code spans of growing length. A construct that scans ahead and can fail
   needs a memo of what the failed scan saw, as `code_text_runs` is for code spans and
@@ -62,7 +65,11 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   pieces through a growable arena buffer, a label is matched against definitions in the
   length of the longest identifier (`ParseState::is_defined`), and a label's text is read
   only when it names a reference. Inline HTML remembers which kinds scanned to the end
-  unclosed (`html_text_unclosed`). Time
+  unclosed (`html_text_unclosed`). The serializer never re-indents a container's text:
+  `utils/serializer/sink.rs` records each container as a layer and writes every prefix
+  once, deciding a blank line from the innermost prefix out. Nested emphasis renders into
+  one shared token buffer, and a delimiter run's token list is shared, not copied per
+  token. Time
   growth in release mode, best of several runs: single debug timings are noisy.
 - Container ends follow micromark, not markdown-rs: a list item ends at the first line
   ending of its trailing blank lines (`prepareList`), stepping over the exits of lists
@@ -78,7 +85,10 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   string content is never trimmed; a token's slice leaves out container prefixes of its later
   lines and reads NUL as U+FFFD, as micromark's chunks do; each line of a label or title is
   a string of its own, a title's indent after a line ending belongs to neither; a point
-  inside a tab is one column and one offset past the tab's start).
+  inside a tab is one column and one offset past the tab's start). The serializer reads
+  characters as upstream reads UTF-16 code units: nothing, or an astral character, is
+  neither whitespace nor punctuation (`classify_unit`), and a reference without a
+  `referenceType` is collapsed.
   `helpers/entities.rs` and `helpers/unicode.rs` are tables generated from markdown-rs's,
   sorted for binary search
 - `md` names entities by syntax construct or mdast node and verbs by layer: `tokenize` and

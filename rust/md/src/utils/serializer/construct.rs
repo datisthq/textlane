@@ -1,0 +1,69 @@
+/// A construct the serializer is inside, which decides what `safe` escapes.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum Construct {
+    Autolink,
+    Blockquote,
+    CodeFenced,
+    CodeFencedLangGraveAccent,
+    CodeFencedLangTilde,
+    CodeFencedMetaGraveAccent,
+    CodeFencedMetaTilde,
+    CodeIndented,
+    Definition,
+    DestinationLiteral,
+    DestinationRaw,
+    Emphasis,
+    HeadingAtx,
+    HeadingSetext,
+    Image,
+    ImageReference,
+    Label,
+    Link,
+    LinkReference,
+    List,
+    ListItem,
+    Paragraph,
+    Phrasing,
+    Reference,
+    Strong,
+    TitleApostrophe,
+    TitleQuote,
+}
+
+impl Construct {
+    pub(crate) const COUNT: usize = 27;
+
+    /// The construct mdast-util-to-markdown calls `name`, if any.
+    pub(crate) fn from_name(name: &str) -> Option<Construct> {
+        Some(match name {
+            "autolink" => Construct::Autolink,
+            "blockquote" => Construct::Blockquote,
+            "codeFenced" => Construct::CodeFenced,
+            "codeFencedLangGraveAccent" => Construct::CodeFencedLangGraveAccent,
+            "codeFencedLangTilde" => Construct::CodeFencedLangTilde,
+            "codeFencedMetaGraveAccent" => Construct::CodeFencedMetaGraveAccent,
+            "codeFencedMetaTilde" => Construct::CodeFencedMetaTilde,
+            "codeIndented" => Construct::CodeIndented,
+            "definition" => Construct::Definition,
+            "destinationLiteral" => Construct::DestinationLiteral,
+            "destinationRaw" => Construct::DestinationRaw,
+            "emphasis" => Construct::Emphasis,
+            "headingAtx" => Construct::HeadingAtx,
+            "headingSetext" => Construct::HeadingSetext,
+            "image" => Construct::Image,
+            "imageReference" => Construct::ImageReference,
+            "label" => Construct::Label,
+            "link" => Construct::Link,
+            "linkReference" => Construct::LinkReference,
+            "list" => Construct::List,
+            "listItem" => Construct::ListItem,
+            "paragraph" => Construct::Paragraph,
+            "phrasing" => Construct::Phrasing,
+            "reference" => Construct::Reference,
+            "strong" => Construct::Strong,
+            "titleApostrophe" => Construct::TitleApostrophe,
+            "titleQuote" => Construct::TitleQuote,
+            _ => return None,
+        })
+    }
+}

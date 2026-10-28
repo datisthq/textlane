@@ -173,10 +173,11 @@ fn read_optional_str<'a>(
         .map(|text| &*alloc.alloc_str(text))
 }
 
+// mdast-util-to-markdown writes a reference without a type as a collapsed one
 fn read_reference_type(value: &Value) -> ReferenceType {
     match value.get("referenceType").and_then(Value::as_str) {
-        Some("collapsed") => ReferenceType::Collapsed,
+        Some("shortcut") => ReferenceType::Shortcut,
         Some("full") => ReferenceType::Full,
-        _ => ReferenceType::Shortcut,
+        _ => ReferenceType::Collapsed,
     }
 }

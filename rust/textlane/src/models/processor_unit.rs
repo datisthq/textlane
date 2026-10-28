@@ -142,3 +142,55 @@ fn rejects_hostile_html_in_linear_time() -> Result<(), Error> {
     }
     Ok(())
 }
+
+fn format_markdown(input: &str) -> Result<String, Error> {
+    let processor = Processor::new()
+        .with(textlane_md::parse(Default::default()))
+        .with(textlane_md::stringify(Default::default()))
+        .freeze()?;
+    Ok(processor.process(input)?.value)
+}
+
+#[test]
+fn formats_markdown() -> Result<(), Error> {
+    assert_eq!(format_markdown("a *b*\n\n- c\n- d")?, "a *b*\n\n* c\n* d\n");
+    Ok(())
+}
+
+#[test]
+fn formats_deep_nesting_in_linear_time() -> Result<(), Error> {
+    for input in [
+        "*".repeat(100_000) + "a" + &"*".repeat(100_000),
+        "> ".repeat(20_000) + "a\n",
+        "- ".repeat(20_000) + "a\n",
+        "1. ".repeat(20_000) + "a\n",
+        "[a](b ".repeat(10_000) + "*c*" + &")".repeat(10_000),
+    ] {
+        let started = std::time::Instant::now();
+        format_markdown(&input)?;
+        let took = started.elapsed();
+        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+    }
+    Ok(())
+}
+
+#[test]
+fn formats_hostile_phrasing_in_linear_time() -> Result<(), Error> {
+    for input in [
+        "*a**b*".repeat(5_000),
+        "_a__b_".repeat(5_000),
+        "*a*_b_".repeat(5_000),
+        "**a*b*c**".repeat(5_000),
+        "a_b".repeat(30_000),
+        "a\\*".repeat(30_000),
+        "`".to_string() + &"\n# a".repeat(30_000) + "`",
+        "a  \n".repeat(30_000),
+        "<a>\nb\n".repeat(20_000),
+    ] {
+        let started = std::time::Instant::now();
+        format_markdown(&input)?;
+        let took = started.elapsed();
+        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+    }
+    Ok(())
+}

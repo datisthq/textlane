@@ -30,7 +30,7 @@ otherwise.
 - Serialized output is keyed by its file extension (`html`, `md`, `js`, `txt`), never by the
   domain that produced it; `tree` and `error` are the other outcomes.
 - A pipeline of the crate's plugins runs through the real `Processor`: `add_plugin` in `run.rs`
-  maps each name (`md.parse`, `md.toHtml`, `html.stringify`) and reads its options into the
+  maps each name (`md.parse`, `md.gemoji`, `md.stringify`, `md.toHtml`, `html.stringify`) and reads its options into the
   plugin's options struct, failing with `invalid-options`; a new plugin joins there. A tree
   input is read as the kind the first stage takes. `test.*` plugins live only there, as the
   stub `test.parseText` and `test.compileValue`.

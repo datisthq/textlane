@@ -19,8 +19,13 @@ mod utils {
         pub(crate) mod state;
     }
     pub(crate) mod serializer {
+        pub(crate) mod construct;
+        pub(crate) mod format;
         pub(crate) mod join;
+        pub(crate) mod phrasing;
         pub(crate) mod safe;
+        pub(crate) mod settings;
+        pub(crate) mod sink;
         pub(crate) mod state;
         pub(crate) mod unsafe_patterns;
     }
@@ -261,6 +266,12 @@ mod plugins {
         pub(crate) mod plugin;
     }
     pub(crate) mod gemoji {
+        pub(crate) mod actions {
+            pub(crate) mod text {
+                pub(crate) mod replace;
+            }
+        }
+        pub(crate) mod names;
         pub(crate) mod plugin;
     }
     pub(crate) mod gfm {
@@ -284,12 +295,17 @@ mod plugins {
 }
 
 // models
-pub use models::options::{ParseOptions, ToHtmlOptions};
+pub use models::options::{
+    Names, ParseOptions, StringifyOptions, ToHtmlOptions, UnsafePattern,
+};
 
 // actions
 pub use actions::markdown::parse::parse_markdown;
+pub use actions::markdown::stringify::stringify_markdown;
 pub use actions::mdast::convert::convert_mdast;
 
 // plugins
+pub use plugins::gemoji::plugin::{Gemoji, gemoji};
 pub use plugins::parse::plugin::{Parse, parse};
+pub use plugins::stringify::plugin::{Stringify, stringify};
 pub use plugins::to_html::plugin::{ToHtml, to_html};

@@ -10,10 +10,11 @@
 <p>
   The tree shape and the plugin contract every crate builds on, and the layout of the
   <code>md</code> crate that ports micromark. Source: the design session of 2026-10-28;
-  the bootstrap implements the arena tree, positions, the processor,
-  <code>html.stringify</code> and <code>md</code>'s engine with paragraphs, ATX headings
-  and thematic breaks; the rest is design. Each choice's status and the alternatives
-  turned down are on <a href="decisions.html">Decisions</a>.
+  implemented so far are the arena tree, positions, the processor, all of CommonMark in
+  <code>md.parse</code>, <code>md.toHtml</code>, <code>md.stringify</code>,
+  <code>md.gemoji</code> and <code>html.stringify</code>; the rest is design. Each
+  choice's status and the alternatives turned down are on
+  <a href="decisions.html">Decisions</a>.
 </p>
 
 <htmlpress-callout type="note">
