@@ -1082,6 +1082,7 @@ name = "textlane-html"
 version = "0.0.0"
 dependencies = [
  "bumpalo",
+ "memchr",
  "serde",
  "serde_json",
  "stacker",
@@ -1094,6 +1095,7 @@ name = "textlane-md"
 version = "0.0.0"
 dependencies = [
  "bumpalo",
+ "memchr",
  "regex",
  "serde",
  "serde_json",
