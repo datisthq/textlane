@@ -46,11 +46,7 @@ pub(crate) fn compile_text(compiler: &mut Compiler, name: Name, kind: Kind) {
 
 /// Open a text node, or reopen the one right before.
 pub(crate) fn enter_text(compiler: &mut Compiler) {
-    let after_text = compiler
-        .tail_mut()
-        .children()
-        .and_then(|children| children.last())
-        .is_some_and(|last| matches!(last, Node::Text(_)));
+    let after_text = matches!(compiler.last_child_mut(), Some(Node::Text(_)));
     if after_text {
         compiler.tail_push_again();
     } else {

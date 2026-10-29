@@ -59,6 +59,10 @@ pub(crate) struct Compiler<'a, 'e> {
     pub(crate) directive_attributes: Vec<(&'a str, String)>,
     trailing: Vec<(usize, TrailingRun)>,
     stack: Vec<Node<'a>>,
+    // The children of open nodes, each node's from its `starts` entry on, moved into the
+    // arena once it closes: growing arena vectors would leave every outgrown buffer behind
+    children: Vec<Node<'a>>,
+    starts: Vec<usize>,
     // The enter event of each node opened by a token, as mdast-util-from-markdown's token
     // stack: buffers are not on it, so a node left open inside one is still found
     stack_tokens: Vec<usize>,
@@ -106,6 +110,8 @@ impl<'a, 'e> Compiler<'a, 'e> {
             directive_attributes: vec![],
             trailing,
             stack: vec![root],
+            children: vec![],
+            starts: vec![0],
             stack_tokens: vec![],
             error: None,
             mdx: MdxCompile::default(),
@@ -124,10 +130,45 @@ impl<'a, 'e> Compiler<'a, 'e> {
         while self.stack.len() > 1 {
             self.attach_tail();
         }
-        match self.stack.pop() {
+        match self.pop_node() {
             Some(root) => Ok(root),
             None => unreachable!("the root is never popped"),
         }
+    }
+
+    fn push_node(&mut self, node: Node<'a>) {
+        self.stack.push(node);
+        self.starts.push(self.children.len());
+    }
+
+    // Close the innermost open node, its children after any it was given directly
+    fn pop_node(&mut self) -> Option<Node<'a>> {
+        let mut node = self.stack.pop()?;
+        let start = self.starts.pop().unwrap_or(self.children.len());
+        if start < self.children.len()
+            && let Some(children) = node.children_mut()
+        {
+            let added = self.children.drain(start..);
+            if children.is_empty() {
+                let mut exact = ArenaVec::with_capacity_in(added.len(), self.alloc);
+                exact.extend(added);
+                *children = exact;
+            } else {
+                children.extend(added);
+            }
+        }
+        Some(node)
+    }
+
+    /// The last child of the innermost open node.
+    pub(crate) fn last_child_mut(&mut self) -> Option<&mut Node<'a>> {
+        let start = self.starts.last().copied().unwrap_or(0);
+        if start < self.children.len() {
+            return self.children.last_mut();
+        }
+        self.tail_mut()
+            .children_mut()
+            .and_then(|children| children.last_mut())
     }
 
     /// The innermost open node.
@@ -145,7 +186,7 @@ impl<'a, 'e> Compiler<'a, 'e> {
         if child.position().is_none() {
             *child.position_mut() = Some(Position::span(point, point));
         }
-        self.stack.push(child);
+        self.push_node(child);
         self.stack_tokens.push(self.index);
     }
 
@@ -177,12 +218,16 @@ impl<'a, 'e> Compiler<'a, 'e> {
 
     /// Reopen the last child of the innermost open node.
     pub(crate) fn tail_push_again(&mut self) {
-        if let Some(last) = self
-            .tail_mut()
-            .children_mut()
-            .and_then(|children| children.pop())
-        {
-            self.stack.push(last);
+        let start = self.starts.last().copied().unwrap_or(0);
+        let last = if start < self.children.len() {
+            self.children.pop()
+        } else {
+            self.tail_mut()
+                .children_mut()
+                .and_then(|children| children.pop())
+        };
+        if let Some(last) = last {
+            self.push_node(last);
             self.stack_tokens.push(self.index);
         }
     }
@@ -243,10 +288,8 @@ impl<'a, 'e> Compiler<'a, 'e> {
             return;
         }
         self.stack_tokens.pop();
-        if let Some(node) = self.stack.pop()
-            && let Some(children) = self.tail_mut().children_mut()
-        {
-            children.push(node);
+        if let Some(node) = self.pop_node() {
+            self.children.push(node);
         }
     }
 
@@ -290,18 +333,9 @@ impl<'a, 'e> Compiler<'a, 'e> {
             return;
         };
         let value = builder.into_bump_str();
-        let node = match self.stack.last_mut() {
-            Some(Node::Text(text)) => Some(text),
-            Some(parent) => match parent
-                .children_mut()
-                .and_then(|children| children.last_mut())
-            {
-                Some(Node::Text(text)) => Some(text),
-                _ => None,
-            },
-            None => None,
-        };
-        if let Some(text) = node {
+        if let Some(Node::Text(text)) = self.stack.last_mut() {
+            text.value = value;
+        } else if let Some(Node::Text(text)) = self.last_child_mut() {
             text.value = value;
         }
     }
@@ -315,7 +349,7 @@ impl<'a, 'e> Compiler<'a, 'e> {
     /// Collect the text that follows into a buffer, until `resume`.
     pub(crate) fn buffer(&mut self) {
         self.flush_text();
-        self.stack.push(Node::Paragraph(Paragraph {
+        self.push_node(Node::Paragraph(Paragraph {
             children: ArenaVec::new_in(self.alloc),
             position: None,
             data: None,
@@ -325,7 +359,7 @@ impl<'a, 'e> Compiler<'a, 'e> {
     /// Close the buffer and return it, with the phrasing collected in it.
     pub(crate) fn resume_node(&mut self) -> Option<Node<'a>> {
         self.flush_text();
-        self.stack.pop()
+        self.pop_node()
     }
 
     /// The enter event of the innermost node a token opened.
@@ -457,10 +491,7 @@ impl<'a, 'e> Compiler<'a, 'e> {
     /// Set the end of the innermost open node's last child to the current event.
     pub(crate) fn extend_last_child(&mut self) {
         let end = to_point(&self.events[self.index].point);
-        if let Some(last) = self
-            .tail_mut()
-            .children_mut()
-            .and_then(|children| children.last_mut())
+        if let Some(last) = self.last_child_mut()
             && let Some(Position::Span { end: last_end, .. }) = last.position_mut()
         {
             *last_end = end;

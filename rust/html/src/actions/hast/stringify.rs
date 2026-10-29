@@ -458,27 +458,44 @@ fn is_js_space(character: char) -> bool {
 }
 
 fn has_any(value: &str, subset: &str) -> bool {
-    value.bytes().any(|byte| subset.as_bytes().contains(&byte))
+    find_any(value.as_bytes(), subset.as_bytes(), 0).is_some()
 }
 
 // stringify-entities with a subset: each listed character as a hexadecimal reference. The
 // subsets are ASCII, so a byte never matches inside a multibyte character
 fn push_escaped(output: &mut String, value: &str, subset: &str) {
-    let subset = subset.as_bytes();
+    let bytes = value.as_bytes();
     let mut start = 0;
-    for (index, byte) in value.bytes().enumerate() {
-        if subset.contains(&byte) {
-            output.push_str(&value[start..index]);
-            output.push_str("&#x");
-            if byte >= 16 {
-                output.push(char::from(HEX[usize::from(byte >> 4)]));
-            }
-            output.push(char::from(HEX[usize::from(byte & 15)]));
-            output.push(';');
-            start = index + 1;
+    while let Some(index) = find_any(bytes, subset.as_bytes(), start) {
+        let byte = bytes[index];
+        output.push_str(&value[start..index]);
+        output.push_str("&#x");
+        if byte >= 16 {
+            output.push(char::from(HEX[usize::from(byte >> 4)]));
         }
+        output.push(char::from(HEX[usize::from(byte & 15)]));
+        output.push(';');
+        start = index + 1;
     }
     output.push_str(&value[start..]);
+}
+
+fn find_any(bytes: &[u8], subset: &[u8], from: usize) -> Option<usize> {
+    let rest = &bytes[from..];
+    let found = match *subset {
+        [] => None,
+        [a] => memchr::memchr(a, rest),
+        [a, b] => memchr::memchr2(a, b, rest),
+        [a, b, c] => memchr::memchr3(a, b, c, rest),
+        _ => {
+            let mut mask = [false; 256];
+            for &byte in subset {
+                mask[usize::from(byte)] = true;
+            }
+            rest.iter().position(|&byte| mask[usize::from(byte)])
+        }
+    };
+    found.map(|index| from + index)
 }
 
 const HEX: &[u8; 16] = b"0123456789ABCDEF";

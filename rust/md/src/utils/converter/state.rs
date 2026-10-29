@@ -87,8 +87,15 @@ impl<'a> Converter<'a, '_> {
             let Some(frame) = stack.pop() else {
                 break;
             };
-            let mut converted =
-                ArenaVec::with_capacity_in(results.len() - frame.start, self.alloc);
+            let count = results.len() - frame.start;
+            // Wrapped children gain a line ending between and around them, in place
+            let capacity = match frame.node {
+                mdast::Node::Root(_)
+                | mdast::Node::Blockquote(_)
+                | mdast::Node::List(_) => count * 2 + 1,
+                _ => count,
+            };
+            let mut converted = ArenaVec::with_capacity_in(capacity, self.alloc);
             converted.extend(results.drain(frame.start..));
             let start = results.len();
             let parent = stack.last().map(|parent| parent.node);
@@ -332,10 +339,26 @@ impl<'a> Converter<'a, '_> {
     /// Put a line ending between nodes, and around them when `loose`.
     pub(crate) fn wrap(
         &self,
-        nodes: ArenaVec<'a, hast::Node<'a>>,
+        mut nodes: ArenaVec<'a, hast::Node<'a>>,
         loose: bool,
     ) -> ArenaVec<'a, hast::Node<'a>> {
-        let mut result = ArenaVec::with_capacity_in(nodes.len() * 2 + 1, self.alloc);
+        let count = nodes.len();
+        let outer = usize::from(loose);
+        let len = match count {
+            0 => outer,
+            _ => count * 2 - 1 + outer * 2,
+        };
+        if nodes.capacity() >= len {
+            while nodes.len() < len {
+                nodes.push(line_ending());
+            }
+            // From the back, each node swaps with a line ending already in its place
+            for index in (0..count).rev() {
+                nodes.swap(index, outer + index * 2);
+            }
+            return nodes;
+        }
+        let mut result = ArenaVec::with_capacity_in(len, self.alloc);
         let any = !nodes.is_empty();
         if loose {
             result.push(line_ending());

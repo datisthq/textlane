@@ -88,7 +88,12 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   them in again, so document-sized event lists go back to `utils/tokenizer/recycle.rs`
   (a few per thread, within a size band) instead of being dropped, a pass never
   allocates a second list, and `process` takes the thread's last arena, reset, from
-  `with_allocator` (`textlane/src/actions/allocator/reuse.rs`, up to 64 MB kept). Count faults with `/usr/bin/time -f %R` beside the timing; the
+  `with_allocator` (`textlane/src/actions/allocator/reuse.rs`, up to 64 MB kept). An arena never frees a
+  vector it outgrew, so trees are built at their exact size: the compiler collects open
+  nodes' children in one scratch `Vec` and moves them into the arena when the node closes
+  (`pop_node`), and `md.toHtml` gives wrapped parents room for their line endings up front
+  (`wrap` works in place); an arena past 64 MB is dropped and faulted in again per
+  document. Scan bytes with `memchr`, never `slice.contains` per byte. Count faults with `/usr/bin/time -f %R` beside the timing; the
   pprof harness must not blocklist `libc`, or malloc, free and memcpy vanish from it.
   Measure a change A/B against the previous build, interleaved, best of many runs: a
   loaded machine drifts by more than most wins

@@ -22,6 +22,7 @@ serde.workspace = true
 serde_json.workspace = true
 regex.workspace = true
 stacker.workspace = true
+memchr.workspace = true
 unicode-id-start.workspace = true
 schemars = { workspace = true, optional = true }
 

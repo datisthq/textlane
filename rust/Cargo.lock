@@ -1406,6 +1406,7 @@ version = "0.0.0"
 dependencies = [
  "bumpalo",
  "giallo",
+ "memchr",
  "schemars",
  "serde",
  "serde_json",
@@ -1419,6 +1420,7 @@ name = "textlane-md"
 version = "0.0.0"
 dependencies = [
  "bumpalo",
+ "memchr",
  "regex",
  "schemars",
  "serde",

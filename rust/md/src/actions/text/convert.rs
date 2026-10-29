@@ -20,29 +20,26 @@ pub(crate) fn convert_text<'a>(
 // last its end
 fn trim_lines<'a>(converter: &Converter<'a, '_>, value: &'a str) -> &'a str {
     let bytes = value.as_bytes();
-    let blank = |byte: &u8| matches!(byte, b' ' | b'\t');
-    let ending = |byte: &u8| matches!(byte, b'\n' | b'\r');
-    if !bytes.windows(2).any(|pair| {
-        (blank(&pair[0]) && ending(&pair[1])) || (ending(&pair[0]) && blank(&pair[1]))
-    }) {
+    let blank = |at: usize| matches!(bytes.get(at), Some(b' ' | b'\t'));
+    if !memchr::memchr2_iter(b'\n', b'\r', bytes)
+        .any(|index| (index > 0 && blank(index - 1)) || blank(index + 1))
+    {
         return value;
     }
     let mut result = ArenaString::with_capacity_in(value.len(), converter.alloc);
     let mut last = 0;
-    let mut index = 0;
-    while index < bytes.len() {
+    for index in memchr::memchr2_iter(b'\n', b'\r', bytes) {
+        // The `\n` of a `\r\n` was taken with its `\r`
+        if index < last {
+            continue;
+        }
         let ending = match bytes[index] {
             b'\r' if bytes.get(index + 1) == Some(&b'\n') => 2,
-            b'\r' | b'\n' => 1,
-            _ => {
-                index += 1;
-                continue;
-            }
+            _ => 1,
         };
         result.push_str(trim_line(&value[last..index], last > 0, true));
         result.push_str(&value[index..index + ending]);
-        index += ending;
-        last = index;
+        last = index + ending;
     }
     result.push_str(trim_line(&value[last..], last > 0, false));
     result.into_bump_str()

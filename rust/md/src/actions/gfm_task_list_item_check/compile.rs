@@ -28,11 +28,7 @@ pub(crate) fn strip_task_list_item_space(compiler: &mut Compiler) {
         return;
     }
     let source = compiler.source.as_bytes();
-    let Some(Node::Paragraph(paragraph)) = compiler
-        .tail_mut()
-        .children_mut()
-        .and_then(|children| children.last_mut())
-    else {
+    let Some(Node::Paragraph(paragraph)) = compiler.last_child_mut() else {
         return;
     };
     let Some(Node::Text(head)) = paragraph.children.first_mut() else {

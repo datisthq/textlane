@@ -20,7 +20,17 @@ pub(crate) fn convert_list_item<'a>(
     let loose = list_loose.unwrap_or_else(|| is_item_loose(node));
     let tail_is_paragraph = results.last().is_some_and(is_paragraph);
     let any = !results.is_empty();
-    let mut children = ArenaVec::with_capacity_in(results.len() * 2 + 1, converter.alloc);
+    let unwrapped: usize = results
+        .iter()
+        .map(|child| match child {
+            hast::Node::Element(paragraph) if paragraph.tag_name == "p" && !loose => {
+                paragraph.children.len()
+            }
+            _ => 1,
+        })
+        .sum();
+    let mut children =
+        ArenaVec::with_capacity_in(unwrapped + results.len() + 1, converter.alloc);
     for (index, child) in results.into_iter().enumerate() {
         // A line ending before each child, except a tight item's first paragraph
         if loose || index != 0 || !is_paragraph(&child) {
