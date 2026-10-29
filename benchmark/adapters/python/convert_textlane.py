@@ -1,21 +1,18 @@
-import json
+from textlane import html, md, textlane
 
-import textlane
 from common import run_adapter
 
-PIPELINE = [
-    ["md.parse"],
-    ["md.toHtml", {"allowDangerousHtml": True}],
-    ["html.stringify", {"allowDangerousHtml": True}],
-]
+PROCESSOR = (
+    textlane()
+    .use(md.parse())
+    .use(md.to_html({"allowDangerousHtml": True}))
+    .use(html.stringify({"allowDangerousHtml": True}))
+    .freeze()
+)
 
 
 def convert(markdown: str) -> str:
-    # the bindings expose no pipeline yet, so this drives the `testing` build's case runner
-    result = json.loads(textlane.run_case(json.dumps({"pipeline": PIPELINE, "input": markdown})))
-    if "html" not in result:
-        raise RuntimeError(result.get("error", "no html"))
-    return result["html"]
+    return PROCESSOR.process_sync(markdown)["value"]
 
 
 if __name__ == "__main__":

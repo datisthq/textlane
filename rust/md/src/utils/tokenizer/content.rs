@@ -44,7 +44,7 @@ fn chunk_inside(tokenizer: &mut Tokenizer) -> State {
             State::Ok
         }
         _ => {
-            tokenizer.consume();
+            tokenizer.consume_while(|_, _| true);
             State::Next(chunk_inside)
         }
     }
@@ -109,10 +109,10 @@ pub(crate) fn resolve_content(tokenizer: &mut Tokenizer) -> Subresult {
                     tokenizer.events[exit_index + 2].point.clone();
                 tokenizer.map.add(exit_index + 1, 2, vec![]);
                 if let Some(link) = tokenizer.events[exit_index - 1].link.as_mut() {
-                    link.next = Some(enter_index);
+                    link.next = Link::at(enter_index);
                 }
                 if let Some(link) = tokenizer.events[enter_index].link.as_mut() {
-                    link.previous = Some(exit_index - 1);
+                    link.previous = Link::at(exit_index - 1);
                 }
                 exit_index = enter_index + 1;
             }
@@ -120,7 +120,9 @@ pub(crate) fn resolve_content(tokenizer: &mut Tokenizer) -> Subresult {
         }
         index += 1;
     }
-    tokenizer.map.consume(&mut tokenizer.events);
+    tokenizer
+        .map
+        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
     subtokenize(
         &mut tokenizer.events,
         tokenizer.parse_state,

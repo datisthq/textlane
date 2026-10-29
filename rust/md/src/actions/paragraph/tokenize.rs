@@ -42,7 +42,7 @@ fn inside(tokenizer: &mut Tokenizer) -> State {
             State::Next(line_start)
         }
         _ => {
-            tokenizer.consume();
+            tokenizer.consume_while(|_, _| true);
             State::Next(inside)
         }
     }

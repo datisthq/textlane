@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use textlane_core::Error;
 use textlane_core::hast::{Element, Node, PropertyItem, PropertyValue};
 
@@ -189,10 +191,18 @@ impl<'o> State<'o> {
         let self_closing = if svg {
             self.options.close_empty_elements
         } else {
-            let name = element.tag_name.to_lowercase();
+            let name = if element
+                .tag_name
+                .bytes()
+                .any(|byte| byte.is_ascii_uppercase() || !byte.is_ascii())
+            {
+                Cow::Owned(element.tag_name.to_lowercase())
+            } else {
+                Cow::Borrowed(element.tag_name)
+            };
             match &self.options.voids {
-                Some(voids) => voids.contains(&name),
-                None => VOID_ELEMENTS.contains(&name.as_str()),
+                Some(voids) => voids.iter().any(|void| *void == name),
+                None => VOID_ELEMENTS.contains(&&*name),
             }
         };
         if !svg && element.tag_name == "svg" {
@@ -452,13 +462,16 @@ fn escape(value: &str, subset: &str) -> String {
 }
 
 fn push_escaped(output: &mut String, value: &str, subset: &str) {
-    for character in value.chars() {
-        if subset.contains(character) {
-            output.push_str(&format!("&#x{:X};", u32::from(character)));
-        } else {
-            output.push(character);
-        }
+    let mut rest = value;
+    while let Some((index, character)) = rest
+        .char_indices()
+        .find(|(_, character)| subset.contains(*character))
+    {
+        output.push_str(&rest[..index]);
+        output.push_str(&format!("&#x{:X};", u32::from(character)));
+        rest = &rest[index + character.len_utf8()..];
     }
+    output.push_str(rest);
 }
 
 /// A number as JavaScript's `String(number)` writes it.

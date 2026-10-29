@@ -10,7 +10,8 @@ use crate::utils::compiler::stack::Compiler;
 /// and line endings, as mdast-util-mdx-expression and mdast-util-mdxjs-esm read it.
 pub(crate) fn compile_mdx_expression(compiler: &mut Compiler, name: Name, kind: Kind) {
     match kind {
-        Kind::Enter if name.0.ends_with("Chunk") || name.0.ends_with("Data") => {}
+        Kind::Enter
+            if name.text().ends_with("Chunk") || name.text().ends_with("Data") => {}
         Kind::Enter => {
             let data = Some(
                 &*compiler
@@ -38,7 +39,7 @@ pub(crate) fn compile_mdx_expression(compiler: &mut Compiler, name: Name, kind: 
             compiler.tail_push(node);
             compiler.mdx.value = Some(String::new());
         }
-        Kind::Exit if name.0.ends_with("Chunk") || name.0.ends_with("Data") => {
+        Kind::Exit if name.text().ends_with("Chunk") || name.text().ends_with("Data") => {
             let slice = compiler.slice();
             if let Some(value) = compiler.mdx.value.as_mut() {
                 value.push_str(slice);

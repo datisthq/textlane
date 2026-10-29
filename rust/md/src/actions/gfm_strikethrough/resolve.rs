@@ -60,7 +60,9 @@ pub(crate) fn resolve_gfm_strikethrough(tokenizer: &mut Tokenizer) {
         tokenizer.events[sequence.index].name = name;
         tokenizer.events[sequence.index + 1].name = name;
     }
-    tokenizer.map.consume(&mut tokenizer.events);
+    tokenizer
+        .map
+        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
 }
 
 // The nearest opener still live, dropping those that closed or turned into data

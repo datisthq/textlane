@@ -62,7 +62,9 @@ pub(crate) fn resolve_attention(tokenizer: &mut Tokenizer) {
         tokenizer.events[sequence.index].name = Name::DATA;
         tokenizer.events[sequence.index + 1].name = Name::DATA;
     }
-    tokenizer.map.consume(&mut tokenizer.events);
+    tokenizer
+        .map
+        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
 }
 
 fn bucket_of(sequence: &Sequence) -> Bucket {

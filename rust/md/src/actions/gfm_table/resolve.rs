@@ -91,7 +91,9 @@ pub(crate) fn resolve_gfm_table(tokenizer: &mut Tokenizer) {
     if last_table_end != 0 {
         flush_table_end(tokenizer, last_table_end, last_table_has_body);
     }
-    tokenizer.map.consume(&mut tokenizer.events);
+    tokenizer
+        .map
+        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
 }
 
 fn flush_cell(

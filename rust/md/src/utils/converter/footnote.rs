@@ -2,30 +2,10 @@ use std::collections::HashMap;
 
 use textlane_core::ArenaVec;
 use textlane_core::hast::{self, Property, PropertyItem, PropertyValue};
-use textlane_core::mdast::{FootnoteDefinition, Node};
+use textlane_core::mdast::FootnoteDefinition;
 
 use crate::helpers::uri::normalize_uri;
 use crate::utils::converter::state::Converter;
-
-/// Every footnote definition in the tree by its identifier in upper case, walked without
-/// recursing; the first of an identifier wins.
-pub(crate) fn find_footnote_definitions<'n, 'a>(
-    node: &'n Node<'a>,
-) -> HashMap<String, &'n FootnoteDefinition<'a>> {
-    let mut definitions = HashMap::new();
-    let mut stack = vec![node];
-    while let Some(node) = stack.pop() {
-        if let Node::FootnoteDefinition(definition) = node {
-            definitions
-                .entry(definition.identifier.to_uppercase())
-                .or_insert(definition);
-        }
-        if let Some(children) = node.children() {
-            stack.extend(children.iter().rev());
-        }
-    }
-    definitions
-}
 
 /// The section of footnotes that were called, in call order, as mdast-util-to-hast's
 /// `footer`: calls inside a footnote add theirs to the end while it is built.

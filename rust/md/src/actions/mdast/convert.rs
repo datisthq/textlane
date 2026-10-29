@@ -5,9 +5,7 @@ use textlane_core::hast;
 use textlane_core::mdast;
 
 use crate::models::options::ToHtmlOptions;
-use crate::utils::converter::footnote::{
-    append_footer, create_footer, find_footnote_definitions,
-};
+use crate::utils::converter::footnote::{append_footer, create_footer};
 use crate::utils::converter::state::Converter;
 
 /// Turn mdast into hast, as remark-rehype does; several nodes come back in a root.
@@ -27,12 +25,13 @@ pub(crate) fn convert_mdast_with<'a>(
     options: &ToHtmlOptions,
     unravel: bool,
 ) -> hast::Node<'a> {
+    let (definitions, footnotes) = find_definitions(node);
     let mut converter = Converter {
         alloc,
         options,
         unravel,
         loose_lists: vec![],
-        definitions: find_definitions(node),
+        definitions,
         footnote_order: vec![],
         footnote_counts: HashMap::new(),
     };
@@ -61,28 +60,40 @@ pub(crate) fn convert_mdast_with<'a>(
             })
         }
     };
-    let footnotes = find_footnote_definitions(node);
     if let Some(footer) = create_footer(&mut converter, &footnotes) {
         append_footer(&mut tree, footer);
     }
     tree
 }
 
-// Every definition in the tree, walked without recursing; the first of an identifier wins
-fn find_definitions<'a>(
-    node: &mdast::Node<'a>,
-) -> HashMap<String, (&'a str, Option<&'a str>)> {
+type Definitions<'a> = HashMap<String, (&'a str, Option<&'a str>)>;
+type FootnoteDefinitions<'n, 'a> = HashMap<String, &'n mdast::FootnoteDefinition<'a>>;
+
+// Every definition and footnote definition in the tree by its identifier in upper case,
+// in one walk without recursing; the first of an identifier wins
+fn find_definitions<'n, 'a>(
+    node: &'n mdast::Node<'a>,
+) -> (Definitions<'a>, FootnoteDefinitions<'n, 'a>) {
     let mut definitions = HashMap::new();
+    let mut footnotes = HashMap::new();
     let mut stack = vec![node];
     while let Some(node) = stack.pop() {
-        if let mdast::Node::Definition(definition) = node {
-            definitions
-                .entry(definition.identifier.to_uppercase())
-                .or_insert((definition.url, definition.title));
+        match node {
+            mdast::Node::Definition(definition) => {
+                definitions
+                    .entry(definition.identifier.to_uppercase())
+                    .or_insert((definition.url, definition.title));
+            }
+            mdast::Node::FootnoteDefinition(definition) => {
+                footnotes
+                    .entry(definition.identifier.to_uppercase())
+                    .or_insert(definition);
+            }
+            _ => {}
         }
         if let Some(children) = node.children() {
             stack.extend(children.iter().rev());
         }
     }
-    definitions
+    (definitions, footnotes)
 }

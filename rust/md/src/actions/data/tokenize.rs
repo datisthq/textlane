@@ -1,3 +1,4 @@
+use crate::helpers::byte_set::{ByteSet, has_byte};
 use crate::helpers::literal::can_start_literal;
 use crate::models::construct::State;
 use crate::models::token::Name;
@@ -36,18 +37,33 @@ fn inside(tokenizer: &mut Tokenizer) -> State {
         && byte != b'\n'
         && !is_marker(tokenizer, byte)
     {
-        tokenizer.consume();
+        let markers = tokenizer.tokenize_state.markers;
+        let literal = tokenizer.tokenize_state.literal_autolinks;
+        tokenizer.consume_while(|previous, byte| {
+            !is_marker_after(&markers, literal, previous, byte)
+        });
         return State::Next(inside);
     }
     tokenizer.exit(Name::DATA);
     State::Retry(at_break)
 }
 
-// GFM's literal autolinks start at letters too, but only where their previous byte allows
 fn is_marker(tokenizer: &Tokenizer, byte: u8) -> bool {
-    tokenizer.tokenize_state.markers.contains(&byte)
-        || (tokenizer.tokenize_state.math_text && byte == b'$')
-        || (tokenizer.tokenize_state.mdx_text && byte == b'{')
-        || (tokenizer.tokenize_state.literal_autolinks
-            && can_start_literal(tokenizer.previous, byte))
+    let state = &tokenizer.tokenize_state;
+    is_marker_after(
+        &state.markers,
+        state.literal_autolinks,
+        tokenizer.previous,
+        byte,
+    )
+}
+
+// GFM's literal autolinks start at letters too, but only where their previous byte allows
+fn is_marker_after(
+    markers: &ByteSet,
+    literal: bool,
+    previous: Option<u8>,
+    byte: u8,
+) -> bool {
+    has_byte(markers, byte) || (literal && can_start_literal(previous, byte))
 }

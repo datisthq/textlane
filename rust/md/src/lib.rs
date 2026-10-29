@@ -386,6 +386,7 @@ mod actions {
 }
 mod helpers {
     pub(crate) mod attribute;
+    pub(crate) mod byte_set;
     pub(crate) mod character;
     pub(crate) mod content;
     pub(crate) mod decode;

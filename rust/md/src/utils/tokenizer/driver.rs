@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use textlane_core::Error;
 
+use crate::helpers::byte_set::ByteSet;
 use crate::models::construct::{Resolver, State, StateFn};
 use crate::models::def_list::DefListTrack;
 use crate::models::directive::DirectiveState;
@@ -147,7 +148,8 @@ pub(crate) struct TokenizeState<'a> {
     pub(crate) marker_b: u8,
     pub(crate) end: usize,
     pub(crate) marker: u8,
-    pub(crate) markers: &'static [u8],
+    /// The bytes data stops at, as other constructs may start there.
+    pub(crate) markers: ByteSet,
     pub(crate) size: usize,
     pub(crate) size_b: usize,
     pub(crate) size_c: usize,
@@ -202,6 +204,8 @@ pub(crate) struct TokenizeState<'a> {
 pub(crate) struct Tokenizer<'a> {
     column_start: Vec<(usize, usize)>,
     first_line: usize,
+    // Where the bytes being fed end: `consume_while` must not read past them
+    limit: usize,
     line_start: Point,
     attempts: Vec<Attempt>,
     pub(crate) current: Option<u8>,
@@ -224,6 +228,7 @@ impl<'a> Tokenizer<'a> {
         Tokenizer {
             column_start: vec![],
             first_line: point.line,
+            limit: 0,
             line_start: point.clone(),
             attempts: vec![],
             current: None,
@@ -281,6 +286,28 @@ impl<'a> Tokenizer<'a> {
         self.move_one();
         self.previous = self.current;
         self.current = None;
+    }
+
+    /// Consume the current byte, then each byte after it that `keep` accepts after the one
+    /// before, as `consume` would one at a time; tabs and line endings always stop it.
+    pub(crate) fn consume_while(&mut self, keep: impl Fn(Option<u8>, u8) -> bool) {
+        self.consume();
+        if self.point.vs != 0 {
+            return;
+        }
+        let bytes = self.parse_state.bytes;
+        let start = self.point.index;
+        let mut index = start;
+        while index < self.limit
+            && let Some(&byte) = bytes.get(index)
+            && !matches!(byte, b'\t' | b'\r' | b'\n')
+            && keep(self.previous, byte)
+        {
+            self.previous = Some(byte);
+            index += 1;
+        }
+        self.point.index = index;
+        self.point.column += index - start;
     }
 
     fn move_one(&mut self) {
@@ -443,7 +470,8 @@ impl<'a> Tokenizer<'a> {
                     value.definitions.append(&mut result.definitions);
                 }
             }
-            self.map.consume(&mut self.events);
+            self.map
+                .consume(&mut self.events, &self.parse_state.spare_events);
         }
         value
     }
@@ -456,6 +484,7 @@ impl<'a> Tokenizer<'a> {
         flush: bool,
     ) -> State {
         self.move_to(from);
+        self.limit = to.0;
         loop {
             if self.parse_state.failed.get() {
                 return State::Error;

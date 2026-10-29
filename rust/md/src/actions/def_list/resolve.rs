@@ -73,7 +73,9 @@ pub(crate) fn resolve_def_list(tokenizer: &mut Tokenizer) {
         let exit = create_event(Kind::Exit, Name::DEF_LIST, point, None);
         tokenizer.map.add(end + 1, 0, vec![exit]);
     }
-    tokenizer.map.consume(&mut tokenizer.events);
+    tokenizer
+        .map
+        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
 }
 
 // Make the terms of the description at `index`, then open a list for them or join the

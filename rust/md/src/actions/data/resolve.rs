@@ -24,5 +24,7 @@ pub(crate) fn resolve_data(tokenizer: &mut Tokenizer) {
         }
         index += 1;
     }
-    tokenizer.map.consume(&mut tokenizer.events);
+    tokenizer
+        .map
+        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
 }

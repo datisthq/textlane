@@ -10,8 +10,7 @@ const WHEELS = join(import.meta.dirname, ".cache", "wheel")
 
 execFileSync("uv", ["sync", "--frozen"], { cwd: PYTHON_ADAPTERS, stdio: "inherit" })
 
-// the bindings expose no pipeline yet, so textlane's adapters use the `testing` builds
-console.log("Building the textlane addon with `testing`")
+console.log("Building the textlane addon")
 await buildAddon()
 console.log(ADDON_PATH)
 
@@ -20,16 +19,9 @@ const python = join(ROOT, "python")
 execFileSync("bash", ["scripts/copy-skills.sh"], { cwd: python, stdio: "inherit" })
 execFileSync(
   "uvx",
-  [
-    "maturin@1.15.0",
-    "build",
-    "--release",
-    "--features",
-    "python,testing",
-    "--out",
-    WHEELS,
-  ],
-  { cwd: python, stdio: "inherit" },
+  ["maturin@1.15.0", "build", "--release", "--out", WHEELS],
+  // outside rust/, its rust-toolchain.toml does not apply: pin the same channel
+  { cwd: python, stdio: "inherit", env: { ...process.env, RUSTUP_TOOLCHAIN: "stable" } },
 )
 const wheel = readdirSync(WHEELS).find(file => file.endsWith(".whl"))
 if (!wheel) throw new Error(`maturin wrote no wheel to ${WHEELS}`)

@@ -1,6 +1,6 @@
 use crate::helpers::skip::skip_opt_back;
 use crate::models::construct::State;
-use crate::models::event::{ContentType, Event, Kind};
+use crate::models::event::{ContentType, Event, Kind, Link};
 use crate::models::token::Name;
 use crate::utils::tokenizer::content::tokenize_content_definition_before;
 use crate::utils::tokenizer::document::tokenize_document;
@@ -24,10 +24,10 @@ pub(crate) fn link(events: &mut [Event], index: usize) {
 
 pub(crate) fn link_to(events: &mut [Event], previous: usize, next: usize) {
     if let Some(link) = events[previous].link.as_mut() {
-        link.next = Some(next);
+        link.next = Link::at(next);
     }
     if let Some(link) = events[next].link.as_mut() {
-        link.previous = Some(previous);
+        link.previous = Link::at(previous);
     }
 }
 
@@ -50,6 +50,7 @@ pub(crate) fn subtokenize(
             && link.previous.is_none()
             && filter.is_none_or(|filter| link.content == filter)
         {
+            let content = link.content;
             let mut tokenizer = Tokenizer::new(event.point.clone(), parse_state);
             let mut state = State::Next(match link.content {
                 ContentType::Content => tokenize_content_definition_before,
@@ -74,11 +75,23 @@ pub(crate) fn subtokenize(
                     (end.index, end.vs),
                     state,
                 );
-                link_index = current.and_then(|link| link.next);
+                link_index = current.and_then(Link::next);
             }
             let mut result = tokenizer.flush(state, true);
             if parse_state.failed.get() {
                 return value;
+            }
+            // Strings depend on nothing found later: tokenized in the child's few events,
+            // they save the document one more pass over all of its own
+            if content != ContentType::String {
+                subtokenize(
+                    &mut tokenizer.events,
+                    parse_state,
+                    Some(ContentType::String),
+                );
+                if parse_state.failed.get() {
+                    return value;
+                }
             }
             value.definitions.append(&mut result.definitions);
             value.done = false;
@@ -86,7 +99,7 @@ pub(crate) fn subtokenize(
         }
         index += 1;
     }
-    map.consume(events);
+    map.consume(events, &parse_state.spare_events);
     value
 }
 
@@ -142,7 +155,7 @@ pub(crate) fn divide_events(
             link_index = events[link_index]
                 .link
                 .as_ref()
-                .and_then(|link| link.next)
+                .and_then(Link::next)
                 .unwrap_or(link_index);
         }
         let has_previous = child_events[child_index]
@@ -156,19 +169,19 @@ pub(crate) fn divide_events(
                 old_prev + link_index - (slices.len() - 1) * 2
             };
             if let Some(link) = child_events[old_prev].link.as_mut() {
-                link.next = Some(new_link + acc_before.1 - acc_before.0);
+                link.next = Link::at(new_link + acc_before.1 - acc_before.0);
             }
         }
-        let next = child_events[child_index]
-            .link
-            .as_ref()
-            .and_then(|link| link.next);
+        let next = child_events[child_index].link.as_ref().and_then(Link::next);
         if let Some(next) = next
             && let Some(link) = child_events[next].link.as_mut()
         {
-            old_prev = link.previous;
-            link.previous = link.previous.map(|previous| {
-                previous + link_index - (slices.len() * 2) + acc_before.1 - acc_before.0
+            old_prev = link.previous();
+            link.previous = link.previous().and_then(|previous| {
+                Link::at(
+                    previous + link_index - (slices.len() * 2) + acc_before.1
+                        - acc_before.0,
+                )
             });
         }
         child_index += 1;

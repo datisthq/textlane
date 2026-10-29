@@ -59,28 +59,28 @@ pub(crate) struct DirectiveNames {
 macro_rules! directive_names {
     ($prefix:literal, $disallow_eol:expr) => {
         DirectiveNames {
-            name: Name(concat!($prefix, "Name")),
-            label: Name(concat!($prefix, "Label")),
-            label_marker: Name(concat!($prefix, "LabelMarker")),
-            label_string: Name(concat!($prefix, "LabelString")),
-            attributes: Name(concat!($prefix, "Attributes")),
-            attributes_marker: Name(concat!($prefix, "AttributesMarker")),
-            attribute: Name(concat!($prefix, "Attribute")),
-            attribute_id: Name(concat!($prefix, "AttributeId")),
-            attribute_id_marker: Name(concat!($prefix, "AttributeIdMarker")),
-            attribute_id_value: Name(concat!($prefix, "AttributeIdValue")),
-            attribute_class: Name(concat!($prefix, "AttributeClass")),
-            attribute_class_marker: Name(concat!($prefix, "AttributeClassMarker")),
-            attribute_class_value: Name(concat!($prefix, "AttributeClassValue")),
-            attribute_name: Name(concat!($prefix, "AttributeName")),
-            attribute_initializer_marker: Name(concat!(
+            name: Name::new(concat!($prefix, "Name")),
+            label: Name::new(concat!($prefix, "Label")),
+            label_marker: Name::new(concat!($prefix, "LabelMarker")),
+            label_string: Name::new(concat!($prefix, "LabelString")),
+            attributes: Name::new(concat!($prefix, "Attributes")),
+            attributes_marker: Name::new(concat!($prefix, "AttributesMarker")),
+            attribute: Name::new(concat!($prefix, "Attribute")),
+            attribute_id: Name::new(concat!($prefix, "AttributeId")),
+            attribute_id_marker: Name::new(concat!($prefix, "AttributeIdMarker")),
+            attribute_id_value: Name::new(concat!($prefix, "AttributeIdValue")),
+            attribute_class: Name::new(concat!($prefix, "AttributeClass")),
+            attribute_class_marker: Name::new(concat!($prefix, "AttributeClassMarker")),
+            attribute_class_value: Name::new(concat!($prefix, "AttributeClassValue")),
+            attribute_name: Name::new(concat!($prefix, "AttributeName")),
+            attribute_initializer_marker: Name::new(concat!(
                 $prefix,
                 "AttributeInitializerMarker"
             )),
-            attribute_value_literal: Name(concat!($prefix, "AttributeValueLiteral")),
-            attribute_value: Name(concat!($prefix, "AttributeValue")),
-            attribute_value_marker: Name(concat!($prefix, "AttributeValueMarker")),
-            attribute_value_data: Name(concat!($prefix, "AttributeValueData")),
+            attribute_value_literal: Name::new(concat!($prefix, "AttributeValueLiteral")),
+            attribute_value: Name::new(concat!($prefix, "AttributeValue")),
+            attribute_value_marker: Name::new(concat!($prefix, "AttributeValueMarker")),
+            attribute_value_data: Name::new(concat!($prefix, "AttributeValueData")),
             disallow_eol: $disallow_eol,
         }
     };
@@ -90,18 +90,20 @@ pub(crate) const TEXT: DirectiveNames = directive_names!("directiveText", false)
 pub(crate) const LEAF: DirectiveNames = directive_names!("directiveLeaf", true);
 pub(crate) const CONTAINER: DirectiveNames = directive_names!("directiveContainer", true);
 
-pub(crate) const DIRECTIVE_TEXT: Name = Name("directiveText");
-pub(crate) const DIRECTIVE_TEXT_MARKER: Name = Name("directiveTextMarker");
-pub(crate) const DIRECTIVE_LEAF: Name = Name("directiveLeaf");
-pub(crate) const DIRECTIVE_LEAF_SEQUENCE: Name = Name("directiveLeafSequence");
-pub(crate) const DIRECTIVE_CONTAINER: Name = Name("directiveContainer");
-pub(crate) const DIRECTIVE_CONTAINER_FENCE: Name = Name("directiveContainerFence");
-pub(crate) const DIRECTIVE_CONTAINER_SEQUENCE: Name = Name("directiveContainerSequence");
-pub(crate) const DIRECTIVE_CONTAINER_CONTENT: Name = Name("directiveContainerContent");
+pub(crate) const DIRECTIVE_TEXT: Name = Name::new("directiveText");
+pub(crate) const DIRECTIVE_TEXT_MARKER: Name = Name::new("directiveTextMarker");
+pub(crate) const DIRECTIVE_LEAF: Name = Name::new("directiveLeaf");
+pub(crate) const DIRECTIVE_LEAF_SEQUENCE: Name = Name::new("directiveLeafSequence");
+pub(crate) const DIRECTIVE_CONTAINER: Name = Name::new("directiveContainer");
+pub(crate) const DIRECTIVE_CONTAINER_FENCE: Name = Name::new("directiveContainerFence");
+pub(crate) const DIRECTIVE_CONTAINER_SEQUENCE: Name =
+    Name::new("directiveContainerSequence");
+pub(crate) const DIRECTIVE_CONTAINER_CONTENT: Name =
+    Name::new("directiveContainerContent");
 /// A line of a label's text, tokenized as text that keeps its trailing whitespace.
-pub(crate) const CHUNK_TEXT: Name = Name("chunkText");
+pub(crate) const CHUNK_TEXT: Name = Name::new("chunkText");
 /// A line of a container's content, tokenized as a document of its own.
-pub(crate) const CHUNK_DOCUMENT: Name = Name("chunkDocument");
+pub(crate) const CHUNK_DOCUMENT: Name = Name::new("chunkDocument");
 
 impl DirectiveKind {
     pub(crate) fn names(self) -> &'static DirectiveNames {

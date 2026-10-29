@@ -13,7 +13,9 @@ pub(crate) fn resolve_heading_atx(tokenizer: &mut Tokenizer) {
         }
         index += 1;
     }
-    tokenizer.map.consume(&mut tokenizer.events);
+    tokenizer
+        .map
+        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
 }
 
 // The heading's child tokens as (enter, exit) indexes; returns the heading's exit index

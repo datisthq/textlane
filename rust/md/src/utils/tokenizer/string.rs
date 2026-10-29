@@ -1,15 +1,16 @@
 use crate::actions::character_escape::tokenize::tokenize_character_escape;
 use crate::actions::character_reference::tokenize::tokenize_character_reference;
 use crate::actions::data::tokenize::tokenize_data;
+use crate::helpers::byte_set::{ByteSet, to_byte_set};
 use crate::models::construct::{Resolver, State};
 use crate::utils::tokenizer::driver::Tokenizer;
 
 // Bytes that may start a string construct: character references and escapes
-const MARKERS: [u8; 2] = *b"&\\";
+const MARKERS: ByteSet = to_byte_set(b"&\\");
 
 /// The string content type: text without phrasing, such as a link destination.
 pub(crate) fn tokenize_string(tokenizer: &mut Tokenizer) -> State {
-    tokenizer.tokenize_state.markers = &MARKERS;
+    tokenizer.tokenize_state.markers = MARKERS;
     State::Retry(before)
 }
 

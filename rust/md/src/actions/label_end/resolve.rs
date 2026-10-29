@@ -11,7 +11,9 @@ pub(crate) fn resolve_label(tokenizer: &mut Tokenizer) {
     let starts = tokenizer.tokenize_state.label_starts_loose.split_off(0);
     mark_as_data(tokenizer, &starts);
     tokenizer.tokenize_state.label_starts_inactive_before = 0;
-    tokenizer.map.consume(&mut tokenizer.events);
+    tokenizer
+        .map
+        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
 }
 
 fn inject_labels(tokenizer: &mut Tokenizer, labels: &[Label]) {

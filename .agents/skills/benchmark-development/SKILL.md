@@ -17,7 +17,7 @@ this skill is how to change it without making the numbers lie.
   it, and the root `tsgo --noEmit` types it. Nothing there runs a real library, and the section
   has no CI job: its numbers need a fixed, idle machine
 - `pnpm -C benchmark setup:tools` — `uv sync --frozen` in `benchmark/adapters/python/`, the
-  `testing` addon into `.cache/addon/`, the `testing` wheel installed into that venv, and the
+  release addon into `.cache/addon/`, the release wheel installed into that venv, and the
   Rust adapters. Rerun it after a crate change: the wheel is not rebuilt per run
 - `pnpm -C benchmark measure` — narrowed with `--case`, `--size`, `--tool`; `--runs 1 --warmup 0`
   for a smoke run. After a textlane change re-measure only
@@ -49,9 +49,11 @@ must sit near the others', or it renders a different document. Pin it: npm by ex
 
 ## Traps
 
-- The bindings expose no pipeline yet: the Node.js and Python adapters call `runCase` /
-  `run_case` of a `testing` build, paying a JSON round trip, a pipeline rebuild and the trace
-  per document. Switch them to the real API the day the bindings get one
+- The Node.js and Python adapters build and `freeze()` their processor once, outside the
+  clock, then `processSync` / `process_sync` per document, as every rival reuses its parser.
+  The Node.js adapter imports `typescript/index.ts` from source, the addon found through
+  `TEXTLANE_ADDON`; the wheel is built by maturin outside `rust/`, so `setup:tools` pins
+  `RUSTUP_TOOLCHAIN=stable` or the default toolchain builds it
 - The Rust adapters are their own cargo workspace, so comrak and friends never enter
   `rust/Cargo.lock`; they build with release, LTO and one codegen unit, as `rust/` does
 - `spec` snippets that leave a fence or raw HTML block open, or define a reference, would

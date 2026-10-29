@@ -24,7 +24,9 @@ pub(crate) fn resolve_whitespace(
             trim_data(tokenizer, index, trim_start, trim_end, hard_break);
         }
     }
-    tokenizer.map.consume(&mut tokenizer.events);
+    tokenizer
+        .map
+        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
 }
 
 fn trim_data(

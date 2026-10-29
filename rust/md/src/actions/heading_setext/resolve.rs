@@ -65,11 +65,11 @@ pub(crate) fn resolve_heading_setext(tokenizer: &mut Tokenizer) {
             tokenizer.events[exit + 1].point = tokenizer.events[enter].point.clone();
             tokenizer.events[exit + 1].link = Some(Link {
                 previous: None,
-                next: Some(exit + 4),
+                next: Link::at(exit + 4),
                 content: ContentType::Text,
             });
             if let Some(link) = tokenizer.events[exit + 4].link.as_mut() {
-                link.previous = Some(exit + 1);
+                link.previous = Link::at(exit + 1);
             }
             tokenizer.map.add(enter + 1, exit - enter, vec![]);
             tokenizer.map.add(exit + 3, 1, vec![]);
@@ -95,5 +95,7 @@ pub(crate) fn resolve_heading_setext(tokenizer: &mut Tokenizer) {
         }
         enter = skip_to(&tokenizer.events, exit + 1, &underline);
     }
-    tokenizer.map.consume(&mut tokenizer.events);
+    tokenizer
+        .map
+        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
 }

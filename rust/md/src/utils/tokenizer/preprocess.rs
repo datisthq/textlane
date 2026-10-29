@@ -50,6 +50,9 @@ pub(crate) struct ParseState<'a> {
     /// Whether a syntax error stopped tokenizing; `error` holds it.
     pub(crate) failed: Cell<bool>,
     pub(crate) error: RefCell<Option<Error>>,
+    /// The buffer `EditMap::consume` rebuilds events into: a fresh one each pass would fault
+    /// in every page again.
+    pub(crate) spare_events: RefCell<Vec<Event>>,
 }
 
 impl ParseState<'_> {
@@ -175,6 +178,7 @@ pub(crate) fn tokenize_input(
         mdx: mdx.cloned(),
         failed: Cell::new(false),
         error: RefCell::new(None),
+        spare_events: RefCell::new(vec![]),
     };
     let start = Point {
         line: 1,

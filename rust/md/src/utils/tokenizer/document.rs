@@ -263,13 +263,13 @@ fn containers_after(tokenizer: &mut Tokenizer) -> State {
     if let Some(previous) = previous
         && let Some(link) = tokenizer.events[previous].link.as_mut()
     {
-        link.next = Some(current);
+        link.next = Link::at(current);
     }
     tokenizer.tokenize_state.document_data_index = Some(current);
     tokenizer.enter_link(
         Name::DATA,
         Link {
-            previous,
+            previous: previous.and_then(Link::at),
             next: None,
             content: ContentType::Flow,
         },
@@ -289,7 +289,7 @@ fn flow_inside(tokenizer: &mut Tokenizer) -> State {
             State::Next(flow_end)
         }
         Some(_) => {
-            tokenizer.consume();
+            tokenizer.consume_while(|_, _| true);
             State::Next(flow_inside)
         }
     }
@@ -361,7 +361,7 @@ fn flow_end(tokenizer: &mut Tokenizer) -> State {
     let mut lazy_continuation = child
         .stack
         .iter()
-        .any(|name| *name == Name::CONTENT || *name == Name("gfmTableHead"));
+        .any(|name| *name == Name::CONTENT || *name == Name::GFM_TABLE_HEAD);
     if !lazy_continuation && !child.events.is_empty() {
         let before =
             skip_opt_back(&child.events, child.events.len() - 1, &[Name::LINE_ENDING]);
@@ -518,7 +518,9 @@ fn resolve(tokenizer: &mut Tokenizer) {
         }
         child_index += 1;
     }
-    child.map.consume(&mut child.events);
+    child
+        .map
+        .consume(&mut child.events, &child.parse_state.spare_events);
 
     let mut flow_index = skip_to(&tokenizer.events, 0, &[Name::DATA]);
     while flow_index < tokenizer.events.len()
@@ -536,7 +538,9 @@ fn resolve(tokenizer: &mut Tokenizer) {
         &mut child.events,
         (0, 0),
     );
-    tokenizer.map.consume(&mut tokenizer.events);
+    tokenizer
+        .map
+        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
 
     if let Some(Some(mut exits)) = tokenizer
         .tokenize_state

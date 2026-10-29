@@ -21,9 +21,11 @@ const CONTAINERS: [Name; 3] = [Name::LIST_ITEM, Name::LIST_ORDERED, Name::LIST_U
 ///
 /// As mdast-util-from-markdown's `prepareList`, blank lines that only trail an item's
 /// content do not make it loose.
-pub(crate) fn find_loose(events: &[Event]) -> HashSet<usize> {
+pub(crate) fn find_loose(
+    events: &[Event],
+    runs: &[(usize, TrailingRun)],
+) -> HashSet<usize> {
     let mut loose = HashSet::new();
-    let trailing_starts = find_trailing_starts(events, true);
     let mut open: Vec<usize> = vec![];
     // The first blank line inside each open item, by the item's enter
     let mut first_blank: HashMap<usize, usize> = HashMap::new();
@@ -36,7 +38,7 @@ pub(crate) fn find_loose(events: &[Event]) -> HashSet<usize> {
         if event.name == Name::LIST_ITEM {
             if let Some(enter) = enter
                 && let Some(blank) = first_blank.remove(&enter)
-                && blank < trailing_starts[index]
+                && blank < read_trailing(runs, index).start
             {
                 loose.insert(enter);
             }
@@ -69,19 +71,53 @@ pub(crate) fn find_loose(events: &[Event]) -> HashSet<usize> {
     loose
 }
 
-/// For each event, where the run of line endings and blank lines right before it starts,
-/// stepping over the exits of lists inside; `prefixes` steps over block quote prefixes
-/// too. Found in one pass, as nested lists all end at the same place.
-pub(crate) fn find_trailing_starts(events: &[Event], prefixes: bool) -> Vec<usize> {
-    let mut starts = Vec::with_capacity(events.len() + 1);
-    starts.push(0);
+/// The run of line endings and blank lines right before an event, stepping over the exits
+/// of lists inside.
+#[derive(Clone, Copy, Debug, Default)]
+pub(crate) struct TrailingRun {
+    /// Where the run starts, block quote prefixes stepped over too.
+    pub(crate) start: usize,
+    /// The first line ending in the run, without and with block quote prefixes.
+    pub(crate) line_ending: [Option<usize>; 2],
+}
+
+/// The trailing run before the exit of each list and list item, the only events that ask,
+/// by the exit's index; found in one pass, as nested lists all end at the same place.
+pub(crate) fn find_trailing(events: &[Event]) -> Vec<(usize, TrailingRun)> {
+    let mut runs = vec![];
+    let mut run = TrailingRun::default();
     for (index, event) in events.iter().enumerate() {
-        let trailing = TRAILING.contains(&event.name)
-            || (prefixes && PREFIXES.contains(&event.name))
-            || (event.kind == Kind::Exit && CONTAINERS.contains(&event.name));
-        starts.push(if trailing { starts[index] } else { index + 1 });
+        let exit = event.kind == Kind::Exit && CONTAINERS.contains(&event.name);
+        if exit {
+            runs.push((index, run));
+        }
+        let trailing = TRAILING.contains(&event.name) || exit;
+        let prefix = PREFIXES.contains(&event.name);
+        let line_ending = event.kind == Kind::Enter
+            && (event.name == Name::LINE_ENDING || event.name == Name::BLANK_LINE_ENDING);
+        if !(trailing || prefix) {
+            run.start = index + 1;
+        }
+        for (first, trailing) in run
+            .line_ending
+            .iter_mut()
+            .zip([trailing, trailing || prefix])
+        {
+            *first = match (trailing, *first) {
+                (false, _) => None,
+                (true, Some(first)) => Some(first),
+                (true, None) => line_ending.then_some(index),
+            };
+        }
     }
-    starts
+    runs
+}
+
+/// The trailing run before the event at `index`, when it is the exit of a list or item.
+pub(crate) fn read_trailing(runs: &[(usize, TrailingRun)], index: usize) -> TrailingRun {
+    runs.binary_search_by_key(&index, |(at, _)| *at)
+        .map(|found| runs[found].1)
+        .unwrap_or_default()
 }
 
 // A blank line right after an item's marker is its empty first line, not a gap
@@ -125,27 +161,4 @@ fn after_empty_container(events: &[Event], exit: usize) -> bool {
         (Name::LIST_ITEM_PREFIX, Some(Name::LIST_ITEM))
             | (Name::BLOCK_QUOTE_PREFIX, Some(Name::BLOCK_QUOTE))
     )
-}
-
-/// For each event, the first line ending in the run of trailing lines right before it,
-/// as `find_trailing_starts` delimits that run.
-pub(crate) fn find_trailing_line_endings(
-    events: &[Event],
-    prefixes: bool,
-) -> Vec<Option<usize>> {
-    let mut firsts = Vec::with_capacity(events.len() + 1);
-    firsts.push(None);
-    for (index, event) in events.iter().enumerate() {
-        let trailing = TRAILING.contains(&event.name)
-            || (prefixes && PREFIXES.contains(&event.name))
-            || (event.kind == Kind::Exit && CONTAINERS.contains(&event.name));
-        let line_ending = event.kind == Kind::Enter
-            && (event.name == Name::LINE_ENDING || event.name == Name::BLANK_LINE_ENDING);
-        firsts.push(match (trailing, firsts[index]) {
-            (false, _) => None,
-            (true, Some(first)) => Some(first),
-            (true, None) => line_ending.then_some(index),
-        });
-    }
-    firsts
 }

@@ -82,7 +82,9 @@ pub(crate) fn resolve_list_item(tokenizer: &mut Tokenizer) {
         tokenizer.map.add(start, 0, vec![list_start]);
         tokenizer.map.add(end + 1, 0, vec![list_end]);
     }
-    tokenizer.map.consume(&mut tokenizer.events);
+    tokenizer
+        .map
+        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
 }
 
 // The exit of each list item, by its enter, found in one pass: walking each item's events

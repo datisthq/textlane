@@ -7,8 +7,8 @@ generated CommonMark document:
 | tool                      | how it runs                                                                           |
 | ------------------------- | ------------------------------------------------------------------------------------- |
 | textlane (Rust)           | `md.parse` → `md.toHtml` → `html.stringify` through `Pipeline`, release+LTO           |
-| textlane (Node.js)        | the same pipeline through the `testing` addon's `runCase`                             |
-| textlane (Python)         | the same pipeline through the `testing` wheel's `run_case`                            |
+| textlane (Node.js)        | the same pipeline through the addon's processor, frozen once, `processSync`           |
+| textlane (Python)         | the same pipeline through the wheel's processor, frozen once, `process_sync`          |
 | comrak                    | `markdown_to_html`, `unsafe` on                                                       |
 | pulldown-cmark            | `html::push_html` over `Parser::new_ext`                                              |
 | markdown-rs               | `to_html_with_options`, dangerous HTML allowed                                        |
@@ -23,9 +23,7 @@ generated CommonMark document:
 
 The adapters live in `adapters/`: `javascript/` beside this package's pinned npm dependencies,
 `python/` a uv project of its own, `rust/` a cargo crate with its own workspace and lock, so no
-rival reaches the published packages. The bindings expose no pipeline yet, so textlane's Node.js
-and Python adapters drive the `testing` build's case runner: each document pays a JSON round
-trip and a pipeline rebuild that a real binding would not. Linux only: memory is the peak
+rival reaches the published packages. Linux only: memory is the peak
 anonymous memory of the process, sampled from `/proc`, and the cap comes from `systemd-run`.
 
 Time leaves out start-up: every adapter imports its library and reads the document, then starts
@@ -35,7 +33,7 @@ its clock, converts the document `repeat` times (at least 8MB of input per run) 
 ## Usage
 
 ```bash
-pnpm -C benchmark setup:tools                    # uv sync, the testing addon and wheel, the Rust adapters
+pnpm -C benchmark setup:tools                    # uv sync, the addon and wheel, the Rust adapters
 pnpm -C benchmark measure --case prose --size 1MB
 pnpm -C benchmark show:report                    # .cache/report.html
 ```

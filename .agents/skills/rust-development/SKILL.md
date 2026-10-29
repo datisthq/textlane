@@ -75,6 +75,14 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   one shared token buffer, and a delimiter run's token list is shared, not copied per
   token. Time
   growth in release mode, best of several runs: single debug timings are noisy.
+- Constant factors in `md`'s tokenizer are memory traffic: each document pass reads and
+  rewrites every event, so an `Event` stays at most a cache line (`Name` a `u16` index into
+  `NAMES`, `Link` indices `u32`), `EditMap::consume` rebuilds in one pass into
+  `ParseState::spare_events`, strings are tokenized inside each child rather than in a pass
+  of their own, and data, paragraph and chunk lines take runs of plain bytes at once
+  (`Tokenizer::consume_while`). Per-event side tables pay the same: keep them sparse, as
+  the compiler's trailing runs are. Measure a change A/B against the previous build,
+  interleaved, best of many runs: a loaded machine drifts by more than most wins
 - Container ends follow micromark, not markdown-rs: a list item ends at the first line
   ending of its trailing blank lines (`prepareList`), stepping over the exits of lists
   inside but not of block quotes; a list does the same without stepping over block quote
@@ -98,7 +106,8 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   by fuzzing random fragments through `md.parse` and the pinned from-markdown; each one
   fixed becomes a case in `conformance/sources/differential.ts`
 - `md`'s engine is a port of markdown-rs (micromark's design in Rust): a state is a plain
-  `fn(&mut Tokenizer) -> State`, a token name an open `Name("…")` constant. A construct not
+  `fn(&mut Tokenizer) -> State`, a token name a `Name::new("…")` constant, its text listed in `NAMES` (`models/token.rs`) or
+  it fails to compile. A construct not
   ported yet is marked where it joins, in `utils/tokenizer/{document,flow,text}.rs`. Where
   markdown-rs differs from micromark or unified, the corpus wins (flow nodes start after their
   indent: `tail_push_after_prefix`; `*` and `_` never count as punctuation next to attention;

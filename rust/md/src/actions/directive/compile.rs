@@ -13,9 +13,10 @@ use crate::utils::compiler::stack::Compiler;
 
 /// A directive: its name, attributes and, for a container, its label as a paragraph.
 pub(crate) fn compile_directive(compiler: &mut Compiler, name: Name, kind: Kind) {
-    let names = [&TEXT, &LEAF, &CONTAINER]
-        .into_iter()
-        .find(|names| name.0.starts_with(names.name.0.trim_end_matches("Name")));
+    let names = [&TEXT, &LEAF, &CONTAINER].into_iter().find(|names| {
+        name.text()
+            .starts_with(names.name.text().trim_end_matches("Name"))
+    });
     match (kind, names) {
         (Kind::Enter, _) if name == DIRECTIVE_TEXT => {
             let children = ArenaVec::new_in(compiler.alloc);

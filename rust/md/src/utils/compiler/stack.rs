@@ -4,7 +4,7 @@ use textlane_core::{Allocator, ArenaString, ArenaVec, Error, Lines, Point, Posit
 use std::collections::HashSet;
 
 use crate::helpers::slice::Slice;
-use crate::helpers::spread::{find_loose, find_trailing_line_endings};
+use crate::helpers::spread::{TrailingRun, find_loose, find_trailing, read_trailing};
 use crate::models::event::{self, Event};
 use crate::models::mdx::MdxCompile;
 use crate::models::options::Matter;
@@ -57,9 +57,7 @@ pub(crate) struct Compiler<'a, 'e> {
     pub(crate) task_list_check_seen: bool,
     /// The attributes of the directive being compiled, as name and decoded value.
     pub(crate) directive_attributes: Vec<(&'a str, String)>,
-    // The first line ending of the trailing lines before each event, without and with
-    // block quote prefixes
-    trailing_line_endings: [Vec<Option<usize>>; 2],
+    trailing: Vec<(usize, TrailingRun)>,
     stack: Vec<Node<'a>>,
     // The enter event of each node opened by a token, as mdast-util-from-markdown's token
     // stack: buffers are not on it, so a node left open inside one is still found
@@ -88,6 +86,7 @@ impl<'a, 'e> Compiler<'a, 'e> {
             position: Some(Position::span(start, end)),
             data: None,
         });
+        let trailing = find_trailing(events);
         Self {
             events,
             source,
@@ -102,13 +101,10 @@ impl<'a, 'e> Compiler<'a, 'e> {
             prefixes,
             text_builder: None,
             heading_setext_text_after: false,
-            loose: find_loose(events),
+            loose: find_loose(events, &trailing),
             task_list_check_seen: false,
             directive_attributes: vec![],
-            trailing_line_endings: [
-                find_trailing_line_endings(events, false),
-                find_trailing_line_endings(events, true),
-            ],
+            trailing,
             stack: vec![root],
             stack_tokens: vec![],
             error: None,
@@ -212,7 +208,8 @@ impl<'a, 'e> Compiler<'a, 'e> {
     pub(crate) fn tail_pop_before_trailing_lines(&mut self, prefixes: bool) {
         self.check_mdx_jsx_closed();
         self.flush_text();
-        let trailing = self.trailing_line_endings[usize::from(prefixes)][self.index];
+        let trailing =
+            read_trailing(&self.trailing, self.index).line_ending[usize::from(prefixes)];
         let mut end = trailing.unwrap_or(self.index);
         // An item whose last construct took its line ending (an unclosed fence) ends
         // after the next item's prefix, as mdast-util-from-markdown's `prepareList` does
@@ -529,7 +526,7 @@ impl<'a, 'e> Compiler<'a, 'e> {
 
 /// Whether a token is a JSX tag, in flow or text.
 pub(crate) fn is_mdx_jsx_tag(name: Name) -> bool {
-    name.0 == "mdxJsxFlowTag" || name.0 == "mdxJsxTextTag"
+    name.text() == "mdxJsxFlowTag" || name.text() == "mdxJsxTextTag"
 }
 
 /// A tag as mdast-util-mdx-jsx names it in errors: `<a>` or `</a>`.
@@ -542,7 +539,7 @@ pub(crate) fn token_type(name: Name) -> &'static str {
     match name {
         Name::HEADING_ATX => "atxHeading",
         Name::HEADING_SETEXT => "setextHeading",
-        _ => name.0,
+        _ => name.text(),
     }
 }
 

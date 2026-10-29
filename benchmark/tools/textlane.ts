@@ -15,9 +15,6 @@ export const ADDON_PATH = join(
   "addon",
   "textlane.node",
 )
-const RUN_CASE_CAVEAT =
-  "drives the `testing` build's case runner, as the binding has no pipeline yet: each document " +
-  "pays a JSON round trip and a pipeline rebuild"
 
 export const textlaneRustTool: Tool = {
   ...createRustTool({
@@ -33,7 +30,7 @@ const typescriptAdapter = createJavascriptTool({
   name: "textlane-typescript",
   title: "textlane (Node.js)",
   adapter: "textlane.ts",
-  caveats: [RUN_CASE_CAVEAT],
+  caveats: [],
 })
 
 export const textlaneTypescriptTool: Tool = {
@@ -54,7 +51,7 @@ export const textlanePythonTool: Tool = {
     title: "textlane (Python)",
     adapter: "convert_textlane.py",
     distribution: "textlane",
-    caveats: [RUN_CASE_CAVEAT],
+    caveats: [],
   }),
   isTextlane: true,
   getVersion: readTextlaneVersion,
@@ -65,12 +62,12 @@ const LIBRARY_NAMES: Record<string, string> = {
   linux: "libtextlane.so",
 }
 
-/** The napi addon with the `testing` feature, the only build exposing `runCase`. */
+/** The napi addon, as the platform packages ship it. */
 export async function buildAddon() {
   const rust = join(ROOT, "rust")
   await promisify(execFile)(
     "cargo",
-    ["build", "--release", "-p", "textlane", "--features", "node,testing"],
+    ["build", "--release", "-p", "textlane", "--features", "node"],
     { cwd: rust, maxBuffer: 64 * 1024 * 1024 },
   )
   const library = LIBRARY_NAMES[process.platform]

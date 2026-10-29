@@ -136,14 +136,16 @@ pub(crate) fn compile_event(compiler: &mut Compiler) {
         Name::TASK_LIST_CHECK_VALUE_CHECKED | Name::TASK_LIST_CHECK_VALUE_UNCHECKED => {
             compile_gfm_task_list_item_check(compiler, name, kind)
         }
-        _ if name.0.starts_with("directive") => compile_directive(compiler, name, kind),
-        _ if name.0.starts_with("mdxJsx") => {
+        _ if name.text().starts_with("directive") => {
+            compile_directive(compiler, name, kind)
+        }
+        _ if name.text().starts_with("mdxJsx") => {
             compile_mdx_jsx_element(compiler, name, kind)
         }
-        _ if (name.0.starts_with("mdxFlowExpression")
-            || name.0.starts_with("mdxTextExpression")
-            || name.0.starts_with("mdxjsEsm"))
-            && !name.0.ends_with("Marker") =>
+        _ if (name.text().starts_with("mdxFlowExpression")
+            || name.text().starts_with("mdxTextExpression")
+            || name.text().starts_with("mdxjsEsm"))
+            && !name.text().ends_with("Marker") =>
         {
             compile_mdx_expression(compiler, name, kind);
         }

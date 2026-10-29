@@ -18,28 +18,38 @@ use crate::actions::label_start_link::tokenize::tokenize_label_start_link;
 use crate::actions::math_text::tokenize::tokenize_math_text;
 use crate::actions::mdx_expression_text::tokenize::tokenize_mdx_expression_text;
 use crate::actions::mdx_jsx_text::tokenize::tokenize_mdx_jsx_text;
+use crate::helpers::byte_set::{ByteSet, add_byte, to_byte_set};
 use crate::helpers::literal::can_start_literal;
 use crate::models::construct::{Resolver, State};
 use crate::utils::tokenizer::driver::Tokenizer;
 
 // Bytes that may start a text construct, where data stops to let one try
-const MARKERS: [u8; 9] = *b"!&*<[\\]_`";
-const MARKERS_GFM: [u8; 10] = *b"!&*<[\\]_`~";
-const MARKERS_DIRECTIVE: [u8; 10] = *b"!&*:<[\\]_`";
-const MARKERS_GFM_DIRECTIVE: [u8; 11] = *b"!&*:<[\\]_`~";
+const MARKERS: ByteSet = to_byte_set(b"!&*<[\\]_`");
+const MARKERS_GFM: ByteSet = to_byte_set(b"!&*<[\\]_`~");
+const MARKERS_DIRECTIVE: ByteSet = to_byte_set(b"!&*:<[\\]_`");
+const MARKERS_GFM_DIRECTIVE: ByteSet = to_byte_set(b"!&*:<[\\]_`~");
 
 /// The text content type: phrasing, such as the inside of a paragraph or heading.
 pub(crate) fn tokenize_text(tokenizer: &mut Tokenizer) -> State {
     let gfm = tokenizer.parse_state.gfm.is_some();
-    tokenizer.tokenize_state.markers = match (gfm, tokenizer.parse_state.directive) {
-        (false, false) => &MARKERS,
-        (true, false) => &MARKERS_GFM,
-        (false, true) => &MARKERS_DIRECTIVE,
-        (true, true) => &MARKERS_GFM_DIRECTIVE,
+    let mut markers = match (gfm, tokenizer.parse_state.directive) {
+        (false, false) => MARKERS,
+        (true, false) => MARKERS_GFM,
+        (false, true) => MARKERS_DIRECTIVE,
+        (true, true) => MARKERS_GFM_DIRECTIVE,
     };
+    let math = tokenizer.parse_state.math.is_some();
+    let mdx = tokenizer.parse_state.mdx.is_some();
+    if math {
+        markers = add_byte(markers, b'$');
+    }
+    if mdx {
+        markers = add_byte(markers, b'{');
+    }
+    tokenizer.tokenize_state.markers = markers;
     tokenizer.tokenize_state.literal_autolinks = gfm;
-    tokenizer.tokenize_state.math_text = tokenizer.parse_state.math.is_some();
-    tokenizer.tokenize_state.mdx_text = tokenizer.parse_state.mdx.is_some();
+    tokenizer.tokenize_state.math_text = math;
+    tokenizer.tokenize_state.mdx_text = mdx;
     State::Retry(before)
 }
 

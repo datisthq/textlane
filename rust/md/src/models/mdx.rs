@@ -131,46 +131,46 @@ pub(crate) struct MdxExpressionNames {
 macro_rules! jsx_names {
     ($prefix:literal) => {
         MdxJsxNames {
-            tag: Name($prefix),
-            marker: Name(concat!($prefix, "Marker")),
-            closing_marker: Name(concat!($prefix, "ClosingMarker")),
-            self_closing_marker: Name(concat!($prefix, "SelfClosingMarker")),
-            name: Name(concat!($prefix, "Name")),
-            name_primary: Name(concat!($prefix, "NamePrimary")),
-            name_member_marker: Name(concat!($prefix, "NameMemberMarker")),
-            name_member: Name(concat!($prefix, "NameMember")),
-            name_prefix_marker: Name(concat!($prefix, "NamePrefixMarker")),
-            name_local: Name(concat!($prefix, "NameLocal")),
+            tag: Name::new($prefix),
+            marker: Name::new(concat!($prefix, "Marker")),
+            closing_marker: Name::new(concat!($prefix, "ClosingMarker")),
+            self_closing_marker: Name::new(concat!($prefix, "SelfClosingMarker")),
+            name: Name::new(concat!($prefix, "Name")),
+            name_primary: Name::new(concat!($prefix, "NamePrimary")),
+            name_member_marker: Name::new(concat!($prefix, "NameMemberMarker")),
+            name_member: Name::new(concat!($prefix, "NameMember")),
+            name_prefix_marker: Name::new(concat!($prefix, "NamePrefixMarker")),
+            name_local: Name::new(concat!($prefix, "NameLocal")),
             expression_attribute: MdxExpressionNames {
-                expression: Name(concat!($prefix, "ExpressionAttribute")),
-                marker: Name(concat!($prefix, "ExpressionAttributeMarker")),
-                chunk: Name(concat!($prefix, "ExpressionAttributeValue")),
+                expression: Name::new(concat!($prefix, "ExpressionAttribute")),
+                marker: Name::new(concat!($prefix, "ExpressionAttributeMarker")),
+                chunk: Name::new(concat!($prefix, "ExpressionAttributeValue")),
             },
-            attribute: Name(concat!($prefix, "Attribute")),
-            attribute_name: Name(concat!($prefix, "AttributeName")),
-            attribute_name_primary: Name(concat!($prefix, "AttributeNamePrimary")),
-            attribute_name_prefix_marker: Name(concat!(
+            attribute: Name::new(concat!($prefix, "Attribute")),
+            attribute_name: Name::new(concat!($prefix, "AttributeName")),
+            attribute_name_primary: Name::new(concat!($prefix, "AttributeNamePrimary")),
+            attribute_name_prefix_marker: Name::new(concat!(
                 $prefix,
                 "AttributeNamePrefixMarker"
             )),
-            attribute_name_local: Name(concat!($prefix, "AttributeNameLocal")),
-            attribute_initializer_marker: Name(concat!(
+            attribute_name_local: Name::new(concat!($prefix, "AttributeNameLocal")),
+            attribute_initializer_marker: Name::new(concat!(
                 $prefix,
                 "AttributeInitializerMarker"
             )),
-            attribute_value_literal: Name(concat!($prefix, "AttributeValueLiteral")),
-            attribute_value_literal_marker: Name(concat!(
+            attribute_value_literal: Name::new(concat!($prefix, "AttributeValueLiteral")),
+            attribute_value_literal_marker: Name::new(concat!(
                 $prefix,
                 "AttributeValueLiteralMarker"
             )),
-            attribute_value_literal_value: Name(concat!(
+            attribute_value_literal_value: Name::new(concat!(
                 $prefix,
                 "AttributeValueLiteralValue"
             )),
             attribute_value_expression: MdxExpressionNames {
-                expression: Name(concat!($prefix, "AttributeValueExpression")),
-                marker: Name(concat!($prefix, "AttributeValueExpressionMarker")),
-                chunk: Name(concat!($prefix, "AttributeValueExpressionValue")),
+                expression: Name::new(concat!($prefix, "AttributeValueExpression")),
+                marker: Name::new(concat!($prefix, "AttributeValueExpressionMarker")),
+                chunk: Name::new(concat!($prefix, "AttributeValueExpressionValue")),
             },
         }
     };
@@ -180,20 +180,20 @@ pub(crate) static JSX_FLOW: MdxJsxNames = jsx_names!("mdxJsxFlowTag");
 pub(crate) static JSX_TEXT: MdxJsxNames = jsx_names!("mdxJsxTextTag");
 
 pub(crate) static EXPRESSION_FLOW: MdxExpressionNames = MdxExpressionNames {
-    expression: Name("mdxFlowExpression"),
-    marker: Name("mdxFlowExpressionMarker"),
-    chunk: Name("mdxFlowExpressionChunk"),
+    expression: Name::new("mdxFlowExpression"),
+    marker: Name::new("mdxFlowExpressionMarker"),
+    chunk: Name::new("mdxFlowExpressionChunk"),
 };
 pub(crate) static EXPRESSION_TEXT: MdxExpressionNames = MdxExpressionNames {
-    expression: Name("mdxTextExpression"),
-    marker: Name("mdxTextExpressionMarker"),
-    chunk: Name("mdxTextExpressionChunk"),
+    expression: Name::new("mdxTextExpression"),
+    marker: Name::new("mdxTextExpressionMarker"),
+    chunk: Name::new("mdxTextExpressionChunk"),
 };
 
-pub(crate) const MDXJS_ESM: Name = Name("mdxjsEsm");
-pub(crate) const MDXJS_ESM_DATA: Name = Name("mdxjsEsmData");
-pub(crate) const ES_WHITESPACE: Name = Name("esWhitespace");
-pub(crate) const LINE_PREFIX: Name = Name("linePrefix");
+pub(crate) const MDXJS_ESM: Name = Name::new("mdxjsEsm");
+pub(crate) const MDXJS_ESM_DATA: Name = Name::new("mdxjsEsmData");
+pub(crate) const ES_WHITESPACE: Name = Name::new("esWhitespace");
+pub(crate) const LINE_PREFIX: Name = Name::new("linePrefix");
 
 /// A JSX tag being compiled, as mdast-util-mdx-jsx builds it before it opens or closes an
 /// element.

@@ -14,9 +14,9 @@ const SOURCE: &str = "mdast-util-mdx-jsx";
 /// A JSX tag: it opens an element, closes one, or both, as mdast-util-mdx-jsx compiles it.
 pub(crate) fn compile_mdx_jsx_element(compiler: &mut Compiler, name: Name, kind: Kind) {
     let part = name
-        .0
+        .text()
         .strip_prefix("mdxJsxFlowTag")
-        .or_else(|| name.0.strip_prefix("mdxJsxTextTag"))
+        .or_else(|| name.text().strip_prefix("mdxJsxTextTag"))
         .unwrap_or_default();
     match (part, kind) {
         ("", Kind::Enter) => {
@@ -191,7 +191,7 @@ fn exit_tag(compiler: &mut Compiler) {
             position: Some(Position::span(start, start)),
             data: None,
         };
-        let flow = compiler.events[compiler.index].name.0 == "mdxJsxFlowTag";
+        let flow = compiler.events[compiler.index].name.text() == "mdxJsxFlowTag";
         let index = compiler.index;
         compiler.index = tag.start;
         compiler.tail_push(if flow {
