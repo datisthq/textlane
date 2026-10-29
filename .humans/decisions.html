@@ -863,6 +863,18 @@
     <p><strong>Why.</strong> A skipped case always points at the fix that unblocks it.</p>
     <p><strong>Rejected.</strong> Free-form skip lists.</p>
   </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> <code>html.format</code>
+    indents at most 100 levels deep; deeper blocks indent as the 100th
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Each line's indentation grows with its depth, so a deeply
+      nested document would format into output quadratic in its size, as
+      hast-util-format's does; no real page nests that deep.
+    </p>
+    <p><strong>Rejected.</strong> Unbounded indentation; a total output budget.</p>
+  </dd>
 </dl>
 
 <h2>Open</h2>

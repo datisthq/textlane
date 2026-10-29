@@ -95,6 +95,12 @@ impl Parser<'_> {
             Token::Eof(_) => on_eof(self, &mut token),
         }
     }
+
+    /// Feed one token as parse5's `_processToken` does, for tokens no tokenizer read.
+    pub(crate) fn process(&mut self, token: Token) {
+        let mut token = token;
+        process_token(self, &mut token);
+    }
 }
 
 fn process_token(p: &mut Parser, token: &mut Token) {

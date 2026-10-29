@@ -553,3 +553,73 @@ fn checks_setext_underlines_in_linear_time() -> Result<(), Error> {
     }
     Ok(())
 }
+
+#[test]
+fn reparses_hostile_raw_html_in_linear_time() -> Result<(), Error> {
+    let markdown = Processor::new()
+        .with(textlane_md::parse(Default::default()))
+        .with(textlane_md::to_html(textlane_md::ToHtmlOptions {
+            allow_dangerous_html: true,
+            ..Default::default()
+        }))
+        .with(textlane_html::raw(Default::default()))
+        .with(textlane_html::stringify(Default::default()))
+        .freeze()?;
+    for input in [
+        "<div>\n\n".repeat(50_000),
+        "<span>".repeat(100_000),
+        "a <i>b</i> ".repeat(50_000),
+        "<i>a".repeat(20_000),
+        "<table>\n\n".to_string() + &"<td>x\n\n".repeat(20_000),
+        "<title>\n\n".to_string() + &"a <b>c</b> ".repeat(50_000),
+        "x &amp".repeat(50_000),
+        "<!--\n\n".repeat(50_000),
+    ] {
+        let started = std::time::Instant::now();
+        markdown.process(&input)?;
+        let took = started.elapsed();
+        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+    }
+    let html = Processor::new()
+        .with(textlane_html::parse(Default::default()))
+        .with(textlane_html::raw(Default::default()))
+        .with(textlane_html::stringify(Default::default()))
+        .freeze()?;
+    for input in [
+        "<div>".repeat(100_000),
+        "<svg>".repeat(100_000),
+        "<a><b>".repeat(20_000) + &"</a>".repeat(20_000),
+        "<template>".repeat(50_000),
+    ] {
+        let started = std::time::Instant::now();
+        html.process(&input)?;
+        let took = started.elapsed();
+        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+    }
+    Ok(())
+}
+
+#[test]
+fn formats_hostile_html_in_linear_time() -> Result<(), Error> {
+    let indented = Processor::new()
+        .with(textlane_html::parse(Default::default()))
+        .with(textlane_html::format(Default::default()))
+        .with(textlane_html::stringify(Default::default()))
+        .freeze()?;
+    for input in [
+        "<p>a</p>\n".repeat(100_000),
+        "<span>a\n</span>".repeat(100_000),
+        "<div>".to_string() + &"a\n".repeat(100_000),
+        "<head>".to_string() + &"<b>x</b>\n".repeat(50_000),
+        "<div>".repeat(100_000),
+        "<div>\n".repeat(100_000),
+        "<span>".repeat(100_000) + "x",
+        "<svg>".repeat(100_000),
+    ] {
+        let started = std::time::Instant::now();
+        indented.process(&input)?;
+        let took = started.elapsed();
+        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+    }
+    Ok(())
+}

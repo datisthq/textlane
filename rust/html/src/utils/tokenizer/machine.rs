@@ -104,6 +104,10 @@ pub(crate) struct Tokenizer<'s> {
     character: Option<CharacterToken>,
     /// parse5's `currentLocation`: where the next character token or doctype starts.
     location: usize,
+    // Whether parse5's `currentLocation` is set: hast-util-raw clears it, and a reset
+    // drops pending characters that were read without one
+    located: bool,
+    character_located: bool,
     tag: TagToken,
     end_tag: bool,
     attribute_name: String,
@@ -128,6 +132,8 @@ impl<'s> Tokenizer<'s> {
             eof: None,
             character: None,
             location: 0,
+            located: true,
+            character_located: true,
             tag: create_tag(0),
             end_tag: false,
             attribute_name: String::new(),
@@ -154,6 +160,67 @@ impl<'s> Tokenizer<'s> {
             let char = self.consume();
             self.call_state(char);
         }
+    }
+
+    /// The next token of a chunk written with `write`; `None` once the chunk is used up
+    /// and the tokenizer waits for more, keeping its state, as parse5 hibernates.
+    pub(crate) fn next_chunk_token(&mut self) -> Option<Token> {
+        loop {
+            if let Some(token) = self.queue.pop_front() {
+                return Some(token);
+            }
+            if self.preprocessor.chunk_end {
+                return None;
+            }
+            let char = self.consume();
+            if self.preprocessor.chunk_end {
+                return None;
+            }
+            self.call_state(char);
+        }
+    }
+
+    /// Continue on a new chunk that is not the last, dropping what was left of the last
+    /// one, as hast-util-raw resets parse5's preprocessor for each raw node; a chunk with
+    /// a position sets parse5's `currentLocation`.
+    pub(crate) fn write(&mut self, chunk: &'s str, located: bool) {
+        self.preprocessor = Preprocessor::new(chunk);
+        self.preprocessor.last_chunk = false;
+        self.location = 0;
+        self.located = self.located || located;
+        if self.state == State::CharacterReference {
+            self.state = self.return_state;
+        }
+    }
+
+    /// hast-util-raw's `resetTokenizer`: drop the token being built and hand back the
+    /// pending characters, unless read without a location, keeping `state`,
+    /// `in_foreign_node` and `last_start_tag_name`.
+    pub(crate) fn reset(&mut self) -> Option<CharacterToken> {
+        let pos = self.pos();
+        let located = self.character_located;
+        let character = self
+            .character
+            .take()
+            .filter(|_| located)
+            .map(|mut character| {
+                character.span.end = pos;
+                character
+            });
+        self.located = false;
+        self.queue.clear();
+        self.return_state = State::Data;
+        self.tag = create_tag(0);
+        self.end_tag = false;
+        self.attribute_name.clear();
+        self.attribute_index = None;
+        self.attribute_names.clear();
+        self.comment = CommentToken {
+            data: String::new(),
+            span: Span::default(),
+        };
+        self.doctype = create_doctype(None, 0);
+        character
     }
 
     fn consume(&mut self) -> Option<char> {
@@ -193,13 +260,13 @@ impl<'s> Tokenizer<'s> {
     // Token creation and emission
 
     fn create_start_tag(&mut self) {
-        self.tag = create_tag(self.pos() - 1);
+        self.tag = create_tag(self.pos().saturating_sub(1));
         self.end_tag = false;
         self.attribute_names.clear();
     }
 
     fn create_end_tag(&mut self) {
-        self.tag = create_tag(self.pos() - 2);
+        self.tag = create_tag(self.pos().saturating_sub(2));
         self.end_tag = true;
         self.attribute_names.clear();
     }
@@ -208,7 +275,7 @@ impl<'s> Tokenizer<'s> {
         self.comment = CommentToken {
             data: String::new(),
             span: Span {
-                start: self.pos() - offset,
+                start: self.pos().saturating_sub(offset),
                 end: 0,
             },
         };
@@ -223,6 +290,7 @@ impl<'s> Tokenizer<'s> {
         self.attribute_name.push_str(first);
         self.attribute_index = None;
         self.location = self.pos();
+        self.located = true;
     }
 
     fn leave_attribute_name(&mut self) {
@@ -269,6 +337,7 @@ impl<'s> Tokenizer<'s> {
         self.flush_character(start);
         let end = self.pos() + 1;
         self.location = end;
+        self.located = true;
         end
     }
 
@@ -333,8 +402,10 @@ impl<'s> Tokenizer<'s> {
                 return;
             }
             self.location = self.pos();
+            self.located = true;
             self.flush_character(self.location);
         }
+        self.character_located = self.located;
         self.character = Some(CharacterToken {
             kind,
             chars: chars.to_owned(),
@@ -681,7 +752,7 @@ impl<'s> Tokenizer<'s> {
     }
 
     fn text_end_tag_name(&mut self, char: Option<char>, text: State) {
-        if !self.match_special_end_tag() {
+        if !self.match_special_end_tag() && !self.preprocessor.chunk_end {
             self.emit_chars("</");
             self.call_text_state(text, char);
         }
@@ -842,7 +913,7 @@ impl<'s> Tokenizer<'s> {
     fn script_data_double_escape_start(&mut self, char: Option<char>) {
         if self.consume_script_sequence(char) {
             self.state = State::ScriptDataDoubleEscaped;
-        } else {
+        } else if !self.preprocessor.chunk_end {
             self.call_text_state(State::ScriptDataEscaped, char);
         }
     }
@@ -912,7 +983,7 @@ impl<'s> Tokenizer<'s> {
     fn script_data_double_escape_end(&mut self, char: Option<char>) {
         if self.consume_script_sequence(char) {
             self.state = State::ScriptDataEscaped;
-        } else {
+        } else if !self.preprocessor.chunk_end {
             self.call_text_state(State::ScriptDataDoubleEscaped, char);
         }
     }
@@ -1115,7 +1186,8 @@ impl<'s> Tokenizer<'s> {
             self.create_comment(3);
             self.state = State::CommentStart;
         } else if self.consume_sequence("doctype", false) {
-            self.location = self.pos() - 8;
+            self.location = self.pos().saturating_sub(8);
+            self.located = true;
             self.state = State::Doctype;
         } else if self.consume_sequence("[CDATA[", true) {
             if self.in_foreign_node {
@@ -1126,7 +1198,7 @@ impl<'s> Tokenizer<'s> {
                 self.comment.data.push_str("[CDATA[");
                 self.state = State::BogusComment;
             }
-        } else {
+        } else if !self.preprocessor.chunk_end {
             self.error(ErrorCode::IncorrectlyOpenedComment);
             self.create_comment(2);
             self.state = State::BogusComment;
@@ -1365,7 +1437,7 @@ impl<'s> Tokenizer<'s> {
                     self.state = State::AfterDoctypePublicKeyword;
                 } else if self.consume_sequence("system", false) {
                     self.state = State::AfterDoctypeSystemKeyword;
-                } else {
+                } else if !self.preprocessor.chunk_end {
                     self.error(ErrorCode::InvalidCharacterSequenceAfterDoctypeName);
                     self.doctype.force_quirks = true;
                     self.state = State::BogusDoctype;
@@ -1606,6 +1678,11 @@ impl<'s> Tokenizer<'s> {
             DecodeMode::Legacy
         };
         let rest = self.preprocessor.input.get(start + 1..).unwrap_or_default();
+        // parse5 waits for the rest of a reference a chunk ends in, then drops it
+        if !self.preprocessor.last_chunk && may_continue_reference(rest) {
+            self.preprocessor.chunk_end = true;
+            return;
+        }
         let reference = decode_reference(rest, mode);
         if reference.consumed > 0 {
             self.preprocessor.set_pos(start + reference.consumed - 1);
@@ -1646,6 +1723,12 @@ impl<'s> Tokenizer<'s> {
             }
         }
     }
+}
+
+// Whether a reference running to the end of a chunk could still go on in the next one
+fn may_continue_reference(rest: &str) -> bool {
+    rest.bytes()
+        .all(|byte| byte.is_ascii_alphanumeric() || byte == b'#')
 }
 
 fn create_tag(start: usize) -> TagToken {

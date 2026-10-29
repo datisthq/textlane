@@ -12,6 +12,7 @@ mod utils {
     pub(crate) mod builder {
         pub(crate) mod convert;
         pub(crate) mod dom;
+        pub(crate) mod feed;
         pub(crate) mod formatting;
         pub(crate) mod modes;
         pub(crate) mod parser;
@@ -61,9 +62,11 @@ mod actions {
     }
     pub(crate) mod hast {
         pub(crate) mod convert;
+        pub(crate) mod format;
         #[cfg(feature = "highlight")]
         pub(crate) mod highlight;
         pub(crate) mod minify;
+        pub(crate) mod raw;
         pub(crate) mod sanitize;
         pub(crate) mod slug;
         pub(crate) mod stringify;
@@ -160,11 +163,17 @@ mod helpers {
     pub(crate) mod value;
 }
 mod plugins {
+    pub(crate) mod format {
+        pub(crate) mod plugin;
+    }
     #[cfg(feature = "highlight")]
     pub(crate) mod highlight {
         pub(crate) mod plugin;
     }
     pub(crate) mod parse {
+        pub(crate) mod plugin;
+    }
+    pub(crate) mod raw {
         pub(crate) mod plugin;
     }
     pub(crate) mod sanitize {
@@ -183,23 +192,28 @@ mod plugins {
 
 // models
 pub use models::options::{
-    AttributeDefinition, HighlightOptions, ParseOptions, Primitive, SanitizeOptions,
-    SlugOptions, StringifyOptions, ToMarkdownOptions,
+    AttributeDefinition, FormatOptions, HighlightOptions, Indent, ParseOptions,
+    Primitive, RawOptions, SanitizeOptions, SlugOptions, StringifyOptions,
+    ToMarkdownOptions,
 };
 
 // actions
 pub use actions::hast::convert::convert_hast;
+pub use actions::hast::format::format_hast;
 #[cfg(feature = "highlight")]
 pub use actions::hast::highlight::highlight_hast;
+pub use actions::hast::raw::raw_hast;
 pub use actions::hast::sanitize::sanitize_hast;
 pub use actions::hast::slug::slug_hast;
 pub use actions::hast::stringify::stringify_hast;
 pub use actions::html::parse::parse_html;
 
 // plugins
+pub use plugins::format::plugin::{Format, format};
 #[cfg(feature = "highlight")]
 pub use plugins::highlight::plugin::{Highlight, highlight};
 pub use plugins::parse::plugin::{Parse, parse};
+pub use plugins::raw::plugin::{Raw, raw};
 pub use plugins::sanitize::plugin::{Sanitize, sanitize};
 pub use plugins::slug::plugin::{Slug, slug};
 pub use plugins::stringify::plugin::{Stringify, stringify};

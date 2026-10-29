@@ -11,6 +11,11 @@ pub(crate) struct Preprocessor<'s> {
     next: usize,
     skip_next_line_feed: bool,
     last_error: Option<usize>,
+    /// Whether the input ends the document, not a chunk more may follow.
+    pub(crate) last_chunk: bool,
+    /// Whether a read ran past the end of a chunk that is not the last: parse5's sticky
+    /// `endOfChunkHit`, after which the tokenizer waits for the next chunk.
+    pub(crate) chunk_end: bool,
 }
 
 impl<'s> Preprocessor<'s> {
@@ -21,6 +26,8 @@ impl<'s> Preprocessor<'s> {
             next: 0,
             skip_next_line_feed: false,
             last_error: None,
+            last_chunk: true,
+            chunk_end: false,
         }
     }
 
@@ -34,6 +41,7 @@ impl<'s> Preprocessor<'s> {
                 .and_then(|rest| rest.chars().next())
             else {
                 self.next = self.pos + 1;
+                self.chunk_end = !self.last_chunk;
                 return None;
             };
             self.next = self.pos + char.len_utf8();
@@ -64,14 +72,15 @@ impl<'s> Preprocessor<'s> {
     /// Where `pattern` ends if the input continues with it from the current character,
     /// comparing UTF-16 units as parse5 does: case-insensitively by setting bit `0x20`.
     pub(crate) fn match_sequence(
-        &self,
+        &mut self,
         pattern: &str,
         case_sensitive: bool,
     ) -> Option<usize> {
         let mut expected = pattern.encode_utf16();
         let mut end = self.pos;
         let mut units = [0; 2];
-        let rest = self.input.get(self.pos..)?;
+        let input = self.input;
+        let rest = input.get(self.pos..)?;
         for char in rest.chars() {
             for &unit in char.encode_utf16(&mut units).iter() {
                 let Some(want) = expected.next() else {
@@ -84,12 +93,20 @@ impl<'s> Preprocessor<'s> {
             }
             end += char.len_utf8();
         }
-        expected.next().is_none().then_some(end)
+        if expected.next().is_some() {
+            self.chunk_end = !self.last_chunk;
+            return None;
+        }
+        Some(end)
     }
 
     /// The character at byte `pos`, with CR read as LF.
-    pub(crate) fn peek_at(&self, pos: usize) -> Option<char> {
-        let char = self.input.get(pos..)?.chars().next()?;
+    pub(crate) fn peek_at(&mut self, pos: usize) -> Option<char> {
+        let Some(char) = self.input.get(pos..).and_then(|rest| rest.chars().next())
+        else {
+            self.chunk_end = !self.last_chunk;
+            return None;
+        };
         Some(if char == '\r' { '\n' } else { char })
     }
 

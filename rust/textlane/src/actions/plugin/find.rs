@@ -40,6 +40,14 @@ pub(crate) fn find_plugin(name: &str) -> Option<BuildPlugin> {
             |_, options| Ok(Box::new(textlane_html::parse(read_options(options)?)))
         }
         #[cfg(feature = "html")]
+        "html.raw" => {
+            |_, options| Ok(Box::new(textlane_html::raw(read_options(options)?)))
+        }
+        #[cfg(feature = "html")]
+        "html.format" => {
+            |_, options| Ok(Box::new(textlane_html::format(read_options(options)?)))
+        }
+        #[cfg(feature = "html")]
         "html.sanitize" => {
             |_, options| Ok(Box::new(textlane_html::sanitize(read_options(options)?)))
         }

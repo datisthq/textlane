@@ -9,7 +9,7 @@ use crate::helpers::schema::{
 use crate::models::options::StringifyOptions;
 
 // html-void-elements
-const VOID_ELEMENTS: [&str; 20] = [
+pub(crate) const VOID_ELEMENTS: [&str; 20] = [
     "area", "base", "basefont", "bgsound", "br", "col", "command", "embed", "frame",
     "hr", "image", "img", "input", "keygen", "link", "meta", "param", "source", "track",
     "wbr",

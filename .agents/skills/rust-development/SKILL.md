@@ -152,6 +152,29 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   element address. Table spans clamp as browsers do (rowspan 65534, colspan 1000), one table adds
   at most `MAX_ADDED_CELLS` empty cells, and each row's splices from rows above are replayed in
   one pass (`replay_inserts`, a Fenwick tree), keeping upstream's index-based splices exact
+- `html.raw` ports hast-util-raw 9.1.0 on the same parse5 port, never a second parser: one
+  `Parser` (`for_document("")` when the tree starts with a doctype or `<html>`, else the
+  template fragment parser) fed by `utils/builder/feed.rs`. Elements, text, comments and
+  doctypes become tokens handed straight to the tree builder (`Parser::process`, parse5's
+  `_processToken`: a text node is always a character token, never whitespace); each raw
+  node is a chunk that is not the last (`Tokenizer::write`, `next_chunk_token`). A read
+  past a chunk's end sets the sticky `Preprocessor::chunk_end` and the tokenizer stops
+  with its state and half-built token kept, as parse5 hibernates; the explicit
+  `_ensureHibernation` sites skip their fallback on it, and the next chunk drops what that
+  lookahead left (`<!-` then `- x -->` is the comment `- x --`). `Tokenizer::reset` is
+  `resetTokenizer`: pending characters reach the builder only if parse5 would hold a
+  `currentLocation` for them (`located`), so a raw `</textarea>` after a text node in a
+  `<title>` vanishes, as upstream. No EOF is ever sent. Passed-through nodes enter as empty
+  comments whose DOM ids `convert_dom` swaps back (`replacements`); their children are
+  separate parse jobs in a queue, converted last first, so nesting never recurses. The
+  output has no positions yet: chunks share no input offsets (rehype-raw maps them through
+  the raw node's start point)
+- `html.format` ports hast-util-format 1.1.0 (`actions/hast/format.rs`): `minify_hast` with
+  `newlines`, then a preorder walk whose frames hold each children vector taken out of its
+  parent and put back once walked. Output grows with depth times indent by nature, so deep
+  stress inputs use `indent: ""`. `html.parse`'s `verbose` builds `data.position` in
+  `convert_dom` from the start tag's span and the attribute spans inside it; attributes the
+  tree builder adopted from a later tag have none, as in parse5
 - `md.gfm` only puts `GfmOptions` in the `GfmSlot` slot; `md.parse` and `md.stringify` read it
   when their factories run at freeze, so GFM's constructs, handlers and unsafe patterns are
   on only with it. A GFM table is tried after each first byte's own flow constructs, as

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use textlane_core::hast::Node;
 use textlane_core::{Allocator, File, Lines, Message, Point, Position};
 
@@ -25,8 +27,10 @@ pub fn parse_html<'a>(
     } else {
         parser.document
     };
-    if options.emit_parse_errors {
-        let lines = Lines::new(input);
+    let lines = (options.emit_parse_errors || options.verbose).then(|| Lines::new(input));
+    if options.emit_parse_errors
+        && let Some(lines) = &lines
+    {
         parser.errors.append(&mut parser.tokenizer.errors);
         for error in std::mem::take(&mut parser.errors) {
             let place = lines.to_unist_position(&Position::span(
@@ -41,5 +45,13 @@ pub fn parse_html<'a>(
             });
         }
     }
-    convert_dom(&parser.dom, root, input.len(), alloc)
+    let verbose = lines.as_ref().filter(|_| options.verbose);
+    convert_dom(
+        &parser.dom,
+        root,
+        input.len(),
+        alloc,
+        &mut HashMap::new(),
+        verbose,
+    )
 }

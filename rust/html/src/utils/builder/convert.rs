@@ -3,25 +3,32 @@ use std::collections::HashMap;
 use textlane_core::hast::{
     Comment, Doctype, Element, Node, Property, PropertyItem, PropertyValue, Root, Text,
 };
-use textlane_core::{Allocator, ArenaVec, Point, Position};
+use textlane_core::{Allocator, ArenaVec, Data, Lines, Point, Position};
 
 use crate::helpers::property::{Item, Value, find_property, parse_property_value};
 use crate::helpers::schema::{HTML, Info, SVG};
 use crate::models::namespace::Namespace;
+use crate::models::token::Span;
 use crate::utils::builder::dom::{DocumentMode, Dom, Location, NodeData, NodeId};
 
-/// Turn the parser's tree into hast, as hast-util-from-parse5 does with hastscript.
+/// Turn the parser's tree into hast, as hast-util-from-parse5 does with hastscript; a leaf
+/// in `replacements` becomes its node there, as hast-util-raw swaps its stitches back.
+/// Given the source's lines, elements get their tags' and attributes' positions in `data`.
 pub(crate) fn convert_dom<'a>(
     dom: &Dom,
     root: NodeId,
     source_length: usize,
     alloc: &'a Allocator,
+    replacements: &mut HashMap<NodeId, Node<'a>>,
+    verbose: Option<&Lines>,
 ) -> Node<'a> {
     let mut converter = Converter {
         dom,
         alloc,
         source_length,
         location_seen: false,
+        replacements,
+        verbose,
     };
     converter.convert(root)
 }
@@ -32,6 +39,8 @@ struct Converter<'d, 'a> {
     source_length: usize,
     // hast-util-from-parse5 gives a root a position once any node before it had one
     location_seen: bool,
+    replacements: &'d mut HashMap<NodeId, Node<'a>>,
+    verbose: Option<&'d Lines<'d>>,
 }
 
 struct Frame<'a> {
@@ -138,17 +147,87 @@ impl<'a> Converter<'_, 'a> {
                     }
                     Position::span(Point::new(location.start, 0), Point::new(end, 0))
                 });
+                let data = match (self.verbose, node.location) {
+                    (Some(lines), Some(location)) => {
+                        self.create_verbose_data(lines, schema, element, location)
+                    }
+                    _ => None,
+                };
                 Node::Element(Element {
                     tag_name: self.alloc.alloc_str(&tag_name),
                     properties,
                     children,
                     position,
                     content,
-                    data: None,
+                    data,
                 })
             }
             _ => Node::Root(self.create_root(Some(frame.children))),
         }
+    }
+
+    // `data.position` of hast-util-from-parse5's `verbose`: the opening and closing tags,
+    // and each attribute of the start tag by property name
+    fn create_verbose_data(
+        &self,
+        lines: &Lines,
+        schema: &'static [Info],
+        element: &crate::utils::builder::dom::Element,
+        location: Location,
+    ) -> Option<&'a Data<'a>> {
+        let start_tag = location.start_tag?;
+        let mut properties: Vec<(String, Data<'a>)> = Vec::new();
+        for attribute in &element.attrs {
+            // Attributes the tree builder adopted from a later tag have no location
+            if attribute.span.start < start_tag.start
+                || attribute.span.end > start_tag.end
+            {
+                continue;
+            }
+            let name = match &attribute.prefix {
+                Some(prefix) if !prefix.is_empty() => {
+                    format!("{prefix}:{}", attribute.name)
+                }
+                _ => attribute.name.clone(),
+            };
+            let property = find_property(schema, &name).property.into_owned();
+            let value = self.create_position_data(lines, attribute.span);
+            match properties.iter_mut().find(|(name, _)| *name == property) {
+                Some(entry) => entry.1 = value,
+                None => properties.push((property, value)),
+            }
+        }
+        let mut fields = ArenaVec::new_in(self.alloc);
+        fields.push(("opening", self.create_position_data(lines, start_tag)));
+        if let Some(end_tag) = location.end_tag {
+            fields.push(("closing", self.create_position_data(lines, end_tag)));
+        }
+        let mut entries = ArenaVec::with_capacity_in(properties.len(), self.alloc);
+        for (name, value) in properties {
+            entries.push((&*self.alloc.alloc_str(&name), value));
+        }
+        fields.push(("properties", Data::Object(entries)));
+        let mut data = ArenaVec::new_in(self.alloc);
+        data.push(("position", Data::Object(fields)));
+        Some(self.alloc.alloc(Data::Object(data)))
+    }
+
+    fn create_position_data(&self, lines: &Lines, span: Span) -> Data<'a> {
+        let position = lines.to_unist_position(&Position::span(
+            Point::new(span.start, 0),
+            Point::new(span.end, 0),
+        ));
+        let mut fields = ArenaVec::new_in(self.alloc);
+        for (name, point) in [("start", position.start), ("end", position.end)] {
+            let mut entries = ArenaVec::new_in(self.alloc);
+            entries.push(("line", Data::Number(point.line as f64)));
+            entries.push(("column", Data::Number(point.column as f64)));
+            if let Some(offset) = point.offset {
+                entries.push(("offset", Data::Number(offset as f64)));
+            }
+            fields.push((name, Data::Object(entries)));
+        }
+        Data::Object(fields)
     }
 
     fn create_root(&self, children: Option<ArenaVec<'a, Node<'a>>>) -> Root<'a> {
@@ -163,6 +242,9 @@ impl<'a> Converter<'_, 'a> {
     }
 
     fn convert_leaf(&mut self, node: NodeId) -> Node<'a> {
+        if let Some(replacement) = self.replacements.remove(&node) {
+            return replacement;
+        }
         let dom_node = &self.dom.nodes[node];
         let position = dom_node
             .location

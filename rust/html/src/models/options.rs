@@ -139,3 +139,35 @@ pub struct ToMarkdownOptions {
     /// deep it nests; `"` by default.
     pub quotes: Option<Vec<String>>,
 }
+
+/// Options of `html.raw`, named as hast-util-raw names them.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
+pub struct RawOptions {
+    /// Node types, unknown to hast, to copy through as they are; their children are
+    /// reparsed on their own.
+    pub pass_through: Vec<String>,
+    /// Escape the opening `<` of the tags GFM's tagfilter disallows in raw nodes.
+    pub tagfilter: bool,
+}
+
+/// Options of `html.format`, named as hast-util-format names them.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
+pub struct FormatOptions {
+    /// Tag names of elements to put a blank line between, when both are one.
+    pub blanks: Vec<String>,
+    /// One level of indentation: a number of spaces or the text itself; two spaces when
+    /// left out.
+    pub indent: Option<Indent>,
+    /// Indent the first level, usually `<html>`'s `head` and `body`; `true` when left out.
+    pub indent_initial: Option<bool>,
+}
+
+/// One level of indentation.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(untagged)]
+pub enum Indent {
+    Spaces(usize),
+    Text(String),
+}
