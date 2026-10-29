@@ -10,7 +10,7 @@ Textlane is a Rust-native text processing pipeline: a replacement for unified wh
 - **pipeline** — a processor built with `.use()`: parse, transform and serialize stages run in order over a syntax tree
 - **plugin** — one pipeline stage, native Rust or a host-language (JavaScript, Python) function called through a binding
 - **conformance suite** — language-neutral JSON cases, each a pipeline, an input and the expected output, in the style of the JSON-Schema test suite; every implementation runs the same cases
-- **docs site** — this repo's livemark project: `livemark.config.ts`, `.livemark/` the Python, TypeScript and Rust sections from the pages in `python/docs/`, `typescript/docs/` and `rust/docs/` and each package's `README.md`, plus the root `CONTRIBUTING.md` and `CHANGELOG.md`, built by `pnpm build:docs` and deployed to textlane.dev
+- **docs site** — this repo's livemark project: `livemark.config.ts`, `.livemark/` and the Python, TypeScript and Rust sections, each from its `docs/` pages, `README.md` and `CONTRIBUTING.md` symlink, plus the root `CHANGELOG.md` as the header's Changelog section, built by `pnpm build:docs` and deployed to textlane.dev
 
 ## Rules
 
@@ -92,7 +92,7 @@ The root is a private pnpm workspace (`package.json`, `pnpm-workspace.yaml`): fo
 - `python/` — the PyPI package `textlane`: `pyproject.toml`, which points maturin at `rust/textlane/Cargo.toml` with `bindings = "pyo3"` and the `python` feature, `scripts/copy-skills.sh`, which stages the shipped skills as wheel data, and `scripts/test.sh`, which builds a `testing` wheel and runs the conformance suite; `docs/` the docs site's Python section
 - `benchmark/` — a private workspace package timing textlane against other Markdown libraries: seeded documents, `adapters/` per language (npm deps here, a uv project, an own-workspace cargo crate), `.cache/report.html` (**`benchmark-development`**)
 - `.skills/` — the shipped agent skills
-- `README.md`, `CONTRIBUTING.md` — the GitHub overview and the contributor guide; `rust/textlane/README.md`, `typescript/README.md` and `python/README.md` are each registry's page
+- `README.md`, `CONTRIBUTING.md` — the GitHub overview and the contributor guide, symlinked as `python/CONTRIBUTING.md`, `typescript/CONTRIBUTING.md` and `rust/CONTRIBUTING.md`, since livemark mounts a file at one path only; `rust/textlane/README.md`, `typescript/README.md` and `python/README.md` are each registry's page
 
 Dot-directories hold non-package code: `.agents/` repo skills, `.humans/` design notes, decisions and research for people (htmlpress pages, served by `pnpm read`), `.skills/` shipped skills, `.livemark/` the docs site's escapes, `.release/` release-please config, `.scripts/` repo-wide guards (`.scripts/-test/`) and the `pnpm squash` script, whose tests the root `vite.config.ts` runs.
 
@@ -104,7 +104,7 @@ Dot-directories hold non-package code: `.agents/` repo skills, `.humans/` design
 - `package.json` script names are `verb[:object]` (`check:lint`, `build:docs`), never noun-first
 - Specs: Vitest via `vite-plus/test`, `<module>.unit.ts`, no "Arrange / Act / Assert" comments
 - Rust: edition 2024, rustfmt (90 columns), clippy with `-D warnings`; snake_case **verb_noun** functions; no `unwrap` / `expect` / `unsafe` outside tests (**`rust-development`**)
-- Docs pages in `python/docs/`, `typescript/docs/` and `rust/docs/` are Markdown with livemark frontmatter (`title`, `description`, `path` under the language's prefix, `icon`, `order`); each package's `README.md` becomes its section's Introduction, and the root `CONTRIBUTING.md` and `CHANGELOG.md` join every section's sidebar, all through `patches` and `sections` in `livemark.config.ts`
+- Docs pages in `python/docs/`, `typescript/docs/` and `rust/docs/` are Markdown with livemark frontmatter (`title`, `description`, `path` under the language's prefix, `icon`, `order`); each package's `README.md` becomes its section's Introduction and its `CONTRIBUTING.md` symlink its Contributing page, and the root `CHANGELOG.md` is a `changelog` section in the header, split per version with the latest beside its tab, all through `patches` and `sections` in `livemark.config.ts`
 - Commits: Conventional Commits, typed by what an installer gets (below)
 
 ## Releases

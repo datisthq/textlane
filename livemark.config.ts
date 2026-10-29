@@ -13,8 +13,9 @@ export default defineConfig({
     "typescript/docs/**/*.md",
     "rust/textlane/README.md",
     "rust/docs/**/*.md",
-    "CONTRIBUTING.md",
-    "CHANGELOG.md",
+    "python/CONTRIBUTING.md",
+    "typescript/CONTRIBUTING.md",
+    "rust/CONTRIBUTING.md",
   ],
   skills: [".skills/*/SKILL.md"],
   sections: [
@@ -22,18 +23,12 @@ export default defineConfig({
     { title: "TypeScript", prefix: "/typescript/", icon: "code-xml" },
     { title: "Rust", prefix: "/rust/", icon: "cog" },
     {
-      title: "Contributing",
-      type: "custom",
-      url: "/contributing/",
-      icon: "heart-handshake",
-      position: "sidebar",
-    },
-    {
       title: "Changelog",
-      type: "custom",
-      url: "/changelog/",
+      type: "changelog",
+      prefix: "/changelog/",
+      source: "CHANGELOG.md",
+      version: true,
       icon: "history",
-      position: "sidebar",
     },
     {
       title: "GitHub",
@@ -74,24 +69,36 @@ export default defineConfig({
       },
     },
     {
-      file: "CONTRIBUTING.md",
+      file: "python/CONTRIBUTING.md",
       article: {
         title: "Contributing",
         description:
           "How to report bugs and share ideas, and how team members work on textlane.",
         icon: "heart-handshake",
-        order: -2,
-        path: "/contributing/",
+        order: -1,
+        path: "/python/contributing/",
       },
     },
     {
-      file: "CHANGELOG.md",
+      file: "typescript/CONTRIBUTING.md",
       article: {
-        title: "Changelog",
-        description: "What changed in each release.",
-        icon: "history",
+        title: "Contributing",
+        description:
+          "How to report bugs and share ideas, and how team members work on textlane.",
+        icon: "heart-handshake",
         order: -1,
-        path: "/changelog/",
+        path: "/typescript/contributing/",
+      },
+    },
+    {
+      file: "rust/CONTRIBUTING.md",
+      article: {
+        title: "Contributing",
+        description:
+          "How to report bugs and share ideas, and how team members work on textlane.",
+        icon: "heart-handshake",
+        order: -1,
+        path: "/rust/contributing/",
       },
     },
   ],

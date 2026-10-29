@@ -82,7 +82,8 @@ area's skill. Keep `AGENTS.md` near 10 KB.
   and the shipped skill under `.skills/` covering it (`textlane-usage`), kept in step; each fact
   in exactly one.
 - How to **work on** textlane → a repo skill in `.agents/skills/`.
-- How a person contributes → `CONTRIBUTING.md`.
+- How a person contributes → the root `CONTRIBUTING.md`; each site section's `CONTRIBUTING.md` is a
+  symlink to it, so never write to those.
 
 Do not restate the change in the docs; the story is what `git log` is for. If the diff adds no
 invariant and removes none, the right outcome is **no documentation change**.

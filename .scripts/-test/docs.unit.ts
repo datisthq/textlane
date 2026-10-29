@@ -5,6 +5,7 @@ import { describe, expect, it } from "vite-plus/test"
 const ROOT = resolve(import.meta.dirname, "..", "..")
 const REPO_SKILLS = join(ROOT, ".agents", "skills")
 const SECTIONS = ["typescript", "python", "rust/textlane"]
+const SITE_SECTIONS = ["python", "typescript", "rust"]
 const SHIPPED_SKILLS = [join(ROOT, ".skills")]
 
 describe("documentation stays true", () => {
@@ -28,6 +29,14 @@ describe("documentation stays true", () => {
     }
     walk(ROOT)
     expect(stray).toEqual([])
+  })
+
+  it("links each site section's CONTRIBUTING.md to the root one", () => {
+    const root = realpathSync(join(ROOT, "CONTRIBUTING.md"))
+    const unlinked = SITE_SECTIONS.filter(
+      name => realpathSync(join(ROOT, name, "CONTRIBUTING.md")) !== root,
+    )
+    expect(unlinked).toEqual([])
   })
 
   it("keeps the package READMEs' usage in step", () => {
