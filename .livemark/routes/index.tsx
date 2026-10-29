@@ -73,14 +73,15 @@ function Hero() {
             Open source · MIT License
           </p>
           <h1 className="mt-5 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-5xl">
-            Fast Markdown pipeline for the{" "}
+            Fast Markdown pipeline for{" "}
             <span className="box-decoration-clone bg-linear-to-r from-primary/20 to-primary/20 bg-size-[100%_0.3em] bg-position-[0_88%] bg-no-repeat">
-              unified ecosystem
+              Python, TypeScript, and Rust
             </span>
           </h1>
           <p className="mt-6 max-w-[52ch] text-lg leading-relaxed text-muted-foreground md:text-xl">
-            Textlane runs the remark, rehype and retext pipeline in Rust: the same mdast,
-            hast and nlcst trees, the same plugins, one crate for every language.
+            Textlane parses Markdown, HTML and prose into syntax trees, runs plugins over
+            them and writes the result back, natively in Rust: one crate behind Rust,
+            Python and TypeScript.
           </p>
           <HeroActions />
         </div>
