@@ -1,0 +1,193 @@
+<title>Optimization</title>
+<meta
+  name="description"
+  content="Where textlane's Markdown-to-HTML time goes, what unified compatibility forces, and the ideas for getting 2–3× faster."
+/>
+<meta name="order" content="6" />
+<meta name="date" content="2026-10-29" />
+
+<h1>Optimization</h1>
+<p>
+  How much faster textlane can turn Markdown into HTML while staying a unified
+  replacement. Stage times are from 2026-10-29 at commit <code>9bf4f98</code>, timing
+  <code>parse</code>, <code>run</code> and <code>stringify</code> separately on 1 MB of
+  the benchmark's <code>prose</code> document; library numbers are from
+  <a href="./benchmark.html">the benchmark</a>. The floors below are estimates, not
+  measurements.
+</p>
+
+<htmlpress-grid cols="4">
+  <htmlpress-card>
+    <h3>66 ms per MB</h3>
+    <p>textlane today, about 16 MB/s for the three stages alone</p>
+  </htmlpress-card>
+  <htmlpress-card>
+    <h3>78% parsing</h3>
+    <p>51 ms in <code>md.parse</code>, before any tree reaches a plugin</p>
+  </htmlpress-card>
+  <htmlpress-card>
+    <h3>~25–35 ms floor</h3>
+    <p>estimated with unified compatibility kept: 2–3× headroom</p>
+  </htmlpress-card>
+  <htmlpress-card>
+    <h3>20 ms comrak</h3>
+    <p>one tree, one pass: the speed a compatible pipeline can approach</p>
+  </htmlpress-card>
+</htmlpress-grid>
+
+<h2>Where the time goes</h2>
+<htmlpress-table>
+  <table>
+    <thead>
+      <tr>
+        <th>Stage</th>
+        <th>Now</th>
+        <th>Estimated floor</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>md.parse</code> → mdast</td>
+        <td>51 ms</td>
+        <td>15–25 ms</td>
+      </tr>
+      <tr>
+        <td><code>md.toHtml</code> → hast</td>
+        <td>7 ms</td>
+        <td>3–5 ms</td>
+      </tr>
+      <tr>
+        <td><code>html.stringify</code></td>
+        <td>6 ms</td>
+        <td>4–5 ms</td>
+      </tr>
+      <tr>
+        <td>freeing the arena</td>
+        <td>2 ms</td>
+        <td>2 ms</td>
+      </tr>
+      <tr>
+        <td><strong>total</strong></td>
+        <td><strong>66 ms</strong></td>
+        <td><strong>25–35 ms</strong></td>
+      </tr>
+    </tbody>
+  </table>
+</htmlpress-table>
+<p>
+  The parser's cost is per block and per line, not per byte: one long paragraph runs near
+  13 MB/s, while a document of tiny paragraphs pays about 2.7 µs each. That is why the
+  benchmark's <code>spec</code> case, thousands of tiny edge cases, runs at 2 MB/s.
+</p>
+
+<h2>Why comrak is 5× faster with a tree too</h2>
+<dl>
+  <dt>Tokenizing</dt>
+  <dd>
+    textlane ports markdown-rs (micromark in Rust): a byte-by-byte state machine that
+    tries each construct with <code>attempt</code> and <code>check</code>, saving and
+    restoring its state, and writes an enter/exit event with a position for everything it
+    finds. comrak scans block structure once per line with hand-written scanners and a
+    stack of open blocks.
+  </dd>
+  <dt>Between tokens and tree</dt>
+  <dd>
+    textlane's resolvers splice the events through an edit map, and content is
+    re-tokenized into text by nested tokenizers before the events become mdast. comrak has
+    no middle layer: nodes go straight into its arena.
+  </dd>
+  <dt>Trees</dt>
+  <dd>
+    textlane builds mdast, then hast, then serializes hast. comrak renders HTML from its
+    single tree. The second tree and the serializer alone cost textlane 13 ms, about 65%
+    of comrak's whole run.
+  </dd>
+  <dt>Not the difference</dt>
+  <dd>
+    Memory: both allocate nodes from a per-document arena (<code>bumpalo</code> in
+    <code>textlane-core</code>, <code>typed_arena</code> in comrak), and freeing it is 2
+    ms of 66.
+  </dd>
+</dl>
+
+<h2>What unified compatibility forces</h2>
+<dl>
+  <dt>Forced</dt>
+  <dd>
+    A full mdast with unified's node shapes and positions, since plugins may run between
+    any two stages; a hast as mdast-util-to-hast builds it; HTML as hast-util-to-html
+    writes it. Textlane will never be pulldown-cmark, which builds no tree.
+  </dd>
+  <dt>Not forced</dt>
+  <dd>
+    The micromark architecture. Only the trees and the HTML are compared, never the
+    events, attempts or tokenizer layers that produce them, so any parser that emits the
+    same mdast with the same positions is compatible.
+  </dd>
+</dl>
+
+<h2>Ideas</h2>
+<p>Ordered from safest to largest; each is checked by the conformance suite.</p>
+<dl>
+  <dt>
+    <htmlpress-badge type="warning">idea</htmlpress-badge> Profile the tokenizer and trim
+    per-attempt overhead
+  </dt>
+  <dd>
+    <p>
+      Skip the state snapshot on common attempts, shrink events and their points, drop the
+      per-byte check of the shared failure flag, replace the edit map's hash map, and cut
+      re-tokenizing layers where a construct allows it. Keeps the port intact; probably
+      1.5–2× on parsing at most. Needs <code>perf</code>, which
+      <code>kernel.perf_event_paranoid=1</code> enables.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">idea</htmlpress-badge> Skip the hast tree when no
+    plugin needs it
+  </dt>
+  <dd>
+    <p>
+      When <code>md.toHtml</code> is followed directly by <code>html.stringify</code>,
+      write HTML from mdast as hast-util-to-html would write the hast, without
+      materializing it. Saves most of the 7 ms; the output is still compared byte for
+      byte, and a pipeline with anything in between takes today's path.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">idea</htmlpress-badge> Tune <code>md.toHtml</code> and
+    <code>html.stringify</code>
+  </dt>
+  <dd>
+    <p>
+      Fewer allocations per node and buffered string writes; small, bounded wins of a few
+      milliseconds per MB.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="danger">open</htmlpress-badge> A single-pass parser that emits
+    mdast directly
+  </dt>
+  <dd>
+    <p>
+      comrak's approach with micromark's output: the only route to comrak-class parsing
+      and the largest share of the 2–3×. It must reproduce every micromark edge case and
+      its exact positions, and reimplement each syntax extension (GFM, math, directive,
+      frontmatter, MDX) on the new parser. The ~2.3k Markdown conformance cases with trees
+      and positions are what make that verifiable; a rewrite is still the largest risk on
+      this page.
+    </p>
+  </dd>
+</dl>
+
+<h2>Not measured yet</h2>
+<ul>
+  <li>
+    JavaScript and Python plugins inside a pipeline: each moves a tree across the binding,
+    a cost that depends on the open host-plugin bridge decision.
+  </li>
+  <li>
+    The other pipelines: HTML parsing, <code>md.stringify</code>, MDX and the prose
+    plugins. Only Markdown to HTML is benchmarked.
+  </li>
+</ul>

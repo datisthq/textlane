@@ -28,7 +28,7 @@
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>4 open</h3>
+    <h3>5 open</h3>
     <p><htmlpress-badge type="danger">open</htmlpress-badge> still to decide</p>
   </htmlpress-card>
 </htmlpress-grid>
@@ -1078,6 +1078,17 @@
       <code>process</code> keeps the tree in the arena and is unaffected. Turning unist
       offsets back into byte spans when <code>run</code> has the file's text would close
       it; the API sample runners compare those trees without positions until then.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="danger">open</htmlpress-badge> Keep the micromark-port parser
+    and tune it, or replace it with a single-pass parser that emits mdast directly
+  </dt>
+  <dd>
+    <p>
+      Parsing is 78% of Markdown-to-HTML time; tuning likely gives 1.5–2× on it, a
+      comrak-style parser 2–3× overall, at the risk of micromark's edge cases and
+      positions. See <a href="./optimization.html">Optimization</a>.
     </p>
   </dd>
 </dl>
