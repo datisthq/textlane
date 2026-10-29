@@ -22,6 +22,7 @@ pub(crate) fn compile_text(compiler: &mut Compiler, name: Name, kind: Kind) {
                     | Node::Emphasis(_)
                     | Node::Strong(_)
                     | Node::TextDirective(_)
+                    | Node::MdxJsxTextElement(_)
             ) {
                 compiler.index -= 1;
                 enter_text(compiler);

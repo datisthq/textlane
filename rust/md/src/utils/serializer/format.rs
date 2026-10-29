@@ -128,6 +128,8 @@ pub(crate) fn is_phrasing(node: &Node) -> bool {
             | Node::Strong(_)
             | Node::Text(_)
             | Node::TextDirective(_)
+            | Node::MdxJsxTextElement(_)
+            | Node::MdxTextExpression(_)
     )
 }
 

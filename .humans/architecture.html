@@ -217,7 +217,9 @@
     bridges need no domain-to-domain edge.
   </li>
   <li>
-    The JS tree is oxc's and lives in <code>mdx</code>, the only crate that compiles oxc.
+    The JS tree lives in <code>mdx</code>, the only crate that compiles oxc: oxc parses
+    embedded JavaScript and its ESTree serializer fills <code>mdx</code>'s own ESTree
+    store.
   </li>
   <li>
     <code>textlane</code> re-exports the domains as modules and, once it has items, core's
@@ -263,9 +265,9 @@
   </dd>
   <dt><code>textlane-mdx</code></dt>
   <dd>
-    <code>compile</code>: hast into a JS tree on oxc, the MDX transforms (document, JSX
-    rewrite, build JSX) and code generation, with ESTree conversion so JavaScript recma
-    plugins can join.
+    <code>compile</code>: hast into an ESTree tree (embedded JavaScript parsed by oxc),
+    the MDX transforms (document, JSX rewrite, build JSX) and code generation as astring
+    prints it.
   </dd>
   <dt><code>textlane-prose</code></dt>
   <dd>
@@ -449,7 +451,7 @@ const processor = textlane()
   </li>
   <li>
     <strong>Core holds every tree type but the JS tree.</strong> That keeps every domain
-    depending on core alone; the JS tree stays inside <code>mdx</code> on oxc.
+    depending on core alone; the JS tree stays inside <code>mdx</code>.
   </li>
   <li>
     <strong>Lifecycle as data.</strong> The core corpus depends on one set of test

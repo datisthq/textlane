@@ -4,8 +4,15 @@ pub(crate) enum Layer {
     Blockquote,
     CodeIndented,
     DefListDescription,
-    FootnoteDefinition { indent_first: bool },
-    ListItem { bullet: String, size: usize },
+    FootnoteDefinition {
+        indent_first: bool,
+    },
+    ListItem {
+        bullet: String,
+        size: usize,
+    },
+    /// A JSX flow element's child, indented by how deep the element nests.
+    Indent(String),
 }
 
 impl Layer {
@@ -27,6 +34,11 @@ impl Layer {
             Layer::FootnoteDefinition { indent_first } => {
                 if !blank && (line > 0 || *indent_first) {
                     output.push_str("    ");
+                }
+            }
+            Layer::Indent(indent) => {
+                if !blank {
+                    output.push_str(indent);
                 }
             }
             Layer::ListItem { bullet, size } => {

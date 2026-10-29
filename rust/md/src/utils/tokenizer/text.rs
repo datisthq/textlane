@@ -16,6 +16,8 @@ use crate::actions::label_end::tokenize::tokenize_label_end;
 use crate::actions::label_start_image::tokenize::tokenize_label_start_image;
 use crate::actions::label_start_link::tokenize::tokenize_label_start_link;
 use crate::actions::math_text::tokenize::tokenize_math_text;
+use crate::actions::mdx_expression_text::tokenize::tokenize_mdx_expression_text;
+use crate::actions::mdx_jsx_text::tokenize::tokenize_mdx_jsx_text;
 use crate::helpers::literal::can_start_literal;
 use crate::models::construct::{Resolver, State};
 use crate::utils::tokenizer::driver::Tokenizer;
@@ -37,6 +39,7 @@ pub(crate) fn tokenize_text(tokenizer: &mut Tokenizer) -> State {
     };
     tokenizer.tokenize_state.literal_autolinks = gfm;
     tokenizer.tokenize_state.math_text = tokenizer.parse_state.math.is_some();
+    tokenizer.tokenize_state.mdx_text = tokenizer.parse_state.mdx.is_some();
     State::Retry(before)
 }
 
@@ -62,6 +65,14 @@ fn before_construct(tokenizer: &mut Tokenizer) -> State {
         Some(b'!') => {
             tokenizer.attempt(State::Next(before), State::Next(before_data));
             State::Retry(tokenize_label_start_image)
+        }
+        Some(b'<') if tokenizer.tokenize_state.mdx_text => {
+            tokenizer.attempt(State::Next(before), State::Next(before_data));
+            State::Retry(tokenize_mdx_jsx_text)
+        }
+        Some(b'{') if tokenizer.tokenize_state.mdx_text => {
+            tokenizer.attempt(State::Next(before), State::Next(before_data));
+            State::Retry(tokenize_mdx_expression_text)
         }
         Some(b'<') => {
             tokenizer.attempt(State::Next(before), State::Next(before_html));

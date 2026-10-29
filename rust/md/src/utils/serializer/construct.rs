@@ -31,6 +31,8 @@ pub(crate) enum Construct {
     ListItem,
     MathFlow,
     MathFlowMeta,
+    MdxJsxFlowElement,
+    MdxJsxTextElement,
     Paragraph,
     Phrasing,
     Reference,
@@ -46,7 +48,7 @@ pub(crate) enum Construct {
 }
 
 impl Construct {
-    pub(crate) const COUNT: usize = 42;
+    pub(crate) const COUNT: usize = 44;
 
     /// The construct mdast-util-to-markdown calls `name`, if any.
     pub(crate) fn from_name(name: &str) -> Option<Construct> {
@@ -81,6 +83,8 @@ impl Construct {
             "listItem" => Construct::ListItem,
             "mathFlow" => Construct::MathFlow,
             "mathFlowMeta" => Construct::MathFlowMeta,
+            "mdxJsxFlowElement" => Construct::MdxJsxFlowElement,
+            "mdxJsxTextElement" => Construct::MdxJsxTextElement,
             "paragraph" => Construct::Paragraph,
             "phrasing" => Construct::Phrasing,
             "reference" => Construct::Reference,

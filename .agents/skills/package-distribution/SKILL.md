@@ -43,6 +43,9 @@ workflow's Stage Skills step both run it, and a wheel built without it ships no 
 one wheel per target with `PyO3/maturin-action`; no sdist is published, since the crate sits
 outside `python/`. Check locally: `pnpm -C python build`, then
 `uv run --with python/build/<wheel> --no-project python -c 'import textlane; print(textlane.version())'`.
+maturin runs from `python/`, outside `rust/`, so `rust/rust-toolchain.toml` does not
+apply there: `python/package.json` and `scripts/test.sh` pin `RUSTUP_TOOLCHAIN=stable`, or a
+machine whose rustup default is an older nightly fails on oxc's minimum rustc.
 
 ## crates.io: `textlane`
 

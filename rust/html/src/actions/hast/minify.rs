@@ -114,7 +114,13 @@ impl<'a> Minifier<'a> {
                 ignore: true,
                 ..Outcome::default()
             },
-            Node::Raw(_) | Node::Unknown(_) => Outcome::default(),
+            Node::Raw(_)
+            | Node::Unknown(_)
+            | Node::MdxJsxFlowElement(_)
+            | Node::MdxJsxTextElement(_)
+            | Node::MdxFlowExpression(_)
+            | Node::MdxTextExpression(_)
+            | Node::MdxjsEsm(_) => Outcome::default(),
         }
     }
 
@@ -217,7 +223,14 @@ fn infer_boundary(node: &Node<'_>) -> Option<bool> {
         Node::Element(_) => None,
         Node::Text(text) if !is_whitespace(text.value) => Some(false),
         Node::Text(_) | Node::Comment(_) | Node::Doctype(_) => None,
-        Node::Root(_) | Node::Raw(_) | Node::Unknown(_) => Some(false),
+        Node::Root(_)
+        | Node::Raw(_)
+        | Node::Unknown(_)
+        | Node::MdxJsxFlowElement(_)
+        | Node::MdxJsxTextElement(_)
+        | Node::MdxFlowExpression(_)
+        | Node::MdxTextExpression(_)
+        | Node::MdxjsEsm(_) => Some(false),
     }
 }
 

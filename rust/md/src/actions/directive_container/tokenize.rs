@@ -2,7 +2,9 @@ use crate::actions::directive_attributes::tokenize::tokenize_directive_attribute
 use crate::actions::directive_label::tokenize::tokenize_directive_label;
 use crate::actions::directive_name::tokenize::tokenize_directive_name;
 use crate::actions::non_lazy_continuation::tokenize::tokenize_non_lazy_continuation;
-use crate::actions::space_or_tab::tokenize::tokenize_space_or_tab;
+use crate::actions::space_or_tab::tokenize::{
+    tokenize_space_or_tab, tokenize_space_or_tab_indent,
+};
 use crate::helpers::slice::{Slice, span_of_exit};
 use crate::models::construct::{Resolver, State};
 use crate::models::directive::{
@@ -13,7 +15,6 @@ use crate::models::event::{ContentType, Link};
 use crate::models::token::Name;
 use crate::utils::tokenizer::driver::Tokenizer;
 
-const TAB_SIZE: usize = 4;
 const SEQUENCE_SIZE_MIN: usize = 3;
 
 /// A container directive: an opening fence of three or more colons with a name, label and
@@ -22,7 +23,7 @@ const SEQUENCE_SIZE_MIN: usize = 3;
 pub(crate) fn tokenize_directive_container(tokenizer: &mut Tokenizer) -> State {
     if matches!(tokenizer.current, Some(b'\t' | b' ')) {
         tokenizer.attempt(State::Next(before), State::Nok);
-        return State::Retry(tokenize_space_or_tab(tokenizer, 0, TAB_SIZE - 1));
+        return State::Retry(tokenize_space_or_tab_indent(tokenizer, 0));
     }
     State::Retry(before)
 }
@@ -205,7 +206,7 @@ fn closing_start(tokenizer: &mut Tokenizer) -> State {
     tokenizer.tokenize_state.directive.size_close = 0;
     if matches!(tokenizer.current, Some(b'\t' | b' ')) {
         tokenizer.attempt(State::Next(closing_prefix_after), State::Nok);
-        return State::Retry(tokenize_space_or_tab(tokenizer, 0, TAB_SIZE - 1));
+        return State::Retry(tokenize_space_or_tab_indent(tokenizer, 0));
     }
     State::Retry(closing_prefix_after)
 }

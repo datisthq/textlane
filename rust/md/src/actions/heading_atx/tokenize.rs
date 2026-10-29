@@ -1,10 +1,11 @@
-use crate::actions::space_or_tab::tokenize::tokenize_space_or_tab;
+use crate::actions::space_or_tab::tokenize::{
+    tokenize_space_or_tab, tokenize_space_or_tab_indent,
+};
 use crate::models::construct::{Resolver, State};
 use crate::models::event::{ContentType, Link};
 use crate::models::token::Name;
 use crate::utils::tokenizer::driver::Tokenizer;
 
-const TAB_SIZE: usize = 4;
 const OPENING_SEQUENCE_SIZE_MAX: usize = 6;
 
 /// An ATX heading: one to six `#`, the text, and an optional closing sequence.
@@ -12,7 +13,7 @@ pub(crate) fn tokenize_heading_atx(tokenizer: &mut Tokenizer) -> State {
     tokenizer.enter(Name::HEADING_ATX);
     if matches!(tokenizer.current, Some(b'\t' | b' ')) {
         tokenizer.attempt(State::Next(before), State::Nok);
-        State::Retry(tokenize_space_or_tab(tokenizer, 0, TAB_SIZE - 1))
+        State::Retry(tokenize_space_or_tab_indent(tokenizer, 0))
     } else {
         State::Retry(before)
     }

@@ -27,6 +27,11 @@ use crate::actions::link_reference::stringify::stringify_link_reference;
 use crate::actions::list::stringify::stringify_list;
 use crate::actions::list_item::stringify::stringify_list_item;
 use crate::actions::math::stringify::stringify_math;
+use crate::actions::mdx_expression::stringify::stringify_mdx_expression;
+use crate::actions::mdx_jsx_element::stringify::{
+    serialize_mdx_jsx_tags, stringify_mdx_jsx_element,
+};
+use crate::actions::mdxjs_esm::stringify::stringify_mdxjs_esm;
 use crate::actions::paragraph::stringify::stringify_paragraph;
 use crate::actions::root::stringify::stringify_root;
 use crate::actions::strong::stringify::{create_strong_attention, stringify_strong};
@@ -256,6 +261,21 @@ impl<'c> Serializer<'c> {
             {
                 stringify_directive(self, node, info)
             }
+            Node::MdxJsxFlowElement(_) | Node::MdxJsxTextElement(_)
+                if self.settings.mdx.is_some() =>
+            {
+                stringify_mdx_jsx_element(self, node)
+            }
+            Node::MdxFlowExpression(expression) | Node::MdxTextExpression(expression)
+                if self.settings.mdx.is_some() =>
+            {
+                stringify_mdx_expression(self, expression);
+                Ok(())
+            }
+            Node::MdxjsEsm(esm) if self.settings.mdx.is_some() => {
+                stringify_mdxjs_esm(self, esm);
+                Ok(())
+            }
             Node::Yaml(yaml) => stringify_frontmatter(self, "yaml", yaml.value),
             Node::Toml(toml) => stringify_frontmatter(self, "toml", toml.value),
             Node::Literal(literal) => {
@@ -276,6 +296,11 @@ impl<'c> Serializer<'c> {
             | Node::DefListDescription(_)
             | Node::Math(_)
             | Node::InlineMath(_)
+            | Node::MdxJsxFlowElement(_)
+            | Node::MdxJsxTextElement(_)
+            | Node::MdxFlowExpression(_)
+            | Node::MdxTextExpression(_)
+            | Node::MdxjsEsm(_)
             | Node::Unknown(_) => Err(Error::new(
                 "unknown-node",
                 format!("Cannot handle unknown node `{}`", read_node_type(node)),
@@ -344,8 +369,20 @@ impl<'c> Serializer<'c> {
         parent: Parent<'n, 'a>,
         info: Info,
     ) -> Result<Vec<Item>, Error> {
+        let mut results = Vec::new();
+        self.phrasing_into(parent, info, &mut results)?;
+        Ok(results)
+    }
+
+    // Phrasing appended to `results`: a JSX text element's tags and children go in the same
+    // list, as copying each nested element's text into its parent is quadratic
+    fn phrasing_into<'n, 'a>(
+        &mut self,
+        parent: Parent<'n, 'a>,
+        info: Info,
+        results: &mut Vec<Item>,
+    ) -> Result<(), Error> {
         let children = parent.children;
-        let mut results: Vec<Item> = Vec::new();
         let mut before = info.before.to_string();
         self.index_stack.push(0);
         for (index, child) in children.iter().enumerate() {
@@ -379,7 +416,28 @@ impl<'c> Serializer<'c> {
                 }
                 _ => None,
             };
-            if let Some(kind) = kind {
+            if let Node::MdxJsxTextElement(element) = child
+                && self.settings.mdx.is_some()
+                && !element.children.is_empty()
+            {
+                let (open, close) = serialize_mdx_jsx_tags(self, element)?;
+                results.push(Item::Text(open));
+                self.enter(Construct::MdxJsxTextElement);
+                let inner = stacker::maybe_grow(STACK_RED_ZONE, STACK_GROWTH, || {
+                    self.phrasing_into(
+                        Parent::of(child),
+                        Info {
+                            before: ">",
+                            after: "<",
+                        },
+                        results,
+                    )
+                });
+                self.exit();
+                inner?;
+                results.push(Item::Text(close));
+                before = ">".to_string();
+            } else if let Some(kind) = kind {
                 let id = self.attention_item(Parent::of(child), kind)?;
                 before = last_character(kind_first_sequence(&self.attentions, id));
                 results.push(Item::Attention(id));
@@ -400,7 +458,7 @@ impl<'c> Serializer<'c> {
             }
         }
         self.index_stack.pop();
-        Ok(results)
+        Ok(())
     }
 
     /// Store an emphasis or strong and its phrasing; returns its index in the store.
@@ -462,6 +520,7 @@ impl<'c> Serializer<'c> {
             }),
             Node::LinkReference(_) | Node::FootnoteReference(_) => Some('['),
             Node::TextDirective(_) if self.settings.directive.is_some() => Some(':'),
+            Node::MdxJsxTextElement(_) if self.settings.mdx.is_some() => Some('<'),
             _ => None,
         };
         if let Some(character) = character {
@@ -551,5 +610,10 @@ pub(crate) fn read_node_type<'a>(node: &Node<'a>) -> &'a str {
         Node::Toml(_) => "toml",
         Node::Literal(literal) => literal.kind,
         Node::Unknown(unknown) => unknown.kind,
+        Node::MdxJsxFlowElement(_) => "mdxJsxFlowElement",
+        Node::MdxJsxTextElement(_) => "mdxJsxTextElement",
+        Node::MdxFlowExpression(_) => "mdxFlowExpression",
+        Node::MdxTextExpression(_) => "mdxTextExpression",
+        Node::MdxjsEsm(_) => "mdxjsEsm",
     }
 }

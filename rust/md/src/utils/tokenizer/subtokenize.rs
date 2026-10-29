@@ -77,6 +77,9 @@ pub(crate) fn subtokenize(
                 link_index = current.and_then(|link| link.next);
             }
             let mut result = tokenizer.flush(state, true);
+            if parse_state.failed.get() {
+                return value;
+            }
             value.definitions.append(&mut result.definitions);
             value.done = false;
             acc = divide_events(&mut map, events, index, &mut tokenizer.events, acc);

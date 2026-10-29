@@ -1,7 +1,7 @@
 use textlane_core::Error;
 
 use crate::models::options::{
-    DirectiveOptions, GfmOptions, MathOptions, Matter, StringifyOptions,
+    DirectiveOptions, GfmOptions, MathOptions, Matter, MdxOptions, StringifyOptions,
 };
 
 /// `md::stringify`'s options, checked once, with their defaults filled in.
@@ -33,6 +33,9 @@ pub(crate) struct Settings {
     /// Directives' options, when `md::directive` is used: their handlers and unsafe
     /// patterns.
     pub(crate) directive: Option<DirectiveOptions>,
+    /// MDX's options, when `md::mdx` is used: its handlers and unsafe patterns, fenced code
+    /// and resource links.
+    pub(crate) mdx: Option<MdxOptions>,
     /// `md.frontmatter`'s matters, whose nodes it writes.
     pub(crate) frontmatter: Vec<Matter>,
 }
@@ -144,6 +147,7 @@ impl Settings {
             definition_list: false,
             math: None,
             directive: None,
+            mdx: None,
             frontmatter: vec![],
         })
     }

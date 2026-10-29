@@ -2,6 +2,9 @@ use serde_json::Value;
 
 use crate::actions::hast::deserialize::{deserialize_data, deserialize_fields};
 use crate::actions::mdast::serialize::MAX_JSON_DEPTH;
+use crate::actions::mdx::deserialize::{
+    read_mdx_jsx_attributes, read_mdx_jsx_name, read_mdx_value,
+};
 use crate::actions::position::deserialize::deserialize_position;
 use crate::models::error::Error;
 use crate::models::mdast::{
@@ -12,6 +15,7 @@ use crate::models::mdast::{
     ReferenceType, Root, Strong, Table, TableCell, TableRow, Text, TextDirective,
     ThematicBreak, Toml, Unknown, Yaml,
 };
+use crate::models::mdx::{MdxExpression, MdxJsxElement, MdxjsEsm};
 use crate::{Allocator, ArenaVec, Data};
 
 /// Read an mdast node from unified's JSON into the arena.
@@ -267,6 +271,35 @@ fn deserialize_node<'a>(
         }),
         "toml" => Node::Toml(Toml {
             value: read_optional_str(value, "value", alloc).unwrap_or_default(),
+            position,
+            data,
+        }),
+        "mdxJsxFlowElement" | "mdxJsxTextElement" => {
+            let element = MdxJsxElement {
+                name: read_mdx_jsx_name(value, alloc),
+                attributes: read_mdx_jsx_attributes(value, alloc, depth)?,
+                children: deserialize_children(value, alloc, depth)?,
+                position,
+                data,
+            };
+            if kind == "mdxJsxFlowElement" {
+                Node::MdxJsxFlowElement(element)
+            } else {
+                Node::MdxJsxTextElement(element)
+            }
+        }
+        "mdxFlowExpression" => Node::MdxFlowExpression(MdxExpression {
+            value: read_mdx_value(value, alloc),
+            position,
+            data,
+        }),
+        "mdxTextExpression" => Node::MdxTextExpression(MdxExpression {
+            value: read_mdx_value(value, alloc),
+            position,
+            data,
+        }),
+        "mdxjsEsm" => Node::MdxjsEsm(MdxjsEsm {
+            value: read_mdx_value(value, alloc),
             position,
             data,
         }),

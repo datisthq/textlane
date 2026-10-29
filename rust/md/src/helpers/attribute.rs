@@ -52,6 +52,16 @@ const INVALID: [(u32, char); 28] = [
 /// `attribute: true`: a reference without a semicolon stays when a letter, digit or `=`
 /// follows it.
 pub(crate) fn decode_attribute(value: &str) -> String {
+    decode_with(value, true)
+}
+
+/// Decode only the character references a semicolon ends, as parse-entities does with
+/// `nonTerminated: false`.
+pub(crate) fn decode_terminated(value: &str) -> String {
+    decode_with(value, false)
+}
+
+fn decode_with(value: &str, non_terminated: bool) -> String {
     let bytes = value.as_bytes();
     let mut result = String::with_capacity(value.len());
     let mut index = 0;
@@ -68,7 +78,7 @@ pub(crate) fn decode_attribute(value: &str) -> String {
             index += 1;
             continue;
         }
-        match decode_reference(value, index + 1) {
+        match decode_reference(value, index + 1, non_terminated) {
             Some((reference, end)) => {
                 result.push_str(&value[start..index]);
                 result.push_str(&reference);
@@ -83,7 +93,11 @@ pub(crate) fn decode_attribute(value: &str) -> String {
 }
 
 // The decoded reference that starts after the `&` at `start`, and where it ends
-fn decode_reference(value: &str, start: usize) -> Option<(String, usize)> {
+fn decode_reference(
+    value: &str,
+    start: usize,
+    non_terminated: bool,
+) -> Option<(String, usize)> {
     let bytes = value.as_bytes();
     let (numeric, radix, begin) = match (bytes.get(start), bytes.get(start + 1)) {
         (Some(b'#'), Some(b'x' | b'X')) => (true, 16, start + 2),
@@ -108,6 +122,9 @@ fn decode_reference(value: &str, start: usize) -> Option<(String, usize)> {
         return None;
     }
     let terminated = bytes.get(end) == Some(&b';');
+    if !terminated && !non_terminated {
+        return None;
+    }
     if numeric {
         let code = u32::from_str_radix(characters, radix).unwrap_or(u32::MAX);
         let after = end + usize::from(terminated);

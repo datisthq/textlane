@@ -1,5 +1,7 @@
 use crate::actions::blank_line::tokenize::tokenize_blank_line;
-use crate::actions::space_or_tab::tokenize::tokenize_space_or_tab;
+use crate::actions::space_or_tab::tokenize::{
+    tokenize_space_or_tab, tokenize_space_or_tab_indent,
+};
 use crate::helpers::identifier::normalize_identifier;
 use crate::models::construct::State;
 use crate::models::event::{ContentType, Link};
@@ -17,7 +19,7 @@ pub(crate) fn tokenize_gfm_footnote_definition(tokenizer: &mut Tokenizer) -> Sta
     tokenizer.enter(Name::GFM_FOOTNOTE_DEFINITION);
     if matches!(tokenizer.current, Some(b'\t' | b' ')) {
         tokenizer.attempt(State::Next(label_before), State::Nok);
-        State::Retry(tokenize_space_or_tab(tokenizer, 1, TAB_SIZE - 1))
+        State::Retry(tokenize_space_or_tab_indent(tokenizer, 1))
     } else {
         State::Retry(label_before)
     }

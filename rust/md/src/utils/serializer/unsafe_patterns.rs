@@ -47,6 +47,7 @@ pub(crate) fn compile_patterns(
     gfm: bool,
     math: Option<&MathOptions>,
     directive: bool,
+    mdx: bool,
     extra: &[UnsafePattern],
 ) -> Result<Vec<Pattern>, Error> {
     let mut patterns = Vec::new();
@@ -57,11 +58,13 @@ pub(crate) fn compile_patterns(
     } else {
         vec![]
     };
+    let mdx_patterns = if mdx { create_mdx_patterns() } else { vec![] };
     for pattern in create_default_patterns()
         .iter()
         .chain(&gfm_patterns)
         .chain(&math_patterns)
         .chain(&directive_patterns)
+        .chain(&mdx_patterns)
         .chain(extra)
     {
         patterns.push(compile_pattern(pattern)?);
@@ -143,6 +146,17 @@ fn create_directive_patterns() -> Vec<UnsafePattern> {
             ..create(':', None, None, phrasing, None)
         },
         create_at_break(':', Some(":+"), None),
+    ]
+}
+
+// mdast-util-mdx's: `{` and `<` would start an expression or a tag
+fn create_mdx_patterns() -> Vec<UnsafePattern> {
+    let phrasing = Some(&["phrasing"][..]);
+    vec![
+        create('{', None, None, phrasing, None),
+        create_at_break('{', None, None),
+        create('<', None, None, phrasing, None),
+        create_at_break('<', None, None),
     ]
 }
 

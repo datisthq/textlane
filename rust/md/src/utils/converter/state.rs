@@ -22,6 +22,8 @@ use crate::actions::link::convert::convert_link;
 use crate::actions::link_reference::convert::convert_link_reference;
 use crate::actions::list::convert::convert_list;
 use crate::actions::list_item::convert::{convert_list_item, is_list_loose};
+use crate::actions::mdx_expression::convert::convert_mdx_expression;
+use crate::actions::mdx_jsx_element::convert::convert_mdx_jsx_element;
 use crate::actions::paragraph::convert::convert_paragraph;
 use crate::actions::root::convert::convert_root;
 use crate::actions::strong::convert::convert_strong;
@@ -37,6 +39,8 @@ use crate::utils::converter::unknown::{apply_data, convert_unknown};
 pub(crate) struct Converter<'a, 'o> {
     pub(crate) alloc: &'a Allocator,
     pub(crate) options: &'o ToHtmlOptions,
+    /// Whether paragraphs of only MDX JSX, expressions and white space unravel.
+    pub(crate) unravel: bool,
     /// Whether each list being converted is loose, worked out once per list for its items.
     pub(crate) loose_lists: Vec<bool>,
     /// The URL and title of each definition, by its identifier in upper case; the first
@@ -144,6 +148,12 @@ impl<'a> Converter<'a, '_> {
             mdast::Node::FootnoteReference(node) => {
                 (convert_footnote_reference(self, node), true)
             }
+            mdast::Node::MdxFlowExpression(_)
+            | mdast::Node::MdxTextExpression(_)
+            | mdast::Node::MdxjsEsm(_) => {
+                results.extend(convert_mdx_expression(node));
+                return;
+            }
             mdast::Node::Math(_)
             | mdast::Node::InlineMath(_)
             | mdast::Node::Literal(_)
@@ -193,6 +203,10 @@ impl<'a> Converter<'a, '_> {
             mdast::Node::Emphasis(emphasis) => convert_emphasis(self, emphasis, children),
             mdast::Node::Strong(strong) => convert_strong(self, strong, children),
             mdast::Node::Paragraph(paragraph) => {
+                if self.unravel && is_unravelable(&paragraph.children) {
+                    unravel_paragraph(&paragraph.children, children, results);
+                    return;
+                }
                 convert_paragraph(self, paragraph, children)
             }
             mdast::Node::Link(link) => convert_link(self, link, children),
@@ -230,6 +244,10 @@ impl<'a> Converter<'a, '_> {
                 {
                     results.push(apply_data(self, node.data(), result));
                 }
+                return;
+            }
+            mdast::Node::MdxJsxFlowElement(_) | mdast::Node::MdxJsxTextElement(_) => {
+                results.extend(convert_mdx_jsx_element(node, children));
                 return;
             }
             mdast::Node::ContainerDirective(_)
@@ -353,6 +371,53 @@ impl<'a> Converter<'a, '_> {
 }
 
 // As trimMarkdownSpaceStart does, on a text node or the first child of an element
+// remark-mark-and-unravel: some MDX, and otherwise only text of HTML white space
+fn is_unravelable(children: &[mdast::Node<'_>]) -> bool {
+    let mut any = false;
+    for child in children {
+        match child {
+            mdast::Node::MdxJsxTextElement(_) | mdast::Node::MdxTextExpression(_) => {
+                any = true
+            }
+            mdast::Node::Text(text)
+                if text.value.bytes().all(|byte| {
+                    matches!(byte, b' ' | b'\t' | b'\n' | b'\r' | b'\x0c')
+                }) => {}
+            _ => return false,
+        }
+    }
+    any
+}
+
+// The MDX becomes flow and white space of tabs, line endings and spaces goes; each child
+// converted into exactly one node, so both lists line up
+fn unravel_paragraph<'a>(
+    mdast_children: &[mdast::Node<'_>],
+    children: ArenaVec<'a, hast::Node<'a>>,
+    results: &mut Vec<hast::Node<'a>>,
+) {
+    for (source, child) in mdast_children.iter().zip(children) {
+        if let mdast::Node::Text(text) = source
+            && !text.value.is_empty()
+            && text
+                .value
+                .bytes()
+                .all(|byte| matches!(byte, b' ' | b'\t' | b'\n' | b'\r'))
+        {
+            continue;
+        }
+        results.push(match child {
+            hast::Node::MdxJsxTextElement(element) => {
+                hast::Node::MdxJsxFlowElement(element)
+            }
+            hast::Node::MdxTextExpression(expression) => {
+                hast::Node::MdxFlowExpression(expression)
+            }
+            child => child,
+        });
+    }
+}
+
 fn trim_start(node: &mut hast::Node<'_>) {
     let text = match node {
         hast::Node::Text(text) => Some(text),

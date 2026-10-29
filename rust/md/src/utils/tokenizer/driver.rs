@@ -1,9 +1,12 @@
 use std::collections::HashMap;
 
+use textlane_core::Error;
+
 use crate::models::construct::{Resolver, State, StateFn};
 use crate::models::def_list::DefListTrack;
 use crate::models::directive::DirectiveState;
 use crate::models::event::{ContentType, Event, Kind, Link, Point};
+use crate::models::mdx::MdxState;
 use crate::models::token::Name;
 use crate::utils::tokenizer::edit_map::EditMap;
 use crate::utils::tokenizer::preprocess::ParseState;
@@ -188,6 +191,10 @@ pub(crate) struct TokenizeState<'a> {
     pub(crate) frontmatter_fence: usize,
     /// For each matter, where the first one that found no closing fence started.
     pub(crate) frontmatter_failed: Vec<Option<usize>>,
+    /// Whether MDX's JSX and expressions may start in this text, so data stops at `{`.
+    pub(crate) mdx_text: bool,
+    /// What the MDX constructs share.
+    pub(crate) mdx: MdxState,
 }
 
 /// Feeds bytes to state functions and records the events they emit.
@@ -407,10 +414,24 @@ impl<'a> Tokenizer<'a> {
         self.push_impl(from, to, state, false)
     }
 
+    /// Stop tokenizing with a syntax error; the first one reported wins.
+    pub(crate) fn crash(&mut self, error: Error) -> State {
+        if !self.parse_state.failed.replace(true) {
+            *self.parse_state.error.borrow_mut() = Some(error);
+        }
+        State::Error
+    }
+
     /// Feed the end of input, then run the registered resolvers when `resolve` is set.
     pub(crate) fn flush(&mut self, state: State, resolve: bool) -> Subresult {
         let to = (self.point.index, self.point.vs);
         self.push_impl(to, to, state, true);
+        if self.parse_state.failed.get() {
+            return Subresult {
+                done: true,
+                definitions: vec![],
+            };
+        }
         let mut value = Subresult {
             done: false,
             definitions: self.tokenize_state.definitions.split_off(0),
@@ -436,7 +457,11 @@ impl<'a> Tokenizer<'a> {
     ) -> State {
         self.move_to(from);
         loop {
+            if self.parse_state.failed.get() {
+                return State::Error;
+            }
             match state {
+                State::Error => break,
                 State::Ok | State::Nok => {
                     let Some(attempt) = self.attempts.pop() else {
                         break;

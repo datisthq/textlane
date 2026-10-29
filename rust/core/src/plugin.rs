@@ -108,6 +108,52 @@ pub struct ProseParserSlot {
     pub parser: Option<Arc<dyn ProseParser>>,
 }
 
+/// A JavaScript parser, as acorn is to micromark's MDX extensions: `md.mdx` asks it where
+/// an expression or a block of imports and exports is valid, and keeps only the source.
+pub trait ScriptParser: Send + Sync {
+    /// Parse `source` whole as one expression (JSX included), comments and white space
+    /// around it allowed, and describe it.
+    fn parse_expression(&self, source: &str) -> Result<ScriptExpression, ScriptError>;
+
+    /// Parse `source` as a module and list its top-level statements.
+    fn parse_module(&self, source: &str) -> Result<Vec<ScriptStatement>, ScriptError>;
+}
+
+/// What an expression is, as far as MDX checks it: the byte offset where it ends, before
+/// any comments after it, and, for an object literal (parentheses dropped), the ESTree type
+/// and byte offset of each property.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ScriptExpression {
+    pub end: usize,
+    pub object: Option<Vec<(String, usize)>>,
+}
+
+/// A top-level statement of a module: its ESTree type, where it starts and, for an
+/// import, the local names it declares.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ScriptStatement {
+    pub kind: String,
+    pub offset: usize,
+    pub imports: Vec<String>,
+}
+
+/// A syntax error: the byte span of what the parser stopped at, which ends at the end of
+/// the source when more source might still make it valid.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ScriptError {
+    pub start: usize,
+    pub end: usize,
+    pub reason: String,
+}
+
+/// The slot holding the script parser `md.mdx` validates JavaScript with; the textlane
+/// processor seeds it when built with `mdx`. Without one, expressions end at the brace
+/// that balances their opening one and imports and exports at a blank line.
+#[derive(Clone, Default)]
+pub struct ScriptParserSlot {
+    pub parser: Option<Arc<dyn ScriptParser>>,
+}
+
 type ParserFactory = Box<dyn FnOnce(&Slots) -> Result<Box<dyn Parser>, Error>>;
 type CompilerFactory = Box<dyn FnOnce(&Slots) -> Result<Box<dyn Compiler>, Error>>;
 

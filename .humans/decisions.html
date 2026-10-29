@@ -21,7 +21,7 @@
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>27 agent's calls</h3>
+    <h3>28 agent's calls</h3>
     <p>
       <htmlpress-badge type="warning">my call</htmlpress-badge> settled by the agent, open
       to change
@@ -167,7 +167,7 @@
     <p>
       <strong>Why.</strong> Syntax changes how Markdown tokenizes; compiling hast to a JS
       module is its own format's job, as <code>@mdx-js/mdx</code> is upstream. The JS tree
-      on oxc stays internal to <code>mdx</code>, and no domain depends on another.
+      stays internal to <code>mdx</code>, and no domain depends on another.
     </p>
     <p>
       <strong>Rejected.</strong> A <code>javascript</code> (or <code>script</code>) crate
@@ -183,7 +183,7 @@
   <dd>
     <p>
       <strong>Why.</strong> Bridges then need no domain-to-domain dependency; the JS tree
-      is oxc's and stays inside <code>mdx</code>.
+      stays inside <code>mdx</code>.
     </p>
     <p><strong>Rejected.</strong> Each domain owning its tree types.</p>
   </dd>
@@ -821,6 +821,29 @@
     </p>
   </dd>
   <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Core defines a
+    <code>ScriptParser</code> trait and a <code>ScriptParserSlot</code>; the mdx crate
+    implements it on oxc and the textlane processor seeds the slot when built with
+    <code>mdx</code>
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> <code>md.mdx</code> lives in md, which depends on core only,
+      yet micromark's MDX extensions ask acorn where an expression ends, whether a spread
+      is one, and which imports and exports a block holds. The trait carries exactly that:
+      parse an expression (where it ends, an object's property types) and parse a module
+      (its statements' types and imported names), each failing with the span it stopped
+      at. md keeps micromark's decisions (a try at each <code>}</code>, the empty check,
+      the error codes), and oxc stays the mdx crate's dependency. Without the slot,
+      expressions balance braces and ESM ends at a blank line, as upstream without acorn.
+    </p>
+    <p>
+      <strong>Rejected.</strong> oxc in md (a JavaScript parser in every Markdown build);
+      a hand-written JavaScript scanner in md (JSX text, regular expressions and template
+      literals would each diverge from acorn).
+    </p>
+  </dd>
+  <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge> retext-spell is deferred
   </dt>
   <dd>
@@ -908,6 +931,25 @@
       <code>prose.indefiniteArticle</code> still fail the run, as upstream throws.
     </p>
     <p><strong>Rejected.</strong> Copying upstream's silent fallback and crash.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> MDX's JavaScript parses on a
+    stack sized from an upper bound on its depth, and a value that keeps failing is given
+    up on after a linear re-parse budget
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> oxc recurses once per nesting level with no guard of its own,
+      and unary, assignment, arrow and JSX chains nest without brackets: the count of
+      punctuation bytes and words bounds every shape. micromark re-parses an expression at
+      each closing brace and ESM at each blank line, which is quadratic on text that keeps
+      one unclosed (<code>{'</code> then many <code>}</code>); such a value now fails as a
+      parse error once it has cost 16 times its length plus 1 MiB.
+    </p>
+    <p>
+      <strong>Rejected.</strong> A bracket counter, which <code>=&gt;</code>, strings and
+      bracket-free chains fool; rejecting deep input outright; upstream's unbounded tries.
+    </p>
   </dd>
 </dl>
 

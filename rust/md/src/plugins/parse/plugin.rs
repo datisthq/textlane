@@ -1,9 +1,12 @@
-use textlane_core::{Allocator, Attach, Error, File, Parser, Plugin, Tree, TreeKind};
+use textlane_core::{
+    Allocator, Attach, Error, File, Parser, Plugin, ScriptParserSlot, Tree, TreeKind,
+};
 
-use crate::actions::markdown::parse::parse_markdown_with;
+use crate::actions::markdown::parse::{ParseSettings, parse_markdown_with};
+use crate::models::mdx::MdxScript;
 use crate::models::options::{
     DefinitionListSlot, DirectiveSlot, FrontmatterSlot, GfmOptions, GfmSlot, MathOptions,
-    MathSlot, Matter, ParseOptions,
+    MathSlot, Matter, MdxSlot, ParseOptions,
 };
 
 /// `md.parse`: Markdown into mdast.
@@ -31,12 +34,23 @@ impl Plugin for Parse {
                 .unwrap_or_default();
             let definition_list =
                 slots.get::<DefinitionListSlot>().is_some_and(|slot| slot.0);
+            let mdx = slots
+                .get::<MdxSlot>()
+                .and_then(|slot| slot.0.as_ref())
+                .map(|_| {
+                    MdxScript(
+                        slots
+                            .get::<ScriptParserSlot>()
+                            .and_then(|slot| slot.parser.clone()),
+                    )
+                });
             Ok(Box::new(MarkdownParser {
                 gfm,
                 math,
                 directive,
                 frontmatter,
                 definition_list,
+                mdx,
             }))
         });
         Ok(())
@@ -49,6 +63,7 @@ struct MarkdownParser {
     directive: bool,
     frontmatter: Vec<Matter>,
     definition_list: bool,
+    mdx: Option<MdxScript>,
 }
 
 impl Parser for MarkdownParser {
@@ -67,14 +82,14 @@ impl Parser for MarkdownParser {
         _file: &mut File,
         alloc: &'a Allocator,
     ) -> Result<Tree<'a>, Error> {
-        Ok(Tree::Mdast(parse_markdown_with(
-            input,
-            self.gfm.as_ref(),
-            self.math.as_ref(),
-            self.directive,
-            &self.frontmatter,
-            self.definition_list,
-            alloc,
-        )))
+        let settings = ParseSettings {
+            gfm: self.gfm.as_ref(),
+            math: self.math.as_ref(),
+            directive: self.directive,
+            frontmatter: &self.frontmatter,
+            definition_list: self.definition_list,
+            mdx: self.mdx.as_ref(),
+        };
+        parse_markdown_with(input, &settings, alloc).map(Tree::Mdast)
     }
 }

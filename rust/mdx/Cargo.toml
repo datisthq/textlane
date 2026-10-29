@@ -7,12 +7,21 @@ license.workspace = true
 authors.workspace = true
 repository.workspace = true
 homepage.workspace = true
-description = "Textlane's MDX compiler: the JS tree on oxc, the MDX transforms and code generation"
+description = "Textlane's MDX compiler: hast into JavaScript, with the MDX transforms and code generation"
 keywords = ["mdx", "javascript", "ast", "textlane"]
 categories = ["text-processing", "parser-implementations"]
 
 [dependencies]
 textlane-core.workspace = true
+oxc_allocator.workspace = true
+oxc_ast.workspace = true
+oxc_diagnostics.workspace = true
+oxc_parser.workspace = true
+oxc_semantic.workspace = true
+oxc_span.workspace = true
+oxc_syntax.workspace = true
+serde.workspace = true
+stacker.workspace = true
 
 [lints]
 workspace = true

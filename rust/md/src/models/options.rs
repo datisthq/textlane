@@ -1,4 +1,6 @@
 use serde::Deserialize;
+use std::sync::Arc;
+use std::sync::atomic::AtomicBool;
 
 /// Options of `md::parse`.
 #[derive(Clone, Debug, Default, Deserialize)]
@@ -228,6 +230,28 @@ impl Default for DirectiveOptions {
 /// What `md::math` shares with the parser and serializer: `Some` once math is used.
 #[derive(Clone, Debug, Default)]
 pub struct MathSlot(pub Option<MathOptions>);
+
+/// Options of `md::mdx`, named as remark-mdx and mdast-util-mdx-jsx's serializer name them.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
+pub struct MdxOptions {
+    /// The quote of JSX attribute values: `"` (when unset) or `'`.
+    pub quote: Option<String>,
+    /// Use the other quote when the preferred one occurs more often in a value.
+    pub quote_smart: bool,
+    /// Write self-closing tags without a space before the slash, `<a/>`.
+    pub tight_self_closing: bool,
+    /// The width past which a flow element's attributes go on lines of their own.
+    pub print_width: Option<f64>,
+}
+
+/// Whether `md::mdx` is in the pipeline, for `md::to_html`, which may attach before it.
+#[derive(Clone, Debug, Default)]
+pub(crate) struct UnravelSlot(pub(crate) Arc<AtomicBool>);
+
+/// What `md::mdx` shares with the parser and serializer: `Some` once MDX is used.
+#[derive(Clone, Debug, Default)]
+pub struct MdxSlot(pub Option<MdxOptions>);
 
 /// What `md::directive` shares with the parser and serializer: `Some` once directives are
 /// used.

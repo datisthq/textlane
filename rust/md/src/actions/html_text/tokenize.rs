@@ -12,7 +12,7 @@ const INSTRUCTION: usize = 3;
 
 /// Inline HTML: a tag, comment, processing instruction, declaration or CDATA.
 pub(crate) fn tokenize_html_text(tokenizer: &mut Tokenizer) -> State {
-    if Some(b'<') == tokenizer.current && true {
+    if Some(b'<') == tokenizer.current && tokenizer.parse_state.mdx.is_none() {
         tokenizer.enter(Name::HTML_TEXT);
         tokenizer.enter(Name::HTML_TEXT_DATA);
         tokenizer.consume();

@@ -28,6 +28,15 @@ regex = { version = "1.11.1", default-features = false, features = [
 stacker = "0.1.21"
 giallo = { version = "0.5.2", features = ["dump"] }
 url = "2.5.4"
+unicode-id-start = "1.5.0"
+oxc_allocator = "0.155.0"
+oxc_ast = { version = "0.155.0", features = ["serialize"] }
+oxc_ast_visit = "0.155.0"
+oxc_diagnostics = "0.155.0"
+oxc_parser = "0.155.0"
+oxc_semantic = "0.155.0"
+oxc_span = "0.155.0"
+oxc_syntax = "0.155.0"
 
 [workspace.lints.rust]
 unsafe_code = "deny"

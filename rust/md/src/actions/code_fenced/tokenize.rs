@@ -1,12 +1,13 @@
 use crate::actions::non_lazy_continuation::tokenize::tokenize_non_lazy_continuation;
-use crate::actions::space_or_tab::tokenize::tokenize_space_or_tab;
+use crate::actions::space_or_tab::tokenize::{
+    tokenize_space_or_tab, tokenize_space_or_tab_indent,
+};
 use crate::helpers::slice::{Slice, span_of_exit};
 use crate::models::construct::State;
 use crate::models::event::{ContentType, Link};
 use crate::models::token::Name;
 use crate::utils::tokenizer::driver::Tokenizer;
 
-const TAB_SIZE: usize = 4;
 const SEQUENCE_SIZE_MIN: usize = 3;
 
 /// Fenced code: an opening fence of three or more `` ` `` or `~` with an optional info
@@ -14,7 +15,7 @@ const SEQUENCE_SIZE_MIN: usize = 3;
 pub(crate) fn tokenize_code_fenced(tokenizer: &mut Tokenizer) -> State {
     if matches!(tokenizer.current, Some(b'\t' | b' ')) {
         tokenizer.attempt(State::Next(before_sequence_open), State::Nok);
-        return State::Retry(tokenize_space_or_tab(tokenizer, 0, TAB_SIZE - 1));
+        return State::Retry(tokenize_space_or_tab_indent(tokenizer, 0));
     }
     if matches!(tokenizer.current, Some(b'`' | b'~')) {
         return State::Retry(before_sequence_open);
@@ -154,7 +155,7 @@ fn close_start(tokenizer: &mut Tokenizer) -> State {
     tokenizer.enter(Name::CODE_FENCED_FENCE);
     if matches!(tokenizer.current, Some(b'\t' | b' ')) {
         tokenizer.attempt(State::Next(before_sequence_close), State::Nok);
-        State::Retry(tokenize_space_or_tab(tokenizer, 0, TAB_SIZE - 1))
+        State::Retry(tokenize_space_or_tab_indent(tokenizer, 0))
     } else {
         State::Retry(before_sequence_close)
     }

@@ -22,6 +22,8 @@ pub(crate) fn find_plugin(name: &str) -> Option<BuildPlugin> {
         #[cfg(feature = "md")]
         "md.math" => |_, options| Ok(Box::new(textlane_md::math(read_options(options)?))),
         #[cfg(feature = "md")]
+        "md.mdx" => |_, options| Ok(Box::new(textlane_md::mdx(read_options(options)?))),
+        #[cfg(feature = "md")]
         "md.frontmatter" => {
             |_, options| Ok(Box::new(textlane_md::frontmatter(read_options(options)?)))
         }
@@ -72,6 +74,10 @@ pub(crate) fn find_plugin(name: &str) -> Option<BuildPlugin> {
         #[cfg(feature = "html")]
         "html.stringify" => {
             |_, options| Ok(Box::new(textlane_html::stringify(read_options(options)?)))
+        }
+        #[cfg(feature = "mdx")]
+        "mdx.compile" => {
+            |_, options| Ok(Box::new(textlane_mdx::compile(read_options(options)?)))
         }
         #[cfg(feature = "prose")]
         "prose.parse" => {

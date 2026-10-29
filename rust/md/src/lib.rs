@@ -8,6 +8,7 @@ mod models {
     pub(crate) mod def_list;
     pub(crate) mod directive;
     pub(crate) mod event;
+    pub(crate) mod mdx;
     pub(crate) mod options;
     pub(crate) mod token;
 }
@@ -295,6 +296,36 @@ mod actions {
         pub(crate) mod bridge;
         pub(crate) mod convert;
     }
+    pub(crate) mod mdx_expression {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod mdx_expression_flow {
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod mdx_expression_text {
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod mdx_jsx {
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod mdx_jsx_element {
+        pub(crate) mod compile;
+        pub(crate) mod convert;
+        pub(crate) mod stringify;
+    }
+    pub(crate) mod mdx_jsx_flow {
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod mdx_jsx_text {
+        pub(crate) mod tokenize;
+    }
+    pub(crate) mod mdxjs_esm {
+        pub(crate) mod stringify;
+        pub(crate) mod tokenize;
+    }
     pub(crate) mod non_lazy_continuation {
         pub(crate) mod tokenize;
     }
@@ -366,6 +397,7 @@ mod helpers {
     pub(crate) mod math;
     pub(crate) mod position;
     pub(crate) mod reference;
+    pub(crate) mod script;
     pub(crate) mod skip;
     pub(crate) mod slice;
     pub(crate) mod spread;
@@ -423,8 +455,9 @@ mod plugins {
 // models
 pub use models::options::{
     DefinitionListSlot, DirectiveOptions, DirectiveSlot, FrontmatterOptions,
-    FrontmatterSlot, GfmOptions, GfmSlot, MathOptions, MathSlot, Matter, Names,
-    ParseOptions, StringifyOptions, ToHtmlOptions, ToProseOptions, UnsafePattern,
+    FrontmatterSlot, GfmOptions, GfmSlot, MathOptions, MathSlot, Matter, MdxOptions,
+    MdxSlot, Names, ParseOptions, StringifyOptions, ToHtmlOptions, ToProseOptions,
+    UnsafePattern,
 };
 
 // actions
@@ -440,6 +473,7 @@ pub use plugins::frontmatter::plugin::{Frontmatter, frontmatter};
 pub use plugins::gemoji::plugin::{Gemoji, gemoji};
 pub use plugins::gfm::plugin::{Gfm, gfm};
 pub use plugins::math::plugin::{Math, math};
+pub use plugins::mdx::plugin::{Mdx, mdx};
 pub use plugins::parse::plugin::{Parse, parse};
 pub use plugins::stringify::plugin::{Stringify, stringify};
 pub use plugins::to_html::plugin::{ToHtml, to_html};

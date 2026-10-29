@@ -222,6 +222,9 @@ fn to_string<'a>(element: &Element<'a>, alloc: &'a Allocator) -> &'a str {
                     stack.push(children.iter());
                 }
             }
+            Some(Node::MdxJsxFlowElement(element) | Node::MdxJsxTextElement(element)) => {
+                stack.push(element.children.iter());
+            }
             Some(_) => {}
             None => {
                 stack.pop();

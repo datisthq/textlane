@@ -1,5 +1,6 @@
 use crate::ArenaVec;
 use crate::models::data::Data;
+use crate::models::mdx::{MdxExpression, MdxJsxElement, MdxjsEsm};
 use crate::models::position::Position;
 
 /// A hast node.
@@ -12,6 +13,11 @@ pub enum Node<'a> {
     Doctype(Doctype<'a>),
     Raw(Raw<'a>),
     Unknown(Unknown<'a>),
+    MdxJsxFlowElement(MdxJsxElement<'a, Node<'a>>),
+    MdxJsxTextElement(MdxJsxElement<'a, Node<'a>>),
+    MdxFlowExpression(MdxExpression<'a>),
+    MdxTextExpression(MdxExpression<'a>),
+    MdxjsEsm(MdxjsEsm<'a>),
 }
 
 /// The document or fragment.
@@ -122,6 +128,9 @@ impl<'a> Node<'a> {
             Node::Doctype(node) => node.data,
             Node::Raw(node) => node.data,
             Node::Unknown(node) => node.data,
+            Node::MdxJsxFlowElement(node) | Node::MdxJsxTextElement(node) => node.data,
+            Node::MdxFlowExpression(node) | Node::MdxTextExpression(node) => node.data,
+            Node::MdxjsEsm(node) => node.data,
         }
     }
 
@@ -134,6 +143,13 @@ impl<'a> Node<'a> {
             Node::Doctype(node) => node.position.as_ref(),
             Node::Raw(node) => node.position.as_ref(),
             Node::Unknown(node) => node.position.as_ref(),
+            Node::MdxJsxFlowElement(node) | Node::MdxJsxTextElement(node) => {
+                node.position.as_ref()
+            }
+            Node::MdxFlowExpression(node) | Node::MdxTextExpression(node) => {
+                node.position.as_ref()
+            }
+            Node::MdxjsEsm(node) => node.position.as_ref(),
         }
     }
 }

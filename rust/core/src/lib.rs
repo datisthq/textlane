@@ -12,6 +12,7 @@ mod models {
     pub(crate) mod lines;
     pub(crate) mod location;
     pub(crate) mod mdast;
+    pub(crate) mod mdx;
     pub(crate) mod nlcst;
     pub(crate) mod position;
     pub(crate) mod tree;
@@ -23,6 +24,10 @@ mod actions {
         pub(crate) mod serialize;
     }
     pub(crate) mod mdast {
+        pub(crate) mod deserialize;
+        pub(crate) mod serialize;
+    }
+    pub(crate) mod mdx {
         pub(crate) mod deserialize;
         pub(crate) mod serialize;
     }
@@ -43,6 +48,7 @@ pub mod mdast {
     #[cfg(feature = "json")]
     pub use crate::actions::mdast::serialize::serialize_mdast;
     pub use crate::models::mdast::*;
+    pub use crate::models::mdx::*;
 }
 
 /// The hast nodes: HTML's syntax tree.
@@ -52,6 +58,7 @@ pub mod hast {
     #[cfg(feature = "json")]
     pub use crate::actions::hast::serialize::serialize_hast;
     pub use crate::models::hast::*;
+    pub use crate::models::mdx::*;
 }
 
 /// The nlcst nodes: natural language's syntax tree.
@@ -73,7 +80,8 @@ pub use models::location::Location;
 pub use models::position::{Point, Position, UnistPoint, UnistPosition};
 pub use models::tree::{Tree, TreeKind};
 pub use plugin::{
-    Attach, Compiler, Job, Parser, Plugin, ProseParser, ProseParserSlot, Slots, Step,
+    Attach, Compiler, Job, Parser, Plugin, ProseParser, ProseParserSlot, ScriptError,
+    ScriptExpression, ScriptParser, ScriptParserSlot, ScriptStatement, Slots, Step,
     Transform,
 };
 

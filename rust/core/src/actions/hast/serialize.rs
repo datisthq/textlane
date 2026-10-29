@@ -1,6 +1,7 @@
 use serde_json::{Map, Value};
 
 use crate::actions::mdast::serialize::MAX_JSON_DEPTH;
+use crate::actions::mdx::serialize::insert_mdx_jsx;
 use crate::actions::position::serialize::serialize_position;
 use crate::models::data::Data;
 use crate::models::error::Error;
@@ -74,6 +75,27 @@ fn serialize_node(
             if let Some(children) = &unknown.children {
                 object.insert("children".into(), serialize_all(children)?);
             }
+        }
+        Node::MdxJsxFlowElement(element) | Node::MdxJsxTextElement(element) => {
+            let kind = match node {
+                Node::MdxJsxFlowElement(_) => "mdxJsxFlowElement",
+                _ => "mdxJsxTextElement",
+            };
+            object.insert("type".into(), kind.into());
+            insert_mdx_jsx(&mut object, element.name, &element.attributes, lines);
+            object.insert("children".into(), serialize_all(&element.children)?);
+        }
+        Node::MdxFlowExpression(expression) | Node::MdxTextExpression(expression) => {
+            let kind = match node {
+                Node::MdxFlowExpression(_) => "mdxFlowExpression",
+                _ => "mdxTextExpression",
+            };
+            object.insert("type".into(), kind.into());
+            object.insert("value".into(), expression.value.into());
+        }
+        Node::MdxjsEsm(esm) => {
+            object.insert("type".into(), "mdxjsEsm".into());
+            object.insert("value".into(), esm.value.into());
         }
     }
     if let Some(data) = node.data() {

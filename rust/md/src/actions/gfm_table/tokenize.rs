@@ -1,10 +1,10 @@
-use crate::actions::space_or_tab::tokenize::tokenize_space_or_tab;
+use crate::actions::space_or_tab::tokenize::{
+    tokenize_space_or_tab, tokenize_space_or_tab_indent,
+};
 use crate::helpers::skip::skip_opt_back;
 use crate::models::construct::{Resolver, State};
 use crate::models::token::Name;
 use crate::utils::tokenizer::driver::Tokenizer;
-
-const TAB_SIZE: usize = 4;
 
 /// A GFM table: a head row and a delimiter row, then a body row per line.
 pub(crate) fn tokenize_gfm_table(tokenizer: &mut Tokenizer) -> State {
@@ -34,7 +34,7 @@ pub(crate) fn tokenize_gfm_table(tokenizer: &mut Tokenizer) -> State {
 fn head_row_before(tokenizer: &mut Tokenizer) -> State {
     if matches!(tokenizer.current, Some(b'\t' | b' ')) {
         tokenizer.attempt(State::Next(head_row_open), State::Nok);
-        State::Retry(tokenize_space_or_tab(tokenizer, 0, TAB_SIZE - 1))
+        State::Retry(tokenize_space_or_tab_indent(tokenizer, 0))
     } else {
         State::Retry(head_row_open)
     }
@@ -138,7 +138,7 @@ fn head_delimiter_start(tokenizer: &mut Tokenizer) -> State {
     tokenizer.tokenize_state.seen = false;
     if matches!(tokenizer.current, Some(b'\t' | b' ')) {
         tokenizer.attempt(State::Next(head_delimiter_before), State::Next(head_nok));
-        State::Retry(tokenize_space_or_tab(tokenizer, 0, TAB_SIZE - 1))
+        State::Retry(tokenize_space_or_tab_indent(tokenizer, 0))
     } else {
         State::Retry(head_delimiter_before)
     }

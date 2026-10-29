@@ -1,6 +1,9 @@
 use serde_json::Value;
 
 use crate::actions::mdast::serialize::MAX_JSON_DEPTH;
+use crate::actions::mdx::deserialize::{
+    read_mdx_jsx_attributes, read_mdx_jsx_name, read_mdx_value,
+};
 use crate::actions::position::deserialize::deserialize_position;
 use crate::models::data::Data;
 use crate::models::error::Error;
@@ -8,6 +11,7 @@ use crate::models::hast::{
     Comment, Doctype, Element, Node, Property, PropertyItem, PropertyValue, Raw, Root,
     Text, Unknown,
 };
+use crate::models::mdx::{MdxExpression, MdxJsxElement, MdxjsEsm};
 use crate::{Allocator, ArenaVec};
 
 /// Read a hast node from unified's JSON into the arena.
@@ -74,6 +78,35 @@ fn deserialize_node<'a>(
         "doctype" => Node::Doctype(Doctype { position, data }),
         "raw" => Node::Raw(Raw {
             value: read_str("value"),
+            position,
+            data,
+        }),
+        "mdxJsxFlowElement" | "mdxJsxTextElement" => {
+            let element = MdxJsxElement {
+                name: read_mdx_jsx_name(value, alloc),
+                attributes: read_mdx_jsx_attributes(value, alloc, depth)?,
+                children: deserialize_children(value, alloc, depth)?,
+                position,
+                data,
+            };
+            if kind == "mdxJsxFlowElement" {
+                Node::MdxJsxFlowElement(element)
+            } else {
+                Node::MdxJsxTextElement(element)
+            }
+        }
+        "mdxFlowExpression" => Node::MdxFlowExpression(MdxExpression {
+            value: read_mdx_value(value, alloc),
+            position,
+            data,
+        }),
+        "mdxTextExpression" => Node::MdxTextExpression(MdxExpression {
+            value: read_mdx_value(value, alloc),
+            position,
+            data,
+        }),
+        "mdxjsEsm" => Node::MdxjsEsm(MdxjsEsm {
+            value: read_mdx_value(value, alloc),
             position,
             data,
         }),

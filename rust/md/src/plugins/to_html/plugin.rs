@@ -1,7 +1,10 @@
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
+
 use textlane_core::{Allocator, Attach, Error, File, Plugin, Transform, Tree, TreeKind};
 
-use crate::actions::mdast::convert::convert_mdast;
-use crate::models::options::ToHtmlOptions;
+use crate::actions::mdast::convert::{convert_mdast, convert_mdast_with};
+use crate::models::options::{ToHtmlOptions, UnravelSlot};
 
 /// `md.toHtml`: mdast into hast.
 #[derive(Clone, Debug, Default)]
@@ -16,7 +19,15 @@ pub fn to_html(options: ToHtmlOptions) -> ToHtml {
 
 impl Plugin for ToHtml {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
-        context.add_transform(Box::new(self.clone()));
+        let unravel = context
+            .slots_mut()
+            .get_or_default::<UnravelSlot>()
+            .0
+            .clone();
+        context.add_transform(Box::new(Converting {
+            options: self.options.clone(),
+            unravel,
+        }));
         Ok(())
     }
 }
@@ -40,6 +51,41 @@ impl Transform for ToHtml {
             Tree::Mdast(node) => {
                 Ok(Tree::Hast(convert_mdast(&node, alloc, &self.options)))
             }
+            _ => Err(Error::new("invalid-stage", "`md.toHtml` takes mdast")),
+        }
+    }
+}
+
+// The stage a pipeline runs: with `md::mdx` in it, @mdx-js/mdx's remark-mark-and-unravel
+// first lifts MDX out of paragraphs that hold nothing else
+struct Converting {
+    options: ToHtmlOptions,
+    unravel: Arc<AtomicBool>,
+}
+
+impl Transform for Converting {
+    fn input(&self) -> TreeKind {
+        TreeKind::Mdast
+    }
+
+    fn output(&self) -> TreeKind {
+        TreeKind::Hast
+    }
+
+    fn run<'a>(
+        &self,
+        tree: Tree<'a>,
+        _file: &mut File,
+        alloc: &'a Allocator,
+    ) -> Result<Tree<'a>, Error> {
+        let unravel = self.unravel.load(Ordering::Relaxed);
+        match tree {
+            Tree::Mdast(node) => Ok(Tree::Hast(convert_mdast_with(
+                &node,
+                alloc,
+                &self.options,
+                unravel,
+            ))),
             _ => Err(Error::new("invalid-stage", "`md.toHtml` takes mdast")),
         }
     }

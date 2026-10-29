@@ -2,7 +2,7 @@ use std::borrow::Cow;
 use std::collections::HashMap;
 use std::mem::discriminant;
 
-use textlane_core::hast::{Element, Node, Root, Unknown};
+use textlane_core::hast::{Element, MdxJsxElement, Node, Root, Unknown};
 use textlane_core::{Allocator, ArenaVec, Error};
 
 use crate::models::options::RawOptions;
@@ -57,13 +57,12 @@ pub fn raw_hast<'a>(
         let mut replacements = HashMap::new();
         for (comment, stitch) in job.stitches {
             let (node, child) = reparse.stitches[stitch];
-            let children = node.children.as_ref().map(|_| {
+            let children = read_children(node).map(|_| {
                 child
                     .and_then(|child| results[child].take())
                     .unwrap_or_else(|| ArenaVec::new_in(alloc))
             });
-            let clone = Unknown { children, ..*node };
-            replacements.insert(comment, Node::Unknown(clone));
+            replacements.insert(comment, rebuild(node, children));
         }
         let node = convert_dom(&job.dom, job.root, 0, alloc, &mut replacements, None);
         if index == 0 {
@@ -93,7 +92,7 @@ struct Reparse<'n, 'o, 'a> {
     alloc: &'a Allocator,
     jobs: Vec<(&'n [Node<'a>], bool)>,
     // Each passed-through node, and the job parsing its children
-    stitches: Vec<(&'n Unknown<'a>, Option<usize>)>,
+    stitches: Vec<(&'n Node<'a>, Option<usize>)>,
 }
 
 struct Parsed {
@@ -138,32 +137,30 @@ impl<'n, 'a> Reparse<'n, '_, 'a> {
                     };
                     parser.feed_raw(value, raw.position.is_some());
                 }
-                Node::Unknown(unknown)
-                    if self
-                        .options
-                        .pass_through
-                        .iter()
-                        .any(|kind| kind == unknown.kind) =>
+                node if read_kind(node).is_some_and(|kind| {
+                    self.options.pass_through.iter().any(|pass| pass == kind)
+                }) =>
                 {
-                    let job = unknown.children.as_ref().map(|children| {
+                    let job = read_children(node).map(|children| {
                         let head = children.first();
                         self.jobs.push((children, is_document(head)));
                         self.jobs.len() - 1
                     });
-                    self.stitches.push((unknown, job));
+                    self.stitches.push((node, job));
                     if let Some(comment) = parser.feed_comment("") {
                         stitches.push((comment, self.stitches.len() - 1));
                     }
                 }
-                Node::Unknown(unknown) => {
-                    let extra = if MDX_TYPES.contains(&unknown.kind) {
+                node => {
+                    let kind = read_kind(node).unwrap_or_default();
+                    let extra = if MDX_TYPES.contains(&kind) {
                         ". It looks like you are using MDX nodes with `hast-util-raw` (or `rehype-raw`). If you use this because you are using remark or rehype plugins that inject `'html'` nodes, then please raise an issue with that plugin, as its a bad and slow idea. If you use this because you are using markdown syntax, then you have to configure this utility (or plugin) to pass through these nodes (see `passThrough` in docs), but you can also migrate to use the MDX syntax"
                     } else {
                         ""
                     };
                     return Err(Error::new(
                         "unknown-node",
-                        format!("Cannot compile `{}` node{extra}", unknown.kind),
+                        format!("Cannot compile `{kind}` node{extra}"),
                     ));
                 }
             }
@@ -183,6 +180,61 @@ impl<'n, 'a> Reparse<'n, '_, 'a> {
 }
 
 // Whether a tree is a whole document: it starts with a doctype or `<html>`
+// The type of a node hast does not define, which only `passThrough` lets through
+fn read_kind<'a>(node: &Node<'a>) -> Option<&'a str> {
+    match node {
+        Node::Unknown(unknown) => Some(unknown.kind),
+        Node::MdxJsxFlowElement(_) => Some("mdxJsxFlowElement"),
+        Node::MdxJsxTextElement(_) => Some("mdxJsxTextElement"),
+        Node::MdxFlowExpression(_) => Some("mdxFlowExpression"),
+        Node::MdxTextExpression(_) => Some("mdxTextExpression"),
+        Node::MdxjsEsm(_) => Some("mdxjsEsm"),
+        _ => None,
+    }
+}
+
+fn read_children<'n, 'a>(node: &'n Node<'a>) -> Option<&'n [Node<'a>]> {
+    match node {
+        Node::Unknown(unknown) => unknown.children.as_ref().map(|children| &children[..]),
+        Node::MdxJsxFlowElement(element) | Node::MdxJsxTextElement(element) => {
+            Some(&element.children)
+        }
+        _ => None,
+    }
+}
+
+// A passed-through node again, with its children reparsed
+fn rebuild<'a>(node: &Node<'a>, children: Option<ArenaVec<'a, Node<'a>>>) -> Node<'a> {
+    let element = |element: &MdxJsxElement<'a, Node<'a>>,
+                   children: Option<ArenaVec<'a, Node<'a>>>| {
+        let alloc = element.attributes.bump();
+        let mut attributes = ArenaVec::with_capacity_in(element.attributes.len(), alloc);
+        attributes.extend(element.attributes.iter().cloned());
+        MdxJsxElement {
+            name: element.name,
+            attributes,
+            children: children.unwrap_or_else(|| ArenaVec::new_in(alloc)),
+            position: element.position,
+            data: element.data,
+        }
+    };
+    match node {
+        Node::MdxJsxFlowElement(node) => Node::MdxJsxFlowElement(element(node, children)),
+        Node::MdxJsxTextElement(node) => Node::MdxJsxTextElement(element(node, children)),
+        Node::MdxFlowExpression(node) => Node::MdxFlowExpression(node.clone()),
+        Node::MdxTextExpression(node) => Node::MdxTextExpression(node.clone()),
+        Node::MdxjsEsm(node) => Node::MdxjsEsm(node.clone()),
+        Node::Unknown(node) => Node::Unknown(Unknown { children, ..*node }),
+        _ => Node::Unknown(Unknown {
+            kind: "",
+            fields: &[],
+            children,
+            position: None,
+            data: None,
+        }),
+    }
+}
+
 fn is_document(head: Option<&Node<'_>>) -> bool {
     match head {
         Some(Node::Doctype(_)) => true,
@@ -193,7 +245,9 @@ fn is_document(head: Option<&Node<'_>>) -> bool {
 
 fn is_same_type(left: &Node<'_>, right: &Node<'_>) -> bool {
     match (left, right) {
-        (Node::Unknown(left), Node::Unknown(right)) => left.kind == right.kind,
+        (Node::Unknown(_), _) | (_, Node::Unknown(_)) => {
+            read_kind(left) == read_kind(right)
+        }
         _ => discriminant(left) == discriminant(right),
     }
 }

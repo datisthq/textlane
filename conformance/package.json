@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "generate:mdx-tables": "node sources/mdx-tables.ts && pnpm -C ../rust format",
     "generate:prose-tables": "node sources/prose-tables.ts && pnpm -C ../rust format",
     "import:chains": "node sources/chains.ts && vp fmt tests",
     "import:commonmark": "node sources/commonmark.ts && vp fmt tests",

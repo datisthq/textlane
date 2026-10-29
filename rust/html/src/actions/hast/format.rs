@@ -216,6 +216,9 @@ fn children_of<'n, 'a>(node: &'n mut Node<'a>) -> Option<&'n mut ArenaVec<'a, No
         Node::Root(root) => Some(&mut root.children),
         Node::Element(element) => Some(&mut element.children),
         Node::Unknown(unknown) => unknown.children.as_mut(),
+        Node::MdxJsxFlowElement(element) | Node::MdxJsxTextElement(element) => {
+            Some(&mut element.children)
+        }
         _ => None,
     }
 }

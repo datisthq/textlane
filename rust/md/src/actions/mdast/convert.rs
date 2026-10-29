@@ -16,9 +16,21 @@ pub fn convert_mdast<'a>(
     alloc: &'a Allocator,
     options: &ToHtmlOptions,
 ) -> hast::Node<'a> {
+    convert_mdast_with(node, alloc, options, false)
+}
+
+/// `convert_mdast`, lifting MDX out of paragraphs first with `unravel`, as @mdx-js/mdx's
+/// remark-mark-and-unravel does.
+pub(crate) fn convert_mdast_with<'a>(
+    node: &mdast::Node<'a>,
+    alloc: &'a Allocator,
+    options: &ToHtmlOptions,
+    unravel: bool,
+) -> hast::Node<'a> {
     let mut converter = Converter {
         alloc,
         options,
+        unravel,
         loose_lists: vec![],
         definitions: find_definitions(node),
         footnote_order: vec![],

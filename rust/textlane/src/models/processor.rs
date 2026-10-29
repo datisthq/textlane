@@ -200,7 +200,14 @@ fn seed_slots(context: &mut Attach) {
             .get_or_default::<textlane_core::ProseParserSlot>()
             .parser = Some(std::sync::Arc::new(parser));
     }
-    #[cfg(not(feature = "prose"))]
+    #[cfg(feature = "mdx")]
+    {
+        context
+            .slots_mut()
+            .get_or_default::<textlane_core::ScriptParserSlot>()
+            .parser = Some(std::sync::Arc::new(textlane_mdx::OxcScriptParser));
+    }
+    #[cfg(not(any(feature = "prose", feature = "mdx")))]
     let _ = context;
 }
 

@@ -1,6 +1,7 @@
 use serde_json::{Map, Value};
 
 use crate::actions::hast::serialize::{insert_fields, serialize_data};
+use crate::actions::mdx::serialize::insert_mdx_jsx;
 use crate::actions::position::serialize::serialize_position;
 use crate::models::error::Error;
 use crate::models::lines::Lines;
@@ -182,6 +183,26 @@ fn serialize_node(
         Node::Unknown(unknown) => {
             insert_fields(&mut object, unknown.fields);
             unknown.kind
+        }
+        Node::MdxJsxFlowElement(element) => {
+            insert_mdx_jsx(&mut object, element.name, &element.attributes, lines);
+            "mdxJsxFlowElement"
+        }
+        Node::MdxJsxTextElement(element) => {
+            insert_mdx_jsx(&mut object, element.name, &element.attributes, lines);
+            "mdxJsxTextElement"
+        }
+        Node::MdxFlowExpression(expression) => {
+            object.insert("value".into(), expression.value.into());
+            "mdxFlowExpression"
+        }
+        Node::MdxTextExpression(expression) => {
+            object.insert("value".into(), expression.value.into());
+            "mdxTextExpression"
+        }
+        Node::MdxjsEsm(esm) => {
+            object.insert("value".into(), esm.value.into());
+            "mdxjsEsm"
         }
     };
     object.insert("type".into(), kind.into());

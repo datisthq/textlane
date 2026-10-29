@@ -7,7 +7,10 @@ const TAB_SIZE: usize = 4;
 
 /// Indented code: lines indented by four spaces or more, which cannot interrupt a paragraph.
 pub(crate) fn tokenize_code_indented(tokenizer: &mut Tokenizer) -> State {
-    if tokenizer.interrupt || !matches!(tokenizer.current, Some(b'\t' | b' ')) {
+    if tokenizer.interrupt
+        || !tokenizer.parse_state.code_indented()
+        || !matches!(tokenizer.current, Some(b'\t' | b' '))
+    {
         return State::Nok;
     }
     tokenizer.enter(Name::CODE_INDENTED);

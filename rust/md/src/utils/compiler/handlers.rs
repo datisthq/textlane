@@ -20,11 +20,14 @@ use crate::actions::link::compile::compile_link;
 use crate::actions::list::compile::compile_list;
 use crate::actions::list_item::compile::compile_list_item;
 use crate::actions::math::compile::compile_math;
+use crate::actions::mdx_expression::compile::compile_mdx_expression;
+use crate::actions::mdx_jsx_element::compile::compile_mdx_jsx_element;
 use crate::actions::paragraph::compile::compile_paragraph;
 use crate::actions::strong::compile::compile_strong;
 use crate::actions::table::compile::compile_table;
 use crate::actions::text::compile::compile_text;
 use crate::actions::thematic_break::compile::compile_thematic_break;
+use crate::models::event::Kind;
 use crate::models::token::Name;
 use crate::utils::compiler::stack::Compiler;
 
@@ -32,6 +35,16 @@ use crate::utils::compiler::stack::Compiler;
 pub(crate) fn compile_event(compiler: &mut Compiler) {
     let event = &compiler.events[compiler.index];
     let (name, kind) = (event.name, event.kind);
+    // Line endings inside an expression, attribute value or ESM belong to its value
+    if name == Name::LINE_ENDING && compiler.mdx.value.is_some() {
+        if kind == Kind::Exit {
+            let slice = compiler.slice();
+            if let Some(value) = compiler.mdx.value.as_mut() {
+                value.push_str(slice);
+            }
+        }
+        return;
+    }
     match name {
         Name::DATA
         | Name::CHARACTER_ESCAPE
@@ -124,6 +137,16 @@ pub(crate) fn compile_event(compiler: &mut Compiler) {
             compile_gfm_task_list_item_check(compiler, name, kind)
         }
         _ if name.0.starts_with("directive") => compile_directive(compiler, name, kind),
+        _ if name.0.starts_with("mdxJsx") => {
+            compile_mdx_jsx_element(compiler, name, kind)
+        }
+        _ if (name.0.starts_with("mdxFlowExpression")
+            || name.0.starts_with("mdxTextExpression")
+            || name.0.starts_with("mdxjsEsm"))
+            && !name.0.ends_with("Marker") =>
+        {
+            compile_mdx_expression(compiler, name, kind);
+        }
         _ => {}
     }
 }

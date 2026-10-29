@@ -155,6 +155,23 @@ impl<'o> State<'o> {
                     format!("Cannot compile unknown node `{}`", unknown.kind),
                 ));
             }
+            Node::MdxJsxFlowElement(_)
+            | Node::MdxJsxTextElement(_)
+            | Node::MdxFlowExpression(_)
+            | Node::MdxTextExpression(_)
+            | Node::MdxjsEsm(_) => {
+                let kind = match node {
+                    Node::MdxJsxFlowElement(_) => "mdxJsxFlowElement",
+                    Node::MdxJsxTextElement(_) => "mdxJsxTextElement",
+                    Node::MdxFlowExpression(_) => "mdxFlowExpression",
+                    Node::MdxTextExpression(_) => "mdxTextExpression",
+                    _ => "mdxjsEsm",
+                };
+                return Err(Error::new(
+                    "unknown-node",
+                    format!("Cannot compile unknown node `{kind}`"),
+                ));
+            }
         }
         Ok(())
     }

@@ -13,6 +13,8 @@ pub(crate) enum State {
     Retry(StateFn),
     Ok,
     Nok,
+    /// A syntax error, kept in `ParseState::error`: tokenizing stops.
+    Error,
 }
 
 /// A pass over the events once a content type is tokenized.

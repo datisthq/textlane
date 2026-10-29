@@ -1,11 +1,12 @@
 use textlane_core::mdast::{Node, Paragraph, ReferenceType, Root};
-use textlane_core::{Allocator, ArenaString, ArenaVec, Point, Position};
+use textlane_core::{Allocator, ArenaString, ArenaVec, Error, Lines, Point, Position};
 
 use std::collections::HashSet;
 
 use crate::helpers::slice::Slice;
 use crate::helpers::spread::{find_loose, find_trailing_line_endings};
 use crate::models::event::{self, Event};
+use crate::models::mdx::MdxCompile;
 use crate::models::options::Matter;
 use crate::models::token::Name;
 
@@ -60,6 +61,13 @@ pub(crate) struct Compiler<'a, 'e> {
     // block quote prefixes
     trailing_line_endings: [Vec<Option<usize>>; 2],
     stack: Vec<Node<'a>>,
+    // The enter event of each node opened by a token, as mdast-util-from-markdown's token
+    // stack: buffers are not on it, so a node left open inside one is still found
+    stack_tokens: Vec<usize>,
+    /// The first error compiling found, which ends it.
+    pub(crate) error: Option<Error>,
+    /// What compiling MDX keeps between events.
+    pub(crate) mdx: MdxCompile<'a>,
     /// The kinds of frontmatter the parser recognizes, to tell which one a token is.
     pub(crate) frontmatter: &'e [Matter],
 }
@@ -102,18 +110,26 @@ impl<'a, 'e> Compiler<'a, 'e> {
                 find_trailing_line_endings(events, true),
             ],
             stack: vec![root],
+            stack_tokens: vec![],
+            error: None,
+            mdx: MdxCompile::default(),
             frontmatter: &[],
         }
     }
 
-    pub(crate) fn finish(mut self) -> Node<'a> {
+    pub(crate) fn finish(mut self) -> Result<Node<'a>, Error> {
+        if let Some(open) = (self.stack_tokens.iter().rev().copied())
+            .find(|open| is_mdx_jsx_tag(self.events[*open].name))
+        {
+            return Err(self.mdx_unclosed_error(open, None));
+        }
         self.flush_text();
         // Events always balance, but attach anything left open rather than lose it
         while self.stack.len() > 1 {
             self.attach_tail();
         }
         match self.stack.pop() {
-            Some(root) => root,
+            Some(root) => Ok(root),
             None => unreachable!("the root is never popped"),
         }
     }
@@ -134,6 +150,7 @@ impl<'a, 'e> Compiler<'a, 'e> {
             *child.position_mut() = Some(Position::span(point, point));
         }
         self.stack.push(child);
+        self.stack_tokens.push(self.index);
     }
 
     /// Open `child` like `tail_push`, but starting after the spaces or tabs that open the
@@ -170,11 +187,13 @@ impl<'a, 'e> Compiler<'a, 'e> {
             .and_then(|children| children.pop())
         {
             self.stack.push(last);
+            self.stack_tokens.push(self.index);
         }
     }
 
     /// Close the innermost open node at the current event.
     pub(crate) fn tail_pop(&mut self) {
+        self.check_mdx_jsx_closed();
         // A text node being built stays open to more pieces as its parent's last child
         if !matches!(self.stack.last(), Some(Node::Text(_))) {
             self.flush_text();
@@ -191,6 +210,7 @@ impl<'a, 'e> Compiler<'a, 'e> {
     /// the current event, as micromark ends lists and mdast-util-from-markdown list items;
     /// `prefixes` also passes block quote prefixes, as items do.
     pub(crate) fn tail_pop_before_trailing_lines(&mut self, prefixes: bool) {
+        self.check_mdx_jsx_closed();
         self.flush_text();
         let trailing = self.trailing_line_endings[usize::from(prefixes)][self.index];
         let mut end = trailing.unwrap_or(self.index);
@@ -225,6 +245,7 @@ impl<'a, 'e> Compiler<'a, 'e> {
         if self.stack.len() < 2 {
             return;
         }
+        self.stack_tokens.pop();
         if let Some(node) = self.stack.pop()
             && let Some(children) = self.tail_mut().children_mut()
         {
@@ -308,6 +329,86 @@ impl<'a, 'e> Compiler<'a, 'e> {
     pub(crate) fn resume_node(&mut self) -> Option<Node<'a>> {
         self.flush_text();
         self.stack.pop()
+    }
+
+    /// The enter event of the innermost node a token opened.
+    pub(crate) fn tail_token(&self) -> Option<usize> {
+        self.stack_tokens.last().copied()
+    }
+
+    // Closing any node but a JSX element while one is open inside it fails, as
+    // mdast-util-mdx-jsx's `onErrorRightIsTag` does
+    fn check_mdx_jsx_closed(&mut self) {
+        if self.mdx.closing || self.error.is_some() {
+            return;
+        }
+        if let Some(open) = self.tail_token()
+            && is_mdx_jsx_tag(self.events[open].name)
+        {
+            self.error = Some(self.mdx_unclosed_error(open, Some(self.index)));
+        }
+    }
+
+    /// mdast-util-mdx-jsx's error for an element opened at the tag entered at `open`, still
+    /// open where the token exited at `closing` ends, or at the end.
+    pub(crate) fn mdx_unclosed_error(
+        &self,
+        open: usize,
+        closing: Option<usize>,
+    ) -> Error {
+        let tag = match self.mdx.open.last() {
+            Some(tag) => serialize_abbreviated_tag(tag.name.as_deref(), tag.close),
+            None => "<>".into(),
+        };
+        let place = match closing {
+            Some(closing) => {
+                format!(
+                    " before the end of `{}`",
+                    token_type(self.events[closing].name)
+                )
+            }
+            None => String::new(),
+        };
+        Error::new(
+            "mdast-util-mdx-jsx:end-tag-mismatch",
+            format!(
+                "Expected a closing tag for `{tag}` ({}){place}",
+                self.stringify_span(open, self.find_exit(open))
+            ),
+        )
+    }
+
+    /// The exit event of the token entered at `enter`.
+    pub(crate) fn find_exit(&self, enter: usize) -> usize {
+        let mut depth = 0;
+        for (index, event) in self.events.iter().enumerate().skip(enter) {
+            match event.kind {
+                event::Kind::Enter => depth += 1,
+                event::Kind::Exit => {
+                    depth -= 1;
+                    if depth == 0 {
+                        return index;
+                    }
+                }
+            }
+        }
+        enter
+    }
+
+    /// `line:column` of an event, as unist-util-stringify-position writes a point.
+    pub(crate) fn stringify_point(&self, index: usize) -> String {
+        let point =
+            Lines::new(self.source).to_unist_point(to_point(&self.events[index].point));
+        format!("{}:{}", point.line, point.column)
+    }
+
+    /// `line:column-line:column` of two events.
+    pub(crate) fn stringify_span(&self, start: usize, end: usize) -> String {
+        format!(
+            "{}-{}",
+            self.stringify_point(start),
+            self.stringify_point(end)
+        )
     }
 
     /// The text of a node, as mdast-util-to-string reads it: values, image alts and the
@@ -423,6 +524,25 @@ impl<'a, 'e> Compiler<'a, 'e> {
         let base = self.source.as_ptr() as usize;
         let at = value.as_ptr() as usize;
         (at >= base && at + value.len() <= base + self.source.len()).then(|| at - base)
+    }
+}
+
+/// Whether a token is a JSX tag, in flow or text.
+pub(crate) fn is_mdx_jsx_tag(name: Name) -> bool {
+    name.0 == "mdxJsxFlowTag" || name.0 == "mdxJsxTextTag"
+}
+
+/// A tag as mdast-util-mdx-jsx names it in errors: `<a>` or `</a>`.
+pub(crate) fn serialize_abbreviated_tag(name: Option<&str>, close: bool) -> String {
+    format!("<{}{}>", if close { "/" } else { "" }, name.unwrap_or(""))
+}
+
+/// A token's type as micromark names it, which errors show.
+pub(crate) fn token_type(name: Name) -> &'static str {
+    match name {
+        Name::HEADING_ATX => "atxHeading",
+        Name::HEADING_SETEXT => "setextHeading",
+        _ => name.0,
     }
 }
 

@@ -13,6 +13,16 @@ pub(crate) fn tokenize_space_or_tab(
     tokenize_space_or_tab_linked(tokenizer, min, max, None, false)
 }
 
+/// At least `min` spaces or tabs of a flow construct's indent: at most three, or any
+/// number when MDX turns indented code off.
+pub(crate) fn tokenize_space_or_tab_indent(
+    tokenizer: &mut Tokenizer,
+    min: usize,
+) -> StateFn {
+    let max = tokenizer.parse_state.indent_max();
+    tokenize_space_or_tab(tokenizer, min, max)
+}
+
 /// Between `min` and `max` spaces or tabs, as a token named `name`.
 pub(crate) fn tokenize_space_or_tab_named(
     tokenizer: &mut Tokenizer,

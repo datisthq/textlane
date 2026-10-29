@@ -1,10 +1,13 @@
 use crate::models::options::{GfmOptions, MathOptions, Matter};
-use std::cell::{OnceCell, RefCell};
+use std::cell::{Cell, OnceCell, RefCell};
+
 use std::collections::HashSet;
+use textlane_core::Error;
 
 use crate::helpers::identifier::normalize_identifier;
 use crate::models::construct::State;
 use crate::models::event::{Event, Point};
+use crate::models::mdx::MdxScript;
 use crate::utils::tokenizer::document::tokenize_document;
 use crate::utils::tokenizer::driver::Tokenizer;
 use crate::utils::tokenizer::subtokenize::subtokenize;
@@ -42,6 +45,23 @@ pub(crate) struct ParseState<'a> {
     pub(crate) content_breaks: RefCell<HashSet<usize>>,
     /// The kinds of frontmatter `md.frontmatter` adds, in order.
     pub(crate) frontmatter: Vec<Matter>,
+    /// MDX's parser, when its constructs are on.
+    pub(crate) mdx: Option<MdxScript>,
+    /// Whether a syntax error stopped tokenizing; `error` holds it.
+    pub(crate) failed: Cell<bool>,
+    pub(crate) error: RefCell<Option<Error>>,
+}
+
+impl ParseState<'_> {
+    /// Whether indented code is on: MDX turns it off, so any indent opens flow constructs.
+    pub(crate) fn code_indented(&self) -> bool {
+        self.mdx.is_none()
+    }
+
+    /// The most indent a flow construct may have before it.
+    pub(crate) fn indent_max(&self) -> usize {
+        if self.code_indented() { 3 } else { usize::MAX }
+    }
 }
 
 impl ParseState<'_> {
@@ -123,6 +143,10 @@ impl ParseState<'_> {
     }
 }
 
+/// A document's events and its container prefixes, as where each prefixed line starts and
+/// where its content does.
+pub(crate) type Tokenized = (Vec<Event>, Vec<(usize, usize)>);
+
 /// Tokenize a document into its events, subtokenizing until no linked content is left.
 pub(crate) fn tokenize_input(
     value: &str,
@@ -131,7 +155,8 @@ pub(crate) fn tokenize_input(
     directive: bool,
     frontmatter: &[Matter],
     definition_list: bool,
-) -> (Vec<Event>, Vec<(usize, usize)>) {
+    mdx: Option<&MdxScript>,
+) -> Result<Tokenized, Error> {
     let mut parse_state = ParseState {
         bytes: value.as_bytes(),
         definitions: HashSet::new(),
@@ -147,6 +172,9 @@ pub(crate) fn tokenize_input(
         prefixes_nested: RefCell::new(vec![]),
         content_breaks: RefCell::new(HashSet::new()),
         frontmatter: frontmatter.to_vec(),
+        mdx: mdx.cloned(),
+        failed: Cell::new(false),
+        error: RefCell::new(None),
     };
     let start = Point {
         line: 1,
@@ -166,6 +194,9 @@ pub(crate) fn tokenize_input(
             std::mem::take(&mut tokenizer.tokenize_state.gfm_footnote_definitions);
         (tokenizer.events, result, footnotes)
     };
+    if let Some(error) = parse_state.error.take() {
+        return Err(error);
+    }
     for label in footnotes {
         parse_state.gfm_footnote_chars_max = parse_state
             .gfm_footnote_chars_max
@@ -175,9 +206,12 @@ pub(crate) fn tokenize_input(
     loop {
         parse_state.add_definitions(std::mem::take(&mut result.definitions));
         if result.done {
-            return (events, merge_prefixes(&parse_state));
+            return Ok((events, merge_prefixes(&parse_state)));
         }
         result = subtokenize(&mut events, &parse_state, None);
+        if let Some(error) = parse_state.error.take() {
+            return Err(error);
+        }
     }
 }
 

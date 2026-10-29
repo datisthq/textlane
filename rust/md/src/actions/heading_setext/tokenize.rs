@@ -1,11 +1,11 @@
-use crate::actions::space_or_tab::tokenize::tokenize_space_or_tab;
+use crate::actions::space_or_tab::tokenize::{
+    tokenize_space_or_tab, tokenize_space_or_tab_indent,
+};
 use crate::helpers::content::{find_chunks, find_paragraph_start};
 use crate::helpers::skip::skip_opt_back;
 use crate::models::construct::{Resolver, State};
 use crate::models::token::Name;
 use crate::utils::tokenizer::driver::Tokenizer;
-
-const TAB_SIZE: usize = 4;
 
 /// A setext heading's underline: `=` or `-` under a paragraph, which becomes the heading.
 pub(crate) fn tokenize_heading_setext(tokenizer: &mut Tokenizer) -> State {
@@ -32,7 +32,7 @@ pub(crate) fn tokenize_heading_setext(tokenizer: &mut Tokenizer) -> State {
     tokenizer.enter(Name::HEADING_SETEXT_UNDERLINE);
     if matches!(tokenizer.current, Some(b'\t' | b' ')) {
         tokenizer.attempt(State::Next(before), State::Nok);
-        State::Retry(tokenize_space_or_tab(tokenizer, 0, TAB_SIZE - 1))
+        State::Retry(tokenize_space_or_tab_indent(tokenizer, 0))
     } else {
         State::Retry(before)
     }

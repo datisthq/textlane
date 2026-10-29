@@ -7,7 +7,7 @@ const DOMAIN_SIZE_MAX: usize = 63;
 
 /// An autolink: `<https://example.com>` or `<a@example.com>`.
 pub(crate) fn tokenize_autolink(tokenizer: &mut Tokenizer) -> State {
-    if tokenizer.current != Some(b'<') {
+    if tokenizer.current != Some(b'<') || tokenizer.parse_state.mdx.is_some() {
         return State::Nok;
     }
     tokenizer.enter(Name::AUTOLINK);

@@ -9,6 +9,9 @@ use crate::actions::heading_atx::tokenize::tokenize_heading_atx;
 use crate::actions::heading_setext::tokenize::tokenize_heading_setext;
 use crate::actions::html_flow::tokenize::tokenize_html_flow;
 use crate::actions::math_flow::tokenize::tokenize_math_flow;
+use crate::actions::mdx_expression_flow::tokenize::tokenize_mdx_expression_flow;
+use crate::actions::mdx_jsx_flow::tokenize::tokenize_mdx_jsx_flow;
+use crate::actions::mdxjs_esm::tokenize::tokenize_mdxjs_esm;
 use crate::actions::thematic_break::tokenize::tokenize_thematic_break;
 use crate::models::construct::State;
 use crate::models::token::Name;
@@ -35,9 +38,21 @@ fn before_flow(tokenizer: &mut Tokenizer) -> State {
             tokenizer.attempt(State::Next(after), State::Next(before_gfm_table));
             State::Retry(tokenize_code_fenced)
         }
+        Some(b'<') if tokenizer.parse_state.mdx.is_some() => {
+            tokenizer.attempt(State::Next(after), State::Next(before_gfm_table));
+            State::Retry(tokenize_mdx_jsx_flow)
+        }
         Some(b'<') => {
             tokenizer.attempt(State::Next(after), State::Next(before_gfm_table));
             State::Retry(tokenize_html_flow)
+        }
+        Some(b'{') if tokenizer.parse_state.mdx.is_some() => {
+            tokenizer.attempt(State::Next(after), State::Next(before_gfm_table));
+            State::Retry(tokenize_mdx_expression_flow)
+        }
+        Some(b'e' | b'i') if tokenizer.parse_state.mdx.is_some() => {
+            tokenizer.attempt(State::Next(after), State::Next(before_gfm_table));
+            State::Retry(tokenize_mdxjs_esm)
         }
         Some(b'*' | b'_') => {
             tokenizer.attempt(State::Next(after), State::Next(before_gfm_table));
@@ -78,8 +93,13 @@ fn before_math_flow(tokenizer: &mut Tokenizer) -> State {
 }
 
 fn before_html_flow(tokenizer: &mut Tokenizer) -> State {
-    tokenizer.attempt(State::Next(after), State::Next(before_heading_atx));
+    tokenizer.attempt(State::Next(after), State::Next(before_mdx_jsx_flow));
     State::Retry(tokenize_html_flow)
+}
+
+fn before_mdx_jsx_flow(tokenizer: &mut Tokenizer) -> State {
+    tokenizer.attempt(State::Next(after), State::Next(before_heading_atx));
+    State::Retry(tokenize_mdx_jsx_flow)
 }
 
 fn before_heading_atx(tokenizer: &mut Tokenizer) -> State {
@@ -96,7 +116,7 @@ fn before_thematic_break(tokenizer: &mut Tokenizer) -> State {
     let next = if tokenizer.parse_state.directive {
         before_directive_container
     } else {
-        before_gfm_table
+        before_mdx_expression_flow
     };
     tokenizer.attempt(State::Next(after), State::Next(next));
     State::Retry(tokenize_thematic_break)
@@ -108,8 +128,13 @@ fn before_directive_container(tokenizer: &mut Tokenizer) -> State {
 }
 
 fn before_directive_leaf(tokenizer: &mut Tokenizer) -> State {
-    tokenizer.attempt(State::Next(after), State::Next(before_gfm_table));
+    tokenizer.attempt(State::Next(after), State::Next(before_mdx_expression_flow));
     State::Retry(tokenize_directive_leaf)
+}
+
+fn before_mdx_expression_flow(tokenizer: &mut Tokenizer) -> State {
+    tokenizer.attempt(State::Next(after), State::Next(before_gfm_table));
+    State::Retry(tokenize_mdx_expression_flow)
 }
 
 fn before_gfm_table(tokenizer: &mut Tokenizer) -> State {

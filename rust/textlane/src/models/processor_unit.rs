@@ -587,6 +587,66 @@ fn handles_hostile_math_in_linear_time() -> Result<(), Error> {
 }
 
 #[test]
+fn handles_hostile_mdx_in_linear_time() -> Result<(), Error> {
+    let mdx = || textlane_md::mdx(Default::default());
+    let render = Processor::new()
+        .with(textlane_md::parse(Default::default()))
+        .with(mdx())
+        .with(textlane_md::to_html(Default::default()))
+        .freeze()?;
+    let format = Processor::new()
+        .with(textlane_md::parse(Default::default()))
+        .with(mdx())
+        .with(textlane_md::stringify(Default::default()))
+        .freeze()?;
+    let inputs: Vec<(String, bool)> = vec![
+        // Indenting nested flow elements grows the output with depth squared, by nature
+        ("<a>\n".repeat(20_000) + &"</a>\n".repeat(20_000), false),
+        (
+            "x ".to_string() + &"<a>".repeat(50_000) + &"</a>".repeat(50_000),
+            true,
+        ),
+        ("<a ".to_string() + &"b ".repeat(100_000), true),
+        ("<a b=\"".to_string() + &"c\n".repeat(50_000), true),
+        ("<a/>".repeat(50_000), true),
+        ("a <b {...c} d={e} />".repeat(20_000), true),
+        ("{".repeat(100_000), true),
+        ("{}".repeat(50_000), true),
+        ("{".repeat(50_000) + &"}".repeat(50_000), true),
+        ("{(".to_string() + &"}".repeat(100_000), true),
+        ("<a {(".to_string() + &"}".repeat(100_000), true),
+        (
+            "{[".to_string() + &"(".repeat(100_000) + &")".repeat(100_000) + "]}",
+            true,
+        ),
+        ("x {a\n".to_string() + &"b\n".repeat(50_000) + "}", true),
+        ("import a from 'b'\n".repeat(20_000), true),
+        (
+            "export const a = {\n".to_string() + &"b,\n".repeat(50_000) + "}\n",
+            true,
+        ),
+    ];
+    for (input, formats) in &inputs {
+        let processors: &[&_] = if *formats {
+            &[&render, &format]
+        } else {
+            &[&render]
+        };
+        for processor in processors {
+            let started = std::time::Instant::now();
+            let _ = processor.process(input);
+            let took = started.elapsed();
+            assert!(
+                took.as_secs() < LIMIT_SECS,
+                "{:?}… took {took:?}",
+                &input[..12]
+            );
+        }
+    }
+    Ok(())
+}
+
+#[test]
 fn checks_setext_underlines_in_linear_time() -> Result<(), Error> {
     for input in [
         "a\n".to_string() + &"=x\n".repeat(50_000),
@@ -987,6 +1047,162 @@ fn bridges_hostile_html_into_prose_in_linear_time() -> Result<(), Error> {
             took.as_secs() < LIMIT_SECS,
             "{:?}… took {took:?}",
             &input[..12]
+        );
+    }
+    Ok(())
+}
+
+fn compile_mdx(
+    input: &str,
+    options: textlane_mdx::CompileOptions,
+) -> Result<String, Error> {
+    let processor = Processor::new()
+        .with(textlane_md::parse(Default::default()))
+        .with(textlane_md::mdx(Default::default()))
+        .with(textlane_md::to_html(Default::default()))
+        .with(textlane_mdx::compile(options))
+        .freeze()?;
+    Ok(processor.process(input)?.value)
+}
+
+#[test]
+fn compiles_deeply_nested_markdown_into_javascript() -> Result<(), Error> {
+    let jsx = textlane_mdx::CompileOptions {
+        jsx: true,
+        ..Default::default()
+    };
+    let started = std::time::Instant::now();
+    let output = compile_mdx(&format!("{}a", "> ".repeat(100_000)), jsx)?;
+    assert!(output.contains("<_components.blockquote>{\"\\n\"}<_components.blockquote>"));
+    // Calls indent each level's object, so the output itself grows with depth squared
+    let output = compile_mdx(&format!("{}a", "> ".repeat(2_000)), Default::default())?;
+    assert!(output.contains("_jsxs(_components.blockquote, {"));
+    assert!(
+        started.elapsed().as_secs() < LIMIT_SECS,
+        "took {:?}",
+        started.elapsed()
+    );
+    Ok(())
+}
+
+#[test]
+fn compiles_long_markdown_into_javascript_in_linear_time() -> Result<(), Error> {
+    let input = "a *b* [c](d) `e`\n\n".repeat(20_000);
+    let started = std::time::Instant::now();
+    let output = compile_mdx(&input, Default::default())?;
+    assert!(output.ends_with("}\n"));
+    assert!(
+        started.elapsed().as_secs() < LIMIT_SECS,
+        "took {:?}",
+        started.elapsed()
+    );
+    Ok(())
+}
+
+#[test]
+fn compiles_deeply_nested_jsx_into_javascript() -> Result<(), Error> {
+    let depth = 10_000;
+    let input = format!("{}b{}", "<a>".repeat(depth), "</a>".repeat(depth));
+    let started = std::time::Instant::now();
+    let jsx = textlane_mdx::CompileOptions {
+        jsx: true,
+        ..Default::default()
+    };
+    let output = compile_mdx(&input, jsx)?;
+    assert!(output.contains("<a><a>"));
+    // JSX in an expression nests only as deep as oxc may parse it
+    let inner = format!("{}b{}", "<a>".repeat(1_000), "</a>".repeat(1_000));
+    let output = compile_mdx(&format!("{{{inner}}}"), Default::default())?;
+    assert!(output.contains("_jsx(\"a\", {"));
+    assert!(
+        started.elapsed().as_secs() < LIMIT_SECS,
+        "took {:?}",
+        started.elapsed()
+    );
+    Ok(())
+}
+
+#[test]
+fn compiles_many_components_and_exports_in_linear_time() -> Result<(), Error> {
+    let mut input = String::new();
+    for index in 0..10_000 {
+        input.push_str(&format!(
+            "export const a{index} = {index}\n\n<X{index} a={{a{index}}} />\n\n"
+        ));
+    }
+    let started = std::time::Instant::now();
+    let output = compile_mdx(&input, Default::default())?;
+    assert!(output.contains("if (!X9999) _missingMdxReference(\"X9999\", true);"));
+    let body = textlane_mdx::CompileOptions {
+        output_format: Some("function-body".to_string()),
+        ..Default::default()
+    };
+    let output = compile_mdx(&input, body)?;
+    assert!(output.contains("a9999,"));
+    assert!(
+        started.elapsed().as_secs() < LIMIT_SECS,
+        "took {:?}",
+        started.elapsed()
+    );
+    Ok(())
+}
+
+#[test]
+fn parses_deeply_recursive_mdx_scripts_without_overflow() -> Result<(), Error> {
+    let compile = Processor::new()
+        .with(textlane_md::parse(Default::default()))
+        .with(textlane_md::mdx(Default::default()))
+        .with(textlane_md::to_html(Default::default()))
+        .with(textlane_mdx::compile(Default::default()))
+        .freeze()?;
+    let depth = 5_000;
+    for input in [
+        format!("{{{}{}}}", "<a>".repeat(depth), "</a>".repeat(depth)),
+        format!("{{{}a}}", "!".repeat(depth)),
+        format!("{{{}a}}", "a=".repeat(depth)),
+        format!("{{{}a{}}}", "(".repeat(depth), ")".repeat(depth)),
+        format!("{{{}x}}", "x=>".repeat(depth)),
+        format!("{{{}a}}", "new ".repeat(depth)),
+        format!("{{{}c}}", "a?b:".repeat(depth)),
+        format!(
+            "export const a = {}1{}\n",
+            "[".repeat(depth),
+            "]".repeat(depth)
+        ),
+    ] {
+        let started = std::time::Instant::now();
+        // An error is fine; overflowing the stack is not
+        let _ = compile.process(&input);
+        let took = started.elapsed();
+        assert!(
+            took.as_secs() < LIMIT_SECS,
+            "{:?}… took {took:?}",
+            &input[..12]
+        );
+    }
+    Ok(())
+}
+
+#[test]
+fn gives_up_on_mdx_scripts_that_keep_failing_in_linear_time() -> Result<(), Error> {
+    let render = Processor::new()
+        .with(textlane_md::parse(Default::default()))
+        .with(textlane_md::mdx(Default::default()))
+        .with(textlane_md::to_html(Default::default()))
+        .freeze()?;
+    for input in [
+        "{'".to_string() + &"}".repeat(100_000),
+        "{/*".to_string() + &" }".repeat(100_000),
+        "{`".to_string() + &"a}".repeat(100_000),
+        "export const a = /*\n".to_string() + &"a\n\n".repeat(50_000),
+    ] {
+        let started = std::time::Instant::now();
+        let _ = render.process(&input);
+        let took = started.elapsed();
+        assert!(
+            took.as_secs() < LIMIT_SECS,
+            "{:?}… took {took:?}",
+            &input[..3]
         );
     }
     Ok(())

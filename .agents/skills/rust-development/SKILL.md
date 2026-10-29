@@ -30,8 +30,9 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   as in fairspec: `textlane/`, `core/` (`textlane-core`: the trees, the file and the plugin
   contract every other crate shares: mdast, hast and nlcst), and one directory per domain: `md/`, `html/`, `mdx/`,
   `prose/` (`textlane-<domain>`). A domain crate depends on `textlane-core`, never on another
-  domain or on `textlane`, which depends on them all. `mdx` compiles core's hast to a JS tree
-  on oxc, so oxc is its own dependency and never core's
+  domain or on `textlane`, which depends on them all. `mdx` compiles core's hast to JavaScript
+  and parses `md.mdx`'s JavaScript, both with oxc, so oxc is its own dependency and never
+  core's or md's
 - A domain is named short (`md`, `html`, `mdx`, `prose`); its functions spell formats out in
   full: `md.toHtml`, `html.toMarkdown`, `md.toProse`. Rust `to_markdown` becomes napi's
   `toMarkdown` and Python's `to_markdown` with no `js_name` override
@@ -175,6 +176,24 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   stress inputs use `indent: ""`. `html.parse`'s `verbose` builds `data.position` in
   `convert_dom` from the start tag's span and the attribute spans inside it; attributes the
   tree builder adopted from a later tag have none, as in parse5
+- `mdx.compile` is a `Compiler` on hast with extension `js`, porting what @mdx-js/mdx 3.1.1
+  runs after remark-rehype: hast-util-to-estree (`actions/hast/convert.rs`), recma-document,
+  recma-jsx-rewrite, estree-util-build-jsx with recma-build-jsx-transform
+  (`actions/program/{wrap,rewrite,build}.rs`) and astring 1.9.0 with estree-util-to-js's JSX
+  handlers (`utils/printer/`), compared byte for byte. oxc only parses: each ESM block or
+  expression goes through oxc's own ESTree serializer, which writes acorn's shapes (`raw`,
+  one `MemberExpression`, `Property`), into `models/estree.rs`, a flat store of ESTree
+  objects (type plus ordered fields) the ports walk exactly as upstream walks JSON-like
+  trees; field order is walk order. JSX strings are decoded as acorn-jsx does
+  (`helpers/entity.rs`); each snippet gets disjoint virtual offsets so comment attachment
+  compares within it and `duplicate-layout` maps back to lines (`helpers/place.rs`). Walks
+  (`helpers/walk.rs`, estree-walker's enter/leave/skip/replace) and patterns keep explicit
+  stacks; conversion, printing and comment attachment recurse under `stacker`. Calls
+  indent each nested object, so the printed size of deep JSX grows with depth squared.
+  `helpers/{entity,property}_table.rs` come from `pnpm -C conformance generate:mdx-tables`.
+  With `md.mdx` in the pipeline, `md.toHtml` runs remark-mark-and-unravel first (an
+  `UnravelSlot` flag either plugin may attach first): a paragraph of only MDX text nodes
+  and white space becomes its MDX as flow nodes, which hast cannot recover once wrapped
 - `md.gfm` only puts `GfmOptions` in the `GfmSlot` slot; `md.parse` and `md.stringify` read it
   when their factories run at freeze, so GFM's constructs, handlers and unsafe patterns are
   on only with it. A GFM table is tried after each first byte's own flow constructs, as
@@ -199,6 +218,23 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   container. A definition description is a document container (`Container::DefList`): its
   check closes the flow even when no list opens, and `Resolver::DefList` splits the
   paragraph above into terms, as micromark-extension-definition-list does
+- `md.mdx` ports micromark-extension-mdxjs (JSX, expressions, ESM; indented code,
+  autolinks and raw HTML off, so flow constructs take any indent: `ParseState::indent_max`)
+  and mdast-util-mdx. Core holds the MDX nodes for mdast and hast alike (`models/mdx.rs`);
+  `md.toHtml` passes them into hast unchanged, as @mdx-js/mdx's remark-rehype does. md
+  asks acorn's questions through core's `ScriptParser` in `ScriptParserSlot`, which the
+  mdx crate implements on oxc (`OxcScriptParser`, a module checked by oxc_semantic too,
+  for acorn's early errors) and `Processor::freeze_with` seeds under `mdx`. A syntax
+  error is `State::Error`: `Tokenizer::crash` keeps the first one in `ParseState::error`
+  and every tokenizer stops; the compiler's `error` does the same for
+  mdast-util-mdx-jsx's tag mismatches, found on its own token stack (`stack_tokens`,
+  which buffers are not on, as from-markdown's). An expression tries each `}` with the
+  parser, as micromark does; a failure before the end of the value
+  (`ScriptError::end`) is one no later text fixes, so no `}` after it is tried
+  (`MdxState::hard_crash`), and the value grows per event, not per try. oxc parses
+  shallow sources on the caller's stack and deeper ones on a grown one, past 1024 open
+  brackets not at all. A JSX text element's tags and children go into its parent's
+  phrasing items (`phrasing_into`): copying each nested element's text is quadratic
 - `prose`'s parser ports parse-latin 7.0.0 and parse-english 7.0.0 (`language: "english"`
   adds parse-english's two plugins in front of parse-latin's). Core's nlcst
   (`models/nlcst.rs`) is one `Node` enum over two shapes, `Parent` (root, paragraph,

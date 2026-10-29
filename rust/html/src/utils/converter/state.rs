@@ -82,6 +82,16 @@ impl<'a, 'n> Converter<'a, 'n, '_> {
                 Converted::One(self.store.add_text(raw.value, raw.position))
             }
             Node::Unknown(unknown) => convert_unknown(self, unknown),
+            // As unknown nodes: a value is text, an element its children
+            Node::MdxJsxFlowElement(element) | Node::MdxJsxTextElement(element) => {
+                Converted::Many(self.all(&element.children))
+            }
+            Node::MdxFlowExpression(expression) | Node::MdxTextExpression(expression) => {
+                Converted::One(self.store.add_text(expression.value, expression.position))
+            }
+            Node::MdxjsEsm(esm) => {
+                Converted::One(self.store.add_text(esm.value, esm.position))
+            }
         })
     }
 

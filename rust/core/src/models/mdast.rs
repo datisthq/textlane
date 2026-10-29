@@ -1,5 +1,6 @@
 use crate::ArenaVec;
 use crate::models::data::Data;
+use crate::models::mdx::{MdxExpression, MdxJsxElement, MdxjsEsm};
 use crate::models::position::Position;
 
 /// An mdast node.
@@ -42,6 +43,11 @@ pub enum Node<'a> {
     DefList(DefList<'a>),
     DefListTerm(DefListTerm<'a>),
     DefListDescription(DefListDescription<'a>),
+    MdxJsxFlowElement(MdxJsxElement<'a, Node<'a>>),
+    MdxJsxTextElement(MdxJsxElement<'a, Node<'a>>),
+    MdxFlowExpression(MdxExpression<'a>),
+    MdxTextExpression(MdxExpression<'a>),
+    MdxjsEsm(MdxjsEsm<'a>),
 }
 
 /// The document.
@@ -476,6 +482,9 @@ impl<'a> Node<'a> {
             Node::DefListTerm(node) => Some(&node.children),
             Node::DefListDescription(node) => Some(&node.children),
             Node::Unknown(node) => node.children.as_ref(),
+            Node::MdxJsxFlowElement(node) | Node::MdxJsxTextElement(node) => {
+                Some(&node.children)
+            }
             Node::ThematicBreak(_)
             | Node::FootnoteReference(_)
             | Node::Text(_)
@@ -490,7 +499,10 @@ impl<'a> Node<'a> {
             | Node::InlineMath(_)
             | Node::Yaml(_)
             | Node::Toml(_)
-            | Node::Literal(_) => None,
+            | Node::Literal(_)
+            | Node::MdxFlowExpression(_)
+            | Node::MdxTextExpression(_)
+            | Node::MdxjsEsm(_) => None,
         }
     }
 
@@ -519,6 +531,9 @@ impl<'a> Node<'a> {
             Node::DefListTerm(node) => Some(&mut node.children),
             Node::DefListDescription(node) => Some(&mut node.children),
             Node::Unknown(node) => node.children.as_mut(),
+            Node::MdxJsxFlowElement(node) | Node::MdxJsxTextElement(node) => {
+                Some(&mut node.children)
+            }
             Node::ThematicBreak(_)
             | Node::FootnoteReference(_)
             | Node::Text(_)
@@ -533,7 +548,10 @@ impl<'a> Node<'a> {
             | Node::InlineMath(_)
             | Node::Yaml(_)
             | Node::Toml(_)
-            | Node::Literal(_) => None,
+            | Node::Literal(_)
+            | Node::MdxFlowExpression(_)
+            | Node::MdxTextExpression(_)
+            | Node::MdxjsEsm(_) => None,
         }
     }
 
@@ -577,6 +595,9 @@ impl<'a> Node<'a> {
             Node::DefList(node) => node.data,
             Node::DefListTerm(node) => node.data,
             Node::DefListDescription(node) => node.data,
+            Node::MdxJsxFlowElement(node) | Node::MdxJsxTextElement(node) => node.data,
+            Node::MdxFlowExpression(node) | Node::MdxTextExpression(node) => node.data,
+            Node::MdxjsEsm(node) => node.data,
         }
     }
 
@@ -619,6 +640,13 @@ impl<'a> Node<'a> {
             Node::DefList(node) => node.position.as_ref(),
             Node::DefListTerm(node) => node.position.as_ref(),
             Node::DefListDescription(node) => node.position.as_ref(),
+            Node::MdxJsxFlowElement(node) | Node::MdxJsxTextElement(node) => {
+                node.position.as_ref()
+            }
+            Node::MdxFlowExpression(node) | Node::MdxTextExpression(node) => {
+                node.position.as_ref()
+            }
+            Node::MdxjsEsm(node) => node.position.as_ref(),
         }
     }
 
@@ -661,6 +689,13 @@ impl<'a> Node<'a> {
             Node::DefList(node) => &mut node.position,
             Node::DefListTerm(node) => &mut node.position,
             Node::DefListDescription(node) => &mut node.position,
+            Node::MdxJsxFlowElement(node) | Node::MdxJsxTextElement(node) => {
+                &mut node.position
+            }
+            Node::MdxFlowExpression(node) | Node::MdxTextExpression(node) => {
+                &mut node.position
+            }
+            Node::MdxjsEsm(node) => &mut node.position,
         }
     }
 }

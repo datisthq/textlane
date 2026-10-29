@@ -18,7 +18,7 @@ const COMPLETE: u8 = 7;
 
 /// An HTML block: one of seven kinds by how it starts, each ending its own way.
 pub(crate) fn tokenize_html_flow(tokenizer: &mut Tokenizer) -> State {
-    if true {
+    if tokenizer.parse_state.mdx.is_none() {
         tokenizer.enter(Name::HTML_FLOW);
 
         if matches!(tokenizer.current, Some(b'\t' | b' ')) {
