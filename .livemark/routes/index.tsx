@@ -970,12 +970,12 @@ interface Measure {
 
 // The 100KB `spec` case of benchmark/, Markdown to HTML, median time per document
 const measures: Measure[] = [
-  { tool: "textlane (Rust)", ms: 132, mb: 54, isTextlane: true },
-  { tool: "textlane (Node.js)", ms: 121, mb: 86, isTextlane: true },
-  { tool: "textlane (Python)", ms: 120, mb: 60, isTextlane: true },
-  { tool: "markdown-rs", ms: 247, mb: 48 },
-  { tool: "micromark", ms: 718, mb: 549 },
-  { tool: "unified (remark + rehype)", ms: 848, mb: 564 },
+  { tool: "textlane (Rust)", ms: 18, mb: 24, isTextlane: true },
+  { tool: "textlane (Node.js)", ms: 17, mb: 67, isTextlane: true },
+  { tool: "textlane (Python)", ms: 20, mb: 30, isTextlane: true },
+  { tool: "markdown-rs", ms: 140, mb: 48 },
+  { tool: "micromark", ms: 563, mb: 562 },
+  { tool: "unified (remark + rehype)", ms: 604, mb: 572 },
 ]
 
 function Benchmark() {
@@ -986,7 +986,7 @@ function Benchmark() {
         <Reveal>
           <div className="text-center max-w-2xl mx-auto mb-10 md:mb-16">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-              6× faster than remark + rehype
+              30× faster than remark + rehype
             </h2>
             <p className="mt-4 text-muted-foreground text-lg">
               The same Markdown-to-HTML pipeline in a tenth of the memory, from every
