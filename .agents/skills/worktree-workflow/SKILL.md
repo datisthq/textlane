@@ -74,4 +74,9 @@ git worktree remove .worktrees/<name>
 git branch -d <name>
 ```
 
+Before landing, `git ls-files --others --ignored --exclude-standard -- 'rust/*/src'` must
+print nothing: an ignore rule that matches a source path (an unanchored `compile/` once
+swallowed `rust/mdx/src/plugins/compile/`) keeps the file out of the squash, and a forced
+`git worktree remove` then deletes the only copy.
+
 Never remove another session's worktree or branch.

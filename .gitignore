@@ -63,7 +63,7 @@ pids
 .vscode/
 .wrangler/
 build/
-compile/
+/typescript/compile/
 dist/
 .astro/
 .cursor/
