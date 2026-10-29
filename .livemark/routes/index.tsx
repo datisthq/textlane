@@ -98,7 +98,7 @@ function HeroActions() {
       <div className="mt-10 flex flex-wrap gap-3">
         <Link
           to="/$"
-          params={{ _splat: "rust/introduction" }}
+          params={{ _splat: "python/introduction" }}
           className={cn(
             buttonVariants({ variant: "default", size: "lg" }),
             "flex-1 px-3 no-underline sm:flex-none sm:px-5",
@@ -366,7 +366,7 @@ function PortsCard(props: { slides: Slide[]; active: number }) {
           href="https://unifiedjs.com/"
           target="_blank"
           rel="noopener noreferrer"
-          className="font-medium text-primary underline-offset-4 hover:underline"
+          className="font-medium text-primary underline underline-offset-4 hover:no-underline"
         >
           unified community
         </a>{" "}
@@ -1080,7 +1080,7 @@ function FinalCta() {
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               to="/$"
-              params={{ _splat: "rust/introduction" }}
+              params={{ _splat: "python/introduction" }}
               className={cn(
                 buttonVariants({ variant: "default", size: "lg" }),
                 "px-5 no-underline",
