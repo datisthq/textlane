@@ -2,10 +2,10 @@ import { Link, createFileRoute } from "@tanstack/react-router"
 import {
   ArrowRight,
   BookOpen,
+  CircleCheck,
   Bot,
   Boxes,
   Braces,
-  CheckCircle2,
   Gauge,
   Github,
   Rocket,
@@ -41,6 +41,7 @@ function Landing() {
         <Pipeline />
         <Plugins />
         <Features />
+        <ConformanceStripe />
         <Benchmark />
         <FinalCta />
         <Datist />
@@ -78,12 +79,12 @@ function Hero() {
             </span>
           </h1>
           <p className="mt-6 max-w-[52ch] text-lg leading-relaxed text-muted-foreground md:text-xl">
-            Textlane runs the remark, rehype and retext pipeline natively: the same mdast,
+            Textlane runs the remark, rehype and retext pipeline in Rust: the same mdast,
             hast and nlcst trees, the same plugins, one crate for every language.
           </p>
           <HeroActions />
         </div>
-        <div className="mt-12 lg:mt-0 animate-in fade-in-0 slide-in-from-bottom-4 duration-700 ease-out">
+        <div className="mt-12 lg:mt-0 xl:w-[60rem] animate-in fade-in-0 slide-in-from-bottom-4 duration-700 ease-out">
           <HeroCarousel slides={slides} />
         </div>
       </div>
@@ -300,20 +301,8 @@ function HeroCarousel(props: { slides: Slide[] }) {
           ))}
         </div>
       </figure>
-      <div className="mt-4 grid lg:absolute lg:-bottom-10 lg:-left-10 lg:mt-0 lg:w-[24rem]">
-        {props.slides.map((slide, index) => (
-          <div
-            key={slide.id}
-            aria-hidden={index !== active}
-            inert={index !== active}
-            className={cn(
-              "[grid-area:1/1] transition-opacity duration-700 motion-reduce:transition-none",
-              index === active ? "opacity-100" : "pointer-events-none opacity-0",
-            )}
-          >
-            <PortsChip ports={slide.ports} />
-          </div>
-        ))}
+      <div className="mt-4 lg:absolute lg:-bottom-16 lg:-left-12 lg:mt-0 lg:w-[30rem]">
+        <PortsCard slides={props.slides} active={active} />
       </div>
     </div>
   )
@@ -321,7 +310,7 @@ function HeroCarousel(props: { slides: Slide[] }) {
 
 function SlideBody(props: { slide: Slide }) {
   return (
-    <div className="flex h-full flex-col gap-4 p-4 sm:p-5 lg:pb-16">
+    <div className="flex h-full flex-col gap-4 p-4 sm:p-5 lg:pb-36">
       <ol className="flex flex-wrap items-center gap-1.5">
         {props.slide.stages.map((stage, index) => (
           <li key={stage} className="flex items-center gap-1.5">
@@ -355,21 +344,55 @@ function Pane(props: { label: string; text: string }) {
   )
 }
 
-function PortsChip(props: { ports: string[] }) {
+function PortsCard(props: { slides: Slide[]; active: number }) {
   return (
-    <figure className="flex h-full gap-3 rounded-card border border-primary/25 bg-card p-4 shadow-lg">
-      <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-        <Workflow className="size-4" />
-      </span>
-      <div className="min-w-0">
-        <p className="text-xs font-semibold tracking-[0.12em] text-primary uppercase">
-          Ported from unified
-        </p>
-        <figcaption className="mt-2 flex flex-wrap gap-x-2 gap-y-1 font-mono text-xs text-muted-foreground">
-          {props.ports.map(port => (
-            <span key={port}>{port}</span>
-          ))}
-        </figcaption>
+    <figure className="rounded-card border border-primary/40 bg-card p-5 shadow-2xl ring-4 ring-primary/10">
+      <div className="flex items-center gap-3">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <Workflow className="size-5" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-xs font-semibold tracking-[0.12em] text-primary uppercase">
+            Ported from unified
+          </p>
+          <p className="mt-0.5 text-base font-semibold text-foreground">
+            AI-driven port of unified
+          </p>
+        </div>
+      </div>
+      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+        All credit goes to the{" "}
+        <a
+          href="https://unifiedjs.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-medium text-primary underline-offset-4 hover:underline"
+        >
+          unified community
+        </a>{" "}
+        for creating the project: its plugins, syntax trees and pipeline design are
+        theirs.
+      </p>
+      <div className="mt-4 grid">
+        {props.slides.map((slide, index) => (
+          <figcaption
+            key={slide.id}
+            aria-hidden={index !== props.active}
+            className={cn(
+              "[grid-area:1/1] flex flex-wrap content-start gap-1.5 transition-opacity duration-700 motion-reduce:transition-none",
+              index === props.active ? "opacity-100" : "opacity-0",
+            )}
+          >
+            {slide.ports.map(port => (
+              <code
+                key={port}
+                className="rounded-md border border-border bg-muted/60 px-2 py-0.5 font-mono text-xs text-foreground"
+              >
+                {port}
+              </code>
+            ))}
+          </figcaption>
+        ))}
       </div>
     </figure>
   )
@@ -499,42 +522,68 @@ const BACKGROUND_CSS = `
 }
 `
 
-const unifiedSource = `import { unified } from "unified"
-import remarkParse from "remark-parse"
-import remarkGfm from "remark-gfm"
-import remarkRehype from "remark-rehype"
-import rehypeSlug from "rehype-slug"
-import rehypeStringify from "rehype-stringify"
+interface Example {
+  id: string
+  label: string
+  file: string
+  keywords: Set<string>
+  source: string
+}
 
-const file = await unified()
-  .use(remarkParse)
-  .use(remarkGfm)
-  .use(remarkRehype)
-  .use(rehypeSlug)
-  .use(rehypeStringify)
-  .process(markdown)`
+const examples: Example[] = [
+  {
+    id: "python",
+    label: "Python",
+    file: "main.py",
+    keywords: new Set(["from", "import"]),
+    source: `from textlane import textlane, md, html
 
-const textlaneSource = `use serde_json::json;
-use textlane::{Api, File, Pipeline};
+processor = (
+    textlane()
+    .use(md.parse())
+    .use(md.gfm())
+    .use(md.to_html())
+    .use(html.slug())
+    .use(html.stringify())
+)
 
-let mut pipeline = Pipeline::new();
-pipeline.use_value(
-    &json!([
-        "md.parse",
-        "md.gfm",
-        "md.toHtml",
-        "html.slug",
-        "html.stringify"
-    ]),
-    None,
-)?;
+file = processor.process(markdown)`,
+  },
+  {
+    id: "typescript",
+    label: "TypeScript",
+    file: "main.ts",
+    keywords: new Set(["import", "from", "const", "await", "as"]),
+    source: `import { textlane } from "textlane"
+import * as md from "textlane/md"
+import * as html from "textlane/html"
 
-let html = pipeline
-    .process(markdown, &mut File::new(), Api::Sync)?;`
+const file = await textlane()
+  .use(md.parse())
+  .use(md.gfm())
+  .use(md.toHtml())
+  .use(html.slug())
+  .use(html.stringify())
+  .process(markdown)`,
+  },
+  {
+    id: "rust",
+    label: "Rust",
+    file: "main.rs",
+    keywords: new Set(["use", "let", "mut", "fn"]),
+    source: `use textlane::{Processor, html, md};
 
-const JS_KEYWORDS = new Set(["import", "from", "const", "await"])
+let processor = Processor::new()
+    .with(md::parse(Default::default()))
+    .with(md::gfm(Default::default()))
+    .with(md::to_html(Default::default()))
+    .with(html::slug(Default::default()))
+    .with(html::stringify(Default::default()))
+    .freeze()?;
 
-const RUST_KEYWORDS = new Set(["use", "let", "mut", "fn", "None"])
+let output = processor.process(markdown)?;`,
+  },
+]
 
 const CODE_TOKEN =
   /(\/\/.*)|("(?:[^"\\]|\\.)*")|(\b\d+\b)|([A-Za-z_]\w*)|([^\sA-Za-z_\d"]+)|(\s+)|([\s\S])/g
@@ -552,7 +601,7 @@ function highlightCode(code: string, keywords: Set<string>) {
           : word
             ? keywords.has(word)
               ? tk.keyword
-              : next === "(" || /^(remark|rehype)/.test(word)
+              : next === "("
                 ? tk.func
                 : /^[A-Z]/.test(word)
                   ? tk.type
@@ -573,43 +622,33 @@ function highlightCode(code: string, keywords: Set<string>) {
 function Pipeline() {
   return (
     <section className="border-b border-border bg-primary/5">
-      <div className="mx-auto max-w-6xl px-6 py-16 md:py-24">
+      <div className="mx-auto max-w-6xl px-6 pt-16 md:pt-24">
         <Reveal>
           <div className="text-center max-w-2xl mx-auto mb-10 md:mb-16">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
               The same pipeline, stage for stage
             </h2>
             <p className="mt-4 text-muted-foreground text-lg">
-              Every unified plugin you use has a native stage of the same shape: same
+              Every stage is a native port of the unified plugin of the same name: same
               options, same trees in, same trees out.
             </p>
           </div>
         </Reveal>
-        <Reveal>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <WindowCard label="unified · main.js">
-              <pre className="p-5 text-sm leading-relaxed font-mono overflow-x-auto">
-                <code className={tk.body}>
-                  {highlightCode(unifiedSource, JS_KEYWORDS)}
-                </code>
-              </pre>
-            </WindowCard>
-            <WindowCard label="textlane · main.rs">
-              <pre className="p-5 text-sm leading-relaxed font-mono overflow-x-auto">
-                <code className={tk.body}>
-                  {highlightCode(textlaneSource, RUST_KEYWORDS)}
-                </code>
-              </pre>
-            </WindowCard>
-          </div>
-        </Reveal>
-        <Reveal delayMs={120}>
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Bullet text="Stages keep unified's order, options and use, data and freeze semantics." />
-            <Bullet text="Trees read and write unified's JSON: mdast, hast and nlcst, positions included." />
-            <Bullet text="Rust runs pipelines today; the Node.js and Python .use() API is in progress." />
-          </div>
-        </Reveal>
+      </div>
+      <div className="mx-auto max-w-7xl px-6 pb-16 md:pb-24">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          {examples.map((example, i) => (
+            <Reveal key={example.id} delayMs={i * 60}>
+              <WindowCard label={`${example.label} · ${example.file}`}>
+                <pre className="overflow-x-auto p-4 font-mono text-xs leading-relaxed sm:text-sm lg:text-xs">
+                  <code className={tk.body}>
+                    {highlightCode(example.source, example.keywords)}
+                  </code>
+                </pre>
+              </WindowCard>
+            </Reveal>
+          ))}
+        </div>
       </div>
     </section>
   )
@@ -758,7 +797,7 @@ const features: Feature[] = [
   },
   {
     icon: ShieldCheck,
-    title: "9,400+ conformance cases",
+    title: "10k+ conformance tests",
     description:
       "Ported from CommonMark, html5lib and WPT, remark, rehype and retext. Every implementation runs the same JSON cases.",
   },
@@ -807,6 +846,117 @@ function FeatureCard(props: { feature: Feature }) {
         {props.feature.description}
       </p>
     </div>
+  )
+}
+
+const SUITE = "https://github.com/datisthq/textlane/tree/main/conformance"
+
+const conformanceStats = [
+  { value: "10k+", label: "tests" },
+  { value: "30", label: "plugins" },
+  { value: "3", label: "languages" },
+]
+
+const conformanceCase = `{
+  "description": "micromark-extension-gfm-strikethrough",
+  "pipeline": [
+    ["md.parse"],
+    ["md.gfm"],
+    ["md.toHtml"],
+    ["html.stringify"]
+  ],
+  "tests": [{
+    "description": "should support nested strikethrough",
+    "input": "a ~~b ~~c~~ d~~ e",
+    "expected": {
+      "html": "<p>a <del>b <del>c</del> d</del> e</p>"
+    }
+  }]
+}`
+
+const JSON_TOKEN =
+  /("(?:[^"\\]|\\.)*"(?=:))|("(?:[^"\\]|\\.)*")|(\b\d+\b)|([{}[\],:])|(\s+|[^\s"{}[\],:]+)/g
+
+function highlightJson(code: string) {
+  return [...code.matchAll(JSON_TOKEN)].map(match => {
+    const [text, key, string, number, punct] = match
+    const className = key
+      ? tk.key
+      : string
+        ? tk.string
+        : number
+          ? tk.type
+          : punct
+            ? tk.punct
+            : undefined
+    return className ? (
+      <span key={match.index} className={className}>
+        {text}
+      </span>
+    ) : (
+      text
+    )
+  })
+}
+
+function ConformanceStripe() {
+  return (
+    <section className="border-b border-border bg-primary/5">
+      <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-16 md:grid-cols-2 md:gap-12 md:py-20">
+        <Reveal>
+          <p className="text-xs font-semibold tracking-[0.12em] text-primary uppercase">
+            Conformance suite
+          </p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
+            One test suite, every language
+          </h2>
+          <p className="mt-4 text-lg text-muted-foreground">
+            Python, TypeScript and Rust run the same language-neutral cases, ported from
+            CommonMark, html5lib, remark, rehype and retext: the same pipeline, the same
+            input, the same expected output.
+          </p>
+          <dl className="mt-8 grid grid-cols-3 gap-4">
+            {conformanceStats.map(stat => (
+              <div
+                key={stat.label}
+                className="flex flex-col border-l-2 border-primary/40 pl-3"
+              >
+                <dt className="text-xs text-muted-foreground">{stat.label}</dt>
+                <dd className="order-first font-mono text-2xl font-bold tracking-tight text-foreground tabular-nums">
+                  {stat.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <a
+            href={SUITE}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-8 inline-block font-medium text-primary underline-offset-4 hover:underline"
+          >
+            Browse the suite →
+          </a>
+        </Reveal>
+        <Reveal delayMs={100}>
+          <WindowCard label="conformance/tests/md/gfm-strikethrough.json">
+            <pre className="overflow-x-auto p-5 font-mono text-xs leading-relaxed sm:text-sm">
+              <code className={tk.body}>{highlightJson(conformanceCase)}</code>
+            </pre>
+            <div className="flex flex-wrap gap-2 border-t border-primary/20 bg-muted/50 px-4 py-3">
+              {["Python", "TypeScript", "Rust"].map(language => (
+                <span
+                  key={language}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 font-mono text-xs"
+                >
+                  <CircleCheck className="size-3.5 text-[#40a02b] dark:text-[#a6e3a1]" />
+                  {language}
+                </span>
+              ))}
+            </div>
+          </WindowCard>
+        </Reveal>
+      </div>
+    </section>
   )
 }
 
@@ -894,15 +1044,6 @@ function Benchmark() {
         </Reveal>
       </div>
     </section>
-  )
-}
-
-function Bullet(props: { text: string }) {
-  return (
-    <div className="flex items-start gap-3 rounded-card border border-primary/20 bg-card/60 p-4">
-      <CheckCircle2 className="size-5 text-primary shrink-0 mt-0.5" />
-      <p className="text-sm text-foreground/90 leading-relaxed">{props.text}</p>
-    </div>
   )
 }
 
