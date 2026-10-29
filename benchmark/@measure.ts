@@ -16,7 +16,7 @@ const { values } = parseArgs({
     tool: { type: "string", multiple: true },
     runs: { type: "string", default: "5" },
     warmup: { type: "string", default: "1" },
-    timeout: { type: "string", default: "600" },
+    timeout: { type: "string", default: "180" },
     "memory-max": { type: "string" },
   },
 })

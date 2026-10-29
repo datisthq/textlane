@@ -23,6 +23,11 @@ this skill is how to change it without making the numbers lie.
   for a smoke run. After a textlane change re-measure only
   `--tool textlane-rust --tool textlane-typescript --tool textlane-python`; rivals carry over
 - `pnpm -C benchmark show:report` — merges `.cache/results/`, latest per case, size and tool
+- Publish a full run in `.humans/benchmark.html`: its tables, chart and cards, with the date,
+  commit and machine. A stale result file from before a textlane change still merges into
+  `show:report`, so pass the run's own file (`show:report <path>`) when the page is regenerated
+- A full run takes about half an hour; unified and micromark dominate it and grow faster than
+  their input, so keep the largest sizes at a few megabytes and the timeout at 180s
 
 ## Layout
 

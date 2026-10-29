@@ -40,7 +40,7 @@ pnpm -C benchmark show:report                    # .cache/report.html
 
 `measure` runs every size of every case unless narrowed with `--case`, `--size` or `--tool`
 (each repeatable). `--runs` (5) and `--warmup` (1) set the series per tool, `--timeout` its
-limit in seconds (600), and `--memory-max` caps each tool, for example `4G`. The Rust adapters
+limit in seconds (180), and `--memory-max` caps each tool, for example `4G`. The Rust adapters
 and the Node.js addon are rebuilt before each run (a no-op when fresh); the Python wheel is not,
 so rerun `setup:tools` after a crate change before measuring textlane (Python). Results land in
 `.cache/results/`, one file per invocation; `show:report` keeps the latest result per case,

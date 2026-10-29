@@ -1,5 +1,5 @@
 {
   "description": "Convert the CommonMark edge cases of the conformance suite to HTML",
   "profile": "spec",
-  "sizes": ["100KB", "4MB"]
+  "sizes": ["100KB", "1MB"]
 }
