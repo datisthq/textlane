@@ -101,6 +101,20 @@ pub enum Primitive {
     String(String),
 }
 
+/// Options of `html.highlight`, named as @shikijs/rehype names them.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
+pub struct HighlightOptions {
+    /// The theme of each color mode, `light` first, as `{"light": …, "dark": …}`.
+    pub themes: Option<serde_json::Map<String, serde_json::Value>>,
+    /// The one theme, when `themes` is not given.
+    pub theme: Option<String>,
+    /// The language of a block that names none; such a block is left alone without it.
+    pub default_language: Option<String>,
+    /// The language of a block naming one Shiki does not know; left alone without it.
+    pub fallback_language: Option<String>,
+}
+
 /// Options of `html.slug`, named as rehype-slug names them.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[serde(default, rename_all = "camelCase")]

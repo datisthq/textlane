@@ -15,11 +15,11 @@ matched_entries = set()
 failing_entries = set()
 
 
-# An entry names a file, a group, or a whole area as `<area>/*`
-def matches_entry(entry, file_id, group_id):
+# An entry names a file, a group, one test as `<group>#<test>`, or an area as `<area>/*`
+def matches_entry(entry, file_id, group_id, test_id):
     if entry.endswith("*"):
         return file_id.startswith(entry[:-1])
-    return entry in (file_id, group_id)
+    return entry in (file_id, group_id, test_id)
 
 
 def collect_cases():
@@ -29,11 +29,15 @@ def collect_cases():
             group_id = f"{file_id}#{group['description']}"
             if group_id in KNOWN_DIVERGENCES:
                 continue
-            entry = next((key for key in PENDING if matches_entry(key, file_id, group_id)), None)
-            if entry:
-                matched_entries.add(entry)
             for test in group["tests"]:
-                yield pytest.param(group, test, entry, id=f"{group_id} / {test['description']}")
+                test_id = f"{group_id}#{test['description']}"
+                entry = next(
+                    (key for key in PENDING if matches_entry(key, file_id, group_id, test_id)),
+                    None,
+                )
+                if entry:
+                    matched_entries.add(entry)
+                yield pytest.param(group, test, entry, id=test_id)
 
 
 @pytest.mark.parametrize("group,test,entry", list(collect_cases()))

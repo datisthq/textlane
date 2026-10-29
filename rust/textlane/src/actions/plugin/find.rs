@@ -47,6 +47,10 @@ pub(crate) fn find_plugin(name: &str) -> Option<BuildPlugin> {
         "html.slug" => {
             |_, options| Ok(Box::new(textlane_html::slug(read_options(options)?)))
         }
+        #[cfg(feature = "highlight")]
+        "html.highlight" => {
+            |_, options| Ok(Box::new(textlane_html::highlight(read_options(options)?)))
+        }
         #[cfg(feature = "html")]
         "html.toMarkdown" => {
             |_, options| Ok(Box::new(textlane_html::to_markdown(read_options(options)?)))

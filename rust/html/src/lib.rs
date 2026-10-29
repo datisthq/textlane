@@ -1,6 +1,8 @@
 //! Textlane's HTML plugins: parsing, hast transforms, sanitizing and serializing.
 
 mod models {
+    #[cfg(feature = "highlight")]
+    pub(crate) mod highlight;
     pub(crate) mod namespace;
     pub(crate) mod options;
     pub(crate) mod parse_error;
@@ -40,6 +42,10 @@ mod actions {
     }
     pub(crate) mod code {
         pub(crate) mod convert;
+        #[cfg(feature = "highlight")]
+        pub(crate) mod highlight;
+        #[cfg(feature = "highlight")]
+        pub(crate) mod tokenize;
     }
     pub(crate) mod comment {
         pub(crate) mod convert;
@@ -55,6 +61,8 @@ mod actions {
     }
     pub(crate) mod hast {
         pub(crate) mod convert;
+        #[cfg(feature = "highlight")]
+        pub(crate) mod highlight;
         pub(crate) mod minify;
         pub(crate) mod sanitize;
         pub(crate) mod slug;
@@ -120,6 +128,10 @@ mod actions {
     pub(crate) mod textarea {
         pub(crate) mod convert;
     }
+    #[cfg(feature = "highlight")]
+    pub(crate) mod theme {
+        pub(crate) mod resolve;
+    }
     pub(crate) mod unknown {
         pub(crate) mod convert;
     }
@@ -135,15 +147,23 @@ mod helpers {
     pub(crate) mod phrasing;
     pub(crate) mod property;
     pub(crate) mod reason;
+    #[cfg(feature = "highlight")]
+    pub(crate) mod registry;
     pub(crate) mod schema;
     pub(crate) mod selected;
     pub(crate) mod slug;
     pub(crate) mod slug_table;
     pub(crate) mod tag;
     pub(crate) mod text;
+    #[cfg(feature = "highlight")]
+    pub(crate) mod theme_table;
     pub(crate) mod value;
 }
 mod plugins {
+    #[cfg(feature = "highlight")]
+    pub(crate) mod highlight {
+        pub(crate) mod plugin;
+    }
     pub(crate) mod parse {
         pub(crate) mod plugin;
     }
@@ -163,18 +183,22 @@ mod plugins {
 
 // models
 pub use models::options::{
-    AttributeDefinition, ParseOptions, Primitive, SanitizeOptions, SlugOptions,
-    StringifyOptions, ToMarkdownOptions,
+    AttributeDefinition, HighlightOptions, ParseOptions, Primitive, SanitizeOptions,
+    SlugOptions, StringifyOptions, ToMarkdownOptions,
 };
 
 // actions
 pub use actions::hast::convert::convert_hast;
+#[cfg(feature = "highlight")]
+pub use actions::hast::highlight::highlight_hast;
 pub use actions::hast::sanitize::sanitize_hast;
 pub use actions::hast::slug::slug_hast;
 pub use actions::hast::stringify::stringify_hast;
 pub use actions::html::parse::parse_html;
 
 // plugins
+#[cfg(feature = "highlight")]
+pub use plugins::highlight::plugin::{Highlight, highlight};
 pub use plugins::parse::plugin::{Parse, parse};
 pub use plugins::sanitize::plugin::{Sanitize, sanitize};
 pub use plugins::slug::plugin::{Slug, slug};

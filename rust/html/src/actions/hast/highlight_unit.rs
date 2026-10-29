@@ -1,0 +1,81 @@
+use serde_json::json;
+use textlane_core::{Allocator, Error, File};
+
+use super::highlight_hast;
+use crate::actions::hast::stringify::stringify_hast;
+use crate::actions::html::parse::parse_html;
+use crate::models::options::{HighlightOptions, ParseOptions, StringifyOptions};
+
+fn highlight(input: &str, options: serde_json::Value) -> Result<String, Error> {
+    let alloc = Allocator::new();
+    let options: HighlightOptions = serde_json::from_value(options)
+        .map_err(|error| Error::new("invalid-options", error.to_string()))?;
+    let parse = ParseOptions {
+        fragment: true,
+        ..Default::default()
+    };
+    let mut node = parse_html(input, &parse, &mut File::new(), &alloc);
+    highlight_hast(&mut node, &options, &alloc)?;
+    stringify_hast(&node, &StringifyOptions::default())
+}
+
+#[test]
+fn colors_with_one_theme_without_css_variables() -> Result<(), Error> {
+    let input = "<pre><code class=\"language-js\">// a\nlet a = \"b\"\n</code></pre>";
+    assert_eq!(
+        highlight(input, json!({ "theme": "github-light" }))?,
+        "<pre class=\"shiki github-light\" style=\"background-color:#fff;color:#24292e\" \
+         tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#6A737D\">// a</span>\
+         </span>\n<span class=\"line\"><span style=\"color:#D73A49\">let</span><span \
+         style=\"color:#24292E\"> a </span><span style=\"color:#D73A49\">=</span><span \
+         style=\"color:#032F62\"> \"b\"</span></span></code></pre>"
+    );
+    Ok(())
+}
+
+#[test]
+fn puts_the_light_theme_first_whatever_the_order() -> Result<(), Error> {
+    let input = "<pre><code class=\"language-js\">let a\n</code></pre>";
+    let themes = json!({ "themes": { "dark": "github-dark", "light": "github-light" } });
+    assert_eq!(
+        highlight(input, themes)?,
+        "<pre class=\"shiki shiki-themes github-light github-dark\" \
+         style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;\
+         --shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span \
+         style=\"color:#D73A49;--shiki-dark:#F97583\">let</span><span \
+         style=\"color:#24292E;--shiki-dark:#E1E4E8\"> a</span></span></code></pre>"
+    );
+    Ok(())
+}
+
+#[test]
+fn leaves_plain_text_uncolored_with_a_span_per_line() -> Result<(), Error> {
+    let options = json!({ "theme": "github-light", "defaultLanguage": "txt" });
+    assert_eq!(
+        highlight("<pre><code>a\n\nb</code></pre>", options)?,
+        "<pre class=\"shiki github-light\" style=\"background-color:#fff;color:#24292e\" \
+         tabindex=\"0\"><code><span class=\"line\"><span>a</span></span>\n<span \
+         class=\"line\"><span></span></span>\n<span class=\"line\"><span>b</span></span>\
+         </code></pre>"
+    );
+    Ok(())
+}
+
+#[test]
+fn fails_on_themes_shiki_would_not_load() {
+    let input = "<pre><code class=\"language-js\">a</code></pre>";
+    for options in [
+        json!({ "themes": { "light": "nope", "dark": "github-dark" } }),
+        json!({ "themes": { "dark": "github-dark" } }),
+        json!({}),
+    ] {
+        let error = highlight(input, options).err().map(|error| error.code);
+        assert_eq!(error.as_deref(), Some("invalid-options"));
+    }
+}
+
+#[test]
+fn checks_themes_only_once_a_block_is_highlighted() -> Result<(), Error> {
+    assert_eq!(highlight("<p>a</p>", json!({}))?, "<p>a</p>");
+    Ok(())
+}

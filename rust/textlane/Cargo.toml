@@ -17,13 +17,23 @@ include = ["src/**/*", "build.rs", "README.md", "LICENSE.md"]
 crate-type = ["lib", "cdylib"]
 
 [features]
-default = ["md", "html", "mdx", "prose"]
+default = ["md", "html", "highlight", "mdx", "prose"]
 md = ["dep:textlane-md"]
 html = ["dep:textlane-html"]
+highlight = ["html", "textlane-html/highlight"]
 mdx = ["dep:textlane-mdx"]
 prose = ["dep:textlane-prose"]
-node = ["md", "html", "mdx", "prose", "dep:napi", "dep:napi-derive", "dep:napi-build"]
-python = ["md", "html", "mdx", "prose", "dep:pyo3"]
+node = [
+  "md",
+  "html",
+  "highlight",
+  "mdx",
+  "prose",
+  "dep:napi",
+  "dep:napi-derive",
+  "dep:napi-build",
+]
+python = ["md", "html", "highlight", "mdx", "prose", "dep:pyo3"]
 testing = []
 
 [dependencies]

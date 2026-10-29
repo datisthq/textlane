@@ -14,7 +14,7 @@ homepage = "https://textlane.dev"
 [workspace.dependencies]
 textlane-core = { path = "core", version = "0.0.0" }
 textlane-md = { path = "md", version = "0.0.0" }
-textlane-html = { path = "html", version = "0.0.0" }
+textlane-html = { path = "html", version = "0.0.0", default-features = false }
 textlane-prose = { path = "prose", version = "0.0.0" }
 textlane-mdx = { path = "mdx", version = "0.0.0" }
 bumpalo = { version = "3.19.0", features = ["collections"] }
@@ -26,6 +26,7 @@ regex = { version = "1.11.1", default-features = false, features = [
   "unicode",
 ] }
 stacker = "0.1.21"
+giallo = { version = "0.5.2", features = ["dump"] }
 url = "2.5.4"
 
 [workspace.lints.rust]

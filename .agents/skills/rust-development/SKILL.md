@@ -134,6 +134,14 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   `html.sanitize` and `html.slug` port hast-util-sanitize and rehype-slug; the sanitizer
   walks with its own stack and counts open ancestors instead of searching them, and
   `helpers/slug_table.rs` is github-slugger's removal regex as generated code-point ranges
+  `html.highlight` follows @shikijs/rehype 4.5.0 on giallo 0.5.2 (Shiki's TextMate grammars
+  and themes on Oniguruma, `onig-regset`): giallo's tokens unmerged, then textlane joins
+  neighbours every theme styles alike, merges whitespace forward and writes Shiki's hast and
+  `--shiki-<mode>` styles itself. `helpers/theme_table.rs` holds what giallo's parsed themes
+  lose (each theme's `fg`/`bg` as written, colors spelled `#fff` or `#…ff`);
+  `helpers/registry.rs` aliases `injectTo` scopes to languages, since giallo links injections
+  by language name. giallo exposes no scopes, so Shiki's token-type splits (same color, one
+  scope naming `string`) cannot be followed; those cases are pending one by one
   `html.toMarkdown` ports hast-util-to-mdast 10.1.2 with rehype-minify-whitespace run first
   (`actions/hast/minify.rs`, which works out `collapsableAfter` for every node in one pass).
   Handlers build into `utils/converter/store.rs`, a flat store that keeps per-subtree flags
@@ -187,6 +195,10 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   `rust/textlane/tests/conformance.rs` requires it (**`conformance-suite`**).
 - `md`, `html`, `mdx` and `prose` (all default) gate the domain re-exports. `node` and
   `python` enable every domain, since each binding is one addon that must carry them all.
+- `highlight` (default, and on in `node` and `python`) is `textlane-html/highlight`: giallo,
+  its 1 MB grammar dump and Oniguruma's C build (`onig_sys`, plus `zstd-sys`), about 2.5 MB of
+  addon. The workspace pins `textlane-html` with `default-features = false`, so `html` alone
+  builds without a C compiler
 - `node` pulls in napi, and `build.rs` runs napi-build only under it; `python` pulls in PyO3
   with `abi3-py39`. Each binding module is compiled only under its feature.
 - `pnpm -C rust check:lint` runs clippy three times: default features, `--features node` and

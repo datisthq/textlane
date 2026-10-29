@@ -79,10 +79,13 @@ describe("conformance", () => {
     for (const group of groups) {
       const groupId = `${id}#${group.description}`
       if (groupId in KNOWN_DIVERGENCES) continue
-      const entry = Object.keys(PENDING).find(key => matchesEntry(key, id, groupId))
-      if (entry) matchedEntries.add(entry)
       describe(groupId, () => {
         for (const test of group.tests) {
+          const testId = `${groupId}#${test.description}`
+          const entry = Object.keys(PENDING).find(key =>
+            matchesEntry(key, id, groupId, testId),
+          )
+          if (entry) matchedEntries.add(entry)
           it(test.description, () => {
             const parsed: Expected = JSON.parse(
               runCase(
@@ -121,10 +124,10 @@ function stripPositions<T>(value: T): T {
   )
 }
 
-// An entry names a file, a group, or a whole area as `<area>/*`
-function matchesEntry(entry: string, fileId: string, groupId: string) {
+// An entry names a file, a group, one test as `<group>#<test>`, or an area as `<area>/*`
+function matchesEntry(entry: string, fileId: string, groupId: string, testId: string) {
   if (entry.endsWith("*")) return fileId.startsWith(entry.slice(0, -1))
-  return entry === fileId || entry === groupId
+  return entry === fileId || entry === groupId || entry === testId
 }
 
 // A run may report several outcomes; the one `expected` names is compared, and an unexpected

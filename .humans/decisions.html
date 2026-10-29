@@ -482,6 +482,35 @@
     </p>
   </dd>
   <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> textlane publishes on giallo
+    0.5.2 from crates.io
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> giallo 0.5.2 depends on <code>onig-regset</code>, its
+      rust-onig fork published on crates.io, so no git dependency stands in the way of
+      publishing.
+    </p>
+    <p><strong>Rejected.</strong> Vendoring the fork.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> Highlighting is the
+    <code>highlight</code> feature, on by default and in both bindings
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> It is the one part of textlane that needs a C compiler
+      (Oniguruma, zstd) and adds about 2.5 MB to an addon; a Rust user who wants
+      <code>html</code> without it turns the feature off, while every addon and wheel
+      carries it, as each binding carries every domain.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Always on, which forces the C build on every
+      <code>html</code> user; off by default, which leaves <code>cargo add textlane</code>
+      without the plugin npm and PyPI users get.
+    </p>
+  </dd>
+  <dt>
     <htmlpress-badge type="success">decided</htmlpress-badge> The corpus is filled before
     the implementation; <code>conformance/pending.json</code> marks what the crate does
     not pass yet
@@ -839,6 +868,19 @@
 <h2>Open</h2>
 <dl>
   <dt>
+    <htmlpress-badge type="danger">open</htmlpress-badge> giallo exposes no token scopes,
+    so <code>html.highlight</code> cannot keep same-colored tokens apart as Shiki does
+  </dt>
+  <dd>
+    <p>
+      Shiki splits neighbours whose vscode-textmate token type differs (string, comment,
+      regex), and injects grammars by scope prefix; giallo 0.5.2 gives styles only and
+      injects into one exact language. Six highlight cases (json, jsonl, http, emacs-lisp,
+      wikitext, one-light shellscript) stay pending until giallo exposes scopes; raise it
+      upstream, with the <code>injectTo</code> lookup by language name rather than scope.
+    </p>
+  </dd>
+  <dt>
     <htmlpress-badge type="danger">open</htmlpress-badge> Host-plugin bridge semantics: a
     serialized copy per plugin run, or a live handle
   </dt>
@@ -857,16 +899,6 @@
     <p>
       Until then the reference and 22 verbatim stringify expectations disagree (21 in
       to-markdown, 1 in frontmatter); afterwards none should.
-    </p>
-  </dd>
-  <dt>
-    <htmlpress-badge type="danger">open</htmlpress-badge> giallo depends on a fork of
-    rust-onig, not on crates.io under that name
-  </dt>
-  <dd>
-    <p>
-      crates.io rejects git dependencies, so textlane cannot publish on giallo until the
-      fork's change is released or vendored.
     </p>
   </dd>
 </dl>

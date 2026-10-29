@@ -30,7 +30,7 @@ describe("the conformance suite", () => {
     },
   )
 
-  it("lists only existing files, groups or areas in pending.json", () => {
+  it("lists only existing files, groups, tests or areas in pending.json", () => {
     const pending: Record<string, string> = JSON.parse(
       readFileSync(join(SUITE, "pending.json"), "utf8"),
     )
@@ -38,8 +38,15 @@ describe("the conformance suite", () => {
       const fileId = relative(TESTS, file)
         .replace(/\\/g, "/")
         .replace(/\.json$/, "")
-      const groups: { description: string }[] = JSON.parse(readFileSync(file, "utf8"))
-      return [fileId, ...groups.map(group => `${fileId}#${group.description}`)]
+      const groups: { description: string; tests: { description: string }[] }[] =
+        JSON.parse(readFileSync(file, "utf8"))
+      return [
+        fileId,
+        ...groups.flatMap(group => {
+          const groupId = `${fileId}#${group.description}`
+          return [groupId, ...group.tests.map(test => `${groupId}#${test.description}`)]
+        }),
+      ]
     })
     const unknown = Object.keys(pending).filter(entry =>
       entry.endsWith("*")

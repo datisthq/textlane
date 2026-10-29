@@ -24,10 +24,7 @@ fn conformance() -> Result<(), String> {
                 .iter()
                 .any(|(skipped, _)| *skipped == group_id)
             {
-                let entry = pending
-                    .iter()
-                    .find(|entry| matches_entry(entry, &id, &group_id));
-                run_group(group, &group_id, entry, &mut report);
+                run_group(group, &id, &group_id, &pending, &mut report);
             }
         }
     }
@@ -64,11 +61,22 @@ impl Report {
     }
 }
 
-fn run_group(group: &Value, group_id: &str, entry: Option<&String>, report: &mut Report) {
-    if let Some(entry) = entry.filter(|entry| !report.matched_entries.contains(entry)) {
-        report.matched_entries.push(entry.clone());
-    }
+fn run_group(
+    group: &Value,
+    file_id: &str,
+    group_id: &str,
+    pending: &[String],
+    report: &mut Report,
+) {
     for test in group["tests"].as_array().into_iter().flatten() {
+        let name = test["description"].as_str().unwrap_or_default();
+        let test_id = format!("{group_id}#{name}");
+        let entry = (pending.iter())
+            .find(|entry| matches_entry(entry, file_id, group_id, &test_id));
+        if let Some(entry) = entry.filter(|entry| !report.matched_entries.contains(entry))
+        {
+            report.matched_entries.push(entry.clone());
+        }
         let mut case = json!({ "pipeline": group["pipeline"] });
         for key in ["input", "tree", "operations"] {
             if let Some(value) = test.get(key) {
@@ -84,11 +92,9 @@ fn run_group(group: &Value, group_id: &str, entry: Option<&String>, report: &mut
         } else if let Some(entry) = entry {
             report.failing_entries.push(entry.clone());
         } else {
-            let name = test["description"].as_str().unwrap_or_default();
             let expected = &test["expected"];
-            let message = format!(
-                "{group_id} / {name}\n  expected {expected}\n  actual   {actual}"
-            );
+            let message =
+                format!("{test_id}\n  expected {expected}\n  actual   {actual}");
             report.failures.push(message);
         }
     }
@@ -125,11 +131,11 @@ fn matches_expected(actual: &Value, expected: &Value) -> bool {
     }
 }
 
-// An entry names a file, a group, or a whole area as `<area>/*`
-fn matches_entry(entry: &str, file_id: &str, group_id: &str) -> bool {
+// An entry names a file, a group, one test as `<group>#<test>`, or an area as `<area>/*`
+fn matches_entry(entry: &str, file_id: &str, group_id: &str, test_id: &str) -> bool {
     match entry.strip_suffix('*') {
         Some(prefix) => file_id.starts_with(prefix),
-        None => entry == file_id || entry == group_id,
+        None => entry == file_id || entry == group_id || entry == test_id,
     }
 }
 
