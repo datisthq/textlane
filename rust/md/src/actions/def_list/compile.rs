@@ -16,10 +16,12 @@ pub(crate) fn compile_def_list(compiler: &mut Compiler, name: Name, kind: Kind) 
         Name::DEF_LIST => compiler.tail_push(Node::DefList(DefList {
             children,
             position: None,
+            data: None,
         })),
         Name::DEF_LIST_TERM => compiler.tail_push(Node::DefListTerm(DefListTerm {
             children,
             position: None,
+            data: None,
         })),
         _ => {
             let spread = compiler.events[compiler.index..]
@@ -30,6 +32,7 @@ pub(crate) fn compile_def_list(compiler: &mut Compiler, name: Name, kind: Kind) 
                 spread,
                 children,
                 position: None,
+                data: None,
             }));
         }
     }

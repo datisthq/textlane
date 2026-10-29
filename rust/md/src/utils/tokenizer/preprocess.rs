@@ -38,6 +38,8 @@ pub(crate) struct ParseState<'a> {
     /// Prefixes of lines inside container directives, found after the document's own:
     /// merged into `prefixes` at the end.
     pub(crate) prefixes_nested: RefCell<Vec<(usize, usize)>>,
+    /// Where content chunks start that must not join the content before them.
+    pub(crate) content_breaks: RefCell<HashSet<usize>>,
     /// The kinds of frontmatter `md.frontmatter` adds, in order.
     pub(crate) frontmatter: Vec<Matter>,
 }
@@ -143,6 +145,7 @@ pub(crate) fn tokenize_input(
         math: math.cloned(),
         directive,
         prefixes_nested: RefCell::new(vec![]),
+        content_breaks: RefCell::new(HashSet::new()),
         frontmatter: frontmatter.to_vec(),
     };
     let start = Point {

@@ -11,6 +11,7 @@ pub enum Node<'a> {
     Comment(Comment<'a>),
     Doctype(Doctype<'a>),
     Raw(Raw<'a>),
+    Unknown(Unknown<'a>),
 }
 
 /// The document or fragment.
@@ -96,6 +97,20 @@ pub struct Doctype<'a> {
     pub data: Option<&'a Data<'a>>,
 }
 
+/// A node of a type hast does not define, such as one `md.toHtml` passes through.
+#[derive(Debug, PartialEq)]
+pub struct Unknown<'a> {
+    /// The node's `type`.
+    pub kind: &'a str,
+    /// Its fields besides `type`, `children`, `position` and `data`, in order.
+    pub fields: &'a [(&'a str, Data<'a>)],
+    /// Its children, when it is a parent.
+    pub children: Option<ArenaVec<'a, Node<'a>>>,
+    pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
+}
+
 impl<'a> Node<'a> {
     /// The node's unist `data`, when it carries any.
     pub fn data(&self) -> Option<&'a Data<'a>> {
@@ -106,6 +121,7 @@ impl<'a> Node<'a> {
             Node::Comment(node) => node.data,
             Node::Doctype(node) => node.data,
             Node::Raw(node) => node.data,
+            Node::Unknown(node) => node.data,
         }
     }
 
@@ -117,6 +133,7 @@ impl<'a> Node<'a> {
             Node::Comment(node) => node.position.as_ref(),
             Node::Doctype(node) => node.position.as_ref(),
             Node::Raw(node) => node.position.as_ref(),
+            Node::Unknown(node) => node.position.as_ref(),
         }
     }
 }

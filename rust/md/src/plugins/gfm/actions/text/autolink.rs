@@ -65,6 +65,7 @@ fn create_node<'a>(value: &'a str, piece: Piece, alloc: &'a Allocator) -> Node<'
         Node::Text(Text {
             value: &value[start..end],
             position: None,
+            data: None,
         })
     };
     match piece {
@@ -83,6 +84,7 @@ fn create_node<'a>(value: &'a str, piece: Piece, alloc: &'a Allocator) -> Node<'
                 title: None,
                 children,
                 position: None,
+                data: None,
             })
         }
     }

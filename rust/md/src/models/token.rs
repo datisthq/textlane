@@ -18,7 +18,6 @@ impl Name {
     pub(crate) const BLOCK_QUOTE: Name = Name("blockQuote");
     pub(crate) const BLOCK_QUOTE_MARKER: Name = Name("blockQuoteMarker");
     pub(crate) const BLOCK_QUOTE_PREFIX: Name = Name("blockQuotePrefix");
-    pub(crate) const BYTE_ORDER_MARK: Name = Name("byteOrderMark");
     pub(crate) const CHARACTER_ESCAPE: Name = Name("characterEscape");
     pub(crate) const CHARACTER_ESCAPE_MARKER: Name = Name("characterEscapeMarker");
     pub(crate) const CHARACTER_ESCAPE_VALUE: Name = Name("characterEscapeValue");

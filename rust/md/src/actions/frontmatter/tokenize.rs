@@ -2,8 +2,6 @@ use crate::models::construct::State;
 use crate::models::token::Name;
 use crate::utils::tokenizer::driver::Tokenizer;
 
-const BOM: &[u8] = "\u{FEFF}".as_bytes();
-
 /// Frontmatter: an opening fence on the first line, or any line for a matter found
 /// `anywhere`, the value, and a closing fence; each matter whose fence starts with the
 /// current byte is tried in order.
@@ -16,13 +14,9 @@ fn matter_before(tokenizer: &mut Tokenizer) -> State {
     let point = &tokenizer.point;
     let state = &tokenizer.tokenize_state;
     let matters = &tokenizer.parse_state.frontmatter;
-    // micromark drops a byte order mark before it tokenizes, so the column after it is 1
-    let bom = point.line == 1
-        && point.index == BOM.len()
-        && tokenizer.parse_state.bytes.starts_with(BOM);
     let found = (state.frontmatter_index..matters.len()).find(|&index| {
         let matter = &matters[index];
-        (point.column == 1 || bom)
+        point.column == 1
             && point.vs == 0
             && (point.line == 1 || matter.anywhere)
             && matter.open.as_bytes().first() == tokenizer.current.as_ref()

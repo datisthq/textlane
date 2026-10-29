@@ -9,6 +9,7 @@ pub(crate) fn compile_thematic_break(compiler: &mut Compiler, kind: Kind) {
         Kind::Enter => {
             compiler.tail_push_after_prefix(Node::ThematicBreak(ThematicBreak {
                 position: None,
+                data: None,
             }))
         }
         Kind::Exit => compiler.tail_pop(),

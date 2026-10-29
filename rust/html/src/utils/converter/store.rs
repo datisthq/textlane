@@ -287,19 +287,23 @@ impl<'a> Store<'a> {
             Kind::Root => mdast::Node::Root(mdast::Root {
                 children: children(),
                 position,
+                data: None,
             }),
             Kind::Paragraph => mdast::Node::Paragraph(mdast::Paragraph {
                 children: children(),
                 position,
+                data: None,
             }),
             Kind::Heading(depth) => mdast::Node::Heading(mdast::Heading {
                 depth: *depth,
                 children: children(),
                 position,
+                data: None,
             }),
-            Kind::ThematicBreak => {
-                mdast::Node::ThematicBreak(mdast::ThematicBreak { position })
-            }
+            Kind::ThematicBreak => mdast::Node::ThematicBreak(mdast::ThematicBreak {
+                position,
+                data: None,
+            }),
             Kind::Text(text) => {
                 let value = if text.is_plain() {
                     text.value
@@ -308,29 +312,42 @@ impl<'a> Store<'a> {
                     text.write(&mut value);
                     alloc.alloc_str(&value)
                 };
-                mdast::Node::Text(mdast::Text { value, position })
+                mdast::Node::Text(mdast::Text {
+                    value,
+                    position,
+                    data: None,
+                })
             }
             Kind::Emphasis => mdast::Node::Emphasis(mdast::Emphasis {
                 children: children(),
                 position,
+                data: None,
             }),
             Kind::Strong => mdast::Node::Strong(mdast::Strong {
                 children: children(),
                 position,
+                data: None,
             }),
-            Kind::Break => mdast::Node::Break(mdast::Break { position }),
+            Kind::Break => mdast::Node::Break(mdast::Break {
+                position,
+                data: None,
+            }),
             Kind::Code { lang, value } => mdast::Node::Code(mdast::Code {
                 lang: *lang,
                 meta: None,
                 value,
                 position,
+                data: None,
             }),
-            Kind::InlineCode(value) => {
-                mdast::Node::InlineCode(mdast::InlineCode { value, position })
-            }
+            Kind::InlineCode(value) => mdast::Node::InlineCode(mdast::InlineCode {
+                value,
+                position,
+                data: None,
+            }),
             Kind::Blockquote => mdast::Node::Blockquote(mdast::Blockquote {
                 children: children(),
                 position,
+                data: None,
             }),
             Kind::List {
                 ordered,
@@ -342,6 +359,7 @@ impl<'a> Store<'a> {
                 spread: Some(*spread),
                 children: children(),
                 position,
+                data: None,
             }),
             Kind::ListItem { spread, checked } => {
                 mdast::Node::ListItem(mdast::ListItem {
@@ -349,6 +367,7 @@ impl<'a> Store<'a> {
                     checked: *checked,
                     children: children(),
                     position,
+                    data: None,
                 })
             }
             Kind::Link { url, title } => mdast::Node::Link(mdast::Link {
@@ -356,17 +375,24 @@ impl<'a> Store<'a> {
                 title: *title,
                 children: children(),
                 position,
+                data: None,
             }),
             Kind::Image { url, title, alt } => mdast::Node::Image(mdast::Image {
                 url,
                 title: *title,
                 alt: Some(alt),
                 position,
+                data: None,
             }),
-            Kind::Html(value) => mdast::Node::Html(mdast::Html { value, position }),
+            Kind::Html(value) => mdast::Node::Html(mdast::Html {
+                value,
+                position,
+                data: None,
+            }),
             Kind::Delete => mdast::Node::Delete(mdast::Delete {
                 children: children(),
                 position,
+                data: None,
             }),
             Kind::Table(align) => {
                 let mut kinds = ArenaVec::with_capacity_in(align.len(), alloc);
@@ -375,19 +401,23 @@ impl<'a> Store<'a> {
                     align: kinds,
                     children: children(),
                     position,
+                    data: None,
                 })
             }
             Kind::TableRow => mdast::Node::TableRow(mdast::TableRow {
                 children: children(),
                 position,
+                data: None,
             }),
             Kind::TableCell(_) => mdast::Node::TableCell(mdast::TableCell {
                 children: children(),
                 position,
+                data: None,
             }),
             Kind::Fragment => mdast::Node::Root(mdast::Root {
                 children: children(),
                 position,
+                data: None,
             }),
         }
     }
@@ -509,6 +539,7 @@ impl<'t, 'a> Run<'t, 'a> {
         nodes.push(mdast::Node::Text(mdast::Text {
             value,
             position: self.position,
+            data: None,
         }));
     }
 }

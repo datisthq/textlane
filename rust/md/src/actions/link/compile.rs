@@ -20,6 +20,7 @@ pub(crate) fn compile_link(compiler: &mut Compiler, name: Name, kind: Kind) {
                 title: None,
                 children: ArenaVec::new_in(compiler.alloc),
                 position: None,
+                data: None,
             }));
             if name == Name::LINK {
                 compiler.media.push(Media::default());
@@ -31,6 +32,7 @@ pub(crate) fn compile_link(compiler: &mut Compiler, name: Name, kind: Kind) {
                 title: None,
                 alt: None,
                 position: None,
+                data: None,
             }));
             compiler.media.push(Media::default());
         }
@@ -144,6 +146,7 @@ fn into_reference<'a>(compiler: &mut Compiler<'a, '_>, mut media: Media<'a>) {
         Node::Text(textlane_core::mdast::Text {
             value: "",
             position: None,
+            data: None,
         }),
     );
     *tail = match node {
@@ -153,6 +156,7 @@ fn into_reference<'a>(compiler: &mut Compiler<'a, '_>, mut media: Media<'a>) {
             reference_type,
             children: link.children,
             position: link.position,
+            data: None,
         }),
         Node::Image(image) => Node::ImageReference(ImageReference {
             identifier: media.identifier,
@@ -160,6 +164,7 @@ fn into_reference<'a>(compiler: &mut Compiler<'a, '_>, mut media: Media<'a>) {
             reference_type,
             alt: image.alt,
             position: image.position,
+            data: None,
         }),
         node => node,
     };

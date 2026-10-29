@@ -53,6 +53,7 @@ fn empty_code<'a>() -> Node<'a> {
         meta: None,
         value: "",
         position: None,
+        data: None,
     })
 }
 

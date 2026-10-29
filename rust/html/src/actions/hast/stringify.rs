@@ -68,7 +68,7 @@ pub fn stringify_hast(
                 node,
                 index,
                 parent,
-            } => state.open(node, index, parent, &mut stack),
+            } => state.open(node, index, parent, &mut stack)?,
             Step::Close(close) => state.close(close),
         }
     }
@@ -116,7 +116,7 @@ impl<'o> State<'o> {
         index: usize,
         parent: Option<Siblings<'n, 'a>>,
         stack: &mut Vec<Step<'n, 'a>>,
-    ) {
+    ) -> Result<(), Error> {
         match node {
             Node::Root(root) => {
                 let siblings = Siblings {
@@ -149,7 +149,14 @@ impl<'o> State<'o> {
                 }
                 self.output.push_str("html>");
             }
+            Node::Unknown(unknown) => {
+                return Err(Error::new(
+                    "unknown-node",
+                    format!("Cannot compile unknown node `{}`", unknown.kind),
+                ));
+            }
         }
+        Ok(())
     }
 
     fn open_element<'n, 'a>(

@@ -14,6 +14,7 @@ pub(crate) fn compile_heading(compiler: &mut Compiler, name: Name, kind: Kind) {
                 depth: 0,
                 children: ArenaVec::new_in(compiler.alloc),
                 position: None,
+                data: None,
             })),
         (Name::HEADING_ATX, Kind::Exit) => compiler.tail_pop(),
         (Name::HEADING_SETEXT, Kind::Exit) => {

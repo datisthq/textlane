@@ -24,6 +24,9 @@ pub struct ToHtmlOptions {
     pub footnote_label: Option<String>,
     /// The tag name of the footnotes section's heading; `h2` when unset.
     pub footnote_label_tag_name: Option<String>,
+    /// Node types without a handler to copy into hast as they are, their children
+    /// converted.
+    pub pass_through: Vec<String>,
 }
 
 /// Options of `md::stringify`, named as mdast-util-to-markdown names them.

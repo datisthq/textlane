@@ -10,6 +10,7 @@ pub(crate) fn compile_strong(compiler: &mut Compiler, kind: Kind) {
         Kind::Enter => compiler.tail_push(Node::Strong(Strong {
             children: ArenaVec::new_in(compiler.alloc),
             position: None,
+            data: None,
         })),
         Kind::Exit => compiler.tail_pop(),
     }

@@ -1,5 +1,4 @@
 use crate::actions::block_quote::tokenize::{continue_block_quote, tokenize_block_quote};
-use crate::actions::bom::tokenize::tokenize_bom;
 use crate::actions::def_list::check::{DefListCheck, check_def_list, confirm_def_list};
 use crate::actions::def_list::tokenize::{continue_def_list, tokenize_def_list};
 use crate::actions::def_list::track::track_def_list;
@@ -32,15 +31,7 @@ pub(crate) fn tokenize_document(tokenizer: &mut Tokenizer) -> State {
         tokenizer.point.clone(),
         tokenizer.parse_state,
     )));
-    // A container directive's content is a document too, with no byte order mark
-    if tokenizer.point.index > 0 {
-        return State::Retry(container_existing_before);
-    }
-    tokenizer.attempt(
-        State::Next(container_existing_before),
-        State::Next(container_existing_before),
-    );
-    State::Retry(tokenize_bom)
+    State::Retry(container_existing_before)
 }
 
 fn container_existing_before(tokenizer: &mut Tokenizer) -> State {
@@ -182,10 +173,10 @@ fn container_new_after(tokenizer: &mut Tokenizer) -> State {
         .tokenize_state
         .document_container_stack
         .swap_remove(continued);
-    // A new container closes the ones that did not continue, before it opens
-    if continued != tokenizer.tokenize_state.document_container_stack.len() {
-        exit_containers(tokenizer, &Phase::Prefix);
-    }
+    // A new container closes the flow, as micromark's `closeFlow` does, and the containers
+    // that did not continue, before it opens: an attempt still pending (a GFM table head)
+    // must not see the new container's line
+    exit_containers(tokenizer, &Phase::Prefix);
     // micromark closes the flow when a container opens, so what was open before cannot
     // keep the new container's first construct from interrupting it
     if let Some(child) = tokenizer.tokenize_state.document_child.as_mut() {
@@ -375,7 +366,7 @@ fn flow_end(tokenizer: &mut Tokenizer) -> State {
         let before =
             skip_opt_back(&child.events, child.events.len() - 1, &[Name::LINE_ENDING]);
         let name = child.events[before].name;
-        if name == Name::CONTENT || name == Name::HEADING_SETEXT_UNDERLINE {
+        if name == Name::CONTENT {
             lazy_continuation = true;
         }
     }

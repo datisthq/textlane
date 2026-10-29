@@ -56,6 +56,7 @@ pub(crate) fn enter_text(compiler: &mut Compiler) {
         compiler.tail_push(Node::Text(Text {
             value: "",
             position: None,
+            data: None,
         }));
     }
 }

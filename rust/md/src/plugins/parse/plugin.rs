@@ -56,6 +56,11 @@ impl Parser for MarkdownParser {
         TreeKind::Mdast
     }
 
+    // micromark's preprocessor drops a byte order mark, so offsets count from after it
+    fn source<'a>(&self, input: &'a str) -> &'a str {
+        input.strip_prefix('\u{FEFF}').unwrap_or(input)
+    }
+
     fn parse<'a>(
         &self,
         input: &'a str,

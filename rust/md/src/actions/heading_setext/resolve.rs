@@ -29,6 +29,15 @@ pub(crate) fn resolve_heading_setext(tokenizer: &mut Tokenizer) {
             // Definitions before it in the same content: micromark starts the heading
             // where that content does
             let mut before = paragraph_enter;
+            let start = tokenizer.events[paragraph_enter].point.index;
+            if tokenizer
+                .parse_state
+                .content_breaks
+                .borrow()
+                .contains(&start)
+            {
+                before = 0;
+            }
             while before > 0 {
                 let event = &tokenizer.events[before - 1];
                 if event.name == Name::LINE_ENDING {
@@ -45,12 +54,6 @@ pub(crate) fn resolve_heading_setext(tokenizer: &mut Tokenizer) {
             let mut heading_exit = tokenizer.events[exit].clone();
             heading_exit.name = Name::HEADING_SETEXT;
             tokenizer.map.add(exit + 1, 0, vec![heading_exit]);
-        } else if let Some(sequence) = dash_break_sequence(tokenizer, enter, exit) {
-            // Only definitions above: micromark sees no paragraph, so `---` is a break
-            tokenizer.events[enter].name = Name::THEMATIC_BREAK;
-            tokenizer.events[exit].name = Name::THEMATIC_BREAK;
-            tokenizer.events[sequence].name = Name::THEMATIC_BREAK_SEQUENCE;
-            tokenizer.events[sequence + 1].name = Name::THEMATIC_BREAK_SEQUENCE;
         } else if exit + 4 < tokenizer.events.len()
             && tokenizer.events[exit + 1].name == Name::LINE_ENDING
             && tokenizer.events[exit + 3].name == Name::PARAGRAPH
@@ -93,20 +96,4 @@ pub(crate) fn resolve_heading_setext(tokenizer: &mut Tokenizer) {
         enter = skip_to(&tokenizer.events, exit + 1, &underline);
     }
     tokenizer.map.consume(&mut tokenizer.events);
-}
-
-fn dash_break_sequence(
-    tokenizer: &Tokenizer,
-    enter: usize,
-    exit: usize,
-) -> Option<usize> {
-    let sequence = skip_to(
-        &tokenizer.events,
-        enter + 1,
-        &[Name::HEADING_SETEXT_UNDERLINE_SEQUENCE],
-    );
-    let start = &tokenizer.events.get(sequence)?.point;
-    let end = &tokenizer.events.get(sequence + 1)?.point;
-    let dashes = tokenizer.parse_state.bytes.get(start.index..end.index)?;
-    (sequence < exit && dashes.len() >= 3 && dashes[0] == b'-').then_some(sequence)
 }

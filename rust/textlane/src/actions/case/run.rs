@@ -53,7 +53,7 @@ fn run_document(
     let processor = pipeline.freeze()?;
     let alloc = Allocator::new();
     let input = case.get("input").and_then(Value::as_str);
-    let lines = input.map(Lines::new);
+    let lines = input.map(|input| Lines::new(processor.source(input)));
     let tree = match (input, case.get("tree")) {
         (Some(input), _) if processor.has_parser() => {
             processor.parse(input, file, &alloc)?

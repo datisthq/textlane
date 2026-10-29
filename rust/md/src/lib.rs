@@ -64,9 +64,6 @@ mod actions {
         pub(crate) mod convert;
         pub(crate) mod stringify;
     }
-    pub(crate) mod bom {
-        pub(crate) mod tokenize;
-    }
     pub(crate) mod character_escape {
         pub(crate) mod tokenize;
     }
@@ -240,7 +237,6 @@ mod actions {
     }
     pub(crate) mod inline_math {
         pub(crate) mod compile;
-        pub(crate) mod convert;
         pub(crate) mod stringify;
     }
     pub(crate) mod label {
@@ -274,9 +270,6 @@ mod actions {
         pub(crate) mod convert;
         pub(crate) mod stringify;
     }
-    pub(crate) mod literal {
-        pub(crate) mod convert;
-    }
     pub(crate) mod list_item {
         pub(crate) mod compile;
         pub(crate) mod convert;
@@ -290,7 +283,6 @@ mod actions {
     }
     pub(crate) mod math {
         pub(crate) mod compile;
-        pub(crate) mod convert;
         pub(crate) mod stringify;
     }
     pub(crate) mod math_flow {
@@ -363,6 +355,7 @@ mod actions {
 mod helpers {
     pub(crate) mod attribute;
     pub(crate) mod character;
+    pub(crate) mod content;
     pub(crate) mod decode;
     pub(crate) mod entities;
     pub(crate) mod html;

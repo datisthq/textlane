@@ -86,7 +86,8 @@ a test's `comment` only where it means something different.
   module inward, so one loop's or test's `const value` never leaks into another's case.
 
 `sources/differential.ts` holds textlane's own md inputs where `md.parse` once differed from
-the reference, found by fuzzing; add an input there and rerun `import:differential`, never
+the reference, found by fuzzing, and its directive cases for `md.toHtml`, rendered by the
+pinned mdast-util-to-hast; add an input there and rerun `import:differential`, never
 write its tree by hand.
 
 ## Core cases

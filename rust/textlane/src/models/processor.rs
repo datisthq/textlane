@@ -98,7 +98,7 @@ impl FrozenProcessor {
         alloc: &'a Allocator,
     ) -> Result<Tree<'a>, Error> {
         match &self.parser {
-            Some(parser) => parser.parse(input, file, alloc),
+            Some(parser) => parser.parse(parser.source(input), file, alloc),
             None => Err(Error::new("missing-parser", "the processor has no parser")),
         }
     }
@@ -146,6 +146,14 @@ impl FrozenProcessor {
                 "missing-compiler",
                 "the processor has no compiler",
             )),
+        }
+    }
+
+    /// The part of `input` the parser reads, which positions count from.
+    pub fn source<'a>(&self, input: &'a str) -> &'a str {
+        match &self.parser {
+            Some(parser) => parser.source(input),
+            None => input,
         }
     }
 

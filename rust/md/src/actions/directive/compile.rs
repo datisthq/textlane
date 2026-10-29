@@ -24,6 +24,7 @@ pub(crate) fn compile_directive(compiler: &mut Compiler, name: Name, kind: Kind)
                 attributes: ArenaVec::new_in(compiler.alloc),
                 children,
                 position: None,
+                data: None,
             }));
         }
         (Kind::Enter, _) if name == DIRECTIVE_LEAF => {
@@ -33,6 +34,7 @@ pub(crate) fn compile_directive(compiler: &mut Compiler, name: Name, kind: Kind)
                 attributes: ArenaVec::new_in(compiler.alloc),
                 children,
                 position: None,
+                data: None,
             }));
         }
         (Kind::Enter, _) if name == DIRECTIVE_CONTAINER => {
@@ -43,6 +45,7 @@ pub(crate) fn compile_directive(compiler: &mut Compiler, name: Name, kind: Kind)
                 label: false,
                 children,
                 position: None,
+                data: None,
             }));
         }
         (Kind::Exit, _)
@@ -59,6 +62,7 @@ pub(crate) fn compile_directive(compiler: &mut Compiler, name: Name, kind: Kind)
             compiler.tail_push(Node::Paragraph(Paragraph {
                 children: ArenaVec::new_in(compiler.alloc),
                 position: None,
+                data: None,
             }));
         }
         (Kind::Exit, _) if name == CONTAINER.label => compiler.tail_pop(),

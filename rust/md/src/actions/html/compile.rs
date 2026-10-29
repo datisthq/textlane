@@ -10,6 +10,7 @@ pub(crate) fn compile_html(compiler: &mut Compiler, kind: Kind) {
             compiler.tail_push(Node::Html(Html {
                 value: "",
                 position: None,
+                data: None,
             }));
             compiler.buffer();
         }

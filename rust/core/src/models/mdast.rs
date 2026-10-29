@@ -38,6 +38,7 @@ pub enum Node<'a> {
     Yaml(Yaml<'a>),
     Toml(Toml<'a>),
     Literal(Literal<'a>),
+    Unknown(Unknown<'a>),
     DefList(DefList<'a>),
     DefListTerm(DefListTerm<'a>),
     DefListDescription(DefListDescription<'a>),
@@ -48,6 +49,8 @@ pub enum Node<'a> {
 pub struct Root<'a> {
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A paragraph.
@@ -55,6 +58,8 @@ pub struct Root<'a> {
 pub struct Paragraph<'a> {
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A heading of rank `depth`, 1 to 6.
@@ -63,12 +68,16 @@ pub struct Heading<'a> {
     pub depth: u8,
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A thematic break.
 #[derive(Debug, PartialEq)]
 pub struct ThematicBreak<'a> {
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// Stressed text, `*a*`.
@@ -76,6 +85,8 @@ pub struct ThematicBreak<'a> {
 pub struct Emphasis<'a> {
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// Strongly stressed text, `**a**`.
@@ -83,12 +94,16 @@ pub struct Emphasis<'a> {
 pub struct Strong<'a> {
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A hard line break.
 #[derive(Debug, PartialEq)]
 pub struct Break<'a> {
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A block of code, fenced or indented; `lang` and `meta` come from a fence's info string.
@@ -98,6 +113,8 @@ pub struct Code<'a> {
     pub meta: Option<&'a str>,
     pub value: &'a str,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A code span.
@@ -105,6 +122,8 @@ pub struct Code<'a> {
 pub struct InlineCode<'a> {
     pub value: &'a str,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A block quote.
@@ -112,6 +131,8 @@ pub struct InlineCode<'a> {
 pub struct Blockquote<'a> {
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A list: `ordered` from `1.`, starting at `start`; `spread` when its items are separated
@@ -123,6 +144,8 @@ pub struct List<'a> {
     pub spread: Option<bool>,
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A list item; `checked` is a GFM task's state.
@@ -132,6 +155,8 @@ pub struct ListItem<'a> {
     pub checked: Option<bool>,
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A link to `url`.
@@ -141,6 +166,8 @@ pub struct Link<'a> {
     pub title: Option<&'a str>,
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// An image at `url`.
@@ -150,6 +177,8 @@ pub struct Image<'a> {
     pub title: Option<&'a str>,
     pub alt: Option<&'a str>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// How a reference is written: `[a]`, `[a][]` or `[b][a]`.
@@ -168,6 +197,8 @@ pub struct LinkReference<'a> {
     pub reference_type: ReferenceType,
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// An image through a definition, matched by `identifier`.
@@ -178,6 +209,8 @@ pub struct ImageReference<'a> {
     pub reference_type: ReferenceType,
     pub alt: Option<&'a str>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A definition of where references with its `identifier` go.
@@ -188,6 +221,8 @@ pub struct Definition<'a> {
     pub url: &'a str,
     pub title: Option<&'a str>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 impl ReferenceType {
@@ -206,6 +241,8 @@ impl ReferenceType {
 pub struct Delete<'a> {
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// How a table column is aligned.
@@ -223,6 +260,8 @@ pub struct Table<'a> {
     pub align: ArenaVec<'a, AlignKind>,
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A row of a table; the first is its head.
@@ -230,6 +269,8 @@ pub struct Table<'a> {
 pub struct TableRow<'a> {
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A cell of a table row.
@@ -237,6 +278,8 @@ pub struct TableRow<'a> {
 pub struct TableCell<'a> {
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A GFM footnote's content, `[^a]: b`, matched by `identifier`.
@@ -246,6 +289,8 @@ pub struct FootnoteDefinition<'a> {
     pub label: Option<&'a str>,
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A call to a GFM footnote, `[^a]`.
@@ -254,6 +299,8 @@ pub struct FootnoteReference<'a> {
     pub identifier: &'a str,
     pub label: Option<&'a str>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// Math as a block, `$$`; `data` holds the hast `md.toHtml` renders it as.
@@ -287,6 +334,8 @@ pub struct ContainerDirective<'a> {
     pub label: bool,
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A leaf directive, `::name[label]{attributes}`, its label as its children.
@@ -296,6 +345,8 @@ pub struct LeafDirective<'a> {
     pub attributes: DirectiveAttributes<'a>,
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A text directive, `:name[label]{attributes}`, its label as its children.
@@ -305,6 +356,8 @@ pub struct TextDirective<'a> {
     pub attributes: DirectiveAttributes<'a>,
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A definition list: its terms and their descriptions, in order.
@@ -312,6 +365,8 @@ pub struct TextDirective<'a> {
 pub struct DefList<'a> {
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A term of a definition list.
@@ -319,6 +374,8 @@ pub struct DefList<'a> {
 pub struct DefListTerm<'a> {
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A description of a definition list; `spread` when a blank line comes before it.
@@ -327,6 +384,8 @@ pub struct DefListDescription<'a> {
     pub spread: bool,
     pub children: ArenaVec<'a, Node<'a>>,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// Raw HTML.
@@ -334,6 +393,8 @@ pub struct DefListDescription<'a> {
 pub struct Html<'a> {
     pub value: &'a str,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// Plain text.
@@ -341,6 +402,8 @@ pub struct Html<'a> {
 pub struct Text<'a> {
     pub value: &'a str,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// YAML frontmatter, without its fences.
@@ -348,6 +411,8 @@ pub struct Text<'a> {
 pub struct Yaml<'a> {
     pub value: &'a str,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// TOML frontmatter, without its fences.
@@ -355,6 +420,8 @@ pub struct Yaml<'a> {
 pub struct Toml<'a> {
     pub value: &'a str,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 /// A node of a type mdast does not define, holding a value: custom frontmatter, say.
@@ -364,6 +431,23 @@ pub struct Literal<'a> {
     pub kind: &'a str,
     pub value: &'a str,
     pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
+}
+
+/// A node of a type mdast does not define, with any fields: what a plugin of its own
+/// made, kept so it can pass through as it is.
+#[derive(Debug, PartialEq)]
+pub struct Unknown<'a> {
+    /// The node's `type`.
+    pub kind: &'a str,
+    /// Its fields besides `type`, `children`, `position` and `data`, in order.
+    pub fields: &'a [(&'a str, Data<'a>)],
+    /// Its children, when it is a parent.
+    pub children: Option<ArenaVec<'a, Node<'a>>>,
+    pub position: Option<Position<'a>>,
+    /// unist's `data`, when the node carries any.
+    pub data: Option<&'a Data<'a>>,
 }
 
 impl<'a> Node<'a> {
@@ -391,6 +475,7 @@ impl<'a> Node<'a> {
             Node::DefList(node) => Some(&node.children),
             Node::DefListTerm(node) => Some(&node.children),
             Node::DefListDescription(node) => Some(&node.children),
+            Node::Unknown(node) => node.children.as_ref(),
             Node::ThematicBreak(_)
             | Node::FootnoteReference(_)
             | Node::Text(_)
@@ -433,6 +518,7 @@ impl<'a> Node<'a> {
             Node::DefList(node) => Some(&mut node.children),
             Node::DefListTerm(node) => Some(&mut node.children),
             Node::DefListDescription(node) => Some(&mut node.children),
+            Node::Unknown(node) => node.children.as_mut(),
             Node::ThematicBreak(_)
             | Node::FootnoteReference(_)
             | Node::Text(_)
@@ -448,6 +534,49 @@ impl<'a> Node<'a> {
             | Node::Yaml(_)
             | Node::Toml(_)
             | Node::Literal(_) => None,
+        }
+    }
+
+    /// The node's unist `data`, when it carries any.
+    pub fn data(&self) -> Option<&'a Data<'a>> {
+        match self {
+            Node::Root(node) => node.data,
+            Node::Paragraph(node) => node.data,
+            Node::Heading(node) => node.data,
+            Node::ThematicBreak(node) => node.data,
+            Node::Text(node) => node.data,
+            Node::Emphasis(node) => node.data,
+            Node::Strong(node) => node.data,
+            Node::Break(node) => node.data,
+            Node::Code(node) => node.data,
+            Node::InlineCode(node) => node.data,
+            Node::Blockquote(node) => node.data,
+            Node::List(node) => node.data,
+            Node::ListItem(node) => node.data,
+            Node::Definition(node) => node.data,
+            Node::Html(node) => node.data,
+            Node::ImageReference(node) => node.data,
+            Node::LinkReference(node) => node.data,
+            Node::Image(node) => node.data,
+            Node::Link(node) => node.data,
+            Node::Delete(node) => node.data,
+            Node::Table(node) => node.data,
+            Node::TableRow(node) => node.data,
+            Node::TableCell(node) => node.data,
+            Node::FootnoteDefinition(node) => node.data,
+            Node::FootnoteReference(node) => node.data,
+            Node::Math(node) => node.data,
+            Node::InlineMath(node) => node.data,
+            Node::ContainerDirective(node) => node.data,
+            Node::LeafDirective(node) => node.data,
+            Node::TextDirective(node) => node.data,
+            Node::Yaml(node) => node.data,
+            Node::Toml(node) => node.data,
+            Node::Literal(node) => node.data,
+            Node::Unknown(node) => node.data,
+            Node::DefList(node) => node.data,
+            Node::DefListTerm(node) => node.data,
+            Node::DefListDescription(node) => node.data,
         }
     }
 
@@ -486,6 +615,7 @@ impl<'a> Node<'a> {
             Node::Yaml(node) => node.position.as_ref(),
             Node::Toml(node) => node.position.as_ref(),
             Node::Literal(node) => node.position.as_ref(),
+            Node::Unknown(node) => node.position.as_ref(),
             Node::DefList(node) => node.position.as_ref(),
             Node::DefListTerm(node) => node.position.as_ref(),
             Node::DefListDescription(node) => node.position.as_ref(),
@@ -527,6 +657,7 @@ impl<'a> Node<'a> {
             Node::Yaml(node) => &mut node.position,
             Node::Toml(node) => &mut node.position,
             Node::Literal(node) => &mut node.position,
+            Node::Unknown(node) => &mut node.position,
             Node::DefList(node) => &mut node.position,
             Node::DefListTerm(node) => &mut node.position,
             Node::DefListDescription(node) => &mut node.position,

@@ -25,6 +25,7 @@ pub(crate) fn compile_list(compiler: &mut Compiler, name: Name, kind: Kind) {
                 spread: Some(spread),
                 children: ArenaVec::new_in(compiler.alloc),
                 position: None,
+                data: None,
             }));
         }
         (_, Kind::Exit) => compiler.tail_pop_before_trailing_lines(false),

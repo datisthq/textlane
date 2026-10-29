@@ -106,7 +106,7 @@ impl Pipeline {
         check_parser(processor, "parse")?;
         let alloc = Allocator::new();
         let tree = processor.parse(input, file, &alloc)?;
-        write_tree(&tree, Some(&Lines::new(input)))
+        write_tree(&tree, Some(&Lines::new(processor.source(input))))
     }
 
     /// Run the transforms over a tree given as JSON.

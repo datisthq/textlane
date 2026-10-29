@@ -3,6 +3,7 @@ use textlane_core::hast::{self, Property, PropertyValue};
 use textlane_core::mdast::{AlignKind, Node, TableRow};
 
 use crate::utils::converter::state::Converter;
+use crate::utils::converter::unknown::apply_data;
 
 /// A row becomes `tr`: `th` cells in the first row of its parent, `td` cells otherwise,
 /// one per column of a table, aligned as it says.
@@ -55,7 +56,8 @@ pub(crate) fn convert_table_row<'a>(
                 None,
             ),
         };
-        cells.push(cell);
+        let data = node.children.get(index).and_then(Node::data);
+        cells.push(apply_data(converter, data, cell));
     }
     let cells = converter.wrap(cells, true);
     converter.element("tr", cells, node.position)

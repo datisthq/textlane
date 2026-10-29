@@ -1,6 +1,6 @@
 use serde_json::Value;
 
-use crate::actions::hast::deserialize::deserialize_data;
+use crate::actions::hast::deserialize::{deserialize_data, deserialize_fields};
 use crate::actions::mdast::serialize::MAX_JSON_DEPTH;
 use crate::actions::position::deserialize::deserialize_position;
 use crate::models::error::Error;
@@ -10,7 +10,7 @@ use crate::models::mdast::{
     FootnoteReference, Heading, Html, Image, ImageReference, InlineCode, InlineMath,
     LeafDirective, Link, LinkReference, List, ListItem, Literal, Math, Node, Paragraph,
     ReferenceType, Root, Strong, Table, TableCell, TableRow, Text, TextDirective,
-    ThematicBreak, Toml, Yaml,
+    ThematicBreak, Toml, Unknown, Yaml,
 };
 use crate::{Allocator, ArenaVec, Data};
 
@@ -34,6 +34,7 @@ fn deserialize_node<'a>(
         ));
     }
     let position = deserialize_position(value, alloc)?;
+    let data = read_data(value, alloc, depth)?;
     let kind = value
         .get("type")
         .and_then(Value::as_str)
@@ -42,10 +43,12 @@ fn deserialize_node<'a>(
         "root" => Node::Root(Root {
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
         "paragraph" => Node::Paragraph(Paragraph {
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
         "heading" => Node::Heading(Heading {
             depth: value
@@ -54,18 +57,21 @@ fn deserialize_node<'a>(
                 .map_or(1, |depth| depth.clamp(1, 6) as u8),
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
-        "thematicBreak" => Node::ThematicBreak(ThematicBreak { position }),
-        "break" => Node::Break(Break { position }),
+        "thematicBreak" => Node::ThematicBreak(ThematicBreak { position, data }),
+        "break" => Node::Break(Break { position, data }),
         "code" => Node::Code(Code {
             lang: read_optional_str(value, "lang", alloc),
             meta: read_optional_str(value, "meta", alloc),
             value: read_optional_str(value, "value", alloc).unwrap_or_default(),
             position,
+            data,
         }),
         "blockquote" => Node::Blockquote(Blockquote {
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
         "list" => Node::List(List {
             ordered: value
@@ -79,24 +85,28 @@ fn deserialize_node<'a>(
             spread: value.get("spread").and_then(Value::as_bool),
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
         "listItem" => Node::ListItem(ListItem {
             spread: value.get("spread").and_then(Value::as_bool),
             checked: value.get("checked").and_then(Value::as_bool),
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
         "link" => Node::Link(Link {
             url: read_optional_str(value, "url", alloc).unwrap_or_default(),
             title: read_optional_str(value, "title", alloc),
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
         "image" => Node::Image(Image {
             url: read_optional_str(value, "url", alloc).unwrap_or_default(),
             title: read_optional_str(value, "title", alloc),
             alt: read_optional_str(value, "alt", alloc),
             position,
+            data,
         }),
         "linkReference" => Node::LinkReference(LinkReference {
             identifier: read_optional_str(value, "identifier", alloc).unwrap_or_default(),
@@ -104,6 +114,7 @@ fn deserialize_node<'a>(
             reference_type: read_reference_type(value),
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
         "imageReference" => Node::ImageReference(ImageReference {
             identifier: read_optional_str(value, "identifier", alloc).unwrap_or_default(),
@@ -111,6 +122,7 @@ fn deserialize_node<'a>(
             reference_type: read_reference_type(value),
             alt: read_optional_str(value, "alt", alloc),
             position,
+            data,
         }),
         "definition" => Node::Definition(Definition {
             identifier: read_optional_str(value, "identifier", alloc).unwrap_or_default(),
@@ -118,10 +130,12 @@ fn deserialize_node<'a>(
             url: read_optional_str(value, "url", alloc).unwrap_or_default(),
             title: read_optional_str(value, "title", alloc),
             position,
+            data,
         }),
         "delete" => Node::Delete(Delete {
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
         "table" => Node::Table(Table {
             align: {
@@ -143,17 +157,20 @@ fn deserialize_node<'a>(
             },
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
         "footnoteDefinition" => Node::FootnoteDefinition(FootnoteDefinition {
             identifier: read_identifier(value, alloc),
             label: read_optional_str(value, "label", alloc),
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
         "footnoteReference" => Node::FootnoteReference(FootnoteReference {
             identifier: read_identifier(value, alloc),
             label: read_optional_str(value, "label", alloc),
             position,
+            data,
         }),
         "containerDirective" => Node::ContainerDirective(ContainerDirective {
             name: read_optional_str(value, "name", alloc).unwrap_or_default(),
@@ -161,34 +178,41 @@ fn deserialize_node<'a>(
             label: read_directive_label(value),
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
         "leafDirective" => Node::LeafDirective(LeafDirective {
             name: read_optional_str(value, "name", alloc).unwrap_or_default(),
             attributes: read_attributes(value, alloc),
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
         "textDirective" => Node::TextDirective(TextDirective {
             name: read_optional_str(value, "name", alloc).unwrap_or_default(),
             attributes: read_attributes(value, alloc),
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
         "tableRow" => Node::TableRow(TableRow {
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
         "tableCell" => Node::TableCell(TableCell {
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
         "defList" => Node::DefList(DefList {
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
         "defListTerm" => Node::DefListTerm(DefListTerm {
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
         "defListDescription" => Node::DefListDescription(DefListDescription {
             spread: value
@@ -197,57 +221,79 @@ fn deserialize_node<'a>(
                 .unwrap_or(false),
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
         "html" => Node::Html(Html {
             value: read_optional_str(value, "value", alloc).unwrap_or_default(),
             position,
+            data,
         }),
         "inlineCode" => Node::InlineCode(InlineCode {
             value: read_optional_str(value, "value", alloc).unwrap_or_default(),
             position,
+            data,
         }),
         "math" => Node::Math(Math {
             meta: read_optional_str(value, "meta", alloc),
             value: read_optional_str(value, "value", alloc).unwrap_or_default(),
             position,
-            data: read_data(value, alloc, depth)?,
+            data,
         }),
         "inlineMath" => Node::InlineMath(InlineMath {
             value: read_optional_str(value, "value", alloc).unwrap_or_default(),
             position,
-            data: read_data(value, alloc, depth)?,
+            data,
         }),
         "emphasis" => Node::Emphasis(Emphasis {
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
         "strong" => Node::Strong(Strong {
             children: deserialize_children(value, alloc, depth)?,
             position,
+            data,
         }),
         "text" => Node::Text(Text {
             value: alloc
                 .alloc_str(value.get("value").and_then(Value::as_str).unwrap_or("")),
             position,
+            data,
         }),
         "yaml" => Node::Yaml(Yaml {
             value: read_optional_str(value, "value", alloc).unwrap_or_default(),
             position,
+            data,
         }),
         "toml" => Node::Toml(Toml {
             value: read_optional_str(value, "value", alloc).unwrap_or_default(),
             position,
+            data,
         }),
         _ if !kind.is_empty()
-            && value.get("children").is_none()
-            && let Some(text) = value.get("value").and_then(Value::as_str) =>
+            && let Some(object) = value.as_object()
+            && let Some(text) = value.get("value").and_then(Value::as_str)
+            && object.keys().all(|key| {
+                matches!(key.as_str(), "type" | "value" | "position" | "data")
+            }) =>
         {
             Node::Literal(Literal {
                 kind: alloc.alloc_str(kind),
                 value: alloc.alloc_str(text),
                 position,
+                data,
             })
         }
+        _ if !kind.is_empty() => Node::Unknown(Unknown {
+            kind: alloc.alloc_str(kind),
+            fields: deserialize_fields(value, alloc, depth)?,
+            children: match value.get("children") {
+                Some(_) => Some(deserialize_children(value, alloc, depth)?),
+                None => None,
+            },
+            position,
+            data,
+        }),
         _ => {
             return Err(Error::new(
                 "unsupported-node",

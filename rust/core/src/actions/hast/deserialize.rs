@@ -6,7 +6,7 @@ use crate::models::data::Data;
 use crate::models::error::Error;
 use crate::models::hast::{
     Comment, Doctype, Element, Node, Property, PropertyItem, PropertyValue, Raw, Root,
-    Text,
+    Text, Unknown,
 };
 use crate::{Allocator, ArenaVec};
 
@@ -77,12 +77,19 @@ fn deserialize_node<'a>(
             position,
             data,
         }),
-        _ => {
-            return Err(Error::new(
-                "unsupported-node",
-                format!("no hast node `{kind}` yet"),
-            ));
+        "" => {
+            return Err(Error::new("unsupported-node", "no hast node `` yet"));
         }
+        _ => Node::Unknown(Unknown {
+            kind: alloc.alloc_str(kind),
+            fields: deserialize_fields(value, alloc, depth)?,
+            children: match value.get("children") {
+                Some(_) => Some(deserialize_children(value, alloc, depth)?),
+                None => None,
+            },
+            position,
+            data,
+        }),
     })
 }
 
@@ -188,6 +195,24 @@ fn deserialize_data_field<'a>(
         alloc,
         depth + 1,
     )?)))
+}
+
+/// Read the fields of a node of an unknown type, all but `type`, `children`, `position`
+/// and `data`.
+pub(crate) fn deserialize_fields<'a>(
+    value: &Value,
+    alloc: &'a Allocator,
+    depth: usize,
+) -> Result<&'a [(&'a str, Data<'a>)], Error> {
+    let mut fields = ArenaVec::new_in(alloc);
+    for (key, item) in value.as_object().into_iter().flatten() {
+        if !matches!(key.as_str(), "type" | "children" | "position" | "data") {
+            let item = deserialize_data(item, alloc, depth + 1)?;
+            fields.push((&*alloc.alloc_str(key), item));
+        }
+    }
+    let fields: &'a ArenaVec<'a, _> = alloc.alloc(fields);
+    Ok(fields)
 }
 
 /// Read unist `data` JSON into the arena.

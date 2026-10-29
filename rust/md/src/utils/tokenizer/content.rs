@@ -11,6 +11,16 @@ pub(crate) fn tokenize_content_chunk(tokenizer: &mut Tokenizer) -> State {
     match tokenizer.current {
         None | Some(b'\n') => State::Nok,
         _ => {
+            if tokenizer.tokenize_state.content_break_line.take()
+                == Some(tokenizer.point.line)
+            {
+                let start = tokenizer.point.index;
+                tokenizer
+                    .parse_state
+                    .content_breaks
+                    .borrow_mut()
+                    .insert(start);
+            }
             tokenizer.enter_link(
                 Name::CONTENT,
                 Link {
@@ -86,6 +96,11 @@ pub(crate) fn resolve_content(tokenizer: &mut Tokenizer) -> Subresult {
                 }
                 if enter_index == tokenizer.events.len()
                     || tokenizer.events[enter_index].name != Name::CONTENT
+                    || tokenizer
+                        .parse_state
+                        .content_breaks
+                        .borrow()
+                        .contains(&tokenizer.events[enter_index].point.index)
                 {
                     break;
                 }

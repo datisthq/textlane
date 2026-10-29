@@ -24,15 +24,18 @@ pub(crate) fn compile_table(compiler: &mut Compiler, name: Name, kind: Kind) {
                 align,
                 children,
                 position: None,
+                data: None,
             })
         }
         Name::GFM_TABLE_ROW => Node::TableRow(TableRow {
             children,
             position: None,
+            data: None,
         }),
         _ => Node::TableCell(TableCell {
             children,
             position: None,
+            data: None,
         }),
     };
     compiler.tail_push(node);

@@ -275,7 +275,8 @@ impl<'c> Serializer<'c> {
             | Node::DefListTerm(_)
             | Node::DefListDescription(_)
             | Node::Math(_)
-            | Node::InlineMath(_) => Err(Error::new(
+            | Node::InlineMath(_)
+            | Node::Unknown(_) => Err(Error::new(
                 "unknown-node",
                 format!("Cannot handle unknown node `{}`", read_node_type(node)),
             )),
@@ -549,5 +550,6 @@ pub(crate) fn read_node_type<'a>(node: &Node<'a>) -> &'a str {
         Node::Yaml(_) => "yaml",
         Node::Toml(_) => "toml",
         Node::Literal(literal) => literal.kind,
+        Node::Unknown(unknown) => unknown.kind,
     }
 }

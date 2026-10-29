@@ -15,6 +15,7 @@ pub(crate) fn compile_definition(compiler: &mut Compiler, name: Name, kind: Kind
                 url: "",
                 title: None,
                 position: None,
+                data: None,
             }));
         }
         (Name::DEFINITION, Kind::Exit) => compiler.tail_pop(),

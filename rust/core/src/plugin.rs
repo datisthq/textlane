@@ -14,6 +14,12 @@ pub trait Plugin: Send + Sync {
 /// Turns input text into a tree.
 pub trait Parser: Send + Sync {
     fn output(&self) -> TreeKind;
+
+    /// The part of `input` the parser reads and positions count from: all of it by default.
+    fn source<'a>(&self, input: &'a str) -> &'a str {
+        input
+    }
+
     fn parse<'a>(
         &self,
         input: &'a str,

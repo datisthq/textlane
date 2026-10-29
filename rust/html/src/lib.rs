@@ -120,6 +120,9 @@ mod actions {
     pub(crate) mod textarea {
         pub(crate) mod convert;
     }
+    pub(crate) mod unknown {
+        pub(crate) mod convert;
+    }
     pub(crate) mod wbr {
         pub(crate) mod convert;
     }

@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
 use crate::helpers::character::{
-    CharacterKind, classify_character_unit, find_character_after, find_character_before,
+    CharacterKind, classify_character_unit, find_character_after,
+    find_text_character_before,
 };
 use crate::models::event::{Event, Kind, Point};
 use crate::models::token::Name;
@@ -81,8 +82,9 @@ fn find_sequences(tokenizer: &Tokenizer) -> Vec<Sequence> {
         if event.name == Name::STRIKETHROUGH_SEQUENCE_TEMPORARY {
             if event.kind == Kind::Enter {
                 let exit = &tokenizer.events[index + 1];
-                let before = classify_character_unit(find_character_before(
+                let before = classify_character_unit(find_text_character_before(
                     bytes,
+                    &tokenizer.parse_state.prefixes.borrow(),
                     event.point.index,
                 ));
                 let after = classify_character_unit(find_character_after(

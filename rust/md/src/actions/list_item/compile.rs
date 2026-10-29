@@ -14,6 +14,7 @@ pub(crate) fn compile_list_item(compiler: &mut Compiler, kind: Kind) {
                 checked: None,
                 children: ArenaVec::new_in(compiler.alloc),
                 position: None,
+                data: None,
             }));
         }
         Kind::Exit => compiler.tail_pop_before_trailing_lines(true),

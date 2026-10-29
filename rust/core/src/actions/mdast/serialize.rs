@@ -1,8 +1,7 @@
 use serde_json::{Map, Value};
 
-use crate::actions::hast::serialize::serialize_data;
+use crate::actions::hast::serialize::{insert_fields, serialize_data};
 use crate::actions::position::serialize::serialize_position;
-use crate::models::data::Data;
 use crate::models::error::Error;
 use crate::models::lines::Lines;
 use crate::models::mdast::AlignKind;
@@ -150,12 +149,10 @@ fn serialize_node(
         Node::Math(math) => {
             object.insert("meta".into(), math.meta.into());
             object.insert("value".into(), math.value.into());
-            insert_data(&mut object, math.data);
             "math"
         }
         Node::InlineMath(math) => {
             object.insert("value".into(), math.value.into());
-            insert_data(&mut object, math.data);
             "inlineMath"
         }
         Node::ContainerDirective(directive) => {
@@ -182,6 +179,10 @@ fn serialize_node(
             object.insert("value".into(), literal.value.into());
             literal.kind
         }
+        Node::Unknown(unknown) => {
+            insert_fields(&mut object, unknown.fields);
+            unknown.kind
+        }
     };
     object.insert("type".into(), kind.into());
     if let Some(children) = node.children() {
@@ -193,20 +194,20 @@ fn serialize_node(
             && directive.label
             && let Some(Value::Object(label)) = children.first_mut()
         {
-            let mut data = Map::new();
-            data.insert("directiveLabel".into(), true.into());
-            label.insert("data".into(), Value::Object(data));
+            let data = label
+                .entry("data")
+                .or_insert_with(|| Value::Object(Map::new()));
+            if let Value::Object(data) = data {
+                data.insert("directiveLabel".into(), true.into());
+            }
         }
         object.insert("children".into(), Value::Array(children));
     }
-    serialize_position(&mut object, node.position(), lines);
-    Ok(Value::Object(object))
-}
-
-fn insert_data(object: &mut Map<String, Value>, data: Option<&Data<'_>>) {
-    if let Some(data) = data {
+    if let Some(data) = node.data() {
         object.insert("data".into(), serialize_data(data));
     }
+    serialize_position(&mut object, node.position(), lines);
+    Ok(Value::Object(object))
 }
 
 fn insert_directive(

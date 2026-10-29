@@ -1,10 +1,12 @@
 use textlane_core::hast::{self, Element, Property, PropertyItem, PropertyValue};
 use textlane_core::mdast::Code;
-use textlane_core::{ArenaString, ArenaVec};
+use textlane_core::{ArenaString, ArenaVec, Data};
 
 use crate::utils::converter::state::Converter;
+use crate::utils::converter::unknown::apply_data;
 
-/// Code becomes `pre` around `code`, classed by the first word of `lang`.
+/// Code becomes `pre` around `code`, classed by the first word of `lang`, its `meta` in the
+/// `code`'s `data`.
 pub(crate) fn convert_code<'a>(
     converter: &mut Converter<'a, '_>,
     node: &Code<'a>,
@@ -36,14 +38,20 @@ pub(crate) fn convert_code<'a>(
         position: None,
         data: None,
     }));
+    let data = node.meta.filter(|meta| !meta.is_empty()).map(|meta| {
+        let mut entries = ArenaVec::with_capacity_in(1, alloc);
+        entries.push(("meta", Data::String(meta)));
+        &*alloc.alloc(Data::Object(entries))
+    });
     let code = hast::Node::Element(Element {
         tag_name: "code",
         properties,
         children: text,
         position: node.position,
         content: None,
-        data: None,
+        data,
     });
+    let code = apply_data(converter, node.data, code);
     let mut children = ArenaVec::with_capacity_in(1, alloc);
     children.push(code);
     converter.element("pre", children, node.position)

@@ -18,13 +18,10 @@ use crate::actions::html::convert::convert_html;
 use crate::actions::image::convert::convert_image;
 use crate::actions::image_reference::convert::convert_image_reference;
 use crate::actions::inline_code::convert::convert_inline_code;
-use crate::actions::inline_math::convert::convert_inline_math;
 use crate::actions::link::convert::convert_link;
 use crate::actions::link_reference::convert::convert_link_reference;
 use crate::actions::list::convert::convert_list;
 use crate::actions::list_item::convert::{convert_list_item, is_list_loose};
-use crate::actions::literal::convert::convert_literal;
-use crate::actions::math::convert::convert_math;
 use crate::actions::paragraph::convert::convert_paragraph;
 use crate::actions::root::convert::convert_root;
 use crate::actions::strong::convert::convert_strong;
@@ -34,6 +31,7 @@ use crate::actions::table_row::convert::convert_table_row;
 use crate::actions::text::convert::convert_text;
 use crate::actions::thematic_break::convert::convert_thematic_break;
 use crate::models::options::ToHtmlOptions;
+use crate::utils::converter::unknown::{apply_data, convert_unknown};
 
 /// Turns mdast into hast, as mdast-util-to-hast does.
 pub(crate) struct Converter<'a, 'o> {
@@ -124,33 +122,45 @@ impl<'a> Converter<'a, '_> {
             });
             return;
         }
-        match node {
-            mdast::Node::Text(text) => results.push(convert_text(self, text)),
-            mdast::Node::Code(node) => results.push(convert_code(self, node)),
-            mdast::Node::InlineCode(node) => {
-                results.push(convert_inline_code(self, node))
-            }
+        // Whether the handler applies `data`: `code` does on its inner element itself, and
+        // the source text of an undefined reference takes none
+        let (result, applies) = match node {
+            mdast::Node::Text(text) => (convert_text(self, text), true),
+            mdast::Node::Code(node) => (convert_code(self, node), false),
+            mdast::Node::InlineCode(node) => (convert_inline_code(self, node), true),
             mdast::Node::ThematicBreak(node) => {
-                results.push(convert_thematic_break(self, node))
+                (convert_thematic_break(self, node), true)
             }
-            mdast::Node::Break(node) => {
-                results.push(convert_hard_break(self, node));
-                results.push(line_ending());
-            }
-            mdast::Node::Image(node) => results.push(convert_image(self, node)),
-            mdast::Node::Html(node) => results.extend(convert_html(self, node)),
-            mdast::Node::ImageReference(node) => {
-                results.push(convert_image_reference(self, node));
-            }
+            mdast::Node::Break(node) => (convert_hard_break(self, node), true),
+            mdast::Node::Image(node) => (convert_image(self, node), true),
+            mdast::Node::Html(node) => match convert_html(self, node) {
+                Some(result) => (result, true),
+                None => return,
+            },
+            mdast::Node::ImageReference(node) => (
+                convert_image_reference(self, node),
+                self.find_definition(node.identifier).is_some(),
+            ),
             mdast::Node::FootnoteReference(node) => {
-                results.push(convert_footnote_reference(self, node));
+                (convert_footnote_reference(self, node), true)
             }
-            mdast::Node::Math(node) => results.push(convert_math(self, node)),
-            mdast::Node::InlineMath(node) => {
-                results.push(convert_inline_math(self, node))
-            }
-            mdast::Node::Literal(node) => results.push(convert_literal(node)),
-            _ => {}
+            mdast::Node::Math(_)
+            | mdast::Node::InlineMath(_)
+            | mdast::Node::Literal(_)
+            | mdast::Node::Unknown(_) => (
+                convert_unknown(self, node, ArenaVec::new_in(self.alloc)),
+                false,
+            ),
+            _ => return,
+        };
+        let result = if applies {
+            apply_data(self, node.data(), result)
+        } else {
+            result
+        };
+        results.push(result);
+        if matches!(node, mdast::Node::Break(_)) {
+            results.push(line_ending());
         }
         if trim && let Some(first) = results.get_mut(start) {
             trim_start(first);
@@ -190,19 +200,48 @@ impl<'a> Converter<'a, '_> {
             mdast::Node::TableRow(row) => {
                 convert_table_row(self, row, node, parent, children)
             }
-            mdast::Node::TableCell(cell) => convert_table_cell(self, cell, children),
-            mdast::Node::DefList(list) => convert_def_list(self, list, children),
-            mdast::Node::DefListTerm(term) => convert_def_list_term(self, term, children),
+            // A row takes its cells' `data` itself
+            mdast::Node::TableCell(cell) => {
+                let result = convert_table_cell(self, cell, children);
+                if matches!(parent, Some(mdast::Node::TableRow(_))) {
+                    results.push(result);
+                    return;
+                }
+                result
+            }
+            // remark-definition-list's handlers apply no `data`
+            mdast::Node::DefList(list) => {
+                results.push(convert_def_list(self, list, children));
+                return;
+            }
+            mdast::Node::DefListTerm(term) => {
+                results.push(convert_def_list_term(self, term, children));
+                return;
+            }
             mdast::Node::DefListDescription(description) => {
-                convert_def_list_description(self, description, children)
+                results.push(convert_def_list_description(self, description, children));
+                return;
             }
             mdast::Node::LinkReference(reference) => {
                 convert_link_reference(self, reference, children, results);
+                // The source text of an undefined reference takes no `data`
+                if self.find_definition(reference.identifier).is_some()
+                    && let Some(result) = results.pop()
+                {
+                    results.push(apply_data(self, node.data(), result));
+                }
+                return;
+            }
+            mdast::Node::ContainerDirective(_)
+            | mdast::Node::LeafDirective(_)
+            | mdast::Node::TextDirective(_)
+            | mdast::Node::Unknown(_) => {
+                results.push(convert_unknown(self, node, children));
                 return;
             }
             _ => return,
         };
-        results.push(result);
+        results.push(apply_data(self, node.data(), result));
     }
 
     /// The URL and title of the definition an identifier refers to.

@@ -156,6 +156,7 @@ impl Parser for TextParser {
         Ok(Tree::Mdast(Node::Text(Text {
             value: input,
             position: None,
+            data: None,
         })))
     }
 }

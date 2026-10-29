@@ -167,6 +167,10 @@ pub(crate) struct TokenizeState<'a> {
     /// Whether this text starts the first paragraph of a list item, where a GFM task list
     /// check may be.
     pub(crate) task_list_check_allowed: bool,
+    /// The exit of the content above the underline being tokenized.
+    pub(crate) setext_content: Option<usize>,
+    /// The line an underline closed definitions-only content on, so its content is new.
+    pub(crate) content_break_line: Option<usize>,
     /// Whether math may start in this text, so data stops at `$`.
     pub(crate) math_text: bool,
     /// The last start of a dollar run of each length, as math in text scans for closers.

@@ -1,5 +1,7 @@
 import { writeFileSync } from "node:fs"
 import { join, resolve } from "node:path"
+import { toHast } from "mdast-util-to-hast"
+import type { Options as ToHastOptions } from "mdast-util-to-hast"
 import { parseMarkdown } from "../actions/markdown/render.ts"
 
 const OUTPUT = join(
@@ -47,11 +49,113 @@ const INPUTS: { description: string; input: string }[] = [
   { description: "unclosed HTML before a sibling item", input: "- <!--\n- b" },
   { description: "a nested empty block quote at the end", input: "> >\n>" },
   { description: "code spans after an unclosed longer run", input: "```x`a`b`c`" },
+  { description: "a byte order mark is not counted", input: "\uFEFF# a\nb" },
+  { description: "only the first byte order mark is dropped", input: "\uFEFF\uFEFFa" },
+  {
+    description: "an equals line after a definition starts a paragraph",
+    input: "[x]: /u\n===\n[a]: b",
+  },
+  {
+    description: "a heading after a rejected underline starts at its text",
+    input: "[a]: b\n===\nc\n===",
+  },
+  {
+    description: "a setext heading in an item takes no lazy line",
+    input: "- d\n  ---\n-->",
+  },
+  { description: "emphasis right after a block quote marker", input: ">***a-****" },
+]
+
+// Cases that differed only with GFM on
+const GFM_INPUTS: { description: string; input: string }[] = [
+  {
+    description: "a list item after a possible table head takes indented code",
+    input: "c\n*     y",
+  },
+  {
+    description: "strikethrough right after a block quote marker",
+    input: ">***~~a~~****",
+  },
+]
+
+// Directives have no mdast-util-to-hast handler, so its unknown handler and `data` apply
+const DIRECTIVE_INPUTS: { description: string; input: string }[] = [
+  { description: "a container directive", input: ":::note\nalpha\n:::" },
+  {
+    description: "a container directive with a label and attributes",
+    input: ":::note[Bravo]{.charlie #delta}\necho\n:::",
+  },
+  { description: "nested container directives", input: "::::a\n:::b\nc\n:::\n::::" },
+  { description: "a leaf directive", input: "::video[Foxtrot]{id=golf}" },
+  { description: "a leaf directive without a label", input: "::hotel" },
+  { description: "a text directive", input: "india :abbr[HTML]{title=juliett} kilo" },
+]
+
+type TreeCase = { description: string; tree: object }
+
+const DIRECTIVE_TREES: TreeCase[] = [
+  {
+    description: "a container directive with `data.hName` and `data.hProperties`",
+    tree: {
+      type: "containerDirective",
+      name: "note",
+      attributes: {},
+      data: { hName: "aside", hProperties: { className: ["note"] } },
+      children: [{ type: "paragraph", children: [{ type: "text", value: "lima" }] }],
+    },
+  },
+  {
+    description: "a leaf directive with `data.hChildren`",
+    tree: {
+      type: "leafDirective",
+      name: "video",
+      attributes: { id: "mike" },
+      data: {
+        hName: "video",
+        hChildren: [{ type: "text", value: "november" }],
+      },
+      children: [{ type: "text", value: "oscar" }],
+    },
+  },
+  {
+    description: "a text directive with `data.hName` in a paragraph",
+    tree: {
+      type: "paragraph",
+      children: [
+        { type: "text", value: "papa " },
+        {
+          type: "textDirective",
+          name: "abbr",
+          attributes: { title: "quebec" },
+          data: { hName: "abbr", hProperties: { title: "quebec" } },
+          children: [{ type: "text", value: "romeo" }],
+        },
+      ],
+    },
+  },
+]
+
+const PASS_THROUGH_TREES: TreeCase[] = [
+  {
+    description: "a text directive passed through",
+    tree: {
+      type: "paragraph",
+      children: [
+        {
+          type: "textDirective",
+          name: "sierra",
+          attributes: { tango: "uniform" },
+          data: { hName: "span" },
+          children: [{ type: "emphasis", children: [{ type: "text", value: "victor" }] }],
+        },
+      ],
+    },
+  },
 ]
 
 importDifferential()
 
-// textlane's own cases, not ported from upstream: the file is this one group, with no source
+// textlane's own cases, not ported from upstream: groups with no source
 function importDifferential() {
   const group = {
     description: "differential",
@@ -61,6 +165,47 @@ function importDifferential() {
       expected: { tree: parseMarkdown(test.input) },
     })),
   }
-  writeFileSync(OUTPUT, `${JSON.stringify([group], null, 2)}\n`)
-  console.log(`differential: ${INPUTS.length} cases`)
+  const directives = {
+    description: "directive to hast",
+    pipeline: [["md.parse"], ["md.directive"], ["md.toHtml"]],
+    tests: DIRECTIVE_INPUTS.map(test => ({
+      ...test,
+      expected: { tree: convertTree(parseMarkdown(test.input, { directive: {} })) },
+    })),
+  }
+  const gfm = {
+    description: "differential with GFM",
+    pipeline: [["md.parse"], ["md.gfm"]],
+    tests: GFM_INPUTS.map(test => ({
+      ...test,
+      expected: { tree: parseMarkdown(test.input, { gfm: {} }) },
+    })),
+  }
+  const groups = [
+    group,
+    gfm,
+    directives,
+    createTreeGroup(DIRECTIVE_TREES),
+    createTreeGroup(PASS_THROUGH_TREES, { passThrough: ["textDirective"] }),
+  ]
+  writeFileSync(OUTPUT, `${JSON.stringify(groups, null, 2)}\n`)
+  const count = groups.reduce((total, item) => total + item.tests.length, 0)
+  console.log(`differential: ${count} cases`)
+}
+
+function createTreeGroup(tests: TreeCase[], options?: ToHastOptions) {
+  return {
+    description: `directive data to hast${options ? ` ${JSON.stringify(options)}` : ""}`,
+    pipeline: [options ? ["md.toHtml", options] : ["md.toHtml"]],
+    tests: tests.map(test => ({
+      ...test,
+      expected: { tree: convertTree(test.tree, options) },
+    })),
+  }
+}
+
+// A JSON copy, so `undefined` fields drop out as they do in the runners' JSON
+function convertTree(tree: object, options?: ToHastOptions) {
+  const copy = JSON.parse(JSON.stringify(tree))
+  return JSON.parse(JSON.stringify(toHast(copy, options)))
 }

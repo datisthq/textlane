@@ -10,6 +10,7 @@ pub(crate) fn compile_inline_code(compiler: &mut Compiler, kind: Kind) {
             compiler.tail_push(Node::InlineCode(InlineCode {
                 value: "",
                 position: None,
+                data: None,
             }));
             compiler.buffer();
         }

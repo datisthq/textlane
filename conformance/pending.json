@@ -1,20 +1,14 @@
 {
-  "md/document#mdast-util-to-hast core": "the md constructs and plugins this needs are not implemented yet",
-  "md/document#mdast-util-to-hast core {\"passThrough\":[\"alpha\",\"bravo\"]}": "the md constructs and plugins this needs are not implemented yet",
-  "md/document#mdast-util-to-hast root": "the md constructs and plugins this needs are not implemented yet",
   "md/frontmatter#mdast-util-frontmatter stringify {\"type\":\"custom\",\"marker\":{\"open\":\"<\",\"close\":\">\"}}": "upstream expects the blank line in a root's text unencoded; the pinned mdast-util-to-markdown 2.2.0 and textlane write it as `&#xA;&#xA;`",
   "md/mdx": "the md constructs and plugins this needs are not implemented yet",
-  "md/text#mdast-util-to-hast text": "the md constructs and plugins this needs are not implemented yet",
   "md/to-prose": "the md constructs and plugins this needs are not implemented yet",
   "html/format": "the html plugins this needs are not implemented yet",
   "html/highlight": "the html plugins this needs are not implemented yet",
   "html/to-prose": "the html plugins this needs are not implemented yet",
   "prose/*": "prose.parse, prose.stringify and the prose plugins are not implemented yet",
   "mdx/*": "mdx.compile is not implemented yet",
-  "md/code-fenced#mdast-util-to-hast code": "the md constructs and plugins this needs are not implemented yet",
   "html/raw#hast-util-raw": "the html plugins this needs are not implemented yet",
   "html/raw#hast-util-raw {\"passThrough\":[\"customLiteral\"]}": "the html plugins this needs are not implemented yet",
   "html/raw#hast-util-raw {\"passThrough\":[\"customParent\"]}": "the html plugins this needs are not implemented yet",
-  "html/parse#rehype fixtures (tree) {\"verbose\":true}": "the html plugins this needs are not implemented yet",
-  "md/gfm-table#mdast-util-to-hast table {\"allowDangerousHtml\":true}": "the md constructs and plugins this needs are not implemented yet"
+  "html/parse#rehype fixtures (tree) {\"verbose\":true}": "the html plugins this needs are not implemented yet"
 }

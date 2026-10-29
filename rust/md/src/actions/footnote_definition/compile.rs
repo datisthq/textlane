@@ -21,6 +21,7 @@ pub(crate) fn compile_footnote_definition(
                     label: None,
                     children,
                     position: None,
+                    data: None,
                 },
             ));
         }

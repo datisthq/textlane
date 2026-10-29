@@ -78,6 +78,7 @@ impl<'a, 'e> Compiler<'a, 'e> {
         let root = Node::Root(Root {
             children: ArenaVec::new_in(alloc),
             position: Some(Position::span(start, end)),
+            data: None,
         });
         Self {
             events,
@@ -299,6 +300,7 @@ impl<'a, 'e> Compiler<'a, 'e> {
         self.stack.push(Node::Paragraph(Paragraph {
             children: ArenaVec::new_in(self.alloc),
             position: None,
+            data: None,
         }));
     }
 

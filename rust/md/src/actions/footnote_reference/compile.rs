@@ -17,6 +17,7 @@ pub(crate) fn compile_footnote_reference(
                 identifier: "",
                 label: None,
                 position: None,
+                data: None,
             }));
         }
         (Name::GFM_FOOTNOTE_CALL, Kind::Exit) => compiler.tail_pop(),

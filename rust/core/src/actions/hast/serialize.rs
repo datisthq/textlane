@@ -68,6 +68,13 @@ fn serialize_node(
         Node::Doctype(_) => {
             object.insert("type".into(), "doctype".into());
         }
+        Node::Unknown(unknown) => {
+            object.insert("type".into(), unknown.kind.into());
+            insert_fields(&mut object, unknown.fields);
+            if let Some(children) = &unknown.children {
+                object.insert("children".into(), serialize_all(children)?);
+            }
+        }
     }
     if let Some(data) = node.data() {
         object.insert("data".into(), serialize_data(data));
@@ -107,6 +114,16 @@ fn serialize_root(
     }
     serialize_position(&mut object, root.position.as_ref(), lines);
     Ok(Value::Object(object))
+}
+
+/// Write the fields of a node of an unknown type.
+pub(crate) fn insert_fields(
+    object: &mut Map<String, Value>,
+    fields: &[(&str, Data<'_>)],
+) {
+    for (key, value) in fields {
+        object.insert((*key).into(), serialize_data(value));
+    }
 }
 
 /// Write unist `data` as JSON.

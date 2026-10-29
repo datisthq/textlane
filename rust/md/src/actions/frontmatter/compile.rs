@@ -54,15 +54,18 @@ fn create_node<'a>(compiler: &Compiler<'a, '_>) -> Node<'a> {
         "yaml" => Node::Yaml(Yaml {
             value: "",
             position: None,
+            data: None,
         }),
         "toml" => Node::Toml(Toml {
             value: "",
             position: None,
+            data: None,
         }),
         _ => Node::Literal(Literal {
             kind: compiler.alloc_str(kind),
             value: "",
             position: None,
+            data: None,
         }),
     }
 }

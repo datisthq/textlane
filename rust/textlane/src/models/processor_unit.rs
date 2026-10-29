@@ -533,3 +533,23 @@ fn handles_hostile_math_in_linear_time() -> Result<(), Error> {
     }
     Ok(())
 }
+
+#[test]
+fn checks_setext_underlines_in_linear_time() -> Result<(), Error> {
+    for input in [
+        "a\n".to_string() + &"=x\n".repeat(50_000),
+        "[a]: b\n".repeat(50_000) + "===\n",
+        "[a]: b\n===\n".repeat(30_000),
+        "[a]: b\n---\n".repeat(30_000),
+        "a\n".to_string() + &"-- -\n".repeat(50_000),
+    ] {
+        let started = std::time::Instant::now();
+        render(&input)?;
+        assert!(
+            started.elapsed().as_secs() < 5,
+            "took {:?}",
+            started.elapsed()
+        );
+    }
+    Ok(())
+}

@@ -86,7 +86,13 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   differs: `interrupt` is decided once a line, before any container opens on it
   (`document_opened`); the last line is flushed before laziness is judged; the empty line
   after a final line ending is lazy inside a block quote the line continued; closing
-  containers after a line keeps the child's `interrupt`. Sizes are columns, not bytes: a
+  containers after a line keeps the child's `interrupt`. A new container always closes the
+  flow (micromark's `closeFlow`), even with no container to exit, or a pending GFM table head
+  sees its line. A setext underline needs a paragraph in the content above, checked once the
+  underline matched; after definitions only it fails and its line starts new content
+  (`ParseState::content_breaks`). micromark drops a leading byte order mark before it
+  tokenizes: `Parser::source` hands the parser the input without it, and positions count from
+  there. Text right after a container prefix (`>*a*`) has no character before it Sizes are columns, not bytes: a
   tab after a list marker widens the prefix to the next tab stop. Differences show best
   by fuzzing random fragments through `md.parse` and the pinned from-markdown; each one
   fixed becomes a case in `conformance/sources/differential.ts`
@@ -148,11 +154,16 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   scans to the end with the lines `concrete` and then rewinds, so `---\n- a` is a break and a
   paragraph, as upstream. Events carry no matter, so the compiler takes the first whose fences
   and place match; a matter that found no closing fence remembers where, so `anywhere` stays
-  linear. Custom types are `Literal` nodes, as is any unknown JSON node with a `value`
+  linear. Custom types are `Literal` nodes, as is any unknown JSON node with only a string
+  `value`; any other unknown type is an `Unknown` node (mdast and hast alike) keeping its
+  fields as `Data` and its children, so `md.toHtml`'s `passThrough` can copy it into hast
 - `md.math`, `md.directive` and `md.definitionList` use slots the same way, and each adds a
   flag to `tokenize_input` and `parse_markdown_with`, in that order after `frontmatter`.
-  Math nodes carry their hast in unist `data`, which `utils/converter/unknown.rs` applies as
-  mdast-util-to-hast's unknown handler does. A container directive is a concrete flow
+  Every mdast node carries unist `data` (`None` unless a tree from JSON or a plugin set it);
+  `md.toHtml` applies its `hName`, `hProperties` and `hChildren` after each handler that
+  upstream calls `applyData` in (`utils/converter/unknown.rs`), never to definition lists,
+  passed-through nodes or a row's cells twice. Math and directives have no handler upstream:
+  the unknown handler makes math's `data` its hast and a directive a `div`. A container directive is a concrete flow
   construct whose lines are a nested document (`ContentType::Document`), not a document
   container. A definition description is a document container (`Container::DefList`): its
   check closes the flow even when no list opens, and `Resolver::DefList` splits the

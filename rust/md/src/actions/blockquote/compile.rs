@@ -10,6 +10,7 @@ pub(crate) fn compile_blockquote(compiler: &mut Compiler, kind: Kind) {
         Kind::Enter => compiler.tail_push_after_prefix(Node::Blockquote(Blockquote {
             children: ArenaVec::new_in(compiler.alloc),
             position: None,
+            data: None,
         })),
         Kind::Exit => compiler.tail_pop(),
     }

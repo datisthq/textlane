@@ -8,8 +8,10 @@ use crate::utils::compiler::handlers::compile_event;
 use crate::utils::compiler::stack::Compiler;
 use crate::utils::tokenizer::preprocess::tokenize_input;
 
-/// Parse Markdown into mdast, allocated in `alloc` and borrowing `input` where it can.
+/// Parse Markdown into mdast, allocated in `alloc` and borrowing `input` where it can; as
+/// micromark, it skips a leading byte order mark, and positions count from after it.
 pub fn parse_markdown<'a>(input: &'a str, alloc: &'a Allocator) -> Node<'a> {
+    let input = input.strip_prefix('\u{FEFF}').unwrap_or(input);
     parse_markdown_with(input, None, None, false, &[], false, alloc)
 }
 

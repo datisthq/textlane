@@ -33,6 +33,7 @@ use crate::actions::table_cell::convert::convert_table_cell;
 use crate::actions::table_row::convert::convert_table_row;
 use crate::actions::text::convert::convert_text;
 use crate::actions::textarea::convert::convert_textarea;
+use crate::actions::unknown::convert::convert_unknown;
 use crate::actions::wbr::convert::convert_wbr;
 use crate::helpers::selected::OptionValues;
 use crate::helpers::value::{find_string, find_value, is_truthy, read_value};
@@ -80,6 +81,7 @@ impl<'a, 'n> Converter<'a, 'n, '_> {
             Node::Raw(raw) => {
                 Converted::One(self.store.add_text(raw.value, raw.position))
             }
+            Node::Unknown(unknown) => convert_unknown(self, unknown),
         })
     }
 

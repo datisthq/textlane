@@ -19,6 +19,7 @@ pub(crate) fn compile_gfm_autolink_literal(
             title: None,
             children: ArenaVec::new_in(compiler.alloc),
             position: None,
+            data: None,
         })),
         (Name::LITERAL_AUTOLINK, Kind::Exit) => compiler.tail_pop(),
         (_, Kind::Enter) => enter_text(compiler),
