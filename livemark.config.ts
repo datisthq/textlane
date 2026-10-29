@@ -3,7 +3,7 @@ import { defineConfig } from "livemark"
 export default defineConfig({
   site: "https://textlane.dev",
   title: "Textlane",
-  description: "Unified, ported to Rust",
+  description: "Fast Markdown pipeline",
   logo: "/logo.svg",
   favicon: "/logo.png",
   include: ["README.md", "CONTRIBUTING.md", "CHANGELOG.md", "rust/docs/**/*.md"],

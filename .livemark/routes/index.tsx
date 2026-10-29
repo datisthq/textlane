@@ -72,16 +72,17 @@ function Hero() {
             Open source · MIT License
           </p>
           <h1 className="mt-5 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-5xl">
-            Unified,
+            Fast Markdown pipeline
             <br />
             <span className="box-decoration-clone bg-linear-to-r from-primary/20 to-primary/20 bg-size-[100%_0.3em] bg-position-[0_88%] bg-no-repeat">
-              ported to Rust.
+              for Rust, Node.js
+              <br />
+              and Python.
             </span>
           </h1>
           <p className="mt-6 max-w-[52ch] text-lg leading-relaxed text-muted-foreground md:text-xl">
             Textlane runs the remark, rehype and retext pipeline natively: the same mdast,
-            hast and nlcst trees, the same plugins, one crate for Rust, Node.js and
-            Python.
+            hast and nlcst trees, the same plugins, one crate for every language.
           </p>
           <HeroActions />
         </div>
@@ -516,27 +517,33 @@ const file = await unified()
   .use(rehypeStringify)
   .process(markdown)`
 
-const textlaneSource = `{
-  "pipeline": [
-    ["md.parse"],
-    ["md.gfm"],
-    ["md.toHtml"],
-    ["html.slug"],
-    ["html.stringify"]
-  ],
-  "input": "# Hello, *lane*",
-  "expected": {
-    "html": "<h1 id=\\"hello-lane\\">..."
-  }
-}`
+const textlaneSource = `use serde_json::json;
+use textlane::{Api, File, Pipeline};
+
+let mut pipeline = Pipeline::new();
+pipeline.use_value(
+    &json!([
+        "md.parse",
+        "md.gfm",
+        "md.toHtml",
+        "html.slug",
+        "html.stringify"
+    ]),
+    None,
+)?;
+
+let html = pipeline
+    .process(markdown, &mut File::new(), Api::Sync)?;`
 
 const JS_KEYWORDS = new Set(["import", "from", "const", "await"])
 
-const JS_TOKEN =
+const RUST_KEYWORDS = new Set(["use", "let", "mut", "fn", "None"])
+
+const CODE_TOKEN =
   /(\/\/.*)|("(?:[^"\\]|\\.)*")|(\b\d+\b)|([A-Za-z_]\w*)|([^\sA-Za-z_\d"]+)|(\s+)|([\s\S])/g
 
-function highlightJs(code: string) {
-  return [...code.matchAll(JS_TOKEN)].map(match => {
+function highlightCode(code: string, keywords: Set<string>) {
+  return [...code.matchAll(CODE_TOKEN)].map(match => {
     const [text, comment, string, number, word, punct] = match
     const next = code[match.index + text.length]
     const className = comment
@@ -546,38 +553,13 @@ function highlightJs(code: string) {
         : number
           ? tk.type
           : word
-            ? JS_KEYWORDS.has(word)
+            ? keywords.has(word)
               ? tk.keyword
               : next === "(" || /^(remark|rehype)/.test(word)
                 ? tk.func
-                : undefined
-            : punct
-              ? tk.punct
-              : undefined
-    return className ? (
-      <span key={match.index} className={className}>
-        {text}
-      </span>
-    ) : (
-      text
-    )
-  })
-}
-
-const JSON_TOKEN =
-  /("(?:[^"\\]|\\.)*"(?=:))|("(?:[^"\\]|\\.)*")|(\b\d+\b)|(\.\.\.)|([{}[\],:])|(\s+|[^\s"{}[\],:.]+|\.)/g
-
-function highlightJson(code: string) {
-  return [...code.matchAll(JSON_TOKEN)].map(match => {
-    const [text, key, string, number, ellipsis, punct] = match
-    const className = key
-      ? tk.key
-      : string
-        ? tk.string
-        : number
-          ? tk.type
-          : ellipsis
-            ? tk.dim
+                : /^[A-Z]/.test(word)
+                  ? tk.type
+                  : undefined
             : punct
               ? tk.punct
               : undefined
@@ -608,14 +590,18 @@ function Pipeline() {
         </Reveal>
         <Reveal>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <WindowCard label="unified.js">
+            <WindowCard label="unified · main.js">
               <pre className="p-5 text-sm leading-relaxed font-mono overflow-x-auto">
-                <code className={tk.body}>{highlightJs(unifiedSource)}</code>
+                <code className={tk.body}>
+                  {highlightCode(unifiedSource, JS_KEYWORDS)}
+                </code>
               </pre>
             </WindowCard>
-            <WindowCard label="case.json">
+            <WindowCard label="textlane · main.rs">
               <pre className="p-5 text-sm leading-relaxed font-mono overflow-x-auto">
-                <code className={tk.body}>{highlightJson(textlaneSource)}</code>
+                <code className={tk.body}>
+                  {highlightCode(textlaneSource, RUST_KEYWORDS)}
+                </code>
               </pre>
             </WindowCard>
           </div>
@@ -624,7 +610,7 @@ function Pipeline() {
           <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
             <Bullet text="Stages keep unified's order, options and use, data and freeze semantics." />
             <Bullet text="Trees read and write unified's JSON: mdast, hast and nlcst, positions included." />
-            <Bullet text="The Node.js and Python .use() API is in progress; the crate drives pipelines by name today." />
+            <Bullet text="Rust runs pipelines today; the Node.js and Python .use() API is in progress." />
           </div>
         </Reveal>
       </div>
