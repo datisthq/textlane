@@ -30,7 +30,7 @@ export default defineConfig({
       article: {
         title: "Contributing",
         description:
-          "How to set up textlane locally, propose changes, and ship a release.",
+          "How to report bugs and share ideas, and how team members work on textlane.",
         icon: "heart-handshake",
         order: -2,
         path: "/contributing/",
