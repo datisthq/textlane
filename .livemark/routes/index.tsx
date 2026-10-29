@@ -72,13 +72,11 @@ function Hero() {
             Open source · MIT License
           </p>
           <h1 className="mt-5 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-5xl">
-            Fast Markdown pipeline
-            <br />
+            Fast{" "}
             <span className="box-decoration-clone bg-linear-to-r from-primary/20 to-primary/20 bg-size-[100%_0.3em] bg-position-[0_88%] bg-no-repeat">
-              for Rust, Node.js
-              <br />
-              and Python.
-            </span>
+              Markdown pipeline
+            </span>{" "}
+            for Python, TypeScript, and Rust.
           </h1>
           <p className="mt-6 max-w-[52ch] text-lg leading-relaxed text-muted-foreground md:text-xl">
             Textlane runs the remark, rehype and retext pipeline natively: the same mdast,
@@ -137,7 +135,7 @@ function InstallCard(props: { className?: string }) {
     >
       <span className="text-primary select-none">$</span>
       <span>
-        <span className="text-foreground">cargo add</span> textlane
+        <span className="text-foreground">pip install</span> textlane
       </span>
       <span className="text-primary select-none">$</span>
       <span>
@@ -145,7 +143,7 @@ function InstallCard(props: { className?: string }) {
       </span>
       <span className="text-primary select-none">$</span>
       <span>
-        <span className="text-foreground">pip install</span> textlane
+        <span className="text-foreground">cargo add</span> textlane
       </span>
     </div>
   )
