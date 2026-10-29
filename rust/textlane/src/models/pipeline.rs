@@ -33,8 +33,9 @@ impl Pipeline {
         Self::default()
     }
 
-    /// Add a plugin by name, a list of plugins, or a preset (`{plugins, settings}`); a plugin
-    /// used again is reconfigured, its object options merged into the earlier ones.
+    /// Add a plugin by name or descriptor (`{name, options?}`), a list of plugins, or a preset
+    /// (`{plugins, settings}`); a plugin used again is reconfigured, its object options merged
+    /// into the earlier ones.
     pub fn use_value(
         &mut self,
         value: &Value,
@@ -45,7 +46,10 @@ impl Pipeline {
             Value::Null => Ok(()),
             Value::String(name) => self.add_plugin(name, options),
             Value::Array(list) => self.add_list(list),
-            Value::Object(preset) => self.add_preset(preset),
+            Value::Object(object) => match read_descriptor(object) {
+                Some((name, own)) => self.add_plugin(name, options.or(own)),
+                None => self.add_preset(object),
+            },
             other => Err(Error::new(
                 "invalid-plugin",
                 format!("Expected usable value, not `{other}`"),
@@ -57,6 +61,20 @@ impl Pipeline {
     pub fn set_data(&mut self, key: &str, value: Value) -> Result<(), Error> {
         self.check_unfrozen("data")?;
         self.data.insert(key.to_string(), value);
+        Ok(())
+    }
+
+    /// Replace all data with an object, as unified's `data(dataset)`; fails once the
+    /// pipeline is frozen.
+    pub fn replace_data(&mut self, data: Value) -> Result<(), Error> {
+        self.check_unfrozen("data")?;
+        let Value::Object(data) = data else {
+            return Err(Error::new(
+                "invalid-data",
+                format!("Expected an object as data, not `{data}`"),
+            ));
+        };
+        self.data = data;
         Ok(())
     }
 
@@ -109,7 +127,8 @@ impl Pipeline {
         write_tree(&tree, Some(&Lines::new(processor.source(input))))
     }
 
-    /// Run the transforms over a tree given as JSON.
+    /// Run the transforms over a tree given as JSON. A `file` holding the document's text
+    /// (`File::value`) lets bridges read it and places the result's nodes in it.
     pub fn run(
         &mut self,
         tree: &Value,
@@ -117,10 +136,14 @@ impl Pipeline {
         api: Api,
     ) -> Result<Value, Error> {
         let processor = self.freeze()?;
+        if let Some(value) = &file.value {
+            file.value = Some(processor.source(value).to_string());
+        }
         let alloc = Allocator::new();
         let tree = read_tree(tree, processor.input_kind(), &alloc)?;
         let tree = run_tree(processor, tree, file, &alloc, api, "run")?;
-        write_tree(&tree, None)
+        let lines = file.value.as_deref().map(Lines::new);
+        write_tree(&tree, lines.as_ref())
     }
 
     /// Compile a tree given as JSON, running no transform.
@@ -190,9 +213,20 @@ impl Pipeline {
                     Some((Value::String(name), rest)) => {
                         self.add_plugin(name, rest.first().cloned())?;
                     }
+                    Some((Value::Object(object), rest)) => {
+                        match read_descriptor(object) {
+                            Some((name, own)) => {
+                                self.add_plugin(name, rest.first().cloned().or(own))?;
+                            }
+                            None => return Err(invalid_entry(entry)),
+                        }
+                    }
                     _ => return Err(invalid_entry(entry)),
                 },
-                Value::Object(preset) => self.add_preset(preset)?,
+                Value::Object(object) => match read_descriptor(object) {
+                    Some((name, own)) => self.add_plugin(name, own)?,
+                    None => self.add_preset(object)?,
+                },
                 _ => return Err(invalid_entry(entry)),
             }
         }
@@ -262,6 +296,12 @@ fn check_compiler(processor: &FrozenProcessor, call: &str) -> Result<(), Error> 
             format!("Cannot `{call}` without `compiler`"),
         )),
     }
+}
+
+// An absent `options` is None, not null: `use(md.gfm())` must keep earlier options
+fn read_descriptor(object: &Map<String, Value>) -> Option<(&str, Option<Value>)> {
+    let name = object.get("name")?.as_str()?;
+    Some((name, object.get("options").cloned()))
 }
 
 fn unknown_plugin(name: &str) -> Error {

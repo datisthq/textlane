@@ -1,0 +1,85 @@
+[
+  {
+    "description": "use: plugin descriptors",
+    "comment": "The `{name, options}` objects the bindings' domain functions return",
+    "pipeline": [],
+    "tests": [
+      {
+        "description": "a descriptor without options",
+        "operations": [["use", { "name": "test.recordOptions" }], ["freeze"]],
+        "expected": { "data": { "recorded": [null] } }
+      },
+      {
+        "description": "a descriptor with options",
+        "operations": [
+          ["use", { "name": "test.recordOptions", "options": { "a": 1 } }],
+          ["freeze"]
+        ],
+        "expected": { "data": { "recorded": [{ "a": 1 }] } }
+      },
+      {
+        "description": "options given with a descriptor replace its own",
+        "operations": [
+          ["use", { "name": "test.recordOptions", "options": { "a": 1 } }, { "b": 2 }],
+          ["freeze"]
+        ],
+        "expected": { "data": { "recorded": [{ "b": 2 }] } }
+      },
+      {
+        "description": "descriptors in a list, alone and in tuples",
+        "operations": [
+          [
+            "use",
+            [
+              { "name": "test.recordOptions", "options": { "a": 1 } },
+              [{ "name": "test.setData" }, { "key": "b", "value": 2 }]
+            ]
+          ],
+          ["freeze"]
+        ],
+        "expected": { "data": { "recorded": [{ "a": 1 }], "b": 2 } }
+      },
+      {
+        "description": "a descriptor in a preset",
+        "operations": [
+          ["use", { "plugins": [{ "name": "test.recordOptions", "options": true }] }],
+          ["freeze"]
+        ],
+        "expected": { "data": { "recorded": [null] } }
+      },
+      {
+        "description": "a descriptor reconfigures a plugin used by name",
+        "operations": [
+          ["use", "test.recordOptions", { "a": 1, "b": 1 }],
+          ["use", { "name": "test.recordOptions", "options": { "b": 2 } }],
+          ["freeze"]
+        ],
+        "expected": { "data": { "recorded": [{ "a": 1, "b": 2 }] } }
+      },
+      {
+        "description": "a descriptor without options keeps the earlier ones",
+        "operations": [
+          ["use", "test.recordOptions", { "a": 1 }],
+          ["use", { "name": "test.recordOptions" }],
+          ["freeze"]
+        ],
+        "expected": { "data": { "recorded": [{ "a": 1 }] } }
+      },
+      {
+        "description": "a descriptor naming an unknown plugin",
+        "operations": [["use", { "name": "test.missing" }]],
+        "expected": { "error": { "code": "unknown-plugin" } }
+      },
+      {
+        "description": "a name that is not a string makes no descriptor",
+        "operations": [["use", { "name": 1 }]],
+        "expected": { "error": { "code": "invalid-plugin" } }
+      },
+      {
+        "description": "a descriptor in a tuple with a name that is not a string",
+        "operations": [["use", [[{ "name": 1 }]]]],
+        "expected": { "error": { "code": "invalid-plugin" } }
+      }
+    ]
+  }
+]

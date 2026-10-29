@@ -14,6 +14,8 @@ categories = ["text-processing", "parser-implementations"]
 [features]
 default = ["highlight"]
 highlight = ["dep:giallo"]
+# The options' JSON Schema, which the bindings' types are generated from
+schema = ["dep:schemars"]
 
 [dependencies]
 textlane-core.workspace = true
@@ -23,6 +25,7 @@ serde.workspace = true
 serde_json.workspace = true
 stacker.workspace = true
 url.workspace = true
+schemars = { workspace = true, optional = true }
 
 [lints]
 workspace = true

@@ -2,6 +2,7 @@ use serde::Deserialize;
 
 /// Options of `prose.quotes`, as retext-quotes takes them.
 #[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
 pub struct QuotesOptions {
     /// The style of quotes and apostrophes to prefer: `smart` by default.
@@ -15,6 +16,7 @@ pub struct QuotesOptions {
 
 /// A style of quotes: straight (`"`) or smart (`“”`).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(rename_all = "lowercase")]
 pub enum QuoteStyle {
     #[default]

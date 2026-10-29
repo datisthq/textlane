@@ -30,6 +30,7 @@ build-backend = "maturin"
 bindings = "pyo3"
 manifest-path = "../rust/textlane/Cargo.toml"
 features = ["python"]
-module-name = "textlane"
+# The extension sits inside the Python package in textlane/, which wraps it
+module-name = "textlane._native"
 # scripts/copy-skills.sh fills it; never committed
 data = "textlane.data"

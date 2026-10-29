@@ -28,5 +28,7 @@ retext and MDX test suites. Every implementation runs the same cases.
 
 ## Status
 
-Textlane is pre-release. The packages are published to reserve the names and exercise the
-release pipeline; the pipeline API is not public yet.
+Textlane is pre-release. In Rust, `Processor::new().with(plugin)` builds a typed pipeline;
+the Node.js and Python packages drive `textlane::Pipeline`, which takes plugins by name with
+JSON options and follows unified's `use`, `data` and `freeze`. JavaScript and Python plugins
+cannot join a pipeline yet.

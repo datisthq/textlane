@@ -11,6 +11,10 @@ description = "Textlane's Markdown plugins: parsing, extensions, transforms, ser
 keywords = ["markdown", "ast", "textlane"]
 categories = ["text-processing", "parser-implementations"]
 
+[features]
+# The options' JSON Schema, which the bindings' types are generated from
+schema = ["dep:schemars"]
+
 [dependencies]
 textlane-core.workspace = true
 bumpalo.workspace = true
@@ -19,6 +23,7 @@ serde_json.workspace = true
 regex.workspace = true
 stacker.workspace = true
 unicode-id-start.workspace = true
+schemars = { workspace = true, optional = true }
 
 [lints]
 workspace = true

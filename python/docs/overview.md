@@ -28,5 +28,14 @@ retext and MDX test suites. Every implementation, Python included, runs the same
 
 ## Status
 
-Textlane is pre-release. The pipeline API is not public in Python yet; the package exposes
-`textlane.version()` so far.
+Textlane is pre-release. `textlane()` builds a processor over the native pipeline, and
+`textlane.md`, `textlane.html`, `textlane.mdx` and `textlane.prose` hold one function per
+plugin, its options typed as a `TypedDict` generated from the crate's option structs. Python
+plugins cannot join a pipeline yet.
+
+```python
+from textlane import html, md, textlane
+
+file = textlane().use(md.parse()).use(md.to_html()).use(html.stringify()).process_sync("# hi")
+file["value"]  # "<h1>hi</h1>"
+```

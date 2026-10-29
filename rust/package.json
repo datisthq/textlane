@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "cargo build --release",
-    "check:lint": "cargo fmt --all --check && cargo clippy --workspace --all-targets -- -D warnings && cargo clippy --workspace --all-targets --features node,testing -- -D warnings && cargo clippy --workspace --all-targets --features python,testing -- -D warnings",
+    "check:lint": "cargo fmt --all --check && cargo clippy --workspace --all-targets -- -D warnings && cargo clippy --workspace --all-targets --features node,testing,schema -- -D warnings && cargo clippy --workspace --all-targets --features python,testing -- -D warnings",
     "check:types": "cargo check --workspace --all-targets",
     "format": "cargo fmt --all",
     "measure:coverage": "cargo llvm-cov --workspace --html",

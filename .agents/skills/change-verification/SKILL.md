@@ -17,18 +17,19 @@ gate belongs to the lefthook pre-push hook and CI; a commit runs the **commit ga
 
 ## What each check costs
 
-| check                                                   | catches                                                                          |
-| ------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `vp fmt --check <files>` / `vp lint <files>`            | format, oxlint on TS, JSON, YAML, Markdown                                       |
-| `pnpm -C rust check:lint`                               | rustfmt and clippy, default/node/python                                          |
-| `cargo clippy --all-targets --features node` / `python` | a binding, from `rust/`                                                          |
-| `cargo test <name>` from `rust/`                        | the tests whose path contains the name                                           |
-| `pnpm -C rust test:unit`                                | every Rust unit                                                                  |
-| `pnpm -C typescript test:unit`                          | the loader's units and the Node conformance runner, which builds the addon first |
-| `pnpm -C python test:unit`                              | the Python conformance runner; builds a wheel, needs `uv`                        |
-| `vp test .scripts/-test/conformance.unit.ts`            | every conformance test file against its schema                                   |
-| `vp test .scripts/-test/docs.unit.ts`                   | paths, scripts and skill tables in docs                                          |
-| `pnpm build:docs`                                       | the real build over every docs page                                              |
+| check                                                   | catches                                                                                                      |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `vp fmt --check <files>` / `vp lint <files>`            | format, oxlint on TS, JSON, YAML, Markdown                                                                   |
+| `pnpm -C rust check:lint`                               | rustfmt and clippy, default/node/python                                                                      |
+| `cargo clippy --all-targets --features node` / `python` | a binding, from `rust/`                                                                                      |
+| `cargo test <name>` from `rust/`                        | the tests whose path contains the name                                                                       |
+| `pnpm -C rust test:unit`                                | every Rust unit                                                                                              |
+| `pnpm -C typescript test:unit`                          | the loader's, processor's and API-sample units and the Node conformance runner, which builds the addon first |
+| `pnpm -C python test:unit`                              | the Python units, API sample and conformance runner; builds a wheel, needs `uv`                              |
+| `vp test .scripts/-test/bindings.unit.ts`               | the generated domain modules against the crate's plugins and option structs                                  |
+| `vp test .scripts/-test/conformance.unit.ts`            | every conformance test file against its schema                                                               |
+| `vp test .scripts/-test/docs.unit.ts`                   | paths, scripts and skill tables in docs                                                                      |
+| `pnpm build:docs`                                       | the real build over every docs page                                                                          |
 
 The first clippy or test run after a dependency change compiles for a minute; later ones take
 seconds. The changed files come from `git diff --name-only main...` plus `git status --short`.
@@ -44,7 +45,8 @@ Pick the **highest** rung the diff reaches, and run everything that rung lists.
    before looking at the page.
 2. **Logic** — an action or a binding. `pnpm -C rust check:lint` and `cargo test` on the
    module. A new or changed test runs on its own first and fails before the fix. A binding
-   change adds the clippy run for its feature.
+   change adds the clippy run for its feature. A plugin added or an options struct changed
+   adds `pnpm generate:bindings` and the bindings guard.
 3. **Build-shaped** — dependencies, a `Cargo.toml` under `rust/`, `rust/textlane/build.rs`, a `vite.config.ts`, a
    `tsconfig`, the bindings or the release scripts. Run `pnpm test`, then `pnpm build`; for
    the bindings, the local checks in **`package-distribution`**.

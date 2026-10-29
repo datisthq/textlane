@@ -53,19 +53,24 @@ textlane/
 ├── rust/                # the cargo workspace, one directory per crate
 │   ├── textlane/        #   the crates.io package `textlane`
 │   │   ├── src/
-│   │   │   ├── actions/  #   package/version
+│   │   │   ├── actions/  #   package/version, plugin/find (the plugin table), file/write
+│   │   │   ├── models/   #   processor.rs (typed `with`), pipeline.rs (what the bindings drive)
 │   │   │   ├── bindings/ #   node.rs (napi, `node` feature), python.rs (PyO3, `python` feature)
 │   │   │   └── lib.rs    #   the library façade
+│   │   ├── examples/    #   schema.rs: the option schemas `pnpm generate:bindings` reads
 │   │   └── build.rs     #   napi setup under the `node` feature
 │   ├── core/            #   textlane-core: trees, the file, the plugin contract
 │   ├── md/ html/ mdx/ prose/  # one textlane-<domain> crate each
 │   └── docs/            #   the docs site's Markdown pages, built with livemark
 ├── typescript/          # the npm package `textlane`: loads the native addon
 │   ├── actions/         #   resolveAddon — find the platform package's addon
-│   ├── index.ts         #   the package entry
+│   ├── generated/       #   textlane/md, /html, /mdx, /prose, from `pnpm generate:bindings`
+│   ├── models/          #   the processor over the addon's pipeline, and its types
+│   ├── index.ts         #   the package entry: `textlane()`
 │   ├── scripts/         #   pack and publish the per-platform packages
 │   └── settings.ts      #   the platform list
 ├── python/              # the PyPI package `textlane`: maturin PyO3 wheels
+│   └── textlane/        #   the processor over the extension; md.py etc. generated
 ├── conformance/         # the language-neutral suite every implementation runs
 ├── .skills/             # shipped agent skills for people who use textlane
 ├── .agents/skills/      # repo skills for coding agents (see AGENTS.md)
@@ -81,20 +86,21 @@ All behaviour lives in `rust/`. The npm and PyPI packages only expose the same c
 
 Run these at the repo root; each chains into the sections with `pnpm -C <section>`.
 
-| Command            | What it does                                                                    |
-| ------------------ | ------------------------------------------------------------------------------- |
-| `pnpm install`     | Install dependencies                                                            |
-| `pnpm build`       | Build the release crate, the npm loader and the Python wheel                    |
-| `pnpm check:types` | Type-check via `tsgo --noEmit` and `cargo check`                                |
-| `pnpm check:lint`  | Format check + lint (`vp fmt`, `vp lint`, `cargo fmt`, `clippy`)                |
-| `pnpm check`       | `pnpm check:lint && pnpm check:types`                                           |
-| `pnpm format`      | Auto-fix formatting (`vp fmt`, `cargo fmt`)                                     |
-| `pnpm test:unit`   | Run the repo guards, the loader's tests, `cargo test` and the conformance suite |
-| `pnpm test`        | `pnpm check && pnpm test:unit`                                                  |
-| `pnpm start`       | Serve the docs site with livemark and live reload                               |
-| `pnpm build:docs`  | Production build of the docs site                                               |
-| `pnpm read`        | Serve the design notes and decisions in `.humans/` with htmlpress               |
-| `pnpm scan`        | Secret and vulnerability scans (gitleaks, semgrep)                              |
+| Command                  | What it does                                                                    |
+| ------------------------ | ------------------------------------------------------------------------------- |
+| `pnpm install`           | Install dependencies                                                            |
+| `pnpm build`             | Build the release crate, the npm loader and the Python wheel                    |
+| `pnpm check:types`       | Type-check via `tsgo --noEmit` and `cargo check`                                |
+| `pnpm check:lint`        | Format check + lint (`vp fmt`, `vp lint`, `cargo fmt`, `clippy`)                |
+| `pnpm check`             | `pnpm check:lint && pnpm check:types`                                           |
+| `pnpm format`            | Auto-fix formatting (`vp fmt`, `cargo fmt`)                                     |
+| `pnpm generate:bindings` | Regenerate the domain modules and option types from the crate                   |
+| `pnpm test:unit`         | Run the repo guards, the loader's tests, `cargo test` and the conformance suite |
+| `pnpm test`              | `pnpm check && pnpm test:unit`                                                  |
+| `pnpm start`             | Serve the docs site with livemark and live reload                               |
+| `pnpm build:docs`        | Production build of the docs site                                               |
+| `pnpm read`              | Serve the design notes and decisions in `.humans/` with htmlpress               |
+| `pnpm scan`              | Secret and vulnerability scans (gitleaks, semgrep)                              |
 
 A change is ready to push when `pnpm test` is green.
 

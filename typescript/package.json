@@ -24,7 +24,13 @@
   ],
   "type": "module",
   "sideEffects": false,
-  "exports": "./build/index.js",
+  "exports": {
+    ".": "./build/index.js",
+    "./md": "./build/generated/md.js",
+    "./html": "./build/generated/html.js",
+    "./mdx": "./build/generated/mdx.js",
+    "./prose": "./build/generated/prose.js"
+  },
   "scripts": {
     "build": "tsgo --project tsconfig.build.json",
     "check:types": "tsgo --noEmit",

@@ -292,7 +292,17 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   (to-hast), so `actions/heading/compile.rs` exports `compile_heading`. No file named after
   its parent module (`utils/tokenizer/tokenizer.rs`): clippy's `module_inception` rejects it
 - `textlane/src/bindings/node.rs` and `python.rs` only map crate functions to their
-  language (`version()` in both); behaviour never lives there
+  language: `version()`, `plugin_names()` and a `Pipeline` class over `models/pipeline.rs`
+  whose methods are its calls (`run`/`runSync`, `process`/`processSync` pick `Api::Async` or
+  `Api::Sync`), plus `run_case` under `testing`; behaviour never lives there. Node crosses
+  values as `serde_json::Value`, Python as JSON text; both turn a crate `Error` into a thrown
+  error whose `code` is the crate's (napi's status, an attribute on `TextlaneError`).
+  `Pipeline::use_value` reads the bindings' descriptors (`{name, options?}`) as plugins, alone
+  or first in a tuple, and `write_file` (`actions/file/write.rs`) shapes `process`'s vfile
+- `actions/plugin/find.rs` holds `PLUGINS`, the one table of public plugins: name, builder
+  and, under the `schema` feature, its options' `JsonSchema`. `list_plugins` and
+  `describe_plugins` (what `examples/schema.rs` prints for `pnpm generate:bindings`) read it,
+  so a plugin missing from the table exists for no binding
 - Unit tests sit beside their module as `<module>_unit.rs`, wired in with
   `#[cfg(test)] #[path = "<module>_unit.rs"] mod unit;`; one that can fail returns a `Result`
   and uses `?` instead of `unwrap`, which clippy denies
@@ -301,6 +311,9 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
 
 - The default features need neither Node nor Python: `cargo add textlane` must build without
   napi or PyO3. Every binding dependency is optional and enabled only by its feature.
+- `schema` (never default) derives `schemars::JsonSchema` on every options struct, through
+  each domain crate's own `schema` feature, and adds `describe_plugins`. Release builds and
+  `cargo add textlane` never compile schemars. `pnpm -C rust check:lint` lints it with `node`.
 - `testing` adds `run_case` and the `test.*` plugins the conformance suite drives, and exposes
   them through both bindings; it is never default and never published in an addon or wheel.
   `rust/textlane/tests/conformance.rs` requires it (**`conformance-suite`**).
@@ -312,7 +325,8 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   builds without a C compiler
 - `node` pulls in napi, and `build.rs` runs napi-build only under it; `python` pulls in PyO3
   with `abi3-py39`. Each binding module is compiled only under its feature.
-- `pnpm -C rust check:lint` runs clippy three times: default features, `--features node` and
-  `--features python`, so CI on every OS compiles both bindings before a release can tag.
+- `pnpm -C rust check:lint` runs clippy three times: default features, `--features node`
+  (with `testing` and `schema`) and `--features python` (with `testing`), so CI on every OS
+  compiles both bindings before a release can tag.
 - `unsafe_code` is `deny` in `[workspace.lints]`. The one exception is `bindings::node`, allowed
   in `lib.rs` because napi's macros expand to unsafe FFI glue; never widen it.

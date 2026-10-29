@@ -1,9 +1,15 @@
 import { createRequire } from "node:module"
 import { resolveAddon } from "./actions/addon/resolve.ts"
+import type { Addon } from "./models/addon.ts"
+import { Processor } from "./models/processor.ts"
+
+export type { Compatible, Message, Node, Point, VFile } from "./models/file.ts"
+export type { Pluggable, PluggableList, Plugin, Preset } from "./models/plugin.ts"
+export { Processor } from "./models/processor.ts"
 
 const require = createRequire(import.meta.url)
 
-const addon: { version: () => string } = require(
+const addon: Addon = require(
   resolveAddon({
     platform: process.platform,
     arch: process.arch,
@@ -12,5 +18,13 @@ const addon: { version: () => string } = require(
   }),
 )
 
+/** A new processor: add plugins with `use`, then `process` text. */
+export function textlane() {
+  return new Processor(new addon.Pipeline())
+}
+
 /** The package version, as the native crate reports it. */
 export const version = addon.version
+
+/** The name of every native plugin, as a pipeline names it. */
+export const pluginNames = addon.pluginNames

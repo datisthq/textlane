@@ -10,7 +10,20 @@ One workspace, three registries, one version. Nothing here may change what the c
 ## npm: `textlane`
 
 - `typescript/index.ts` loads the napi addon that `resolveAddon`
-  (`typescript/actions/addon/resolve.ts`) finds and re-exports its functions.
+  (`typescript/actions/addon/resolve.ts`) finds and exports `textlane()`, a `Processor`
+  (`typescript/models/processor.ts`) over the addon's `Pipeline` class: chaining, Promises
+  and `data`'s overloads only; values cross napi as JSON (`serde-json`), so a JavaScript
+  function in `use` fails in napi rather than vanishing.
+- The subpaths `textlane/md`, `textlane/html`, `textlane/mdx` and `textlane/prose` are
+  `exports` entries pointing at `build/generated/<domain>.js`. Their sources,
+  `typescript/generated/<domain>.ts`, and Python's `python/textlane/<domain>.py` are written by
+  `pnpm generate:bindings` from `cargo run --example schema --features schema`: the plugin
+  table in `rust/textlane/src/actions/plugin/find.rs` and each options struct's
+  `schemars::JsonSchema`, derived only under each crate's `schema` feature, so no release build
+  pays for schemars. A plugin added to the table or an option changed in Rust is one
+  `pnpm generate:bindings` away; `.scripts/-test/bindings.unit.ts` fails until it runs.
+  A custom `Deserialize` needs a hand-written `JsonSchema` beside it (`FrontmatterOptions`,
+  smartypants' modes), and a `deserialize_with` field a `schemars(with = …)`.
 - `resolveAddon` takes `TEXTLANE_ADDON` first (a cargo build, an unsupported platform), else
   resolves `@textlane/<platform>-<arch>/textlane.node` from the installed packages.
 - `PLATFORMS` in `typescript/settings.ts` is the single list. `scripts/pack.ts` reads it to lay
@@ -27,14 +40,21 @@ One workspace, three registries, one version. Nothing here may change what the c
 - Local check without publishing: `cargo build --release --features node` from `rust/`, copy
   `libtextlane.so` from its `target/release/` (`.dylib` on macOS, `textlane.dll` on Windows) to
   `<dir>/<platform>/textlane.node`, `pnpm -C typescript build`, then
-  `TEXTLANE_ADDON=<dir>/<platform>/textlane.node node -e 'import("./typescript/build/index.js").then(m=>console.log(m.version()))'`.
+  `TEXTLANE_ADDON=<dir>/<platform>/textlane.node node -e 'import("./typescript/build/index.js").then(m=>console.log(m.version()))'`;
+  `import("./typescript/build/generated/md.js")` reaches a subpath the same way.
   `pnpm -C typescript pack:platforms --addons <dir>` needs every platform's addon.
 
 ## PyPI: `textlane`
 
-`python/pyproject.toml` is the whole package: maturin with `bindings = "pyo3"`,
-`features = ["python"]`, `module-name = "textlane"` and `manifest-path = "../rust/textlane/Cargo.toml"`,
-`dynamic = ["version"]` so the wheel takes the crate's version. PyO3's `abi3-py39` makes one
+`python/pyproject.toml` and the package `python/textlane/` are the whole package: maturin's
+mixed layout with `bindings = "pyo3"`, `features = ["python"]`,
+`module-name = "textlane._native"` (the PyO3 module is `#[pymodule(name = "_native")]`) and
+`manifest-path = "../rust/textlane/Cargo.toml"`. `textlane/__init__.py` re-exports the
+extension's `version`, `plugin_names` and `TextlaneError`, and `run_case` when a `testing`
+build has it; `_processor.py` is the processor, crossing the boundary as JSON text;
+`_native.pyi` and `py.typed` type it. `scripts/test.sh` runs every `-test/*_unit.py` against
+the installed wheel, never the source folder, which lacks the extension.
+`dynamic = ["version"]` gives the wheel the crate's version. PyO3's `abi3-py39` makes one
 wheel per platform serve every CPython from 3.9. A wheel holds the skills under
 `.data/data/share/textlane/skills/`, installed to `<venv>/share/textlane/skills`. maturin reads
 them from the `textlane.data` folder beside `pyproject.toml` (its `data` key), which
@@ -42,7 +62,8 @@ them from the `textlane.data` folder beside `pyproject.toml` (its `data` key), w
 workflow's Stage Skills step both run it, and a wheel built without it ships no skills. CI builds
 one wheel per target with `PyO3/maturin-action`; no sdist is published, since the crate sits
 outside `python/`. Check locally: `pnpm -C python build`, then
-`uv run --with python/build/<wheel> --no-project python -c 'import textlane; print(textlane.version())'`.
+`uv run --with python/build/<wheel> --no-project python -I -c 'import textlane; print(textlane.version())'`;
+`-I` keeps a `textlane/` source folder in the working directory from shadowing the wheel.
 maturin runs from `python/`, outside `rust/`, so `rust/rust-toolchain.toml` does not
 apply there: `python/package.json` and `scripts/test.sh` pin `RUSTUP_TOOLCHAIN=stable`, or a
 machine whose rustup default is an older nightly fails on oxc's minimum rustc.

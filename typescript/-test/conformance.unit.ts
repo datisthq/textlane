@@ -1,11 +1,11 @@
-import { execFileSync } from "node:child_process"
-import { copyFileSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs"
+import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs"
 import { createRequire } from "node:module"
 import { tmpdir } from "node:os"
 import { join, relative, resolve } from "node:path"
 import { afterAll, beforeAll, describe, expect, it } from "vite-plus/test"
 import { resolveAddon } from "../actions/addon/resolve.ts"
 import { ADDON_ENV } from "../settings.ts"
+import { buildAddon } from "./addon.ts"
 
 const ROOT = resolve(import.meta.dirname, "..", "..")
 const TESTS = join(ROOT, "conformance", "tests")
@@ -16,12 +16,6 @@ const KNOWN_DIVERGENCES: Record<string, string> = {}
 const PENDING: Record<string, string> = JSON.parse(
   readFileSync(join(ROOT, "conformance", "pending.json"), "utf8"),
 )
-
-const LIBRARY_NAMES: Record<string, string> = {
-  darwin: "libtextlane.dylib",
-  linux: "libtextlane.so",
-  win32: "textlane.dll",
-}
 
 type Expected = { error?: { code: string; message?: string } } & Record<string, unknown>
 type Test = {
@@ -42,16 +36,8 @@ let runCase: (json: string) => string
 let addonDir = ""
 
 beforeAll(() => {
-  const rust = join(ROOT, "rust")
-  execFileSync("cargo", ["build", "-p", "textlane", "--features", "node,testing"], {
-    cwd: rust,
-    stdio: "inherit",
-  })
-  const library = LIBRARY_NAMES[process.platform]
-  if (!library) throw new Error(`no cargo library name known for ${process.platform}`)
   addonDir = mkdtempSync(join(tmpdir(), "textlane-addon-"))
-  const addonPath = join(addonDir, "textlane.node")
-  copyFileSync(join(rust, "target", "debug", library), addonPath)
+  const addonPath = buildAddon(addonDir)
   const require = createRequire(import.meta.url)
   const addon: { runCase: (json: string) => string } = require(
     resolveAddon({

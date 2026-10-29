@@ -14,14 +14,60 @@ The wheel carries a prebuilt extension for your platform; no Rust toolchain is n
 
 ## Usage
 
-Textlane is pre-release: the pipeline API is not published yet, and each package exposes only
-its version so far.
+A processor chains plugins with `use`, as unified does, then parses, transforms and serializes
+text with `process`. Each language reaches the same crate; plugins are grouped by domain (`md`,
+`html`, `mdx`, `prose`) and named as the pipeline names them.
 
-| Language | Call                                                   |
-| -------- | ------------------------------------------------------ |
-| Rust     | `textlane::read_version()`                             |
-| Node.js  | `import { version } from "textlane"`, then `version()` |
-| Python   | `import textlane`, then `textlane.version()`           |
+Rust:
+
+```rust
+use textlane::{Processor, html, md};
+
+let processor = Processor::new()
+    .with(md::parse(Default::default()))
+    .with(md::gfm(Default::default()))
+    .with(md::to_html(Default::default()))
+    .with(html::stringify(Default::default()))
+    .freeze()?;
+assert_eq!(processor.process("# hi")?.value, "<h1>hi</h1>");
+```
+
+Node.js:
+
+```js
+import { textlane } from "textlane"
+import * as html from "textlane/html"
+import * as md from "textlane/md"
+
+const file = await textlane()
+  .use(md.parse())
+  .use(md.gfm())
+  .use(md.toHtml({ allowDangerousHtml: true }))
+  .use(html.stringify())
+  .process("# hi")
+file.value // "<h1>hi</h1>"
+```
+
+Python:
+
+```python
+from textlane import html, md, textlane
+
+file = (
+    textlane()
+    .use(md.parse())
+    .use(md.gfm())
+    .use(md.to_html({"allowDangerousHtml": True}))
+    .use(html.stringify())
+    .process_sync("# hi")
+)
+file["value"]  # "<h1>hi</h1>"
+```
+
+Node.js and Python also offer `parse`, `run`, `stringify`, `data` and `freeze`, with
+`process`/`run` returning a Promise or coroutine and `processSync`/`process_sync` the result.
+Errors carry the crate's `code`, such as `unknown-plugin`. Only native plugins can join a
+pipeline so far; JavaScript and Python plugins are planned.
 
 ## Documentation
 

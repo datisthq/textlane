@@ -28,5 +28,15 @@ retext and MDX test suites. Every implementation, TypeScript included, runs the 
 
 ## Status
 
-Textlane is pre-release. The pipeline API is not public in Node.js yet; the package exposes
-`version()` so far.
+Textlane is pre-release. `textlane()` builds a processor over the native pipeline, and
+`textlane/md`, `textlane/html`, `textlane/mdx` and `textlane/prose` export one function per
+plugin, typed from the crate's option structs. JavaScript plugins cannot join a pipeline yet.
+
+```js
+import { textlane } from "textlane"
+import * as html from "textlane/html"
+import * as md from "textlane/md"
+
+const file = await textlane().use(md.parse()).use(md.toHtml()).use(html.stringify()).process("# hi")
+file.value // "<h1>hi</h1>"
+```

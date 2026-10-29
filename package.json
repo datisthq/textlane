@@ -9,6 +9,7 @@
     "check:lint": "vp fmt --check && vp lint && pnpm -C rust check:lint",
     "check:types": "tsgo --noEmit && pnpm -C typescript check:types && pnpm -C rust check:types",
     "format": "vp fmt --no-error-on-unmatched-pattern && pnpm -C rust format",
+    "generate:bindings": "node .scripts/generate-bindings.ts",
     "measure:coverage": "pnpm -C typescript measure:coverage && pnpm -C rust measure:coverage",
     "prepare": "lefthook install && node .scripts/link-skills.ts && (command -v cargo >/dev/null && pnpm -C rust setup || true)",
     "read": "htmlpress start .humans",

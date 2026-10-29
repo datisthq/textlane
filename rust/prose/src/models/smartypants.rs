@@ -3,6 +3,7 @@ use serde::de::{Deserializer, Error};
 
 /// Options of `prose.smartypants`, as retext-smartypants takes them.
 #[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
 pub struct SmartypantsOptions {
     /// Turn double backticks and double straight single quotes into double quotes; `all`
@@ -18,11 +19,13 @@ pub struct SmartypantsOptions {
     pub opening_quotes: Option<QuoteCharacters>,
     /// Turn straight quotes into smart ones.
     #[serde(deserialize_with = "read_switch")]
+    #[cfg_attr(feature = "schema", schemars(with = "Option<bool>"))]
     pub quotes: bool,
 }
 
 /// The quote characters to use for double and single quotes.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct QuoteCharacters {
     pub double: String,
     pub single: String,
@@ -127,5 +130,43 @@ impl<'de> Deserialize<'de> for Ellipses {
             Some(Err(_)) => Ellipses::Unspaced,
             _ => Ellipses::On,
         })
+    }
+}
+
+#[cfg(feature = "schema")]
+fn write_mode(names: &[&str]) -> schemars::Schema {
+    schemars::json_schema!({ "anyOf": [{ "type": "boolean" }, { "enum": names }] })
+}
+
+#[cfg(feature = "schema")]
+impl schemars::JsonSchema for Backticks {
+    fn schema_name() -> std::borrow::Cow<'static, str> {
+        "Backticks".into()
+    }
+
+    fn json_schema(_: &mut schemars::SchemaGenerator) -> schemars::Schema {
+        write_mode(&["all"])
+    }
+}
+
+#[cfg(feature = "schema")]
+impl schemars::JsonSchema for Dashes {
+    fn schema_name() -> std::borrow::Cow<'static, str> {
+        "Dashes".into()
+    }
+
+    fn json_schema(_: &mut schemars::SchemaGenerator) -> schemars::Schema {
+        write_mode(&["oldschool", "inverted"])
+    }
+}
+
+#[cfg(feature = "schema")]
+impl schemars::JsonSchema for Ellipses {
+    fn schema_name() -> std::borrow::Cow<'static, str> {
+        "Ellipses".into()
+    }
+
+    fn json_schema(_: &mut schemars::SchemaGenerator) -> schemars::Schema {
+        write_mode(&["spaced", "unspaced"])
     }
 }

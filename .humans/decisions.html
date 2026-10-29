@@ -322,6 +322,85 @@
       far more code for the same output.
     </p>
   </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> A domain function returns a
+    plain descriptor, <code>{name, options?}</code>, which the crate's <code>use</code>
+    reads as a plugin
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> <code>md.toHtml(options)</code> crosses napi and PyO3 as JSON
+      with nothing to hold on the host side; reading descriptors in
+      <code>Pipeline::use_value</code> (alone, first in a tuple, inside lists and presets)
+      keeps both bindings to one rule, and <code>core/descriptor.json</code> pins it.
+      Options are left out when not given, so <code>use(md.gfm())</code> keeps earlier
+      options as unified's <code>use(plugin)</code> does. Python keeps the camelCase
+      option keys: they are the public API, the same in every language.
+    </p>
+    <p>
+      <strong>Rejected.</strong> Host-side objects or classes per plugin; mapping
+      descriptors to tuples in each binding; snake_case keyword options in Python.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> The domain modules and their
+    option types are generated from the crate: one plugin table, schemars behind a
+    <code>schema</code> feature, committed output and a drift guard
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> <code>PLUGINS</code> in <code>actions/plugin/find.rs</code> is
+      the only list of plugins; <code>examples/schema.rs</code> prints each one's options
+      schema and <code>pnpm generate:bindings</code> writes
+      <code>typescript/generated/&lt;domain&gt;.ts</code> (functions and interfaces) and
+      <code>python/textlane/&lt;domain&gt;.py</code> (functions and
+      <code>TypedDict</code>s, total=False, valid at runtime on 3.9). Whole modules rather
+      than <code>.d.ts</code>/<code>.pyi</code> stubs: the functions and their types come
+      from one source, and no hand-written module can list a plugin the crate lacks.
+      <code>.scripts/-test/bindings.unit.ts</code> fails when the files drift.
+    </p>
+    <p>
+      <strong>Rejected.</strong> A runtime <code>pluginNames()</code> the modules are
+      built from (no static types); hand-written stubs; schemars in every build.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> The async API computes on
+    the calling thread: Node's <code>process</code>/<code>run</code> return a Promise of
+    the native call, Python's are coroutines that compute and return
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> They use <code>Api::Async</code>, so they finish jobs where
+      the sync API fails with <code>async-in-sync</code>. Every stage today is native, and
+      the jobs to come are JavaScript promises and Python coroutines, which must be
+      awaited on the host's own thread. A worker thread would need a
+      <code>Send</code> pipeline and copies of every tree, for no work that can overlap
+      yet.
+    </p>
+    <p>
+      <strong>Rejected.</strong> napi <code>AsyncTask</code>s;
+      <code>asyncio.to_thread</code>
+      with the GIL released.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Values cross as JSON: napi's
+    <code>serde-json</code> in Node, JSON text in Python; a processor class on each host
+    only chains and awaits
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> Trees, options and data are JSON in unified already. A
+      JavaScript function fails napi's conversion instead of vanishing as
+      <code>JSON.stringify</code> would drop it; Python's <code>json</code> is C-backed
+      and needs no extra crate. A file is <code>{value, messages, data}</code>, shaped by
+      the crate's <code>write_file</code>; errors carry the crate's <code>code</code>.
+      <code>run(tree, file?)</code> takes the source text, as unified's file, so bridges
+      can read it.
+    </p>
+    <p><strong>Rejected.</strong> <code>pythonize</code>; host-side vfile classes.</p>
+  </dd>
 </dl>
 
 <h2>Conformance suite</h2>
@@ -987,6 +1066,18 @@
     <p>
       Until then the reference and 22 verbatim stringify expectations disagree (21 in
       to-markdown, 1 in frontmatter); afterwards none should.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="danger">open</htmlpress-badge> A tree read back from JSON keeps
+    unist positions, so <code>md.toProse</code> and <code>html.toProse</code> leave nlcst
+    unplaced after a separate <code>parse</code> and <code>run</code>
+  </dt>
+  <dd>
+    <p>
+      <code>process</code> keeps the tree in the arena and is unaffected. Turning unist
+      offsets back into byte spans when <code>run</code> has the file's text would close
+      it; the API sample runners compare those trees without positions until then.
     </p>
   </dd>
 </dl>

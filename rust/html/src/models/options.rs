@@ -4,6 +4,7 @@ use serde::Deserialize;
 
 /// Options of `html.stringify`, named as hast-util-to-html names them.
 #[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
 pub struct StringifyOptions {
     /// Write raw nodes as they are instead of escaping them.
@@ -46,6 +47,7 @@ pub struct StringifyOptions {
 
 /// Options of `html.parse`, named as rehype-parse names them.
 #[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
 pub struct ParseOptions {
     /// Parse a fragment, as in a `template`, rather than a whole document.
@@ -59,6 +61,7 @@ pub struct ParseOptions {
 /// Options of `html.sanitize`: hast-util-sanitize's schema; a field left out keeps the
 /// default schema's, which is GitHub's.
 #[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
 pub struct SanitizeOptions {
     /// Keep comments.
@@ -86,6 +89,7 @@ pub struct SanitizeOptions {
 
 /// A property a sanitize schema allows: by name, or a name and its allowed values.
 #[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(untagged)]
 pub enum AttributeDefinition {
     Name(String),
@@ -94,6 +98,7 @@ pub enum AttributeDefinition {
 
 /// A primitive property value.
 #[derive(Clone, Debug, PartialEq, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(untagged)]
 pub enum Primitive {
     Boolean(bool),
@@ -103,6 +108,7 @@ pub enum Primitive {
 
 /// Options of `html.highlight`, named as @shikijs/rehype names them.
 #[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
 pub struct HighlightOptions {
     /// The theme of each color mode, `light` first, as `{"light": …, "dark": …}`.
@@ -117,6 +123,7 @@ pub struct HighlightOptions {
 
 /// Options of `html.slug`, named as rehype-slug names them.
 #[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
 pub struct SlugOptions {
     /// Put before each id.
@@ -125,6 +132,7 @@ pub struct SlugOptions {
 
 /// Options of `html.toMarkdown`, named as hast-util-to-mdast names them.
 #[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
 pub struct ToMarkdownOptions {
     /// Wrap all phrasing content of the root in paragraphs, as for a whole document.
@@ -142,6 +150,7 @@ pub struct ToMarkdownOptions {
 
 /// Options of `html.raw`, named as hast-util-raw names them.
 #[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
 pub struct RawOptions {
     /// Node types, unknown to hast, to copy through as they are; their children are
@@ -153,6 +162,7 @@ pub struct RawOptions {
 
 /// Options of `html.format`, named as hast-util-format names them.
 #[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
 pub struct FormatOptions {
     /// Tag names of elements to put a blank line between, when both are one.
@@ -166,6 +176,7 @@ pub struct FormatOptions {
 
 /// One level of indentation.
 #[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(untagged)]
 pub enum Indent {
     Spaces(usize),

@@ -4,135 +4,194 @@ use textlane_core::{Error, Plugin};
 /// Builds a plugin from its name and its options, as JSON.
 pub(crate) type BuildPlugin = fn(&str, Value) -> Result<Box<dyn Plugin>, Error>;
 
+/// One public plugin: its name in a pipeline, its builder and, for the bindings' generated
+/// types, the schema of its options.
+pub(crate) struct PluginEntry {
+    pub(crate) name: &'static str,
+    pub(crate) build: BuildPlugin,
+    #[cfg(feature = "schema")]
+    pub(crate) options: Option<fn(&mut schemars::SchemaGenerator) -> schemars::Schema>,
+}
+
+macro_rules! plugin {
+    ($name:literal, $build:path, $options:ty) => {
+        PluginEntry {
+            name: $name,
+            build: |_, options| Ok(Box::new($build(read_options::<$options>(options)?))),
+            #[cfg(feature = "schema")]
+            options: Some(|generator| generator.subschema_for::<$options>()),
+        }
+    };
+    ($name:literal, $build:path) => {
+        PluginEntry {
+            name: $name,
+            build: |_, _| Ok(Box::new($build())),
+            #[cfg(feature = "schema")]
+            options: None,
+        }
+    };
+}
+
+/// Every public plugin, in the order the bindings list them.
+pub(crate) const PLUGINS: &[PluginEntry] = &[
+    #[cfg(feature = "md")]
+    plugin!("md.parse", textlane_md::parse, textlane_md::ParseOptions),
+    #[cfg(feature = "md")]
+    plugin!(
+        "md.directive",
+        textlane_md::directive,
+        textlane_md::DirectiveOptions
+    ),
+    #[cfg(feature = "md")]
+    plugin!("md.gfm", textlane_md::gfm, textlane_md::GfmOptions),
+    #[cfg(feature = "md")]
+    plugin!("md.definitionList", textlane_md::definition_list),
+    #[cfg(feature = "md")]
+    plugin!("md.math", textlane_md::math, textlane_md::MathOptions),
+    #[cfg(feature = "md")]
+    plugin!("md.mdx", textlane_md::mdx, textlane_md::MdxOptions),
+    #[cfg(feature = "md")]
+    plugin!(
+        "md.frontmatter",
+        textlane_md::frontmatter,
+        textlane_md::FrontmatterOptions
+    ),
+    #[cfg(feature = "md")]
+    plugin!("md.gemoji", textlane_md::gemoji),
+    #[cfg(feature = "md")]
+    plugin!(
+        "md.stringify",
+        textlane_md::stringify,
+        textlane_md::StringifyOptions
+    ),
+    #[cfg(feature = "md")]
+    plugin!(
+        "md.toHtml",
+        textlane_md::to_html,
+        textlane_md::ToHtmlOptions
+    ),
+    #[cfg(feature = "md")]
+    plugin!(
+        "md.toProse",
+        textlane_md::to_prose,
+        textlane_md::ToProseOptions
+    ),
+    #[cfg(feature = "html")]
+    plugin!(
+        "html.parse",
+        textlane_html::parse,
+        textlane_html::ParseOptions
+    ),
+    #[cfg(feature = "html")]
+    plugin!("html.raw", textlane_html::raw, textlane_html::RawOptions),
+    #[cfg(feature = "html")]
+    plugin!(
+        "html.format",
+        textlane_html::format,
+        textlane_html::FormatOptions
+    ),
+    #[cfg(feature = "html")]
+    plugin!(
+        "html.sanitize",
+        textlane_html::sanitize,
+        textlane_html::SanitizeOptions
+    ),
+    #[cfg(feature = "html")]
+    plugin!("html.slug", textlane_html::slug, textlane_html::SlugOptions),
+    #[cfg(feature = "highlight")]
+    plugin!(
+        "html.highlight",
+        textlane_html::highlight,
+        textlane_html::HighlightOptions
+    ),
+    #[cfg(feature = "html")]
+    plugin!(
+        "html.toMarkdown",
+        textlane_html::to_markdown,
+        textlane_html::ToMarkdownOptions
+    ),
+    #[cfg(feature = "html")]
+    plugin!("html.toProse", textlane_html::to_prose),
+    #[cfg(feature = "html")]
+    plugin!(
+        "html.stringify",
+        textlane_html::stringify,
+        textlane_html::StringifyOptions
+    ),
+    #[cfg(feature = "mdx")]
+    plugin!(
+        "mdx.compile",
+        textlane_mdx::compile,
+        textlane_mdx::CompileOptions
+    ),
+    #[cfg(feature = "prose")]
+    plugin!(
+        "prose.parse",
+        textlane_prose::parse,
+        textlane_prose::ParseOptions
+    ),
+    #[cfg(feature = "prose")]
+    plugin!(
+        "prose.equality",
+        textlane_prose::equality,
+        textlane_prose::EqualityOptions
+    ),
+    #[cfg(feature = "prose")]
+    plugin!(
+        "prose.passive",
+        textlane_prose::passive,
+        textlane_prose::PassiveOptions
+    ),
+    #[cfg(feature = "prose")]
+    plugin!(
+        "prose.readability",
+        textlane_prose::readability,
+        textlane_prose::ReadabilityOptions
+    ),
+    #[cfg(feature = "prose")]
+    plugin!("prose.repeatedWords", textlane_prose::repeated_words),
+    #[cfg(feature = "prose")]
+    plugin!(
+        "prose.sentenceSpacing",
+        textlane_prose::sentence_spacing,
+        textlane_prose::SentenceSpacingOptions
+    ),
+    #[cfg(feature = "prose")]
+    plugin!("prose.stringify", textlane_prose::stringify),
+    #[cfg(feature = "prose")]
+    plugin!(
+        "prose.smartypants",
+        textlane_prose::smartypants,
+        textlane_prose::SmartypantsOptions
+    ),
+    #[cfg(feature = "prose")]
+    plugin!(
+        "prose.quotes",
+        textlane_prose::quotes,
+        textlane_prose::QuotesOptions
+    ),
+    #[cfg(feature = "prose")]
+    plugin!(
+        "prose.contractions",
+        textlane_prose::contractions,
+        textlane_prose::ContractionsOptions
+    ),
+    #[cfg(feature = "prose")]
+    plugin!(
+        "prose.indefiniteArticle",
+        textlane_prose::indefinite_article
+    ),
+];
+
 /// The builder of the plugin a pipeline names, when the crate has one by that name.
 pub(crate) fn find_plugin(name: &str) -> Option<BuildPlugin> {
-    let build: BuildPlugin = match name {
-        #[cfg(feature = "md")]
-        "md.parse" => {
-            |_, options| Ok(Box::new(textlane_md::parse(read_options(options)?)))
-        }
-        #[cfg(feature = "md")]
-        "md.directive" => {
-            |_, options| Ok(Box::new(textlane_md::directive(read_options(options)?)))
-        }
-        #[cfg(feature = "md")]
-        "md.gfm" => |_, options| Ok(Box::new(textlane_md::gfm(read_options(options)?))),
-        #[cfg(feature = "md")]
-        "md.definitionList" => |_, _| Ok(Box::new(textlane_md::definition_list())),
-        #[cfg(feature = "md")]
-        "md.math" => |_, options| Ok(Box::new(textlane_md::math(read_options(options)?))),
-        #[cfg(feature = "md")]
-        "md.mdx" => |_, options| Ok(Box::new(textlane_md::mdx(read_options(options)?))),
-        #[cfg(feature = "md")]
-        "md.frontmatter" => {
-            |_, options| Ok(Box::new(textlane_md::frontmatter(read_options(options)?)))
-        }
-        #[cfg(feature = "md")]
-        "md.gemoji" => |_, _| Ok(Box::new(textlane_md::gemoji())),
-        #[cfg(feature = "md")]
-        "md.stringify" => {
-            |_, options| Ok(Box::new(textlane_md::stringify(read_options(options)?)))
-        }
-        #[cfg(feature = "md")]
-        "md.toHtml" => {
-            |_, options| Ok(Box::new(textlane_md::to_html(read_options(options)?)))
-        }
-        #[cfg(feature = "md")]
-        "md.toProse" => {
-            |_, options| Ok(Box::new(textlane_md::to_prose(read_options(options)?)))
-        }
-        #[cfg(feature = "html")]
-        "html.parse" => {
-            |_, options| Ok(Box::new(textlane_html::parse(read_options(options)?)))
-        }
-        #[cfg(feature = "html")]
-        "html.raw" => {
-            |_, options| Ok(Box::new(textlane_html::raw(read_options(options)?)))
-        }
-        #[cfg(feature = "html")]
-        "html.format" => {
-            |_, options| Ok(Box::new(textlane_html::format(read_options(options)?)))
-        }
-        #[cfg(feature = "html")]
-        "html.sanitize" => {
-            |_, options| Ok(Box::new(textlane_html::sanitize(read_options(options)?)))
-        }
-        #[cfg(feature = "html")]
-        "html.slug" => {
-            |_, options| Ok(Box::new(textlane_html::slug(read_options(options)?)))
-        }
-        #[cfg(feature = "highlight")]
-        "html.highlight" => {
-            |_, options| Ok(Box::new(textlane_html::highlight(read_options(options)?)))
-        }
-        #[cfg(feature = "html")]
-        "html.toMarkdown" => {
-            |_, options| Ok(Box::new(textlane_html::to_markdown(read_options(options)?)))
-        }
-        #[cfg(feature = "html")]
-        "html.toProse" => |_, _| Ok(Box::new(textlane_html::to_prose())),
-        #[cfg(feature = "html")]
-        "html.stringify" => {
-            |_, options| Ok(Box::new(textlane_html::stringify(read_options(options)?)))
-        }
-        #[cfg(feature = "mdx")]
-        "mdx.compile" => {
-            |_, options| Ok(Box::new(textlane_mdx::compile(read_options(options)?)))
-        }
-        #[cfg(feature = "prose")]
-        "prose.parse" => {
-            |_, options| Ok(Box::new(textlane_prose::parse(read_options(options)?)))
-        }
-        #[cfg(feature = "prose")]
-        "prose.equality" => {
-            |_, options| Ok(Box::new(textlane_prose::equality(read_options(options)?)))
-        }
-        #[cfg(feature = "prose")]
-        "prose.passive" => {
-            |_, options| Ok(Box::new(textlane_prose::passive(read_options(options)?)))
-        }
-        #[cfg(feature = "prose")]
-        "prose.readability" => |_, options| {
-            Ok(Box::new(textlane_prose::readability(read_options(
-                options,
-            )?)))
-        },
-        #[cfg(feature = "prose")]
-        "prose.repeatedWords" => |_, _| Ok(Box::new(textlane_prose::repeated_words())),
-        #[cfg(feature = "prose")]
-        "prose.sentenceSpacing" => |_, options| {
-            Ok(Box::new(textlane_prose::sentence_spacing(read_options(
-                options,
-            )?)))
-        },
-        #[cfg(feature = "prose")]
-        "prose.stringify" => |_, _| Ok(Box::new(textlane_prose::stringify())),
-        #[cfg(feature = "prose")]
-        "prose.smartypants" => |_, options| {
-            Ok(Box::new(textlane_prose::smartypants(read_options(
-                options,
-            )?)))
-        },
-        #[cfg(feature = "prose")]
-        "prose.quotes" => {
-            |_, options| Ok(Box::new(textlane_prose::quotes(read_options(options)?)))
-        }
-        #[cfg(feature = "prose")]
-        "prose.contractions" => |_, options| {
-            Ok(Box::new(textlane_prose::contractions(read_options(
-                options,
-            )?)))
-        },
-        #[cfg(feature = "prose")]
-        "prose.indefiniteArticle" => {
-            |_, _| Ok(Box::new(textlane_prose::indefinite_article()))
-        }
-        #[cfg(feature = "testing")]
-        _ => return crate::utils::testing::plugins::find_test_plugin(name),
-        #[cfg(not(feature = "testing"))]
-        _ => return None,
-    };
-    Some(build)
+    if let Some(entry) = PLUGINS.iter().find(|entry| entry.name == name) {
+        return Some(entry.build);
+    }
+    #[cfg(feature = "testing")]
+    return crate::utils::testing::plugins::find_test_plugin(name);
+    #[cfg(not(feature = "testing"))]
+    None
 }
 
 fn read_options<T: serde::de::DeserializeOwned + Default>(

@@ -4,11 +4,13 @@ use std::sync::atomic::AtomicBool;
 
 /// Options of `md::parse`.
 #[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
 pub struct ParseOptions {}
 
 /// Options of `md::to_html`, named as remark-rehype names them.
 #[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
 pub struct ToHtmlOptions {
     /// Keep raw HTML in the tree instead of dropping it.
@@ -33,6 +35,7 @@ pub struct ToHtmlOptions {
 
 /// Options of `md::to_prose`, named as remark-retext and mdast-util-to-nlcst name them.
 #[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct ToProseOptions {
     /// Node types to leave out, besides `table`, `tableRow` and `tableCell`.
@@ -43,6 +46,7 @@ pub struct ToProseOptions {
 
 /// Options of `md::stringify`, named as mdast-util-to-markdown names them.
 #[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
 pub struct StringifyOptions {
     /// The marker of unordered list items: `*`, `+` or `-`.
@@ -111,6 +115,7 @@ impl Default for StringifyOptions {
 
 /// A character to escape where it would otherwise start or end syntax.
 #[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
 pub struct UnsafePattern {
     /// The character, escaped as a regular expression would need it.
@@ -135,6 +140,7 @@ pub struct UnsafePattern {
 
 /// One name or several.
 #[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(untagged)]
 pub enum Names {
     One(String),
@@ -153,6 +159,7 @@ impl Names {
 
 /// Options of `md::gfm`, named as remark-gfm names them.
 #[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
 pub struct GfmOptions {
     /// Let one tilde, `~a~`, form strikethrough, as well as two.
@@ -185,6 +192,7 @@ pub struct GfmSlot(pub Option<GfmOptions>);
 pub struct DefinitionListSlot(pub bool);
 /// Options of `md::math`, named as remark-math names them.
 #[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
 pub struct MathOptions {
     /// Let one dollar, `$a$`, form math in text, as well as two.
@@ -201,6 +209,7 @@ impl Default for MathOptions {
 
 /// Options of `md::directive`, named as mdast-util-directive's serializer names them.
 #[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
 pub struct DirectiveOptions {
     /// Write an empty attribute as its name alone, `{a}`, rather than `{a=""}`.
@@ -233,6 +242,7 @@ pub struct MathSlot(pub Option<MathOptions>);
 
 /// Options of `md::mdx`, named as remark-mdx and mdast-util-mdx-jsx's serializer name them.
 #[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
 pub struct MdxOptions {
     /// The quote of JSX attribute values: `"` (when unset) or `'`.
@@ -385,6 +395,67 @@ fn is_truthy(value: &serde_json::Value) -> bool {
         Value::String(text) => !text.is_empty(),
         Value::Number(number) => number.as_f64().is_some_and(|n| n != 0.0 && !n.is_nan()),
         _ => true,
+    }
+}
+
+#[cfg(feature = "schema")]
+impl schemars::JsonSchema for FrontmatterOptions {
+    fn schema_name() -> std::borrow::Cow<'static, str> {
+        "FrontmatterOptions".into()
+    }
+
+    fn json_schema(generator: &mut schemars::SchemaGenerator) -> schemars::Schema {
+        let matter = generator.subschema_for::<Matter>();
+        let preset = serde_json::json!({ "enum": ["yaml", "toml"] });
+        schemars::json_schema!({
+            "description": "The kinds of matter to recognize, as remark-frontmatter takes them: a preset, a matter, or a list of them; `yaml` when unset.",
+            "anyOf": [preset, matter, { "type": "array", "items": { "anyOf": [preset, matter] } }],
+        })
+    }
+}
+
+#[cfg(feature = "schema")]
+impl schemars::JsonSchema for Matter {
+    fn schema_name() -> std::borrow::Cow<'static, str> {
+        "Matter".into()
+    }
+
+    // Its fences are definitions of their own, so the generated types get names for them
+    fn json_schema(generator: &mut schemars::SchemaGenerator) -> schemars::Schema {
+        let path = generator
+            .settings()
+            .definitions_path
+            .trim_start_matches('/')
+            .to_string();
+        let definitions = generator.definitions_mut();
+        definitions.insert(
+            "FencePair".into(),
+            serde_json::json!({
+                "description": "Different opening and closing fences.",
+                "type": "object",
+                "properties": { "open": { "type": "string" }, "close": { "type": "string" } },
+                "required": ["open", "close"],
+            }),
+        );
+        definitions.insert(
+            "Fence".into(),
+            serde_json::json!({
+                "description": "A fence, or its opening and closing ones.",
+                "anyOf": [{ "type": "string" }, { "$ref": format!("#/{path}/FencePair") }],
+            }),
+        );
+        let fence = serde_json::json!({ "$ref": format!("#/{path}/Fence") });
+        schemars::json_schema!({
+            "description": "One kind of frontmatter: the node `type` it becomes and its fences, a `marker` repeated three times or a whole `fence`.",
+            "type": "object",
+            "properties": {
+                "type": { "type": "string" },
+                "marker": fence,
+                "fence": fence,
+                "anywhere": { "type": "boolean" },
+            },
+            "required": ["type"],
+        })
     }
 }
 

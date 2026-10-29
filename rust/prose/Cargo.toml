@@ -11,10 +11,15 @@ description = "Textlane's prose plugins: natural-language parsing, serializing a
 keywords = ["prose", "ast", "textlane"]
 categories = ["text-processing", "parser-implementations"]
 
+[features]
+# The options' JSON Schema, which the bindings' types are generated from
+schema = ["dep:schemars"]
+
 [dependencies]
 textlane-core.workspace = true
 serde.workspace = true
 regex.workspace = true
+schemars = { workspace = true, optional = true }
 
 [lints]
 workspace = true

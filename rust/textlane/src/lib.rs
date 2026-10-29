@@ -10,11 +10,17 @@ mod actions {
     pub(crate) mod case {
         pub(crate) mod run;
     }
+    pub(crate) mod file {
+        pub(crate) mod write;
+    }
     pub(crate) mod package {
         pub(crate) mod version;
     }
     pub(crate) mod plugin {
+        #[cfg(feature = "schema")]
+        pub(crate) mod describe;
         pub(crate) mod find;
+        pub(crate) mod list;
     }
 }
 #[cfg(feature = "testing")]
@@ -37,7 +43,11 @@ mod bindings {
 
 #[cfg(feature = "testing")]
 pub use actions::case::run::run_case;
+pub use actions::file::write::write_file;
 pub use actions::package::version::read_version;
+#[cfg(feature = "schema")]
+pub use actions::plugin::describe::describe_plugins;
+pub use actions::plugin::list::list_plugins;
 pub use models::pipeline::{Api, Pipeline};
 pub use models::processor::{FrozenProcessor, Output, Processor};
 pub use textlane_core::*;

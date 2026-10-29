@@ -11,6 +11,10 @@ description = "Textlane's MDX compiler: hast into JavaScript, with the MDX trans
 keywords = ["mdx", "javascript", "ast", "textlane"]
 categories = ["text-processing", "parser-implementations"]
 
+[features]
+# The options' JSON Schema, which the bindings' types are generated from
+schema = ["dep:schemars"]
+
 [dependencies]
 textlane-core.workspace = true
 oxc_allocator.workspace = true
@@ -22,6 +26,7 @@ oxc_span.workspace = true
 oxc_syntax.workspace = true
 serde.workspace = true
 stacker.workspace = true
+schemars = { workspace = true, optional = true }
 
 [lints]
 workspace = true
