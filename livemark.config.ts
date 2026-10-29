@@ -6,9 +6,35 @@ export default defineConfig({
   description: "Fast Markdown pipeline",
   logo: "/logo.svg",
   favicon: "/logo.png",
-  include: ["README.md", "CONTRIBUTING.md", "CHANGELOG.md", "rust/docs/**/*.md"],
+  include: [
+    "python/README.md",
+    "python/docs/**/*.md",
+    "typescript/README.md",
+    "typescript/docs/**/*.md",
+    "rust/textlane/README.md",
+    "rust/docs/**/*.md",
+    "CONTRIBUTING.md",
+    "CHANGELOG.md",
+  ],
   skills: [".skills/*/SKILL.md"],
   sections: [
+    { title: "Python", prefix: "/python/", icon: "code" },
+    { title: "TypeScript", prefix: "/typescript/", icon: "code-xml" },
+    { title: "Rust", prefix: "/rust/", icon: "cog" },
+    {
+      title: "Contributing",
+      type: "custom",
+      url: "/contributing/",
+      icon: "heart-handshake",
+      position: "sidebar",
+    },
+    {
+      title: "Changelog",
+      type: "custom",
+      url: "/changelog/",
+      icon: "history",
+      position: "sidebar",
+    },
     {
       title: "GitHub",
       type: "custom",
@@ -18,13 +44,33 @@ export default defineConfig({
   ],
   patches: [
     {
-      file: "README.md",
+      file: "python/README.md",
       article: {
         title: "Introduction",
-        description: "What textlane is and how to install it.",
+        description: "Install textlane for Python.",
         icon: "rocket",
         order: 1,
-        path: "/introduction/",
+        path: "/python/introduction/",
+      },
+    },
+    {
+      file: "typescript/README.md",
+      article: {
+        title: "Introduction",
+        description: "Install textlane for Node.js.",
+        icon: "rocket",
+        order: 1,
+        path: "/typescript/introduction/",
+      },
+    },
+    {
+      file: "rust/textlane/README.md",
+      article: {
+        title: "Introduction",
+        description: "Install textlane for Rust.",
+        icon: "rocket",
+        order: 1,
+        path: "/rust/introduction/",
       },
     },
     {

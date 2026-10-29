@@ -1,6 +1,6 @@
 # textlane
 
-Textlane is a Rust-native text processing pipeline: a replacement for unified whose plugins run natively, with existing JavaScript plugins still able to join a pipeline. It is one cargo workspace in `rust/`, shipped three ways: crates.io (`cargo add textlane`), npm (`textlane` in `typescript/`, a loader plus one prebuilt napi addon per platform) and PyPI (`textlane` in `python/`, PyO3 wheels built by maturin), all at one version. The repo root holds the tooling shared across them and textlane's own docs site, written in Markdown under `rust/docs/` and built with livemark.
+Textlane is a Rust-native text processing pipeline: a replacement for unified whose plugins run natively, with existing JavaScript plugins still able to join a pipeline. It is one cargo workspace in `rust/`, shipped three ways: crates.io (`cargo add textlane`), npm (`textlane` in `typescript/`, a loader plus one prebuilt napi addon per platform) and PyPI (`textlane` in `python/`, PyO3 wheels built by maturin), all at one version. The repo root holds the tooling shared across them and textlane's own docs site, written in Markdown under `python/docs/`, `typescript/docs/` and `rust/docs/` and built with livemark.
 
 ## Terminology
 
@@ -10,7 +10,7 @@ Textlane is a Rust-native text processing pipeline: a replacement for unified wh
 - **pipeline** — a processor built with `.use()`: parse, transform and serialize stages run in order over a syntax tree
 - **plugin** — one pipeline stage, native Rust or a host-language (JavaScript, Python) function called through a binding
 - **conformance suite** — language-neutral JSON cases, each a pipeline, an input and the expected output, in the style of the JSON-Schema test suite; every implementation runs the same cases
-- **docs site** — this repo's livemark project: `livemark.config.ts`, `.livemark/` and the pages in `rust/docs/` plus the root `README.md`, `CONTRIBUTING.md` and `CHANGELOG.md`, built by `pnpm build:docs` and deployed to textlane.dev
+- **docs site** — this repo's livemark project: `livemark.config.ts`, `.livemark/` the Python, TypeScript and Rust sections from the pages in `python/docs/`, `typescript/docs/` and `rust/docs/` and each package's `README.md`, plus the root `CONTRIBUTING.md` and `CHANGELOG.md`, built by `pnpm build:docs` and deployed to textlane.dev
 
 ## Rules
 
@@ -86,10 +86,10 @@ The root is a private pnpm workspace (`package.json`, `pnpm-workspace.yaml`): fo
   - `md/src/` — a port of micromark and the mdast utilities: `utils/` holds the engines (`tokenizer`, `compiler`, `serializer`, `converter`), `actions/<construct|node>/<verb>.rs` one handler each (`tokenize`, `resolve`, `compile`, `stringify`, `convert`), `plugins/` the public stages and syntax extensions
   - `html/src/` — a port of parse5 and hast-util-from-parse5: `utils/tokenizer` (the tokenizer, pulled one token at a time), `utils/builder` (the tree builder over a linked arena DOM, then the conversion to hast), `utils/converter` (hast to mdast, hast-util-to-mdast's state, its flat node store and `wrap`), `helpers/` the tag, entity, foreign-content and property-information tables
   - Unit tests beside their module as `<module>_unit.rs`
-  - `docs/` — the docs site's Markdown pages, outside the crate's `include`
-- `typescript/` — the npm package `textlane`: `index.ts` loads the addon `actions/addon/resolve.ts` finds; `settings.ts` lists the platforms; `scripts/` packs and publishes the platform packages into `typescript/compile/` (**`package-distribution`**)
+  - `docs/` — the docs site's Rust section, outside the crate's `include`
+- `typescript/` — the npm package `textlane`: `index.ts` loads the addon `actions/addon/resolve.ts` finds; `settings.ts` lists the platforms; `scripts/` packs and publishes the platform packages into `typescript/compile/` (**`package-distribution`**); `docs/` the docs site's TypeScript section
 - `conformance/` — the language-neutral conformance suite and a private workspace package: `test-schema.json`, `tests/<area>/<feature>.json`, `pending.json` (what the crate does not pass yet) and `sources/` importers (`pnpm -C conformance import:commonmark`, one script per source), run by `rust/textlane/tests/conformance.rs`, `typescript/-test/conformance.unit.ts` and `python/-test/conformance_unit.py` (**`conformance-suite`**)
-- `python/` — the PyPI package `textlane`: `pyproject.toml`, which points maturin at `rust/textlane/Cargo.toml` with `bindings = "pyo3"` and the `python` feature, `scripts/copy-skills.sh`, which stages the shipped skills as wheel data, and `scripts/test.sh`, which builds a `testing` wheel and runs the conformance suite
+- `python/` — the PyPI package `textlane`: `pyproject.toml`, which points maturin at `rust/textlane/Cargo.toml` with `bindings = "pyo3"` and the `python` feature, `scripts/copy-skills.sh`, which stages the shipped skills as wheel data, and `scripts/test.sh`, which builds a `testing` wheel and runs the conformance suite; `docs/` the docs site's Python section
 - `benchmark/` — a private workspace package timing textlane against other Markdown libraries: seeded documents, `adapters/` per language (npm deps here, a uv project, an own-workspace cargo crate), `.cache/report.html` (**`benchmark-development`**)
 - `.skills/` — the shipped agent skills
 - `README.md`, `CONTRIBUTING.md` — the GitHub overview and the contributor guide; `rust/textlane/README.md`, `typescript/README.md` and `python/README.md` are each registry's page
@@ -104,7 +104,7 @@ Dot-directories hold non-package code: `.agents/` repo skills, `.humans/` design
 - `package.json` script names are `verb[:object]` (`check:lint`, `build:docs`), never noun-first
 - Specs: Vitest via `vite-plus/test`, `<module>.unit.ts`, no "Arrange / Act / Assert" comments
 - Rust: edition 2024, rustfmt (90 columns), clippy with `-D warnings`; snake_case **verb_noun** functions; no `unwrap` / `expect` / `unsafe` outside tests (**`rust-development`**)
-- Docs pages in `rust/docs/` are Markdown with livemark frontmatter (`title`, `description`, `icon`, `order`); the root `README.md`, `CONTRIBUTING.md` and `CHANGELOG.md` join the site through `patches` in `livemark.config.ts`
+- Docs pages in `python/docs/`, `typescript/docs/` and `rust/docs/` are Markdown with livemark frontmatter (`title`, `description`, `path` under the language's prefix, `icon`, `order`); each package's `README.md` becomes its section's Introduction, and the root `CONTRIBUTING.md` and `CHANGELOG.md` join every section's sidebar, all through `patches` and `sections` in `livemark.config.ts`
 - Commits: Conventional Commits, typed by what an installer gets (below)
 
 ## Releases

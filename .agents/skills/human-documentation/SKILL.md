@@ -65,8 +65,9 @@ files, and is no longer true.
   `description`, which decides whether a skill gets picked up at all.
 - `README.md`, `rust/textlane/README.md`, `typescript/README.md`, `python/README.md` — the three package
   READMEs share their usage section; change all three together.
-- `rust/docs/` — the user manual, in Markdown with livemark frontmatter; a page should build
-  cleanly with `pnpm build:docs`.
+- `python/docs/`, `typescript/docs/` and `rust/docs/` — the user manual, one site section per language, in Markdown with livemark frontmatter; a page should build
+  cleanly with `pnpm build:docs`. The three sections mirror each other: a page added to one gets its
+  counterpart in the others, its `path` under that language's prefix.
 - `.humans/` — the design and decision pages; a changed decision or crate layout makes them
   false like any other document.
 
@@ -77,7 +78,7 @@ area they are in: hard rules, invariants that fail silently, terminology, one li
 and per source folder, and the skills tables. Procedure, rationale and an area's traps go in that
 area's skill. Keep `AGENTS.md` near 10 KB.
 
-- How to **use** textlane (pipelines, plugins, the bindings) → the matching `rust/docs/` page
+- How to **use** textlane (pipelines, plugins, the bindings) → the matching page in each language's `docs/`
   and the shipped skill under `.skills/` covering it (`textlane-usage`), kept in step; each fact
   in exactly one.
 - How to **work on** textlane → a repo skill in `.agents/skills/`.

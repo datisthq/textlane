@@ -1,6 +1,7 @@
 ---
 title: Overview
-description: What textlane is for and how it is built.
+description: What textlane is for and how the Rust crate is built.
+path: /rust/overview/
 icon: book-open
 order: 2
 ---
@@ -12,17 +13,18 @@ parses text into a syntax tree, runs plugins over it and serializes the result. 
 and its most expensive plugins run in Rust; existing JavaScript plugins can still take part,
 called only at the stage where they run.
 
-## One crate, three languages
+## The Rust crate
 
-All behaviour lives in one Rust crate. The npm package loads it as a prebuilt native addon and
-the PyPI package as a prebuilt extension, so each language gets the same pipeline at the same
-version.
+`cargo add textlane` adds the crate that holds all of textlane's behaviour. It re-exports one
+crate per domain as a module of its name: `textlane::md`, `textlane::html`,
+`textlane::mdx` and `textlane::prose`. The npm package loads the same crate as a prebuilt native addon and the PyPI
+package as a prebuilt extension, so each language gets the same pipeline at the same version.
 
 ## Conformance
 
 Compatibility is defined by a language-neutral conformance suite: JSON cases, each naming a
-pipeline, an input and the expected output, ported from the upstream unified, remark, rehype
-and MDX test suites. Every implementation runs the same cases.
+pipeline, an input and the expected output, ported from the upstream unified, remark, rehype,
+retext and MDX test suites. Every implementation runs the same cases.
 
 ## Status
 

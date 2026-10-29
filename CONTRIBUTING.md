@@ -40,7 +40,7 @@ pnpm install
 pnpm start
 ```
 
-`pnpm install` also fetches the Rust crates when `cargo` is on your `PATH`. `pnpm start` serves the docs site in `rust/docs/` with livemark, with live reload. To run every check:
+`pnpm install` also fetches the Rust crates when `cargo` is on your `PATH`. `pnpm start` serves the docs site with livemark, with live reload. To run every check:
 
 ```bash
 pnpm test
@@ -103,7 +103,7 @@ A change is ready to push when `pnpm test` is green.
 - **Rust**: edition 2024 on the pinned stable toolchain, clippy-clean with no `unwrap`/`expect` outside tests; unit tests beside the module as `<module>_unit.rs`, run one with `cargo test <name>` from `rust/`.
 - **TypeScript**: strict mode is on. Don't use `any`, `as`-casts, or non-null `!` without permission. Full ESM imports with the `.ts` extension; tests beside the module as `<module>.unit.ts`.
 - **Comments**: docs on public items only. Skip narrative comments inside function bodies.
-- **Docs pages**: Markdown in `rust/docs/` with livemark frontmatter.
+- **Docs pages**: Markdown in `python/docs/`, `typescript/docs/` and `rust/docs/`, one site section per language, with livemark frontmatter.
 - **Formatting**: `pnpm format`. 2-space indent, no semicolons, double quotes (LF, UTF-8); rustfmt at 90 columns.
 
 ### Proposing a change

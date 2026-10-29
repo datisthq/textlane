@@ -43,7 +43,7 @@ action on the issue's input and asserting on its result. Run it with `cargo test
 ## 5. Fix it minimally, through the area skill
 
 `rust-development` for the crate and its bindings, `package-distribution` for the packages.
-Change only what the root cause needs. A behaviour a user or agent can see updates its `rust/docs/` page and the
+Change only what the root cause needs. A behaviour a user or agent can see updates its pages in each language's `docs/` and the
 matching shipped `.skills/` skill in the same commit.
 
 ## 6. Gate it

@@ -31,7 +31,7 @@ in it.
 
 - behaviour added to a binding (`typescript/`, `python/`) instead of the crate;
 - a changed plugin name, option, AST node shape or binding export without the matching
-  `rust/docs/` page and shipped `.skills/` skill;
+  `python/docs/`, `typescript/docs/` and `rust/docs/` pages and shipped `.skills/` skill;
 - `PLATFORMS` and the release matrix drifting apart (**`package-distribution`**);
 - an `unwrap` or `expect` outside tests, or a default feature that pulls in napi or PyO3;
 - a commit typed `feat` or `fix` that does not change what an installer gets, or a package change

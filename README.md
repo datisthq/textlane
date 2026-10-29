@@ -11,6 +11,7 @@ serializers run natively, while existing JavaScript plugins can still join the s
 
 Every channel ships the same Rust crate at the same version. Textlane is pre-release: the
 pipeline API is not published yet. The docs live at [textlane.dev](https://textlane.dev), built
-with livemark from `rust/docs/`. This repository holds the crate in `rust/` and the npm and PyPI
+with livemark from `python/docs/`,
+`typescript/docs/` and `rust/docs/`. This repository holds the crate in `rust/` and the npm and PyPI
 bindings in `typescript/` and `python/`; see [Contributing](CONTRIBUTING.md) for the layout and
 the commands.

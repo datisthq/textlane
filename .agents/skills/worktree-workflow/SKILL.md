@@ -30,7 +30,7 @@ server.
 
 ## Running the docs site
 
-Start the server from inside the worktree: `pnpm start` serves the worktree's own `rust/docs/`, and
+Start the server from inside the worktree: `pnpm start` serves the worktree's own docs pages, and
 `pnpm build:docs` writes into the worktree's `.livemark/build`, never the root's. The first
 cargo run compiles into the worktree's own `rust/target/`, which takes a minute.
 

@@ -28,7 +28,7 @@ gate belongs to the lefthook pre-push hook and CI; a commit runs the **commit ga
 | `pnpm -C python test:unit`                              | the Python conformance runner; builds a wheel, needs `uv`                        |
 | `vp test .scripts/-test/conformance.unit.ts`            | every conformance test file against its schema                                   |
 | `vp test .scripts/-test/docs.unit.ts`                   | paths, scripts and skill tables in docs                                          |
-| `pnpm build:docs`                                       | the real build over `rust/docs/`                                                 |
+| `pnpm build:docs`                                       | the real build over every docs page                                              |
 
 The first clippy or test run after a dependency change compiles for a minute; later ones take
 seconds. The changed files come from `git diff --name-only main...` plus `git status --short`.
@@ -38,8 +38,10 @@ seconds. The changed files come from `git diff --name-only main...` plus `git st
 Pick the **highest** rung the diff reaches, and run everything that rung lists.
 
 1. **Markdown, copy, a docs page.** `vp fmt --check` on Markdown files. For `AGENTS.md`,
-   `README.md`, `CONTRIBUTING.md` or a skill, add the docs guard. For a page under `rust/docs/`, run
+   `README.md`, `CONTRIBUTING.md` or a skill, add the docs guard. For a page under a language's `docs/`, run
    `pnpm build:docs`: a page livemark cannot read fails there.
+   `livemark preview` keeps serving the old asset hashes after a rebuild, so restart it
+   before looking at the page.
 2. **Logic** — an action or a binding. `pnpm -C rust check:lint` and `cargo test` on the
    module. A new or changed test runs on its own first and fails before the fix. A binding
    change adds the clippy run for its feature.
