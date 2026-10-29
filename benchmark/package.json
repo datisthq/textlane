@@ -1,0 +1,26 @@
+{
+  "name": "textlane-benchmark",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate:data": "node @generate.ts",
+    "measure": "node @measure.ts",
+    "setup:tools": "node @setup.ts",
+    "show:report": "node @report.ts",
+    "test": "pnpm test:unit",
+    "test:unit": "vp test"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "14.2.0",
+    "@types/node": "24.2.0",
+    "markdown-it": "15.0.3",
+    "marked": "18.1.1",
+    "micromark": "4.0.3",
+    "rehype-stringify": "10.0.1",
+    "remark-parse": "11.0.0",
+    "remark-rehype": "11.1.2",
+    "unified": "11.0.5",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  }
+}

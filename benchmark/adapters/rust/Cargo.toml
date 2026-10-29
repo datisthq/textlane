@@ -1,0 +1,22 @@
+[package]
+name = "textlane-benchmark"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+# its own workspace, so the rivals never enter rust/Cargo.lock
+[workspace]
+
+[dependencies]
+textlane = { path = "../../../rust/textlane", default-features = false, features = [
+  "md",
+  "html",
+] }
+serde_json = "1.0.145"
+comrak = "0.59.0"
+pulldown-cmark = "0.13.5"
+markdown = "1.0.0"
+
+[profile.release]
+codegen-units = 1
+lto = true

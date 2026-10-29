@@ -18,7 +18,7 @@
     "squash": "node .scripts/squash-branch.ts",
     "start": "livemark start",
     "test": "pnpm check && pnpm test:unit",
-    "test:unit": "vp test && pnpm -C typescript test:unit && pnpm -C rust test:unit && pnpm -C python test:unit",
+    "test:unit": "vp test && pnpm -C typescript test:unit && pnpm -C rust test:unit && pnpm -C python test:unit && pnpm -C benchmark test:unit",
     "update:deps": "ncu -ws --root -u --cooldown 7d"
   },
   "devDependencies": {

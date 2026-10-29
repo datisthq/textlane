@@ -39,16 +39,17 @@ Depth lives in skills: this file carries invariants, the skills carry procedure.
 
 Repo skills live in `.agents/skills/` (reached by Claude Code through the `.claude/skills` symlink `pnpm install` creates) and are never published:
 
-| skill                  | when                                                                       |
-| ---------------------- | -------------------------------------------------------------------------- |
-| `change-review`        | reviewing a pull request or the working diff — also what CI review runs    |
-| `change-verification`  | checking a change works — the smallest lint/type/unit slice and a look     |
-| `conformance-suite`    | adding or porting conformance cases, the runners and the `testing` feature |
-| `human-documentation`  | a page for people under `.humans/`, the docs-truth pass, where facts go    |
-| `issue-resolution`     | taking one issue or bug report to one tested commit in a worktree          |
-| `package-distribution` | the npm and PyPI bindings, platform packages and the release addons matrix |
-| `rust-development`     | working in `rust/` — layout, cargo commands, features, the bindings        |
-| `worktree-workflow`    | starting, running and landing a `.worktrees/<name>` branch                 |
+| skill                   | when                                                                       |
+| ----------------------- | -------------------------------------------------------------------------- |
+| `benchmark-development` | speed and memory against other Markdown libraries, in `benchmark/`         |
+| `change-review`         | reviewing a pull request or the working diff — also what CI review runs    |
+| `change-verification`   | checking a change works — the smallest lint/type/unit slice and a look     |
+| `conformance-suite`     | adding or porting conformance cases, the runners and the `testing` feature |
+| `human-documentation`   | a page for people under `.humans/`, the docs-truth pass, where facts go    |
+| `issue-resolution`      | taking one issue or bug report to one tested commit in a worktree          |
+| `package-distribution`  | the npm and PyPI bindings, platform packages and the release addons matrix |
+| `rust-development`      | working in `rust/` — layout, cargo commands, features, the bindings        |
+| `worktree-workflow`     | starting, running and landing a `.worktrees/<name>` branch                 |
 
 Shipped skills live in `.skills/` and teach coding agents to **use** textlane; they are published on the docs site and in the npm and PyPI packages. Read the matching one before changing the behaviour it describes, and update it in the same commit:
 
@@ -70,6 +71,7 @@ Shipped skills live in `.skills/` and teach coding agents to **use** textlane; t
 - `pnpm measure:coverage` — the unit tests with coverage
 - `pnpm scan:leaks` / `pnpm scan:vulns` / `pnpm scan` — gitleaks / semgrep / both
 - `pnpm update:deps` — bump npm dependencies past a 7-day cooldown
+- `pnpm -C benchmark setup:tools` / `pnpm -C benchmark measure` / `pnpm -C benchmark show:report` — the Markdown-to-HTML benchmark against other libraries (**`benchmark-development`**)
 - `pnpm -C typescript pack:platforms --addons <dir>` / `pnpm -C typescript release` / `pnpm -C python release` / `pnpm -C rust release` — lay out and publish npm / PyPI / crates.io; run by the release workflow only
 - `pnpm squash <branch> -m "<subject>"` — land a worktree branch on local `main` as one commit (**`worktree-workflow`**)
 
@@ -88,6 +90,7 @@ The root is a private pnpm workspace (`package.json`, `pnpm-workspace.yaml`): fo
 - `typescript/` — the npm package `textlane`: `index.ts` loads the addon `actions/addon/resolve.ts` finds; `settings.ts` lists the platforms; `scripts/` packs and publishes the platform packages into `typescript/compile/` (**`package-distribution`**)
 - `conformance/` — the language-neutral conformance suite and a private workspace package: `test-schema.json`, `tests/<area>/<feature>.json`, `pending.json` (what the crate does not pass yet) and `sources/` importers (`pnpm -C conformance import:commonmark`, one script per source), run by `rust/textlane/tests/conformance.rs`, `typescript/-test/conformance.unit.ts` and `python/-test/conformance_unit.py` (**`conformance-suite`**)
 - `python/` — the PyPI package `textlane`: `pyproject.toml`, which points maturin at `rust/textlane/Cargo.toml` with `bindings = "pyo3"` and the `python` feature, `scripts/copy-skills.sh`, which stages the shipped skills as wheel data, and `scripts/test.sh`, which builds a `testing` wheel and runs the conformance suite
+- `benchmark/` — a private workspace package timing textlane against other Markdown libraries: seeded documents, `adapters/` per language (npm deps here, a uv project, an own-workspace cargo crate), `.cache/report.html` (**`benchmark-development`**)
 - `.skills/` — the shipped agent skills
 - `README.md`, `CONTRIBUTING.md` — the GitHub overview and the contributor guide; `rust/textlane/README.md`, `typescript/README.md` and `python/README.md` are each registry's page
 

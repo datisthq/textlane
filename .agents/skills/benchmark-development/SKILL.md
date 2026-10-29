@@ -1,0 +1,61 @@
+---
+name: benchmark-development
+description: Use when working in `benchmark/` — textlane's Markdown-to-HTML speed and memory against other libraries in Rust, Node.js and Python. Covers commands, profiles, the adapter contract and its traps.
+---
+
+# Benchmark
+
+`benchmark/` measures textlane converting Markdown to HTML from Rust, Node.js and Python against
+eleven other libraries (comrak, pulldown-cmark, markdown-rs, unified, micromark, markdown-it,
+marked, markdown-it-py, mistune, Python-Markdown, cmark). It ships nothing and is not a release
+component: its commits are `chore(benchmark)`. `benchmark/README.md` is the user reference;
+this skill is how to change it without making the numbers lie.
+
+## Commands
+
+- `pnpm -C benchmark test:unit` — the units in `benchmark/-test/`; the root `test:unit` chains
+  it, and the root `tsgo --noEmit` types it. Nothing there runs a real library, and the section
+  has no CI job: its numbers need a fixed, idle machine
+- `pnpm -C benchmark setup:tools` — `uv sync --frozen` in `benchmark/adapters/python/`, the
+  `testing` addon into `.cache/addon/`, the `testing` wheel installed into that venv, and the
+  Rust adapters. Rerun it after a crate change: the wheel is not rebuilt per run
+- `pnpm -C benchmark measure` — narrowed with `--case`, `--size`, `--tool`; `--runs 1 --warmup 0`
+  for a smoke run. After a textlane change re-measure only
+  `--tool textlane-rust --tool textlane-typescript --tool textlane-python`; rivals carry over
+- `pnpm -C benchmark show:report` — merges `.cache/results/`, latest per case, size and tool
+
+## Layout
+
+`@*.ts` are the entry points; `generate/` the seeded writer, `profiles/` the document shapes,
+`cases/` what `measure` runs, `harness/` running and timing, `tools/` one `Tool` per library,
+`report/` the HTML, `adapters/<language>/` the scripts and binaries that convert. Everything
+generated lives in its `.cache/` (gitignored repo-wide).
+
+## The adapter contract
+
+An adapter takes `<document> <repeat>`, imports its library and reads the document untimed,
+then converts `repeat` times and prints `{"elapsedMs", "outputBytes"}` last. The harness picks
+`repeat` so a run converts at least 8MB, and divides. Every library gets the same job:
+CommonMark only, raw HTML passed through (`allowDangerousHtml`, `unsafe`, `html: true`).
+
+## Adding a library
+
+Write the adapter beside the others, add a `Tool` in `tools/<language>.ts`, list it in `TOOLS`,
+and run `measure --size 10KB --size 100KB --runs 1 --warmup 0 --tool <name>`: its HTML size
+must sit near the others', or it renders a different document. Pin it: npm by exact version
+(the workspace's seven-day quarantine applies), Python in `pyproject.toml` under
+`exclude-newer`, Rust in `adapters/rust/Cargo.lock`. Whatever it does differently from textlane
+(no tree, not CommonMark) goes in its `caveats`, which the report prints.
+
+## Traps
+
+- The bindings expose no pipeline yet: the Node.js and Python adapters call `runCase` /
+  `run_case` of a `testing` build, paying a JSON round trip, a pipeline rebuild and the trace
+  per document. Switch them to the real API the day the bindings get one
+- The Rust adapters are their own cargo workspace, so comrak and friends never enter
+  `rust/Cargo.lock`; they build with release, LTO and one codegen unit, as `rust/` does
+- `spec` snippets that leave a fence or raw HTML block open, or define a reference, would
+  change every later snippet: `readSnippets` drops them, and a thematic break at column 0
+  closes any list, quote or indented code between snippets
+- Memory is sampled every 50ms, so a run shorter than that shows none; it includes the runtime,
+  so Node.js starts tens of megabytes above Rust

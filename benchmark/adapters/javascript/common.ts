@@ -1,0 +1,12 @@
+import { readFileSync } from "node:fs"
+
+/** Converts `<input> <repeat>` times and prints `{elapsedMs, outputBytes}`; imports are untimed. */
+export function runAdapter(convert: (markdown: string) => string) {
+  const [path = "", repeat = "1"] = process.argv.slice(2)
+  const markdown = readFileSync(path, "utf8")
+  let html = ""
+  const started = performance.now()
+  for (let index = 0; index < Number(repeat); index++) html = convert(markdown)
+  const elapsedMs = performance.now() - started
+  console.log(JSON.stringify({ elapsedMs, outputBytes: Buffer.byteLength(html) }))
+}
