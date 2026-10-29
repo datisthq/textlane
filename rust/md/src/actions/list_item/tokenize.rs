@@ -135,7 +135,7 @@ fn after(tokenizer: &mut Tokenizer) -> State {
     if blank {
         prefix += 1;
     }
-    prefix += read_def_list_indent(tokenizer, start);
+    prefix += read_def_list_indent(tokenizer, start) as u32;
     let continued = tokenizer.tokenize_state.document_continued;
     if let Some(container) = tokenizer
         .tokenize_state
@@ -143,7 +143,7 @@ fn after(tokenizer: &mut Tokenizer) -> State {
         .get_mut(continued)
     {
         container.blank_initial = blank;
-        container.size = prefix;
+        container.size = prefix as usize;
     }
     tokenizer.exit(Name::LIST_ITEM_PREFIX);
     tokenizer.register_resolver_before(Resolver::ListItem);

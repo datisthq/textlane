@@ -58,7 +58,7 @@ fn label_at_marker(tokenizer: &mut Tokenizer) -> State {
             content: ContentType::String,
         },
     );
-    tokenizer.tokenize_state.start = tokenizer.point.index;
+    tokenizer.tokenize_state.start = tokenizer.point.index as usize;
     State::Next(label_inside)
 }
 
@@ -70,7 +70,7 @@ fn label_inside(tokenizer: &mut Tokenizer) -> State {
         Some(b']') if size == 0 => label_nok(tokenizer),
         Some(b']') => {
             tokenizer.tokenize_state.size = 0;
-            tokenizer.tokenize_state.end = tokenizer.point.index;
+            tokenizer.tokenize_state.end = tokenizer.point.index as usize;
             tokenizer.exit(Name::DATA);
             tokenizer.exit(Name::GFM_FOOTNOTE_DEFINITION_LABEL_STRING);
             tokenizer.enter(Name::GFM_FOOTNOTE_DEFINITION_LABEL_MARKER);

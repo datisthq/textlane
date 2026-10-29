@@ -6,19 +6,21 @@ const TAB_SIZE: usize = 4;
 #[derive(Debug)]
 pub(crate) struct Slice<'a> {
     pub(crate) bytes: &'a [u8],
+    /// Where `bytes` starts in the input.
+    pub(crate) start: usize,
     pub(crate) before: usize,
     pub(crate) after: usize,
 }
 
 impl<'a> Slice<'a> {
     pub(crate) fn from_points(bytes: &'a [u8], start: &Point, end: &Point) -> Slice<'a> {
-        let mut before = start.vs;
-        let mut after = end.vs;
-        let mut start_index = start.index;
-        let mut end_index = end.index;
+        let mut before = start.vs as usize;
+        let mut after = end.vs as usize;
+        let mut start_index = start.index as usize;
+        let mut end_index = end.index as usize;
         // The rest of a split tab runs to the next tab stop, which its column tells
         if before > 0 {
-            before = TAB_SIZE - (start.column - 1) % TAB_SIZE;
+            before = TAB_SIZE - (start.column as usize - 1) % TAB_SIZE;
             start_index += 1;
         }
         if after > 0 {
@@ -27,6 +29,7 @@ impl<'a> Slice<'a> {
         }
         Slice {
             bytes: bytes.get(start_index..end_index).unwrap_or_default(),
+            start: start_index,
             before,
             after,
         }

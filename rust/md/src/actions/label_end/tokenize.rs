@@ -42,7 +42,7 @@ fn after(tokenizer: &mut Tokenizer) -> State {
     };
     let from = tokenizer.events[start.start.1].point.index;
     let to = tokenizer.events[state.end].point.index;
-    let defined = tokenizer.parse_state.is_defined(from, to);
+    let defined = tokenizer.parse_state.is_defined(from as usize, to as usize);
     let otherwise = State::Next(if defined { ok } else { nok });
     match tokenizer.current {
         Some(b'(') => {
@@ -210,7 +210,10 @@ fn reference_full_after(tokenizer: &mut Tokenizer) -> State {
         &[Name::REFERENCE_STRING],
     );
     let (start, end) = span_of_exit(&tokenizer.events, exit);
-    if tokenizer.parse_state.is_defined(start.index, end.index) {
+    if tokenizer
+        .parse_state
+        .is_defined(start.index as usize, end.index as usize)
+    {
         State::Ok
     } else {
         State::Nok

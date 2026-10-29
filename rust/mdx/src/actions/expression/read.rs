@@ -3,6 +3,7 @@ use textlane_core::Error;
 use crate::actions::script::parse::parse_script;
 use crate::models::estree::Id;
 use crate::models::estree::{Store, Value};
+use crate::models::name::Key;
 
 /// Parse the JavaScript of an MDX expression, as micromark-util-events-to-acorn does: no
 /// expression when it holds only white space and comments, else the one expression, read
@@ -27,15 +28,15 @@ pub(crate) fn read_expression(
     let (low, high) = (base as f64, (base + source.len()) as f64);
     for index in first..store.len() {
         let id = Id(index);
-        for key in ["start", "end"] {
+        for key in [Key::START, Key::END] {
             if let Some(offset) = store.number(id, key) {
                 store.set(id, key, Value::Number(offset.clamp(low, high)));
             }
         }
     }
-    let statement = store.children(program, "body").first().copied();
+    let statement = store.children(program, Key::BODY).first().copied();
     Ok((
-        statement.and_then(|statement| store.child(statement, "expression")),
+        statement.and_then(|statement| store.child(statement, Key::EXPRESSION)),
         comments,
     ))
 }

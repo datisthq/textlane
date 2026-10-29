@@ -1,11 +1,15 @@
-use std::cell::RefCell;
+use std::ops::Range;
 
-use crate::models::event::{Event, Link};
+use crate::models::event::{Event, Kind, Link, Point};
+use crate::models::token::Name;
+use crate::utils::tokenizer::recycle::give_events;
 
 /// Edits to an event list, collected and then applied in one pass, keeping links valid.
 #[derive(Debug, Default)]
 pub(crate) struct EditMap {
     edits: Vec<Edit>,
+    // Events that pooled edits add, so a split child list needs no vector per piece
+    pool: Vec<Event>,
 }
 
 // One call's edit: those at the same index merge once sorted, which keeps their call order
@@ -15,6 +19,7 @@ struct Edit {
     remove: usize,
     before: bool,
     add: Vec<Event>,
+    pooled: Range<usize>,
 }
 
 impl EditMap {
@@ -32,6 +37,35 @@ impl EditMap {
         self.push(index, remove, true, add);
     }
 
+    /// Move `events` into the pool and return where they start there.
+    pub(crate) fn pool(&mut self, events: &mut Vec<Event>) -> usize {
+        let start = self.pool.len();
+        if start == 0 {
+            std::mem::swap(&mut self.pool, events);
+        } else {
+            self.pool.append(events);
+        }
+        start
+    }
+
+    /// At `index`, remove `remove` events and add the pooled events in `range`.
+    pub(crate) fn add_pooled(
+        &mut self,
+        index: usize,
+        remove: usize,
+        range: Range<usize>,
+    ) {
+        if remove != 0 || !range.is_empty() {
+            self.edits.push(Edit {
+                at: index,
+                remove,
+                before: false,
+                add: vec![],
+                pooled: range,
+            });
+        }
+    }
+
     fn push(&mut self, at: usize, remove: usize, before: bool, add: Vec<Event>) {
         if remove != 0 || !add.is_empty() {
             self.edits.push(Edit {
@@ -39,37 +73,35 @@ impl EditMap {
                 remove,
                 before,
                 add,
+                pooled: 0..0,
             });
         }
     }
 
-    /// Apply the edits, rebuilding `events` into `spare` when it is large enough and keeping
-    /// the larger of the two buffers there.
-    pub(crate) fn consume(
-        &mut self,
-        events: &mut Vec<Event>,
-        spare: &RefCell<Vec<Event>>,
-    ) {
+    /// Apply the edits in place, keeping links valid.
+    pub(crate) fn consume(&mut self, events: &mut Vec<Event>) {
         if self.edits.is_empty() {
             return;
         }
         let mut edits = std::mem::take(&mut self.edits);
         edits.sort_by_key(|edit| edit.at);
-        // Each index's edits, as `(at, remove, start, end)` ranges of `edits`
-        let mut groups: Vec<(usize, usize, usize, usize)> = vec![];
+        // Each index's edits, as `(at, remove, added, start, end)`, a range of `edits`
+        let mut groups: Vec<(usize, usize, usize, usize, usize)> = vec![];
         let mut jumps = vec![];
         let mut add_acc = 0;
         let mut remove_acc = 0;
         for (index, edit) in edits.iter().enumerate() {
+            let added = edit.add.len() + edit.pooled.len();
             match groups.last_mut() {
                 Some(group) if group.0 == edit.at => {
                     group.1 += edit.remove;
-                    group.3 = index + 1;
+                    group.2 += added;
+                    group.4 = index + 1;
                 }
-                _ => groups.push((edit.at, edit.remove, index, index + 1)),
+                _ => groups.push((edit.at, edit.remove, added, index, index + 1)),
             }
             remove_acc += edit.remove;
-            add_acc += edit.add.len();
+            add_acc += added;
             if jumps
                 .last()
                 .is_some_and(|jump: &(usize, usize, usize)| jump.0 == edit.at)
@@ -78,43 +110,69 @@ impl EditMap {
             }
             jumps.push((edit.at, remove_acc, add_acc));
         }
-        // One pass that shifts links and copies each kept event and each added one once
-        let len = events.len() + add_acc - remove_acc;
-        let mut old = std::mem::take(events);
-        let mut spare = spare.borrow_mut();
-        if spare.capacity() >= len {
-            std::mem::swap(events, &mut spare);
-        } else {
-            events.reserve(len);
-        }
-        let mut links = Links::new(&jumps);
+        let old_len = events.len();
+        Links::new(&jumps).shift_to(events, old_len);
+        // Kept runs as `(from, to, destination)`, and each group's added events' destination
+        let mut runs = Vec::with_capacity(groups.len() + 1);
+        let mut adds = Vec::with_capacity(groups.len());
         let mut index = 0;
-        for (at, remove, start, end) in groups {
-            let kept = at.clamp(index, old.len());
-            links.shift_to(&mut old, kept);
-            events.extend_from_slice(&old[index..kept]);
-            // Chunks added before come latest first: prepending in place would copy
-            for edit in edits[start..end]
-                .iter_mut()
-                .rev()
-                .filter(|edit| edit.before)
-            {
-                events.append(&mut edit.add);
-            }
-            for edit in edits[start..end].iter_mut().filter(|edit| !edit.before) {
-                events.append(&mut edit.add);
-            }
-            index = (kept + remove).min(old.len());
+        let mut written = 0;
+        for &(at, remove, added, _, _) in &groups {
+            let kept = at.clamp(index, old_len);
+            runs.push((index, kept, written));
+            written += kept - index;
+            adds.push(written);
+            written += added;
+            index = (kept + remove).min(old_len);
         }
-        let end = old.len();
-        links.shift_to(&mut old, end);
-        events.extend_from_slice(&old[index..]);
-        if old.capacity() > spare.capacity() {
-            old.clear();
-            *spare = old;
+        runs.push((index, old_len, written));
+        let len = written + old_len - index;
+        if len > old_len {
+            events.resize(len, FILLER);
         }
+        // A run moving left lands on runs before it once they moved, one moving right on
+        // runs after it: each direction goes in its own order or overwrites unmoved events
+        for &(from, to, destination) in &runs {
+            if destination < from {
+                events.copy_within(from..to, destination);
+            }
+        }
+        for &(from, to, destination) in runs.iter().rev() {
+            if destination > from {
+                events.copy_within(from..to, destination);
+            }
+        }
+        for (group, &(_, _, _, start, end)) in groups.iter().enumerate() {
+            let mut at = adds[group];
+            // Chunks added before come latest first
+            for edit in edits[start..end].iter().rev().filter(|edit| edit.before) {
+                events[at..at + edit.add.len()].copy_from_slice(&edit.add);
+                at += edit.add.len();
+            }
+            for edit in edits[start..end].iter().filter(|edit| !edit.before) {
+                events[at..at + edit.add.len()].copy_from_slice(&edit.add);
+                at += edit.add.len();
+                let pooled = &self.pool[edit.pooled.clone()];
+                events[at..at + pooled.len()].copy_from_slice(pooled);
+                at += pooled.len();
+            }
+        }
+        events.truncate(len);
+        give_events(std::mem::take(&mut self.pool));
     }
 }
+
+const FILLER: Event = Event {
+    kind: Kind::Enter,
+    name: Name::DATA,
+    point: Point {
+        line: 0,
+        column: 0,
+        index: 0,
+        vs: 0,
+    },
+    link: None,
+};
 
 /// markdown-rs's link shift, walked lazily: it visits only the events a chain leads to and
 /// skips removed ones, so links it never reaches stay as they were.

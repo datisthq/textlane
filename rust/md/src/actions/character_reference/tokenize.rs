@@ -54,7 +54,7 @@ fn value(tokenizer: &mut Tokenizer) -> State {
             let name = tokenizer
                 .parse_state
                 .bytes
-                .get(end - size..end)
+                .get((end - size as u32) as usize..end as usize)
                 .unwrap_or_default();
             let known = std::str::from_utf8(name)
                 .ok()

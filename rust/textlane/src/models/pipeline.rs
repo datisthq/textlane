@@ -1,6 +1,7 @@
 use serde_json::{Map, Value};
 use textlane_core::{Allocator, Error, File, Lines, Tree, TreeKind};
 
+use crate::actions::allocator::reuse::with_allocator;
 use crate::actions::plugin::find::find_plugin;
 use crate::models::processor::{FrozenProcessor, Processor};
 
@@ -169,10 +170,11 @@ impl Pipeline {
         };
         check_parser(processor, call)?;
         check_compiler(processor, call)?;
-        let alloc = Allocator::new();
-        let tree = processor.parse(input, file, &alloc)?;
-        let tree = run_tree(processor, tree, file, &alloc, api, "process")?;
-        processor.stringify(&tree, file)
+        with_allocator(|alloc| {
+            let tree = processor.parse(input, file, alloc)?;
+            let tree = run_tree(processor, tree, file, alloc, api, "process")?;
+            processor.stringify(&tree, file)
+        })
     }
 
     fn check_unfrozen(&self, call: &str) -> Result<(), Error> {

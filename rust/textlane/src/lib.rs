@@ -6,6 +6,9 @@ mod models {
     pub(crate) mod processor;
 }
 mod actions {
+    pub(crate) mod allocator {
+        pub(crate) mod reuse;
+    }
     #[cfg(feature = "testing")]
     pub(crate) mod case {
         pub(crate) mod run;

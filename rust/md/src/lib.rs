@@ -40,6 +40,7 @@ mod utils {
         pub(crate) mod edit_map;
         pub(crate) mod flow;
         pub(crate) mod preprocess;
+        pub(crate) mod recycle;
         pub(crate) mod registry;
         pub(crate) mod string;
         pub(crate) mod subtokenize;

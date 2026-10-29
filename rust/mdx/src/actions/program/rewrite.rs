@@ -4,6 +4,7 @@ use crate::actions::program::wrap::specifiers_to_declarations;
 use crate::helpers::identifier::is_identifier_name;
 use crate::helpers::walk::{Enter, Visit, walk};
 use crate::models::estree::{Id, Store, Value};
+use crate::models::name::{Key, Kind};
 use crate::models::options::CompileOptions;
 use crate::models::scope::Scopes;
 
@@ -28,22 +29,26 @@ pub(crate) fn rewrite_program(store: &mut Store, program: Id, options: &CompileO
         && let Some(source) = provider
     {
         let statement = create_import_provider(store, source, function_body);
-        store.list_mut(program, "body").insert(0, statement.into());
+        store
+            .list_mut(program, Key::BODY)
+            .insert(0, statement.into());
     }
     if rewrite.error_helper {
         let helper = create_error_helper(store);
-        store.list_mut(program, "body").push(helper.into());
+        store.list_mut(program, Key::BODY).push(helper.into());
     }
     if function_body {
         let literal = store.literal("use strict");
         let directive = store.add(
-            "ExpressionStatement",
-            vec![
-                ("expression", literal.into()),
-                ("directive", "use strict".into()),
+            Kind::EXPRESSION_STATEMENT,
+            [
+                (Key::EXPRESSION, literal.into()),
+                (Key::DIRECTIVE, "use strict".into()),
             ],
         );
-        store.list_mut(program, "body").insert(0, directive.into());
+        store
+            .list_mut(program, Key::BODY)
+            .insert(0, directive.into());
     }
 }
 
@@ -92,14 +97,16 @@ struct Rewrite {
 fn is_function(store: &Store, id: Id) -> bool {
     matches!(
         store.kind(id),
-        "FunctionDeclaration" | "FunctionExpression" | "ArrowFunctionExpression"
+        Kind::FUNCTION_DECLARATION
+            | Kind::FUNCTION_EXPRESSION
+            | Kind::ARROW_FUNCTION_EXPRESSION
     )
 }
 
 fn is_named(store: &Store, id: Id, name: &str) -> bool {
     store
-        .child(id, "id")
-        .and_then(|id| store.str(id, "name"))
+        .child(id, Key::ID)
+        .and_then(|id| store.str(id, Key::NAME))
         .is_some_and(|found| found == name)
 }
 
@@ -143,7 +150,7 @@ impl Visit for Rewrite {
         if !is_named(store, info.node, "_createMdxContent") && !self.provider {
             return Enter::default();
         }
-        if store.is(id, "JSXElement") {
+        if store.is(id, Kind::JSX_ELEMENT) {
             self.element(store, id);
         }
         Enter::default()
@@ -162,30 +169,33 @@ impl Visit for Rewrite {
 
 impl Rewrite {
     fn element(&mut self, store: &mut Store, node: Id) {
-        let Some(opening) = store.child(node, "openingElement") else {
+        let Some(opening) = store.child(node, Key::OPENING_ELEMENT) else {
             return;
         };
-        let Some(mut name) = store.child(opening, "name") else {
+        let Some(mut name) = store.child(opening, Key::NAME) else {
             return;
         };
         let outermost = self.functions.len() == 1
-            && store.is(self.functions[0].node, "FunctionDeclaration")
+            && store.is(self.functions[0].node, Kind::FUNCTION_DECLARATION)
             && is_named(store, self.functions[0].node, "_createMdxContent");
         match store.kind(name) {
-            "JSXMemberExpression" => {
+            Kind::JSX_MEMBER_EXPRESSION => {
                 let mut ids = Vec::new();
-                while store.is(name, "JSXMemberExpression") {
-                    if let Some(property) = store.child(name, "property") {
+                while store.is(name, Kind::JSX_MEMBER_EXPRESSION) {
+                    if let Some(property) = store.child(name, Key::PROPERTY) {
                         ids.push(
-                            store.str(property, "name").unwrap_or_default().to_string(),
+                            store
+                                .str(property, Key::NAME)
+                                .unwrap_or_default()
+                                .to_string(),
                         );
                     }
-                    match store.child(name, "object") {
+                    match store.child(name, Key::OBJECT) {
                         Some(object) => name = object,
                         None => break,
                     }
                 }
-                let id = store.str(name, "name").unwrap_or_default().to_string();
+                let id = store.str(name, Key::NAME).unwrap_or_default().to_string();
                 ids.push(id.clone());
                 ids.reverse();
                 let full = ids.join(".");
@@ -198,9 +208,9 @@ impl Rewrite {
                     info.objects.insert(&id);
                 }
             }
-            "JSXNamespacedName" => {}
+            Kind::JSX_NAMESPACED_NAME => {}
             _ => {
-                let id = store.str(name, "name").unwrap_or_default().to_string();
+                let id = store.str(name, Key::NAME).unwrap_or_default().to_string();
                 if is_identifier_name(&id, false)
                     && !id.starts_with(|c: char| c.is_ascii_lowercase())
                 {
@@ -211,7 +221,7 @@ impl Rewrite {
                         }
                         info.components.insert(&id);
                     }
-                } else if !store.flag(node, "explicit") {
+                } else if !store.flag(node, Key::EXPLICIT) {
                     let info = &mut self.functions[0];
                     info.tags.insert(&id);
                     let path = if is_identifier_name(&id, false) {
@@ -230,10 +240,10 @@ impl Rewrite {
                         vec![name]
                     };
                     let opening_name = jsx_member(store, &path);
-                    store.set(opening, "name", opening_name);
-                    if let Some(closing) = store.child(node, "closingElement") {
+                    store.set(opening, Key::NAME, opening_name);
+                    if let Some(closing) = store.child(node, Key::CLOSING_ELEMENT) {
                         let closing_name = jsx_member(store, &path);
-                        store.set(closing, "name", closing_name);
+                        store.set(closing, Key::NAME, closing_name);
                     }
                 }
             }
@@ -281,11 +291,11 @@ impl Rewrite {
                 let left = parameters.first().copied();
                 let right = store.object(Vec::new());
                 store.add(
-                    "LogicalExpression",
-                    vec![
-                        ("operator", "||".into()),
-                        ("left", left.into()),
-                        ("right", right.into()),
+                    Kind::LOGICAL_EXPRESSION,
+                    [
+                        (Key::OPERATOR, "||".into()),
+                        (Key::LEFT, left.into()),
+                        (Key::RIGHT, right.into()),
                     ],
                 )
             } else {
@@ -302,8 +312,8 @@ impl Rewrite {
                     })
                     .collect();
                 store.add(
-                    "ObjectPattern",
-                    vec![("properties", Value::nodes(properties))],
+                    Kind::OBJECT_PATTERN,
+                    [(Key::PROPERTIES, Value::nodes(properties))],
                 )
             });
             let mut declarations = Vec::new();
@@ -349,11 +359,11 @@ impl Rewrite {
             let parts: Vec<&str> = reference.id.split('.').collect();
             let argument = id_or_member(store, &parts);
             let test = store.add(
-                "UnaryExpression",
-                vec![
-                    ("operator", "!".into()),
-                    ("prefix", true.into()),
-                    ("argument", argument.into()),
+                Kind::UNARY_EXPRESSION,
+                [
+                    (Key::OPERATOR, "!".into()),
+                    (Key::PREFIX, true.into()),
+                    (Key::ARGUMENT, argument.into()),
                 ],
             );
             let callee = store.identifier("_missingMdxReference");
@@ -362,27 +372,27 @@ impl Rewrite {
             let call = store.call(callee, vec![id, component]);
             let consequent = store.expression_statement(call);
             statements.push(store.add(
-                "IfStatement",
-                vec![
-                    ("test", test.into()),
-                    ("consequent", consequent.into()),
-                    ("alternate", Value::Null),
+                Kind::IF_STATEMENT,
+                [
+                    (Key::TEST, test.into()),
+                    (Key::CONSEQUENT, consequent.into()),
+                    (Key::ALTERNATE, Value::Null),
                 ],
             ));
         }
         if statements.is_empty() {
             return;
         }
-        let body = match store.child(node, "body") {
-            Some(body) if store.is(body, "BlockStatement") => body,
+        let body = match store.child(node, Key::BODY) {
+            Some(body) if store.is(body, Kind::BLOCK_STATEMENT) => body,
             body => {
                 let returned = store.return_statement(body);
                 let block = store.block(vec![returned]);
-                store.set(node, "body", block);
+                store.set(node, Key::BODY, block);
                 block
             }
         };
-        let list = store.list_mut(body, "body");
+        let list = store.list_mut(body, Key::BODY);
         for (index, statement) in statements.into_iter().enumerate() {
             list.insert(index, statement.into());
         }
@@ -400,7 +410,7 @@ pub(crate) fn id_or_member(store: &mut Store, names: &[&str]) -> Id {
         };
         object = Some(match object {
             Some(object) => {
-                let computed = store.is(id, "Literal");
+                let computed = store.is(id, Kind::LITERAL);
                 store.member(object, id, computed)
             }
             None => id,
@@ -416,8 +426,8 @@ fn jsx_member(store: &mut Store, names: &[String]) -> Id {
         let id = store.jsx_identifier(name);
         object = Some(match object {
             Some(object) => store.add(
-                "JSXMemberExpression",
-                vec![("object", object.into()), ("property", id.into())],
+                Kind::JSX_MEMBER_EXPRESSION,
+                [(Key::OBJECT, object.into()), (Key::PROPERTY, id.into())],
             ),
             None => id,
         });
@@ -429,8 +439,8 @@ fn create_import_provider(store: &mut Store, source: &str, function_body: bool) 
     let imported = store.identifier("useMDXComponents");
     let local = store.identifier("_provideComponents");
     let specifier = store.add(
-        "ImportSpecifier",
-        vec![("imported", imported.into()), ("local", local.into())],
+        Kind::IMPORT_SPECIFIER,
+        [(Key::IMPORTED, imported.into()), (Key::LOCAL, local.into())],
     );
     if function_body {
         let arguments = store.identifier("arguments");
@@ -441,11 +451,11 @@ fn create_import_provider(store: &mut Store, source: &str, function_body: bool) 
     }
     let source = store.literal(source);
     store.add(
-        "ImportDeclaration",
-        vec![
-            ("specifiers", Value::nodes([specifier])),
-            ("attributes", Value::List(Vec::new())),
-            ("source", source.into()),
+        Kind::IMPORT_DECLARATION,
+        [
+            (Key::SPECIFIERS, Value::nodes([specifier])),
+            (Key::ATTRIBUTES, Value::List(Vec::new())),
+            (Key::SOURCE, source.into()),
         ],
     )
 }
@@ -456,11 +466,11 @@ fn create_error_helper(store: &mut Store) -> Id {
     let consequent = store.literal("component");
     let alternate = store.literal("object");
     let conditional = store.add(
-        "ConditionalExpression",
-        vec![
-            ("test", test.into()),
-            ("consequent", consequent.into()),
-            ("alternate", alternate.into()),
+        Kind::CONDITIONAL_EXPRESSION,
+        [
+            (Key::TEST, test.into()),
+            (Key::CONSEQUENT, consequent.into()),
+            (Key::ALTERNATE, alternate.into()),
         ],
     );
     let tick = store.literal(" `");
@@ -470,35 +480,35 @@ fn create_error_helper(store: &mut Store) -> Id {
     let mut message = expected;
     for right in [conditional, tick, id, rest] {
         message = store.add(
-            "BinaryExpression",
-            vec![
-                ("left", message.into()),
-                ("operator", "+".into()),
-                ("right", right.into()),
+            Kind::BINARY_EXPRESSION,
+            [
+                (Key::LEFT, message.into()),
+                (Key::OPERATOR, "+".into()),
+                (Key::RIGHT, right.into()),
             ],
         );
     }
     let error = store.identifier("Error");
     let construct = store.add(
-        "NewExpression",
-        vec![
-            ("callee", error.into()),
-            ("arguments", Value::nodes([message])),
+        Kind::NEW_EXPRESSION,
+        [
+            (Key::CALLEE, error.into()),
+            (Key::ARGUMENTS, Value::nodes([message])),
         ],
     );
-    let thrown = store.add("ThrowStatement", vec![("argument", construct.into())]);
+    let thrown = store.add(Kind::THROW_STATEMENT, [(Key::ARGUMENT, construct.into())]);
     let body = store.block(vec![thrown]);
     let name = store.identifier("_missingMdxReference");
     let id = store.identifier("id");
     let component = store.identifier("component");
     store.add(
-        "FunctionDeclaration",
-        vec![
-            ("id", name.into()),
-            ("generator", false.into()),
-            ("async", false.into()),
-            ("params", Value::nodes([id, component])),
-            ("body", body.into()),
+        Kind::FUNCTION_DECLARATION,
+        [
+            (Key::ID, name.into()),
+            (Key::GENERATOR, false.into()),
+            (Key::ASYNC, false.into()),
+            (Key::PARAMS, Value::nodes([id, component])),
+            (Key::BODY, body.into()),
         ],
     )
 }

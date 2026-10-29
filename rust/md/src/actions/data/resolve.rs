@@ -17,14 +17,11 @@ pub(crate) fn resolve_data(tokenizer: &mut Tokenizer) {
             }
             if exit_index > index {
                 tokenizer.map.add(index, exit_index - index, vec![]);
-                tokenizer.events[index].point =
-                    tokenizer.events[exit_index].point.clone();
+                tokenizer.events[index].point = tokenizer.events[exit_index].point;
                 index = exit_index;
             }
         }
         index += 1;
     }
-    tokenizer
-        .map
-        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
+    tokenizer.map.consume(&mut tokenizer.events);
 }

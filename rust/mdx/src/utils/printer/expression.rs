@@ -1,5 +1,6 @@
 use crate::helpers::json::{format_number, json_string};
 use crate::models::estree::{Id, Value};
+use crate::models::name::{Key, Kind};
 use crate::utils::printer::precedence::{NEEDS_PARENTHESES, below, precedence_of};
 use crate::utils::printer::state::Printer;
 
@@ -7,46 +8,46 @@ impl Printer<'_> {
     /// astring's expression and pattern handlers; `false` for other kinds.
     pub(crate) fn expression(&mut self, id: Id) -> bool {
         match self.kind(id) {
-            "ArrowFunctionExpression" => self.arrow(id),
-            "ThisExpression" => self.write("this"),
-            "Super" => self.write("super"),
-            "RestElement" | "SpreadElement" => {
+            Kind::ARROW_FUNCTION_EXPRESSION => self.arrow(id),
+            Kind::THIS_EXPRESSION => self.write("this"),
+            Kind::SUPER => self.write("super"),
+            Kind::REST_ELEMENT | Kind::SPREAD_ELEMENT => {
                 self.write("...");
-                self.field(id, "argument");
+                self.field(id, Key::ARGUMENT);
             }
-            "YieldExpression" => {
-                self.write(if self.store.flag(id, "delegate") {
+            Kind::YIELD_EXPRESSION => {
+                self.write(if self.store.flag(id, Key::DELEGATE) {
                     "yield*"
                 } else {
                     "yield"
                 });
-                if self.store.child(id, "argument").is_some() {
+                if self.store.child(id, Key::ARGUMENT).is_some() {
                     self.write(" ");
-                    self.field(id, "argument");
+                    self.field(id, Key::ARGUMENT);
                 }
             }
-            "AwaitExpression" => {
+            Kind::AWAIT_EXPRESSION => {
                 self.write("await ");
-                if let Some(argument) = self.store.child(id, "argument") {
+                if let Some(argument) = self.store.child(id, Key::ARGUMENT) {
                     self.operand(argument, id, false);
                 }
             }
-            "TemplateLiteral" => self.template(id),
-            "TemplateElement" => self.template_raw(id),
-            "TaggedTemplateExpression" => {
-                if let Some(tag) = self.store.child(id, "tag") {
+            Kind::TEMPLATE_LITERAL => self.template(id),
+            Kind::TEMPLATE_ELEMENT => self.template_raw(id),
+            Kind::TAGGED_TEMPLATE_EXPRESSION => {
+                if let Some(tag) = self.store.child(id, Key::TAG) {
                     self.operand(tag, id, false);
                 }
-                self.field(id, "quasi");
+                self.field(id, Key::QUASI);
             }
-            "ArrayExpression" | "ArrayPattern" => self.array(id),
-            "ObjectExpression" => self.object(id),
-            "Property" => self.property(id),
-            "ObjectPattern" => {
+            Kind::ARRAY_EXPRESSION | Kind::ARRAY_PATTERN => self.array(id),
+            Kind::OBJECT_EXPRESSION => self.object(id),
+            Kind::PROPERTY => self.property(id),
+            Kind::OBJECT_PATTERN => {
                 self.write("{");
                 for (index, property) in self
                     .store
-                    .children(id, "properties")
+                    .children(id, Key::PROPERTIES)
                     .into_iter()
                     .enumerate()
                 {
@@ -57,68 +58,68 @@ impl Printer<'_> {
                 }
                 self.write("}");
             }
-            "SequenceExpression" => {
-                let expressions = self.store.list(id, "expressions").to_vec();
+            Kind::SEQUENCE_EXPRESSION => {
+                let expressions = self.store.list(id, Key::EXPRESSIONS).to_vec();
                 self.sequence(&expressions);
             }
-            "UnaryExpression" => self.unary(id),
-            "UpdateExpression" => {
+            Kind::UNARY_EXPRESSION => self.unary(id),
+            Kind::UPDATE_EXPRESSION => {
                 let operator = self
                     .store
-                    .str(id, "operator")
+                    .str(id, Key::OPERATOR)
                     .unwrap_or_default()
                     .to_string();
-                if self.store.flag(id, "prefix") {
+                if self.store.flag(id, Key::PREFIX) {
                     self.write(&operator);
-                    self.field(id, "argument");
+                    self.field(id, Key::ARGUMENT);
                 } else {
-                    self.field(id, "argument");
+                    self.field(id, Key::ARGUMENT);
                     self.write(&operator);
                 }
             }
-            "AssignmentExpression" => {
-                self.field(id, "left");
+            Kind::ASSIGNMENT_EXPRESSION => {
+                self.field(id, Key::LEFT);
                 let operator =
-                    format!(" {} ", self.store.str(id, "operator").unwrap_or("="));
+                    format!(" {} ", self.store.str(id, Key::OPERATOR).unwrap_or("="));
                 self.write(&operator);
-                self.field(id, "right");
+                self.field(id, Key::RIGHT);
             }
-            "AssignmentPattern" => {
-                self.field(id, "left");
+            Kind::ASSIGNMENT_PATTERN => {
+                self.field(id, Key::LEFT);
                 self.write(" = ");
-                self.field(id, "right");
+                self.field(id, Key::RIGHT);
             }
-            "BinaryExpression" | "LogicalExpression" => self.binary(id),
-            "ConditionalExpression" => self.conditional(id),
-            "NewExpression" => self.new_expression(id),
-            "CallExpression" => self.call(id),
-            "ChainExpression" => self.field(id, "expression"),
-            "MemberExpression" => self.member(id),
-            "MetaProperty" => {
+            Kind::BINARY_EXPRESSION | Kind::LOGICAL_EXPRESSION => self.binary(id),
+            Kind::CONDITIONAL_EXPRESSION => self.conditional(id),
+            Kind::NEW_EXPRESSION => self.new_expression(id),
+            Kind::CALL_EXPRESSION => self.call(id),
+            Kind::CHAIN_EXPRESSION => self.field(id, Key::EXPRESSION),
+            Kind::MEMBER_EXPRESSION => self.member(id),
+            Kind::META_PROPERTY => {
                 let text = format!(
                     "{}.{}",
-                    self.name_of(id, "meta"),
-                    self.name_of(id, "property")
+                    self.name_of(id, Key::META),
+                    self.name_of(id, Key::PROPERTY)
                 );
                 self.write(&text);
             }
-            "Identifier" => {
+            Kind::IDENTIFIER => {
                 let name = self
                     .store
-                    .str(id, "name")
+                    .str(id, Key::NAME)
                     .unwrap_or("undefined")
                     .to_string();
                 self.write(&name);
             }
-            "PrivateIdentifier" => {
+            Kind::PRIVATE_IDENTIFIER => {
                 let name =
-                    format!("#{}", self.store.str(id, "name").unwrap_or("undefined"));
+                    format!("#{}", self.store.str(id, Key::NAME).unwrap_or("undefined"));
                 self.write(&name);
             }
-            "Literal" => self.literal(id),
-            "ImportExpression" => {
+            Kind::LITERAL => self.literal(id),
+            Kind::IMPORT_EXPRESSION => {
                 self.write("import(");
-                self.field(id, "source");
+                self.field(id, Key::SOURCE);
                 self.write(")");
             }
             _ => return false,
@@ -127,15 +128,15 @@ impl Printer<'_> {
     }
 
     fn arrow(&mut self, id: Id) {
-        if self.store.flag(id, "async") {
+        if self.store.flag(id, Key::ASYNC) {
             self.write("async ");
         }
-        let params = self.store.list(id, "params").to_vec();
+        let params = self.store.list(id, Key::PARAMS).to_vec();
         match params.as_slice() {
-            [Value::Node(param)] if self.kind(*param).starts_with('I') => {
+            [Value::Node(param)] if self.kind_text(*param).starts_with('I') => {
                 let name = self
                     .store
-                    .str(*param, "name")
+                    .str(*param, Key::NAME)
                     .unwrap_or("undefined")
                     .to_string();
                 self.write(&name);
@@ -143,18 +144,18 @@ impl Printer<'_> {
             _ => self.sequence(&params),
         }
         self.write(" => ");
-        if self.kind_of(id, "body").starts_with('O') {
+        if self.kind_text_of(id, Key::BODY).starts_with('O') {
             self.write("(");
-            self.field(id, "body");
+            self.field(id, Key::BODY);
             self.write(")");
         } else {
-            self.field(id, "body");
+            self.field(id, Key::BODY);
         }
     }
 
     fn template(&mut self, id: Id) {
-        let quasis = self.store.children(id, "quasis");
-        let expressions = self.store.children(id, "expressions");
+        let quasis = self.store.children(id, Key::QUASIS);
+        let expressions = self.store.children(id, Key::EXPRESSIONS);
         self.write("`");
         for (index, expression) in expressions.iter().enumerate() {
             if let Some(quasi) = quasis.get(index) {
@@ -173,8 +174,8 @@ impl Printer<'_> {
     fn template_raw(&mut self, id: Id) {
         let raw = self
             .store
-            .child(id, "value")
-            .and_then(|value| self.store.str(value, "raw"))
+            .child(id, Key::VALUE)
+            .and_then(|value| self.store.str(value, Key::RAW))
             .unwrap_or("undefined")
             .to_string();
         self.write(&raw);
@@ -182,7 +183,7 @@ impl Printer<'_> {
 
     fn array(&mut self, id: Id) {
         self.write("[");
-        let elements = self.store.list(id, "elements").to_vec();
+        let elements = self.store.list(id, Key::ELEMENTS).to_vec();
         let count = elements.len();
         for (index, element) in elements.iter().enumerate() {
             if let Value::Node(element) = element {
@@ -201,13 +202,13 @@ impl Printer<'_> {
         self.level += 1;
         let property_indent = self.indent(self.level);
         self.write("{");
-        let properties = self.store.children(id, "properties");
+        let properties = self.store.children(id, Key::PROPERTIES);
         if !properties.is_empty() {
             self.write("\n");
-            self.comments_of(id, "comments", &property_indent);
+            self.comments_of(id, Key::COMMENTS, &property_indent);
             let count = properties.len();
             for (index, property) in properties.into_iter().enumerate() {
-                self.comments_of(property, "comments", &property_indent);
+                self.comments_of(property, Key::COMMENTS, &property_indent);
                 self.write(&property_indent);
                 self.node(property);
                 if index + 1 < count {
@@ -215,18 +216,18 @@ impl Printer<'_> {
                 }
             }
             self.write("\n");
-            self.comments_of(id, "trailingComments", &property_indent);
+            self.comments_of(id, Key::TRAILING_COMMENTS, &property_indent);
             self.write(&indent);
             self.write("}");
-        } else if self.store.has(id, "comments") {
+        } else if self.store.has(id, Key::COMMENTS) {
             self.write("\n");
-            self.comments_of(id, "comments", &property_indent);
-            self.comments_of(id, "trailingComments", &property_indent);
+            self.comments_of(id, Key::COMMENTS, &property_indent);
+            self.comments_of(id, Key::TRAILING_COMMENTS, &property_indent);
             self.write(&indent);
             self.write("}");
-        } else if self.store.has(id, "trailingComments") {
+        } else if self.store.has(id, Key::TRAILING_COMMENTS) {
             self.write("\n");
-            self.comments_of(id, "trailingComments", &property_indent);
+            self.comments_of(id, Key::TRAILING_COMMENTS, &property_indent);
             self.write(&indent);
             self.write("}");
         } else {
@@ -236,39 +237,39 @@ impl Printer<'_> {
     }
 
     fn property(&mut self, id: Id) {
-        if self.store.flag(id, "method")
+        if self.store.flag(id, Key::METHOD)
             || !self
                 .store
-                .str(id, "kind")
+                .str(id, Key::KIND)
                 .unwrap_or("init")
                 .starts_with('i')
         {
             self.method(id);
             return;
         }
-        if !self.store.flag(id, "shorthand") {
-            if self.store.flag(id, "computed") {
+        if !self.store.flag(id, Key::SHORTHAND) {
+            if self.store.flag(id, Key::COMPUTED) {
                 self.write("[");
-                self.field(id, "key");
+                self.field(id, Key::KEY);
                 self.write("]");
             } else {
-                self.field(id, "key");
+                self.field(id, Key::KEY);
             }
             self.write(": ");
         }
-        self.field(id, "value");
+        self.field(id, Key::VALUE);
     }
 
     fn unary(&mut self, id: Id) {
         let operator = self
             .store
-            .str(id, "operator")
+            .str(id, Key::OPERATOR)
             .unwrap_or_default()
             .to_string();
-        let Some(argument) = self.store.child(id, "argument") else {
+        let Some(argument) = self.store.child(id, Key::ARGUMENT) else {
             return;
         };
-        if !self.store.flag(id, "prefix") {
+        if !self.store.flag(id, Key::PREFIX) {
             self.node(argument);
             self.write(&operator);
             return;
@@ -276,11 +277,11 @@ impl Printer<'_> {
         self.write(&operator);
         let needs_parentheses = self.needs_parentheses(argument, id, false);
         let kind = self.kind(argument);
-        let nested = (kind == "UnaryExpression" || kind == "UpdateExpression")
-            && self.store.flag(argument, "prefix")
+        let nested = (kind == Kind::UNARY_EXPRESSION || kind == Kind::UPDATE_EXPRESSION)
+            && self.store.flag(argument, Key::PREFIX)
             && self
                 .store
-                .str(argument, "operator")
+                .str(argument, Key::OPERATOR)
                 .is_some_and(|inner| inner.chars().next() == operator.chars().next())
             && (operator == "+" || operator == "-");
         if !needs_parentheses && (operator.len() > 1 || nested) {
@@ -298,18 +299,18 @@ impl Printer<'_> {
     fn binary(&mut self, id: Id) {
         let operator = self
             .store
-            .str(id, "operator")
+            .str(id, Key::OPERATOR)
             .unwrap_or_default()
             .to_string();
         let is_in = operator == "in";
         if is_in {
             self.write("(");
         }
-        if let Some(left) = self.store.child(id, "left") {
+        if let Some(left) = self.store.child(id, Key::LEFT) {
             self.operand(left, id, false);
         }
         self.write(&format!(" {operator} "));
-        if let Some(right) = self.store.child(id, "right") {
+        if let Some(right) = self.store.child(id, Key::RIGHT) {
             self.operand(right, id, true);
         }
         if is_in {
@@ -318,7 +319,7 @@ impl Printer<'_> {
     }
 
     fn conditional(&mut self, id: Id) {
-        if let Some(test) = self.store.child(id, "test") {
+        if let Some(test) = self.store.child(id, Key::TEST) {
             let precedence = self.precedence(test);
             if precedence == Some(NEEDS_PARENTHESES)
                 || matches!(precedence, Some(precedence) if precedence <= 4)
@@ -331,17 +332,17 @@ impl Printer<'_> {
             }
         }
         self.write(" ? ");
-        self.field(id, "consequent");
+        self.field(id, Key::CONSEQUENT);
         self.write(" : ");
-        self.field(id, "alternate");
+        self.field(id, Key::ALTERNATE);
     }
 
     fn new_expression(&mut self, id: Id) {
         self.write("new ");
-        if let Some(callee) = self.store.child(id, "callee") {
+        if let Some(callee) = self.store.child(id, Key::CALLEE) {
             let precedence = self.precedence(callee);
             if precedence == Some(NEEDS_PARENTHESES)
-                || below(precedence, precedence_of("CallExpression"))
+                || below(precedence, precedence_of(Kind::CALL_EXPRESSION))
                 || self.has_call(callee)
             {
                 self.write("(");
@@ -351,7 +352,7 @@ impl Printer<'_> {
                 self.node(callee);
             }
         }
-        let arguments = self.store.list(id, "arguments").to_vec();
+        let arguments = self.store.list(id, Key::ARGUMENTS).to_vec();
         self.sequence(&arguments);
     }
 
@@ -359,23 +360,23 @@ impl Printer<'_> {
     fn has_call(&self, id: Id) -> bool {
         let mut current = Some(id);
         while let Some(node) = current {
-            let kind = self.kind(node);
+            let kind = self.kind_text(node);
             if kind.starts_with("Ca") {
                 return true;
             }
             if !kind.starts_with("Mem") {
                 return false;
             }
-            current = self.store.child(node, "object");
+            current = self.store.child(node, Key::OBJECT);
         }
         false
     }
 
     fn call(&mut self, id: Id) {
-        if let Some(callee) = self.store.child(id, "callee") {
+        if let Some(callee) = self.store.child(id, Key::CALLEE) {
             let precedence = self.precedence(callee);
             if precedence == Some(NEEDS_PARENTHESES)
-                || below(precedence, precedence_of("CallExpression"))
+                || below(precedence, precedence_of(Kind::CALL_EXPRESSION))
             {
                 self.write("(");
                 self.node(callee);
@@ -384,18 +385,18 @@ impl Printer<'_> {
                 self.node(callee);
             }
         }
-        if self.store.flag(id, "optional") {
+        if self.store.flag(id, Key::OPTIONAL) {
             self.write("?.");
         }
-        let arguments = self.store.list(id, "arguments").to_vec();
+        let arguments = self.store.list(id, Key::ARGUMENTS).to_vec();
         self.sequence(&arguments);
     }
 
     fn member(&mut self, id: Id) {
-        if let Some(object) = self.store.child(id, "object") {
+        if let Some(object) = self.store.child(id, Key::OBJECT) {
             let precedence = self.precedence(object);
             if precedence == Some(NEEDS_PARENTHESES)
-                || below(precedence, precedence_of("MemberExpression"))
+                || below(precedence, precedence_of(Kind::MEMBER_EXPRESSION))
             {
                 self.write("(");
                 self.node(object);
@@ -404,41 +405,41 @@ impl Printer<'_> {
                 self.node(object);
             }
         }
-        let optional = self.store.flag(id, "optional");
-        if self.store.flag(id, "computed") {
+        let optional = self.store.flag(id, Key::OPTIONAL);
+        if self.store.flag(id, Key::COMPUTED) {
             if optional {
                 self.write("?.");
             }
             self.write("[");
-            self.field(id, "property");
+            self.field(id, Key::PROPERTY);
             self.write("]");
         } else {
             self.write(if optional { "?." } else { "." });
-            self.field(id, "property");
+            self.field(id, Key::PROPERTY);
         }
     }
 
     fn literal(&mut self, id: Id) {
-        if let Some(raw) = self.store.str(id, "raw") {
+        if let Some(raw) = self.store.str(id, Key::RAW) {
             let raw = raw.to_string();
             self.write(&raw);
             return;
         }
-        if let Some(regex) = self.store.child(id, "regex") {
+        if let Some(regex) = self.store.child(id, Key::REGEX) {
             let text = format!(
                 "/{}/{}",
-                self.store.str(regex, "pattern").unwrap_or_default(),
-                self.store.str(regex, "flags").unwrap_or_default()
+                self.store.str(regex, Key::PATTERN).unwrap_or_default(),
+                self.store.str(regex, Key::FLAGS).unwrap_or_default()
             );
             self.write(&text);
             return;
         }
-        if let Some(bigint) = self.store.str(id, "bigint") {
+        if let Some(bigint) = self.store.str(id, Key::BIGINT) {
             let text = format!("{bigint}n");
             self.write(&text);
             return;
         }
-        let text = match self.store.get(id, "value") {
+        let text = match self.store.get(id, Key::VALUE) {
             Some(Value::Str(value)) => json_string(value),
             Some(Value::Number(value)) if value.is_finite() => format_number(*value),
             Some(Value::Bool(value)) => value.to_string(),

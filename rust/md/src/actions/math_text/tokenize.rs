@@ -34,11 +34,11 @@ fn sequence_open(tokenizer: &mut Tokenizer) -> State {
     let state = &tokenizer.tokenize_state;
     // As code spans: once one scanned to the end, a run with none of its length after it
     // cannot close, and scanning again would make input quadratic
-    let start = tokenizer.point.index - state.size;
+    let start = tokenizer.point.index - state.size as u32;
     let closable = state
         .math_text_runs
         .get(&state.size)
-        .is_some_and(|last| *last > start);
+        .is_some_and(|last| *last > start as usize);
     if (state.size < 2 && !single) || (state.math_text_scanned && !closable) {
         tokenizer.tokenize_state.size = 0;
         return State::Nok;
@@ -91,13 +91,13 @@ fn sequence_close(tokenizer: &mut Tokenizer) -> State {
         return State::Next(sequence_close);
     }
     let size = tokenizer.tokenize_state.size_b;
-    let start = tokenizer.point.index - size;
+    let start = tokenizer.point.index - size as u32;
     let last = tokenizer
         .tokenize_state
         .math_text_runs
         .entry(size)
-        .or_insert(start);
-    *last = (*last).max(start);
+        .or_insert(start as usize);
+    *last = (*last).max(start as usize);
     tokenizer.exit(Name::MATH_TEXT_SEQUENCE);
     if tokenizer.tokenize_state.size == tokenizer.tokenize_state.size_b {
         tokenizer.exit(Name::MATH_TEXT);

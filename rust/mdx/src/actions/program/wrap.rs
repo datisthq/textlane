@@ -4,6 +4,7 @@ use crate::actions::hast::convert::Snippet;
 use crate::helpers::place::stringify_place;
 use crate::helpers::walk::{Enter, Visit, walk};
 use crate::models::estree::{Id, Store, Value};
+use crate::models::name::{Key, Kind};
 use crate::models::options::CompileOptions;
 use crate::models::scope::Scopes;
 
@@ -52,37 +53,38 @@ pub(crate) fn wrap_program(
         let local = wrap.store.identifier(name);
         let specifier = wrap
             .store
-            .add("ImportDefaultSpecifier", vec![("local", local.into())]);
+            .add(Kind::IMPORT_DEFAULT_SPECIFIER, [(Key::LOCAL, local.into())]);
         let source = wrap.store.literal(pragma_import_source);
         let import = wrap.store.add(
-            "ImportDeclaration",
-            vec![
-                ("specifiers", Value::nodes([specifier])),
-                ("attributes", Value::List(Vec::new())),
-                ("source", source.into()),
+            Kind::IMPORT_DECLARATION,
+            [
+                (Key::SPECIFIERS, Value::nodes([specifier])),
+                (Key::ATTRIBUTES, Value::List(Vec::new())),
+                (Key::SOURCE, source.into()),
             ],
         );
         wrap.handle_esm(import);
     }
     let mut layout: Option<Id> = None;
     let mut content = false;
-    for child in wrap.store.children(program, "body") {
+    for child in wrap.store.children(program, Key::BODY) {
         match wrap.store.kind(child) {
-            "ExportDefaultDeclaration" => {
+            Kind::EXPORT_DEFAULT_DECLARATION => {
                 if let Some(previous) = layout {
                     return Err(duplicate_layout(wrap.store, snippets, previous));
                 }
                 layout = Some(child);
-                let declaration = wrap.store.child(child, "declaration");
+                let declaration = wrap.store.child(child, Key::DECLARATION);
                 let init =
                     declaration.map(|declaration| match wrap.store.kind(declaration) {
-                        "FunctionDeclaration" | "ClassDeclaration" => {
+                        Kind::FUNCTION_DECLARATION | Kind::CLASS_DECLARATION => {
                             let expression = wrap.store.copy(declaration);
                             let kind =
-                                if wrap.store.is(declaration, "FunctionDeclaration") {
-                                    "FunctionExpression"
+                                if wrap.store.is(declaration, Kind::FUNCTION_DECLARATION)
+                                {
+                                    Kind::FUNCTION_EXPRESSION
                                 } else {
-                                    "ClassExpression"
+                                    Kind::CLASS_EXPRESSION
                                 };
                             wrap.store.set_kind(expression, kind);
                             expression
@@ -94,14 +96,16 @@ pub(crate) fn wrap_program(
                 let constant = wrap.store.declaration("const", vec![declarator]);
                 wrap.replacement.push(constant);
             }
-            "ExportNamedDeclaration" if wrap.store.child(child, "source").is_some() => {
-                let source = wrap.store.child(child, "source");
+            Kind::EXPORT_NAMED_DECLARATION
+                if wrap.store.child(child, Key::SOURCE).is_some() =>
+            {
+                let source = wrap.store.child(child, Key::SOURCE);
                 let mut kept = Vec::new();
-                for specifier in wrap.store.children(child, "specifiers") {
-                    let exported = wrap.store.child(specifier, "exported");
+                for specifier in wrap.store.children(child, Key::SPECIFIERS) {
+                    let exported = wrap.store.child(specifier, Key::EXPORTED);
                     let is_default = exported.is_some_and(|exported| {
-                        wrap.store.is(exported, "Identifier")
-                            && wrap.store.str(exported, "name") == Some("default")
+                        wrap.store.is(exported, Kind::IDENTIFIER)
+                            && wrap.store.str(exported, Key::NAME) == Some("default")
                     });
                     if !is_default {
                         kept.push(specifier);
@@ -111,22 +115,22 @@ pub(crate) fn wrap_program(
                         return Err(duplicate_layout(wrap.store, snippets, previous));
                     }
                     layout = Some(specifier);
-                    let local = wrap.store.child(specifier, "local");
+                    let local = wrap.store.child(specifier, Key::LOCAL);
                     let mdx_layout = wrap.store.identifier("MDXLayout");
                     let import_specifier = if local.is_some_and(|local| {
-                        wrap.store.is(local, "Identifier")
-                            && wrap.store.str(local, "name") == Some("default")
+                        wrap.store.is(local, Kind::IDENTIFIER)
+                            && wrap.store.str(local, Key::NAME) == Some("default")
                     }) {
                         wrap.store.add(
-                            "ImportDefaultSpecifier",
-                            vec![("local", mdx_layout.into())],
+                            Kind::IMPORT_DEFAULT_SPECIFIER,
+                            [(Key::LOCAL, mdx_layout.into())],
                         )
                     } else {
                         let import_specifier = wrap.store.add(
-                            "ImportSpecifier",
-                            vec![
-                                ("imported", local.into()),
-                                ("local", mdx_layout.into()),
+                            Kind::IMPORT_SPECIFIER,
+                            [
+                                (Key::IMPORTED, local.into()),
+                                (Key::LOCAL, mdx_layout.into()),
                             ],
                         );
                         if let Some(local) = local {
@@ -135,45 +139,44 @@ pub(crate) fn wrap_program(
                         import_specifier
                     };
                     let value = source
-                        .and_then(|source| wrap.store.get(source, "value").cloned());
+                        .and_then(|source| wrap.store.get(source, Key::VALUE).cloned());
                     let from = wrap.store.literal(value.unwrap_or(Value::Null));
                     if let Some(source) = source {
                         wrap.store.copy_place(source, from);
                     }
                     let declaration = wrap.store.add(
-                        "ImportDeclaration",
-                        vec![
-                            ("specifiers", Value::nodes([import_specifier])),
-                            ("attributes", Value::List(Vec::new())),
-                            ("source", from.into()),
+                        Kind::IMPORT_DECLARATION,
+                        [
+                            (Key::SPECIFIERS, Value::nodes([import_specifier])),
+                            (Key::ATTRIBUTES, Value::List(Vec::new())),
+                            (Key::SOURCE, from.into()),
                         ],
                     );
                     wrap.store.copy_place(specifier, declaration);
                     wrap.handle_esm(declaration);
                 }
                 let remaining = !kept.is_empty();
-                wrap.store.set(child, "specifiers", Value::nodes(kept));
+                wrap.store.set(child, Key::SPECIFIERS, Value::nodes(kept));
                 if remaining {
                     wrap.handle_export(child);
                 }
             }
-            "ExportNamedDeclaration" | "ExportAllDeclaration" => {
+            Kind::EXPORT_NAMED_DECLARATION | Kind::EXPORT_ALL_DECLARATION => {
                 wrap.handle_export(child)
             }
-            "ImportDeclaration" => wrap.handle_esm(child),
-            "ExpressionStatement"
-                if wrap
-                    .store
-                    .child(child, "expression")
-                    .is_some_and(|expression| {
+            Kind::IMPORT_DECLARATION => wrap.handle_esm(child),
+            Kind::EXPRESSION_STATEMENT
+                if wrap.store.child(child, Key::EXPRESSION).is_some_and(
+                    |expression| {
                         matches!(
                             wrap.store.kind(expression),
-                            "JSXElement" | "JSXFragment"
+                            Kind::JSX_ELEMENT | Kind::JSX_FRAGMENT
                         )
-                    }) =>
+                    },
+                ) =>
             {
                 content = true;
-                let expression = wrap.store.child(child, "expression");
+                let expression = wrap.store.child(child, Key::EXPRESSION);
                 let statements = wrap.create_mdx_content(expression, layout.is_some());
                 wrap.replacement.extend(statements);
             }
@@ -202,7 +205,8 @@ pub(crate) fn wrap_program(
         wrap.replacement.push(statement);
     }
     let replacement = std::mem::take(&mut wrap.replacement);
-    wrap.store.set(program, "body", Value::nodes(replacement));
+    wrap.store
+        .set(program, Key::BODY, Value::nodes(replacement));
     if function_body {
         resolve_dynamic(wrap.store, program);
     }
@@ -235,18 +239,18 @@ fn duplicate_layout(store: &Store, snippets: &[Snippet], previous: Id) -> Error 
 impl Wrap<'_> {
     fn inject_pragma(&mut self, program: Id, name: &str, value: &str) {
         let comment = self.store.add(
-            "Block",
-            vec![("value", format!("{name} {value}").as_str().into())],
+            Kind::BLOCK,
+            [(Key::VALUE, format!("{name} {value}").as_str().into())],
         );
-        self.store.set(comment, "pragma", true);
+        self.store.set(comment, Key::PRAGMA, true);
         self.store
-            .list_mut(program, "comments")
+            .list_mut(program, Key::COMMENTS)
             .insert(0, comment.into());
     }
 
     fn handle_export(&mut self, node: Id) {
-        if self.store.is(node, "ExportNamedDeclaration") {
-            if self.store.child(node, "declaration").is_some() {
+        if self.store.is(node, Kind::EXPORT_NAMED_DECLARATION) {
+            if self.store.child(node, Key::DECLARATION).is_some() {
                 let mut visitor = DefineVisitor {
                     scopes: Scopes::default(),
                 };
@@ -255,11 +259,11 @@ impl Wrap<'_> {
                 self.exported
                     .extend(defined.into_iter().map(|name| (name, None)));
             }
-            for specifier in self.store.children(node, "specifiers") {
-                if let Some(exported) = self.store.child(specifier, "exported") {
-                    let name = match self.store.get(exported, "name") {
+            for specifier in self.store.children(node, Key::SPECIFIERS) {
+                if let Some(exported) = self.store.child(specifier, Key::EXPORTED) {
+                    let name = match self.store.get(exported, Key::NAME) {
                         Some(Value::Str(name)) => name.to_string(),
-                        _ => match self.store.get(exported, "value") {
+                        _ => match self.store.get(exported, Key::VALUE) {
                             Some(Value::Str(value)) => value.to_string(),
                             _ => String::new(),
                         },
@@ -276,24 +280,24 @@ impl Wrap<'_> {
             self.replacement.push(node);
             return;
         }
-        let kind = self.store.kind(node).to_string();
-        let source = self.store.child(node, "source");
-        let replace = if kind == "ImportDeclaration"
-            || kind == "ExportAllDeclaration"
-            || (kind == "ExportNamedDeclaration" && source.is_some())
+        let kind = self.store.kind(node);
+        let source = self.store.child(node, Key::SOURCE);
+        let replace = if kind == Kind::IMPORT_DECLARATION
+            || kind == Kind::EXPORT_ALL_DECLARATION
+            || (kind == Kind::EXPORT_NAMED_DECLARATION && source.is_some())
         {
             let argument = self
                 .store
-                .add("ImportExpression", vec![("source", source.into())]);
+                .add(Kind::IMPORT_EXPRESSION, [(Key::SOURCE, source.into())]);
             self.store.copy_place(node, argument);
             let init = self
                 .store
-                .add("AwaitExpression", vec![("argument", argument.into())]);
-            let specifiers = self.store.children(node, "specifiers");
-            if kind != "ExportAllDeclaration" && specifiers.is_empty() {
+                .add(Kind::AWAIT_EXPRESSION, [(Key::ARGUMENT, argument.into())]);
+            let specifiers = self.store.children(node, Key::SPECIFIERS);
+            if kind != Kind::EXPORT_ALL_DECLARATION && specifiers.is_empty() {
                 Some(self.store.expression_statement(init))
             } else {
-                let declarations = if kind == "ExportAllDeclaration" {
+                let declarations = if kind == Kind::EXPORT_ALL_DECLARATION {
                     self.export_all_count += 1;
                     let id = self
                         .store
@@ -304,20 +308,21 @@ impl Wrap<'_> {
                 };
                 Some(self.store.declaration("const", declarations))
             }
-        } else if let Some(declaration) = self.store.child(node, "declaration") {
+        } else if let Some(declaration) = self.store.child(node, Key::DECLARATION) {
             Some(declaration)
         } else {
             let mut declarators = Vec::new();
-            for specifier in self.store.children(node, "specifiers") {
+            for specifier in self.store.children(node, Key::SPECIFIERS) {
                 let (Some(exported), Some(local)) = (
-                    self.store.child(specifier, "exported"),
-                    self.store.child(specifier, "local"),
+                    self.store.child(specifier, Key::EXPORTED),
+                    self.store.child(specifier, Key::LOCAL),
                 ) else {
                     continue;
                 };
-                if self.store.is(exported, "Identifier")
-                    && self.store.is(local, "Identifier")
-                    && self.store.str(local, "name") != self.store.str(exported, "name")
+                if self.store.is(exported, Kind::IDENTIFIER)
+                    && self.store.is(local, Kind::IDENTIFIER)
+                    && self.store.str(local, Key::NAME)
+                        != self.store.str(exported, Key::NAME)
                 {
                     declarators.push(self.store.declarator(exported, Some(local)));
                 }
@@ -338,43 +343,45 @@ impl Wrap<'_> {
         let function_body = self.function_body;
         let store = &mut *self.store;
         let props = store.identifier("props");
-        let spread = store.add("JSXSpreadAttribute", vec![("argument", props.into())]);
+        let spread =
+            store.add(Kind::JSX_SPREAD_ATTRIBUTE, [(Key::ARGUMENT, props.into())]);
         let name = store.jsx_identifier("_createMdxContent");
         let opening = store.add(
-            "JSXOpeningElement",
-            vec![
-                ("name", name.into()),
-                ("attributes", Value::nodes([spread])),
-                ("selfClosing", true.into()),
+            Kind::JSX_OPENING_ELEMENT,
+            [
+                (Key::NAME, name.into()),
+                (Key::ATTRIBUTES, Value::nodes([spread])),
+                (Key::SELF_CLOSING, true.into()),
             ],
         );
         let inner = store.add(
-            "JSXElement",
-            vec![
-                ("openingElement", opening.into()),
-                ("closingElement", Value::Null),
-                ("children", Value::List(Vec::new())),
+            Kind::JSX_ELEMENT,
+            [
+                (Key::OPENING_ELEMENT, opening.into()),
+                (Key::CLOSING_ELEMENT, Value::Null),
+                (Key::CHILDREN, Value::List(Vec::new())),
             ],
         );
         let props = store.identifier("props");
-        let spread = store.add("JSXSpreadAttribute", vec![("argument", props.into())]);
+        let spread =
+            store.add(Kind::JSX_SPREAD_ATTRIBUTE, [(Key::ARGUMENT, props.into())]);
         let name = store.jsx_identifier("MDXLayout");
         let opening = store.add(
-            "JSXOpeningElement",
-            vec![
-                ("name", name.into()),
-                ("attributes", Value::nodes([spread])),
-                ("selfClosing", false.into()),
+            Kind::JSX_OPENING_ELEMENT,
+            [
+                (Key::NAME, name.into()),
+                (Key::ATTRIBUTES, Value::nodes([spread])),
+                (Key::SELF_CLOSING, false.into()),
             ],
         );
         let name = store.jsx_identifier("MDXLayout");
-        let closing = store.add("JSXClosingElement", vec![("name", name.into())]);
+        let closing = store.add(Kind::JSX_CLOSING_ELEMENT, [(Key::NAME, name.into())]);
         let element = store.add(
-            "JSXElement",
-            vec![
-                ("openingElement", opening.into()),
-                ("closingElement", closing.into()),
-                ("children", Value::nodes([inner])),
+            Kind::JSX_ELEMENT,
+            [
+                (Key::OPENING_ELEMENT, opening.into()),
+                (Key::CLOSING_ELEMENT, closing.into()),
+                (Key::CHILDREN, Value::nodes([inner])),
             ],
         );
         let mut result = element;
@@ -384,19 +391,19 @@ impl Wrap<'_> {
             let props = store.identifier("props");
             let alternate = store.call(callee, vec![props]);
             result = store.add(
-                "ConditionalExpression",
-                vec![
-                    ("test", test.into()),
-                    ("consequent", element.into()),
-                    ("alternate", alternate.into()),
+                Kind::CONDITIONAL_EXPRESSION,
+                [
+                    (Key::TEST, test.into()),
+                    (Key::CONSEQUENT, element.into()),
+                    (Key::ALTERNATE, alternate.into()),
                 ],
             );
         }
         let mut argument = content.unwrap_or_else(|| store.identifier("undefined"));
-        if store.is(argument, "JSXFragment") {
-            let children = store.list(argument, "children");
+        if store.is(argument, Kind::JSX_FRAGMENT) {
+            let children = store.list(argument, Key::CHILDREN);
             if let [Value::Node(only)] = children
-                && store.is(*only, "JSXElement")
+                && store.is(*only, Kind::JSX_ELEMENT)
             {
                 argument = *only;
             }
@@ -406,18 +413,18 @@ impl Wrap<'_> {
         let left = store.identifier("props");
         let right = store.object(Vec::new());
         let parameter = store.add(
-            "AssignmentPattern",
-            vec![("left", left.into()), ("right", right.into())],
+            Kind::ASSIGNMENT_PATTERN,
+            [(Key::LEFT, left.into()), (Key::RIGHT, right.into())],
         );
         let returned = store.return_statement(Some(result));
         let body = store.block(vec![returned]);
         let id = store.identifier("MDXContent");
         let declaration = store.add(
-            "FunctionDeclaration",
-            vec![
-                ("id", id.into()),
-                ("params", Value::nodes([parameter])),
-                ("body", body.into()),
+            Kind::FUNCTION_DECLARATION,
+            [
+                (Key::ID, id.into()),
+                (Key::PARAMS, Value::nodes([parameter])),
+                (Key::BODY, body.into()),
             ],
         );
         let id = store.identifier("_createMdxContent");
@@ -425,20 +432,20 @@ impl Wrap<'_> {
         let returned = store.return_statement(Some(argument));
         let body = store.block(vec![returned]);
         let create = store.add(
-            "FunctionDeclaration",
-            vec![
-                ("async", visitor.found.into()),
-                ("id", id.into()),
-                ("params", Value::nodes([props])),
-                ("body", body.into()),
+            Kind::FUNCTION_DECLARATION,
+            [
+                (Key::ASYNC, visitor.found.into()),
+                (Key::ID, id.into()),
+                (Key::PARAMS, Value::nodes([props])),
+                (Key::BODY, body.into()),
             ],
         );
         let exported = if function_body {
             declaration
         } else {
             store.add(
-                "ExportDefaultDeclaration",
-                vec![("declaration", declaration.into())],
+                Kind::EXPORT_DEFAULT_DECLARATION,
+                [(Key::DECLARATION, declaration.into())],
             )
         };
         [create, exported]
@@ -456,54 +463,54 @@ pub(crate) fn specifiers_to_declarations(
     let namespace = specifiers
         .iter()
         .copied()
-        .rfind(|specifier| store.is(*specifier, "ImportNamespaceSpecifier"));
+        .rfind(|specifier| store.is(*specifier, Kind::IMPORT_NAMESPACE_SPECIFIER));
     let mut init = init;
     if let Some(namespace) = namespace {
-        let local = store.child(namespace, "local");
+        let local = store.child(namespace, Key::LOCAL);
         let declarator = store.add(
-            "VariableDeclarator",
-            vec![("id", local.into()), ("init", init.into())],
+            Kind::VARIABLE_DECLARATOR,
+            [(Key::ID, local.into()), (Key::INIT, init.into())],
         );
         store.copy_place(namespace, declarator);
         declarations.push(declarator);
         let name = local
-            .and_then(|local| store.str(local, "name"))
+            .and_then(|local| store.str(local, Key::NAME))
             .unwrap_or_default()
             .to_string();
         init = store.identifier(&name);
     }
     let mut properties = Vec::new();
     for specifier in specifiers.iter().copied() {
-        if store.is(specifier, "ImportNamespaceSpecifier") {
+        if store.is(specifier, Kind::IMPORT_NAMESPACE_SPECIFIER) {
             continue;
         }
         let (key, value) = match store.kind(specifier) {
-            "ImportSpecifier" => (
-                store.child(specifier, "imported"),
-                store.child(specifier, "local"),
+            Kind::IMPORT_SPECIFIER => (
+                store.child(specifier, Key::IMPORTED),
+                store.child(specifier, Key::LOCAL),
             ),
-            "ExportSpecifier" => (
-                store.child(specifier, "local"),
-                store.child(specifier, "exported"),
+            Kind::EXPORT_SPECIFIER => (
+                store.child(specifier, Key::LOCAL),
+                store.child(specifier, Key::EXPORTED),
             ),
             _ => (
                 Some(store.identifier("default")),
-                store.child(specifier, "local"),
+                store.child(specifier, Key::LOCAL),
             ),
         };
         let (Some(key), Some(value)) = (key, value) else {
             continue;
         };
-        let shorthand = store.is(key, "Identifier")
-            && store.is(value, "Identifier")
-            && store.str(key, "name") == store.str(value, "name");
+        let shorthand = store.is(key, Kind::IDENTIFIER)
+            && store.is(value, Kind::IDENTIFIER)
+            && store.str(key, Key::NAME) == store.str(value, Key::NAME);
         let property = store.property(key, value, shorthand);
         store.copy_place(specifier, property);
         properties.push(property);
     }
     let pattern = store.add(
-        "ObjectPattern",
-        vec![("properties", Value::nodes(properties))],
+        Kind::OBJECT_PATTERN,
+        [(Key::PROPERTIES, Value::nodes(properties))],
     );
     declarations.push(store.declarator(pattern, Some(init)));
     declarations
@@ -518,7 +525,9 @@ impl Visit for DefineVisitor {
         self.scopes.enter(store, id);
         if matches!(
             store.kind(id),
-            "ArrowFunctionExpression" | "FunctionDeclaration" | "FunctionExpression"
+            Kind::ARROW_FUNCTION_EXPRESSION
+                | Kind::FUNCTION_DECLARATION
+                | Kind::FUNCTION_EXPRESSION
         ) {
             self.scopes.exit(store, id);
             return Enter {
@@ -542,14 +551,16 @@ struct AwaitVisitor {
 impl Visit for AwaitVisitor {
     fn enter(&mut self, store: &mut Store, id: Id) -> Enter {
         match store.kind(id) {
-            "ArrowFunctionExpression" | "FunctionDeclaration" | "FunctionExpression" => {
+            Kind::ARROW_FUNCTION_EXPRESSION
+            | Kind::FUNCTION_DECLARATION
+            | Kind::FUNCTION_EXPRESSION => {
                 return Enter {
                     skip: true,
                     replace: None,
                 };
             }
-            "AwaitExpression" => self.found = true,
-            "ForOfStatement" if store.flag(id, "await") => self.found = true,
+            Kind::AWAIT_EXPRESSION => self.found = true,
+            Kind::FOR_OF_STATEMENT if store.flag(id, Key::AWAIT) => self.found = true,
             _ => {}
         }
         Enter::default()
@@ -571,11 +582,11 @@ fn resolve_dynamic(store: &mut Store, program: Id) {
     if visitor.import {
         visitor.meta = true;
         let helper = resolve_dynamic_specifier(store);
-        store.list_mut(program, "body").push(helper.into());
+        store.list_mut(program, Key::BODY).push(helper.into());
     }
     if visitor.meta {
         let statements = import_meta_url_variable(store);
-        let body = store.list_mut(program, "body");
+        let body = store.list_mut(program, Key::BODY);
         for (index, statement) in statements.into_iter().enumerate() {
             body.insert(index, statement.into());
         }
@@ -589,29 +600,29 @@ struct DynamicVisitor {
 
 impl Visit for DynamicVisitor {
     fn enter(&mut self, store: &mut Store, id: Id) -> Enter {
-        if store.is(id, "ImportExpression") {
+        if store.is(id, Kind::IMPORT_EXPRESSION) {
             self.import = true;
             let callee = store.identifier("_resolveDynamicMdxSpecifier");
-            let source = store.child(id, "source");
+            let source = store.child(id, Key::SOURCE);
             let call = store.call(callee, source.into_iter().collect());
-            store.set(id, "source", call);
+            store.set(id, Key::SOURCE, call);
             return Enter::default();
         }
-        let object = store.child(id, "object");
-        let property = store.child(id, "property");
-        if store.is(id, "MemberExpression")
+        let object = store.child(id, Key::OBJECT);
+        let property = store.child(id, Key::PROPERTY);
+        if store.is(id, Kind::MEMBER_EXPRESSION)
             && let (Some(object), Some(property)) = (object, property)
-            && store.is(object, "MetaProperty")
-            && store.is(property, "Identifier")
+            && store.is(object, Kind::META_PROPERTY)
+            && store.is(property, Kind::IDENTIFIER)
             && store
-                .child(object, "meta")
-                .and_then(|meta| store.str(meta, "name"))
+                .child(object, Key::META)
+                .and_then(|meta| store.str(meta, Key::NAME))
                 == Some("import")
             && store
-                .child(object, "property")
-                .and_then(|name| store.str(name, "name"))
+                .child(object, Key::PROPERTY)
+                .and_then(|name| store.str(name, Key::NAME))
                 == Some("meta")
-            && store.str(property, "name") == Some("url")
+            && store.str(property, Key::NAME) == Some("url")
         {
             self.meta = true;
             let replacement = store.identifier("_importMetaUrl");
@@ -647,37 +658,40 @@ fn starts_with_call(store: &mut Store, prefix: &str) -> Id {
 fn resolve_dynamic_specifier(store: &mut Store) -> Id {
     let d = store.identifier("d");
     let typeof_d = store.add(
-        "UnaryExpression",
-        vec![
-            ("operator", "typeof".into()),
-            ("prefix", true.into()),
-            ("argument", d.into()),
+        Kind::UNARY_EXPRESSION,
+        [
+            (Key::OPERATOR, "typeof".into()),
+            (Key::PREFIX, true.into()),
+            (Key::ARGUMENT, d.into()),
         ],
     );
     let string = store.literal("string");
     let test = store.add(
-        "BinaryExpression",
-        vec![
-            ("left", typeof_d.into()),
-            ("operator", "!==".into()),
-            ("right", string.into()),
+        Kind::BINARY_EXPRESSION,
+        [
+            (Key::LEFT, typeof_d.into()),
+            (Key::OPERATOR, "!==".into()),
+            (Key::RIGHT, string.into()),
         ],
     );
     let d = store.identifier("d");
     let consequent = store.return_statement(Some(d));
     let first = store.add(
-        "IfStatement",
-        vec![
-            ("test", test.into()),
-            ("consequent", consequent.into()),
-            ("alternate", Value::Null),
+        Kind::IF_STATEMENT,
+        [
+            (Key::TEST, test.into()),
+            (Key::CONSEQUENT, consequent.into()),
+            (Key::ALTERNATE, Value::Null),
         ],
     );
     let url = store.identifier("URL");
     let d = store.identifier("d");
     let construct = store.add(
-        "NewExpression",
-        vec![("callee", url.into()), ("arguments", Value::nodes([d]))],
+        Kind::NEW_EXPRESSION,
+        [
+            (Key::CALLEE, url.into()),
+            (Key::ARGUMENTS, Value::nodes([d])),
+        ],
     );
     let construct = store.expression_statement(construct);
     let d = store.identifier("d");
@@ -685,55 +699,55 @@ fn resolve_dynamic_specifier(store: &mut Store) -> Id {
     let block = store.block(vec![construct, returned]);
     let empty = store.block(Vec::new());
     let handler = store.add(
-        "CatchClause",
-        vec![("param", Value::Null), ("body", empty.into())],
+        Kind::CATCH_CLAUSE,
+        [(Key::PARAM, Value::Null), (Key::BODY, empty.into())],
     );
     let second = store.add(
-        "TryStatement",
-        vec![
-            ("block", block.into()),
-            ("handler", handler.into()),
-            ("finalizer", Value::Null),
+        Kind::TRY_STATEMENT,
+        [
+            (Key::BLOCK, block.into()),
+            (Key::HANDLER, handler.into()),
+            (Key::FINALIZER, Value::Null),
         ],
     );
     let absolute = starts_with_call(store, "/");
     let current = starts_with_call(store, "./");
     let left = store.add(
-        "LogicalExpression",
-        vec![
-            ("left", absolute.into()),
-            ("operator", "||".into()),
-            ("right", current.into()),
+        Kind::LOGICAL_EXPRESSION,
+        [
+            (Key::LEFT, absolute.into()),
+            (Key::OPERATOR, "||".into()),
+            (Key::RIGHT, current.into()),
         ],
     );
     let parent = starts_with_call(store, "../");
     let test = store.add(
-        "LogicalExpression",
-        vec![
-            ("left", left.into()),
-            ("operator", "||".into()),
-            ("right", parent.into()),
+        Kind::LOGICAL_EXPRESSION,
+        [
+            (Key::LEFT, left.into()),
+            (Key::OPERATOR, "||".into()),
+            (Key::RIGHT, parent.into()),
         ],
     );
     let url = store.identifier("URL");
     let d = store.identifier("d");
     let meta = store.identifier("_importMetaUrl");
     let construct = store.add(
-        "NewExpression",
-        vec![
-            ("callee", url.into()),
-            ("arguments", Value::nodes([d, meta])),
+        Kind::NEW_EXPRESSION,
+        [
+            (Key::CALLEE, url.into()),
+            (Key::ARGUMENTS, Value::nodes([d, meta])),
         ],
     );
     let href = store.identifier("href");
     let resolved = store.member(construct, href, false);
     let consequent = store.return_statement(Some(resolved));
     let third = store.add(
-        "IfStatement",
-        vec![
-            ("test", test.into()),
-            ("consequent", consequent.into()),
-            ("alternate", Value::Null),
+        Kind::IF_STATEMENT,
+        [
+            (Key::TEST, test.into()),
+            (Key::CONSEQUENT, consequent.into()),
+            (Key::ALTERNATE, Value::Null),
         ],
     );
     let d = store.identifier("d");
@@ -742,13 +756,13 @@ fn resolve_dynamic_specifier(store: &mut Store) -> Id {
     let id = store.identifier("_resolveDynamicMdxSpecifier");
     let d = store.identifier("d");
     store.add(
-        "FunctionDeclaration",
-        vec![
-            ("id", id.into()),
-            ("generator", false.into()),
-            ("async", false.into()),
-            ("params", Value::nodes([d])),
-            ("body", body.into()),
+        Kind::FUNCTION_DECLARATION,
+        [
+            (Key::ID, id.into()),
+            (Key::GENERATOR, false.into()),
+            (Key::ASYNC, false.into()),
+            (Key::PARAMS, Value::nodes([d])),
+            (Key::BODY, body.into()),
         ],
     )
 }
@@ -764,11 +778,11 @@ fn import_meta_url_variable(store: &mut Store) -> [Id; 2] {
     let variable = store.declaration("const", vec![declarator]);
     let meta = store.identifier("_importMetaUrl");
     let test = store.add(
-        "UnaryExpression",
-        vec![
-            ("operator", "!".into()),
-            ("prefix", true.into()),
-            ("argument", meta.into()),
+        Kind::UNARY_EXPRESSION,
+        [
+            (Key::OPERATOR, "!".into()),
+            (Key::PREFIX, true.into()),
+            (Key::ARGUMENT, meta.into()),
         ],
     );
     let error = store.identifier("Error");
@@ -776,19 +790,19 @@ fn import_meta_url_variable(store: &mut Store) -> [Id; 2] {
         "Unexpected missing `options.baseUrl` needed to support `export … from`, `import`, or `import.meta.url` when generating `function-body`",
     );
     let construct = store.add(
-        "NewExpression",
-        vec![
-            ("callee", error.into()),
-            ("arguments", Value::nodes([message])),
+        Kind::NEW_EXPRESSION,
+        [
+            (Key::CALLEE, error.into()),
+            (Key::ARGUMENTS, Value::nodes([message])),
         ],
     );
-    let thrown = store.add("ThrowStatement", vec![("argument", construct.into())]);
+    let thrown = store.add(Kind::THROW_STATEMENT, [(Key::ARGUMENT, construct.into())]);
     let check = store.add(
-        "IfStatement",
-        vec![
-            ("test", test.into()),
-            ("consequent", thrown.into()),
-            ("alternate", Value::Null),
+        Kind::IF_STATEMENT,
+        [
+            (Key::TEST, test.into()),
+            (Key::CONSEQUENT, thrown.into()),
+            (Key::ALTERNATE, Value::Null),
         ],
     );
     [variable, check]

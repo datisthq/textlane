@@ -10,6 +10,7 @@ use crate::models::event::{Event, Point};
 use crate::models::mdx::MdxScript;
 use crate::utils::tokenizer::document::tokenize_document;
 use crate::utils::tokenizer::driver::Tokenizer;
+use crate::utils::tokenizer::recycle::take_events;
 use crate::utils::tokenizer::subtokenize::subtokenize;
 
 /// What every tokenizer of one document shares.
@@ -50,9 +51,6 @@ pub(crate) struct ParseState<'a> {
     /// Whether a syntax error stopped tokenizing; `error` holds it.
     pub(crate) failed: Cell<bool>,
     pub(crate) error: RefCell<Option<Error>>,
-    /// The buffer `EditMap::consume` rebuilds events into: a fresh one each pass would fault
-    /// in every page again.
-    pub(crate) spare_events: RefCell<Vec<Event>>,
 }
 
 impl ParseState<'_> {
@@ -160,6 +158,7 @@ pub(crate) fn tokenize_input(
     definition_list: bool,
     mdx: Option<&MdxScript>,
 ) -> Result<Tokenized, Error> {
+    check_length(value.len())?;
     let mut parse_state = ParseState {
         bytes: value.as_bytes(),
         definitions: HashSet::new(),
@@ -178,7 +177,6 @@ pub(crate) fn tokenize_input(
         mdx: mdx.cloned(),
         failed: Cell::new(false),
         error: RefCell::new(None),
-        spare_events: RefCell::new(vec![]),
     };
     let start = Point {
         line: 1,
@@ -188,6 +186,7 @@ pub(crate) fn tokenize_input(
     };
     let (mut events, mut result, footnotes) = {
         let mut tokenizer = Tokenizer::new(start, &parse_state);
+        tokenizer.events = take_events();
         let state = tokenizer.push(
             (0, 0),
             (parse_state.bytes.len(), 0),
@@ -238,3 +237,21 @@ fn merge_prefixes(parse_state: &ParseState) -> Vec<(usize, usize)> {
     }
     merged
 }
+
+// Points hold lines, columns and offsets as `u32`, and a tab adds up to four columns per
+// byte: past 1 GiB a column could wrap, which core's `Point::MAX_OFFSET` caps at anyway
+pub(crate) fn check_length(len: usize) -> Result<(), Error> {
+    if len > MAX_INPUT {
+        return Err(Error::new(
+            "input-too-long",
+            "Cannot parse Markdown longer than 1 GiB",
+        ));
+    }
+    Ok(())
+}
+
+const MAX_INPUT: usize = (1 << 30) - 1;
+
+#[cfg(test)]
+#[path = "preprocess_unit.rs"]
+mod unit;

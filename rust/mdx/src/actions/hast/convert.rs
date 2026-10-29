@@ -11,6 +11,7 @@ use crate::helpers::json::format_number;
 use crate::helpers::property::{find_property, react_property};
 use crate::helpers::style::parse_style;
 use crate::models::estree::{Id, Store, Value};
+use crate::models::name::{Key, Kind};
 use crate::models::options::CompileOptions;
 
 const STACK_RED_ZONE: usize = 64 * 1024;
@@ -65,7 +66,7 @@ pub(crate) fn convert_hast<'o, 's>(
     let mut body = Vec::new();
     if let Some(mut result) = state.handle(tree)? {
         let kind = state.store.kind(result);
-        if kind != "JSXFragment" && kind != "JSXElement" {
+        if kind != Kind::JSX_FRAGMENT && kind != Kind::JSX_ELEMENT {
             result = state.store.fragment(vec![result]);
         }
         body.push(state.store.expression_statement(result));
@@ -74,11 +75,11 @@ pub(crate) fn convert_hast<'o, 's>(
     statements.extend(body);
     let comments = Value::nodes(state.comments.clone());
     let program = state.store.add(
-        "Program",
-        vec![
-            ("body", Value::nodes(statements)),
-            ("sourceType", "module".into()),
-            ("comments", comments),
+        Kind::PROGRAM,
+        [
+            (Key::BODY, Value::nodes(statements)),
+            (Key::SOURCE_TYPE, "module".into()),
+            (Key::COMMENTS, comments),
         ],
     );
     Ok((state, program))
@@ -161,13 +162,13 @@ impl Convert<'_, '_> {
 
     // hast-util-whitespace: an expression container of a literal of only HTML white space
     fn is_whitespace_text(&self, id: Id) -> bool {
-        self.store.is(id, "JSXExpressionContainer")
+        self.store.is(id, Kind::JSX_EXPRESSION_CONTAINER)
             && self
                 .store
-                .child(id, "expression")
+                .child(id, Key::EXPRESSION)
                 .is_some_and(|expression| {
-                    self.store.is(expression, "Literal")
-                        && match self.store.get(expression, "value") {
+                    self.store.is(expression, Kind::LITERAL)
+                        && match self.store.get(expression, Key::VALUE) {
                             Some(Value::Str(value)) => value.bytes().all(|byte| {
                                 matches!(byte, b' ' | b'\t' | b'\n' | b'\r' | b'\x0c')
                             }),
@@ -182,24 +183,24 @@ impl Convert<'_, '_> {
         }
         let literal = self.store.literal(value);
         Some(self.store.add(
-            "JSXExpressionContainer",
-            vec![("expression", literal.into())],
+            Kind::JSX_EXPRESSION_CONTAINER,
+            [(Key::EXPRESSION, literal.into())],
         ))
     }
 
     fn comment(&mut self, value: &str) -> Id {
-        let comment = self.store.add("Block", vec![("value", value.into())]);
+        let comment = self.store.add(Kind::BLOCK, [(Key::VALUE, value.into())]);
         self.comments.push(comment);
         let attached = self.store.copy(comment);
-        self.store.set(attached, "leading", false);
-        self.store.set(attached, "trailing", true);
+        self.store.set(attached, Key::LEADING, false);
+        self.store.set(attached, Key::TRAILING, true);
         let expression = self.store.add(
-            "JSXEmptyExpression",
-            vec![("comments", Value::nodes([attached]))],
+            Kind::JSX_EMPTY_EXPRESSION,
+            [(Key::COMMENTS, Value::nodes([attached]))],
         );
         self.store.add(
-            "JSXExpressionContainer",
-            vec![("expression", expression.into())],
+            Kind::JSX_EXPRESSION_CONTAINER,
+            [(Key::EXPRESSION, expression.into())],
         )
     }
 
@@ -281,8 +282,8 @@ impl Convert<'_, '_> {
                 let object = self.store.object(properties);
                 style = Some(object);
                 Some(self.store.add(
-                    "JSXExpressionContainer",
-                    vec![("expression", object.into())],
+                    Kind::JSX_EXPRESSION_CONTAINER,
+                    [(Key::EXPRESSION, object.into())],
                 ))
             } else if matches!(value, PropertyValue::Boolean(true)) {
                 None
@@ -303,13 +304,13 @@ impl Convert<'_, '_> {
                 None => {
                     let object = self.store.object(Vec::new());
                     let container = self.store.add(
-                        "JSXExpressionContainer",
-                        vec![("expression", object.into())],
+                        Kind::JSX_EXPRESSION_CONTAINER,
+                        [(Key::EXPRESSION, object.into())],
                     );
                     let name = self.store.jsx_identifier("style");
                     attributes.push(self.store.add(
-                        "JSXAttribute",
-                        vec![("name", name.into()), ("value", container.into())],
+                        Kind::JSX_ATTRIBUTE,
+                        [(Key::NAME, name.into()), (Key::VALUE, container.into())],
                     ));
                     object
                 }
@@ -321,7 +322,7 @@ impl Convert<'_, '_> {
             };
             let property = self.style_property(&key, &align);
             self.store
-                .list_mut(object, "properties")
+                .list_mut(object, Key::PROPERTIES)
                 .push(property.into());
         }
         self.svg = parent_svg;
@@ -343,16 +344,18 @@ impl Convert<'_, '_> {
         if is_identifier_name(name, true) {
             let name = self.store.jsx_identifier(name);
             return self.store.add(
-                "JSXAttribute",
-                vec![("name", name.into()), ("value", value.into())],
+                Kind::JSX_ATTRIBUTE,
+                [(Key::NAME, name.into()), (Key::VALUE, value.into())],
             );
         }
         let key = self.store.literal(name);
         let value = value.unwrap_or_else(|| self.store.literal(true));
         let property = self.store.property(key, value, false);
         let argument = self.store.object(vec![property]);
-        self.store
-            .add("JSXSpreadAttribute", vec![("argument", argument.into())])
+        self.store.add(
+            Kind::JSX_SPREAD_ATTRIBUTE,
+            [(Key::ARGUMENT, argument.into())],
+        )
     }
 
     /// A JSX element named `name`, self-closing when it has no children; `explicit` marks
@@ -366,32 +369,32 @@ impl Convert<'_, '_> {
     ) -> Id {
         let opening_name = self.jsx_name(name);
         let opening = self.store.add(
-            "JSXOpeningElement",
-            vec![
-                ("attributes", Value::nodes(attributes)),
-                ("name", opening_name.into()),
-                ("selfClosing", children.is_empty().into()),
+            Kind::JSX_OPENING_ELEMENT,
+            [
+                (Key::ATTRIBUTES, Value::nodes(attributes)),
+                (Key::NAME, opening_name.into()),
+                (Key::SELF_CLOSING, children.is_empty().into()),
             ],
         );
         let closing = if children.is_empty() {
             None
         } else {
             let closing_name = self.jsx_name(name);
-            Some(
-                self.store
-                    .add("JSXClosingElement", vec![("name", closing_name.into())]),
-            )
+            Some(self.store.add(
+                Kind::JSX_CLOSING_ELEMENT,
+                [(Key::NAME, closing_name.into())],
+            ))
         };
         let element = self.store.add(
-            "JSXElement",
-            vec![
-                ("openingElement", opening.into()),
-                ("closingElement", closing.into()),
-                ("children", Value::nodes(children)),
+            Kind::JSX_ELEMENT,
+            [
+                (Key::OPENING_ELEMENT, opening.into()),
+                (Key::CLOSING_ELEMENT, closing.into()),
+                (Key::CHILDREN, Value::nodes(children)),
             ],
         );
         if explicit {
-            self.store.set(element, "explicit", true);
+            self.store.set(element, Key::EXPLICIT, true);
         }
         element
     }
@@ -404,8 +407,8 @@ impl Convert<'_, '_> {
             for part in parts.take_while(|part| !part.is_empty()) {
                 let property = self.store.jsx_identifier(part);
                 node = self.store.add(
-                    "JSXMemberExpression",
-                    vec![("object", node.into()), ("property", property.into())],
+                    Kind::JSX_MEMBER_EXPRESSION,
+                    [(Key::OBJECT, node.into()), (Key::PROPERTY, property.into())],
                 );
             }
             return node;
@@ -415,8 +418,11 @@ impl Convert<'_, '_> {
             let namespace = self.store.jsx_identifier(namespace);
             let local = self.store.jsx_identifier(local);
             return self.store.add(
-                "JSXNamespacedName",
-                vec![("namespace", namespace.into()), ("name", local.into())],
+                Kind::JSX_NAMESPACED_NAME,
+                [
+                    (Key::NAMESPACE, namespace.into()),
+                    (Key::NAME, local.into()),
+                ],
             );
         }
         self.store.jsx_identifier(name)
@@ -441,28 +447,28 @@ impl Convert<'_, '_> {
                 JsxAttribute::Boolean(name) => {
                     let name = self.jsx_name(name);
                     self.store.add(
-                        "JSXAttribute",
-                        vec![("name", name.into()), ("value", Value::Null)],
+                        Kind::JSX_ATTRIBUTE,
+                        [(Key::NAME, name.into()), (Key::VALUE, Value::Null)],
                     )
                 }
                 JsxAttribute::Literal(name, value) => {
                     let name = self.jsx_name(name);
                     let value = self.store.literal(*value);
                     self.store.add(
-                        "JSXAttribute",
-                        vec![("name", name.into()), ("value", value.into())],
+                        Kind::JSX_ATTRIBUTE,
+                        [(Key::NAME, name.into()), (Key::VALUE, value.into())],
                     )
                 }
                 JsxAttribute::Expression(name, source) => {
                     let expression = self.expression(source, false)?;
                     let value = self.store.add(
-                        "JSXExpressionContainer",
-                        vec![("expression", expression.into())],
+                        Kind::JSX_EXPRESSION_CONTAINER,
+                        [(Key::EXPRESSION, expression.into())],
                     );
                     let name = self.jsx_name(name);
                     self.store.add(
-                        "JSXAttribute",
-                        vec![("name", name.into()), ("value", value.into())],
+                        Kind::JSX_ATTRIBUTE,
+                        [(Key::NAME, name.into()), (Key::VALUE, value.into())],
                     )
                 }
                 JsxAttribute::Spread(source) => {
@@ -470,8 +476,10 @@ impl Convert<'_, '_> {
                         Some(argument) => argument,
                         None => self.store.object(Vec::new()),
                     };
-                    self.store
-                        .add("JSXSpreadAttribute", vec![("argument", argument.into())])
+                    self.store.add(
+                        Kind::JSX_SPREAD_ATTRIBUTE,
+                        [(Key::ARGUMENT, argument.into())],
+                    )
                 }
             };
             results.push(result);
@@ -490,8 +498,8 @@ impl Convert<'_, '_> {
         let expression = self.expression(source, false)?;
         self.mark_explicit(first);
         Ok(self.store.add(
-            "JSXExpressionContainer",
-            vec![("expression", expression.into())],
+            Kind::JSX_EXPRESSION_CONTAINER,
+            [(Key::EXPRESSION, expression.into())],
         ))
     }
 
@@ -507,7 +515,7 @@ impl Convert<'_, '_> {
         self.mark_explicit(first);
         self.comments.extend(comments.iter().copied());
         attach_comments(&mut self.store, program, &comments);
-        self.esm.extend(self.store.children(program, "body"));
+        self.esm.extend(self.store.children(program, Key::BODY));
         Ok(())
     }
 
@@ -515,8 +523,8 @@ impl Convert<'_, '_> {
     // not JSX in attribute values, which `_components` still replaces
     fn mark_explicit(&mut self, first: usize) {
         for index in first..self.store.len() {
-            if self.store.is(Id(index), "JSXElement") {
-                self.store.set(Id(index), "explicit", true);
+            if self.store.is(Id(index), Kind::JSX_ELEMENT) {
+                self.store.set(Id(index), Key::EXPLICIT, true);
             }
         }
     }
@@ -524,7 +532,7 @@ impl Convert<'_, '_> {
     fn expression(&mut self, source: &str, spread: bool) -> Result<Id, Error> {
         match self.parse_expression(source, spread)? {
             Some(expression) => Ok(expression),
-            None => Ok(self.store.add("JSXEmptyExpression", vec![])),
+            None => Ok(self.store.add(Kind::JSX_EMPTY_EXPRESSION, [])),
         }
     }
 
@@ -545,19 +553,19 @@ impl Convert<'_, '_> {
         let start = Value::Number(base as f64);
         let end = Value::Number((base + source.len()) as f64);
         let statement = self.store.add(
-            "ExpressionStatement",
-            vec![
-                ("expression", expression.into()),
-                ("start", start.clone()),
-                ("end", end.clone()),
+            Kind::EXPRESSION_STATEMENT,
+            [
+                (Key::EXPRESSION, expression.into()),
+                (Key::START, start.clone()),
+                (Key::END, end.clone()),
             ],
         );
         let program = self.store.add(
-            "Program",
-            vec![
-                ("body", Value::nodes([statement])),
-                ("start", start),
-                ("end", end),
+            Kind::PROGRAM,
+            [
+                (Key::BODY, Value::nodes([statement])),
+                (Key::START, start),
+                (Key::END, end),
             ],
         );
         attach_comments(&mut self.store, program, &comments);
@@ -566,11 +574,11 @@ impl Convert<'_, '_> {
         }
         Ok(self
             .store
-            .children(expression, "properties")
+            .children(expression, Key::PROPERTIES)
             .first()
             .copied()
-            .filter(|property| self.store.is(*property, "SpreadElement"))
-            .and_then(|property| self.store.child(property, "argument")))
+            .filter(|property| self.store.is(*property, Kind::SPREAD_ELEMENT))
+            .and_then(|property| self.store.child(property, Key::ARGUMENT)))
     }
 
     fn reserve(&mut self, source: &str, position: Option<&Position<'_>>) -> usize {

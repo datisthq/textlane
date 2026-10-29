@@ -33,6 +33,11 @@ pub(crate) fn classify_character_unit(character: Option<char>) -> CharacterKind 
 
 /// The character that ends right before byte `index`.
 pub(crate) fn find_character_before(bytes: &[u8], index: usize) -> Option<char> {
+    match index.checked_sub(1).map(|before| bytes[before]) {
+        None => return None,
+        Some(byte) if byte.is_ascii() => return Some(char::from(byte)),
+        Some(_) => {}
+    }
     let start = index.saturating_sub(4);
     String::from_utf8_lossy(&bytes[start..index]).chars().last()
 }
@@ -52,6 +57,11 @@ pub(crate) fn find_text_character_before(
 
 /// The character that starts at byte `index`.
 pub(crate) fn find_character_after(bytes: &[u8], index: usize) -> Option<char> {
+    match bytes.get(index) {
+        None => return None,
+        Some(byte) if byte.is_ascii() => return Some(char::from(*byte)),
+        Some(_) => {}
+    }
     let end = (index + 4).min(bytes.len());
     String::from_utf8_lossy(&bytes[index..end]).chars().next()
 }

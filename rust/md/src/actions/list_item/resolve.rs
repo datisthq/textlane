@@ -25,7 +25,8 @@ pub(crate) fn resolve_list_item(tokenizer: &mut Tokenizer) {
         }
         let end = exits.get(&index).copied().unwrap_or(index);
         let marker = skip_to(&tokenizer.events, index, &[Name::LIST_ITEM_MARKER]);
-        let marker = tokenizer.parse_state.bytes[tokenizer.events[marker].point.index];
+        let marker =
+            tokenizer.parse_state.bytes[tokenizer.events[marker].point.index as usize];
         let current = (marker, balance, index, end);
         let mut matched = false;
         let mut list_index = lists_wip.len();
@@ -75,16 +76,14 @@ pub(crate) fn resolve_list_item(tokenizer: &mut Tokenizer) {
             b'.' | b')' => Name::LIST_ORDERED,
             _ => Name::LIST_UNORDERED,
         };
-        let mut list_start = tokenizer.events[start].clone();
-        let mut list_end = tokenizer.events[end].clone();
+        let mut list_start = tokenizer.events[start];
+        let mut list_end = tokenizer.events[end];
         list_start.name = name;
         list_end.name = name;
         tokenizer.map.add(start, 0, vec![list_start]);
         tokenizer.map.add(end + 1, 0, vec![list_end]);
     }
-    tokenizer
-        .map
-        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
+    tokenizer.map.consume(&mut tokenizer.events);
 }
 
 // The exit of each list item, by its enter, found in one pass: walking each item's events

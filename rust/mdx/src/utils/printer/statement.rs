@@ -1,4 +1,5 @@
 use crate::models::estree::{Id, Value};
+use crate::models::name::{Key, Kind};
 use crate::utils::printer::precedence::{NEEDS_PARENTHESES, below, precedence_of};
 use crate::utils::printer::state::Printer;
 
@@ -6,116 +7,118 @@ impl Printer<'_> {
     /// astring's statement, declaration and module handlers; `false` for other kinds.
     pub(crate) fn statement(&mut self, id: Id) -> bool {
         match self.kind(id) {
-            "Program" => self.program(id),
-            "BlockStatement" | "ClassBody" => self.block(id),
-            "StaticBlock" => {
+            Kind::PROGRAM => self.program(id),
+            Kind::BLOCK_STATEMENT | Kind::CLASS_BODY => self.block(id),
+            Kind::STATIC_BLOCK => {
                 self.write("static ");
                 self.block(id);
             }
-            "EmptyStatement" => self.write(";"),
-            "ExpressionStatement" => self.expression_statement(id),
-            "IfStatement" => {
+            Kind::EMPTY_STATEMENT => self.write(";"),
+            Kind::EXPRESSION_STATEMENT => self.expression_statement(id),
+            Kind::IF_STATEMENT => {
                 self.write("if (");
-                self.field(id, "test");
+                self.field(id, Key::TEST);
                 self.write(") ");
-                self.field(id, "consequent");
-                if self.store.child(id, "alternate").is_some() {
+                self.field(id, Key::CONSEQUENT);
+                if self.store.child(id, Key::ALTERNATE).is_some() {
                     self.write(" else ");
-                    self.field(id, "alternate");
+                    self.field(id, Key::ALTERNATE);
                 }
             }
-            "LabeledStatement" => {
-                self.field(id, "label");
+            Kind::LABELED_STATEMENT => {
+                self.field(id, Key::LABEL);
                 self.write(": ");
-                self.field(id, "body");
+                self.field(id, Key::BODY);
             }
-            "BreakStatement" | "ContinueStatement" => {
-                self.write(if self.kind(id).starts_with('B') {
+            Kind::BREAK_STATEMENT | Kind::CONTINUE_STATEMENT => {
+                self.write(if self.kind_text(id).starts_with('B') {
                     "break"
                 } else {
                     "continue"
                 });
-                if self.store.child(id, "label").is_some() {
+                if self.store.child(id, Key::LABEL).is_some() {
                     self.write(" ");
-                    self.field(id, "label");
+                    self.field(id, Key::LABEL);
                 }
                 self.write(";");
             }
-            "WithStatement" => {
+            Kind::WITH_STATEMENT => {
                 self.write("with (");
-                self.field(id, "object");
+                self.field(id, Key::OBJECT);
                 self.write(") ");
-                self.field(id, "body");
+                self.field(id, Key::BODY);
             }
-            "SwitchStatement" => self.switch(id),
-            "ReturnStatement" => {
+            Kind::SWITCH_STATEMENT => self.switch(id),
+            Kind::RETURN_STATEMENT => {
                 self.write("return");
-                if self.store.child(id, "argument").is_some() {
+                if self.store.child(id, Key::ARGUMENT).is_some() {
                     self.write(" ");
-                    self.field(id, "argument");
+                    self.field(id, Key::ARGUMENT);
                 }
                 self.write(";");
             }
-            "ThrowStatement" => {
+            Kind::THROW_STATEMENT => {
                 self.write("throw ");
-                self.field(id, "argument");
+                self.field(id, Key::ARGUMENT);
                 self.write(";");
             }
-            "TryStatement" => self.try_statement(id),
-            "WhileStatement" => {
+            Kind::TRY_STATEMENT => self.try_statement(id),
+            Kind::WHILE_STATEMENT => {
                 self.write("while (");
-                self.field(id, "test");
+                self.field(id, Key::TEST);
                 self.write(") ");
-                self.field(id, "body");
+                self.field(id, Key::BODY);
             }
-            "DoWhileStatement" => {
+            Kind::DO_WHILE_STATEMENT => {
                 self.write("do ");
-                self.field(id, "body");
+                self.field(id, Key::BODY);
                 self.write(" while (");
-                self.field(id, "test");
+                self.field(id, Key::TEST);
                 self.write(");");
             }
-            "ForStatement" => self.for_statement(id),
-            "ForInStatement" | "ForOfStatement" => self.for_in(id),
-            "DebuggerStatement" => self.write("debugger;"),
-            "FunctionDeclaration" | "FunctionExpression" => self.function(id),
-            "VariableDeclaration" => {
+            Kind::FOR_STATEMENT => self.for_statement(id),
+            Kind::FOR_IN_STATEMENT | Kind::FOR_OF_STATEMENT => self.for_in(id),
+            Kind::DEBUGGER_STATEMENT => self.write("debugger;"),
+            Kind::FUNCTION_DECLARATION | Kind::FUNCTION_EXPRESSION => self.function(id),
+            Kind::VARIABLE_DECLARATION => {
                 self.variable_declaration(id);
                 self.write(";");
             }
-            "VariableDeclarator" => {
-                self.field(id, "id");
-                if self.store.child(id, "init").is_some() {
+            Kind::VARIABLE_DECLARATOR => {
+                self.field(id, Key::ID);
+                if self.store.child(id, Key::INIT).is_some() {
                     self.write(" = ");
-                    self.field(id, "init");
+                    self.field(id, Key::INIT);
                 }
             }
-            "ClassDeclaration" | "ClassExpression" => self.class(id),
-            "ImportDeclaration" => self.import(id),
-            "ImportAttribute" => self.import_attribute(id),
-            "ExportDefaultDeclaration" => {
+            Kind::CLASS_DECLARATION | Kind::CLASS_EXPRESSION => self.class(id),
+            Kind::IMPORT_DECLARATION => self.import(id),
+            Kind::IMPORT_ATTRIBUTE => self.import_attribute(id),
+            Kind::EXPORT_DEFAULT_DECLARATION => {
                 self.write("export default ");
-                self.field(id, "declaration");
-                let kind = self.kind_of(id, "declaration");
-                if precedence_of(kind).is_some() && !kind.starts_with('F') {
+                self.field(id, Key::DECLARATION);
+                let kind = self.kind_of(id, Key::DECLARATION);
+                if precedence_of(kind).is_some()
+                    && !self.kind_text_of(id, Key::DECLARATION).starts_with('F')
+                {
                     self.write(";");
                 }
             }
-            "ExportNamedDeclaration" => self.export_named(id),
-            "ExportAllDeclaration" => {
-                if self.store.child(id, "exported").is_some() {
+            Kind::EXPORT_NAMED_DECLARATION => self.export_named(id),
+            Kind::EXPORT_ALL_DECLARATION => {
+                if self.store.child(id, Key::EXPORTED).is_some() {
                     let line =
-                        format!("export * as {} from ", self.name_of(id, "exported"));
+                        format!("export * as {} from ", self.name_of(id, Key::EXPORTED));
                     self.write(&line);
                 } else {
                     self.write("export * from ");
                 }
-                self.field(id, "source");
+                self.field(id, Key::SOURCE);
                 self.attributes(id);
                 self.write(";");
             }
-            "MethodDefinition" => self.method(id),
-            "PropertyDefinition" => self.property_definition(id),
+            Kind::METHOD_DEFINITION => self.method(id),
+            Kind::PROPERTY_DEFINITION => self.property_definition(id),
             _ => return false,
         }
         true
@@ -123,14 +126,14 @@ impl Printer<'_> {
 
     fn program(&mut self, id: Id) {
         let indent = self.indent(self.level);
-        self.comments_of(id, "comments", &indent);
-        for statement in self.store.children(id, "body") {
-            self.comments_of(statement, "comments", &indent);
+        self.comments_of(id, Key::COMMENTS, &indent);
+        for statement in self.store.children(id, Key::BODY) {
+            self.comments_of(statement, Key::COMMENTS, &indent);
             self.write(&indent);
             self.node(statement);
             self.write("\n");
         }
-        self.comments_of(id, "trailingComments", &indent);
+        self.comments_of(id, Key::TRAILING_COMMENTS, &indent);
     }
 
     fn block(&mut self, id: Id) {
@@ -138,37 +141,37 @@ impl Printer<'_> {
         self.level += 1;
         let statement_indent = self.indent(self.level);
         self.write("{");
-        let statements = self.store.children(id, "body");
+        let statements = self.store.children(id, Key::BODY);
         if !statements.is_empty() {
             self.write("\n");
-            self.comments_of(id, "comments", &statement_indent);
+            self.comments_of(id, Key::COMMENTS, &statement_indent);
             for statement in statements {
-                self.comments_of(statement, "comments", &statement_indent);
+                self.comments_of(statement, Key::COMMENTS, &statement_indent);
                 self.write(&statement_indent);
                 self.node(statement);
                 self.write("\n");
             }
             self.write(&indent);
-        } else if self.store.has(id, "comments") {
+        } else if self.store.has(id, Key::COMMENTS) {
             self.write("\n");
-            self.comments_of(id, "comments", &statement_indent);
+            self.comments_of(id, Key::COMMENTS, &statement_indent);
             self.write(&indent);
         }
-        self.comments_of(id, "trailingComments", &statement_indent);
+        self.comments_of(id, Key::TRAILING_COMMENTS, &statement_indent);
         self.write("}");
         self.level -= 1;
     }
 
     fn expression_statement(&mut self, id: Id) {
-        let Some(expression) = self.store.child(id, "expression") else {
+        let Some(expression) = self.store.child(id, Key::EXPRESSION) else {
             self.write(";");
             return;
         };
         let precedence = self.precedence(expression);
         let left_object = self
             .store
-            .child(expression, "left")
-            .is_some_and(|left| self.kind(left).starts_with('O'));
+            .child(expression, Key::LEFT)
+            .is_some_and(|left| self.kind_text(left).starts_with('O'));
         if precedence == Some(NEEDS_PARENTHESES) || (precedence == Some(3) && left_object)
         {
             self.write("(");
@@ -186,21 +189,21 @@ impl Printer<'_> {
         let case_indent = self.indent(self.level - 1);
         let statement_indent = self.indent(self.level);
         self.write("switch (");
-        self.field(id, "discriminant");
+        self.field(id, Key::DISCRIMINANT);
         self.write(") {\n");
-        for occurrence in self.store.children(id, "cases") {
-            self.comments_of(occurrence, "comments", &case_indent);
-            if self.store.child(occurrence, "test").is_some() {
+        for occurrence in self.store.children(id, Key::CASES) {
+            self.comments_of(occurrence, Key::COMMENTS, &case_indent);
+            if self.store.child(occurrence, Key::TEST).is_some() {
                 let line = format!("{case_indent}case ");
                 self.write(&line);
-                self.field(occurrence, "test");
+                self.field(occurrence, Key::TEST);
                 self.write(":\n");
             } else {
                 let line = format!("{case_indent}default:\n");
                 self.write(&line);
             }
-            for statement in self.store.children(occurrence, "consequent") {
-                self.comments_of(statement, "comments", &statement_indent);
+            for statement in self.store.children(occurrence, Key::CONSEQUENT) {
+                self.comments_of(statement, Key::COMMENTS, &statement_indent);
                 self.write(&statement_indent);
                 self.node(statement);
                 self.write("\n");
@@ -213,89 +216,89 @@ impl Printer<'_> {
 
     fn try_statement(&mut self, id: Id) {
         self.write("try ");
-        self.field(id, "block");
-        if let Some(handler) = self.store.child(id, "handler") {
-            if self.store.child(handler, "param").is_none() {
+        self.field(id, Key::BLOCK);
+        if let Some(handler) = self.store.child(id, Key::HANDLER) {
+            if self.store.child(handler, Key::PARAM).is_none() {
                 self.write(" catch ");
             } else {
                 self.write(" catch (");
-                self.field(handler, "param");
+                self.field(handler, Key::PARAM);
                 self.write(") ");
             }
-            self.field(handler, "body");
+            self.field(handler, Key::BODY);
         }
-        if self.store.child(id, "finalizer").is_some() {
+        if self.store.child(id, Key::FINALIZER).is_some() {
             self.write(" finally ");
-            self.field(id, "finalizer");
+            self.field(id, Key::FINALIZER);
         }
     }
 
     fn for_statement(&mut self, id: Id) {
         self.write("for (");
-        if let Some(init) = self.store.child(id, "init") {
-            if self.kind(init).starts_with('V') {
+        if let Some(init) = self.store.child(id, Key::INIT) {
+            if self.kind_text(init).starts_with('V') {
                 self.variable_declaration(init);
             } else {
                 self.node(init);
             }
         }
         self.write("; ");
-        self.field(id, "test");
+        self.field(id, Key::TEST);
         self.write("; ");
-        self.field(id, "update");
+        self.field(id, Key::UPDATE);
         self.write(") ");
-        self.field(id, "body");
+        self.field(id, Key::BODY);
     }
 
     fn for_in(&mut self, id: Id) {
-        self.write(if self.store.flag(id, "await") {
+        self.write(if self.store.flag(id, Key::AWAIT) {
             "for await ("
         } else {
             "for ("
         });
-        if let Some(left) = self.store.child(id, "left") {
-            if self.kind(left).starts_with('V') {
+        if let Some(left) = self.store.child(id, Key::LEFT) {
+            if self.kind_text(left).starts_with('V') {
                 self.variable_declaration(left);
             } else {
                 self.node(left);
             }
         }
-        self.write(if self.kind(id) == "ForInStatement" {
+        self.write(if self.kind(id) == Kind::FOR_IN_STATEMENT {
             " in "
         } else {
             " of "
         });
-        self.field(id, "right");
+        self.field(id, Key::RIGHT);
         self.write(") ");
-        self.field(id, "body");
+        self.field(id, Key::BODY);
     }
 
     pub(crate) fn function(&mut self, id: Id) {
         let mut head = String::new();
-        if self.store.flag(id, "async") {
+        if self.store.flag(id, Key::ASYNC) {
             head.push_str("async ");
         }
-        head.push_str(if self.store.flag(id, "generator") {
+        head.push_str(if self.store.flag(id, Key::GENERATOR) {
             "function* "
         } else {
             "function "
         });
-        if let Some(name) = self.store.child(id, "id") {
-            head.push_str(self.store.str(name, "name").unwrap_or("undefined"));
+        if let Some(name) = self.store.child(id, Key::ID) {
+            head.push_str(self.store.str(name, Key::NAME).unwrap_or("undefined"));
         }
         self.write(&head);
-        let params = self.store.list(id, "params").to_vec();
+        let params = self.store.list(id, Key::PARAMS).to_vec();
         self.sequence(&params);
         self.write(" ");
-        self.field(id, "body");
+        self.field(id, Key::BODY);
     }
 
     fn variable_declaration(&mut self, id: Id) {
-        let kind = format!("{} ", self.store.str(id, "kind").unwrap_or("var"));
+        let kind = format!("{} ", self.store.str(id, Key::KIND).unwrap_or("var"));
         self.write(&kind);
         for (index, declarator) in self
             .store
-            .children(id, "declarations")
+            .children(id, Key::DECLARATIONS)
             .into_iter()
             .enumerate()
         {
@@ -307,20 +310,20 @@ impl Printer<'_> {
     }
 
     fn class(&mut self, id: Id) {
-        match self.store.child(id, "id") {
+        match self.store.child(id, Key::ID) {
             Some(name) => {
                 let head = format!(
                     "class {} ",
-                    self.store.str(name, "name").unwrap_or("undefined")
+                    self.store.str(name, Key::NAME).unwrap_or("undefined")
                 );
                 self.write(&head);
             }
             None => self.write("class "),
         }
-        if let Some(super_class) = self.store.child(id, "superClass") {
+        if let Some(super_class) = self.store.child(id, Key::SUPER_CLASS) {
             self.write("extends ");
             let precedence = self.precedence(super_class);
-            if self.kind(super_class) != "ClassExpression"
+            if self.kind(super_class) != Kind::CLASS_EXPRESSION
                 && (precedence == Some(NEEDS_PARENTHESES)
                     || below(precedence, Some(NEEDS_PARENTHESES)))
             {
@@ -332,12 +335,12 @@ impl Printer<'_> {
             }
             self.write(" ");
         }
-        self.field(id, "body");
+        self.field(id, Key::BODY);
     }
 
     fn import(&mut self, id: Id) {
         self.write("import ");
-        let specifiers = self.store.children(id, "specifiers");
+        let specifiers = self.store.children(id, Key::SPECIFIERS);
         let mut index = 0;
         if !specifiers.is_empty() {
             while index < specifiers.len() {
@@ -346,12 +349,13 @@ impl Printer<'_> {
                 }
                 let specifier = specifiers[index];
                 match self.kind(specifier) {
-                    "ImportDefaultSpecifier" => {
-                        let name = self.name_of(specifier, "local");
+                    Kind::IMPORT_DEFAULT_SPECIFIER => {
+                        let name = self.name_of(specifier, Key::LOCAL);
                         self.write(&name);
                     }
-                    "ImportNamespaceSpecifier" => {
-                        let name = format!("* as {}", self.name_of(specifier, "local"));
+                    Kind::IMPORT_NAMESPACE_SPECIFIER => {
+                        let name =
+                            format!("* as {}", self.name_of(specifier, Key::LOCAL));
                         self.write(&name);
                     }
                     _ => break,
@@ -362,9 +366,9 @@ impl Printer<'_> {
                 self.write("{");
                 loop {
                     let specifier = specifiers[index];
-                    let name = self.name_of(specifier, "imported");
+                    let name = self.name_of(specifier, Key::IMPORTED);
                     self.write(&name);
-                    let local = self.name_of(specifier, "local");
+                    let local = self.name_of(specifier, Key::LOCAL);
                     if name != local {
                         self.write(&format!(" as {local}"));
                     }
@@ -379,13 +383,13 @@ impl Printer<'_> {
             }
             self.write(" from ");
         }
-        self.field(id, "source");
+        self.field(id, Key::SOURCE);
         self.attributes(id);
         self.write(";");
     }
 
     fn attributes(&mut self, id: Id) {
-        let attributes = self.store.children(id, "attributes");
+        let attributes = self.store.children(id, Key::ATTRIBUTES);
         if attributes.is_empty() {
             return;
         }
@@ -401,25 +405,25 @@ impl Printer<'_> {
     }
 
     fn import_attribute(&mut self, id: Id) {
-        let key = self.name_of(id, "key");
+        let key = self.name_of(id, Key::KEY);
         self.write(&key);
         self.write(": ");
-        self.field(id, "value");
+        self.field(id, Key::VALUE);
     }
 
     fn export_named(&mut self, id: Id) {
         self.write("export ");
-        if self.store.child(id, "declaration").is_some() {
-            self.field(id, "declaration");
+        if self.store.child(id, Key::DECLARATION).is_some() {
+            self.field(id, Key::DECLARATION);
             return;
         }
         self.write("{");
-        let specifiers = self.store.children(id, "specifiers");
+        let specifiers = self.store.children(id, Key::SPECIFIERS);
         let count = specifiers.len();
         for (index, specifier) in specifiers.into_iter().enumerate() {
-            let name = self.name_of(specifier, "local");
+            let name = self.name_of(specifier, Key::LOCAL);
             self.write(&name);
-            let exported = self.name_of(specifier, "exported");
+            let exported = self.name_of(specifier, Key::EXPORTED);
             if name != exported {
                 self.write(&format!(" as {exported}"));
             }
@@ -428,64 +432,68 @@ impl Printer<'_> {
             }
         }
         self.write("}");
-        if self.store.child(id, "source").is_some() {
+        if self.store.child(id, Key::SOURCE).is_some() {
             self.write(" from ");
-            self.field(id, "source");
+            self.field(id, Key::SOURCE);
         }
         self.attributes(id);
         self.write(";");
     }
 
     pub(crate) fn method(&mut self, id: Id) {
-        if self.store.flag(id, "static") {
+        if self.store.flag(id, Key::STATIC) {
             self.write("static ");
         }
-        let kind = self.store.str(id, "kind").unwrap_or_default().to_string();
+        let kind = self
+            .store
+            .str(id, Key::KIND)
+            .unwrap_or_default()
+            .to_string();
         if kind.starts_with('g') || kind.starts_with('s') {
             self.write(&format!("{kind} "));
         }
-        let value = self.store.child(id, "value");
-        if value.is_some_and(|value| self.store.flag(value, "async")) {
+        let value = self.store.child(id, Key::VALUE);
+        if value.is_some_and(|value| self.store.flag(value, Key::ASYNC)) {
             self.write("async ");
         }
-        if value.is_some_and(|value| self.store.flag(value, "generator")) {
+        if value.is_some_and(|value| self.store.flag(value, Key::GENERATOR)) {
             self.write("*");
         }
-        if self.store.flag(id, "computed") {
+        if self.store.flag(id, Key::COMPUTED) {
             self.write("[");
-            self.field(id, "key");
+            self.field(id, Key::KEY);
             self.write("]");
         } else {
-            self.field(id, "key");
+            self.field(id, Key::KEY);
         }
         if let Some(value) = value {
-            let params = self.store.list(value, "params").to_vec();
+            let params = self.store.list(value, Key::PARAMS).to_vec();
             self.sequence(&params);
             self.write(" ");
-            self.field(value, "body");
+            self.field(value, Key::BODY);
         }
     }
 
     fn property_definition(&mut self, id: Id) {
-        if self.store.flag(id, "static") {
+        if self.store.flag(id, Key::STATIC) {
             self.write("static ");
         }
-        let computed = self.store.flag(id, "computed");
+        let computed = self.store.flag(id, Key::COMPUTED);
         if computed {
             self.write("[");
         }
-        self.field(id, "key");
+        self.field(id, Key::KEY);
         if computed {
             self.write("]");
         }
-        if matches!(self.store.get(id, "value"), None | Some(Value::Null)) {
-            if !self.kind_of(id, "key").starts_with('F') {
+        if matches!(self.store.get(id, Key::VALUE), None | Some(Value::Null)) {
+            if !self.kind_text_of(id, Key::KEY).starts_with('F') {
                 self.write(";");
             }
             return;
         }
         self.write(" = ");
-        self.field(id, "value");
+        self.field(id, Key::VALUE);
         self.write(";");
     }
 }

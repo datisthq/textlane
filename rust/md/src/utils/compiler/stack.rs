@@ -477,14 +477,17 @@ impl<'a, 'e> Compiler<'a, 'e> {
         let end = &self.events[exit].point;
         let start = &self.events[self.enters[exit]].point;
         let slice = Slice::from_points(self.source.as_bytes(), start, end);
-        let text = std::str::from_utf8(slice.bytes).unwrap_or_default();
+        // The input is a `str`: a slice of it needs no validating, only char boundaries
+        let text = (self.source)
+            .get(slice.start..slice.start + slice.bytes.len())
+            .unwrap_or_default();
         // Prefixes of lines after the first are not part of the token's text
         let first = self
             .prefixes
-            .partition_point(|prefix| prefix.0 <= start.index);
+            .partition_point(|prefix| prefix.0 <= start.index as usize);
         let prefixed = self.prefixes[first..]
             .iter()
-            .take_while(|prefix| prefix.0 < end.index)
+            .take_while(|prefix| prefix.0 < end.index as usize)
             .count();
         let clean = slice.before == 0 && slice.after == 0 && prefixed == 0;
         if clean && !text.contains('\0') {
@@ -493,12 +496,14 @@ impl<'a, 'e> Compiler<'a, 'e> {
         let mut value = ArenaString::with_capacity_in(slice.len(), self.alloc);
         // A token that starts or ends inside a tab has the tab's columns there as spaces
         value.extend(std::iter::repeat_n(' ', slice.before));
-        let offset = start.index + usize::from(start.vs > 0);
+        let offset = start.index + u32::from(start.vs > 0);
         let mut at = 0;
         for (line_start, content_start) in &self.prefixes[first..first + prefixed] {
-            let from = line_start.saturating_sub(offset).min(text.len());
+            let from = line_start.saturating_sub(offset as usize).min(text.len());
             value.push_str(&text[at.min(from)..from]);
-            at = content_start.saturating_sub(offset).min(text.len());
+            at = content_start
+                .saturating_sub(offset as usize)
+                .min(text.len());
         }
         value.push_str(&text[at.min(text.len())..]);
         value.extend(std::iter::repeat_n(' ', slice.after));
@@ -559,5 +564,5 @@ fn find_enters(events: &[Event]) -> Vec<usize> {
 }
 
 pub(crate) fn to_point(point: &event::Point) -> Point {
-    Point::new(point.index, point.vs)
+    Point::new(point.index as usize, point.vs as usize)
 }

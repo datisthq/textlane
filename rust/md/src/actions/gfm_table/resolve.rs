@@ -91,9 +91,7 @@ pub(crate) fn resolve_gfm_table(tokenizer: &mut Tokenizer) {
     if last_table_end != 0 {
         flush_table_end(tokenizer, last_table_end, last_table_has_body);
     }
-    tokenizer
-        .map
-        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
+    tokenizer.map.consume(&mut tokenizer.events);
 }
 
 fn flush_cell(
@@ -159,7 +157,7 @@ fn create_event(tokenizer: &Tokenizer, at: usize, kind: Kind, name: Name) -> Eve
     Event {
         kind,
         name,
-        point: tokenizer.events[at].point.clone(),
+        point: tokenizer.events[at].point,
         link: None,
     }
 }

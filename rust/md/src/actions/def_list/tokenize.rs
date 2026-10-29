@@ -91,7 +91,7 @@ fn after(tokenizer: &mut Tokenizer) -> State {
         prefix += 1;
     }
     let continued = tokenizer.tokenize_state.document_continued;
-    prefix += read_def_list_indent(tokenizer, start);
+    prefix += read_def_list_indent(tokenizer, start) as u32;
     if let Some(container) = tokenizer
         .tokenize_state
         .document_container_stack
@@ -100,7 +100,7 @@ fn after(tokenizer: &mut Tokenizer) -> State {
         container.blank_initial = blank;
         container.blank_further = false;
         container.blank_last = false;
-        container.size = prefix;
+        container.size = prefix as usize;
     }
     tokenizer.exit(Name::DEF_LIST_DESCRIPTION_PREFIX);
     let track = &mut tokenizer.tokenize_state.def_list;

@@ -28,12 +28,12 @@ fn before(tokenizer: &mut Tokenizer) -> State {
             if let Some((failed, start, end)) =
                 tokenizer.tokenize_state.thematic_break_failed
                 && failed == marker
-                && (start..end).contains(&index)
+                && (start..end).contains(&(index as usize))
             {
                 return State::Nok;
             }
             tokenizer.tokenize_state.marker = marker;
-            tokenizer.tokenize_state.size_c = index;
+            tokenizer.tokenize_state.size_c = index as usize;
             State::Retry(at_break)
         }
         _ => State::Nok,
@@ -55,7 +55,7 @@ fn at_break(tokenizer: &mut Tokenizer) -> State {
     } else {
         let state = &mut tokenizer.tokenize_state;
         state.thematic_break_failed =
-            Some((state.marker, state.size_c, tokenizer.point.index));
+            Some((state.marker, state.size_c, tokenizer.point.index as usize));
         state.marker = 0;
         state.size = 0;
         State::Nok

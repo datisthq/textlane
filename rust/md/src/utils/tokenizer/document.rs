@@ -15,6 +15,7 @@ use crate::utils::tokenizer::driver::{
     Container, ContainerState, TokenizeState, Tokenizer,
 };
 use crate::utils::tokenizer::flow::tokenize_flow;
+use crate::utils::tokenizer::recycle::take_events;
 use crate::utils::tokenizer::subtokenize::divide_events;
 
 #[derive(Debug, PartialEq)]
@@ -27,10 +28,9 @@ enum Phase {
 /// The document content type: containers line by line, with flow inside them in a child
 /// tokenizer.
 pub(crate) fn tokenize_document(tokenizer: &mut Tokenizer) -> State {
-    tokenizer.tokenize_state.document_child = Some(Box::new(Tokenizer::new(
-        tokenizer.point.clone(),
-        tokenizer.parse_state,
-    )));
+    let mut child = Tokenizer::new(tokenizer.point, tokenizer.parse_state);
+    child.events = take_events();
+    tokenizer.tokenize_state.document_child = Some(Box::new(child));
     State::Retry(container_existing_before)
 }
 
@@ -233,19 +233,22 @@ fn new_container(kind: Container) -> ContainerState {
 }
 
 fn containers_after(tokenizer: &mut Tokenizer) -> State {
-    let point = tokenizer.point.clone();
+    let point = tokenizer.point;
     let bytes = tokenizer.parse_state.bytes;
     let mut line_start = point.index;
-    while line_start > 0 && !matches!(bytes[line_start - 1], b'\n' | b'\r') {
+    while line_start > 0 && !matches!(bytes[(line_start - 1) as usize], b'\n' | b'\r') {
         line_start -= 1;
     }
     if line_start < point.index {
         let mut prefixes = tokenizer.parse_state.prefixes.borrow_mut();
-        if prefixes.last().is_none_or(|last| last.0 < line_start) {
-            prefixes.push((line_start, point.index));
+        if prefixes
+            .last()
+            .is_none_or(|last| last.0 < line_start as usize)
+        {
+            prefixes.push((line_start as usize, point.index as usize));
         } else if tokenizer.parse_state.directive {
             let mut nested = tokenizer.parse_state.prefixes_nested.borrow_mut();
-            nested.push((line_start, point.index));
+            nested.push((line_start as usize, point.index as usize));
         }
     }
     let lazy = tokenizer.tokenize_state.document_continued
@@ -300,9 +303,9 @@ fn flow_end(tokenizer: &mut Tokenizer) -> State {
     // chunk starts past that line's prefix, which is not this line's flow
     let to = match tokenizer.events.last() {
         Some(event) if event.kind == Kind::Exit && event.name == Name::DATA => {
-            (event.point.index, event.point.vs)
+            (event.point.index as usize, event.point.vs as usize)
         }
-        _ => (tokenizer.point.index, tokenizer.point.vs),
+        _ => (tokenizer.point.index as usize, tokenizer.point.vs as usize),
     };
     let state = tokenizer
         .tokenize_state
@@ -328,7 +331,7 @@ fn flow_end(tokenizer: &mut Tokenizer) -> State {
     let Some(child) = tokenizer.tokenize_state.document_child.as_mut() else {
         return State::Nok;
     };
-    let from = (child.point.index, child.point.vs);
+    let from = (child.point.index as usize, child.point.vs as usize);
     // A blank last line, with no line ending, inside a block quote closes the containers
     // it did not continue at the end, as micromark does
     let blank_last_line = tokenizer.current.is_none()
@@ -442,7 +445,7 @@ fn exit_containers(tokenizer: &mut Tokenizer, phase: &Phase) {
             exits.push(Event {
                 kind: Kind::Exit,
                 name,
-                point: tokenizer.point.clone(),
+                point: tokenizer.point,
                 link: None,
             });
             if let Some(position) = tokenizer.stack.iter().rposition(|open| *open == name)
@@ -475,12 +478,12 @@ fn resolve(tokenizer: &mut Tokenizer) {
             && (event.name == Name::LINE_ENDING || event.name == Name::BLANK_LINE_ENDING)
         {
             let mut inject_index = child_index - 1;
-            let mut point = child.events[inject_index].point.clone();
+            let mut point = child.events[inject_index].point;
             while child_index + 1 < child.events.len()
                 && child.events[child_index + 1].kind == Kind::Exit
             {
                 child_index += 1;
-                point = child.events[child_index].point.clone();
+                point = child.events[child_index].point;
                 inject_index = child_index + 1;
             }
             if let Some(Some(mut exits)) = tokenizer
@@ -490,18 +493,18 @@ fn resolve(tokenizer: &mut Tokenizer) {
                 .map(Option::take)
             {
                 for exit in &mut exits {
-                    exit.point = point.clone();
+                    exit.point = point;
                 }
                 child.map.add(inject_index, 0, exits);
             }
             line += 1;
         } else if is_chunk_line(tokenizer.parse_state.bytes, event) {
-            let mut point = event.point.clone();
+            let mut point = event.point;
             while child_index + 1 < child.events.len()
                 && child.events[child_index + 1].kind == Kind::Exit
             {
                 child_index += 1;
-                point = child.events[child_index].point.clone();
+                point = child.events[child_index].point;
             }
             if let Some(Some(mut exits)) = tokenizer
                 .tokenize_state
@@ -510,7 +513,7 @@ fn resolve(tokenizer: &mut Tokenizer) {
                 .map(Option::take)
             {
                 for exit in &mut exits {
-                    exit.point = point.clone();
+                    exit.point = point;
                 }
                 child.map.add(child_index + 1, 0, exits);
             }
@@ -518,9 +521,7 @@ fn resolve(tokenizer: &mut Tokenizer) {
         }
         child_index += 1;
     }
-    child
-        .map
-        .consume(&mut child.events, &child.parse_state.spare_events);
+    child.map.consume(&mut child.events);
 
     let mut flow_index = skip_to(&tokenizer.events, 0, &[Name::DATA]);
     while flow_index < tokenizer.events.len()
@@ -538,9 +539,7 @@ fn resolve(tokenizer: &mut Tokenizer) {
         &mut child.events,
         (0, 0),
     );
-    tokenizer
-        .map
-        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
+    tokenizer.map.consume(&mut tokenizer.events);
 
     if let Some(Some(mut exits)) = tokenizer
         .tokenize_state
@@ -549,7 +548,7 @@ fn resolve(tokenizer: &mut Tokenizer) {
         .map(Option::take)
     {
         for exit in &mut exits {
-            exit.point = tokenizer.point.clone();
+            exit.point = tokenizer.point;
         }
         tokenizer.events.append(&mut exits);
     }
@@ -571,5 +570,8 @@ fn is_chunk_line(bytes: &[u8], event: &Event) -> bool {
     event.kind == Kind::Exit
         && event.name == CHUNK_DOCUMENT
         && event.point.index > 0
-        && matches!(bytes.get(event.point.index - 1), Some(b'\n' | b'\r'))
+        && matches!(
+            bytes.get((event.point.index - 1) as usize),
+            Some(b'\n' | b'\r')
+        )
 }

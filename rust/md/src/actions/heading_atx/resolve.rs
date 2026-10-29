@@ -13,9 +13,7 @@ pub(crate) fn resolve_heading_atx(tokenizer: &mut Tokenizer) {
         }
         index += 1;
     }
-    tokenizer
-        .map
-        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
+    tokenizer.map.consume(&mut tokenizer.events);
 }
 
 // The heading's child tokens as (enter, exit) indexes; returns the heading's exit index
@@ -69,8 +67,8 @@ fn resolve_heading(tokenizer: &mut Tokenizer, enter: usize) -> usize {
     }
     let (text_enter, _) = tokens[start];
     let (_, text_exit) = tokens[end];
-    let enter_point = events[text_enter].point.clone();
-    let exit_point = events[text_exit].point.clone();
+    let enter_point = events[text_enter].point;
+    let exit_point = events[text_exit].point;
     let data = |kind, point| Event {
         kind,
         name: Name::DATA,
@@ -91,9 +89,9 @@ fn resolve_heading(tokenizer: &mut Tokenizer, enter: usize) -> usize {
         text_enter,
         text_exit - text_enter + 1,
         vec![
-            text(Kind::Enter, enter_point.clone()),
+            text(Kind::Enter, enter_point),
             data(Kind::Enter, enter_point),
-            data(Kind::Exit, exit_point.clone()),
+            data(Kind::Exit, exit_point),
             text(Kind::Exit, exit_point),
         ],
     );

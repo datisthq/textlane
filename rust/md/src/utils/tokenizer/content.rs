@@ -12,14 +12,14 @@ pub(crate) fn tokenize_content_chunk(tokenizer: &mut Tokenizer) -> State {
         None | Some(b'\n') => State::Nok,
         _ => {
             if tokenizer.tokenize_state.content_break_line.take()
-                == Some(tokenizer.point.line)
+                == Some(tokenizer.point.line as usize)
             {
                 let start = tokenizer.point.index;
                 tokenizer
                     .parse_state
                     .content_breaks
                     .borrow_mut()
-                    .insert(start);
+                    .insert(start as usize);
             }
             tokenizer.enter_link(
                 Name::CONTENT,
@@ -100,13 +100,13 @@ pub(crate) fn resolve_content(tokenizer: &mut Tokenizer) -> Subresult {
                         .parse_state
                         .content_breaks
                         .borrow()
-                        .contains(&tokenizer.events[enter_index].point.index)
+                        .contains(&(tokenizer.events[enter_index].point.index as usize))
                 {
                     break;
                 }
                 // Swallow the line ending into the chunk before it
                 tokenizer.events[exit_index].point =
-                    tokenizer.events[exit_index + 2].point.clone();
+                    tokenizer.events[exit_index + 2].point;
                 tokenizer.map.add(exit_index + 1, 2, vec![]);
                 if let Some(link) = tokenizer.events[exit_index - 1].link.as_mut() {
                     link.next = Link::at(enter_index);
@@ -120,9 +120,7 @@ pub(crate) fn resolve_content(tokenizer: &mut Tokenizer) -> Subresult {
         }
         index += 1;
     }
-    tokenizer
-        .map
-        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
+    tokenizer.map.consume(&mut tokenizer.events);
     subtokenize(
         &mut tokenizer.events,
         tokenizer.parse_state,

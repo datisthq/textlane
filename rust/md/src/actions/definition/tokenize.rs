@@ -130,7 +130,7 @@ fn after_whitespace(tokenizer: &mut Tokenizer) -> State {
     let label = tokenizer
         .parse_state
         .bytes
-        .get(start.index..end.index)
+        .get(start.index as usize..end.index as usize)
         .and_then(|label| std::str::from_utf8(label).ok())
         .unwrap_or_default();
     let identifier = normalize_identifier(label);

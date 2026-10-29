@@ -1,4 +1,5 @@
 use crate::models::estree::{Id, Store, Value};
+use crate::models::name::{Key, Kind};
 
 const STACK_RED_ZONE: usize = 64 * 1024;
 const STACK_GROWTH: usize = 1024 * 1024;
@@ -40,27 +41,38 @@ impl Printer<'_> {
         });
     }
 
-    pub(crate) fn field(&mut self, id: Id, key: &str) {
+    pub(crate) fn field(&mut self, id: Id, key: Key) {
         if let Some(child) = self.store.child(id, key) {
             self.node(child);
         }
     }
 
-    pub(crate) fn kind(&self, id: Id) -> &str {
+    pub(crate) fn kind(&self, id: Id) -> Kind {
         self.store.kind(id)
     }
 
-    pub(crate) fn kind_of(&self, id: Id, key: &str) -> &str {
+    /// A node's `type` as written, for astring's checks of its first letters.
+    pub(crate) fn kind_text(&self, id: Id) -> &str {
+        self.store.kind_text(id)
+    }
+
+    pub(crate) fn kind_text_of(&self, id: Id, key: Key) -> &str {
         self.store
             .child(id, key)
-            .map_or("", |child| self.store.kind(child))
+            .map_or("", |child| self.store.kind_text(child))
+    }
+
+    pub(crate) fn kind_of(&self, id: Id, key: Key) -> Kind {
+        self.store
+            .child(id, key)
+            .map_or(Kind::NONE, |child| self.store.kind(child))
     }
 
     /// A field's name, as JS reads `node.x.name`: `undefined` when it has none.
-    pub(crate) fn name_of(&self, id: Id, key: &str) -> String {
+    pub(crate) fn name_of(&self, id: Id, key: Key) -> String {
         self.store
             .child(id, key)
-            .and_then(|child| self.store.str(child, "name"))
+            .and_then(|child| self.store.str(child, Key::NAME))
             .unwrap_or("undefined")
             .to_string()
     }
@@ -79,7 +91,7 @@ impl Printer<'_> {
         self.write(")");
     }
 
-    pub(crate) fn comments_of(&mut self, id: Id, key: &str, indent: &str) -> bool {
+    pub(crate) fn comments_of(&mut self, id: Id, key: Key, indent: &str) -> bool {
         let comments = self.store.children(id, key);
         if !self.store.has(id, key) {
             return false;
@@ -92,8 +104,8 @@ impl Printer<'_> {
     pub(crate) fn format_comments(&mut self, comments: &[Id], indent: &str) {
         for comment in comments {
             self.write(indent);
-            let value = self.store.str(*comment, "value").unwrap_or_default();
-            if self.store.kind(*comment).starts_with('L') {
+            let value = self.store.str(*comment, Key::VALUE).unwrap_or_default();
+            if self.store.is(*comment, Kind::LINE) {
                 let line = format!("// {}\n", value.trim_matches(is_js_whitespace));
                 self.write(&line);
             } else {

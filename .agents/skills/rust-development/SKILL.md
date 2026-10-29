@@ -76,13 +76,22 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   token. Time
   growth in release mode, best of several runs: single debug timings are noisy.
 - Constant factors in `md`'s tokenizer are memory traffic: each document pass reads and
-  rewrites every event, so an `Event` stays at most a cache line (`Name` a `u16` index into
-  `NAMES`, `Link` indices `u32`), `EditMap::consume` rebuilds in one pass into
-  `ParseState::spare_events`, strings are tokenized inside each child rather than in a pass
-  of their own, and data, paragraph and chunk lines take runs of plain bytes at once
-  (`Tokenizer::consume_while`). Per-event side tables pay the same: keep them sparse, as
-  the compiler's trailing runs are. Measure a change A/B against the previous build,
-  interleaved, best of many runs: a loaded machine drifts by more than most wins
+  rewrites every event, so an `Event` stays at 32 bytes (`Name` a `u16` index into `NAMES`,
+  `Point` fields `u32`, which caps input at 4 GiB with `input-too-long`, `Link` indices
+  `NonZeroU32` held plus one), `EditMap::consume` moves kept runs
+  in place (left movers front to back, right movers back to front) and writes added
+  events into the gaps, a child list split into chunks goes into the map's `pool` once,
+  strings are tokenized inside each child rather than in a pass of their own, and data,
+  paragraph and chunk lines take runs of plain bytes at once (`Tokenizer::consume_while`).
+  Per-event side tables pay the same: keep them sparse, as the compiler's trailing runs are
+- Page faults cost as much as the passes: glibc hands large freed buffers back and faults
+  them in again, so document-sized event lists go back to `utils/tokenizer/recycle.rs`
+  (a few per thread, within a size band) instead of being dropped, a pass never
+  allocates a second list, and `process` takes the thread's last arena, reset, from
+  `with_allocator` (`textlane/src/actions/allocator/reuse.rs`, up to 64 MB kept). Count faults with `/usr/bin/time -f %R` beside the timing; the
+  pprof harness must not blocklist `libc`, or malloc, free and memcpy vanish from it.
+  Measure a change A/B against the previous build, interleaved, best of many runs: a
+  loaded machine drifts by more than most wins
 - Container ends follow micromark, not markdown-rs: a list item ends at the first line
   ending of its trailing blank lines (`prepareList`), stepping over the exits of lists
   inside but not of block quotes; a list does the same without stepping over block quote
@@ -200,6 +209,14 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   stacks; conversion, printing and comment attachment recurse under `stacker`. Calls
   indent each nested object, so the printed size of deep JSX grows with depth squared.
   `helpers/{entity,property}_table.rs` come from `pnpm -C conformance generate:mdx-tables`.
+  ESTree kinds and keys are `Kind`/`Key` (`models/name.rs`): `u32` indexes into generated
+  tables, as md's `Name` is, so a check compares integers and a name missing from the table
+  fails to compile; names oxc writes that the tables lack are interned per `Store`, and
+  `kind_text` serves astring's first-letter checks. A node holds where its fields lie in
+  one shared list and gains a field by moving its fields to the end: a `Vec` per node cost
+  an allocation and a pointer chase per lookup. The JSON reader borrows keys and `type`.
+  `with_stack` grows with `stacker::maybe_grow`, never `grow`: a fresh mapped stack per
+  expression made expression-heavy MDX 4–6× slower
   With `md.mdx` in the pipeline, `md.toHtml` runs remark-mark-and-unravel first (an
   `UnravelSlot` flag either plugin may attach first): a paragraph of only MDX text nodes
   and white space becomes its MDX as flow nodes, which hast cannot recover once wrapped

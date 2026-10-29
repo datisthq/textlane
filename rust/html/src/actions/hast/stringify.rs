@@ -59,19 +59,28 @@ pub fn stringify_hast(
         quote,
         alternative: if quote == '"' { '\'' } else { '"' },
     };
-    let mut stack = vec![Step::Open {
-        node,
-        index: 0,
-        parent: None,
-    }];
-    while let Some(step) = stack.pop() {
+    let mut stack = vec![];
+    state.open(node, 0, None, &mut stack)?;
+    while let Some(step) = stack.last_mut() {
         match step {
-            Step::Open {
-                node,
-                index,
-                parent,
-            } => state.open(node, index, parent, &mut stack)?,
-            Step::Close(close) => state.close(close),
+            Step::Children { siblings, next } => {
+                let siblings = *siblings;
+                let index = *next;
+                match siblings.children.get(index) {
+                    Some(child) => {
+                        *next += 1;
+                        state.open(child, index, Some(siblings), &mut stack)?;
+                    }
+                    None => {
+                        stack.pop();
+                    }
+                }
+            }
+            Step::Close(_) => {
+                if let Some(Step::Close(close)) = stack.pop() {
+                    state.close(close);
+                }
+            }
         }
     }
     Ok(state.output)
@@ -86,10 +95,9 @@ struct State<'o> {
 }
 
 enum Step<'n, 'a> {
-    Open {
-        node: &'n Node<'a>,
-        index: usize,
-        parent: Option<Siblings<'n, 'a>>,
+    Children {
+        siblings: Siblings<'n, 'a>,
+        next: usize,
     },
     Close(Close<'n, 'a>),
 }
@@ -121,11 +129,13 @@ impl<'o> State<'o> {
     ) -> Result<(), Error> {
         match node {
             Node::Root(root) => {
-                let siblings = Siblings {
-                    tag_name: None,
-                    children: &root.children,
-                };
-                push_children(stack, siblings);
+                stack.push(Step::Children {
+                    siblings: Siblings {
+                        tag_name: None,
+                        children: &root.children,
+                    },
+                    next: 0,
+                });
             }
             Node::Element(element) => self.open_element(element, index, parent, stack),
             Node::Text(text) => self.write_text(text.value, parent),
@@ -208,18 +218,20 @@ impl<'o> State<'o> {
         if !svg && element.tag_name == "svg" {
             self.schema = &SVG;
         }
-        let attributes = self.serialize_attributes(element);
+        let start = self.output.len();
+        self.output.push('<');
+        self.output.push_str(element.tag_name);
+        let attributes = self.output.len();
+        self.write_attributes(element);
         let mut wrote_start_tag = false;
         let mut tight_slash = false;
-        if !attributes.is_empty() || !omit || !is_opening_omitted(element, index, parent)
+        if self.output.len() == attributes
+            && omit
+            && is_opening_omitted(element, index, parent)
         {
-            self.output.push('<');
-            self.output.push_str(element.tag_name);
-            if !attributes.is_empty() {
-                self.output.push(' ');
-                self.output.push_str(&attributes);
-            }
-            let last = attributes.chars().next_back();
+            self.output.truncate(start);
+        } else {
+            let last = self.output[attributes..].chars().next_back();
             tight_slash = self.options.tight_self_closing
                 && last != Some('/')
                 && last.is_none_or(|last| last == '"' || last == '\'');
@@ -241,13 +253,13 @@ impl<'o> State<'o> {
             wrote_start_tag,
             tight_slash,
         }));
-        push_children(
-            stack,
-            Siblings {
+        stack.push(Step::Children {
+            siblings: Siblings {
                 tag_name: Some(element.tag_name),
                 children,
             },
-        );
+            next: 0,
+        });
     }
 
     fn close(&mut self, close: Close) {
@@ -323,28 +335,29 @@ impl<'o> State<'o> {
         self.output.push_str("-->");
     }
 
-    fn serialize_attributes(&self, element: &Element) -> String {
-        let values: Vec<String> = element
-            .properties
-            .iter()
-            .filter(|property| !matches!(property.value, PropertyValue::Null))
-            .map(|property| self.serialize_attribute(property.name, &property.value))
-            .filter(|value| !value.is_empty())
-            .collect();
-        let mut result = String::new();
-        for (index, value) in values.iter().enumerate() {
-            result.push_str(value);
-            let last = value.chars().next_back();
-            let quoted =
-                self.options.tight_attributes && matches!(last, Some('"' | '\''));
-            if index + 1 != values.len() && !quoted {
-                result.push(' ');
+    // Each attribute after a space, or right after a quoted one with `tight_attributes`
+    fn write_attributes(&mut self, element: &Element) {
+        let mut tight = false;
+        for property in element.properties.iter() {
+            if matches!(property.value, PropertyValue::Null) {
+                continue;
             }
+            let mark = self.output.len();
+            if !tight {
+                self.output.push(' ');
+            }
+            let value = self.output.len();
+            self.write_attribute(property.name, &property.value);
+            if self.output.len() == value {
+                self.output.truncate(mark);
+                continue;
+            }
+            tight = self.options.tight_attributes
+                && matches!(self.output.as_bytes().last(), Some(b'"' | b'\''));
         }
-        result
     }
 
-    fn serialize_attribute(&self, key: &str, value: &PropertyValue) -> String {
+    fn write_attribute(&mut self, key: &str, value: &PropertyValue) {
         let found = find_property(self.schema, key);
         let x = usize::from(!(self.options.allow_parse_errors && !is_svg(self.schema)));
         let y = usize::from(!self.options.allow_dangerous_characters);
@@ -366,11 +379,13 @@ impl<'o> State<'o> {
                 Value::Boolean(*number != 0.0 && !number.is_nan())
             }
             PropertyValue::List(_) if is_bool => Value::Boolean(true),
-            PropertyValue::Null => return String::new(),
+            PropertyValue::Null => return,
             PropertyValue::Boolean(boolean) => Value::Boolean(*boolean),
-            PropertyValue::Number(number) if number.is_nan() => return String::new(),
-            PropertyValue::Number(number) => Value::Text(write_js_number(*number)),
-            PropertyValue::String(text) => Value::Text((*text).to_string()),
+            PropertyValue::Number(number) if number.is_nan() => return,
+            PropertyValue::Number(number) => {
+                Value::Text(Cow::Owned(write_js_number(*number)))
+            }
+            PropertyValue::String(text) => Value::Text(Cow::Borrowed(text)),
             PropertyValue::List(items) => {
                 let items: Vec<String> = items
                     .iter()
@@ -379,65 +394,53 @@ impl<'o> State<'o> {
                         PropertyItem::String(text) => (*text).to_string(),
                     })
                     .collect();
-                Value::Text(if found.kinds & COMMA_SEPARATED != 0 {
+                Value::Text(Cow::Owned(if found.kinds & COMMA_SEPARATED != 0 {
                     join_commas(&items, !self.options.tight_comma_separated_lists)
                 } else {
                     items.join(" ").trim_matches(is_js_space).to_string()
-                })
+                }))
             }
         };
         let value = match value {
-            Value::Boolean(false) => return String::new(),
-            Value::Boolean(true) => return escape(attribute, NAME[x][y]),
+            Value::Boolean(false) => return,
+            Value::Boolean(true) => {
+                push_escaped(&mut self.output, attribute, NAME[x][y]);
+                return;
+            }
             Value::Text(value) => value,
         };
-        let name = escape(attribute, NAME[x][y]);
+        push_escaped(&mut self.output, attribute, NAME[x][y]);
         if self.options.collapse_empty_attributes && value.is_empty() {
-            return name;
+            return;
         }
-        let unquoted = self
-            .options
-            .prefer_unquoted
-            .then(|| escape(&value, UNQUOTED[x][y]));
-        let result = match unquoted {
-            Some(unquoted) if unquoted == value => unquoted,
-            _ => {
-                let mut quote = self.quote;
-                if self.options.quote_smart
-                    && value.matches(quote).count()
-                        > value.matches(self.alternative).count()
-                {
-                    quote = self.alternative;
-                }
-                let subset = if quote == '\'' {
-                    SINGLE[x][y]
-                } else {
-                    DOUBLE[x][y]
-                };
-                format!("{quote}{}{quote}", escape(&value, subset))
+        if self.options.prefer_unquoted && !has_any(&value, UNQUOTED[x][y]) {
+            if !value.is_empty() {
+                self.output.push('=');
+                self.output.push_str(&value);
             }
-        };
-        if result.is_empty() {
-            name
-        } else {
-            format!("{name}={result}")
+            return;
         }
+        let mut quote = self.quote;
+        if self.options.quote_smart
+            && value.matches(quote).count() > value.matches(self.alternative).count()
+        {
+            quote = self.alternative;
+        }
+        let subset = if quote == '\'' {
+            SINGLE[x][y]
+        } else {
+            DOUBLE[x][y]
+        };
+        self.output.push('=');
+        self.output.push(quote);
+        push_escaped(&mut self.output, &value, subset);
+        self.output.push(quote);
     }
 }
 
-enum Value {
+enum Value<'v> {
     Boolean(bool),
-    Text(String),
-}
-
-fn push_children<'n, 'a>(stack: &mut Vec<Step<'n, 'a>>, parent: Siblings<'n, 'a>) {
-    for (index, child) in parent.children.iter().enumerate().rev() {
-        stack.push(Step::Open {
-            node: child,
-            index,
-            parent: Some(parent),
-        });
-    }
+    Text(Cow<'v, str>),
 }
 
 // comma-separated-tokens' `stringify`: a trailing empty item keeps its comma
@@ -454,25 +457,31 @@ fn is_js_space(character: char) -> bool {
     character.is_whitespace() || character == '\u{FEFF}'
 }
 
-// stringify-entities with a subset: each listed character as a hexadecimal reference
-fn escape(value: &str, subset: &str) -> String {
-    let mut output = String::with_capacity(value.len());
-    push_escaped(&mut output, value, subset);
-    output
+fn has_any(value: &str, subset: &str) -> bool {
+    value.bytes().any(|byte| subset.as_bytes().contains(&byte))
 }
 
+// stringify-entities with a subset: each listed character as a hexadecimal reference. The
+// subsets are ASCII, so a byte never matches inside a multibyte character
 fn push_escaped(output: &mut String, value: &str, subset: &str) {
-    let mut rest = value;
-    while let Some((index, character)) = rest
-        .char_indices()
-        .find(|(_, character)| subset.contains(*character))
-    {
-        output.push_str(&rest[..index]);
-        output.push_str(&format!("&#x{:X};", u32::from(character)));
-        rest = &rest[index + character.len_utf8()..];
+    let subset = subset.as_bytes();
+    let mut start = 0;
+    for (index, byte) in value.bytes().enumerate() {
+        if subset.contains(&byte) {
+            output.push_str(&value[start..index]);
+            output.push_str("&#x");
+            if byte >= 16 {
+                output.push(char::from(HEX[usize::from(byte >> 4)]));
+            }
+            output.push(char::from(HEX[usize::from(byte & 15)]));
+            output.push(';');
+            start = index + 1;
+        }
     }
-    output.push_str(rest);
+    output.push_str(&value[start..]);
 }
+
+const HEX: &[u8; 16] = b"0123456789ABCDEF";
 
 /// A number as JavaScript's `String(number)` writes it.
 pub(crate) fn write_js_number(number: f64) -> String {

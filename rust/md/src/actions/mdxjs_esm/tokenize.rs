@@ -37,7 +37,8 @@ pub(crate) fn tokenize_mdxjs_esm(tokenizer: &mut Tokenizer) -> State {
 fn word(tokenizer: &mut Tokenizer) -> State {
     let start = tokenizer.tokenize_state.mdx.events_start;
     let begin = tokenizer.events[start].point.index;
-    let buffer = &tokenizer.parse_state.bytes[begin..tokenizer.point.index];
+    let buffer =
+        &tokenizer.parse_state.bytes[begin as usize..tokenizer.point.index as usize];
     match tokenizer.current {
         Some(byte) if byte.is_ascii_alphabetic() => {
             tokenizer.consume();

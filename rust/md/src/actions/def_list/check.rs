@@ -111,7 +111,7 @@ pub(crate) fn confirm_def_list(
     let paragraph =
         find_term_paragraph(tokenizer.parse_state, &child.events, index, from);
     // The flow closed here: content after this line does not join content before it
-    tokenizer.tokenize_state.def_list.flow_start = tokenizer.point.index;
+    tokenizer.tokenize_state.def_list.flow_start = tokenizer.point.index as usize;
     let track = &tokenizer.tokenize_state.def_list;
     let Some(paragraph) = paragraph else {
         return false;
@@ -146,8 +146,8 @@ pub(crate) fn confirm_def_list(
 fn find_marker(tokenizer: &Tokenizer) -> Option<usize> {
     let bytes = tokenizer.parse_state.bytes;
     let point = &tokenizer.point;
-    let mut index = point.index;
-    let mut column = point.column - 1;
+    let mut index = point.index as usize;
+    let mut column = point.column as usize - 1;
     let mut size = 0;
     // Inside a tab, its rest is indent
     if point.vs > 0 {
@@ -233,7 +233,7 @@ fn find_term_paragraph(
                 && events[enter].name == Name::HEADING_SETEXT_UNDERLINE
         })?;
         // Before `from`, it is across a container boundary
-        if events[enter].point.index < from {
+        if events[enter].point.index < from as u32 {
             break None;
         }
         before = enter;
@@ -257,7 +257,7 @@ fn find_term_paragraph(
         }
     }
     match (start, chunks) {
-        (Some(start), _) => (start >= from).then_some(start),
+        (Some(start), _) => (start >= from as u32).then_some(start as usize),
         (None, Some(chunks)) => find_paragraph_start(parse_state, events, &chunks),
         (None, None) => None,
     }
@@ -272,5 +272,5 @@ fn is_dash_break(bytes: &[u8], events: &[Event], enter: usize) -> bool {
     };
     let start = events[enter + sequence].point.index;
     let end = events[enter + sequence + 1].point.index;
-    end - start >= 3 && bytes.get(start) == Some(&b'-')
+    end - start >= 3 && bytes.get(start as usize) == Some(&b'-')
 }

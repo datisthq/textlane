@@ -4,7 +4,8 @@ use oxc_ast::ast::{CommentKind, Program};
 use textlane_core::Error;
 
 use crate::helpers::entity::decode_entities;
-use crate::models::estree::{Id, Node, Store, Value};
+use crate::models::estree::{Id, Store, Value};
+use crate::models::name::{Key, Kind};
 
 /// Read a program oxc parsed into the store as acorn's ESTree, through oxc's own ESTree
 /// serializer; JSX strings decoded as acorn-jsx does and every `start`/`end` moved by `base`.
@@ -22,6 +23,7 @@ pub(crate) fn read_script(
         index: 0,
         store,
         base,
+        pending: Vec::new(),
     }
     .read()?
     .as_node()
@@ -30,15 +32,15 @@ pub(crate) fn read_script(
     for comment in &program.comments {
         let (start, end) = (comment.span.start as usize, comment.span.end as usize);
         let (kind, value) = match comment.kind {
-            CommentKind::Line => ("Line", source.get(start + 2..end)),
-            _ => ("Block", source.get(start + 2..end.saturating_sub(2))),
+            CommentKind::Line => (Kind::LINE, source.get(start + 2..end)),
+            _ => (Kind::BLOCK, source.get(start + 2..end.saturating_sub(2))),
         };
         comments.push(store.add(
             kind,
-            vec![
-                ("value", Value::str(value.unwrap_or_default())),
-                ("start", Value::Number((base + start) as f64)),
-                ("end", Value::Number((base + end) as f64)),
+            [
+                (Key::VALUE, Value::str(value.unwrap_or_default())),
+                (Key::START, Value::Number((base + start) as f64)),
+                (Key::END, Value::Number((base + end) as f64)),
             ],
         ));
     }
@@ -46,7 +48,8 @@ pub(crate) fn read_script(
 }
 
 enum Frame {
-    Object(Node, Option<Cow<'static, str>>),
+    // An object's kind, where its fields start in `pending`, and the key read last
+    Object(Kind, usize, Option<Key>),
     Array(Vec<Value>),
 }
 
@@ -56,6 +59,7 @@ struct Reader<'j, 's> {
     index: usize,
     store: &'s mut Store,
     base: usize,
+    pending: Vec<(Key, Value)>,
 }
 
 fn invalid(reason: &str) -> Error {
@@ -65,29 +69,25 @@ fn invalid(reason: &str) -> Error {
     )
 }
 
-impl Reader<'_, '_> {
+impl<'j> Reader<'j, '_> {
     // JSON nests as deep as the script does, so values are built on an explicit stack
     fn read(&mut self) -> Result<Value, Error> {
         let mut stack: Vec<Frame> = Vec::new();
         loop {
             self.skip_whitespace();
+            let mut typed = false;
             let mut value = match self.peek()? {
                 b'{' => {
                     self.index += 1;
                     self.skip_whitespace();
                     if self.peek()? == b'}' {
                         self.index += 1;
-                        self.finish_object(Node {
-                            kind: Cow::Borrowed(""),
-                            fields: Vec::new(),
-                        })
+                        self.finish_object(Kind::NONE, self.pending.len())
                     } else {
                         let key = self.read_key()?;
                         stack.push(Frame::Object(
-                            Node {
-                                kind: Cow::Borrowed(""),
-                                fields: Vec::new(),
-                            },
+                            Kind::NONE,
+                            self.pending.len(),
                             Some(key),
                         ));
                         continue;
@@ -104,7 +104,19 @@ impl Reader<'_, '_> {
                         continue;
                     }
                 }
-                b'"' => Value::Str(self.read_string()?.into()),
+                b'"' => {
+                    let text = self.read_string()?;
+                    match stack.last_mut() {
+                        Some(Frame::Object(kind, _, Some(Key::TYPE)))
+                            if *kind == Kind::NONE =>
+                        {
+                            *kind = self.store.intern_kind(&text);
+                            typed = true;
+                            Value::Null
+                        }
+                        _ => Value::Str(text.into()),
+                    }
+                }
                 b't' => self.read_word("true", Value::Bool(true))?,
                 b'f' => self.read_word("false", Value::Bool(false))?,
                 b'n' => self.read_word("null", Value::Null)?,
@@ -116,10 +128,12 @@ impl Reader<'_, '_> {
                 };
                 self.skip_whitespace();
                 match frame {
-                    Frame::Object(node, key) => {
+                    Frame::Object(_, _, key) => {
                         let key =
                             key.take().ok_or_else(|| invalid("a value without a key"))?;
-                        node.fields.push((key, value));
+                        if !std::mem::take(&mut typed) {
+                            self.pending.push((key, value));
+                        }
                         if self.peek()? == b',' {
                             self.index += 1;
                             self.skip_whitespace();
@@ -127,10 +141,10 @@ impl Reader<'_, '_> {
                             break;
                         }
                         self.expect(b'}')?;
-                        let Some(Frame::Object(node, _)) = stack.pop() else {
+                        let Some(Frame::Object(kind, start, _)) = stack.pop() else {
                             return Err(invalid("unbalanced object"));
                         };
-                        value = self.finish_object(node);
+                        value = self.finish_object(kind, start);
                     }
                     Frame::Array(items) => {
                         items.push(value);
@@ -149,39 +163,34 @@ impl Reader<'_, '_> {
         }
     }
 
-    fn finish_object(&mut self, mut node: Node) -> Value {
-        if let Some(index) = node.fields.iter().position(|(key, _)| &**key == "type")
-            && let Value::Str(kind) = &node.fields[index].1
-        {
-            node.kind = Cow::Owned(kind.to_string());
-            node.fields.remove(index);
-        }
-        for (key, value) in &mut node.fields {
-            if (&**key == "start" || &**key == "end")
+    fn finish_object(&mut self, kind: Kind, start: usize) -> Value {
+        let fields = &mut self.pending[start..];
+        for (key, value) in fields.iter_mut() {
+            if (*key == Key::START || *key == Key::END)
                 && let Value::Number(offset) = value
             {
                 *offset += self.base as f64;
             }
         }
-        match &*node.kind {
-            "JSXText" => decode_field(&mut node, true),
-            "JSXAttribute" => {
-                let literal = node
-                    .fields
+        match kind {
+            Kind::JSX_TEXT => decode_field(fields, true),
+            Kind::JSX_ATTRIBUTE => {
+                let literal = fields
                     .iter()
-                    .find(|(key, _)| &**key == "value")
+                    .find(|(key, _)| *key == Key::VALUE)
                     .and_then(|(_, value)| value.as_node())
-                    .filter(|value| self.store.is(*value, "Literal"));
+                    .filter(|value| self.store.is(*value, Kind::LITERAL));
                 if let Some(literal) = literal
-                    && let Some(Value::Str(text)) = self.store.get(literal, "value")
+                    && let Some(Value::Str(text)) = self.store.get(literal, Key::VALUE)
                 {
                     let decoded = decode_entities(text, false);
-                    self.store.set(literal, "value", Value::Str(decoded.into()));
+                    self.store
+                        .set(literal, Key::VALUE, Value::Str(decoded.into()));
                 }
             }
             _ => {}
         }
-        Value::Node(self.store.add_node(node))
+        Value::Node(self.store.add(kind, self.pending.drain(start..)))
     }
 
     fn skip_whitespace(&mut self) {
@@ -209,11 +218,11 @@ impl Reader<'_, '_> {
         Ok(())
     }
 
-    fn read_key(&mut self) -> Result<Cow<'static, str>, Error> {
+    fn read_key(&mut self) -> Result<Key, Error> {
         let key = self.read_string()?;
         self.skip_whitespace();
         self.expect(b':')?;
-        Ok(Cow::Owned(key))
+        Ok(self.store.intern_key(&key))
     }
 
     fn read_word(&mut self, word: &str, value: Value) -> Result<Value, Error> {
@@ -237,16 +246,22 @@ impl Reader<'_, '_> {
             .map_err(|_| invalid("not a number"))
     }
 
-    fn read_string(&mut self) -> Result<String, Error> {
+    // Borrowed unless it has escapes: keys and types are only looked up, never kept
+    fn read_string(&mut self) -> Result<Cow<'j, str>, Error> {
         self.expect(b'"')?;
+        let text = self.text;
         let mut result = String::new();
         let mut start = self.index;
         loop {
             match self.peek()? {
-                b'"' => {
-                    result.push_str(&self.text[start..self.index]);
+                b'"' if result.is_empty() => {
                     self.index += 1;
-                    return Ok(result);
+                    return Ok(Cow::Borrowed(&text[start..self.index - 1]));
+                }
+                b'"' => {
+                    result.push_str(&text[start..self.index]);
+                    self.index += 1;
+                    return Ok(Cow::Owned(result));
                 }
                 b'\\' => {
                     result.push_str(&self.text[start..self.index]);
@@ -293,16 +308,16 @@ impl Reader<'_, '_> {
     }
 }
 
-fn key_slot(stack: &mut [Frame]) -> &mut Option<Cow<'static, str>> {
+fn key_slot(stack: &mut [Frame]) -> &mut Option<Key> {
     match stack.last_mut() {
-        Some(Frame::Object(_, key)) => key,
+        Some(Frame::Object(_, _, key)) => key,
         _ => unreachable!("only called while an object is open"),
     }
 }
 
-fn decode_field(node: &mut Node, normalize: bool) {
-    for (key, value) in &mut node.fields {
-        if &**key == "value"
+fn decode_field(fields: &mut [(Key, Value)], normalize: bool) {
+    for (key, value) in fields {
+        if *key == Key::VALUE
             && let Value::Str(text) = value
         {
             *text = decode_entities(text, normalize).into();

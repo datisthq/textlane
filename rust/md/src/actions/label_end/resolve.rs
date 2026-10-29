@@ -11,16 +11,14 @@ pub(crate) fn resolve_label(tokenizer: &mut Tokenizer) {
     let starts = tokenizer.tokenize_state.label_starts_loose.split_off(0);
     mark_as_data(tokenizer, &starts);
     tokenizer.tokenize_state.label_starts_inactive_before = 0;
-    tokenizer
-        .map
-        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
+    tokenizer.map.consume(&mut tokenizer.events);
 }
 
 fn inject_labels(tokenizer: &mut Tokenizer, labels: &[Label]) {
     let event = |kind, name, index: usize, events: &[Event]| Event {
         kind,
         name,
-        point: events[index].point.clone(),
+        point: events[index].point,
         link: None,
     };
     for label in labels {
@@ -60,13 +58,13 @@ fn mark_as_data(tokenizer: &mut Tokenizer, starts: &[LabelStart]) {
             Event {
                 kind: Kind::Enter,
                 name: Name::DATA,
-                point: tokenizer.events[enter].point.clone(),
+                point: tokenizer.events[enter].point,
                 link: None,
             },
             Event {
                 kind: Kind::Exit,
                 name: Name::DATA,
-                point: tokenizer.events[exit].point.clone(),
+                point: tokenizer.events[exit].point,
                 link: None,
             },
         ];

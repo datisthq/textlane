@@ -43,7 +43,7 @@ pub(crate) fn classify_directive_character(tokenizer: &Tokenizer) -> CharacterKi
         Some(0x80..=0xBF) => CharacterKind::Other,
         Some(_) => classify_character_unit(find_character_after(
             tokenizer.parse_state.bytes,
-            tokenizer.point.index,
+            tokenizer.point.index as usize,
         )),
     }
 }

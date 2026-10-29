@@ -1,10 +1,12 @@
 use crate::actions::hast::convert::Snippet;
 use crate::models::estree::{Id, Store};
+use crate::models::name::Key;
 
 /// unist-util-stringify-position of unist-util-position-from-estree: where a node read from
 /// a snippet sits in the document, `1:1-1:31`, or nothing when that is not known.
 pub(crate) fn stringify_place(store: &Store, snippets: &[Snippet], id: Id) -> String {
-    let (Some(start), Some(end)) = (store.number(id, "start"), store.number(id, "end"))
+    let (Some(start), Some(end)) =
+        (store.number(id, Key::START), store.number(id, Key::END))
     else {
         return String::new();
     };

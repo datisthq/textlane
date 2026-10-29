@@ -19,11 +19,15 @@ pub(crate) fn convert_text<'a>(
 // As the trim-lines package does: lines keep their outer edges, the first its start and the
 // last its end
 fn trim_lines<'a>(converter: &Converter<'a, '_>, value: &'a str) -> &'a str {
-    if !value.contains(['\n', '\r']) {
+    let bytes = value.as_bytes();
+    let blank = |byte: &u8| matches!(byte, b' ' | b'\t');
+    let ending = |byte: &u8| matches!(byte, b'\n' | b'\r');
+    if !bytes.windows(2).any(|pair| {
+        (blank(&pair[0]) && ending(&pair[1])) || (ending(&pair[0]) && blank(&pair[1]))
+    }) {
         return value;
     }
     let mut result = ArenaString::with_capacity_in(value.len(), converter.alloc);
-    let bytes = value.as_bytes();
     let mut last = 0;
     let mut index = 0;
     while index < bytes.len() {

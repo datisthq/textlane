@@ -56,7 +56,7 @@ fn open(tokenizer: &mut Tokenizer) -> State {
         Some(b'/') => {
             tokenizer.consume();
             tokenizer.tokenize_state.seen = true;
-            tokenizer.tokenize_state.start = tokenizer.point.index;
+            tokenizer.tokenize_state.start = tokenizer.point.index as usize;
             State::Next(tag_close_start)
         }
         Some(b'?') => {
@@ -66,7 +66,7 @@ fn open(tokenizer: &mut Tokenizer) -> State {
             State::Next(continuation_declaration_inside)
         }
         Some(b'A'..=b'Z' | b'a'..=b'z') => {
-            tokenizer.tokenize_state.start = tokenizer.point.index;
+            tokenizer.tokenize_state.start = tokenizer.point.index as usize;
             State::Retry(tag_name)
         }
         _ => State::Nok,
@@ -412,7 +412,7 @@ fn continuation_raw_tag_open(tokenizer: &mut Tokenizer) -> State {
     match tokenizer.current {
         Some(b'/') => {
             tokenizer.consume();
-            tokenizer.tokenize_state.start = tokenizer.point.index;
+            tokenizer.tokenize_state.start = tokenizer.point.index as usize;
             State::Next(continuation_raw_end_tag)
         }
         _ => State::Retry(continuation),
@@ -434,7 +434,8 @@ fn continuation_raw_end_tag(tokenizer: &mut Tokenizer) -> State {
             }
         }
         Some(b'A'..=b'Z' | b'a'..=b'z')
-            if tokenizer.point.index - tokenizer.tokenize_state.start < RAW_SIZE_MAX =>
+            if (tokenizer.point.index as usize) - tokenizer.tokenize_state.start
+                < RAW_SIZE_MAX =>
         {
             tokenizer.consume();
             State::Next(continuation_raw_end_tag)
@@ -499,7 +500,7 @@ fn blank_line_before(tokenizer: &mut Tokenizer) -> State {
 fn read_name(tokenizer: &Tokenizer) -> String {
     let bytes = tokenizer.parse_state.bytes;
     let name = bytes
-        .get(tokenizer.tokenize_state.start..tokenizer.point.index)
+        .get(tokenizer.tokenize_state.start..tokenizer.point.index as usize)
         .unwrap_or_default();
     String::from_utf8_lossy(name).trim().to_ascii_lowercase()
 }

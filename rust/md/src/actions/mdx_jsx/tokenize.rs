@@ -575,9 +575,10 @@ fn current_character(tokenizer: &Tokenizer) -> Option<char> {
     match tokenizer.current {
         None => None,
         Some(byte) if byte.is_ascii() => Some(char::from(byte)),
-        Some(_) => {
-            find_character_after(tokenizer.parse_state.bytes, tokenizer.point.index)
-        }
+        Some(_) => find_character_after(
+            tokenizer.parse_state.bytes,
+            tokenizer.point.index as usize,
+        ),
     }
 }
 

@@ -28,11 +28,11 @@ fn sequence_open(tokenizer: &mut Tokenizer) -> State {
         // After one span scanned to the end, every run is known: one with no run of its
         // length after it cannot close, and scanning again would make input quadratic
         let state = &tokenizer.tokenize_state;
-        let start = tokenizer.point.index - state.size;
+        let start = tokenizer.point.index - state.size as u32;
         let closable = state
             .code_text_runs
             .get(&state.size)
-            .is_some_and(|last| *last > start);
+            .is_some_and(|last| *last > start as usize);
         if state.code_text_scanned && !closable {
             tokenizer.tokenize_state.size = 0;
             return State::Nok;
@@ -86,14 +86,14 @@ fn sequence_close(tokenizer: &mut Tokenizer) -> State {
         return State::Next(sequence_close);
     }
     let size = tokenizer.tokenize_state.size_b;
-    let start = tokenizer.point.index - size;
+    let start = tokenizer.point.index - size as u32;
     // Spans closing early meet runs again: keep the last of each length, not the latest seen
     let last = tokenizer
         .tokenize_state
         .code_text_runs
         .entry(size)
-        .or_insert(start);
-    *last = (*last).max(start);
+        .or_insert(start as usize);
+    *last = (*last).max(start as usize);
     tokenizer.exit(Name::CODE_TEXT_SEQUENCE);
     if tokenizer.tokenize_state.size == tokenizer.tokenize_state.size_b {
         tokenizer.exit(Name::CODE_TEXT);

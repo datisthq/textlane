@@ -24,7 +24,7 @@ pub(crate) fn resolve_heading_setext(tokenizer: &mut Tokenizer) {
                 skip_to_back(&tokenizer.events, paragraph_exit - 1, &[Name::PARAGRAPH]);
             tokenizer.events[paragraph_enter].name = Name::HEADING_SETEXT_TEXT;
             tokenizer.events[paragraph_exit].name = Name::HEADING_SETEXT_TEXT;
-            let mut heading_enter = tokenizer.events[paragraph_enter].clone();
+            let mut heading_enter = tokenizer.events[paragraph_enter];
             heading_enter.name = Name::HEADING_SETEXT;
             // Definitions before it in the same content: micromark starts the heading
             // where that content does
@@ -34,7 +34,7 @@ pub(crate) fn resolve_heading_setext(tokenizer: &mut Tokenizer) {
                 .parse_state
                 .content_breaks
                 .borrow()
-                .contains(&start)
+                .contains(&(start as usize))
             {
                 before = 0;
             }
@@ -45,13 +45,13 @@ pub(crate) fn resolve_heading_setext(tokenizer: &mut Tokenizer) {
                 } else if event.name == Name::DEFINITION && event.kind == Kind::Exit {
                     before =
                         skip_to_back(&tokenizer.events, before - 2, &[Name::DEFINITION]);
-                    heading_enter.point = tokenizer.events[before].point.clone();
+                    heading_enter.point = tokenizer.events[before].point;
                 } else {
                     break;
                 }
             }
             tokenizer.map.add(paragraph_enter, 0, vec![heading_enter]);
-            let mut heading_exit = tokenizer.events[exit].clone();
+            let mut heading_exit = tokenizer.events[exit];
             heading_exit.name = Name::HEADING_SETEXT;
             tokenizer.map.add(exit + 1, 0, vec![heading_exit]);
         } else if exit + 4 < tokenizer.events.len()
@@ -62,7 +62,7 @@ pub(crate) fn resolve_heading_setext(tokenizer: &mut Tokenizer) {
             tokenizer.events[enter].name = Name::PARAGRAPH;
             tokenizer.events[exit + 1].name = Name::DATA;
             tokenizer.events[exit + 2].name = Name::DATA;
-            tokenizer.events[exit + 1].point = tokenizer.events[enter].point.clone();
+            tokenizer.events[exit + 1].point = tokenizer.events[enter].point;
             tokenizer.events[exit + 1].link = Some(Link {
                 previous: None,
                 next: Link::at(exit + 4),
@@ -79,7 +79,7 @@ pub(crate) fn resolve_heading_setext(tokenizer: &mut Tokenizer) {
             let data = |kind, index: usize, link| Event {
                 name: Name::DATA,
                 kind,
-                point: tokenizer.events[index].point.clone(),
+                point: tokenizer.events[index].point,
                 link,
             };
             let text = Link {
@@ -95,7 +95,5 @@ pub(crate) fn resolve_heading_setext(tokenizer: &mut Tokenizer) {
         }
         enter = skip_to(&tokenizer.events, exit + 1, &underline);
     }
-    tokenizer
-        .map
-        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
+    tokenizer.map.consume(&mut tokenizer.events);
 }

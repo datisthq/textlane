@@ -27,7 +27,7 @@ pub(crate) fn compile_heading(compiler: &mut Compiler, name: Name, kind: Kind) {
         // `=` underlines a heading of rank 1, `-` of rank 2
         (Name::HEADING_SETEXT_UNDERLINE_SEQUENCE, Kind::Exit) => {
             let (start, _) = span_of_exit(compiler.events, compiler.index);
-            let underline = compiler.source.as_bytes().get(start.index);
+            let underline = compiler.source.as_bytes().get(start.index as usize);
             let depth = if underline == Some(&b'-') { 2 } else { 1 };
             if let Node::Heading(heading) = compiler.tail_mut() {
                 heading.depth = depth;

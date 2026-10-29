@@ -3,6 +3,8 @@ use textlane_core::{
     TreeKind,
 };
 
+use crate::actions::allocator::reuse::with_allocator;
+
 /// A pipeline being composed: `.with()` adds a plugin, as unified's `.use()` does.
 #[derive(Default)]
 pub struct Processor {
@@ -80,11 +82,12 @@ impl Processor {
 impl FrozenProcessor {
     /// Parse, run and stringify one document.
     pub fn process(&self, input: &str) -> Result<Output, Error> {
-        let alloc = Allocator::new();
         let mut file = File::new();
-        let tree = self.parse(input, &mut file, &alloc)?;
-        let tree = self.run(tree, &mut file, &alloc)?;
-        let value = self.stringify(&tree, &mut file)?;
+        let value = with_allocator(|alloc| {
+            let tree = self.parse(input, &mut file, alloc)?;
+            let tree = self.run(tree, &mut file, alloc)?;
+            self.stringify(&tree, &mut file)
+        })?;
         Ok(Output {
             value,
             extension: self.extension().unwrap_or_default(),

@@ -24,9 +24,7 @@ pub(crate) fn resolve_whitespace(
             trim_data(tokenizer, index, trim_start, trim_end, hard_break);
         }
     }
-    tokenizer
-        .map
-        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
+    tokenizer.map.consume(&mut tokenizer.events);
 }
 
 fn trim_data(
@@ -67,10 +65,10 @@ fn trim_data(
             return;
         }
         if diff > 0 || slice.after > 0 {
-            let exit_point = tokenizer.events[exit_index].point.clone();
-            let mut enter_point = exit_point.clone();
-            enter_point.index -= diff;
-            enter_point.column -= diff;
+            let exit_point = tokenizer.events[exit_index].point;
+            let mut enter_point = exit_point;
+            enter_point.index -= diff as u32;
+            enter_point.column -= diff as u32;
             enter_point.vs = 0;
             tokenizer.map.add(
                 exit_index + 1,
@@ -79,7 +77,7 @@ fn trim_data(
                     Event {
                         kind: Kind::Enter,
                         name,
-                        point: enter_point.clone(),
+                        point: enter_point,
                         link: None,
                     },
                     Event {
@@ -107,16 +105,16 @@ fn trim_data(
             return;
         }
         if index > 0 || slice.before > 0 {
-            let enter_point = tokenizer.events[exit_index - 1].point.clone();
-            let mut exit_point = enter_point.clone();
+            let enter_point = tokenizer.events[exit_index - 1].point;
+            let mut exit_point = enter_point;
             // Starting inside a tab, the slice starts after it: so must the whitespace's end,
             // or the rest of the tab stays in the text (markdown-rs has this bug)
             if slice.before > 0 {
-                exit_point.column += slice.before;
+                exit_point.column += slice.before as u32;
                 exit_point.index += 1;
             }
-            exit_point.index += index;
-            exit_point.column += index;
+            exit_point.index += index as u32;
+            exit_point.column += index as u32;
             exit_point.vs = 0;
             tokenizer.map.add(
                 exit_index - 1,
@@ -131,7 +129,7 @@ fn trim_data(
                     Event {
                         kind: Kind::Exit,
                         name: Name::SPACE_OR_TAB,
-                        point: exit_point.clone(),
+                        point: exit_point,
                         link: None,
                     },
                 ],

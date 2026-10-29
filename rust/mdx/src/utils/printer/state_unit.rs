@@ -1,5 +1,6 @@
 use crate::actions::script::parse::parse_script;
 use crate::models::estree::Store;
+use crate::models::name::Key;
 use crate::utils::printer::state::print_program;
 
 // Each source as acorn reads it and astring 1.9.0 with estree-util-to-js's JSX handlers prints it
@@ -188,7 +189,7 @@ fn prints_programs_as_astring() -> Result<(), textlane_core::Error> {
         let (program, comments) = parse_script(&mut store, input, 2)?;
         store.set(
             program,
-            "comments",
+            Key::COMMENTS,
             crate::models::estree::Value::nodes(comments),
         );
         assert_eq!(print_program(&store, program), *expected, "{input}");

@@ -175,7 +175,7 @@ fn protocol_start(tokenizer: &mut Tokenizer) -> State {
         {
             tokenizer.enter(Name::LITERAL_AUTOLINK);
             tokenizer.enter(Name::LITERAL_AUTOLINK_HTTP);
-            tokenizer.tokenize_state.start = tokenizer.point.index;
+            tokenizer.tokenize_state.start = tokenizer.point.index as usize;
             tokenizer.consume();
             State::Next(protocol_prefix_inside)
         }
@@ -187,13 +187,17 @@ fn protocol_prefix_inside(tokenizer: &mut Tokenizer) -> State {
     let start = tokenizer.tokenize_state.start;
     match tokenizer.current {
         // `5` is the size of `https`
-        Some(byte) if byte.is_ascii_alphabetic() && tokenizer.point.index - start < 5 => {
+        Some(byte)
+            if byte.is_ascii_alphabetic()
+                && (tokenizer.point.index as usize) - start < 5 =>
+        {
             tokenizer.consume();
             State::Next(protocol_prefix_inside)
         }
         Some(b':') => {
             tokenizer.tokenize_state.start = 0;
-            let name = &tokenizer.parse_state.bytes[start..tokenizer.point.index];
+            let name =
+                &tokenizer.parse_state.bytes[start..tokenizer.point.index as usize];
             if name.eq_ignore_ascii_case(b"http") || name.eq_ignore_ascii_case(b"https") {
                 tokenizer.consume();
                 State::Next(protocol_slashes_inside)
@@ -250,7 +254,7 @@ fn protocol_after(tokenizer: &mut Tokenizer) -> State {
 fn is_space_or_punctuation(tokenizer: &Tokenizer) -> bool {
     let kind = classify_unit_at(
         tokenizer.parse_state.bytes,
-        tokenizer.point.index,
+        tokenizer.point.index as usize,
         tokenizer.current,
     );
     kind != CharacterKind::Other
@@ -259,7 +263,7 @@ fn is_space_or_punctuation(tokenizer: &Tokenizer) -> bool {
 fn is_whitespace(tokenizer: &Tokenizer) -> bool {
     let kind = classify_unit_at(
         tokenizer.parse_state.bytes,
-        tokenizer.point.index,
+        tokenizer.point.index as usize,
         tokenizer.current,
     );
     kind == CharacterKind::Whitespace
@@ -268,10 +272,10 @@ fn is_whitespace(tokenizer: &Tokenizer) -> bool {
 fn domain_start(tokenizer: &mut Tokenizer) -> State {
     let index = tokenizer.point.index;
     let (start, dot) = tokenizer.tokenize_state.literal_domain_failed;
-    if start <= index && index < dot {
+    if start <= index as usize && index < dot as u32 {
         return State::Nok;
     }
-    tokenizer.tokenize_state.literal_domain = (index, 0, 0);
+    tokenizer.tokenize_state.literal_domain = (index as usize, 0, 0);
     State::Retry(domain_inside)
 }
 
@@ -309,7 +313,8 @@ fn domain_at_punctuation(tokenizer: &mut Tokenizer) -> State {
         tokenizer.tokenize_state.marker_b = tokenizer.tokenize_state.marker;
         tokenizer.tokenize_state.marker = 0;
         let (start, last, _) = tokenizer.tokenize_state.literal_domain;
-        tokenizer.tokenize_state.literal_domain = (start, tokenizer.point.index, last);
+        tokenizer.tokenize_state.literal_domain =
+            (start, tokenizer.point.index as usize, last);
     }
     tokenizer.consume();
     State::Next(domain_inside)
@@ -378,10 +383,10 @@ fn path_after(tokenizer: &mut Tokenizer) -> State {
 fn trail_start(tokenizer: &mut Tokenizer) -> State {
     let index = tokenizer.point.index;
     let (start, failed) = tokenizer.tokenize_state.literal_trail;
-    if start <= index && index < failed {
+    if start <= index as usize && index < failed as u32 {
         return State::Nok;
     }
-    tokenizer.tokenize_state.literal_trail = (index, 0);
+    tokenizer.tokenize_state.literal_trail = (index as usize, 0);
     State::Retry(trail)
 }
 
@@ -444,6 +449,6 @@ fn trail_character_reference_inside(tokenizer: &mut Tokenizer) -> State {
 }
 
 fn fail_trail(tokenizer: &mut Tokenizer) -> State {
-    tokenizer.tokenize_state.literal_trail.1 = tokenizer.point.index;
+    tokenizer.tokenize_state.literal_trail.1 = tokenizer.point.index as usize;
     State::Nok
 }

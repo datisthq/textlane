@@ -51,7 +51,7 @@ pub(crate) fn subtokenize(
             && filter.is_none_or(|filter| link.content == filter)
         {
             let content = link.content;
-            let mut tokenizer = Tokenizer::new(event.point.clone(), parse_state);
+            let mut tokenizer = Tokenizer::new(event.point, parse_state);
             let mut state = State::Next(match link.content {
                 ContentType::Content => tokenize_content_definition_before,
                 ContentType::String => tokenize_string,
@@ -67,12 +67,12 @@ pub(crate) fn subtokenize(
                 let enter = &events[index];
                 let current = enter.link.as_ref();
                 if current.is_some_and(|link| link.previous.is_some()) {
-                    tokenizer.define_skip(enter.point.clone());
+                    tokenizer.define_skip(enter.point);
                 }
                 let end = &events[index + 1].point;
                 state = tokenizer.push(
-                    (enter.point.index, enter.point.vs),
-                    (end.index, end.vs),
+                    (enter.point.index as usize, enter.point.vs as usize),
+                    (end.index as usize, end.vs as usize),
                     state,
                 );
                 link_index = current.and_then(Link::next);
@@ -99,7 +99,7 @@ pub(crate) fn subtokenize(
         }
         index += 1;
     }
-    map.consume(events, &parse_state.spare_events);
+    map.consume(events);
     value
 }
 
@@ -189,10 +189,10 @@ pub(crate) fn divide_events(
     if !child_events.is_empty() {
         slices.push((link_index, slice_start));
     }
-    let mut index = slices.len();
-    while index > 0 {
-        index -= 1;
-        map.add(slices[index].0, 2, child_events.split_off(slices[index].1));
+    let base = map.pool(child_events);
+    for (index, &(at, start)) in slices.iter().enumerate() {
+        let end = slices.get(index + 1).map_or(len, |next| next.1);
+        map.add_pooled(at, 2, base + start..base + end);
     }
     (acc_before.0 + (slices.len() * 2), acc_before.1 + len)
 }

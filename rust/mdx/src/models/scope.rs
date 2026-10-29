@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use crate::models::estree::{Id, Store, Value};
+use crate::models::name::{Key, Kind};
 
 /// One scope: a function's (`block: false`) or a block's, and the names defined in it.
 pub(crate) struct Scope {
@@ -30,43 +31,47 @@ impl Default for Scopes {
 impl Scopes {
     pub(crate) fn enter(&mut self, store: &Store, id: Id) {
         match store.kind(id) {
-            "ArrowFunctionExpression" => {
+            Kind::ARROW_FUNCTION_EXPRESSION => {
                 self.open(false);
                 self.define_parameters(store, id);
             }
-            "BlockStatement" | "DoWhileStatement" | "ForInStatement"
-            | "ForOfStatement" | "ForStatement" | "WhileStatement" => self.open(true),
-            "CatchClause" => {
+            Kind::BLOCK_STATEMENT
+            | Kind::DO_WHILE_STATEMENT
+            | Kind::FOR_IN_STATEMENT
+            | Kind::FOR_OF_STATEMENT
+            | Kind::FOR_STATEMENT
+            | Kind::WHILE_STATEMENT => self.open(true),
+            Kind::CATCH_CLAUSE => {
                 self.open(true);
-                if let Some(param) = store.child(id, "param") {
+                if let Some(param) = store.child(id, Key::PARAM) {
                     self.define_pattern(store, param, true);
                 }
             }
-            "ClassDeclaration" => {
+            Kind::CLASS_DECLARATION => {
                 if let Some(name) = name_of(store, id) {
                     self.define(name, false);
                 }
             }
-            "FunctionDeclaration" | "FunctionExpression" => {
+            Kind::FUNCTION_DECLARATION | Kind::FUNCTION_EXPRESSION => {
                 if let Some(name) = name_of(store, id) {
                     self.define(name, false);
                 }
                 self.open(false);
                 self.define_parameters(store, id);
             }
-            "ImportDeclaration" => {
-                for specifier in store.children(id, "specifiers") {
-                    if let Some(local) = store.child(specifier, "local")
-                        && let Some(name) = store.str(local, "name")
+            Kind::IMPORT_DECLARATION => {
+                for specifier in store.children(id, Key::SPECIFIERS) {
+                    if let Some(local) = store.child(specifier, Key::LOCAL)
+                        && let Some(name) = store.str(local, Key::NAME)
                     {
                         self.define(name.to_string(), false);
                     }
                 }
             }
-            "VariableDeclaration" => {
-                let block = store.str(id, "kind") != Some("var");
-                for declarator in store.children(id, "declarations") {
-                    if let Some(pattern) = store.child(declarator, "id") {
+            Kind::VARIABLE_DECLARATION => {
+                let block = store.str(id, Key::KIND) != Some("var");
+                for declarator in store.children(id, Key::DECLARATIONS) {
+                    if let Some(pattern) = store.child(declarator, Key::ID) {
                         self.define_pattern(store, pattern, block);
                     }
                 }
@@ -78,16 +83,16 @@ impl Scopes {
     pub(crate) fn exit(&mut self, store: &Store, id: Id) {
         if matches!(
             store.kind(id),
-            "ArrowFunctionExpression"
-                | "FunctionDeclaration"
-                | "FunctionExpression"
-                | "BlockStatement"
-                | "CatchClause"
-                | "DoWhileStatement"
-                | "ForInStatement"
-                | "ForOfStatement"
-                | "ForStatement"
-                | "WhileStatement"
+            Kind::ARROW_FUNCTION_EXPRESSION
+                | Kind::FUNCTION_DECLARATION
+                | Kind::FUNCTION_EXPRESSION
+                | Kind::BLOCK_STATEMENT
+                | Kind::CATCH_CLAUSE
+                | Kind::DO_WHILE_STATEMENT
+                | Kind::FOR_IN_STATEMENT
+                | Kind::FOR_OF_STATEMENT
+                | Kind::FOR_STATEMENT
+                | Kind::WHILE_STATEMENT
         ) && let Some(scope) = self.scopes.pop()
         {
             for name in scope.defined {
@@ -121,7 +126,7 @@ impl Scopes {
     }
 
     fn define_parameters(&mut self, store: &Store, id: Id) {
-        for parameter in store.children(id, "params") {
+        for parameter in store.children(id, Key::PARAMS) {
             self.define_pattern(store, parameter, false);
         }
     }
@@ -131,28 +136,28 @@ impl Scopes {
         let mut stack = vec![pattern];
         while let Some(pattern) = stack.pop() {
             match store.kind(pattern) {
-                "ArrayPattern" => {
-                    let elements = store.list(pattern, "elements");
+                Kind::ARRAY_PATTERN => {
+                    let elements = store.list(pattern, Key::ELEMENTS);
                     stack.extend(elements.iter().rev().filter_map(Value::as_node));
                 }
-                "AssignmentPattern" => stack.extend(store.child(pattern, "left")),
-                "Identifier" => {
-                    if let Some(name) = store.str(pattern, "name") {
+                Kind::ASSIGNMENT_PATTERN => stack.extend(store.child(pattern, Key::LEFT)),
+                Kind::IDENTIFIER => {
+                    if let Some(name) = store.str(pattern, Key::NAME) {
                         self.define(name.to_string(), block);
                     }
                 }
-                "ObjectPattern" => {
+                Kind::OBJECT_PATTERN => {
                     for property in
-                        store.children(pattern, "properties").into_iter().rev()
+                        store.children(pattern, Key::PROPERTIES).into_iter().rev()
                     {
-                        if store.is(property, "Property") {
-                            stack.extend(store.child(property, "value"));
+                        if store.is(property, Kind::PROPERTY) {
+                            stack.extend(store.child(property, Key::VALUE));
                         } else {
                             stack.push(property);
                         }
                     }
                 }
-                _ => stack.extend(store.child(pattern, "argument")),
+                _ => stack.extend(store.child(pattern, Key::ARGUMENT)),
             }
         }
     }
@@ -160,7 +165,7 @@ impl Scopes {
 
 fn name_of(store: &Store, id: Id) -> Option<String> {
     store
-        .child(id, "id")
-        .and_then(|name| store.str(name, "name"))
+        .child(id, Key::ID)
+        .and_then(|name| store.str(name, Key::NAME))
         .map(str::to_string)
 }

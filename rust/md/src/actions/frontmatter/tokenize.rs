@@ -20,16 +20,15 @@ fn matter_before(tokenizer: &mut Tokenizer) -> State {
             && point.vs == 0
             && (point.line == 1 || matter.anywhere)
             && matter.open.as_bytes().first() == tokenizer.current.as_ref()
-            && state
-                .frontmatter_failed
-                .get(index)
-                .is_none_or(|failed| failed.is_none_or(|start| point.index < start))
+            && state.frontmatter_failed.get(index).is_none_or(|failed| {
+                failed.is_none_or(|start| point.index < start as u32)
+            })
     });
     let Some(index) = found else {
         return State::Nok;
     };
     tokenizer.tokenize_state.frontmatter_index = index;
-    tokenizer.tokenize_state.frontmatter_start = tokenizer.point.index;
+    tokenizer.tokenize_state.frontmatter_start = tokenizer.point.index as usize;
     tokenizer.attempt(State::Ok, State::Next(matter_next));
     State::Retry(open_start)
 }

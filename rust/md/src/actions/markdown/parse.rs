@@ -8,6 +8,7 @@ use crate::plugins::gfm::actions::text::autolink::autolink_text;
 use crate::utils::compiler::handlers::compile_event;
 use crate::utils::compiler::stack::Compiler;
 use crate::utils::tokenizer::preprocess::tokenize_input;
+use crate::utils::tokenizer::recycle::give_events;
 
 /// Parse Markdown into mdast, allocated in `alloc` and borrowing `input` where it can; as
 /// micromark, it skips a leading byte order mark, and positions count from after it.
@@ -60,6 +61,7 @@ pub(crate) fn parse_markdown_with<'a>(
         }
     }
     let mut root = compiler.finish()?;
+    give_events(events);
     if settings.gfm.is_some() {
         autolink_text(&mut root, alloc);
     }

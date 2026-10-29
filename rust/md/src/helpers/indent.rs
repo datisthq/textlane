@@ -24,7 +24,8 @@ pub(crate) fn read_def_list_indent(tokenizer: &Tokenizer, enter: usize) -> usize
             if parent.kind == Container::DefList
                 && tokenizer.events[exit].name == Name::SPACE_OR_TAB =>
         {
-            tokenizer.events[exit].point.column - tokenizer.events[exit - 1].point.column
+            (tokenizer.events[exit].point.column
+                - tokenizer.events[exit - 1].point.column) as usize
         }
         _ => 0,
     }

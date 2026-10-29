@@ -24,7 +24,7 @@ pub(crate) fn tokenize_mdx_expression(tokenizer: &mut Tokenizer) -> State {
     let events = tokenizer.events.len();
     let state = &mut tokenizer.tokenize_state.mdx;
     state.size = 0;
-    state.line = line;
+    state.line = line as usize;
     state.events_start = events;
     state.events_read = events;
     state.source.clear();
@@ -107,7 +107,7 @@ fn inside(tokenizer: &mut Tokenizer) -> State {
 
 fn eol_after(tokenizer: &mut Tokenizer) -> State {
     let state = &tokenizer.tokenize_state.mdx;
-    if tokenizer.point.line != state.line && !state.allow_lazy && tokenizer.lazy {
+    if tokenizer.point.line != state.line as u32 && !state.allow_lazy && tokenizer.lazy {
         return tokenizer.crash(Error::new(
             format!("{SOURCE}:unexpected-lazy"),
             "Unexpected lazy line in expression in container, expected line to be prefixed with `>` when in a block quote, whitespace when in a list, etc",

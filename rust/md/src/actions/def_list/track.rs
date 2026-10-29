@@ -8,18 +8,18 @@ pub(crate) fn track_def_list(tokenizer: &mut Tokenizer, lazy: bool) {
     let start = tokenizer.point.index;
     let track = &mut tokenizer.tokenize_state.def_list;
     if track.line_boundary {
-        track.run_start = start;
+        track.run_start = start as usize;
     }
     if line_events || track.line_exits {
-        track.pure_start = start;
+        track.pure_start = start as usize;
     }
     track.lazy_before = track.lazy_start.is_some();
     if !lazy {
         track.lazy_start = None;
     } else if track.lazy_start.is_none() {
-        track.lazy_start = Some(start);
+        track.lazy_start = Some(start as usize);
     }
-    track.line_start = start;
+    track.line_start = start as usize;
     track.line_boundary = false;
     track.line_exits = false;
 }

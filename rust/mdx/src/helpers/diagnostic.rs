@@ -74,6 +74,8 @@ pub(crate) fn with_stack<T>(depth: usize, parse: impl FnOnce() -> T) -> T {
     if depth <= LEVELS_SHALLOW {
         parse()
     } else {
-        stacker::grow(STACK_BASE + depth * STACK_PER_LEVEL, parse)
+        // A fresh stack per expression costs a map and its page faults: grow only when short
+        let size = STACK_BASE + depth * STACK_PER_LEVEL;
+        stacker::maybe_grow(size, size, parse)
     }
 }

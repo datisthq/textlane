@@ -4,6 +4,7 @@ use crate::actions::program::wrap::specifiers_to_declarations;
 use crate::helpers::identifier::is_identifier_name;
 use crate::helpers::walk::{Enter, Visit, walk};
 use crate::models::estree::{Id, Store, Value};
+use crate::models::name::{Key, Kind};
 use crate::models::options::CompileOptions;
 
 /// estree-util-build-jsx 3.0.1 as recma-build-jsx runs it: JSX into calls of the runtime
@@ -28,25 +29,29 @@ pub(crate) fn build_program(
         return Err(error);
     }
     let comments: Vec<Value> = store
-        .list(program, "comments")
+        .list(program, Key::COMMENTS)
         .iter()
-        .filter(|comment| !comment.as_node().is_some_and(|id| store.flag(id, "pragma")))
+        .filter(|comment| {
+            !comment
+                .as_node()
+                .is_some_and(|id| store.flag(id, Key::PRAGMA))
+        })
         .cloned()
         .collect();
-    if store.has(program, "comments") {
-        store.set(program, "comments", Value::List(comments));
+    if store.has(program, Key::COMMENTS) {
+        store.set(program, Key::COMMENTS, Value::List(comments));
     }
     if options.output_format.as_deref() == Some("function-body") {
-        let body = store.children(program, "body");
+        let body = store.children(program, Key::BODY);
         let index = body
             .iter()
-            .position(|statement| !store.has(*statement, "directive"))
+            .position(|statement| !store.has(*statement, Key::DIRECTIVE))
             .unwrap_or(body.len());
         if let Some(declaration) = body.get(index).copied()
-            && store.is(declaration, "ImportDeclaration")
+            && store.is(declaration, Kind::IMPORT_DECLARATION)
             && store
-                .child(declaration, "source")
-                .and_then(|source| store.str(source, "value"))
+                .child(declaration, Key::SOURCE)
+                .and_then(|source| store.str(source, Key::VALUE))
                 .is_some_and(|source| {
                     source.ends_with("/jsx-runtime")
                         || source.ends_with("/jsx-dev-runtime")
@@ -55,10 +60,10 @@ pub(crate) fn build_program(
             let arguments = store.identifier("arguments");
             let zero = store.literal(Value::Number(0.0));
             let init = store.member(arguments, zero, true);
-            let specifiers = store.children(declaration, "specifiers");
+            let specifiers = store.children(declaration, Key::SPECIFIERS);
             let declarations = specifiers_to_declarations(store, &specifiers, init);
             let constant = store.declaration("const", declarations);
-            store.list_mut(program, "body")[index] = constant.into();
+            store.list_mut(program, Key::BODY)[index] = constant.into();
         }
     }
     Ok(())
@@ -94,9 +99,9 @@ fn failure(message: &str) -> Error {
 
 impl Visit for Build {
     fn enter(&mut self, store: &mut Store, id: Id) -> Enter {
-        if store.is(id, "Program") {
-            for comment in store.children(id, "comments") {
-                let value = store.str(comment, "value").unwrap_or_default();
+        if store.is(id, Kind::PROGRAM) {
+            for comment in store.children(id, Key::COMMENTS) {
+                let value = store.str(comment, Key::VALUE).unwrap_or_default();
                 read_annotations(value, &mut self.annotations);
             }
             if let Some(runtime) = self.annotations.jsx_runtime.as_deref() {
@@ -134,11 +139,12 @@ impl Visit for Build {
     }
 
     fn leave(&mut self, store: &mut Store, id: Id) -> Option<Id> {
-        if store.is(id, "Program") {
+        if store.is(id, Kind::PROGRAM) {
             self.inject_imports(store, id);
             return None;
         }
-        if self.error.is_some() || !matches!(store.kind(id), "JSXElement" | "JSXFragment")
+        if self.error.is_some()
+            || !matches!(store.kind(id), Kind::JSX_ELEMENT | Kind::JSX_FRAGMENT)
         {
             return None;
         }
@@ -164,8 +170,8 @@ impl Build {
                 let imported = store.identifier(imported);
                 let local = store.identifier(local);
                 specifiers.push(store.add(
-                    "ImportSpecifier",
-                    vec![("imported", imported.into()), ("local", local.into())],
+                    Kind::IMPORT_SPECIFIER,
+                    [(Key::IMPORTED, imported.into()), (Key::LOCAL, local.into())],
                 ));
             }
         }
@@ -181,36 +187,36 @@ impl Build {
         );
         let source = store.literal(source.as_str());
         let declaration = store.add(
-            "ImportDeclaration",
-            vec![
-                ("specifiers", Value::nodes(specifiers)),
-                ("source", source.into()),
+            Kind::IMPORT_DECLARATION,
+            [
+                (Key::SPECIFIERS, Value::nodes(specifiers)),
+                (Key::SOURCE, source.into()),
             ],
         );
-        let body = store.children(program, "body");
+        let body = store.children(program, Key::BODY);
         let index = body
             .iter()
-            .position(|statement| !store.has(*statement, "directive"))
+            .position(|statement| !store.has(*statement, Key::DIRECTIVE))
             .unwrap_or(body.len());
         store
-            .list_mut(program, "body")
+            .list_mut(program, Key::BODY)
             .insert(index, declaration.into());
     }
 
     fn build(&mut self, store: &mut Store, node: Id) -> Result<Id, Error> {
         let mut children = Vec::new();
-        for child in store.children(node, "children") {
+        for child in store.children(node, Key::CHILDREN) {
             match store.kind(child) {
-                "JSXExpressionContainer" => {
-                    if let Some(expression) = store.child(child, "expression")
-                        && !store.is(expression, "JSXEmptyExpression")
+                Kind::JSX_EXPRESSION_CONTAINER => {
+                    if let Some(expression) = store.child(child, Key::EXPRESSION)
+                        && !store.is(expression, Kind::JSX_EMPTY_EXPRESSION)
                     {
                         children.push(expression);
                     }
                 }
-                "JSXText" => {
+                Kind::JSX_TEXT => {
                     let value =
-                        collapse_text(store.str(child, "value").unwrap_or_default());
+                        collapse_text(store.str(child, Key::VALUE).unwrap_or_default());
                     if !value.is_empty() {
                         let text = store.literal(value.as_str());
                         create(store, child, text);
@@ -223,20 +229,21 @@ impl Build {
         let mut fields = Vec::new();
         let mut key = None;
         let name;
-        if store.is(node, "JSXElement") {
-            let opening = store.child(node, "openingElement");
-            let element_name = opening.and_then(|opening| store.child(opening, "name"));
+        if store.is(node, Kind::JSX_ELEMENT) {
+            let opening = store.child(node, Key::OPENING_ELEMENT);
+            let element_name =
+                opening.and_then(|opening| store.child(opening, Key::NAME));
             let mut identifier = match element_name {
                 Some(element_name) => to_identifier(store, element_name),
                 None => store.identifier("undefined"),
             };
-            if store.is(identifier, "Identifier")
-                && store.str(identifier, "name").is_some_and(|name| {
+            if store.is(identifier, Kind::IDENTIFIER)
+                && store.str(identifier, Key::NAME).is_some_and(|name| {
                     name.starts_with(|c: char| c.is_ascii_lowercase())
                 })
             {
                 let text = store
-                    .str(identifier, "name")
+                    .str(identifier, Key::NAME)
                     .unwrap_or_default()
                     .to_string();
                 let next = store.literal(text.as_str());
@@ -245,12 +252,13 @@ impl Build {
             }
             name = identifier;
             let mut spread = false;
-            let attributes = opening.map(|opening| store.children(opening, "attributes"));
+            let attributes =
+                opening.map(|opening| store.children(opening, Key::ATTRIBUTES));
             for attribute in attributes.unwrap_or_default() {
-                if store.is(attribute, "JSXSpreadAttribute") {
-                    if let Some(argument) = store.child(attribute, "argument") {
-                        if store.is(argument, "ObjectExpression") {
-                            fields.extend(store.children(argument, "properties"));
+                if store.is(attribute, Kind::JSX_SPREAD_ATTRIBUTE) {
+                    if let Some(argument) = store.child(attribute, Key::ARGUMENT) {
+                        if store.is(argument, Kind::OBJECT_EXPRESSION) {
+                            fields.extend(store.children(argument, Key::PROPERTIES));
                         } else {
                             fields.push(store.spread(argument));
                         }
@@ -259,8 +267,9 @@ impl Build {
                     continue;
                 }
                 let property = to_property(store, attribute);
-                let is_key = store.child(property, "key").is_some_and(|key| {
-                    store.is(key, "Identifier") && store.str(key, "name") == Some("key")
+                let is_key = store.child(property, Key::KEY).is_some_and(|key| {
+                    store.is(key, Kind::IDENTIFIER)
+                        && store.str(key, Key::NAME) == Some("key")
                 });
                 if self.automatic && is_key {
                     if spread {
@@ -268,7 +277,7 @@ impl Build {
                             "Expected `key` to come before any spread expressions",
                         ));
                     }
-                    key = store.child(property, "value");
+                    key = store.child(property, Key::VALUE);
                 } else {
                     fields.push(property);
                 }
@@ -292,8 +301,8 @@ impl Build {
             if !children.is_empty() {
                 let value = if children.len() > 1 {
                     store.add(
-                        "ArrayExpression",
-                        vec![("elements", Value::nodes(children.clone()))],
+                        Kind::ARRAY_EXPRESSION,
+                        [(Key::ELEMENTS, Value::nodes(children.clone()))],
                     )
                 } else {
                     children[0]
@@ -418,23 +427,23 @@ fn collapse_text(value: &str) -> String {
 // `create`: copy where a node sits, and its comments, onto its replacement
 fn create(store: &mut Store, from: Id, to: Id) {
     store.copy_place(from, to);
-    if let Some(comments) = store.get(from, "comments").cloned() {
-        store.set(to, "comments", comments);
+    if let Some(comments) = store.get(from, Key::COMMENTS).cloned() {
+        store.set(to, Key::COMMENTS, comments);
     }
 }
 
 fn to_property(store: &mut Store, attribute: Id) -> Id {
-    let value = match store.child(attribute, "value") {
-        Some(value) if store.is(value, "JSXExpressionContainer") => {
-            store.child(value, "expression").unwrap_or(value)
+    let value = match store.child(attribute, Key::VALUE) {
+        Some(value) if store.is(value, Kind::JSX_EXPRESSION_CONTAINER) => {
+            store.child(value, Key::EXPRESSION).unwrap_or(value)
         }
         Some(value) => {
-            store.remove(value, "raw");
+            store.remove(value, Key::RAW);
             value
         }
         None => store.literal(true),
     };
-    let key = match store.child(attribute, "name") {
+    let key = match store.child(attribute, Key::NAME) {
         Some(name) => to_identifier(store, name),
         None => store.identifier("undefined"),
     };
@@ -447,20 +456,20 @@ fn to_property(store: &mut Store, attribute: Id) -> Id {
 fn to_identifier(store: &mut Store, node: Id) -> Id {
     let mut parts = Vec::new();
     let mut current = node;
-    while store.is(current, "JSXMemberExpression") {
+    while store.is(current, Kind::JSX_MEMBER_EXPRESSION) {
         parts.push(current);
-        match store.child(current, "object") {
+        match store.child(current, Key::OBJECT) {
             Some(object) => current = object,
             None => break,
         }
     }
     let mut result = simple_identifier(store, current);
     for member in parts.into_iter().rev() {
-        let property = match store.child(member, "property") {
+        let property = match store.child(member, Key::PROPERTY) {
             Some(property) => simple_identifier(store, property),
             None => store.identifier("undefined"),
         };
-        let computed = store.is(property, "Literal");
+        let computed = store.is(property, Kind::LITERAL);
         let expression = store.member(result, property, computed);
         create(store, member, expression);
         result = expression;
@@ -469,19 +478,19 @@ fn to_identifier(store: &mut Store, node: Id) -> Id {
 }
 
 fn simple_identifier(store: &mut Store, node: Id) -> Id {
-    let replace = if store.is(node, "JSXNamespacedName") {
+    let replace = if store.is(node, Kind::JSX_NAMESPACED_NAME) {
         let namespace = store
-            .child(node, "namespace")
-            .and_then(|namespace| store.str(namespace, "name"))
+            .child(node, Key::NAMESPACE)
+            .and_then(|namespace| store.str(namespace, Key::NAME))
             .unwrap_or_default();
         let name = store
-            .child(node, "name")
-            .and_then(|name| store.str(name, "name"))
+            .child(node, Key::NAME)
+            .and_then(|name| store.str(name, Key::NAME))
             .unwrap_or_default();
         let value = format!("{namespace}:{name}");
         store.literal(value.as_str())
     } else {
-        let name = store.str(node, "name").unwrap_or_default().to_string();
+        let name = store.str(node, Key::NAME).unwrap_or_default().to_string();
         if is_identifier_name(&name, false) {
             store.identifier(&name)
         } else {
@@ -502,7 +511,7 @@ fn to_member_expression(store: &mut Store, id: &str) -> Id {
         };
         result = Some(match result {
             Some(object) => {
-                let computed = index > 0 && store.is(property, "Literal");
+                let computed = index > 0 && store.is(property, Kind::LITERAL);
                 store.member(object, property, computed)
             }
             None => property,

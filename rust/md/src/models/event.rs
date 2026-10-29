@@ -1,3 +1,5 @@
+use std::num::NonZeroU32;
+
 use crate::models::token::Name;
 
 /// Whether an event opens or closes a token.
@@ -9,12 +11,12 @@ pub(crate) enum Kind {
 
 /// A place in the input as the tokenizer tracks it: lines and columns count bytes, `vs` the
 /// virtual spaces into a tab.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct Point {
-    pub(crate) line: usize,
-    pub(crate) column: usize,
-    pub(crate) index: usize,
-    pub(crate) vs: usize,
+    pub(crate) line: u32,
+    pub(crate) column: u32,
+    pub(crate) index: u32,
+    pub(crate) vs: u32,
 }
 
 /// The content type a linked token holds, tokenized later by subtokenizing.
@@ -31,33 +33,34 @@ pub(crate) enum ContentType {
 }
 
 /// Links a token to the previous and next chunk of the same content, by event index.
-// u32 keeps an event in one cache line: every pass over the events pays its size
-#[derive(Clone, Debug, PartialEq, Eq)]
+// An index is held plus one, so `None` needs no tag of its own: every pass over the events
+// pays an event's size
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct Link {
-    pub(crate) previous: Option<u32>,
-    pub(crate) next: Option<u32>,
+    pub(crate) previous: Option<NonZeroU32>,
+    pub(crate) next: Option<NonZeroU32>,
     pub(crate) content: ContentType,
 }
 
 impl Link {
     /// Where the previous chunk's enter is.
     pub(crate) fn previous(&self) -> Option<usize> {
-        self.previous.map(|index| index as usize)
+        self.previous.map(|index| index.get() as usize - 1)
     }
 
     /// Where the next chunk's enter is.
     pub(crate) fn next(&self) -> Option<usize> {
-        self.next.map(|index| index as usize)
+        self.next.map(|index| index.get() as usize - 1)
     }
 
     /// An event index as a link holds it.
-    pub(crate) fn at(index: usize) -> Option<u32> {
-        Some(index as u32)
+    pub(crate) fn at(index: usize) -> Option<NonZeroU32> {
+        NonZeroU32::new(index as u32 + 1)
     }
 }
 
 /// Something semantic happening somewhere.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct Event {
     pub(crate) kind: Kind,
     pub(crate) name: Name,

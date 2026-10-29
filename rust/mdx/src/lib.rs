@@ -3,6 +3,7 @@
 
 mod models {
     pub(crate) mod estree;
+    pub(crate) mod name;
     pub(crate) mod options;
     pub(crate) mod scope;
     pub(crate) mod script;

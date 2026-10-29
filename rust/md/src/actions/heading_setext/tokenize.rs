@@ -10,7 +10,7 @@ use crate::utils::tokenizer::driver::Tokenizer;
 /// A setext heading's underline: `=` or `-` under a paragraph, which becomes the heading.
 pub(crate) fn tokenize_heading_setext(tokenizer: &mut Tokenizer) -> State {
     let bytes = tokenizer.parse_state.bytes;
-    let marker = bytes[tokenizer.point.index..]
+    let marker = bytes[tokenizer.point.index as usize..]
         .iter()
         .find(|byte| !matches!(byte, b' ' | b'\t'));
     if !matches!(marker, Some(b'-' | b'=')) {
@@ -72,7 +72,7 @@ fn after(tokenizer: &mut Tokenizer) -> State {
     // has none, yet the underline's check still closes it, so this line is new content.
     // Checked once the underline matched, which ends the content: each is read once
     if !has_paragraph(tokenizer) {
-        tokenizer.tokenize_state.content_break_line = Some(tokenizer.point.line);
+        tokenizer.tokenize_state.content_break_line = Some(tokenizer.point.line as usize);
         return State::Nok;
     }
     tokenizer.interrupt = false;

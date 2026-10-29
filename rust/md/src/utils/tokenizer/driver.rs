@@ -227,9 +227,9 @@ impl<'a> Tokenizer<'a> {
     pub(crate) fn new(point: Point, parse_state: &'a ParseState<'a>) -> Tokenizer<'a> {
         Tokenizer {
             column_start: vec![],
-            first_line: point.line,
+            first_line: point.line as usize,
             limit: 0,
-            line_start: point.clone(),
+            line_start: point,
             attempts: vec![],
             current: None,
             previous: None,
@@ -262,8 +262,8 @@ impl<'a> Tokenizer<'a> {
     /// Skip to `point` whenever a new line starts, past the prefixes of open containers.
     pub(crate) fn define_skip(&mut self, mut point: Point) {
         move_point_back(self, &mut point);
-        let info = (point.index, point.vs);
-        let at = point.line - self.first_line;
+        let info = (point.index as usize, point.vs as usize);
+        let at = point.line as usize - self.first_line;
         if at >= self.column_start.len() {
             self.column_start.push(info);
         } else {
@@ -273,7 +273,7 @@ impl<'a> Tokenizer<'a> {
     }
 
     fn account_for_potential_skip(&mut self) {
-        let at = self.point.line - self.first_line;
+        let at = self.point.line as usize - self.first_line;
         // A container directive's content starts mid-line, so its first line starts there
         let untouched =
             at == 0 && self.events.is_empty() && self.point == self.line_start;
@@ -298,14 +298,16 @@ impl<'a> Tokenizer<'a> {
         let bytes = self.parse_state.bytes;
         let start = self.point.index;
         let mut index = start;
-        while index < self.limit
-            && let Some(&byte) = bytes.get(index)
+        let mut previous = self.previous;
+        while index < self.limit as u32
+            && let Some(&byte) = bytes.get(index as usize)
             && !matches!(byte, b'\t' | b'\r' | b'\n')
-            && keep(self.previous, byte)
+            && keep(previous, byte)
         {
-            self.previous = Some(byte);
+            previous = Some(byte);
             index += 1;
         }
+        self.previous = previous;
         self.point.index = index;
         self.point.column += index - start;
     }
@@ -327,10 +329,13 @@ impl<'a> Tokenizer<'a> {
                 if byte == b'\n' {
                     self.point.line += 1;
                     self.point.column = 1;
-                    if self.point.line - self.first_line + 1 > self.column_start.len() {
-                        self.column_start.push((self.point.index, self.point.vs));
+                    if self.point.line as usize - self.first_line + 1
+                        > self.column_start.len()
+                    {
+                        self.column_start
+                            .push((self.point.index as usize, self.point.vs as usize));
                     }
-                    self.line_start = self.point.clone();
+                    self.line_start = self.point;
                     self.account_for_potential_skip();
                 } else {
                     self.point.column += 1;
@@ -341,8 +346,8 @@ impl<'a> Tokenizer<'a> {
 
     fn move_to(&mut self, to: (usize, usize)) {
         let (to_index, to_vs) = to;
-        while self.point.index < to_index
-            || self.point.index == to_index && self.point.vs < to_vs
+        while self.point.index < to_index as u32
+            || self.point.index == to_index as u32 && self.point.vs < to_vs as u32
         {
             self.move_one();
         }
@@ -357,7 +362,7 @@ impl<'a> Tokenizer<'a> {
     }
 
     fn enter_impl(&mut self, name: Name, link: Option<Link>) {
-        let mut point = self.point.clone();
+        let mut point = self.point;
         move_point_back(self, &mut point);
         self.stack.push(name);
         self.events.push(Event {
@@ -370,10 +375,10 @@ impl<'a> Tokenizer<'a> {
 
     pub(crate) fn exit(&mut self, name: Name) {
         self.stack.pop();
-        let mut point = self.point.clone();
+        let mut point = self.point;
         // An exit right after a line ending sits at the start of the next line
         if matches!(self.previous, Some(b'\n')) {
-            point = self.line_start.clone();
+            point = self.line_start;
         } else {
             move_point_back(self, &mut point);
         }
@@ -389,10 +394,10 @@ impl<'a> Tokenizer<'a> {
         Progress {
             previous: self.previous,
             current: self.current,
-            point: self.point.clone(),
+            point: self.point,
             events_len: self.events.len(),
             stack_len: self.stack.len(),
-            line_start: self.line_start.clone(),
+            line_start: self.line_start,
         }
     }
 
@@ -451,7 +456,7 @@ impl<'a> Tokenizer<'a> {
 
     /// Feed the end of input, then run the registered resolvers when `resolve` is set.
     pub(crate) fn flush(&mut self, state: State, resolve: bool) -> Subresult {
-        let to = (self.point.index, self.point.vs);
+        let to = (self.point.index as usize, self.point.vs as usize);
         self.push_impl(to, to, state, true);
         if self.parse_state.failed.get() {
             return Subresult {
@@ -470,8 +475,7 @@ impl<'a> Tokenizer<'a> {
                     value.definitions.append(&mut result.definitions);
                 }
             }
-            self.map
-                .consume(&mut self.events, &self.parse_state.spare_events);
+            self.map.consume(&mut self.events);
         }
         value
     }
@@ -507,8 +511,9 @@ impl<'a> Tokenizer<'a> {
                     };
                 }
                 State::Next(function) => {
-                    let action = if self.point.index < to.0
-                        || (self.point.index == to.0 && self.point.vs < to.1)
+                    let action = if self.point.index < to.0 as u32
+                        || (self.point.index == to.0 as u32
+                            && self.point.vs < to.1 as u32)
                     {
                         Some(byte_action(self.parse_state.bytes, &self.point))
                     } else if flush {
@@ -553,17 +558,17 @@ fn move_point_back(tokenizer: &Tokenizer, point: &mut Point) {
 }
 
 fn byte_action(bytes: &[u8], point: &Point) -> ByteAction {
-    let Some(&byte) = bytes.get(point.index) else {
+    let Some(&byte) = bytes.get(point.index as usize) else {
         return ByteAction::Ignore;
     };
     if byte == b'\r' {
-        if bytes.get(point.index + 1) == Some(&b'\n') {
+        if bytes.get((point.index + 1) as usize) == Some(&b'\n') {
             ByteAction::Ignore
         } else {
             ByteAction::Normal(b'\n')
         }
     } else if byte == b'\t' {
-        let remainder = point.column % TAB_SIZE;
+        let remainder = point.column as usize % TAB_SIZE;
         let vs = if remainder == 0 {
             0
         } else {

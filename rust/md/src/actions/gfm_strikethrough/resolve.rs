@@ -60,9 +60,7 @@ pub(crate) fn resolve_gfm_strikethrough(tokenizer: &mut Tokenizer) {
         tokenizer.events[sequence.index].name = name;
         tokenizer.events[sequence.index + 1].name = name;
     }
-    tokenizer
-        .map
-        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
+    tokenizer.map.consume(&mut tokenizer.events);
 }
 
 // The nearest opener still live, dropping those that closed or turned into data
@@ -87,16 +85,16 @@ fn find_sequences(tokenizer: &Tokenizer) -> Vec<Sequence> {
                 let before = classify_character_unit(find_text_character_before(
                     bytes,
                     &tokenizer.parse_state.prefixes.borrow(),
-                    event.point.index,
+                    event.point.index as usize,
                 ));
                 let after = classify_character_unit(find_character_after(
                     bytes,
-                    exit.point.index,
+                    exit.point.index as usize,
                 ));
                 sequences.push(Sequence {
                     index,
                     parent: parents.last().copied().unwrap_or(usize::MAX),
-                    size: exit.point.index - event.point.index,
+                    size: (exit.point.index - event.point.index) as usize,
                     open: after == CharacterKind::Other
                         || (after == CharacterKind::Punctuation
                             && before != CharacterKind::Other),
@@ -118,14 +116,14 @@ fn wrap(tokenizer: &mut Tokenizer, open: &Sequence, close: &Sequence) {
     let event = |kind, name, point: &Point| Event {
         kind,
         name,
-        point: point.clone(),
+        point: *point,
         link: None,
     };
     let events = &tokenizer.events;
-    let open_start = events[open.index].point.clone();
-    let open_end = events[open.index + 1].point.clone();
-    let close_start = events[close.index].point.clone();
-    let close_end = events[close.index + 1].point.clone();
+    let open_start = events[open.index].point;
+    let open_end = events[open.index + 1].point;
+    let close_start = events[close.index].point;
+    let close_end = events[close.index + 1].point;
     let map = &mut tokenizer.map;
     map.add(
         open.index,

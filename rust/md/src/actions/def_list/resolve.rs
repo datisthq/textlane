@@ -53,7 +53,7 @@ pub(crate) fn resolve_def_list(tokenizer: &mut Tokenizer) {
                     event.kind == Kind::Exit
                         && event.name == Name::DEF_LIST_DESCRIPTION_PREFIX
                 }) {
-                    tokenizer.events[end].point = prefix.point.clone();
+                    tokenizer.events[end].point = prefix.point;
                 }
                 list
             }
@@ -69,13 +69,11 @@ pub(crate) fn resolve_def_list(tokenizer: &mut Tokenizer) {
         open.push(list);
     }
     for &end in &ends {
-        let point = tokenizer.events[end].point.clone();
+        let point = tokenizer.events[end].point;
         let exit = create_event(Kind::Exit, Name::DEF_LIST, point, None);
         tokenizer.map.add(end + 1, 0, vec![exit]);
     }
-    tokenizer
-        .map
-        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
+    tokenizer.map.consume(&mut tokenizer.events);
 }
 
 // Make the terms of the description at `index`, then open a list for them or join the
@@ -114,7 +112,7 @@ fn open_list(
         })
     });
     let list = joined.unwrap_or_else(|| {
-        let point = tokenizer.events[first].point.clone();
+        let point = tokenizer.events[first].point;
         let enter = create_event(Kind::Enter, Name::DEF_LIST, point, None);
         tokenizer.map.add(first, 0, vec![enter]);
         ends.push(index);
@@ -123,7 +121,7 @@ fn open_list(
     if let Some(terms) = &terms {
         wrap_terms(tokenizer, terms);
     }
-    (list, tokenizer.events[first].point.clone())
+    (list, tokenizer.events[first].point)
 }
 
 // A description starts after its prefix; one with nothing after it at the end of the
@@ -140,10 +138,10 @@ fn start_description(tokenizer: &mut Tokenizer, enter: usize, list: Option<&Poin
     let point = &events[prefix].point;
     let empty = events.get(prefix + 1).is_some_and(|event| {
         event.kind == Kind::Exit && event.name == Name::DEF_LIST_DESCRIPTION
-    }) && !tokenizer.parse_state.bytes[point.index..]
+    }) && !tokenizer.parse_state.bytes[point.index as usize..]
         .iter()
         .any(|byte| matches!(byte, b'\n' | b'\r'));
-    let start = list.filter(|_| empty).unwrap_or(point).clone();
+    let start = *list.filter(|_| empty).unwrap_or(point);
     tokenizer.events[enter].point = start;
 }
 
@@ -173,10 +171,10 @@ fn extend_description(events: &mut [Event], exit: usize) {
         index += 1;
     }
     if let Some(end) = end {
-        let point = events[end].point.clone();
+        let point = events[end].point;
         for event in &mut events[exit..end] {
             if event.kind == Kind::Exit && event.name != Name::LINE_ENDING {
-                event.point = point.clone();
+                event.point = point;
             }
         }
     }
@@ -193,7 +191,7 @@ fn find_terms(
     let exit = loop {
         index = index.checked_sub(1)?;
         let event = &events[index];
-        if event.point.index < from {
+        if event.point.index < from as u32 {
             return None;
         }
         match (event.kind, event.name) {
@@ -220,7 +218,7 @@ fn find_terms(
     chunks.reverse();
     let first = chunks
         .iter()
-        .position(|&chunk| events[chunk].point.index >= from)?;
+        .position(|&chunk| events[chunk].point.index >= from as u32)?;
     Some(Terms {
         paragraph: (enter, exit),
         chunks,
@@ -242,13 +240,13 @@ fn shrink_paragraph(tokenizer: &mut Tokenizer, terms: &Terms) {
         if let Some(link) = tokenizer.events[last].link.as_mut() {
             link.next = None;
         }
-        let mut paragraph_exit = tokenizer.events[exit].clone();
-        paragraph_exit.point = tokenizer.events[last + 1].point.clone();
+        let mut paragraph_exit = tokenizer.events[exit];
+        paragraph_exit.point = tokenizer.events[last + 1].point;
         tokenizer.map.add(last + 2, 0, vec![paragraph_exit]);
     }
     if let Some(index) = terms.block_quote {
-        let mut block_quote_exit = tokenizer.events[index].clone();
-        block_quote_exit.point = tokenizer.events[first].point.clone();
+        let mut block_quote_exit = tokenizer.events[index];
+        block_quote_exit.point = tokenizer.events[first].point;
         tokenizer.map.add(index, 1, vec![]);
         tokenizer.map.add(first, 0, vec![block_quote_exit]);
     }
@@ -258,14 +256,14 @@ fn shrink_paragraph(tokenizer: &mut Tokenizer, terms: &Terms) {
 fn wrap_terms(tokenizer: &mut Tokenizer, terms: &Terms) {
     let bytes = tokenizer.parse_state.bytes;
     for (position, &chunk) in terms.chunks.iter().enumerate().skip(terms.first) {
-        let start = tokenizer.events[chunk].point.clone();
-        let end = tokenizer.events[chunk + 1].point.clone();
+        let start = tokenizer.events[chunk].point;
+        let end = tokenizer.events[chunk + 1].point;
         let unlinked = Link {
             previous: None,
             next: None,
             content: ContentType::Text,
         };
-        let term = create_event(Kind::Enter, Name::DEF_LIST_TERM, start.clone(), None);
+        let term = create_event(Kind::Enter, Name::DEF_LIST_TERM, start, None);
         tokenizer.map.add(chunk, 0, vec![term]);
         // micromark's flow takes the indent of a paragraph's first line only: later lines
         // keep theirs, which text would trim at its start
@@ -275,7 +273,7 @@ fn wrap_terms(tokenizer: &mut Tokenizer, terms: &Terms) {
         if let Some(middle) = middle {
             let indent = vec![
                 create_event(Kind::Enter, Name::DATA, start, None),
-                create_event(Kind::Exit, Name::DATA, middle.clone(), None),
+                create_event(Kind::Exit, Name::DATA, middle, None),
                 create_event(Kind::Enter, Name::DATA, middle, Some(unlinked)),
             ];
             tokenizer.map.add(chunk, 1, indent);
@@ -294,7 +292,7 @@ fn wrap_terms(tokenizer: &mut Tokenizer, terms: &Terms) {
                     && event.kind == Kind::Enter
                     && event.name == Name::LINE_ENDING =>
             {
-                let end = tokenizer.events[line_ending + 1].point.clone();
+                let end = tokenizer.events[line_ending + 1].point;
                 (line_ending + 2, end)
             }
             _ => (chunk + 2, end),
@@ -306,16 +304,16 @@ fn wrap_terms(tokenizer: &mut Tokenizer, terms: &Terms) {
 
 // Where the spaces and tabs a chunk starts with end, unless that is its end
 fn find_indent_end(bytes: &[u8], start: &Point, end: &Point) -> Option<Point> {
-    let mut point = start.clone();
+    let mut point = *start;
     if point.vs > 0 {
-        point.column += TAB_SIZE - (point.column - 1) % TAB_SIZE;
+        point.column += tab_width(point.column);
         point.index += 1;
         point.vs = 0;
     }
     while point.index < end.index {
-        match bytes[point.index] {
+        match bytes[point.index as usize] {
             b' ' => point.column += 1,
-            b'\t' => point.column += TAB_SIZE - (point.column - 1) % TAB_SIZE,
+            b'\t' => point.column += tab_width(point.column),
             _ => break,
         }
         point.index += 1;
@@ -330,4 +328,9 @@ fn create_event(kind: Kind, name: Name, point: Point, link: Option<Link>) -> Eve
         point,
         link,
     }
+}
+
+// The columns a tab at `column` spans, to the next tab stop
+fn tab_width(column: u32) -> u32 {
+    (TAB_SIZE - (column as usize - 1) % TAB_SIZE) as u32
 }

@@ -1,4 +1,5 @@
 use crate::models::estree::{Id, Store, Value};
+use crate::models::name::Kind;
 
 /// What `enter` asks of a walk, as estree-walker's `this.skip()` and `this.replace()`.
 #[derive(Default)]
@@ -38,7 +39,7 @@ pub(crate) fn walk(store: &mut Store, root: Id, visitor: &mut impl Visit) -> Id 
                 id = replacement;
             }
             if !enter.skip {
-                let fields = store.node(id).fields.len();
+                let fields = store.fields(id).len();
                 stack.push(Frame {
                     id,
                     place,
@@ -52,7 +53,7 @@ pub(crate) fn walk(store: &mut Store, root: Id, visitor: &mut impl Visit) -> Id 
             return root;
         };
         while frame.field < frame.fields {
-            let (_, value) = &store.node(frame.id).fields[frame.field];
+            let (_, value) = &store.fields(frame.id)[frame.field];
             let found = match value {
                 Value::Node(child) if frame.item == 0 && is_node(store, *child) => {
                     Some((*child, None))
@@ -93,7 +94,7 @@ pub(crate) fn walk(store: &mut Store, root: Id, visitor: &mut impl Visit) -> Id 
 }
 
 fn is_node(store: &Store, id: Id) -> bool {
-    !store.kind(id).is_empty()
+    !store.is(id, Kind::NONE)
 }
 
 fn put(

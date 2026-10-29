@@ -34,7 +34,7 @@ fn call_start(tokenizer: &mut Tokenizer) -> State {
             content: ContentType::String,
         },
     );
-    tokenizer.tokenize_state.start = tokenizer.point.index;
+    tokenizer.tokenize_state.start = tokenizer.point.index as usize;
     State::Next(call_data)
 }
 
@@ -49,7 +49,7 @@ fn call_data(tokenizer: &mut Tokenizer) -> State {
             let start = state.start;
             state.start = 0;
             state.size = 0;
-            let raw = &tokenizer.parse_state.bytes[start..tokenizer.point.index];
+            let raw = &tokenizer.parse_state.bytes[start..tokenizer.point.index as usize];
             let label = normalize_identifier(&String::from_utf8_lossy(raw));
             if !tokenizer
                 .parse_state

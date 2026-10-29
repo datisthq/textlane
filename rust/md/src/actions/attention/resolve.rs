@@ -62,9 +62,7 @@ pub(crate) fn resolve_attention(tokenizer: &mut Tokenizer) {
         tokenizer.events[sequence.index].name = Name::DATA;
         tokenizer.events[sequence.index + 1].name = Name::DATA;
     }
-    tokenizer
-        .map
-        .consume(&mut tokenizer.events, &tokenizer.parse_state.spare_events);
+    tokenizer.map.consume(&mut tokenizer.events);
 }
 
 fn bucket_of(sequence: &Sequence) -> Bucket {
@@ -121,17 +119,19 @@ fn find_sequences(tokenizer: &Tokenizer) -> Vec<Sequence> {
     let prefixes = tokenizer.parse_state.prefixes.borrow();
     let gfm = tokenizer.parse_state.gfm.is_some();
     let mut stack = vec![];
-    let mut stacks: HashMap<Vec<usize>, usize> = HashMap::new();
     let mut sequences = vec![];
     for (index, enter) in tokenizer.events.iter().enumerate() {
         if enter.name == Name::ATTENTION_SEQUENCE {
             if enter.kind == Kind::Enter {
                 let exit = &tokenizer.events[index + 1];
-                let marker = bytes[enter.point.index];
-                let before_char =
-                    find_text_character_before(bytes, &prefixes, enter.point.index);
+                let marker = bytes[enter.point.index as usize];
+                let before_char = find_text_character_before(
+                    bytes,
+                    &prefixes,
+                    enter.point.index as usize,
+                );
                 let before = classify_character_unit(before_char);
-                let after_char = find_character_after(bytes, exit.point.index);
+                let after_char = find_character_after(bytes, exit.point.index as usize);
                 let after = classify_character_unit(after_char);
                 // micromark lets a sequence open before and close after an extension's
                 // attention marker (GFM's `~`) whatever surrounds it
@@ -152,14 +152,13 @@ fn find_sequences(tokenizer: &Tokenizer) -> Vec<Sequence> {
                 } else {
                     (open, close)
                 };
-                let next_id = stacks.len();
-                let stack_id = *stacks.entry(stack.clone()).or_insert(next_id);
+                // Tokens nest, so the innermost open one names the whole stack
                 sequences.push(Sequence {
                     index,
-                    stack: stack_id,
-                    start_point: enter.point.clone(),
-                    end_point: exit.point.clone(),
-                    size: exit.point.index - enter.point.index,
+                    stack: stack.last().copied().unwrap_or(usize::MAX),
+                    start_point: enter.point,
+                    end_point: exit.point,
+                    size: (exit.point.index - enter.point.index) as usize,
                     open,
                     close,
                     marker,
@@ -192,22 +191,22 @@ fn match_sequences(
     };
     let open_index = sequences[open].index;
     let close_index = sequences[close].index;
-    let open_exit = sequences[open].end_point.clone();
-    let close_enter = sequences[close].start_point.clone();
+    let open_exit = sequences[open].end_point;
+    let close_enter = sequences[close].start_point;
     sequences[open].size -= take;
     sequences[close].size -= take;
-    sequences[open].end_point.column -= take;
-    sequences[open].end_point.index -= take;
-    sequences[close].start_point.column += take;
-    sequences[close].start_point.index += take;
+    sequences[open].end_point.column -= take as u32;
+    sequences[open].end_point.index -= take as u32;
+    sequences[close].start_point.column += take as u32;
+    sequences[close].start_point.index += take as u32;
 
     let event = |kind, name, point: &Point| Event {
         kind,
         name,
-        point: point.clone(),
+        point: *point,
         link: None,
     };
-    let open_point = sequences[open].end_point.clone();
+    let open_point = sequences[open].end_point;
     tokenizer.map.add_before(
         open_index + 2,
         0,
@@ -218,7 +217,7 @@ fn match_sequences(
             event(Kind::Enter, text_name, &open_exit),
         ],
     );
-    let close_point = sequences[close].start_point.clone();
+    let close_point = sequences[close].start_point;
     tokenizer.map.add(
         close_index,
         0,
@@ -239,6 +238,6 @@ fn match_sequences(
     if sequences[open].size == 0 {
         tokenizer.map.add(open_index, 2, vec![]);
     } else {
-        tokenizer.events[open_index + 1].point = sequences[open].end_point.clone();
+        tokenizer.events[open_index + 1].point = sequences[open].end_point;
     }
 }
