@@ -41,7 +41,7 @@ impl Transform for Slug {
                 slug_hast(&mut node, &self.options, alloc);
                 Ok(Tree::Hast(node))
             }
-            Tree::Mdast(_) => Err(Error::new("invalid-stage", "`html.slug` takes hast")),
+            _ => Err(Error::new("invalid-stage", "`html.slug` takes hast")),
         }
     }
 }

@@ -7,7 +7,7 @@ license.workspace = true
 authors.workspace = true
 repository.workspace = true
 homepage.workspace = true
-description = "Textlane's core: unist, mdast and hast trees, the file and the plugin contract its crates share"
+description = "Textlane's core: unist, mdast, hast and nlcst trees, the file and the plugin contract its crates share"
 keywords = ["unist", "mdast", "hast", "plugin", "textlane"]
 categories = ["text-processing", "data-structures"]
 

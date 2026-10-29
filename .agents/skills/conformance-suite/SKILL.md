@@ -30,7 +30,7 @@ otherwise.
 - Serialized output is keyed by its file extension (`html`, `md`, `js`, `txt`), never by the
   domain that produced it; `tree` and `error` are the other outcomes.
 - Every case runs through `Pipeline` (`models/pipeline.rs`), the name-based processor the
-  bindings drive: `find_plugin` in `actions/plugin/find.rs` maps each name (`md.parse`, `md.definitionList`, `md.directive`, `md.frontmatter`, `md.gemoji`, `md.gfm`, `md.math`, `md.stringify`, `md.toHtml`, `html.parse`, `html.format`, `html.highlight`, `html.raw`, `html.sanitize`, `html.slug`, `html.stringify`, `html.toMarkdown`) and reads its options into the
+  bindings drive: `find_plugin` in `actions/plugin/find.rs` maps each name (`md.parse`, `md.definitionList`, `md.directive`, `md.frontmatter`, `md.gemoji`, `md.gfm`, `md.math`, `md.stringify`, `md.toHtml`, `html.parse`, `html.format`, `html.highlight`, `html.raw`, `html.sanitize`, `html.slug`, `html.stringify`, `html.toMarkdown`, `prose.parse`, `prose.stringify`) and reads its options into the
   plugin's options struct, failing with `invalid-options`; a new plugin joins there. A tree
   input is read as the kind the first stage takes. The `test.*` plugins live in
   `utils/testing/plugins.rs`, compiled only under `testing`; `mode: "async"` makes a stage

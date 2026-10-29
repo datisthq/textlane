@@ -1,5 +1,6 @@
-//! Textlane's core: the unist conventions and the mdast and hast nodes built on them, the file a
-//! pipeline reads and reports diagnostics against, and the plugin contract every crate shares.
+//! Textlane's core: the unist conventions and the mdast, hast and nlcst nodes built on them, the
+//! file a pipeline reads and reports diagnostics against, and the plugin contract every crate
+//! shares.
 
 mod plugin;
 mod models {
@@ -9,7 +10,9 @@ mod models {
     pub(crate) mod file;
     pub(crate) mod hast;
     pub(crate) mod lines;
+    pub(crate) mod location;
     pub(crate) mod mdast;
+    pub(crate) mod nlcst;
     pub(crate) mod position;
     pub(crate) mod tree;
 }
@@ -20,6 +23,10 @@ mod actions {
         pub(crate) mod serialize;
     }
     pub(crate) mod mdast {
+        pub(crate) mod deserialize;
+        pub(crate) mod serialize;
+    }
+    pub(crate) mod nlcst {
         pub(crate) mod deserialize;
         pub(crate) mod serialize;
     }
@@ -47,15 +54,28 @@ pub mod hast {
     pub use crate::models::hast::*;
 }
 
+/// The nlcst nodes: natural language's syntax tree.
+pub mod nlcst {
+    #[cfg(feature = "json")]
+    pub use crate::actions::nlcst::deserialize::deserialize_nlcst;
+    #[cfg(feature = "json")]
+    pub use crate::actions::nlcst::serialize::serialize_nlcst;
+    pub use crate::models::nlcst::*;
+}
+
 // models
 pub use models::arena::ArenaVec;
 pub use models::data::Data;
 pub use models::error::Error;
 pub use models::file::{File, Message};
 pub use models::lines::Lines;
+pub use models::location::Location;
 pub use models::position::{Point, Position, UnistPoint, UnistPosition};
 pub use models::tree::{Tree, TreeKind};
-pub use plugin::{Attach, Compiler, Job, Parser, Plugin, Slots, Step, Transform};
+pub use plugin::{
+    Attach, Compiler, Job, Parser, Plugin, ProseParser, ProseParserSlot, Slots, Step,
+    Transform,
+};
 
 /// The arena every node of one document is allocated in.
 pub use bumpalo::Bump as Allocator;

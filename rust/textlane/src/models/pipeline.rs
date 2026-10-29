@@ -313,6 +313,9 @@ pub(crate) fn read_tree<'a>(
         Some(TreeKind::Hast) => Ok(Tree::Hast(textlane_core::hast::deserialize_hast(
             tree, alloc,
         )?)),
+        Some(TreeKind::Nlcst) => Ok(Tree::Nlcst(
+            textlane_core::nlcst::deserialize_nlcst(tree, alloc)?,
+        )),
         _ => Ok(Tree::Mdast(textlane_core::mdast::deserialize_mdast(
             tree, alloc,
         )?)),
@@ -327,5 +330,6 @@ pub(crate) fn write_tree(
     match tree {
         Tree::Mdast(node) => textlane_core::mdast::serialize_mdast(node, lines),
         Tree::Hast(node) => textlane_core::hast::serialize_hast(node, lines),
+        Tree::Nlcst(node) => textlane_core::nlcst::serialize_nlcst(node, lines),
     }
 }

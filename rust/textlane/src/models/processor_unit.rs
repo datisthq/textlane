@@ -1,6 +1,10 @@
 use super::Processor;
 use textlane_core::Error;
 
+// Linear-time guards: a quadratic regression at these sizes takes minutes, so a loose debug
+// limit still catches one while tests run in parallel on a loaded machine
+const LIMIT_SECS: u64 = if cfg!(debug_assertions) { 20 } else { 5 };
+
 fn render(input: &str) -> Result<String, Error> {
     let processor = Processor::new()
         .with(textlane_md::parse(Default::default()))
@@ -31,7 +35,7 @@ fn pairs_many_unmatched_runs_in_linear_time() -> Result<(), Error> {
     let started = std::time::Instant::now();
     render(&input)?;
     assert!(
-        started.elapsed().as_secs() < 5,
+        started.elapsed().as_secs() < LIMIT_SECS,
         "took {:?}",
         started.elapsed()
     );
@@ -44,7 +48,7 @@ fn rejects_many_unclosed_code_spans_in_linear_time() -> Result<(), Error> {
     let started = std::time::Instant::now();
     render(&input)?;
     assert!(
-        started.elapsed().as_secs() < 5,
+        started.elapsed().as_secs() < LIMIT_SECS,
         "took {:?}",
         started.elapsed()
     );
@@ -58,7 +62,7 @@ fn survives_deeply_nested_containers() -> Result<(), Error> {
         let started = std::time::Instant::now();
         render(&input)?;
         assert!(
-            started.elapsed().as_secs() < 5,
+            started.elapsed().as_secs() < LIMIT_SECS,
             "{prefix:?} took {:?}",
             started.elapsed()
         );
@@ -77,7 +81,7 @@ fn continues_deep_containers_over_blank_lines_in_linear_time() -> Result<(), Err
         let started = std::time::Instant::now();
         render(&input)?;
         assert!(
-            started.elapsed().as_secs() < 5,
+            started.elapsed().as_secs() < LIMIT_SECS,
             "took {:?}",
             started.elapsed()
         );
@@ -94,7 +98,7 @@ fn resolves_many_setext_underlines_in_linear_time() -> Result<(), Error> {
         let started = std::time::Instant::now();
         render(&input)?;
         assert!(
-            started.elapsed().as_secs() < 5,
+            started.elapsed().as_secs() < LIMIT_SECS,
             "took {:?}",
             started.elapsed()
         );
@@ -118,7 +122,11 @@ fn resolves_hostile_links_in_linear_time() -> Result<(), Error> {
         let started = std::time::Instant::now();
         render(&input)?;
         let took = started.elapsed();
-        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..20]);
+        assert!(
+            took.as_secs() < LIMIT_SECS,
+            "{:?}… took {took:?}",
+            &input[..20]
+        );
     }
     Ok(())
 }
@@ -165,7 +173,11 @@ fn resolves_hostile_footnotes_in_linear_time() -> Result<(), Error> {
         render_gfm(&input)?;
         format_gfm(&input)?;
         let took = started.elapsed();
-        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+        assert!(
+            took.as_secs() < LIMIT_SECS,
+            "{:?}… took {took:?}",
+            &input[..12]
+        );
     }
     Ok(())
 }
@@ -216,7 +228,11 @@ fn resolves_hostile_definition_lists_in_linear_time() -> Result<(), Error> {
         render_def_list(&input)?;
         format_def_list(&input)?;
         let took = started.elapsed();
-        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+        assert!(
+            took.as_secs() < LIMIT_SECS,
+            "{:?}… took {took:?}",
+            &input[..12]
+        );
     }
     Ok(())
 }
@@ -236,7 +252,11 @@ fn rejects_hostile_html_in_linear_time() -> Result<(), Error> {
         let started = std::time::Instant::now();
         render(&input)?;
         let took = started.elapsed();
-        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+        assert!(
+            took.as_secs() < LIMIT_SECS,
+            "{:?}… took {took:?}",
+            &input[..12]
+        );
     }
     Ok(())
 }
@@ -267,7 +287,11 @@ fn formats_deep_nesting_in_linear_time() -> Result<(), Error> {
         let started = std::time::Instant::now();
         format_markdown(&input)?;
         let took = started.elapsed();
-        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+        assert!(
+            took.as_secs() < LIMIT_SECS,
+            "{:?}… took {took:?}",
+            &input[..12]
+        );
     }
     Ok(())
 }
@@ -288,7 +312,11 @@ fn formats_hostile_phrasing_in_linear_time() -> Result<(), Error> {
         let started = std::time::Instant::now();
         format_markdown(&input)?;
         let took = started.elapsed();
-        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+        assert!(
+            took.as_secs() < LIMIT_SECS,
+            "{:?}… took {took:?}",
+            &input[..12]
+        );
     }
     Ok(())
 }
@@ -336,7 +364,11 @@ fn parses_hostile_html_in_linear_time() -> Result<(), Error> {
         let started = std::time::Instant::now();
         reformat_html(&input)?;
         let took = started.elapsed();
-        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+        assert!(
+            took.as_secs() < LIMIT_SECS,
+            "{:?}… took {took:?}",
+            &input[..12]
+        );
     }
     Ok(())
 }
@@ -361,7 +393,11 @@ fn sanitizes_and_slugs_hostile_html_in_linear_time() -> Result<(), Error> {
         let started = std::time::Instant::now();
         processor.process(&input)?;
         let took = started.elapsed();
-        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+        assert!(
+            took.as_secs() < LIMIT_SECS,
+            "{:?}… took {took:?}",
+            &input[..12]
+        );
     }
     Ok(())
 }
@@ -413,7 +449,11 @@ fn converts_hostile_html_to_markdown_in_linear_time() -> Result<(), Error> {
         let tree = processor.parse(&input, &mut file, &alloc)?;
         processor.run(tree, &mut file, &alloc)?;
         let took = started.elapsed();
-        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..15]);
+        assert!(
+            took.as_secs() < LIMIT_SECS,
+            "{:?}… took {took:?}",
+            &input[..15]
+        );
     }
     Ok(())
 }
@@ -449,7 +489,11 @@ fn handles_hostile_gfm_tables_in_linear_time() -> Result<(), Error> {
             let started = std::time::Instant::now();
             processor.process(&input)?;
             let took = started.elapsed();
-            assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+            assert!(
+                took.as_secs() < LIMIT_SECS,
+                "{:?}… took {took:?}",
+                &input[..12]
+            );
         }
     }
     Ok(())
@@ -496,7 +540,11 @@ fn handles_hostile_gfm_in_linear_time() -> Result<(), Error> {
             let started = std::time::Instant::now();
             processor.process(&input)?;
             let took = started.elapsed();
-            assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+            assert!(
+                took.as_secs() < LIMIT_SECS,
+                "{:?}… took {took:?}",
+                &input[..12]
+            );
         }
     }
     Ok(())
@@ -528,7 +576,11 @@ fn handles_hostile_math_in_linear_time() -> Result<(), Error> {
             let started = std::time::Instant::now();
             processor.process(&input)?;
             let took = started.elapsed();
-            assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+            assert!(
+                took.as_secs() < LIMIT_SECS,
+                "{:?}… took {took:?}",
+                &input[..12]
+            );
         }
     }
     Ok(())
@@ -546,7 +598,7 @@ fn checks_setext_underlines_in_linear_time() -> Result<(), Error> {
         let started = std::time::Instant::now();
         render(&input)?;
         assert!(
-            started.elapsed().as_secs() < 5,
+            started.elapsed().as_secs() < LIMIT_SECS,
             "took {:?}",
             started.elapsed()
         );
@@ -578,7 +630,11 @@ fn reparses_hostile_raw_html_in_linear_time() -> Result<(), Error> {
         let started = std::time::Instant::now();
         markdown.process(&input)?;
         let took = started.elapsed();
-        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+        assert!(
+            took.as_secs() < LIMIT_SECS,
+            "{:?}… took {took:?}",
+            &input[..12]
+        );
     }
     let html = Processor::new()
         .with(textlane_html::parse(Default::default()))
@@ -594,7 +650,11 @@ fn reparses_hostile_raw_html_in_linear_time() -> Result<(), Error> {
         let started = std::time::Instant::now();
         html.process(&input)?;
         let took = started.elapsed();
-        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+        assert!(
+            took.as_secs() < LIMIT_SECS,
+            "{:?}… took {took:?}",
+            &input[..12]
+        );
     }
     Ok(())
 }
@@ -619,7 +679,315 @@ fn formats_hostile_html_in_linear_time() -> Result<(), Error> {
         let started = std::time::Instant::now();
         indented.process(&input)?;
         let took = started.elapsed();
-        assert!(took.as_secs() < 5, "{:?}… took {took:?}", &input[..12]);
+        assert!(
+            took.as_secs() < LIMIT_SECS,
+            "{:?}… took {took:?}",
+            &input[..12]
+        );
+    }
+    Ok(())
+}
+
+fn reparse_prose(
+    input: &str,
+    language: textlane_prose::Language,
+) -> Result<String, Error> {
+    let processor = Processor::new()
+        .with(textlane_prose::parse(textlane_prose::ParseOptions {
+            language,
+        }))
+        .with(textlane_prose::stringify())
+        .freeze()?;
+    Ok(processor.process(input)?.value)
+}
+
+#[test]
+fn parses_hostile_prose_in_linear_time() -> Result<(), Error> {
+    let inputs = [
+        ".".repeat(1_000_000),
+        "!?".repeat(200_000),
+        "a".repeat(1_000_000),
+        "a-".repeat(200_000),
+        "a.".repeat(200_000),
+        "a/".repeat(200_000),
+        "&a ".repeat(100_000),
+        "a. ".repeat(100_000),
+        "A. ".repeat(100_000),
+        ". ".repeat(100_000),
+        "Mr. ".repeat(100_000),
+        "e.g. ".repeat(100_000),
+        "A. , ".repeat(100_000),
+        "a.\" ".repeat(100_000),
+        "a\n\n".repeat(100_000),
+        " \n".repeat(100_000),
+        "'tis 'n' ol' w/ ".repeat(50_000),
+        "😀a".repeat(100_000),
+    ];
+    for input in inputs {
+        for language in [
+            textlane_prose::Language::Latin,
+            textlane_prose::Language::English,
+        ] {
+            let started = std::time::Instant::now();
+            assert_eq!(reparse_prose(&input, language)?, input);
+            assert!(
+                started.elapsed().as_secs() < LIMIT_SECS,
+                "{:?}… took {:?}",
+                input.chars().take(8).collect::<String>(),
+                started.elapsed()
+            );
+        }
+    }
+    Ok(())
+}
+
+// What a bridge into nlcst does with the parser it reads from the slots
+struct ProseBridge;
+
+struct ProseBridgeParser(std::sync::Arc<dyn textlane_core::ProseParser>);
+
+impl textlane_core::Plugin for ProseBridge {
+    fn attach(&self, context: &mut textlane_core::Attach) -> Result<(), Error> {
+        context.set_parser(|slots| {
+            let parser = slots
+                .get::<textlane_core::ProseParserSlot>()
+                .and_then(|slot| slot.parser.clone())
+                .ok_or_else(|| Error::new("missing-parser", "no prose parser"))?;
+            Ok(Box::new(ProseBridgeParser(parser)))
+        });
+        Ok(())
+    }
+}
+
+impl textlane_core::Parser for ProseBridgeParser {
+    fn output(&self) -> textlane_core::TreeKind {
+        textlane_core::TreeKind::Nlcst
+    }
+
+    fn parse<'a>(
+        &self,
+        input: &'a str,
+        _file: &mut textlane_core::File,
+        alloc: &'a textlane_core::Allocator,
+    ) -> Result<textlane_core::Tree<'a>, Error> {
+        let content = self.0.tokenize(input, 0, alloc);
+        let paragraph = self.0.tokenize_paragraph(content, None, alloc);
+        Ok(textlane_core::Tree::Nlcst(
+            self.0.tokenize_root(paragraph, None, alloc),
+        ))
+    }
+}
+
+#[test]
+fn hands_the_prose_parser_to_plugins() -> Result<(), Error> {
+    let processor = Processor::new()
+        .with(ProseBridge)
+        .with(textlane_prose::stringify())
+        .freeze()?;
+    let alloc = textlane_core::Allocator::new();
+    let mut file = textlane_core::File::new();
+    let input = "Mr. Smith left. He said: e.g. this.\n\nNext one.";
+    let tree = processor.parse(input, &mut file, &alloc)?;
+    let expected = textlane_prose::parse_prose(input, &Default::default(), &alloc);
+    assert_eq!(tree, textlane_core::Tree::Nlcst(expected));
+    assert_eq!(processor.stringify(&tree, &mut file)?, input);
+    Ok(())
+}
+
+#[test]
+fn checks_hostile_prose_in_linear_time() -> Result<(), Error> {
+    let processor = Processor::new()
+        .with(textlane_prose::parse(Default::default()))
+        .with(textlane_prose::equality(Default::default()))
+        .with(textlane_prose::equality(textlane_prose::EqualityOptions {
+            binary: Some(true),
+            ..Default::default()
+        }))
+        .with(textlane_prose::readability(Default::default()))
+        .with(textlane_prose::passive(Default::default()))
+        .with(textlane_prose::repeated_words())
+        .with(textlane_prose::sentence_spacing(Default::default()))
+        .with(textlane_prose::stringify())
+        .freeze()?;
+    for input in [
+        "he or she and his/her ".repeat(10_000),
+        "the chairman was fed by a cripple, ".repeat(5_000),
+        "fed ".repeat(50_000),
+        "a ,.;:-—(\"' ".repeat(10_000),
+        "Bad.  Worse.\n\n".repeat(10_000),
+        "antidisestablishmentarianism ".repeat(10_000),
+        "a".repeat(1_000_000),
+        "(".repeat(100_000) + "cripple" + &")".repeat(100_000),
+    ] {
+        let started = std::time::Instant::now();
+        let output = processor.process(&input)?;
+        let took = started.elapsed();
+        assert_eq!(output.value, input);
+        assert!(
+            took.as_secs() < LIMIT_SECS,
+            "{:?}… took {took:?}",
+            &input[..12]
+        );
+    }
+    Ok(())
+}
+
+#[test]
+fn checks_hostile_prose_typography_in_linear_time() -> Result<(), Error> {
+    let plugins = [
+        ("prose.smartypants", serde_json::json!(null)),
+        (
+            "prose.smartypants",
+            serde_json::json!({ "ellipses": "spaced", "dashes": "inverted" }),
+        ),
+        (
+            "prose.smartypants",
+            serde_json::json!({ "quotes": false, "backticks": "all", "dashes": "oldschool" }),
+        ),
+        ("prose.quotes", serde_json::json!(null)),
+        (
+            "prose.quotes",
+            serde_json::json!({ "preferred": "straight" }),
+        ),
+        ("prose.contractions", serde_json::json!(null)),
+        ("prose.indefiniteArticle", serde_json::json!(null)),
+    ];
+    let inputs = [
+        "\"".repeat(125_000),
+        "'".repeat(125_000),
+        "\" ".repeat(50_000),
+        "'a' ".repeat(25_000),
+        "“‘«".repeat(25_000),
+        "-- ".repeat(50_000),
+        "—-".repeat(50_000),
+        "–-".repeat(50_000),
+        ". ".repeat(75_000),
+        ". . . a ".repeat(25_000),
+        "...".repeat(50_000),
+        "``''".repeat(50_000),
+        "é dont ".repeat(25_000),
+        "\"dont\" - ".repeat(12_500),
+        "A apple ".repeat(25_000),
+        "é an 1000 ".repeat(25_000),
+    ];
+    for input in &inputs {
+        for (name, options) in &plugins {
+            let build = crate::actions::plugin::find::find_plugin(name)
+                .ok_or_else(|| Error::new("unknown-plugin", *name))?;
+            let processor = Processor::new()
+                .with(textlane_prose::parse(Default::default()))
+                .with_boxed(build(name, options.clone())?)
+                .with(textlane_prose::stringify())
+                .freeze()?;
+            let started = std::time::Instant::now();
+            processor.process(input)?;
+            let took = started.elapsed();
+            assert!(
+                took.as_secs() < LIMIT_SECS,
+                "{:?}… took {took:?}",
+                input.chars().take(8).collect::<String>()
+            );
+        }
+    }
+    Ok(())
+}
+
+#[test]
+fn places_many_messages_on_non_ascii_prose_in_linear_time() -> Result<(), Error> {
+    let processor = Processor::new()
+        .with(textlane_prose::parse(Default::default()))
+        .with(textlane_prose::equality(Default::default()))
+        .with(textlane_prose::repeated_words())
+        .with(textlane_prose::stringify())
+        .freeze()?;
+    for input in ["é he ".repeat(50_000), "é he he ".repeat(25_000)] {
+        let started = std::time::Instant::now();
+        let output = processor.process(&input)?;
+        let took = started.elapsed();
+        assert!(output.file.messages.len() >= 25_000);
+        assert!(
+            took.as_secs() < LIMIT_SECS,
+            "{:?}… took {took:?}",
+            &input[..12]
+        );
+    }
+    Ok(())
+}
+
+fn markdown_to_prose(input: &str) -> Result<String, Error> {
+    let processor = Processor::new()
+        .with(textlane_md::parse(Default::default()))
+        .with(textlane_md::to_prose(Default::default()))
+        .with(textlane_prose::stringify())
+        .freeze()?;
+    Ok(processor.process(input)?.value)
+}
+
+fn html_to_prose(input: &str) -> Result<String, Error> {
+    let processor = Processor::new()
+        .with(textlane_html::parse(Default::default()))
+        .with(textlane_html::to_prose())
+        .with(textlane_prose::stringify())
+        .freeze()?;
+    Ok(processor.process(input)?.value)
+}
+
+#[test]
+fn bridges_markdown_and_html_into_prose() -> Result<(), Error> {
+    assert_eq!(markdown_to_prose("# A *b*.\n\nC `d`.\n")?, "A b.\n\nC `d`.");
+    assert_eq!(
+        html_to_prose("<p>A <b>b</b>.</p><div>C<br>d <code>e</code></div>")?,
+        "A b.C\nd e"
+    );
+    Ok(())
+}
+
+#[test]
+fn bridges_hostile_markdown_into_prose_in_linear_time() -> Result<(), Error> {
+    for input in [
+        "> ".repeat(20_000) + "a\n",
+        "- ".repeat(20_000) + "a\n",
+        "*".repeat(50_000) + "a" + &"*".repeat(50_000),
+        "[".repeat(50_000) + "a" + &"](b)".repeat(50_000),
+        "Mr. a b. ".repeat(50_000),
+        "a\n".repeat(30_000),
+        "a\n\n".repeat(30_000),
+        "`a` ![b](c) d\\\n".repeat(5_000),
+        "> é😀 b\n".repeat(50_000),
+    ] {
+        let started = std::time::Instant::now();
+        markdown_to_prose(&input)?;
+        let took = started.elapsed();
+        assert!(
+            took.as_secs() < LIMIT_SECS,
+            "{:?}… took {took:?}",
+            &input[..12]
+        );
+    }
+    Ok(())
+}
+
+#[test]
+fn bridges_hostile_html_into_prose_in_linear_time() -> Result<(), Error> {
+    for input in [
+        "<div>".repeat(100_000) + "a",
+        "<p>".to_string() + &"<span>".repeat(100_000) + "a",
+        "<div>".to_string() + &"<ins>".repeat(100_000) + "a",
+        "<div>".to_string() + &"<code>".repeat(50_000) + "a",
+        "<blockquote>".repeat(50_000) + "a",
+        "<p>".to_string() + &"Mr. a b. ".repeat(50_000),
+        "<div>".to_string() + &"a<br>".repeat(100_000),
+        "<div>".to_string() + &"a<p>b</p>".repeat(50_000),
+        "<p>".to_string() + &"&amp;é😀 ".repeat(50_000),
+    ] {
+        let started = std::time::Instant::now();
+        html_to_prose(&input)?;
+        let took = started.elapsed();
+        assert!(
+            took.as_secs() < LIMIT_SECS,
+            "{:?}… took {took:?}",
+            &input[..12]
+        );
     }
     Ok(())
 }

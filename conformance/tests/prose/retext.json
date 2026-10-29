@@ -7,7 +7,7 @@
       "path": "test.js",
       "license": "MIT"
     },
-    "pipeline": [["prose.parse"], ["prose.stringify"]],
+    "pipeline": [["prose.parse"]],
     "tests": [
       {
         "description": "should parse",
@@ -98,7 +98,19 @@
             }
           }
         }
-      },
+      }
+    ]
+  },
+  {
+    "description": "retext (2)",
+    "source": {
+      "repository": "https://github.com/retextjs/retext",
+      "commit": "04580e54d857f86405c1b109f5205be58f1285f8",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["prose.parse"], ["prose.stringify"]],
+    "tests": [
       {
         "description": "should stringify",
         "tree": {
@@ -126,7 +138,7 @@
           ]
         },
         "expected": {
-          "md": "Alfred"
+          "txt": "Alfred"
         }
       }
     ]

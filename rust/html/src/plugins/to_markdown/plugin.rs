@@ -38,9 +38,7 @@ impl Transform for ToMarkdown {
     ) -> Result<Tree<'a>, Error> {
         match tree {
             Tree::Hast(node) => Ok(Tree::Mdast(convert_hast(node, &self.options, alloc))),
-            Tree::Mdast(_) => {
-                Err(Error::new("invalid-stage", "`html.toMarkdown` takes hast"))
-            }
+            _ => Err(Error::new("invalid-stage", "`html.toMarkdown` takes hast")),
         }
     }
 }

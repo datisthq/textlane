@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "generate:prose-tables": "node sources/prose-tables.ts && pnpm -C ../rust format",
     "import:chains": "node sources/chains.ts && vp fmt tests",
     "import:commonmark": "node sources/commonmark.ts && vp fmt tests",
     "import:definition-list": "node sources/definition-list.ts && vp fmt tests",

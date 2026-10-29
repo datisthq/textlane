@@ -54,6 +54,7 @@ impl Processor {
         collect: impl FnOnce(&mut Attach),
     ) -> Result<FrozenProcessor, Error> {
         let mut context = Attach::default();
+        seed_slots(&mut context);
         prepare(&mut context);
         for plugin in &self.plugins {
             plugin.attach(&mut context)?;
@@ -98,7 +99,11 @@ impl FrozenProcessor {
         alloc: &'a Allocator,
     ) -> Result<Tree<'a>, Error> {
         match &self.parser {
-            Some(parser) => parser.parse(parser.source(input), file, alloc),
+            Some(parser) => {
+                let source = parser.source(input);
+                file.value = Some(source.to_string());
+                parser.parse(source, file, alloc)
+            }
             None => Err(Error::new("missing-parser", "the processor has no parser")),
         }
     }
@@ -182,6 +187,21 @@ impl FrozenProcessor {
             .map(|transform| transform.input())
             .or_else(|| self.compiler.as_ref().map(|compiler| compiler.input()))
     }
+}
+
+// Bridges into nlcst live in md and html, which cannot depend on prose, so the parser they
+// share reaches them through a slot
+fn seed_slots(context: &mut Attach) {
+    #[cfg(feature = "prose")]
+    {
+        let parser = textlane_prose::LanguageParser::new(textlane_prose::Language::Latin);
+        context
+            .slots_mut()
+            .get_or_default::<textlane_core::ProseParserSlot>()
+            .parser = Some(std::sync::Arc::new(parser));
+    }
+    #[cfg(not(feature = "prose"))]
+    let _ = context;
 }
 
 fn check_kind(actual: Option<TreeKind>, expected: TreeKind) -> Result<(), Error> {

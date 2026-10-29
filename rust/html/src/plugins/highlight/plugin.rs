@@ -41,9 +41,7 @@ impl Transform for Highlight {
                 highlight_hast(&mut node, &self.options, alloc)?;
                 Ok(Tree::Hast(node))
             }
-            Tree::Mdast(_) => {
-                Err(Error::new("invalid-stage", "`html.highlight` takes hast"))
-            }
+            _ => Err(Error::new("invalid-stage", "`html.highlight` takes hast")),
         }
     }
 }

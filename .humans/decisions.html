@@ -801,6 +801,26 @@
     </p>
   </dd>
   <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Core defines a
+    <code>ProseParser</code> trait and a <code>ProseParserSlot</code>; the textlane
+    processor seeds the slot with <code>prose.parse</code>'s Latin parser before plugins
+    attach
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> <code>md.toProse</code> and <code>html.toProse</code> live in
+      md and html, which depend on core only, yet mdast-util-to-nlcst and
+      hast-util-to-nlcst need a parse-latin instance: <code>tokenize</code>, the sentence
+      and paragraph plugins, the root plugins. The trait carries exactly those three
+      steps, so a bridge reads the parser from the slots at freeze without a
+      domain-to-domain dependency.
+    </p>
+    <p>
+      <strong>Rejected.</strong> The parser in core (a domain's behaviour in the shared
+      crate); the bridges in textlane-prose (prose would depend on md and html).
+    </p>
+  </dd>
+  <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge> retext-spell is deferred
   </dt>
   <dd>
@@ -874,6 +894,20 @@
       hast-util-format's does; no real page nests that deep.
     </p>
     <p><strong>Rejected.</strong> Unbounded indentation; a total output budget.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Prose plugins reject what
+    upstream mishandles: <code>prose.smartypants</code> fails on an unknown mode string
+    and <code>prose.quotes</code> falls back to its defaults for an empty list
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> retext-smartypants silently treats an unknown mode as
+      <code>true</code>, hiding a typo, and retext-quotes crashes on an empty list;
+      neither is behaviour a pipeline relies on. Out-of-range numbers in
+      <code>prose.indefiniteArticle</code> still fail the run, as upstream throws.
+    </p>
+    <p><strong>Rejected.</strong> Copying upstream's silent fallback and crash.</p>
   </dd>
 </dl>
 

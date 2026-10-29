@@ -40,7 +40,7 @@ impl Transform for ToHtml {
             Tree::Mdast(node) => {
                 Ok(Tree::Hast(convert_mdast(&node, alloc, &self.options)))
             }
-            Tree::Hast(_) => Err(Error::new("invalid-stage", "`md.toHtml` takes mdast")),
+            _ => Err(Error::new("invalid-stage", "`md.toHtml` takes mdast")),
         }
     }
 }

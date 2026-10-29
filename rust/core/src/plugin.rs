@@ -1,10 +1,13 @@
 use std::any::{Any, TypeId};
 use std::collections::HashMap;
+use std::sync::Arc;
 
-use crate::Allocator;
 use crate::models::error::Error;
 use crate::models::file::File;
+use crate::models::nlcst::Node;
+use crate::models::position::Position;
 use crate::models::tree::{Tree, TreeKind};
+use crate::{Allocator, ArenaVec};
 
 /// A pipeline stage: attached once when a processor freezes, where it registers what it does.
 pub trait Plugin: Send + Sync {
@@ -64,6 +67,45 @@ pub trait Compiler: Send + Sync {
     fn input(&self) -> TreeKind;
     fn extension(&self) -> &'static str;
     fn compile(&self, tree: &Tree<'_>, file: &mut File) -> Result<String, Error>;
+}
+
+/// A natural-language parser, as parse-latin's instance is to mdast-util-to-nlcst and
+/// hast-util-to-nlcst: bridges into nlcst tokenize text with it and run its plugins.
+pub trait ProseParser: Send + Sync {
+    /// Split `value` into sentence content: words, white space, punctuation and symbols, each
+    /// spanning its bytes from `offset` on.
+    fn tokenize<'a>(
+        &self,
+        value: &'a str,
+        offset: usize,
+        alloc: &'a Allocator,
+    ) -> ArenaVec<'a, Node<'a>>;
+
+    /// Run the sentence plugins over `content` as one sentence, split it into sentences after
+    /// terminal markers and run the paragraph plugins: a `ParagraphNode`. The sentence and the
+    /// paragraph start at `position`; without one, at their children's.
+    fn tokenize_paragraph<'a>(
+        &self,
+        content: ArenaVec<'a, Node<'a>>,
+        position: Option<Position<'a>>,
+        alloc: &'a Allocator,
+    ) -> Node<'a>;
+
+    /// Split a paragraph into paragraphs at white space holding a line ending and run the
+    /// root plugins: a `RootNode`, at `position` or its children's.
+    fn tokenize_root<'a>(
+        &self,
+        paragraph: Node<'a>,
+        position: Option<Position<'a>>,
+        alloc: &'a Allocator,
+    ) -> Node<'a>;
+}
+
+/// The slot holding the prose parser bridges into nlcst read when their stage is built; the
+/// textlane processor seeds it with `prose.parse`'s Latin parser before plugins attach.
+#[derive(Clone, Default)]
+pub struct ProseParserSlot {
+    pub parser: Option<Arc<dyn ProseParser>>,
 }
 
 type ParserFactory = Box<dyn FnOnce(&Slots) -> Result<Box<dyn Parser>, Error>>;

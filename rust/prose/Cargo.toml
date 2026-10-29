@@ -13,6 +13,8 @@ categories = ["text-processing", "parser-implementations"]
 
 [dependencies]
 textlane-core.workspace = true
+serde.workspace = true
+regex.workspace = true
 
 [lints]
 workspace = true

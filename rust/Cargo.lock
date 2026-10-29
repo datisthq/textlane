@@ -896,6 +896,8 @@ dependencies = [
 name = "textlane-prose"
 version = "0.0.0"
 dependencies = [
+ "regex",
+ "serde",
  "textlane-core",
 ]
 

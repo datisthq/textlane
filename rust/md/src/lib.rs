@@ -292,6 +292,7 @@ mod actions {
         pub(crate) mod tokenize;
     }
     pub(crate) mod mdast {
+        pub(crate) mod bridge;
         pub(crate) mod convert;
     }
     pub(crate) mod non_lazy_continuation {
@@ -414,18 +415,22 @@ mod plugins {
     pub(crate) mod to_html {
         pub(crate) mod plugin;
     }
+    pub(crate) mod to_prose {
+        pub(crate) mod plugin;
+    }
 }
 
 // models
 pub use models::options::{
     DefinitionListSlot, DirectiveOptions, DirectiveSlot, FrontmatterOptions,
     FrontmatterSlot, GfmOptions, GfmSlot, MathOptions, MathSlot, Matter, Names,
-    ParseOptions, StringifyOptions, ToHtmlOptions, UnsafePattern,
+    ParseOptions, StringifyOptions, ToHtmlOptions, ToProseOptions, UnsafePattern,
 };
 
 // actions
 pub use actions::markdown::parse::parse_markdown;
 pub use actions::markdown::stringify::stringify_markdown;
+pub use actions::mdast::bridge::bridge_mdast;
 pub use actions::mdast::convert::convert_mdast;
 
 // plugins
@@ -438,3 +443,4 @@ pub use plugins::math::plugin::{Math, math};
 pub use plugins::parse::plugin::{Parse, parse};
 pub use plugins::stringify::plugin::{Stringify, stringify};
 pub use plugins::to_html::plugin::{ToHtml, to_html};
+pub use plugins::to_prose::plugin::{ToProse, to_prose};

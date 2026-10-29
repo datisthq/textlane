@@ -61,6 +61,7 @@ mod actions {
         pub(crate) mod convert;
     }
     pub(crate) mod hast {
+        pub(crate) mod bridge;
         pub(crate) mod convert;
         pub(crate) mod format;
         #[cfg(feature = "highlight")]
@@ -188,6 +189,9 @@ mod plugins {
     pub(crate) mod to_markdown {
         pub(crate) mod plugin;
     }
+    pub(crate) mod to_prose {
+        pub(crate) mod plugin;
+    }
 }
 
 // models
@@ -198,6 +202,7 @@ pub use models::options::{
 };
 
 // actions
+pub use actions::hast::bridge::bridge_hast;
 pub use actions::hast::convert::convert_hast;
 pub use actions::hast::format::format_hast;
 #[cfg(feature = "highlight")]
@@ -218,3 +223,4 @@ pub use plugins::sanitize::plugin::{Sanitize, sanitize};
 pub use plugins::slug::plugin::{Slug, slug};
 pub use plugins::stringify::plugin::{Stringify, stringify};
 pub use plugins::to_markdown::plugin::{ToMarkdown, to_markdown};
+pub use plugins::to_prose::plugin::{ToProse, to_prose};

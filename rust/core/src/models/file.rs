@@ -4,6 +4,8 @@ use crate::models::position::UnistPosition;
 #[derive(Clone, Debug, Default)]
 pub struct File {
     pub path: Option<String>,
+    /// The text the tree was parsed from, which byte spans point into.
+    pub value: Option<String>,
     pub messages: Vec<Message>,
 }
 

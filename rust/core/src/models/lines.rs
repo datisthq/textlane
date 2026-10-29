@@ -6,7 +6,11 @@ pub struct Lines<'a> {
     source: &'a str,
     starts: Vec<usize>,
     ascii: bool,
+    // UTF-16 units before every `BLOCK`th byte, so a point never counts from the start
+    checkpoints: Vec<usize>,
 }
+
+const BLOCK: usize = 256;
 
 impl<'a> Lines<'a> {
     pub fn new(source: &'a str) -> Self {
@@ -21,10 +25,24 @@ impl<'a> Lines<'a> {
             }
             index += 1;
         }
+        let ascii = source.is_ascii();
+        let checkpoints = match ascii {
+            true => vec![],
+            false => {
+                let mut total = 0;
+                let mut checkpoints = Vec::with_capacity(bytes.len() / BLOCK + 1);
+                for block in bytes.chunks(BLOCK) {
+                    checkpoints.push(total);
+                    total += count_byte_units(block);
+                }
+                checkpoints
+            }
+        };
         Self {
             source,
             starts,
-            ascii: source.is_ascii(),
+            ascii,
+            checkpoints,
         }
     }
 
@@ -38,8 +56,8 @@ impl<'a> Lines<'a> {
         let extra = usize::from(point.virtual_spaces() > 0) + (point.offset() - offset);
         UnistPoint {
             line,
-            column: self.count_units(start, offset) + 1 + extra,
-            offset: Some(self.count_units(0, offset) + extra),
+            column: self.count_units_to(offset) - self.count_units_to(start) + 1 + extra,
+            offset: Some(self.count_units_to(offset) + extra),
         }
     }
 
@@ -54,14 +72,28 @@ impl<'a> Lines<'a> {
         }
     }
 
-    fn count_units(&self, from: usize, to: usize) -> usize {
+    // UTF-16 units before byte `to`, from the checkpoint before it
+    fn count_units_to(&self, to: usize) -> usize {
         if self.ascii {
-            return to - from;
+            return to;
         }
-        self.source
-            .get(from..to)
-            .map_or(to - from, |slice| slice.encode_utf16().count())
+        let block = to / BLOCK;
+        let before = self.checkpoints.get(block).copied().unwrap_or_default();
+        let bytes = self.source.as_bytes();
+        before + count_byte_units(bytes.get(block * BLOCK..to).unwrap_or_default())
     }
+}
+
+// Each UTF-8 lead byte starts one UTF-16 unit, or two for a four-byte character
+fn count_byte_units(bytes: &[u8]) -> usize {
+    bytes
+        .iter()
+        .map(|byte| match byte {
+            0x80..=0xBF => 0,
+            0xF0..=0xFF => 2,
+            _ => 1,
+        })
+        .sum()
 }
 
 #[cfg(test)]

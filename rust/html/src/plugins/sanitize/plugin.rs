@@ -40,9 +40,7 @@ impl Transform for Sanitize {
             Tree::Hast(node) => {
                 Ok(Tree::Hast(sanitize_hast(&node, &self.options, alloc)))
             }
-            Tree::Mdast(_) => {
-                Err(Error::new("invalid-stage", "`html.sanitize` takes hast"))
-            }
+            _ => Err(Error::new("invalid-stage", "`html.sanitize` takes hast")),
         }
     }
 }

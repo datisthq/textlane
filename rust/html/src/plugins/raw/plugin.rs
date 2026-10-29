@@ -38,7 +38,7 @@ impl Transform for Raw {
     ) -> Result<Tree<'a>, Error> {
         match tree {
             Tree::Hast(node) => Ok(Tree::Hast(raw_hast(&node, &self.options, alloc)?)),
-            Tree::Mdast(_) => Err(Error::new("invalid-stage", "`html.raw` takes hast")),
+            _ => Err(Error::new("invalid-stage", "`html.raw` takes hast")),
         }
     }
 }

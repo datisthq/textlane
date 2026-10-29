@@ -35,6 +35,10 @@ pub(crate) fn find_plugin(name: &str) -> Option<BuildPlugin> {
         "md.toHtml" => {
             |_, options| Ok(Box::new(textlane_md::to_html(read_options(options)?)))
         }
+        #[cfg(feature = "md")]
+        "md.toProse" => {
+            |_, options| Ok(Box::new(textlane_md::to_prose(read_options(options)?)))
+        }
         #[cfg(feature = "html")]
         "html.parse" => {
             |_, options| Ok(Box::new(textlane_html::parse(read_options(options)?)))
@@ -64,8 +68,58 @@ pub(crate) fn find_plugin(name: &str) -> Option<BuildPlugin> {
             |_, options| Ok(Box::new(textlane_html::to_markdown(read_options(options)?)))
         }
         #[cfg(feature = "html")]
+        "html.toProse" => |_, _| Ok(Box::new(textlane_html::to_prose())),
+        #[cfg(feature = "html")]
         "html.stringify" => {
             |_, options| Ok(Box::new(textlane_html::stringify(read_options(options)?)))
+        }
+        #[cfg(feature = "prose")]
+        "prose.parse" => {
+            |_, options| Ok(Box::new(textlane_prose::parse(read_options(options)?)))
+        }
+        #[cfg(feature = "prose")]
+        "prose.equality" => {
+            |_, options| Ok(Box::new(textlane_prose::equality(read_options(options)?)))
+        }
+        #[cfg(feature = "prose")]
+        "prose.passive" => {
+            |_, options| Ok(Box::new(textlane_prose::passive(read_options(options)?)))
+        }
+        #[cfg(feature = "prose")]
+        "prose.readability" => |_, options| {
+            Ok(Box::new(textlane_prose::readability(read_options(
+                options,
+            )?)))
+        },
+        #[cfg(feature = "prose")]
+        "prose.repeatedWords" => |_, _| Ok(Box::new(textlane_prose::repeated_words())),
+        #[cfg(feature = "prose")]
+        "prose.sentenceSpacing" => |_, options| {
+            Ok(Box::new(textlane_prose::sentence_spacing(read_options(
+                options,
+            )?)))
+        },
+        #[cfg(feature = "prose")]
+        "prose.stringify" => |_, _| Ok(Box::new(textlane_prose::stringify())),
+        #[cfg(feature = "prose")]
+        "prose.smartypants" => |_, options| {
+            Ok(Box::new(textlane_prose::smartypants(read_options(
+                options,
+            )?)))
+        },
+        #[cfg(feature = "prose")]
+        "prose.quotes" => {
+            |_, options| Ok(Box::new(textlane_prose::quotes(read_options(options)?)))
+        }
+        #[cfg(feature = "prose")]
+        "prose.contractions" => |_, options| {
+            Ok(Box::new(textlane_prose::contractions(read_options(
+                options,
+            )?)))
+        },
+        #[cfg(feature = "prose")]
+        "prose.indefiniteArticle" => {
+            |_, _| Ok(Box::new(textlane_prose::indefinite_article()))
         }
         #[cfg(feature = "testing")]
         _ => return crate::utils::testing::plugins::find_test_plugin(name),

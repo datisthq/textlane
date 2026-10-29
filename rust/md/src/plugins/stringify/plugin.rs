@@ -74,9 +74,7 @@ impl Compiler for MarkdownCompiler {
     fn compile(&self, tree: &Tree<'_>, _file: &mut File) -> Result<String, Error> {
         match tree {
             Tree::Mdast(node) => serialize_tree(node, &self.settings, &self.patterns),
-            Tree::Hast(_) => {
-                Err(Error::new("invalid-stage", "`md.stringify` takes mdast"))
-            }
+            _ => Err(Error::new("invalid-stage", "`md.stringify` takes mdast")),
         }
     }
 }

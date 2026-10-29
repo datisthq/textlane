@@ -98,7 +98,14 @@ function importSource(source: (typeof SOURCES)[number]) {
   const groups = new Map<string, { pipeline: unknown[]; tests: object[] }>()
   const seen = new Set<string>()
   for (const found of extractRuns(program)) {
-    const pipeline = found.steps.map(step => {
+    // `.parse()` runs no compiler, so a stringifier in its chain is not part of the case
+    const steps =
+      found.method === "parse"
+        ? found.steps.filter(
+            step => !PLUGINS[step.identifier]?.stage?.endsWith(".stringify"),
+          )
+        : found.steps
+    const pipeline = steps.map(step => {
       const known = PLUGINS[step.identifier]
       const options = { ...known?.options, ...step.options }
       return Object.keys(options).length > 0 ? [known?.stage, options] : [known?.stage]
@@ -229,13 +236,11 @@ function runReference(found: { method: string; steps: Step[]; value: string | ob
       }
     }
     if (found.method === "stringify" && isObject(found.value)) {
-      return { md: String(Reflect.apply(processor.stringify, processor, [found.value])) }
+      const output = String(Reflect.apply(processor.stringify, processor, [found.value]))
+      return keyOutput(last, output)
     }
     if (typeof found.value === "string") {
-      const output = String(processor.processSync(found.value))
-      if (last === "rehypeStringify") return { html: output }
-      if (last === "retextStringify") return { txt: output }
-      return { md: output }
+      return keyOutput(last, String(processor.processSync(found.value)))
     }
   } catch {
     return countSkip("the reference rejects the run")
@@ -246,4 +251,11 @@ function runReference(found: { method: string; steps: Step[]; value: string | ob
 function countSkip(reason: string) {
   skipped.set(reason, (skipped.get(reason) ?? 0) + 1)
   return undefined
+}
+
+// Output is keyed by its file extension, after the stringifier that wrote it
+function keyOutput(last: string, output: string) {
+  if (last === "rehypeStringify") return { html: output }
+  if (last === "retextStringify") return { txt: output }
+  return { md: output }
 }

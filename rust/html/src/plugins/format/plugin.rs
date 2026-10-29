@@ -38,9 +38,7 @@ impl Transform for Format {
     ) -> Result<Tree<'a>, Error> {
         match tree {
             Tree::Hast(node) => Ok(Tree::Hast(format_hast(node, &self.options, alloc))),
-            Tree::Mdast(_) => {
-                Err(Error::new("invalid-stage", "`html.format` takes hast"))
-            }
+            _ => Err(Error::new("invalid-stage", "`html.format` takes hast")),
         }
     }
 }

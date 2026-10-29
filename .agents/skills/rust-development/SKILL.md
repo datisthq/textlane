@@ -28,7 +28,7 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
 
 - `rust/Cargo.toml` is a virtual manifest; each crate is a sibling directory named by its role,
   as in fairspec: `textlane/`, `core/` (`textlane-core`: the trees, the file and the plugin
-  contract every other crate shares), and one directory per domain: `md/`, `html/`, `mdx/`,
+  contract every other crate shares: mdast, hast and nlcst), and one directory per domain: `md/`, `html/`, `mdx/`,
   `prose/` (`textlane-<domain>`). A domain crate depends on `textlane-core`, never on another
   domain or on `textlane`, which depends on them all. `mdx` compiles core's hast to a JS tree
   on oxc, so oxc is its own dependency and never core's
@@ -199,6 +199,58 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   container. A definition description is a document container (`Container::DefList`): its
   check closes the flow even when no list opens, and `Resolver::DefList` splits the
   paragraph above into terms, as micromark-extension-definition-list does
+- `prose`'s parser ports parse-latin 7.0.0 and parse-english 7.0.0 (`language: "english"`
+  adds parse-english's two plugins in front of parse-latin's). Core's nlcst
+  (`models/nlcst.rs`) is one `Node` enum over two shapes, `Parent` (root, paragraph,
+  sentence, word) and `Literal` (text, symbol, punctuation, white space, source), with
+  positions as byte spans. parse-latin tests each UTF-16 unit, so an astral character is
+  always a symbol, and runs of one mark continue only through the same character.
+  `utils/parser/` works on `Store`, ids into a flat node list with `VecDeque` children,
+  never on arena vectors: upstream's plugins splice next to the visited child, which
+  `cursor.rs` makes free by keeping its children split at a gap (`modify_children` reads a
+  visitor's return value as unist-util-modify-children does, and an absolute index after
+  inserts or removals). `mergeRemainingFullStops` walks backwards with its own gap; a
+  sentence break drains the front of the children, not the tail. A position whose end
+  parse-latin left unset is dropped on export
+- `prose`'s checks (`prose.equality`, `prose.readability`, `prose.passive`,
+  `prose.repeatedWords`, `prose.sentenceSpacing`) are nlcst transforms that only add
+  messages. A message's place is unist's (lines, UTF-16 columns), but nlcst holds byte spans:
+  `FrozenProcessor::parse` keeps the source as `File::value` (vfile's `value`). A check
+  returns `Report`s holding positions; `actions/message/place.rs` (`place_messages`) places
+  every byte span in one sorted sweep over the source, since `Lines` counts UTF-16 units from
+  the start per point (quadratic over many messages on non-ASCII text), then appends them
+  sorted by start offset and rule, the order the conformance cases compare. `actions/nlcst/search.rs`
+  is nlcst-search: phrases indexed by first word, each parent's words normalized once and its
+  first and last word known, so nlcst-is-literal never rescans siblings. The pattern and
+  word-list tables (`helpers/*_table.rs`) are generated from the pinned packages by
+  `pnpm -C conformance generate:prose-tables`, never edited; syllable 5.0.1's two expressions
+  with a back reference or lookahead are matched by hand in `actions/syllable/count.rs`, and
+  pluralize's singular rules run on `regex` from their JavaScript source
+- Bridges into nlcst (`md.toProse`, `html.toProse`) live in md and html, so they reach the
+  prose parser through core: `ProseParser` (`tokenize`, `tokenize_paragraph`,
+  `tokenize_root`, the three steps mdast-util-to-nlcst and hast-util-to-nlcst call on
+  parse-latin) in `ProseParserSlot`, which `Processor::freeze_with` seeds with the Latin
+  `LanguageParser` before any plugin attaches. A bridge's `attach` reads it from the slots
+  and fails with `missing-prose-parser` when textlane is built without `prose`. They port
+  mdast-util-to-nlcst 7.0.1 and hast-util-to-nlcst 4.0.0, which place tokens by UTF-16
+  offsets into the document (`patch`), so they read the text the parser saw from
+  `File::value` and place through core's `Location` (vfile-location: `to_point`,
+  `to_offset`, `place_nlcst`), byte spans where an offset starts a character. A value
+  that differs from its source (an escape, a lazy line) drifts exactly as upstream's does.
+  Both walk with explicit stacks: md one frame per parent, remembering the previous
+  child's end for the line endings between; html a task stack of `find` and `add`, with
+  `implicit` grouping phrasing runs up front and `flattenAll` and `toString` iterative
+- Prose checks (`prose.quotes`, `prose.contractions`, `prose.indefiniteArticle`) collect
+  `Report`s with span positions and hand them to `place_messages`, which turns them into
+  unist places in one sorted pass over `File::value` (the text the parser read, set by
+  `FrozenProcessor::parse`): a transform never sees the input otherwise, and `Lines`
+  counts UTF-16 from the start per point, so `helpers/place.rs` `to_place` (a fresh `Lines`
+  per call) is for one-off places only. Word walks go through `helpers/words.rs`, which
+  finds each parent's first and last word once, so nlcst-is-literal's and
+  retext-indefinite-article's sibling scans stay linear. `prose.smartypants` rebuilds each
+  sibling list instead of splicing, keeping upstream's walk quirks (an ellipsis skips as
+  many siblings as it removed). Word lists are generated from the pinned packages
+  (`helpers/contraction_table.rs`, `helpers/article_table.rs`), never hand-copied
 - `md` names entities by syntax construct or mdast node and verbs by layer: `tokenize` and
   `resolve` (micromark), `compile` (from-markdown), `stringify` (to-markdown), `convert`
   (to-hast), so `actions/heading/compile.rs` exports `compile_heading`. No file named after

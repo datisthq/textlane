@@ -29,6 +29,16 @@ pub struct ToHtmlOptions {
     pub pass_through: Vec<String>,
 }
 
+/// Options of `md::to_prose`, named as remark-retext and mdast-util-to-nlcst name them.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(default)]
+pub struct ToProseOptions {
+    /// Node types to leave out, besides `table`, `tableRow` and `tableCell`.
+    pub ignore: Vec<String>,
+    /// Node types to keep as one `SourceNode` of their source text, besides `inlineCode`.
+    pub source: Vec<String>,
+}
+
 /// Options of `md::stringify`, named as mdast-util-to-markdown names them.
 #[derive(Clone, Debug, Deserialize)]
 #[serde(default, rename_all = "camelCase")]

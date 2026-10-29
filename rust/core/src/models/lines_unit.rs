@@ -27,3 +27,34 @@ fn counts_a_point_inside_a_tab_as_past_its_first_column() {
     let point = lines.to_unist_point(Point::new(0, 2));
     assert_eq!((point.column, point.offset), (2, Some(1)));
 }
+
+#[test]
+fn counts_utf16_offsets_across_checkpoints() {
+    let source = "aé😀\nb".repeat(300);
+    let lines = Lines::new(&source);
+    for (index, _) in source.char_indices() {
+        let point = lines.to_unist_point(Point::new(index, 0));
+        let before = &source[..index];
+        let line_start = before.rfind('\n').map_or(0, |at| at + 1);
+        assert_eq!(point.offset, Some(before.encode_utf16().count()));
+        assert_eq!(
+            point.column,
+            source[line_start..index].encode_utf16().count() + 1
+        );
+    }
+}
+
+#[test]
+fn places_many_points_on_one_long_line_in_linear_time() {
+    let source = "é ".repeat(500_000);
+    let lines = Lines::new(&source);
+    let started = std::time::Instant::now();
+    for index in (0..source.len()).step_by(3) {
+        lines.to_unist_point(Point::new(index, 0));
+    }
+    assert!(
+        started.elapsed().as_secs() < if cfg!(debug_assertions) { 20 } else { 5 },
+        "took {:?}",
+        started.elapsed()
+    );
+}
