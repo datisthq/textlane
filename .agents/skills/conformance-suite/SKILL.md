@@ -92,7 +92,9 @@ a test's `comment` only where it means something different.
 - Upstream's own expectations are kept verbatim where they describe textlane's path; they follow
   upstream's latest release, while the pinned reference lags behind the 7-day quarantine. After
   bumping a pin, rerun the importers and compare: a reference that still disagrees with a
-  verbatim expectation is a real difference to look at.
+  verbatim expectation is a real difference to look at. When it is upstream's test lagging its own pinned
+  serializer, the importer takes the reference's output and keeps upstream's in `comment`
+  (`sources/frontmatter.ts`, `checkStringify`).
 - `actions/node/scope.ts` resolves an identifier lexically, through each enclosing block from the
   module inward, so one loop's or test's `const value` never leaks into another's case.
 

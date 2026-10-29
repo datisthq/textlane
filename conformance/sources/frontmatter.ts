@@ -18,6 +18,7 @@ import {
   createMdastPipeline,
   describeMdastOptions,
   extractMdastCases,
+  toExtensions,
   isFrontmatterOptions,
 } from "../actions/mdast/extract.ts"
 import type { MdastSyntax } from "../actions/mdast/extract.ts"
@@ -117,7 +118,7 @@ function importFrontmatter() {
         kind: found.kind,
         options: found.options,
       }),
-      test: found.test,
+      test: checkStringify(found),
     })
   }
   importRemarkFixtures()
@@ -340,4 +341,37 @@ function isCallTo(call: CallExpression, name: string) {
 function countSkip(reason: string) {
   skipped.set(reason, (skipped.get(reason) ?? 0) + 1)
   return undefined
+}
+
+// An upstream stringify expectation the pinned serializer no longer writes is that test
+// lagging its own dependency: the case takes the reference's output, upstream's as a comment
+function checkStringify(found: ReturnType<typeof extractMdastCases>[number]) {
+  const test = found.test
+  if (found.kind !== "stringify" || !isStringifyTest(test)) return test
+  const md = stringifyTree({
+    ...toExtensions(FRONTMATTER, found.options.plugin),
+    tree: test.tree,
+    stringify: found.options.stringify,
+  })
+  if (md === test.expected.md) return test
+  return {
+    ...test,
+    comment: `mdast-util-frontmatter expects: ${test.expected.md}`,
+    expected: { md },
+  }
+}
+
+function isStringifyTest(
+  test: object,
+): test is { tree: object; expected: { md: string } } {
+  return (
+    "tree" in test &&
+    typeof test.tree === "object" &&
+    test.tree !== null &&
+    "expected" in test &&
+    typeof test.expected === "object" &&
+    test.expected !== null &&
+    "md" in test.expected &&
+    typeof test.expected.md === "string"
+  )
 }

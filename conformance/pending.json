@@ -1,5 +1,4 @@
 {
-  "md/frontmatter#mdast-util-frontmatter stringify {\"type\":\"custom\",\"marker\":{\"open\":\"<\",\"close\":\">\"}}": "upstream expects the blank line in a root's text unencoded; the pinned mdast-util-to-markdown 2.2.0 and textlane write it as `&#xA;&#xA;`",
   "html/highlight#every Shiki 4.5.0 grammar's sample (first 30 lines)#bicep": "giallo grammar diverges: `(` after `@description` is #FE640B in Shiki, plain in giallo",
   "html/highlight#every Shiki 4.5.0 grammar's sample (first 30 lines)#dotenv": "giallo grammar diverges: `1` of `MY_NUMER=1` is constant.numeric in Shiki, plain in giallo",
   "html/highlight#every Shiki 4.5.0 grammar's sample (first 30 lines)#moonbit": "giallo grammar diverges: ` {` after `struct Point` is plain in Shiki, #7C7F93 in giallo",

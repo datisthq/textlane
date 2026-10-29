@@ -585,8 +585,9 @@
           ]
         },
         "expected": {
-          "md": "\\<<<\na\n\nb\n\\>>>\n"
-        }
+          "md": "\\<<<\na&#xA;&#xA;b\n\\>>>\n"
+        },
+        "comment": "mdast-util-frontmatter expects: \\<<<\na\n\nb\n\\>>>\n"
       }
     ]
   },

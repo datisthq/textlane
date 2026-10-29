@@ -181,7 +181,8 @@ function withOptions(name: string, options: unknown) {
 }
 
 // Typed reference options for the syntax under test; frontmatter's `null` means its defaults
-function toExtensions(syntax: MdastSyntax, plugin: unknown): Extensions {
+/** The reference's extension settings for a syntax and a case's plugin options. */
+export function toExtensions(syntax: MdastSyntax, plugin: unknown): Extensions {
   if (syntax.extension === "frontmatter") {
     return { frontmatter: isFrontmatterOptions(plugin) ? plugin : null }
   }
