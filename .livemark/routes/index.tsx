@@ -988,9 +988,12 @@ const measures: Measure[] = [
   { tool: "pulldown-cmark", mbps: 286.7 },
   { tool: "comrak", mbps: 119.8 },
   { tool: "cmark (C, via cmarkgfm)", mbps: 104.1 },
-  { tool: "textlane (Rust)", mbps: 75.0, isTextlane: true },
-  { tool: "textlane (TypeScript)", mbps: 66.9, isTextlane: true },
-  { tool: "textlane (Python)", mbps: 63.1, isTextlane: true },
+  { tool: "textlane (Rust)", mbps: 93.9, isTextlane: true },
+  { tool: "textlane (TypeScript)", mbps: 83.5, isTextlane: true },
+  { tool: "textlane (Python)", mbps: 82.8, isTextlane: true },
+  { tool: "textlane (Rust) + HTML plugins", mbps: 60.4, isTextlane: true },
+  { tool: "textlane (TypeScript) + HTML plugins", mbps: 60.1, isTextlane: true },
+  { tool: "textlane (Python) + HTML plugins", mbps: 56.0, isTextlane: true },
   { tool: "marked", mbps: 17.0 },
   { tool: "markdown-it", mbps: 14.3 },
   { tool: "markdown-rs", mbps: 5.2 },
@@ -1011,8 +1014,9 @@ function Benchmark() {
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Performance</h2>
             <p className="mt-4 text-muted-foreground text-lg">
               Markdown-to-HTML throughput from Rust, Node.js and Python, against other
-              libraries. textlane builds two trees, mdast and hast, for plugins to
-              transform; comrak and cmark build one, pulldown-cmark none.
+              libraries. textlane builds mdast for plugins to transform and writes HTML
+              from it, or builds hast too once an HTML plugin needs it; comrak and cmark
+              build one tree, pulldown-cmark none.
             </p>
           </div>
         </Reveal>
@@ -1023,7 +1027,7 @@ function Benchmark() {
                 {measures.map(measure => (
                   <li
                     key={measure.tool}
-                    className="grid grid-cols-1 gap-1 sm:grid-cols-[13rem_minmax(0,1fr)_6rem] sm:items-center sm:gap-4"
+                    className="grid grid-cols-1 gap-1 sm:grid-cols-[17rem_minmax(0,1fr)_6rem] sm:items-center sm:gap-4"
                   >
                     <span
                       className={cn(
