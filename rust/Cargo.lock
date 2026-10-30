@@ -1529,7 +1529,7 @@ checksum = "adb6935a6f5c20170eeceb1a3835a49e12e19d792f6dd344ccc76a985ca5a6ca"
 
 [[package]]
 name = "textlane"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "napi",
  "napi-build",
@@ -1547,7 +1547,7 @@ dependencies = [
 
 [[package]]
 name = "textlane-core"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "bumpalo",
  "serde_json",
@@ -1555,7 +1555,7 @@ dependencies = [
 
 [[package]]
 name = "textlane-html"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "bumpalo",
  "giallo",
@@ -1572,7 +1572,7 @@ dependencies = [
 
 [[package]]
 name = "textlane-md"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "bumpalo",
  "memchr",
@@ -1588,7 +1588,7 @@ dependencies = [
 
 [[package]]
 name = "textlane-mdx"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "oxc_allocator",
  "oxc_ast",
@@ -1605,7 +1605,7 @@ dependencies = [
 
 [[package]]
 name = "textlane-nl"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "regex",
  "schemars",
