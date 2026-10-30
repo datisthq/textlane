@@ -71,7 +71,8 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   match (`blank_match`), an unclosed link bracket's deactivation stops at one already off,
   and runs pair through buckets. A label is matched against definitions only up to the
   longest identifier. The find-and-replace pass for GFM literals after parsing shares one
-  domain run and one atext run among the starts inside it. The serializer
+  domain run and one atext run among the starts inside it, and skips a text with no `@`
+  (emails) or no `www.`/`http:` (URLs) found by memchr. The serializer
   never re-indents a container's text: `utils/serializer/sink.rs` records each container as a layer and writes every prefix
   once, deciding a blank line from the innermost prefix out. Nested emphasis renders into
   one shared token buffer, and a delimiter run's token list is shared, not copied per
@@ -101,8 +102,10 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   list: `block.rs` takes each line through a stack of open blocks, leaves keeping their
   lines, with `FlowText` reading ahead through container prefixes for MDX's multi-line
   constructs; `inline.rs` runs once per leaf: items, then pairing runs, then the tree
-  (without GFM, `scan` jumps over plain text through `INLINE_SPECIAL`, so a byte given
-  an arm in `scan` must join that table, or its construct is skipped over);
+  (`skip_plain` jumps over plain text through `INLINE_SPECIAL`, so a byte given an arm in
+  `scan` must join that table, or its construct is skipped over; under GFM it also stops at
+  `w`/`h` and walks byte by byte only through the atext run before the next `@`, where an
+  email may start);
   `build.rs` turns blocks into nodes, groups definition lists and assembles JSX elements.
   It reproduces micromark's and from-markdown's trees and positions, quirks included:
   `interrupt` is decided once a line, before any container opens on it; unclosed fences

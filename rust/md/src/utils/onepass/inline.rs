@@ -92,6 +92,7 @@ pub(crate) struct Inline<'a, 'd> {
     footnotes: &'d HashSet<String>,
     in_table: bool,
     literal_memo: LiteralMemo,
+    email_window: Option<EmailWindow>,
     html_memo: HtmlMemo,
     code_memo: Vec<((u8, usize), usize)>,
     mdx: Option<&'d MdxBuild<'d>>,
@@ -124,6 +125,14 @@ pub(crate) struct InlineContext<'d> {
     pub(crate) leaf: &'static str,
 }
 
+// The atext run `start..at` before the `@` at `at`, the next one at or after `from`
+#[derive(Clone, Copy)]
+struct EmailWindow {
+    from: usize,
+    start: usize,
+    at: usize,
+}
+
 /// Phrasing content, and the state of a task list check when one opened it.
 pub(crate) struct InlineOutput<'a> {
     pub(crate) children: ArenaVec<'a, Node<'a>>,
@@ -134,6 +143,18 @@ pub(crate) struct InlineOutput<'a> {
 const INLINE_SPECIAL: [bool; 256] = {
     let mut table = [false; 256];
     let bytes = b"\\&`$<{[:~!]*_\n\r";
+    let mut index = 0;
+    while index < bytes.len() {
+        table[bytes[index] as usize] = true;
+        index += 1;
+    }
+    table
+};
+
+// Under GFM, also where a `www.` or `http` literal may start
+const INLINE_SPECIAL_GFM: [bool; 256] = {
+    let mut table = INLINE_SPECIAL;
+    let bytes = b"wWhH";
     let mut index = 0;
     while index < bytes.len() {
         table[bytes[index] as usize] = true;
@@ -159,6 +180,7 @@ pub(crate) fn parse_inline<'a>(
         footnotes: context.footnotes,
         in_table: context.in_table,
         literal_memo: LiteralMemo::default(),
+        email_window: None,
         html_memo: HtmlMemo::default(),
         code_memo: Vec::new(),
         directive: context.directive,
@@ -561,13 +583,7 @@ impl<'a> Inline<'a, '_> {
                     }
                     text_start = pos;
                 }
-                _ if self.gfm.is_none() => {
-                    pos += 1;
-                    while pos < len && !INLINE_SPECIAL[bytes[pos] as usize] {
-                        pos += 1;
-                    }
-                }
-                _ => pos += 1,
+                _ => pos = self.skip_plain(pos + 1),
             }
         }
         let mut suffix = len;
@@ -578,6 +594,41 @@ impl<'a> Inline<'a, '_> {
             suffix -= 1;
         }
         self.push_text(text_start, suffix);
+    }
+
+    // The end of plain text from `pos`: no arm of `scan` and, under GFM, no literal starts
+    // before it. An email starts only in the atext run reaching the next `@`, so only that
+    // run is walked byte by byte
+    fn skip_plain(&mut self, mut pos: usize) -> usize {
+        let bytes = self.bytes;
+        if self.gfm.is_none() {
+            while pos < bytes.len() && !INLINE_SPECIAL[bytes[pos] as usize] {
+                pos += 1;
+            }
+            return pos;
+        }
+        let window = match self.email_window {
+            Some(window) if window.from <= pos && pos <= window.at => window,
+            _ => {
+                let at = memchr::memchr(b'@', &bytes[pos..])
+                    .map_or(bytes.len(), |at| pos + at);
+                let mut start = at;
+                while at < bytes.len() && start > pos && is_atext(bytes[start - 1]) {
+                    start -= 1;
+                }
+                let window = EmailWindow {
+                    from: pos,
+                    start,
+                    at,
+                };
+                self.email_window = Some(window);
+                window
+            }
+        };
+        while pos < window.start && !INLINE_SPECIAL_GFM[bytes[pos] as usize] {
+            pos += 1;
+        }
+        pos
     }
 
     // `:name[label]{attributes}`: a text directive, not right after another colon unless

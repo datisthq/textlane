@@ -189,6 +189,9 @@ struct DomainRun {
 // `/(https?:\/\/|www(?=\.))([-.\w]+)([^ \t\r\n]*)/gi`, then `findUrl`
 fn find_urls(value: &str) -> Option<Vec<Piece>> {
     let bytes = value.as_bytes();
+    if !has_url_start(bytes) {
+        return None;
+    }
     let mut run = DomainRun::default();
     collect_matches(value, 0, value.len(), |index| {
         let rest = &bytes[index..];
@@ -237,6 +240,18 @@ fn find_urls(value: &str) -> Option<Vec<Piece>> {
             found.push(Piece::Text(url_end, end));
         }
         Some((found, end))
+    })
+}
+
+// A `www.` or a `http:`/`https:`, found by their `.` and `:`, so most text skips the
+// per-byte pass
+fn has_url_start(bytes: &[u8]) -> bool {
+    let ends_with = |end: usize, suffix: &[u8]| {
+        end >= suffix.len() && bytes[end - suffix.len()..end].eq_ignore_ascii_case(suffix)
+    };
+    memchr::memchr2_iter(b'.', b':', bytes).any(|at| match bytes[at] {
+        b'.' => ends_with(at, b"www"),
+        _ => ends_with(at, b"http") || ends_with(at, b"https"),
     })
 }
 
@@ -333,6 +348,7 @@ struct AtextRun {
 // `/(?<=^|\s|\p{P}|\p{S})([-.\w+]+)@([-\w]+(?:\.[-\w]+)+)/gu`, then `findEmail`
 fn find_emails(value: &str, start: usize, end: usize) -> Option<Vec<Piece>> {
     let bytes = &value.as_bytes()[..end];
+    memchr::memchr(b'@', &bytes[start..])?;
     let mut run = AtextRun::default();
     collect_matches(value, start, end, |index| {
         let is_atext = |byte: u8| is_word(byte) || matches!(byte, b'-' | b'.' | b'+');
