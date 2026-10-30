@@ -116,6 +116,8 @@ pub(crate) const PLUGINS: &[PluginEntry] = &[
         textlane_html::Highlight,
         "@shikijs/rehype"
     ),
+    #[cfg(feature = "katex")]
+    plugin!("html.katex", textlane_html::Katex, "rehype-katex"),
     #[cfg(feature = "html")]
     plugin!(
         "html.toMarkdown",

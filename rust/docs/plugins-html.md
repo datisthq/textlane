@@ -329,6 +329,64 @@ Takes `string | string[]`.
 
 <!-- /generated -->
 
+## html.katex
+
+Renders math with KaTeX, as rehype-katex does, natively: each `$…$`, `$$…$$` and ` ```math ` that `md.math` and `md.toHtml` leave becomes KaTeX's HTML and MathML. Pages need KaTeX's stylesheet and fonts. A formula that fails to render is reported in the file's messages and shown in `errorColor`.
+
+```rust
+use textlane::{Processor, html, md};
+
+let output = Processor::new()
+    .with(md::Parse::default())
+    .with(md::Math::default())
+    .with(md::ToHtml::default())
+    .with(html::Katex::default())
+    .with(html::Stringify::default())
+    .freeze()?
+    .process("Euler: $e^{i\\pi} = -1$")?;
+output.value
+// <p>Euler: <span class="katex"><span class="katex-mathml"><math …
+```
+
+<!-- generated:options html.katex -->
+
+Follows [rehype-katex](https://www.npmjs.com/package/rehype-katex).
+
+| Option             | Type                     | Default | Description                                                                                                                                        |
+| ------------------ | ------------------------ | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `output`           | `KatexOutput \| null`    |         | The markup to write, both HTML and MathML by default.                                                                                              |
+| `leqno`            | `boolean`                | `false` | Put equation numbers on the left.                                                                                                                  |
+| `fleqn`            | `boolean`                | `false` | Align display math to the left instead of centering it.                                                                                            |
+| `errorColor`       | `string \| null`         | `null`  | The color of math that fails to render, `#cc0000` by default.                                                                                      |
+| `macros`           | `Record<string, string>` | `{}`    | Macros by name, each to the TeX it expands to, as `{"\\RR": "\\mathbb{R}"}`.                                                                       |
+| `minRuleThickness` | `number \| null`         | `null`  | The thinnest a rule, such as a fraction line, is drawn, in ems.                                                                                    |
+| `colorIsTextColor` | `boolean`                | `false` | Let `\color` color the text after it, as LaTeX does.                                                                                               |
+| `strict`           | `KatexStrict \| null`    |         | What to do with input LaTeX would reject: `true` or `"error"` fails it, `"warn"` prints a warning, `false` or `"ignore"` (the default) accepts it. |
+| `trust`            | `boolean`                | `false` | Allow commands that can run untrusted input, such as `\href` and `\includegraphics`.                                                               |
+| `maxSize`          | `number \| null`         | `null`  | The largest a user-given size may be, in ems.                                                                                                      |
+| `maxExpand`        | `number \| null`         | `null`  | How many macro expansions one formula may take, 1000 by default.                                                                                   |
+| `globalGroup`      | `boolean`                | `false` | Let definitions such as `\def` last past the formula they are in.                                                                                  |
+
+**`KatexOutput`**
+
+The markup KaTeX writes.
+
+Takes `"html" | "mathml" | "htmlAndMathml"`.
+
+**`KatexStrict`**
+
+How strictly KaTeX holds input to LaTeX.
+
+Takes `boolean | KatexStrictMode`.
+
+**`KatexStrictMode`**
+
+One level of KaTeX's strictness.
+
+Takes `"ignore" | "warn" | "error"`.
+
+<!-- /generated -->
+
 ## html.toMarkdown
 
 Turns hast into mdast, so HTML can be written out as Markdown.

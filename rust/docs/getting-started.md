@@ -15,8 +15,8 @@ cargo add textlane
 ```
 
 The crate needs Rust 1.88 or later. Each domain is a feature, all on by default: `md`,
-`html`, `highlight` (`html.highlight` and its grammars), `mdx` and `nl`. Leave out what you
-do not use to build faster:
+`html`, `highlight` (`html.highlight` and its grammars), `katex` (`html.katex` and KaTeX's
+font metrics), `mdx` and `nl`. Leave out what you do not use to build faster:
 
 ```bash
 cargo add textlane --no-default-features --features md,html

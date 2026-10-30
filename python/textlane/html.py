@@ -20,6 +20,8 @@ __all__ = [
     "extract_toc",
     "highlight",
     "HighlightOptions",
+    "katex",
+    "KatexOptions",
     "to_markdown",
     "ToMarkdownOptions",
     "to_natural_language",
@@ -214,6 +216,48 @@ class HighlightOptions(TypedDict, total=False):
     transformers: List[HighlightTransformer]
 
 
+# The markup KaTeX writes.
+KatexOutput = Literal["html", "mathml", "htmlAndMathml"]
+
+
+# One level of KaTeX's strictness.
+KatexStrictMode = Literal["ignore", "warn", "error"]
+
+
+# How strictly KaTeX holds input to LaTeX.
+KatexStrict = Union[bool, KatexStrictMode]
+
+
+# `html.katex`: math rendered as rehype-katex renders it, natively by katex-rs; options
+# named as KaTeX names them.
+class KatexOptions(TypedDict, total=False):
+    # The markup to write, both HTML and MathML by default.
+    output: Optional[KatexOutput]
+    # Put equation numbers on the left.
+    leqno: bool
+    # Align display math to the left instead of centering it.
+    fleqn: bool
+    # The color of math that fails to render, `#cc0000` by default.
+    errorColor: Optional[str]
+    # Macros by name, each to the TeX it expands to, as `{"\\RR": "\\mathbb{R}"}`.
+    macros: Dict[str, str]
+    # The thinnest a rule, such as a fraction line, is drawn, in ems.
+    minRuleThickness: Optional[float]
+    # Let `\color` color the text after it, as LaTeX does.
+    colorIsTextColor: bool
+    # What to do with input LaTeX would reject: `true` or `"error"` fails it, `"warn"`
+    # prints a warning, `false` or `"ignore"` (the default) accepts it.
+    strict: Optional[KatexStrict]
+    # Allow commands that can run untrusted input, such as `\href` and `\includegraphics`.
+    trust: bool
+    # The largest a user-given size may be, in ems.
+    maxSize: Optional[float]
+    # How many macro expansions one formula may take, 1000 by default.
+    maxExpand: Optional[int]
+    # Let definitions such as `\def` last past the formula they are in.
+    globalGroup: bool
+
+
 # `html.toMarkdown`: hast into mdast; options named as hast-util-to-mdast names them.
 class ToMarkdownOptions(TypedDict, total=False):
     # Wrap all phrasing content of the root in paragraphs, as for a whole document.
@@ -307,6 +351,11 @@ def extract_toc() -> Plugin:
 def highlight(options: Optional[HighlightOptions] = None) -> Plugin:
     """The `html.highlight` plugin."""
     return describe_plugin("html.highlight", options)
+
+
+def katex(options: Optional[KatexOptions] = None) -> Plugin:
+    """The `html.katex` plugin."""
+    return describe_plugin("html.katex", options)
 
 
 def to_markdown(options: Optional[ToMarkdownOptions] = None) -> Plugin:

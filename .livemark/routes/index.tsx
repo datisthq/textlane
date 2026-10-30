@@ -707,6 +707,7 @@ const domains: Domain[] = [
       ["html.unwrapImages", "rehype-unwrap-images"],
       ["html.format", "rehype-format"],
       ["html.highlight", "@shikijs/rehype"],
+      ["html.katex", "rehype-katex"],
     ],
   },
   {

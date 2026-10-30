@@ -17,23 +17,25 @@ include = ["src/**/*", "build.rs", "README.md", "LICENSE.md"]
 crate-type = ["lib", "cdylib"]
 
 [features]
-default = ["md", "html", "highlight", "mdx", "nl"]
+default = ["md", "html", "highlight", "katex", "mdx", "nl"]
 md = ["dep:textlane-md"]
 html = ["dep:textlane-html"]
 highlight = ["html", "textlane-html/highlight"]
+katex = ["html", "textlane-html/katex"]
 mdx = ["dep:textlane-mdx"]
 nl = ["dep:textlane-nl"]
 node = [
   "md",
   "html",
   "highlight",
+  "katex",
   "mdx",
   "nl",
   "dep:napi",
   "dep:napi-derive",
   "dep:napi-build",
 ]
-python = ["md", "html", "highlight", "mdx", "nl", "dep:pyo3"]
+python = ["md", "html", "highlight", "katex", "mdx", "nl", "dep:pyo3"]
 testing = []
 # The plugins' option schemas, read by `pnpm generate:bindings`; never in a release build
 schema = [

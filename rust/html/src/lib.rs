@@ -88,6 +88,8 @@ mod actions {
         pub(crate) mod slug;
         pub(crate) mod stringify;
         pub(crate) mod toc;
+        #[cfg(feature = "katex")]
+        pub(crate) mod typeset;
         pub(crate) mod unwrap;
     }
     pub(crate) mod heading {
@@ -116,6 +118,10 @@ mod actions {
     }
     pub(crate) mod list {
         pub(crate) mod convert;
+    }
+    #[cfg(feature = "katex")]
+    pub(crate) mod math {
+        pub(crate) mod typeset;
     }
     pub(crate) mod media {
         pub(crate) mod convert;
@@ -192,6 +198,10 @@ mod plugins {
     pub(crate) mod highlight {
         pub(crate) mod plugin;
     }
+    #[cfg(feature = "katex")]
+    pub(crate) mod katex {
+        pub(crate) mod plugin;
+    }
     pub(crate) mod parse {
         pub(crate) mod plugin;
     }
@@ -221,8 +231,9 @@ mod plugins {
 // models
 pub use models::options::{
     AttributeDefinition, Classes, ColorReplacement, ConfiguredTransformer, Format,
-    Highlight, HighlightTransformer, Indent, InlineCode, Parse, Primitive, Raw, Sanitize,
-    Slug, Stringify, ToMarkdown, TransformerName,
+    Highlight, HighlightTransformer, Indent, InlineCode, Katex, KatexOutput, KatexStrict,
+    KatexStrictMode, Parse, Primitive, Raw, Sanitize, Slug, Stringify, ToMarkdown,
+    TransformerName,
 };
 
 // actions
@@ -236,6 +247,8 @@ pub use actions::hast::sanitize::sanitize_hast;
 pub use actions::hast::slug::slug_hast;
 pub use actions::hast::stringify::stringify_hast;
 pub use actions::hast::toc::extract_toc;
+#[cfg(feature = "katex")]
+pub use actions::hast::typeset::typeset_hast;
 pub use actions::hast::unwrap::unwrap_images;
 pub use actions::html::parse::parse_html;
 

@@ -236,6 +236,69 @@ pub enum Classes {
     Many(Vec<String>),
 }
 
+/// `html.katex`: math rendered as rehype-katex renders it, natively by katex-rs; options
+/// named as KaTeX names them.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", schemars(rename = "KatexOptions"))]
+pub struct Katex {
+    /// The markup to write, both HTML and MathML by default.
+    pub output: Option<KatexOutput>,
+    /// Put equation numbers on the left.
+    pub leqno: bool,
+    /// Align display math to the left instead of centering it.
+    pub fleqn: bool,
+    /// The color of math that fails to render, `#cc0000` by default.
+    pub error_color: Option<String>,
+    /// Macros by name, each to the TeX it expands to, as `{"\\RR": "\\mathbb{R}"}`.
+    pub macros: BTreeMap<String, String>,
+    /// The thinnest a rule, such as a fraction line, is drawn, in ems.
+    pub min_rule_thickness: Option<f64>,
+    /// Let `\color` color the text after it, as LaTeX does.
+    pub color_is_text_color: bool,
+    /// What to do with input LaTeX would reject: `true` or `"error"` fails it, `"warn"`
+    /// prints a warning, `false` or `"ignore"` (the default) accepts it.
+    pub strict: Option<KatexStrict>,
+    /// Allow commands that can run untrusted input, such as `\href` and `\includegraphics`.
+    pub trust: bool,
+    /// The largest a user-given size may be, in ems.
+    pub max_size: Option<f64>,
+    /// How many macro expansions one formula may take, 1000 by default.
+    pub max_expand: Option<usize>,
+    /// Let definitions such as `\def` last past the formula they are in.
+    pub global_group: bool,
+}
+
+/// The markup KaTeX writes.
+#[derive(Clone, Copy, Debug, PartialEq, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "camelCase")]
+pub enum KatexOutput {
+    Html,
+    Mathml,
+    HtmlAndMathml,
+}
+
+/// How strictly KaTeX holds input to LaTeX.
+#[derive(Clone, Debug, PartialEq, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(untagged)]
+pub enum KatexStrict {
+    Boolean(bool),
+    Mode(KatexStrictMode),
+}
+
+/// One level of KaTeX's strictness.
+#[derive(Clone, Copy, Debug, PartialEq, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "camelCase")]
+pub enum KatexStrictMode {
+    Ignore,
+    Warn,
+    Error,
+}
+
 /// `html.slug`: ids on headings, from their text; options named as rehype-slug names
 /// them.
 #[derive(Clone, Debug, Default, Deserialize)]

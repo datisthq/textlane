@@ -109,6 +109,43 @@ export type ConfiguredTransformer = { name: "notationDiff"; classLineAdd?: Class
 /** Class names: a list, or one string of them separated by white space. */
 export type Classes = string | string[]
 
+/** `html.katex`: math rendered as rehype-katex renders it, natively by katex-rs; options named as KaTeX names them. */
+export interface KatexOptions {
+  /** The markup to write, both HTML and MathML by default. */
+  output?: KatexOutput | null
+  /** Put equation numbers on the left. @default false */
+  leqno?: boolean
+  /** Align display math to the left instead of centering it. @default false */
+  fleqn?: boolean
+  /** The color of math that fails to render, `#cc0000` by default. */
+  errorColor?: string | null
+  /** Macros by name, each to the TeX it expands to, as `{"\\RR": "\\mathbb{R}"}`. @default {} */
+  macros?: Record<string, string>
+  /** The thinnest a rule, such as a fraction line, is drawn, in ems. */
+  minRuleThickness?: number | null
+  /** Let `\color` color the text after it, as LaTeX does. @default false */
+  colorIsTextColor?: boolean
+  /** What to do with input LaTeX would reject: `true` or `"error"` fails it, `"warn"` prints a warning, `false` or `"ignore"` (the default) accepts it. */
+  strict?: KatexStrict | null
+  /** Allow commands that can run untrusted input, such as `\href` and `\includegraphics`. @default false */
+  trust?: boolean
+  /** The largest a user-given size may be, in ems. */
+  maxSize?: number | null
+  /** How many macro expansions one formula may take, 1000 by default. */
+  maxExpand?: number | null
+  /** Let definitions such as `\def` last past the formula they are in. @default false */
+  globalGroup?: boolean
+}
+
+/** The markup KaTeX writes. */
+export type KatexOutput = "html" | "mathml" | "htmlAndMathml"
+
+/** How strictly KaTeX holds input to LaTeX. */
+export type KatexStrict = boolean | KatexStrictMode
+
+/** One level of KaTeX's strictness. */
+export type KatexStrictMode = "ignore" | "warn" | "error"
+
 /** `html.toMarkdown`: hast into mdast; options named as hast-util-to-mdast names them. */
 export interface ToMarkdownOptions {
   /** Wrap all phrasing content of the root in paragraphs, as for a whole document. @default false */
@@ -207,6 +244,12 @@ export function extractToc(): Plugin<"html.extractToc"> {
 export function highlight(options?: HighlightOptions): Plugin<"html.highlight", HighlightOptions> {
   if (options === undefined) return { name: "html.highlight" }
   return { name: "html.highlight", options }
+}
+
+/** The `html.katex` plugin. */
+export function katex(options?: KatexOptions): Plugin<"html.katex", KatexOptions> {
+  if (options === undefined) return { name: "html.katex" }
+  return { name: "html.katex", options }
 }
 
 /** The `html.toMarkdown` plugin. */

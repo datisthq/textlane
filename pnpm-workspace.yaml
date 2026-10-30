@@ -35,6 +35,8 @@ catalog:
 overrides:
   vite@*: "catalog:"
   vitest@*: "catalog:"
+  # The KaTeX katex-rs tracks, which conformance renders html.katex's expectations with
+  rehype-katex>katex: 0.18.5
 peerDependencyRules:
   allowAny:
     - vite

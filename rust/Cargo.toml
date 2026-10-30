@@ -29,6 +29,8 @@ stacker = "0.1.21"
 memchr = "2.8.3"
 schemars = "1.2.3"
 giallo = { version = "0.5.2", features = ["dump"] }
+# Exact: html.katex works around this version's attribute order
+katex-rs = "=0.3.0"
 url = "2.5.4"
 unicode-id-start = "1.5.0"
 oxc_allocator = "0.155.0"

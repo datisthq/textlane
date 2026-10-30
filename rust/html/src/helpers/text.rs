@@ -24,8 +24,18 @@ enum Piece<'n> {
 
 /// The text an element renders, as hast-util-to-text's `toText` reads it.
 pub(crate) fn read_text(element: &Element<'_>) -> String {
+    collect_text_as(element, Whitespace::Normal)
+}
+
+/// The text of an element as `toText` reads it with `whitespace: 'pre'`.
+#[cfg(feature = "katex")]
+pub(crate) fn read_preformatted_text(element: &Element<'_>) -> String {
+    collect_text_as(element, Whitespace::Pre)
+}
+
+fn collect_text_as(element: &Element<'_>, inherited: Whitespace) -> String {
     let block = is_block_or_caption(element.tag_name);
-    let whitespace = infer_whitespace(element, Whitespace::Normal);
+    let whitespace = infer_whitespace(element, inherited);
     let mut pieces = vec![];
     collect_children(&element.children, whitespace, block, block, &mut pieces);
     join_pieces(&pieces)

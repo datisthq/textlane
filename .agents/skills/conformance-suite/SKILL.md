@@ -102,6 +102,9 @@ a test's `comment` only where it means something different.
   verbatim expectation is a real difference to look at. When it is upstream's test lagging its own pinned
   serializer, the importer takes the reference's output and keeps upstream's in `comment`
   (`sources/frontmatter.ts`, `checkStringify`).
+- Where a plugin deliberately normalizes what its engine emits (`html.katex` sorting
+  katex-rs's hash-ordered attributes), the importer normalizes the reference the same way
+  and says so in the group's `comment` (`sources/katex.ts`); the rest stays verbatim.
 - `actions/node/scope.ts` resolves an identifier lexically, through each enclosing block from the
   module inward, so one loop's or test's `const value` never leaks into another's case.
 

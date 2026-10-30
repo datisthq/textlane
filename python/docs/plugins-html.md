@@ -330,6 +330,65 @@ Takes `Union[str, List[str]]`.
 
 <!-- /generated -->
 
+## html.katex
+
+Renders math with KaTeX, as rehype-katex does, natively: each `$…$`, `$$…$$` and ` ```math ` that `md.math` and `md.toHtml` leave becomes KaTeX's HTML and MathML. Pages need KaTeX's stylesheet and fonts. A formula that fails to render is reported in the file's messages and shown in `errorColor`.
+
+```python
+from textlane import html, md, textlane
+
+file = (
+    textlane()
+    .use(md.parse())
+    .use(md.math())
+    .use(md.to_html())
+    .use(html.katex())
+    .use(html.stringify())
+    .process("Euler: $e^{i\\pi} = -1$")
+)
+file["value"]
+# <p>Euler: <span class="katex"><span class="katex-mathml"><math …
+```
+
+<!-- generated:options html.katex -->
+
+Follows [rehype-katex](https://www.npmjs.com/package/rehype-katex).
+
+| Option             | Type                    | Default | Description                                                                                                                                        |
+| ------------------ | ----------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `output`           | `Optional[KatexOutput]` |         | The markup to write, both HTML and MathML by default.                                                                                              |
+| `leqno`            | `bool`                  | `False` | Put equation numbers on the left.                                                                                                                  |
+| `fleqn`            | `bool`                  | `False` | Align display math to the left instead of centering it.                                                                                            |
+| `errorColor`       | `Optional[str]`         | `None`  | The color of math that fails to render, `#cc0000` by default.                                                                                      |
+| `macros`           | `Dict[str, str]`        | `{}`    | Macros by name, each to the TeX it expands to, as `{"\\RR": "\\mathbb{R}"}`.                                                                       |
+| `minRuleThickness` | `Optional[float]`       | `None`  | The thinnest a rule, such as a fraction line, is drawn, in ems.                                                                                    |
+| `colorIsTextColor` | `bool`                  | `False` | Let `\color` color the text after it, as LaTeX does.                                                                                               |
+| `strict`           | `Optional[KatexStrict]` |         | What to do with input LaTeX would reject: `true` or `"error"` fails it, `"warn"` prints a warning, `false` or `"ignore"` (the default) accepts it. |
+| `trust`            | `bool`                  | `False` | Allow commands that can run untrusted input, such as `\href` and `\includegraphics`.                                                               |
+| `maxSize`          | `Optional[float]`       | `None`  | The largest a user-given size may be, in ems.                                                                                                      |
+| `maxExpand`        | `Optional[int]`         | `None`  | How many macro expansions one formula may take, 1000 by default.                                                                                   |
+| `globalGroup`      | `bool`                  | `False` | Let definitions such as `\def` last past the formula they are in.                                                                                  |
+
+**`KatexOutput`**
+
+The markup KaTeX writes.
+
+Takes `Literal["html", "mathml", "htmlAndMathml"]`.
+
+**`KatexStrict`**
+
+How strictly KaTeX holds input to LaTeX.
+
+Takes `Union[bool, KatexStrictMode]`.
+
+**`KatexStrictMode`**
+
+One level of KaTeX's strictness.
+
+Takes `Literal["ignore", "warn", "error"]`.
+
+<!-- /generated -->
+
 ## html.toMarkdown
 
 Turns hast into mdast, so HTML can be written out as Markdown.

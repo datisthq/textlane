@@ -160,6 +160,20 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   marks tokens `None` and lines `removed` instead of splicing, so the indexes parsed comments
   hold stay valid; Shiki's line ending after a removed line goes with it. Cases come from the
   pinned packages through `import:highlight` (`highlight-transformers.json`, `highlight-ansi.json`)
+  `html.katex` follows rehype-katex 7.0.1 on katex-rs 0.3.0 (KaTeX 0.18.5): KaTeX's markup
+  goes back through the HTML parser, as `fromHtmlIsomorphic` does. katex-rs keeps attributes
+  in a randomly seeded hash map, so every element's are sorted (`class`, `style`, the rest by
+  name) or output would change per run; the conformance importer sorts rehype-katex's the
+  same way. katex-rs recurses once per group or style switch with no depth check, and a
+  stack overflow aborts the host: `measure_levels` bounds the depth from the source (a group
+  or `[` four levels, every control word one until its group closes, since `\displaystyle`
+  nests without braces; macro bodies × `maxExpand` once any macro exists, `\gdef`s of earlier
+  formulas included) and renders on a stack grown to fit, reporting `rangeerror` past 4096
+  levels as rehype-katex reports KaTeX.js's `RangeError`. The bound fails closed: it skips
+  nothing (KaTeX reads `%` in `\url` literally), no `]` closes, and a closer in a comment or
+  `\verb` closes nothing, since a closer the parser never sees would lower it. Its
+  whole-formula error span is rebuilt as KaTeX.js words it. Rendering bugs of katex-rs are
+  pending one by one
   `html.toMarkdown` ports hast-util-to-mdast 10.1.2 with rehype-minify-whitespace run first
   (`actions/hast/minify.rs`, which works out `collapsableAfter` for every node in one pass).
   Handlers build into `utils/converter/store.rs`, a flat store that keeps per-subtree flags
@@ -372,6 +386,8 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   its 1 MB grammar dump and Oniguruma's C build (`onig_sys`, plus `zstd-sys`), about 2.5 MB of
   addon. The workspace pins `textlane-html` with `default-features = false`, so `html` alone
   builds without a C compiler
+- `katex` (default, and on in `node` and `python`) is `textlane-html/katex`: katex-rs, pinned
+  exactly, pure Rust, about 2.5 MB of binary with its font metrics and symbol tables
 - `node` pulls in napi, and `build.rs` runs napi-build only under it; `python` pulls in PyO3
   with `abi3-py39`. Each binding module is compiled only under its feature.
 - `pnpm -C rust check:lint` runs clippy three times: default features, `--features node`

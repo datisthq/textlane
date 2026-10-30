@@ -17,9 +17,10 @@
     "import:gfm": "node sources/gfm.ts && vp fmt tests",
     "import:gfm-mdast": "node sources/gfm-mdast.ts && vp fmt tests",
     "import:highlight": "node sources/highlight.ts && vp fmt tests",
-    "import:html5lib": "node sources/html5lib.ts && vp fmt tests",
     "import:html-convert": "node sources/html-convert.ts && vp fmt tests",
     "import:html-transforms": "node sources/html-transforms.ts && vp fmt tests",
+    "import:html5lib": "node sources/html5lib.ts && vp fmt tests",
+    "import:katex": "node sources/katex.ts && vp fmt tests",
     "import:math": "node sources/math.ts && vp fmt tests",
     "import:mdx": "node sources/mdx.ts && vp fmt tests",
     "import:micromark": "node sources/micromark.ts && vp fmt tests",
@@ -50,6 +51,7 @@
     "hast-util-to-mdast": "10.1.2",
     "hast-util-to-nlcst": "4.0.0",
     "hastscript": "9.0.1",
+    "katex": "0.18.5",
     "mdast-util-directive": "3.1.1",
     "mdast-util-math": "3.0.0",
     "mdast-util-to-hast": "13.2.1",
@@ -58,6 +60,7 @@
     "parse-english": "7.0.0",
     "parse-latin": "7.0.0",
     "rehype-format": "5.0.1",
+    "rehype-katex": "7.0.1",
     "rehype-parse": "9.0.1",
     "rehype-remark": "10.0.1",
     "rehype-sanitize": "6.0.0",
@@ -92,6 +95,7 @@
     "unified": "11.0.5",
     "unist-builder": "4.0.0",
     "vfile": "6.0.3",
-    "vite-plus": "catalog:"
+    "vite-plus": "catalog:",
+    "yaml": "2.9.1"
   }
 }

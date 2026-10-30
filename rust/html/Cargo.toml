@@ -12,14 +12,16 @@ keywords = ["html", "ast", "textlane"]
 categories = ["text-processing", "parser-implementations"]
 
 [features]
-default = ["highlight"]
+default = ["highlight", "katex"]
 highlight = ["dep:giallo", "dep:regex"]
+katex = ["dep:katex-rs"]
 # The options' JSON Schema, which the bindings' types are generated from
 schema = ["dep:schemars"]
 
 [dependencies]
 textlane-core.workspace = true
 giallo = { workspace = true, optional = true }
+katex-rs = { workspace = true, optional = true }
 regex = { workspace = true, optional = true }
 bumpalo.workspace = true
 serde.workspace = true
