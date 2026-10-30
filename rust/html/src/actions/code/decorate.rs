@@ -16,6 +16,10 @@ pub(crate) struct Decoration {
     classes: Vec<String>,
 }
 
+// Each decoration rescans its line, so a line holding thousands of matches would cost their
+// product: past this many, a line's further matches stay unmarked, where Shiki has no cap
+const MAX_LINE_DECORATIONS: usize = 1_000;
+
 static META_WORD: LazyLock<Option<Regex>> =
     LazyLock::new(|| Regex::new(r"/((?:\\.|[^/])+)/").ok());
 static ESCAPE: LazyLock<Option<Regex>> = LazyLock::new(|| Regex::new(r"\\(.)").ok());
@@ -127,16 +131,23 @@ pub(crate) fn apply_decorations<'a>(
         )));
     }
     decorations.sort_by(|a, b| b.start.cmp(&a.start).then(a.end.cmp(&b.end)));
+    let mut applied = vec![0usize; lines.len()];
+    let mut prefixes: Vec<Option<Vec<usize>>> = vec![None; lines.len()];
     for decoration in decorations.iter() {
         let (start_line, start) = to_position(&starts, total, decoration.start);
         let (end_line, end) = to_position(&starts, total, decoration.end);
         if start_line != end_line {
             return Err(failed("A decoration spans lines, which a meta word cannot"));
         }
+        if applied[start_line] >= MAX_LINE_DECORATIONS {
+            continue;
+        }
+        applied[start_line] += 1;
         let Some(Node::Element(line)) = children.get_mut(lines[start_line]) else {
             continue;
         };
-        apply_section(line, start, end, &decoration.classes, alloc)?;
+        let prefix = prefixes[start_line].get_or_insert_with(|| read_prefix(line));
+        apply_section(line, prefix, start, end, &decoration.classes, alloc)?;
     }
     Ok(())
 }
@@ -219,33 +230,21 @@ fn to_position(starts: &[usize], total: usize, index: usize) -> (usize, usize) {
     (line, index - starts.get(line).copied().unwrap_or(0))
 }
 
-// `applyLineSection` for a decoration inside one line
+// `applyLineSection` for a decoration inside one line: the children whose texts, summed,
+// first reach `start` and `end`, found in the line's running lengths, which a wrap keeps in
+// step so no decoration rescans the line
 fn apply_section<'a>(
     line: &mut Element<'a>,
+    prefix: &mut Vec<usize>,
     start: usize,
     end: usize,
     classes: &[String],
     alloc: &'a Allocator,
 ) -> Result<(), Error> {
-    let mut start_index = (start == 0).then_some(0);
-    let mut end_index = (end == 0).then_some(0);
-    let mut length = 0;
-    for (index, child) in line.children.iter().enumerate() {
-        length += text_length(child);
-        if start_index.is_none() && length == start {
-            start_index = Some(index + 1);
-        }
-        if end_index.is_none() && length == end {
-            end_index = Some(index + 1);
-        }
-        if start_index.is_some() && end_index.is_some() {
-            break;
-        }
-    }
-    let start_index =
-        start_index.ok_or_else(|| failed("Failed to find start index for decoration"))?;
-    let end_index =
-        end_index.ok_or_else(|| failed("Failed to find end index for decoration"))?;
+    let start_index = find_index(prefix, start)
+        .ok_or_else(|| failed("Failed to find start index for decoration"))?;
+    let end_index = find_index(prefix, end)
+        .ok_or_else(|| failed("Failed to find end index for decoration"))?;
     let count = end_index.saturating_sub(start_index);
     if count == line.children.len() {
         add_class(&mut line.properties, classes, alloc);
@@ -255,6 +254,9 @@ fn apply_section<'a>(
         && let Some(Node::Element(token)) = line.children.get_mut(start_index)
     {
         add_class(&mut token.properties, classes, alloc);
+        return Ok(());
+    }
+    if end_index < start_index {
         return Ok(());
     }
     let mut wrapped = ArenaVec::with_capacity_in(count, alloc);
@@ -272,7 +274,35 @@ fn apply_section<'a>(
             content: None,
         }),
     );
+    if end_index > start_index + 1 {
+        prefix.drain(start_index + 1..end_index);
+    } else if end_index == start_index {
+        let at = prefix[start_index];
+        prefix.insert(start_index + 1, at);
+    }
     Ok(())
+}
+
+// Each count of leading children's text, `prefix[i]` the length of the first `i`
+fn read_prefix(line: &Element<'_>) -> Vec<usize> {
+    let mut prefix = Vec::with_capacity(line.children.len() + 1);
+    let mut length = 0;
+    prefix.push(0);
+    for child in line.children.iter() {
+        length += text_length(child);
+        prefix.push(length);
+    }
+    prefix
+}
+
+// The first child count whose text reaches `offset` exactly, 0 only for offset 0, as
+// upstream's walk sets the index after the child that reaches it
+fn find_index(prefix: &[usize], offset: usize) -> Option<usize> {
+    if offset == 0 {
+        return Some(0);
+    }
+    let at = prefix.partition_point(|&length| length < offset);
+    (at < prefix.len() && prefix[at] == offset && at > 0).then_some(at)
 }
 
 // hast-util-to-string's text length, in UTF-16 units as JavaScript counts it

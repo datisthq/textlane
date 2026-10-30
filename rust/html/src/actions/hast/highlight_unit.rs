@@ -214,3 +214,20 @@ fn highlights_meta_words_on_many_lines_in_linear_time() -> Result<(), Error> {
     assert!(started.elapsed().as_secs() < 20);
     Ok(())
 }
+
+#[test]
+fn caps_meta_words_on_one_long_line() -> Result<(), Error> {
+    let options =
+        json!({ "theme": "github-light", "transformers": ["metaWordHighlight"] });
+    // plain text skips the grammar, so this times the decorations alone
+    let code = "a ".repeat(100_000);
+    let input = format!(
+        "<pre><code class=\"language-text\" metastring=\"/a/\">{}</code></pre>",
+        code.trim_end()
+    );
+    let started = std::time::Instant::now();
+    let html = highlight(&input, options)?;
+    assert_eq!(html.matches("highlighted-word").count(), 1_000);
+    assert!(started.elapsed().as_secs() < 20);
+    Ok(())
+}
