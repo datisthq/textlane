@@ -1,3 +1,4 @@
+use std::cell::OnceCell;
 use std::collections::HashMap;
 
 use textlane_core::Allocator;
@@ -25,13 +26,13 @@ pub(crate) fn convert_mdast_with<'a>(
     options: &ToHtml,
     unravel: bool,
 ) -> hast::Node<'a> {
-    let (definitions, footnotes) = find_definitions(node);
     let mut converter = Converter {
         alloc,
         options,
         unravel,
         loose_lists: vec![],
-        definitions,
+        root: node,
+        definitions: OnceCell::new(),
         footnote_order: vec![],
         footnote_counts: HashMap::new(),
     };
@@ -60,6 +61,11 @@ pub(crate) fn convert_mdast_with<'a>(
             })
         }
     };
+    // The footer lists only called footnotes, so a document that calls none skips the walk
+    let footnotes = match converter.footnote_order.is_empty() {
+        true => HashMap::new(),
+        false => find_footnote_definitions(node),
+    };
     if let Some(footer) = create_footer(&mut converter, &footnotes) {
         append_footer(&mut tree, footer);
     }
@@ -69,31 +75,43 @@ pub(crate) fn convert_mdast_with<'a>(
 type Definitions<'a> = HashMap<String, (&'a str, Option<&'a str>)>;
 type FootnoteDefinitions<'n, 'a> = HashMap<String, &'n mdast::FootnoteDefinition<'a>>;
 
-// Every definition and footnote definition in the tree by its identifier in upper case,
-// in one walk without recursing; the first of an identifier wins
-fn find_definitions<'n, 'a>(
-    node: &'n mdast::Node<'a>,
-) -> (Definitions<'a>, FootnoteDefinitions<'n, 'a>) {
+// Every definition in the tree by its identifier in upper case, in one walk without
+// recursing; the first of an identifier wins
+pub(crate) fn find_definitions<'a>(node: &mdast::Node<'a>) -> Definitions<'a> {
     let mut definitions = HashMap::new();
+    walk_tree(node, |node| {
+        if let mdast::Node::Definition(definition) = node {
+            definitions
+                .entry(definition.identifier.to_uppercase())
+                .or_insert((definition.url, definition.title));
+        }
+    });
+    definitions
+}
+
+fn find_footnote_definitions<'n, 'a>(
+    node: &'n mdast::Node<'a>,
+) -> FootnoteDefinitions<'n, 'a> {
     let mut footnotes = HashMap::new();
+    walk_tree(node, |node| {
+        if let mdast::Node::FootnoteDefinition(definition) = node {
+            footnotes
+                .entry(definition.identifier.to_uppercase())
+                .or_insert(definition);
+        }
+    });
+    footnotes
+}
+
+fn walk_tree<'n, 'a>(
+    node: &'n mdast::Node<'a>,
+    mut visit: impl FnMut(&'n mdast::Node<'a>),
+) {
     let mut stack = vec![node];
     while let Some(node) = stack.pop() {
-        match node {
-            mdast::Node::Definition(definition) => {
-                definitions
-                    .entry(definition.identifier.to_uppercase())
-                    .or_insert((definition.url, definition.title));
-            }
-            mdast::Node::FootnoteDefinition(definition) => {
-                footnotes
-                    .entry(definition.identifier.to_uppercase())
-                    .or_insert(definition);
-            }
-            _ => {}
-        }
+        visit(node);
         if let Some(children) = node.children() {
             stack.extend(children.iter().rev());
         }
     }
-    (definitions, footnotes)
 }

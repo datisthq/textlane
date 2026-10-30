@@ -1,6 +1,6 @@
 use textlane_core::{
-    Allocator, Attach, Compiler, Error, File, Parser, Plugin, Step, Transform, Tree,
-    TreeKind,
+    Allocator, Attach, Compiler, Error, File, HtmlWriter, Parser, Plugin, Step,
+    Transform, Tree, TreeKind,
 };
 
 use crate::actions::allocator::reuse::with_allocator;
@@ -18,12 +18,25 @@ pub struct FrozenProcessor {
     parser: Option<Box<dyn Parser>>,
     transforms: Vec<Box<dyn Transform>>,
     compiler: Option<Box<dyn Compiler>>,
+    // The last stage and the compiler in one pass: that stage's index and its writer
+    writer: Option<(usize, Box<dyn HtmlWriter>)>,
 }
 
 /// Where running the transforms stopped: at the end, or before stages a binding runs.
 pub(crate) enum Advance<'a> {
     Done(Tree<'a>),
     /// The consecutive host stages' ids, and the index of the stage after them.
+    Host {
+        hosts: Vec<u32>,
+        next: usize,
+        tree: Tree<'a>,
+    },
+}
+
+/// Where running the transforms and compiling stopped: at the text, or before stages a
+/// binding runs.
+pub(crate) enum Finish<'a> {
+    Text(String),
     Host {
         hosts: Vec<u32>,
         next: usize,
@@ -87,10 +100,12 @@ impl Processor {
         if let Some(compiler) = &compiler {
             check_kind(kind, compiler.input())?;
         }
+        let writer = find_writer(&transforms, compiler.as_deref());
         Ok(FrozenProcessor {
             parser,
             transforms,
             compiler,
+            writer,
         })
     }
 }
@@ -105,8 +120,12 @@ impl FrozenProcessor {
     pub fn process_file(&self, input: &str, mut file: File) -> Result<Output, Error> {
         let value = with_allocator(|alloc| {
             let tree = self.parse(input, &mut file, alloc)?;
-            let tree = self.run(tree, &mut file, alloc)?;
-            self.stringify(&tree, &mut file)
+            match self.finish(tree, &mut file, alloc, 0, Api::Async)? {
+                Finish::Text(value) => Ok(value),
+                Finish::Host { hosts, .. } => {
+                    Err(missing_host(hosts.first().copied().unwrap_or_default()))
+                }
+            }
         })?;
         Ok(Output {
             value,
@@ -156,14 +175,58 @@ impl FrozenProcessor {
     /// Run the transforms from the one at `from` until the end or the next host stage.
     pub(crate) fn advance<'a>(
         &self,
-        mut tree: Tree<'a>,
+        tree: Tree<'a>,
         file: &mut File,
         alloc: &'a Allocator,
         from: usize,
         api: Api,
     ) -> Result<Advance<'a>, Error> {
+        self.advance_until(tree, file, alloc, from, self.transforms.len(), api)
+    }
+
+    /// Run the transforms from the one at `from` and compile, writing HTML straight from
+    /// the tree before the last stage when that stage and the compiler allow it.
+    pub(crate) fn finish<'a>(
+        &self,
+        tree: Tree<'a>,
+        file: &mut File,
+        alloc: &'a Allocator,
+        from: usize,
+        api: Api,
+    ) -> Result<Finish<'a>, Error> {
+        let (tree, from) = match &self.writer {
+            Some((stage, writer)) if from <= *stage => {
+                match self.advance_until(tree, file, alloc, from, *stage, api)? {
+                    Advance::Done(tree) => match writer.write(&tree) {
+                        Some(text) => return Ok(Finish::Text(text)),
+                        None => (tree, *stage),
+                    },
+                    Advance::Host { hosts, next, tree } => {
+                        return Ok(Finish::Host { hosts, next, tree });
+                    }
+                }
+            }
+            _ => (tree, from),
+        };
+        match self.advance(tree, file, alloc, from, api)? {
+            Advance::Done(tree) => self.stringify(&tree, file).map(Finish::Text),
+            Advance::Host { hosts, next, tree } => Ok(Finish::Host { hosts, next, tree }),
+        }
+    }
+
+    fn advance_until<'a>(
+        &self,
+        mut tree: Tree<'a>,
+        file: &mut File,
+        alloc: &'a Allocator,
+        from: usize,
+        until: usize,
+        api: Api,
+    ) -> Result<Advance<'a>, Error> {
         let mut index = from;
-        while let Some(transform) = self.transforms.get(index) {
+        while index < until
+            && let Some(transform) = self.transforms.get(index)
+        {
             if transform.host().is_some() {
                 let hosts: Vec<u32> = self.transforms[index..]
                     .iter()
@@ -265,6 +328,21 @@ fn seed_slots(context: &mut Attach) {
     }
     #[cfg(not(any(feature = "nl", feature = "mdx")))]
     let _ = context;
+}
+
+// A writer from the last stage for what the compiler writes, unless a binding runs that
+// stage: its tree must reach the binding
+fn find_writer(
+    transforms: &[Box<dyn Transform>],
+    compiler: Option<&dyn Compiler>,
+) -> Option<(usize, Box<dyn HtmlWriter>)> {
+    let target = compiler?.html_target()?;
+    let last = transforms.last()?;
+    if last.host().is_some() {
+        return None;
+    }
+    let writer = last.html_writer(target)?;
+    Some((transforms.len() - 1, writer))
 }
 
 fn check_kind(actual: Option<TreeKind>, expected: TreeKind) -> Result<(), Error> {

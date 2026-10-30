@@ -12,6 +12,10 @@ mod utils {
         pub(crate) mod state;
         pub(crate) mod unknown;
     }
+    pub(crate) mod writer {
+        pub(crate) mod escape;
+        pub(crate) mod state;
+    }
     pub(crate) mod serializer {
         pub(crate) mod construct;
         pub(crate) mod format;
@@ -140,6 +144,7 @@ mod actions {
     pub(crate) mod mdast {
         pub(crate) mod bridge;
         pub(crate) mod convert;
+        pub(crate) mod write;
     }
     pub(crate) mod mdx_expression {
         pub(crate) mod convert;
@@ -194,6 +199,7 @@ mod helpers {
     pub(crate) mod entities;
     pub(crate) mod html;
     pub(crate) mod identifier;
+    pub(crate) mod lines;
     pub(crate) mod literal;
     pub(crate) mod math;
     pub(crate) mod position;
@@ -385,6 +391,7 @@ pub use actions::markdown::parse::parse_markdown;
 pub use actions::markdown::stringify::stringify_markdown;
 pub use actions::mdast::bridge::bridge_mdast;
 pub use actions::mdast::convert::convert_mdast;
+pub use actions::mdast::write::write_html;
 
 // plugins
 pub use plugins::definition_list::plugin::DefinitionList;

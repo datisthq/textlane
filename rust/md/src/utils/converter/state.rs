@@ -1,3 +1,4 @@
+use std::cell::OnceCell;
 use std::collections::HashMap;
 
 use textlane_core::hast::{self, Element, Property, PropertyValue};
@@ -22,6 +23,7 @@ use crate::actions::link::convert::convert_link;
 use crate::actions::link_reference::convert::convert_link_reference;
 use crate::actions::list::convert::convert_list;
 use crate::actions::list_item::convert::{convert_list_item, is_list_loose};
+use crate::actions::mdast::convert::find_definitions;
 use crate::actions::mdx_expression::convert::convert_mdx_expression;
 use crate::actions::mdx_jsx_element::convert::convert_mdx_jsx_element;
 use crate::actions::paragraph::convert::convert_paragraph;
@@ -43,9 +45,11 @@ pub(crate) struct Converter<'a, 'o> {
     pub(crate) unravel: bool,
     /// Whether each list being converted is loose, worked out once per list for its items.
     pub(crate) loose_lists: Vec<bool>,
+    /// The tree being converted, whose definitions references look up.
+    pub(crate) root: &'o mdast::Node<'a>,
     /// The URL and title of each definition, by its identifier in upper case; the first
-    /// definition of an identifier wins.
-    pub(crate) definitions: HashMap<String, (&'a str, Option<&'a str>)>,
+    /// definition of an identifier wins. Collected at the first reference.
+    pub(crate) definitions: OnceCell<HashMap<String, (&'a str, Option<&'a str>)>>,
     /// The identifiers of called footnotes in upper case, in the order of their first call.
     pub(crate) footnote_order: Vec<String>,
     /// For each called footnote, where it is in `footnote_order` and how often it is called.
@@ -274,7 +278,10 @@ impl<'a> Converter<'a, '_> {
         &self,
         identifier: &str,
     ) -> Option<(&'a str, Option<&'a str>)> {
-        self.definitions.get(&identifier.to_uppercase()).copied()
+        self.definitions
+            .get_or_init(|| find_definitions(self.root))
+            .get(&identifier.to_uppercase())
+            .copied()
     }
 
     /// What footnote `id`s start with.

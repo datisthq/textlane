@@ -111,7 +111,7 @@ pub(crate) fn is_list_loose(list: &mdast::List<'_>) -> bool {
         })
 }
 
-fn is_item_loose(item: &ListItem<'_>) -> bool {
+pub(crate) fn is_item_loose(item: &ListItem<'_>) -> bool {
     item.spread.unwrap_or(item.children.len() > 1)
 }
 

@@ -1,9 +1,13 @@
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use textlane_core::{Allocator, Attach, Error, File, Plugin, Transform, Tree, TreeKind};
+use textlane_core::{
+    Allocator, Attach, Error, File, HtmlTarget, HtmlWriter, Plugin, Transform, Tree,
+    TreeKind,
+};
 
 use crate::actions::mdast::convert::{convert_mdast, convert_mdast_with};
+use crate::actions::mdast::write::write_html;
 use crate::models::options::{ToHtml, UnravelSlot};
 
 impl Plugin for ToHtml {
@@ -74,6 +78,30 @@ impl Transform for Converting {
                 unravel,
             ))),
             _ => Err(Error::new("invalid-stage", "`md.toHtml` takes mdast")),
+        }
+    }
+
+    fn html_writer(&self, target: HtmlTarget) -> Option<Box<dyn HtmlWriter>> {
+        Some(Box::new(Writing {
+            options: self.options.clone(),
+            target,
+        }))
+    }
+}
+
+// What `html_writer` hands out: this stage and an HTML compiler after it, in one pass
+struct Writing {
+    options: ToHtml,
+    target: HtmlTarget,
+}
+
+impl HtmlWriter for Writing {
+    fn write(&self, tree: &Tree<'_>) -> Option<String> {
+        match tree {
+            Tree::Mdast(node) => {
+                write_html(node, &self.options, self.target.allow_dangerous_html)
+            }
+            _ => None,
         }
     }
 }

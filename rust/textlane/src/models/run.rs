@@ -5,7 +5,7 @@ use textlane_core::{Allocator, Error, File, Lines, Tree, TreeKind};
 
 use crate::actions::allocator::reuse::with_allocator;
 use crate::models::pipeline::{Api, read_tree, write_tree};
-use crate::models::processor::{Advance, FrozenProcessor};
+use crate::models::processor::{Advance, Finish, FrozenProcessor};
 
 /// How far a run of a pipeline got: to its end, or to stages a binding must run.
 pub enum Progress {
@@ -111,30 +111,46 @@ impl Run<'_> {
         alloc: &'a Allocator,
         from: usize,
     ) -> Result<Step, Error> {
+        if self.compile {
+            let finished = self
+                .processor
+                .finish(tree, file, alloc, from, self.api)
+                .map_err(|error| self.rename_async(error))?;
+            return match finished {
+                Finish::Text(text) => Ok(Step::Finished(Outcome::Text(text))),
+                Finish::Host { hosts, next, tree } => {
+                    self.pause(hosts, next, &tree, file)
+                }
+            };
+        }
         let advanced = self
             .processor
             .advance(tree, file, alloc, from, self.api)
             .map_err(|error| self.rename_async(error))?;
         match advanced {
-            Advance::Done(tree) if self.compile => self
-                .processor
-                .stringify(&tree, file)
-                .map(|text| Step::Finished(Outcome::Text(text))),
             Advance::Done(tree) => {
                 let lines = file.value.as_deref().map(Lines::new);
                 write_tree(&tree, lines.as_ref())
                     .map(|tree| Step::Finished(Outcome::Tree(tree)))
             }
-            Advance::Host { hosts, next, tree } => {
-                let lines = file.value.as_deref().map(Lines::new);
-                Ok(Step::Paused {
-                    hosts,
-                    kind: tree.kind(),
-                    tree: write_tree(&tree, lines.as_ref())?,
-                    next,
-                })
-            }
+            Advance::Host { hosts, next, tree } => self.pause(hosts, next, &tree, file),
         }
+    }
+
+    fn pause(
+        &self,
+        hosts: Vec<u32>,
+        next: usize,
+        tree: &Tree<'_>,
+        file: &File,
+    ) -> Result<Step, Error> {
+        let lines = file.value.as_deref().map(Lines::new);
+        Ok(Step::Paused {
+            hosts,
+            kind: tree.kind(),
+            tree: write_tree(tree, lines.as_ref())?,
+            next,
+        })
     }
 
     /// The progress a step makes, given the file back.

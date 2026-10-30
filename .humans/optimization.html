@@ -143,15 +143,20 @@
     </p>
   </dd>
   <dt>
-    <htmlpress-badge type="warning">idea</htmlpress-badge> Skip the hast tree when no
+    <htmlpress-badge type="success">done</htmlpress-badge> Skip the hast tree when no
     plugin needs it
   </dt>
   <dd>
     <p>
-      When <code>md.toHtml</code> is followed directly by <code>html.stringify</code>,
-      write HTML from mdast as hast-util-to-html would write the hast, without
-      materializing it. Saves most of the 7 ms; the output is still compared byte for
-      byte, and a pipeline with anything in between takes today's path.
+      When <code>md.toHtml</code> ends the transforms and
+      <code>html.stringify</code> compiles with default options (<code
+        >allowDangerousHtml</code
+      >
+      aside), <code>process</code> writes HTML from mdast as hast-util-to-html would write
+      the hast, without materializing it: 19–30% off the Markdown-to-HTML pipeline.
+      Footnotes, MDX, directives, any node with <code>data</code> and anything else it
+      does not know take the hast path, and a test compares both byte for byte over every
+      Markdown input of the conformance suite.
     </p>
   </dd>
   <dt>
@@ -161,7 +166,10 @@
   <dd>
     <p>
       Fewer allocations per node and buffered string writes; small, bounded wins of a few
-      milliseconds per MB.
+      milliseconds per MB. Collecting definitions only at the first reference, and
+      footnote definitions only once one is called, took 10–19% off
+      <code>md.toHtml</code>; an allocation-free attribute lookup and a matched void list
+      changed nothing measurable in <code>html.stringify</code>.
     </p>
   </dd>
   <dt>

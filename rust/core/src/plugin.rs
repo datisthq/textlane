@@ -57,6 +57,24 @@ pub trait Transform: Send + Sync {
     fn host(&self) -> Option<u32> {
         None
     }
+
+    /// Something that writes, from this stage's input, the HTML a compiler aiming at
+    /// `target` would write from its output, when the stage can skip building that tree.
+    fn html_writer(&self, _target: HtmlTarget) -> Option<Box<dyn HtmlWriter>> {
+        None
+    }
+}
+
+/// What an HTML compiler writes that a stage writing HTML itself must match.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct HtmlTarget {
+    /// Whether raw HTML is written as it is.
+    pub allow_dangerous_html: bool,
+}
+
+/// Writes HTML straight from a tree, or `None` to have the stages run as declared.
+pub trait HtmlWriter: Send + Sync {
+    fn write(&self, tree: &Tree<'_>) -> Option<String>;
 }
 
 /// Deferred work a stage hands back, finished only by the asynchronous API.
@@ -73,6 +91,11 @@ pub trait Compiler: Send + Sync {
     fn input(&self) -> TreeKind;
     fn extension(&self) -> &'static str;
     fn compile(&self, tree: &Tree<'_>, file: &mut File) -> Result<String, Error>;
+
+    /// What a stage before this compiler must match to write its HTML in its place.
+    fn html_target(&self) -> Option<HtmlTarget> {
+        None
+    }
 }
 
 /// A natural-language parser, as parse-latin's instance is to mdast-util-to-nlcst and

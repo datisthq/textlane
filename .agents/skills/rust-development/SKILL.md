@@ -90,6 +90,15 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   the pprof harness must not blocklist `libc`, or malloc, free and memcpy vanish from it.
   Measure a change A/B against the previous build, interleaved, best of many runs: a
   loaded machine drifts by more than most wins
+- `process` skips hast when the last stage is `md.toHtml` and the compiler `html.stringify`
+  with no option but `allowDangerousHtml` set: core's `Transform::html_writer` and
+  `Compiler::html_target` let `FrozenProcessor::finish` hand the mdast to `md`'s
+  `utils/writer`, which writes those two stages' bytes directly (19–30% off `process`) and
+  gives up, to the hast path, on any node it does not know, any `data`, an undefined
+  reference or footnotes. A change to a `convert` handler changes what the writer must
+  write: `textlane/tests/html_writer.rs` compares both over every Markdown input of the
+  conformance suite and fails on any byte. A stage timing must reuse one reset arena, as
+  `process` does: a fresh one per run measures page faults, which tripled `md.toHtml`
 - Container ends follow micromark, not markdown-rs: a list item ends at the first line
   ending of its trailing blank lines (`prepareList`), stepping over the exits of lists
   inside but not of block quotes; a list does the same without stepping over block quote

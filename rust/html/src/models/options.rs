@@ -3,7 +3,7 @@ use std::collections::{BTreeMap, HashMap};
 use serde::Deserialize;
 
 /// `html.stringify`: hast into HTML; options named as hast-util-to-html names them.
-#[derive(Clone, Debug, Default, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, PartialEq)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
 #[cfg_attr(feature = "schema", schemars(rename = "StringifyOptions"))]

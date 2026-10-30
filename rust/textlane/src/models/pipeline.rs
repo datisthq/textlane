@@ -6,7 +6,8 @@ use textlane_core::{Allocator, Error, File, Lines, Tree, TreeKind};
 use crate::actions::allocator::reuse::with_allocator;
 use crate::actions::plugin::find::find_plugin;
 use crate::models::host::Host;
-use crate::models::processor::{FrozenProcessor, Processor};
+use crate::models::host::missing_host;
+use crate::models::processor::{Finish, FrozenProcessor, Processor};
 use crate::models::run::{Progress, Run};
 
 /// Whether a call may finish asynchronous stages, as unified's `process` and `run` do, or
@@ -215,8 +216,15 @@ impl Pipeline {
         check_compiler(processor, call)?;
         with_allocator(|alloc| {
             let tree = processor.parse(input, file, alloc)?;
-            let tree = run_tree(processor, tree, file, alloc, api, "process")?;
-            processor.stringify(&tree, file)
+            match processor
+                .finish(tree, file, alloc, 0, api)
+                .map_err(|error| rename_async(error, api, "process"))?
+            {
+                Finish::Text(text) => Ok(text),
+                Finish::Host { hosts, .. } => {
+                    Err(missing_host(hosts.first().copied().unwrap_or_default()))
+                }
+            }
         })
     }
 
@@ -365,14 +373,18 @@ fn run_tree<'a>(
 ) -> Result<Tree<'a>, Error> {
     match api {
         Api::Async => processor.run(tree, file, alloc),
-        Api::Sync => processor.run_sync(tree, file, alloc).map_err(|error| {
-            if error.code != "async-in-sync" {
-                return error;
-            }
-            let message = format!("`{call}Sync` finished async. Use `{call}` instead");
-            Error::new(error.code, message)
-        }),
+        Api::Sync => processor
+            .run_sync(tree, file, alloc)
+            .map_err(|error| rename_async(error, api, call)),
     }
+}
+
+fn rename_async(error: Error, api: Api, call: &str) -> Error {
+    if api != Api::Sync || error.code != "async-in-sync" {
+        return error;
+    }
+    let message = format!("`{call}Sync` finished async. Use `{call}` instead");
+    Error::new(error.code, message)
 }
 
 fn check_parser(processor: &FrozenProcessor, call: &str) -> Result<(), Error> {
