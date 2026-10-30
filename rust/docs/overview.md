@@ -33,15 +33,3 @@ the Node.js and Python packages drive `textlane::Pipeline`, which takes plugins 
 JSON options and follows unified's `use`, `data` and `freeze`. A binding adds its own
 functions as `{host: id}` descriptors: `start_process` and `start_run` pause before them with
 the tree as JSON, and `Pause::resume` goes on with the tree they returned.
-
-## Memory
-
-Each thread keeps the working memory a document's trees were built in, emptied, for the next
-document, up to 256 MB; a document that needs more has its memory freed once it finishes.
-Documents of several megabytes need more than that, so raise the cap for them, or lower it
-when idle memory matters more than speed. It applies to every processor in the process, and
-`textlane::read_retained_memory()` reads it back.
-
-```rust
-textlane::set_retained_memory(512 << 20);
-```

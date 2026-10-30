@@ -3,7 +3,7 @@ title: Agent Skills
 description: Teach your coding agent to install textlane and call it from Python.
 path: /python/agent-skills/
 icon: sparkles
-order: 3
+order: 13
 ---
 
 # Agent Skills

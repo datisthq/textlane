@@ -321,9 +321,9 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   (`typescript/actions/run/finish.ts`) and `python/textlane/_host.py` drive the loop. The plain
   `run`/`process` fail with `missing-host` on a host stage
 - `actions/plugin/find.rs` holds `PLUGINS`, the one table of public plugins: name, builder
-  and, under the `schema` feature, its options' `JsonSchema`. `list_plugins` and
-  `describe_plugins` (what `examples/schema.rs` prints for `pnpm generate:bindings`) read it,
-  so a plugin missing from the table exists for no binding
+  and, under the `schema` feature, its options' `JsonSchema` and its unified upstream.
+  `list_plugins` and `describe_plugins` (what `examples/schema.rs` prints for
+  `pnpm generate:bindings`) read it, so a plugin missing from the table exists for no binding
 - Unit tests sit beside their module as `<module>_unit.rs`, wired in with
   `#[cfg(test)] #[path = "<module>_unit.rs"] mod unit;`; one that can fail returns a `Result`
   and uses `?` instead of `unwrap`, which clippy denies

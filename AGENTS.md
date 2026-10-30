@@ -73,7 +73,7 @@ Shipped skills live in `.skills/` and teach coding agents to **use** textlane; t
 - `pnpm update:deps` — bump npm dependencies past a 7-day cooldown
 - `pnpm -C benchmark setup:tools` / `pnpm -C benchmark measure` / `pnpm -C benchmark show:report` — the Markdown-to-HTML benchmark against other libraries (**`benchmark-development`**)
 - `pnpm -C typescript pack:platforms --addons <dir>` / `pnpm -C typescript release` / `pnpm -C python release` / `pnpm -C rust release` — lay out and publish npm / PyPI / crates.io; run by the release workflow only
-- `pnpm generate:bindings` — rewrite `typescript/generated/<domain>.ts` and `python/textlane/<domain>.py` (one function per plugin, option types from the crate's `schema` feature); `.scripts/-test/bindings.unit.ts` fails when they drift (**`package-distribution`**)
+- `pnpm generate:bindings` — rewrite `typescript/generated/<domain>.ts` and `python/textlane/<domain>.py` (one function per plugin, option types from the crate's `schema` feature) and each plugin's options section in `<language>/docs/plugins-<domain>.md`; `.scripts/-test/bindings.unit.ts` fails when they drift (**`package-distribution`**)
 - `pnpm squash <branch> -m "<subject>"` — land a worktree branch on local `main` as one commit (**`worktree-workflow`**)
 
 ## Code structure

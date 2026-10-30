@@ -20,8 +20,14 @@ One workspace, three registries, one version. Nothing here may change what the c
   `pnpm generate:bindings` from `cargo run --example schema --features schema`: the plugin
   table in `rust/textlane/src/actions/plugin/find.rs` and each options struct's
   `schemars::JsonSchema`, derived only under each crate's `schema` feature, so no release build
-  pays for schemars. A plugin added to the table or an option changed in Rust is one
-  `pnpm generate:bindings` away; `.scripts/-test/bindings.unit.ts` fails until it runs.
+  pays for schemars. The same run renders each plugin's options section, between
+  `<!-- generated:options <plugin> -->` and `<!-- /generated -->`, into the docs pages
+  `<language>/docs/plugins-<domain>.md` (`.scripts/render-options.ts`). A plugin added to the
+  table or an option changed in Rust is one `pnpm generate:bindings` away;
+  `.scripts/-test/bindings.unit.ts` fails until it runs, and the script fails outright while
+  a plugin has no section on its page in each language — write its prose and marker first.
+  Each `plugin!` entry names its unified upstream (`"remark-gfm"`). Every language's tables
+  show the JSON keys; the Rust pages list them as `Pipeline` takes them.
   A custom `Deserialize` needs a hand-written `JsonSchema` beside it (`md::Frontmatter`,
   smartypants' modes), and a `deserialize_with` field a `schemars(with = …)`.
   A plugin struct is its own options (`md::Gfm`), so schemars would name the binding type

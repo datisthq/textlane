@@ -65,17 +65,3 @@ await textlane().use(md.parse()).use(strong).use(md.toHtml()).use(html.stringify
 Each pause serializes the tree, so a plugin costs one round trip per batch, not per node. A
 JavaScript plugin only transforms: syntax extensions such as remark-gfm need the native
 plugin.
-
-## Memory
-
-Each thread keeps the working memory a document's trees were built in, emptied, for the next
-document, up to 256 MB; a document that needs more has its memory freed once it finishes.
-Documents of several megabytes need more than that, so raise the cap for them, or lower it
-when idle memory matters more than speed. It applies to every processor in the process, and
-`retainedMemory()` reads it back.
-
-```js
-import { setRetainedMemory } from "textlane"
-
-setRetainedMemory(512 * 1024 ** 2)
-```

@@ -23,7 +23,7 @@ pub fn describe_plugins() -> Value {
             .entry(domain)
             .or_insert_with(|| json!({ "plugins": [] }));
         if let Some(Value::Array(list)) = plugins.get_mut("plugins") {
-            list.push(json!({ "name": entry.name, "options": options }));
+            list.push(json!({ "name": entry.name, "upstream": entry.upstream, "options": options }));
         }
     }
     for (domain, mut generator) in generators {
@@ -36,3 +36,7 @@ pub fn describe_plugins() -> Value {
     }
     Value::Object(domains)
 }
+
+#[cfg(test)]
+#[path = "describe_unit.rs"]
+mod unit;

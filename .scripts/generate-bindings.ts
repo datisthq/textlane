@@ -2,28 +2,26 @@ import { execFileSync } from "node:child_process"
 import { readFileSync, writeFileSync } from "node:fs"
 import { join, relative, resolve } from "node:path"
 import { parseArgs } from "node:util"
+import {
+  listRefs,
+  readRef,
+  renderOptions,
+  replaceSections,
+  toSnakeCase,
+  writePythonComment,
+  writePythonType,
+  writeType,
+  writeTypedDict,
+} from "./render-options.ts"
+import type { DescribedPlugin, Language, Schema } from "./render-options.ts"
 
 // Writes each domain's module for both bindings from the crate's plugin list and option
 // schemas (`cargo run --example schema`): the TypeScript one under typescript/generated/, the
-// Python one under python/textlane/. `--check` writes nothing and fails on drift.
-
-interface Schema {
-  type?: string | string[]
-  description?: string
-  default?: unknown
-  $ref?: string
-  anyOf?: Schema[]
-  oneOf?: Schema[]
-  enum?: unknown[]
-  const?: unknown
-  items?: Schema
-  properties?: Record<string, Schema>
-  required?: string[]
-  additionalProperties?: Schema | boolean
-}
+// Python one under python/textlane/, and each plugin's options into the docs pages
+// `<language>/docs/plugins-<domain>.md`. `--check` writes nothing and fails on drift.
 
 interface Domain {
-  plugins: { name: string; options: Schema | null }[]
+  plugins: DescribedPlugin[]
   $defs: Record<string, Schema>
 }
 
@@ -47,6 +45,43 @@ for (const [name, domain] of Object.entries(domains)) {
     writeTypescript(name, domain),
   )
   files.set(join(ROOT, "python", "textlane", `${name}.py`), writePython(name, domain))
+}
+
+const LANGUAGES: Record<Language, string> = {
+  typescript: "typescript/docs",
+  python: "python/docs",
+  rust: "rust/docs",
+}
+const unwritten: string[] = []
+for (const [language, directory] of Object.entries(LANGUAGES) as [Language, string][]) {
+  for (const [name, domain] of Object.entries(domains)) {
+    const path = join(ROOT, directory, `plugins-${name}.md`)
+    let text = ""
+    try {
+      text = readFileSync(path, "utf8")
+    } catch {}
+    const plugins = new Map(domain.plugins.map(plugin => [plugin.name, plugin]))
+    const result = replaceSections({
+      text,
+      names: [...plugins.keys()],
+      render: plugin => {
+        const described = plugins.get(plugin)
+        if (!described) return ""
+        return renderOptions({ language, plugin: described, definitions: domain.$defs })
+      },
+    })
+    for (const plugin of result.missing)
+      unwritten.push(`${directory}: no ${plugin} section`)
+    for (const plugin of result.unknown)
+      unwritten.push(`${directory}: no ${plugin} plugin`)
+    if (text) files.set(path, result.text)
+  }
+}
+if (unwritten.length > 0) {
+  console.error(
+    `docs sections out of step with the plugins:\n  ${unwritten.join("\n  ")}`,
+  )
+  process.exit(1)
 }
 
 const drifted: string[] = []
@@ -106,45 +141,6 @@ function writeTypescript(domain: string, described: Domain) {
     )
   }
   return `${lines.join("\n").trimEnd()}\n`
-}
-
-function writeType(schema: Schema | boolean): string {
-  if (typeof schema === "boolean") return "unknown"
-  if (schema.$ref) return readRef(schema)
-  const union = schema.anyOf ?? schema.oneOf
-  if (union) return joinUnion(union.map(writeType))
-  if (schema.enum) return joinUnion(schema.enum.map(value => JSON.stringify(value)))
-  if (schema.const !== undefined) return JSON.stringify(schema.const)
-  if (Array.isArray(schema.type)) {
-    return joinUnion(schema.type.map(type => writeType({ ...schema, type })))
-  }
-  switch (schema.type) {
-    case "string":
-      return "string"
-    case "boolean":
-      return "boolean"
-    case "number":
-    case "integer":
-      return "number"
-    case "null":
-      return "null"
-    case "array": {
-      const item = schema.items ? writeType(schema.items) : "unknown"
-      return item.includes(" ") ? `(${item})[]` : `${item}[]`
-    }
-    case "object": {
-      if (schema.properties) {
-        const fields = Object.entries(schema.properties).map(([key, property]) => {
-          const optional = schema.required?.includes(key) ? "" : "?"
-          return `${key}${optional}: ${writeType(property)}`
-        })
-        return `{ ${fields.join("; ")} }`
-      }
-      const value = schema.additionalProperties
-      return `Record<string, ${value === undefined ? "unknown" : writeType(value)}>`
-    }
-  }
-  return "unknown"
 }
 
 function writeDoc(description: string | undefined, indent: string, value?: unknown) {
@@ -225,119 +221,4 @@ function writePython(domain: string, described: Domain) {
     .join("\n")
     .replace(/\n{3,}/g, "\n\n\n")
     .trimEnd()}\n`
-}
-
-// A TypedDict is total=False, with required keys in a base of their own: Python 3.9 has
-// no `Required`
-function writeTypedDict(name: string, schema: Schema, definitions: string[]): string[] {
-  const properties = Object.entries(schema.properties ?? {})
-  const required = properties.filter(([key]) => schema.required?.includes(key))
-  const optional = properties.filter(([key]) => !schema.required?.includes(key))
-  const field = ([key, property]: [string, Schema]) => [
-    ...writePythonComment(property.description, "    "),
-    `    ${key}: ${writePythonType(property, name + toPascalCase(key), definitions)}`,
-  ]
-  const lines: string[] = []
-  let base = "TypedDict"
-  if (required.length > 0) {
-    base = `_${name}Required`
-    lines.push(`class ${base}(TypedDict):`, ...required.flatMap(field), "")
-  }
-  lines.push(...writePythonComment(schema.description, ""))
-  lines.push(`class ${name}(${base}, total=False):`)
-  lines.push(...(optional.length > 0 ? optional.flatMap(field) : ["    pass"]), "")
-  return lines
-}
-
-function writePythonType(
-  schema: Schema | boolean,
-  name: string,
-  definitions: string[],
-): string {
-  if (typeof schema === "boolean") return "Any"
-  if (schema.$ref) return readRef(schema)
-  const union = schema.anyOf ?? schema.oneOf
-  if (union) {
-    return joinPythonUnion(
-      union.map((item, index) => writePythonType(item, `${name}${index}`, definitions)),
-    )
-  }
-  if (schema.enum)
-    return `Literal[${schema.enum.map(value => JSON.stringify(value)).join(", ")}]`
-  if (schema.const !== undefined) return `Literal[${JSON.stringify(schema.const)}]`
-  if (Array.isArray(schema.type)) {
-    return joinPythonUnion(
-      schema.type.map(type => writePythonType({ ...schema, type }, name, definitions)),
-    )
-  }
-  switch (schema.type) {
-    case "string":
-      return "str"
-    case "boolean":
-      return "bool"
-    case "integer":
-      return "int"
-    case "number":
-      return "float"
-    case "null":
-      return "None"
-    case "array":
-      return `List[${schema.items ? writePythonType(schema.items, name, definitions) : "Any"}]`
-    case "object": {
-      if (schema.properties) {
-        definitions.push(
-          ...writeTypedDict(name, { ...schema, description: undefined }, definitions),
-        )
-        return name
-      }
-      const value = schema.additionalProperties
-      const item =
-        value === undefined ? "Any" : writePythonType(value, `${name}Value`, definitions)
-      return `Dict[str, ${item}]`
-    }
-  }
-  return "Any"
-}
-
-function writePythonComment(description: string | undefined, indent: string) {
-  if (!description) return []
-  return description.split("\n").map(line => `${indent}# ${line}`.trimEnd())
-}
-
-function listRefs(schema: Schema | boolean): string[] {
-  if (typeof schema === "boolean") return []
-  const nested = [
-    ...(schema.anyOf ?? []),
-    ...(schema.oneOf ?? []),
-    ...Object.values(schema.properties ?? {}),
-    ...(schema.items ? [schema.items] : []),
-    ...(typeof schema.additionalProperties === "object"
-      ? [schema.additionalProperties]
-      : []),
-  ]
-  return [...(schema.$ref ? [readRef(schema)] : []), ...nested.flatMap(listRefs)]
-}
-
-function readRef(schema: Schema) {
-  return (schema.$ref ?? "").replace("#/$defs/", "")
-}
-
-function joinUnion(types: string[]) {
-  return [...new Set(types)].join(" | ")
-}
-
-function joinPythonUnion(types: string[]) {
-  const unique = [...new Set(types)]
-  if (unique.length === 1) return unique[0] ?? "Any"
-  const rest = unique.filter(type => type !== "None")
-  if (rest.length === 1 && unique.includes("None")) return `Optional[${rest[0]}]`
-  return `Union[${unique.join(", ")}]`
-}
-
-function toSnakeCase(name: string) {
-  return name.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`)
-}
-
-function toPascalCase(name: string) {
-  return name.charAt(0).toUpperCase() + name.slice(1)
 }
