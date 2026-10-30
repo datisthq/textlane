@@ -7,7 +7,8 @@ import * as html from "../generated/html.ts"
 import * as md from "../generated/md.ts"
 import * as nl from "../generated/nl.ts"
 import { ADDON_ENV } from "../settings.ts"
-import type { HostFile, Node } from "./file.ts"
+import type { Node } from "./file.ts"
+import type { HostFile, HostMessage } from "./vfile.ts"
 import type { Processor } from "./processor.ts"
 
 let entry: typeof import("../index.ts")
@@ -271,6 +272,54 @@ describe("Processor", () => {
       await expect(processor.process("a")).rejects.toThrow("boom")
     })
 
+    it("fails the run on an Error a transformer returns", () => {
+      const fail = () => () => new Error("returned")
+      const processor = entry.textlane().use([md.parse(), fail, md.stringify()])
+      expect(() => processor.processSync("a")).toThrow("returned")
+    })
+
+    it("gives plugins the file's path and keeps it in the result", () => {
+      const seen: unknown[] = []
+      const record = () => (_tree: Node, file: HostFile) => {
+        seen.push(file.path, file.dirname, file.stem, file.extname, String(file))
+      }
+      const processor = entry.textlane().use([md.parse(), record, md.stringify()])
+      const file = processor.processSync({ value: "a", path: "docs/intro.md" })
+      expect(seen).toEqual(["docs/intro.md", "docs", "intro", ".md", "a"])
+      expect(file.path).toBe("docs/intro.md")
+    })
+
+    it("reports messages as vfile does", () => {
+      const reported: HostMessage[] = []
+      const report = () => (_tree: Node, file: HostFile) => {
+        reported.push(
+          file.message("a", { line: 1, column: 2 }, "remark-lint:rule"),
+          file.info(new Error("b")),
+        )
+        file.fail("c", { place: { start: point(1, 1), end: point(1, 3) }, ruleId: "x" })
+      }
+      const processor = entry.textlane().use([md.parse(), report, md.stringify()])
+      expect(() => processor.processSync({ value: "abc", path: "a.md" })).toThrow(
+        expect.objectContaining({
+          reason: "c",
+          fatal: true,
+          name: "1:1-1:3",
+          file: "a.md",
+        }),
+      )
+      expect(reported[0]).toMatchObject({
+        reason: "a",
+        source: "remark-lint",
+        ruleId: "rule",
+        fatal: false,
+        line: 1,
+        column: 2,
+        name: "1:2",
+      })
+      expect(reported[1]).toMatchObject({ reason: "b", fatal: null, name: "1:1" })
+      expect(reported[1]?.cause).toBeInstanceOf(Error)
+    })
+
     it("runs a tree through native and JavaScript stages", async () => {
       const tree = { type: "root", children: [{ type: "emphasis", children: [] }] }
       const result = await entry.textlane().use(strongEmphasis).use(md.toHtml()).run(tree)
@@ -286,4 +335,8 @@ function visit(tree: Node, visitor: (node: Node) => void) {
   visitor(tree)
   const children = Array.isArray(tree.children) ? tree.children : []
   for (const child of children) visit(child, visitor)
+}
+
+function point(line: number, column: number) {
+  return { line, column, offset: null }
 }

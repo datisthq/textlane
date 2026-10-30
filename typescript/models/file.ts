@@ -24,10 +24,11 @@ export interface VFile {
   value: string
   messages: Message[]
   data: Record<string, unknown>
+  path?: string
 }
 
-/** A file to run a tree against: its text, or a file holding it as `value`. */
-export type Compatible = string | { value: string }
+/** A document: its text, or a file holding it as `value`, with its path when known. */
+export type Compatible = string | { value: string; path?: string }
 
 /** Where a message is: a point, a position, or a node holding one. */
 export type Place =
@@ -35,20 +36,11 @@ export type Place =
   | { start: Point; end: Point }
   | { position?: unknown }
 
-/** What `message` takes besides the reason. */
+/** What `message` takes besides the reason, as vfile-message names it. */
 export interface MessageOptions {
+  ancestors?: unknown[]
+  cause?: unknown
   place?: Place
   ruleId?: string
   source?: string
-}
-
-/** The file a JavaScript plugin gets, as a vfile: the document, its data and messages. */
-export interface HostFile {
-  value: string | undefined
-  data: Record<string, unknown>
-  messages: Message[]
-  /** Report a warning against the file. */
-  message(reason: string, options?: MessageOptions | Place): Message
-  /** Report an error and throw it. */
-  fail(reason: string, options?: MessageOptions | Place): never
 }

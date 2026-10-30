@@ -45,8 +45,11 @@ A callable passed to `use` is an attacher: called with the processor and its opt
 processor freezes, it returns a transformer taking the tree, as a dict, and the file. A run
 pauses before each run of consecutive Python plugins and hands them the tree, mdast or hast as
 the stage before left it; they change it in place or return a new one, and `process` awaits
-one returning an awaitable, which `process_sync` refuses with `async-in-sync`.
-`file.message()` reports into the result's `messages` and `file.data` becomes its `data`.
+one returning an awaitable, which `process_sync` refuses with `async-in-sync`; one returning
+an exception fails the run. The file is vfile's shape: `message`, `info` and `fail` make
+`HostMessage`s that land in the result's `messages`, `file.data` becomes its `data`, and
+`process({"value": …, "path": …})` gives plugins `path`, `dirname`, `stem` and `extname` and
+puts `path` on the result.
 
 ```python
 def strong(processor, options=None):

@@ -1,8 +1,10 @@
-import type { HostFile, Node } from "../../models/file.ts"
+import type { Node } from "../../models/file.ts"
+import type { HostFile } from "../../models/vfile.ts"
 import type { Transformer } from "../../models/plugin.ts"
 
 /** Run one JavaScript transformer: the tree it returns, or the one it changed in place,
- * directly or through a promise when it finishes later. */
+ * directly or through a promise when it finishes later; an `Error` it returns fails the
+ * run, as unified's does. */
 export function callHost(props: {
   transformer: Transformer
   tree: Node
@@ -42,6 +44,7 @@ export function isThenable(value: unknown): value is PromiseLike<unknown> {
 
 // A transformer that changes the tree in place returns nothing: the tree it got goes on
 function readTree(result: unknown, tree: Node) {
+  if (result instanceof Error) throw result
   return isNode(result) ? result : tree
 }
 

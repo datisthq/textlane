@@ -48,8 +48,11 @@ options when the processor freezes, it returns a transformer. A run pauses befor
 consecutive JavaScript plugins and hands them the tree as JSON, mdast or hast as the stage
 before left it; they change it in place or return a new one, directly, through a promise or
 through `next`, and the run goes on natively. `processSync` fails with `async-in-sync` on a
-transformer that finishes later. `file.message()` reports into the result's `messages` and
-`file.data` becomes its `data`.
+transformer that finishes later, and one returning an `Error` fails the run. The file is
+vfile's shape: `message`, `info` and `fail` make vfile-messages that land in the result's
+`messages`, `file.data` becomes its `data`, and `process({ value, path })` gives plugins
+`path`, `dirname`, `stem` and `extname` and puts `path` on the result. Messages from native
+stages reach only the result, not `file.messages`.
 
 ```js
 const strong = () => tree => {

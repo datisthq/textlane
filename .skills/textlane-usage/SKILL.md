@@ -123,7 +123,9 @@ the case: `unknown-plugin`, `invalid-options`, `missing-parser`, `missing-compil
 
 - A JavaScript or Python plugin joins only as a transformer: `use(fn, options)` calls it at
   freeze (`this` is the processor in JavaScript, the first argument in Python) and runs what it
-  returns over the JSON tree. Syntax plugins (remark-gfm, remark-directive, remark-math) need
-  the native ones; do not port a pipeline that needs one textlane lacks, say so.
+  returns over the JSON tree; its file is vfile-shaped, its path from `process({value, path})`.
+  The tree crosses as JSON, so non-JSON values in nodes or `data` do not survive a native
+  stage. Syntax plugins (remark-gfm, remark-directive, remark-math) need the native ones; do
+  not port a pipeline that needs one textlane lacks, say so.
 - remark-stringify reads `settings` from processor data; textlane's `md.stringify` takes its
   options directly.

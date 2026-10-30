@@ -1,5 +1,6 @@
 import type { NativeRun } from "../../models/addon.ts"
-import type { HostFile, Node } from "../../models/file.ts"
+import type { Node } from "../../models/file.ts"
+import type { HostFile } from "../../models/vfile.ts"
 import type { Host } from "../../models/host.ts"
 import { callHost, isThenable } from "../host/call.ts"
 
@@ -26,7 +27,10 @@ export function finishRun(props: {
   }
 
   function resume(tree: Node) {
-    props.run.resume(tree, props.file.messages.slice(sent))
+    props.run.resume(
+      tree,
+      props.file.messages.slice(sent).map(message => message.toJSON()),
+    )
     sent = props.file.messages.length
   }
 }

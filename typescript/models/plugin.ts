@@ -1,4 +1,5 @@
-import type { HostFile, Node } from "./file.ts"
+import type { Node } from "./file.ts"
+import type { HostFile } from "./vfile.ts"
 
 /** A native plugin as a pipeline names it, with its options when given. */
 export interface Plugin<Name extends string = string, Options = unknown> {

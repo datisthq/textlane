@@ -37,20 +37,29 @@ class Message(TypedDict):
     place: Optional[Place]
 
 
-class VFile(TypedDict):
-    """What `process` gives back, as a vfile: the output, the messages and the file's data."""
-
+class _VFileRequired(TypedDict):
     value: str
     messages: List[Message]
     data: Dict[str, Any]
 
 
-class _FileValue(TypedDict):
+class VFile(_VFileRequired, total=False):
+    """What `process` gives back, as a vfile: the output, the messages, the file's data and
+    its path when given."""
+
+    path: str
+
+
+class _FileValueRequired(TypedDict):
     value: str
 
 
+class _FileValue(_FileValueRequired, total=False):
+    path: str
+
+
 Compatible = Optional[Union[str, _FileValue]]
-"""A file to run a tree against: its text, or a file holding it as `value`."""
+"""A document: its text, or a file holding it as `value`, with its path when known."""
 
 
 def describe_plugin(name: str, options: Any = None) -> Plugin:

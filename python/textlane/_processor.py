@@ -72,7 +72,7 @@ class Processor:
         if not self._attach():
             return json.loads(self._native.run(json.dumps(tree), value))
         run = self._native.start_run(json.dumps(tree), value, False)
-        await finish(run, self._hosts, HostFile(value))
+        await finish(run, self._hosts, HostFile(value, _read_path(file)))
         return json.loads(run.result())
 
     def run_sync(self, tree: Dict[str, Any], file: Compatible = None) -> Dict[str, Any]:
@@ -81,7 +81,7 @@ class Processor:
         if not self._attach():
             return json.loads(self._native.run_sync(json.dumps(tree), value))
         run = self._native.start_run(json.dumps(tree), value, True)
-        finish_sync(run, self._hosts, HostFile(value), "run")
+        finish_sync(run, self._hosts, HostFile(value, _read_path(file)), "run")
         return json.loads(run.result())
 
     def stringify(self, tree: Dict[str, Any]) -> str:
@@ -89,23 +89,26 @@ class Processor:
         self._attach()
         return self._native.stringify(json.dumps(tree))
 
-    async def process(self, text: str) -> VFile:
-        """Parse, run and compile, finishing asynchronous stages."""
+    async def process(self, document: Compatible) -> VFile:
+        """Parse, run and compile a document, finishing asynchronous stages."""
+        text = _read_value(document) or ""
         if not self._attach():
-            return json.loads(self._native.process(text))
+            return _with_path(json.loads(self._native.process(text)), document)
         run = self._native.start_process(text, False)
-        file = HostFile(run.value() or text)
+        file = HostFile(run.value() or text, _read_path(document))
         await finish(run, self._hosts, file)
-        return {**json.loads(run.result()), "data": file.data}
+        return _with_path({**json.loads(run.result()), "data": file.data}, document)
 
-    def process_sync(self, text: str) -> VFile:
-        """Parse, run and compile; fails with `async-in-sync` on an asynchronous stage."""
+    def process_sync(self, document: Compatible) -> VFile:
+        """Parse, run and compile a document; fails with `async-in-sync` on an asynchronous
+        stage."""
+        text = _read_value(document) or ""
         if not self._attach():
-            return json.loads(self._native.process_sync(text))
+            return _with_path(json.loads(self._native.process_sync(text)), document)
         run = self._native.start_process(text, True)
-        file = HostFile(run.value() or text)
+        file = HostFile(run.value() or text, _read_path(document))
         finish_sync(run, self._hosts, file, "process")
-        return {**json.loads(run.result()), "data": file.data}
+        return _with_path({**json.loads(run.result()), "data": file.data}, document)
 
     # unified's addPlugin: the same attacher is one plugin, its dict options merged
     def _register(self, attacher: Callable[..., Any], parameters: List[Any]) -> List[Any]:
@@ -171,3 +174,14 @@ def _read_value(file: Compatible) -> Optional[str]:
     if isinstance(file, dict):
         return file["value"]
     return file
+
+
+def _read_path(file: Compatible) -> Optional[str]:
+    if isinstance(file, dict):
+        return file.get("path")
+    return None
+
+
+def _with_path(file: VFile, document: Compatible) -> VFile:
+    path = _read_path(document)
+    return file if path is None else {**file, "path": path}

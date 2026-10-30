@@ -224,3 +224,50 @@ def test_skips_a_python_plugin_turned_off():
 
     processor = textlane.textlane().use([md.parse(), fail, md.stringify()]).use(fail, False)
     assert processor.process_sync("a")["value"] == "a\n"
+
+
+def test_fails_the_run_on_an_exception_a_transformer_returns():
+    def fail(processor):
+        return lambda tree, file: ValueError("returned")
+
+    with pytest.raises(ValueError, match="returned"):
+        textlane.textlane().use([md.parse(), fail, md.stringify()]).process_sync("a")
+
+
+def test_gives_python_plugins_the_files_path_and_keeps_it_in_the_result():
+    seen = []
+
+    def record(processor):
+        def transformer(tree, file):
+            seen.extend([file.path, file.dirname, file.stem, file.extname, str(file)])
+
+        return transformer
+
+    processor = textlane.textlane().use([md.parse(), record, md.stringify()])
+    file = processor.process_sync({"value": "a", "path": "docs/intro.md"})
+    assert seen == ["docs/intro.md", "docs", "intro", ".md", "a"]
+    assert file["path"] == "docs/intro.md"
+
+
+def test_reports_python_messages_as_vfile_does():
+    reported = []
+
+    def report(processor):
+        def transformer(tree, file):
+            reported.append(file.message("a", {"line": 1, "column": 2}, rule_id="rule"))
+            reported.append(file.info(ValueError("b")))
+            file.fail("c", {"start": point(1, 1), "end": point(1, 3)})
+
+        return transformer
+
+    processor = textlane.textlane().use([md.parse(), report, md.stringify()])
+    with pytest.raises(textlane.HostMessage) as raised:
+        processor.process_sync({"value": "abc", "path": "a.md"})
+    assert (raised.value.fatal, raised.value.name, raised.value.file) == (True, "1:1-1:3", "a.md")
+    assert (reported[0].fatal, reported[0].line, reported[0].column) == (False, 1, 2)
+    assert (reported[1].fatal, reported[1].name, reported[1].reason) == (None, "1:1", "b")
+    assert isinstance(reported[1].__cause__, ValueError)
+
+
+def point(line, column):
+    return {"line": line, "column": column, "offset": None}

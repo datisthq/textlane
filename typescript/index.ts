@@ -3,8 +3,24 @@ import { resolveAddon } from "./actions/addon/resolve.ts"
 import type { Addon } from "./models/addon.ts"
 import { Processor } from "./models/processor.ts"
 
-export type { Compatible, Message, Node, Point, VFile } from "./models/file.ts"
-export type { Pluggable, PluggableList, Plugin, Preset } from "./models/plugin.ts"
+export type {
+  Compatible,
+  Message,
+  MessageOptions,
+  Node,
+  Place,
+  Point,
+  VFile,
+} from "./models/file.ts"
+export type {
+  Attacher,
+  Pluggable,
+  PluggableList,
+  Plugin,
+  Preset,
+  Transformer,
+} from "./models/plugin.ts"
+export type { HostFile, HostMessage } from "./models/vfile.ts"
 export { Processor } from "./models/processor.ts"
 
 const require = createRequire(import.meta.url)

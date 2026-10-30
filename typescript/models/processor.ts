@@ -1,5 +1,4 @@
 import { isAttacher } from "../actions/attacher/check.ts"
-import { createFile } from "../actions/file/create.ts"
 import { isPlainObject, mergeOptions } from "../actions/options/merge.ts"
 import { type HostEntry, mapPluggable } from "../actions/pluggable/map.ts"
 import { finishRun } from "../actions/run/finish.ts"
@@ -8,6 +7,7 @@ import type { NativePipeline } from "./addon.ts"
 import type { Compatible, Node, VFile } from "./file.ts"
 import type { Host } from "./host.ts"
 import type { Attacher, Pluggable, PluggableList, Preset } from "./plugin.ts"
+import { HostFile } from "./vfile.ts"
 
 /**
  * unified's processor over the native pipeline; every call is the crate's, except that
@@ -77,29 +77,21 @@ export class Processor {
    * from, lets bridges read it and keeps positions in the result.
    */
   async run(tree: Node, file?: Compatible) {
-    if (!this.#attach()) return this.#native.run(tree, readValue(file))
-    const run = this.#native.startRun(tree, readValue(file), false)
-    await finishRun({
-      run,
-      hosts: this.#hosts,
-      file: createFile(readValue(file)),
-      sync: false,
-      call: "run",
-    })
+    const value = readValue(file)
+    if (!this.#attach()) return this.#native.run(tree, value)
+    const run = this.#native.startRun(tree, value, false)
+    const host = new HostFile({ value, path: readPath(file) })
+    await finishRun({ run, hosts: this.#hosts, file: host, sync: false, call: "run" })
     return run.result()
   }
 
   /** Run the transforms; fails with `async-in-sync` on an asynchronous stage. */
   runSync(tree: Node, file?: Compatible) {
-    if (!this.#attach()) return this.#native.runSync(tree, readValue(file))
-    const run = this.#native.startRun(tree, readValue(file), true)
-    void finishRun({
-      run,
-      hosts: this.#hosts,
-      file: createFile(readValue(file)),
-      sync: true,
-      call: "run",
-    })
+    const value = readValue(file)
+    if (!this.#attach()) return this.#native.runSync(tree, value)
+    const run = this.#native.startRun(tree, value, true)
+    const host = new HostFile({ value, path: readPath(file) })
+    void finishRun({ run, hosts: this.#hosts, file: host, sync: true, call: "run" })
     return run.result()
   }
 
@@ -109,22 +101,24 @@ export class Processor {
     return this.#native.stringify(tree)
   }
 
-  /** Parse, run and compile, finishing asynchronous stages. */
-  async process(text: string): Promise<VFile> {
-    if (!this.#attach()) return this.#native.process(text)
+  /** Parse, run and compile a document, finishing asynchronous stages. */
+  async process(document: Compatible): Promise<VFile> {
+    const text = readValue(document) ?? ""
+    if (!this.#attach()) return withPath(this.#native.process(text), document)
     const run = this.#native.startProcess(text, false)
-    const file = createFile(run.value() ?? text)
+    const file = new HostFile({ value: run.value() ?? text, path: readPath(document) })
     await finishRun({ run, hosts: this.#hosts, file, sync: false, call: "process" })
-    return { ...run.result(), data: file.data }
+    return withPath({ ...run.result(), data: file.data }, document)
   }
 
-  /** Parse, run and compile; fails with `async-in-sync` on an asynchronous stage. */
-  processSync(text: string) {
-    if (!this.#attach()) return this.#native.processSync(text)
+  /** Parse, run and compile a document; fails with `async-in-sync` on an asynchronous stage. */
+  processSync(document: Compatible): VFile {
+    const text = readValue(document) ?? ""
+    if (!this.#attach()) return withPath(this.#native.processSync(text), document)
     const run = this.#native.startProcess(text, true)
-    const file = createFile(run.value() ?? text)
+    const file = new HostFile({ value: run.value() ?? text, path: readPath(document) })
     void finishRun({ run, hosts: this.#hosts, file, sync: true, call: "process" })
-    return { ...run.result(), data: file.data }
+    return withPath({ ...run.result(), data: file.data }, document)
   }
 
   // unified's addPlugin: the same attacher is one plugin, its object options merged
@@ -167,4 +161,13 @@ export class Processor {
 
 function readValue(file: Compatible | undefined) {
   return typeof file === "string" ? file : file?.value
+}
+
+function readPath(file: Compatible | undefined) {
+  return typeof file === "string" ? undefined : file?.path
+}
+
+function withPath(file: VFile, document: Compatible) {
+  const path = readPath(document)
+  return path === undefined ? file : { ...file, path }
 }
