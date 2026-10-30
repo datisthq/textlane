@@ -349,7 +349,7 @@ function PortsCard(props: { slides: Slide[]; active: number }) {
   return (
     <figure className="rounded-card border border-primary/25 bg-card p-4 shadow-lg">
       <div className="flex items-start gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary">
           <Workflow className="size-5" />
         </span>
         <div className="min-w-0 flex-1">
