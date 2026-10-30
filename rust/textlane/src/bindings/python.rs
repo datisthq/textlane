@@ -48,7 +48,7 @@ mod native {
     }
 
     /// The crate's `Pipeline`: plugins, data and trees cross as JSON text.
-    #[pyclass(unsendable)]
+    #[pyclass]
     struct Pipeline {
         inner: crate::Pipeline,
     }
@@ -133,9 +133,11 @@ mod native {
             value.map_err(|error| throw(py, error))
         }
 
+        /// Process with the GIL released, so threads run documents in parallel; `freeze`
+        /// first, as a shared borrow cannot.
         #[pyo3(signature = (text, path=None))]
         fn process(
-            &mut self,
+            &self,
             py: Python<'_>,
             text: &str,
             path: Option<String>,
@@ -183,7 +185,7 @@ mod native {
 
         #[pyo3(signature = (text, path=None))]
         fn process_sync(
-            &mut self,
+            &self,
             py: Python<'_>,
             text: &str,
             path: Option<String>,
@@ -212,17 +214,19 @@ mod native {
         // The text crosses as a string of its own: inside the file's JSON, every quote of
         // the HTML would be escaped here and parsed again in Python
         fn process_with(
-            &mut self,
+            &self,
             py: Python<'_>,
             text: &str,
             path: Option<String>,
             api: Api,
         ) -> PyResult<(String, String)> {
+            let job = self.inner.prepare_process(api);
+            let job = job.map_err(|error| throw(py, error))?;
             let mut file = File {
                 path,
                 ..File::new()
             };
-            let value = self.inner.process(text, &mut file, api);
+            let value = py.detach(|| job.process(text, &mut file));
             let value = value.map_err(|error| throw(py, error))?;
             let rest = serde_json::json!({
                 "messages": crate::write_messages(&file.messages),

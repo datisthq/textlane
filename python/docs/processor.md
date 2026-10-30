@@ -83,7 +83,9 @@ processor.data("site")
   `await arun(tree, file=None)` is its coroutine. Pass the text the tree came from as `file` to keep
   positions
 - `stringify(tree)` serializes a tree with no transform
-- `process(text)` returns the file; `await aprocess(text)` is its coroutine
+- `process(text)` returns the file; `await aprocess(text)` is its coroutine. Unless the
+  pipeline holds a Python plugin, both release the GIL while the crate works, so threads
+  sharing one frozen processor, or `asyncio.gather` over `aprocess`, use several cores
 
 ```python
 from textlane import md, textlane

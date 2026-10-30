@@ -1,7 +1,9 @@
 """unified's processor over the native pipeline; every call is the crate's, except that
 Python plugins run here when a run pauses before them."""
 
+import asyncio
 import json
+import threading
 from typing import Any, Callable, Dict, List, Optional, Union, cast, overload
 
 from . import _native
@@ -19,6 +21,8 @@ class Processor:
         self._ids: Dict[Callable[..., Any], int] = {}
         self._hosts: Dict[int, Host] = {}
         self._attached = False
+        self._frozen = False
+        self._lock = threading.Lock()
 
     def use(self, value: Any, *options: Any) -> "Processor":
         """Add a plugin, a list of them or a preset; a plugin used again is reconfigured.
@@ -54,7 +58,7 @@ class Processor:
     def freeze(self) -> "Processor":
         """Attach every plugin; later `use` and `data` setters fail."""
         self._attach()
-        self._native.freeze()
+        self._freeze_native()
         return self
 
     def parse(self, document: Compatible) -> Dict[str, Any]:
@@ -93,7 +97,9 @@ class Processor:
         """Parse, run and compile a document, finishing asynchronous stages."""
         text = _read_value(document) or ""
         if not self._attach():
-            return _with_path(_read_file(*self._native.process(text, _read_path(document))), document)
+            self._freeze_native()
+            native = await asyncio.to_thread(self._native.process, text, _read_path(document))
+            return _with_path(_read_file(*native), document)
         run = self._native.start_process(text, False, _read_path(document))
         file = HostFile(run.value() or text, _read_path(document))
         await finish(run, self._hosts, file)
@@ -104,11 +110,21 @@ class Processor:
         stage."""
         text = _read_value(document) or ""
         if not self._attach():
-            return _with_path(_read_file(*self._native.process_sync(text, _read_path(document))), document)
+            self._freeze_native()
+            native = self._native.process_sync(text, _read_path(document))
+            return _with_path(_read_file(*native), document)
         run = self._native.start_process(text, True, _read_path(document))
         file = HostFile(run.value() or text, _read_path(document))
         finish_sync(run, self._hosts, file, "process")
         return _with_path(_merge_data(json.loads(run.result()), file.data), document)
+
+    # Once only: `freeze` borrows the native pipeline mutably, which fails while another
+    # thread's `process` holds it with the GIL released
+    def _freeze_native(self) -> None:
+        with self._lock:
+            if not self._frozen:
+                self._native.freeze()
+                self._frozen = True
 
     # unified's addPlugin: the same attacher is one plugin, its dict options merged
     def _register(self, attacher: Callable[..., Any], parameters: List[Any]) -> List[Any]:

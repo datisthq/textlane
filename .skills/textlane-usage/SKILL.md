@@ -88,8 +88,9 @@ file["value"]  # "<h1>hi</h1>"
 Functions are snake_case (`md.to_html`, `nl.indefinite_article`); their options stay the
 camelCase keys the plugin takes, typed as `TypedDict`s. `process(text)` and `run(tree)`
 return directly; `await processor.aprocess(text)` and `await processor.arun(tree)` are their
-coroutines. A
-file and a tree are dicts.
+coroutines. A file and a tree are dicts. Without Python plugins, `process` releases the GIL:
+process many documents through one frozen processor from a thread pool, or `asyncio.gather`
+their `aprocess` calls.
 
 ## Rust
 

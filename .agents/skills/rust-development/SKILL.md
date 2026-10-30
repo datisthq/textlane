@@ -425,6 +425,13 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   error whose `code` is the crate's (napi's status, an attribute on `TextlaneError`).
   `Pipeline::use_value` reads the bindings' descriptors (`{name, options?}`) as plugins, alone
   or first in a tuple, and `write_file` (`actions/file/write.rs`) shapes `process`'s vfile
+- `process` leaves the caller's thread: `Pipeline::prepare_process` hands back a
+  `ProcessJob` (the frozen processor's `Arc`), which Node runs as a napi `AsyncTask` and
+  Python inside `py.detach`, the GIL released. Both take `&self`: napi keeps a `&mut` borrow
+  until the task settles and PyO3 one while detached, so a second call would fail as already
+  borrowed. The loaders therefore freeze the native pipeline once, under a lock in Python,
+  before the first `process`; the Python `Pipeline` class is sendable for it. Pipelines with
+  host plugins stay on the calling thread, through `start_process`
 - Host plugins (a JavaScript or Python function) are `{host: id}` descriptors; their options
   never cross, since they may hold functions, so the loader keeps and merges them as unified's
   `addPlugin` does and the crate only orders and switches them (`Pipeline::hosts`). Each becomes

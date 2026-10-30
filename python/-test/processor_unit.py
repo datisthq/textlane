@@ -14,6 +14,30 @@ def test_processes_markdown_to_html():
     assert file == {"value": "<h1>hi</h1>", "messages": [], "data": {}}
 
 
+def test_processes_documents_in_parallel_threads_as_one_by_one():
+    from concurrent.futures import ThreadPoolExecutor
+
+    processor = to_html().freeze()
+    documents = [f"# {index}\n\n~a~ *b*" for index in range(50)]
+    expected = [processor.process(document)["value"] for document in documents]
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        files = list(pool.map(processor.process, documents))
+    assert [file["value"] for file in files] == expected
+
+
+def test_gathers_aprocess_calls_as_one_by_one():
+    processor = to_html()
+    documents = [f"# {index}\n\n~a~ *b*" for index in range(50)]
+
+    async def gather():
+        return await asyncio.gather(*(processor.aprocess(document) for document in documents))
+
+    files = asyncio.run(gather())
+    assert [file["value"] for file in files] == [
+        processor.process(document)["value"] for document in documents
+    ]
+
+
 def test_processes_synchronously():
     assert to_html().process("~a~")["value"] == "<p><del>a</del></p>"
 
