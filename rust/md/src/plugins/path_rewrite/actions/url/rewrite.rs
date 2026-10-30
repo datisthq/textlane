@@ -31,7 +31,8 @@ pub(crate) fn rewrite_url(
             Some(page) => page.clone(),
             None => page_url(&file, options.markdown_links),
         },
-        false => format!("/{file}"),
+        false if file.is_empty() || !names_directory(target) => format!("/{file}"),
+        false => format!("/{file}/"),
     };
     Some(format!(
         "{}{suffix}",
@@ -49,6 +50,11 @@ fn has_scheme(url: &str) -> bool {
         && scheme
             .iter()
             .all(|byte| byte.is_ascii_alphanumeric() || b"+-.".contains(byte))
+}
+
+// Normalizing drops a trailing slash, which a server reads as a different URL
+fn names_directory(target: &str) -> bool {
+    target.ends_with('/') || matches!(target.rsplit('/').next(), Some("." | ".."))
 }
 
 fn slashes(path: &str) -> String {

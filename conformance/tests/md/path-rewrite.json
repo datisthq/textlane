@@ -75,6 +75,22 @@
         "expected": {
           "md": "![a](img/a.png) ![b](/site/b.png)\n"
         }
+      },
+      {
+        "description": "a root-relative directory URL keeps its trailing slash",
+        "input": "[a](/blog/) and [b](/blog/x/#h)",
+        "path": "/repo/docs/guide/intro.md",
+        "expected": {
+          "md": "[a](/site/blog/) and [b](/site/blog/x/#h)\n"
+        }
+      },
+      {
+        "description": "a relative directory URL keeps its trailing slash",
+        "input": "[a](./api/) and [b](..) and [c](../)",
+        "path": "/repo/docs/guide/intro.md",
+        "expected": {
+          "md": "[a](/site/guide/api/) and [b](/site/) and [c](/site/)\n"
+        }
       }
     ],
     "comment": "md.pathRewrite is textlane's own, with no upstream: these cases are its specification"
