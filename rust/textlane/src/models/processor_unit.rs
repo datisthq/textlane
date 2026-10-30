@@ -1284,7 +1284,7 @@ fn extracts_many_headings_in_linear_time() -> Result<(), Error> {
         .with(textlane_md::HeadingId::default())
         .with(textlane_md::ToHtml::default())
         .with(textlane_html::UnwrapImages)
-        .with(textlane_html::ExtractToc)
+        .with(textlane_html::ExtractToc::default())
         .with(textlane_html::Stringify::default())
         .freeze()?;
     let started = std::time::Instant::now();
@@ -1306,7 +1306,10 @@ fn marks_external_links_and_reads_heading_attributes() -> Result<(), Error> {
     };
     let processor = Processor::new()
         .with(textlane_md::Parse::default())
-        .with(textlane_md::HeadingId { attributes: true })
+        .with(textlane_md::HeadingId {
+            attributes: true,
+            ..Default::default()
+        })
         .with(textlane_md::ToHtml::default())
         .with(links)
         .with(textlane_html::Stringify::default())
@@ -1341,7 +1344,10 @@ fn marks_many_external_links_in_linear_time() -> Result<(), Error> {
 fn reads_heading_attributes_in_linear_time_without_handlers() -> Result<(), Error> {
     let processor = Processor::new()
         .with(textlane_md::Parse::default())
-        .with(textlane_md::HeadingId { attributes: true })
+        .with(textlane_md::HeadingId {
+            attributes: true,
+            ..Default::default()
+        })
         .with(textlane_md::ToHtml::default())
         .with(textlane_html::Stringify::default())
         .freeze()?;

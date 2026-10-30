@@ -88,6 +88,12 @@ export interface ExternalLinksOptions {
 /** Tokens: a list, or one string of them separated by white space. */
 export type Tokens = string | string[]
 
+/** `html.extractToc`: the headings, nested by rank, as the file's `data.toc`, as @stefanprobst/rehype-extract-toc stores them. */
+export interface ExtractTocOptions {
+  /** Attributes, such as `data-toc-hidden`, that keep a heading out of the table of contents; what would nest under it nests under the heading before. @default [] */
+  skip?: string[]
+}
+
 /** `html.highlight`: code blocks colored as Shiki colors them, natively by giallo; options named as @shikijs/rehype names them. */
 export interface HighlightOptions {
   /** The theme of each color mode, `light` first, as `{"light": …, "dark": …}`. */
@@ -263,8 +269,9 @@ export function unwrapImages(): Plugin<"html.unwrapImages"> {
 }
 
 /** The `html.extractToc` plugin. */
-export function extractToc(): Plugin<"html.extractToc"> {
-  return { name: "html.extractToc" }
+export function extractToc(options?: ExtractTocOptions): Plugin<"html.extractToc", ExtractTocOptions> {
+  if (options === undefined) return { name: "html.extractToc" }
+  return { name: "html.extractToc", options }
 }
 
 /** The `html.highlight` plugin. */

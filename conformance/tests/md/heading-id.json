@@ -168,5 +168,93 @@
         }
       }
     ]
+  },
+  {
+    "description": "markers turn heading suffixes into attributes",
+    "comment": "textlane's own: literal suffixes such as livemark's `[step]` and `[!toc]`",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.headingId",
+        {
+          "attributes": true,
+          "markers": {
+            "[step]": {
+              "data-step": true
+            },
+            "[!toc]": {
+              "data-toc-hidden": true
+            },
+            "[toc]": {
+              "hidden": true
+            },
+            "[x]": {
+              "data-kind": "note",
+              "onclick": "bad"
+            }
+          }
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a flag marker",
+        "input": "## Install [step]",
+        "expected": {
+          "html": "<h2 data-step>Install</h2>"
+        }
+      },
+      {
+        "description": "no space before the marker",
+        "input": "## Install[step]",
+        "expected": {
+          "html": "<h2 data-step>Install</h2>"
+        }
+      },
+      {
+        "description": "the longer marker of two that end alike",
+        "input": "## Notes [!toc]",
+        "expected": {
+          "html": "<h2 data-toc-hidden>Notes</h2>"
+        }
+      },
+      {
+        "description": "a marker and an attribute list, either order",
+        "input": "## A [step] {#a}\n\n## B {#b} [step]",
+        "expected": {
+          "html": "<h2 id=\"a\" data-step>A</h2>\n<h2 data-step id=\"b\">B</h2>"
+        }
+      },
+      {
+        "description": "two markers",
+        "input": "## A [step] [!toc]",
+        "expected": {
+          "html": "<h2 data-toc-hidden data-step>A</h2>"
+        }
+      },
+      {
+        "description": "a marker with a value, handlers dropped",
+        "input": "## A [x]",
+        "expected": {
+          "html": "<h2 data-kind=\"note\">A</h2>"
+        }
+      },
+      {
+        "description": "a marker inside the text stays",
+        "input": "## A [step] b",
+        "expected": {
+          "html": "<h2>A [step] b</h2>"
+        }
+      },
+      {
+        "description": "a heading without markers",
+        "input": "## Plain",
+        "expected": {
+          "html": "<h2>Plain</h2>"
+        }
+      }
+    ]
   }
 ]

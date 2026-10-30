@@ -6,7 +6,9 @@ use textlane_core::{
     Allocator, ArenaVec, Attach, Data, Error, File, Plugin, Transform, Tree, TreeKind,
 };
 
-use crate::models::options::HeadingId;
+use std::collections::BTreeMap;
+
+use crate::models::options::{HeadingId, MarkerValue};
 use crate::plugins::heading_id::actions::data::copy::copy_data;
 use crate::utils::onepass::directive::scan_attributes;
 
@@ -38,14 +40,15 @@ impl Transform for HeadingId {
         let Tree::Mdast(mut root) = tree else {
             return Err(Error::new("invalid-stage", "`md.headingId` takes mdast"));
         };
+        // longest first, so `[!toc]` is never read as a shorter marker it ends with
+        let mut markers: Vec<(&String, &BTreeMap<String, MarkerValue>)> =
+            self.markers.iter().collect();
+        markers.sort_by_key(|(key, _)| std::cmp::Reverse(key.len()));
         let mut stack = root.children_mut().into_iter().collect::<Vec<_>>();
         while let Some(children) = stack.pop() {
             for child in children.iter_mut() {
                 if let Node::Heading(heading) = child {
-                    match self.attributes {
-                        true => read_attributes(heading, alloc),
-                        false => read_custom_id(heading, alloc),
-                    }
+                    read_heading(heading, self.attributes, &markers, alloc);
                 }
                 if let Some(children) = child.children_mut() {
                     stack.push(children);
@@ -56,32 +59,73 @@ impl Transform for HeadingId {
     }
 }
 
-// The last text, its trailing spaces dropped, loses its last ` {…}` when those braces hold a
-// valid attribute list ending the text; only the last are tried, which keeps a run of braces
-// linear, so a quoted value holding ` {` leaves the list unread
-fn read_attributes<'a>(heading: &mut Heading<'a>, alloc: &'a Allocator) {
+type Found = Vec<(String, Option<String>)>;
+
+// The last text loses, from its end, any markers and one attribute list (or `{#id}` without
+// `attributes`), in any order; the list is read once, which keeps a run of braces linear
+fn read_heading<'a>(
+    heading: &mut Heading<'a>,
+    attributes: bool,
+    markers: &[(&String, &BTreeMap<String, MarkerValue>)],
+    alloc: &'a Allocator,
+) {
     let Some(Node::Text(text)) = heading.children.last_mut() else {
         return;
     };
-    let trimmed = text.value.trim_end_matches(' ');
-    let Some(brace) = trimmed.rfind(" {") else {
-        return;
-    };
-    let bytes = trimmed.as_bytes();
-    let Some((list, end)) =
-        scan_attributes(bytes, trimmed, brace + 1, bytes.len(), false)
-    else {
-        return;
-    };
-    if end != bytes.len() {
+    let mut value = text.value;
+    let mut found: Found = Vec::new();
+    let mut listed = false;
+    loop {
+        let trimmed = value.trim_end_matches(' ');
+        if let Some((key, fields)) =
+            markers.iter().find(|(key, _)| trimmed.ends_with(*key))
+        {
+            value = trimmed[..trimmed.len() - key.len()].trim_end();
+            for (name, field) in fields.iter().filter(|(name, _)| is_allowed(name)) {
+                let field = match field {
+                    MarkerValue::Flag(false) => continue,
+                    MarkerValue::Flag(true) => None,
+                    MarkerValue::Text(text) => Some(text.clone()),
+                };
+                found.push((name.clone(), field));
+            }
+            continue;
+        }
+        if listed {
+            break;
+        }
+        listed = true;
+        let rest = match attributes {
+            true => read_attribute_list(trimmed, &mut found),
+            false => read_custom_id(trimmed, &mut found),
+        };
+        match rest {
+            Some(rest) => value = rest,
+            None => break,
+        }
+    }
+    if found.is_empty() {
         return;
     }
-    let list: Vec<(String, String)> = list
-        .into_iter()
-        .filter(|(key, _)| is_allowed(key))
-        .collect();
-    text.value = &trimmed[..brace];
-    heading.data = Some(alloc.alloc(write_attributes(heading.data, &list, alloc)));
+    text.value = value;
+    heading.data = Some(alloc.alloc(write_attributes(heading.data, &found, alloc)));
+}
+
+// Its last ` {…}` when those braces hold a valid attribute list ending the text; only the
+// last are tried, so a quoted value holding ` {` leaves the list unread
+fn read_attribute_list<'v>(trimmed: &'v str, found: &mut Found) -> Option<&'v str> {
+    let brace = trimmed.rfind(" {")?;
+    let bytes = trimmed.as_bytes();
+    let (list, end) = scan_attributes(bytes, trimmed, brace + 1, bytes.len(), false)?;
+    if end != bytes.len() {
+        return None;
+    }
+    found.extend(
+        list.into_iter()
+            .filter(|(key, _)| is_allowed(key))
+            .map(|(key, value)| (key, Some(value))),
+    );
+    Some(&trimmed[..brace])
 }
 
 // Event handlers never come from Markdown, nor names an attribute cannot have; the rest is
@@ -96,40 +140,19 @@ fn is_allowed(key: &str) -> bool {
             .all(|byte| byte.is_ascii_alphanumeric() || b"-_:.".contains(&byte))
 }
 
-// The last text, its trailing spaces dropped, loses ` {#id}`, which becomes `data.id` and
-// `data.hProperties.id`
-fn read_custom_id<'a>(heading: &mut Heading<'a>, alloc: &'a Allocator) {
-    let Some(Node::Text(text)) = heading.children.last_mut() else {
-        return;
-    };
-    let trimmed = text.value.trim_end_matches(' ');
-    let Some(captures) = CUSTOM_ID
-        .as_ref()
-        .and_then(|custom| custom.captures(trimmed))
-    else {
-        return;
-    };
-    let (Some(whole), Some(id)) = (captures.get(0), captures.get(1)) else {
-        return;
-    };
-    let id = alloc.alloc_str(id.as_str());
-    text.value = &trimmed[..whole.start()];
-    heading.data = Some(alloc.alloc(write_id(heading.data, id, alloc)));
-}
-
-fn write_id<'a>(
-    data: Option<&'a Data<'a>>,
-    id: &'a str,
-    alloc: &'a Allocator,
-) -> Data<'a> {
-    write_attributes(data, &[("id".to_owned(), id.to_owned())], alloc)
+// remark-heading-id's ` {#id}`, which becomes `data.id` and `data.hProperties.id`
+fn read_custom_id<'v>(trimmed: &'v str, found: &mut Found) -> Option<&'v str> {
+    let captures = CUSTOM_ID.as_ref()?.captures(trimmed)?;
+    let (whole, id) = (captures.get(0)?, captures.get(1)?);
+    found.push(("id".to_owned(), Some(id.as_str().to_owned())));
+    Some(&trimmed[..whole.start()])
 }
 
 // `data.hProperties` gets each attribute, classes as the `className` list, and `data.id`
 // the id, beside whatever data the heading already had
 fn write_attributes<'a>(
     data: Option<&'a Data<'a>>,
-    list: &[(String, String)],
+    list: &[(String, Option<String>)],
     alloc: &'a Allocator,
 ) -> Data<'a> {
     let names: Vec<&str> = list
@@ -161,6 +184,14 @@ fn write_attributes<'a>(
     }
     let mut id = None;
     for ((key, value), name) in list.iter().zip(&names) {
+        // the first of a name wins: the one nearest the heading's end
+        if properties.iter().any(|(existing, _)| existing == name) {
+            continue;
+        }
+        let Some(value) = value else {
+            properties.push((alloc.alloc_str(name), Data::Boolean(true)));
+            continue;
+        };
         let value = alloc.alloc_str(value);
         let written = match key.as_str() {
             "class" => {

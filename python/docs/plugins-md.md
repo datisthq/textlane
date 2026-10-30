@@ -497,7 +497,7 @@ Takes `Literal["cargo", "cargo-binstall"]`.
 
 ## md.headingId
 
-Reads `{#id}` at the end of a heading, after a space, as its id, as remark-heading-id does; `md.toHtml` puts it on the heading. remark-heading-id's `defaults` is not ported: `html.slug` gives the other headings ids. With `{"attributes": True}` it reads a whole attribute list instead, as `md.directive` reads one: `## API {#api .wide data-step=2}` gives the heading an id, classes and a `data-step`. Only the last braces are read, event handlers (`on…`) and invalid names are dropped, and on untrusted input the result still belongs behind `html.sanitize`.
+Reads `{#id}` at the end of a heading, after a space, as its id, as remark-heading-id does; `md.toHtml` puts it on the heading. remark-heading-id's `defaults` is not ported: `html.slug` gives the other headings ids. With `{"attributes": True}` it reads a whole attribute list instead, as `md.directive` reads one: `## API {#api .wide data-step=2}` gives the heading an id, classes and a `data-step`. Only the last braces are read, event handlers (`on…`) and invalid names are dropped, and on untrusted input the result still belongs behind `html.sanitize`. `"markers"` turns literal heading suffixes into attributes and strips them, before or after an attribute list: `{"[step]": {"data-step": true}, "[!toc]": {"data-toc-hidden": true}}` reads `## Install [step]` as `<h2 data-step>Install</h2>`.
 
 ```python
 from textlane import html, md, textlane
@@ -518,9 +518,16 @@ file["value"]
 
 Follows [remark-heading-id](https://www.npmjs.com/package/remark-heading-id).
 
-| Option       | Type   | Default | Description                                                                                                                                        |
-| ------------ | ------ | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `attributes` | `bool` | `False` | Read a whole attribute list, `{#id .class key=value key="v w"}`, as directives write theirs: classes become `className` and other keys properties. |
+| Option       | Type                                | Default | Description                                                                                                                                                           |
+| ------------ | ----------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `attributes` | `bool`                              | `False` | Read a whole attribute list, `{#id .class key=value key="v w"}`, as directives write theirs: classes become `className` and other keys properties.                    |
+| `markers`    | `Dict[str, Dict[str, MarkerValue]]` |         | Literal suffixes, such as `[step]`, stripped from a heading's end for the attributes each names, a value or `true` for a bare one: `{"[step]": {"data-step": true}}`. |
+
+**`MarkerValue`**
+
+An attribute a heading marker sets: its value, or `true` for the bare attribute.
+
+Takes `Union[bool, str]`.
 
 <!-- /generated -->
 

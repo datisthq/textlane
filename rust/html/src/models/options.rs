@@ -339,6 +339,18 @@ pub enum KatexStrictMode {
     Error,
 }
 
+/// `html.extractToc`: the headings, nested by rank, as the file's `data.toc`, as
+/// @stefanprobst/rehype-extract-toc stores them.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", schemars(rename = "ExtractTocOptions"))]
+pub struct ExtractToc {
+    /// Attributes, such as `data-toc-hidden`, that keep a heading out of the table of
+    /// contents; what would nest under it nests under the heading before.
+    pub skip: Vec<String>,
+}
+
 /// `html.slug`: ids on headings, from their text; options named as rehype-slug names
 /// them.
 #[derive(Clone, Debug, Default, Deserialize)]

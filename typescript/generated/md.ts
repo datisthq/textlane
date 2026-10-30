@@ -210,7 +210,12 @@ export type CargoManager = "cargo" | "cargo-binstall"
 export interface HeadingIdOptions {
   /** Read a whole attribute list, `{#id .class key=value key="v w"}`, as directives write theirs: classes become `className` and other keys properties. @default false */
   attributes?: boolean
+  /** Literal suffixes, such as `[step]`, stripped from a heading's end for the attributes each names, a value or `true` for a bare one: `{"[step]": {"data-step": true}}`. */
+  markers?: Record<string, Record<string, MarkerValue>>
 }
+
+/** An attribute a heading marker sets: its value, or `true` for the bare attribute. */
+export type MarkerValue = boolean | string
 
 /** `md.pathRewrite`: the URLs of images, links and definitions as a site serves them: relative ones resolved against the file's path and made root-relative, every root-relative one under `base`, and links to Markdown files turned into page URLs. */
 export interface PathRewriteOptions {

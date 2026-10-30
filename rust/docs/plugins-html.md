@@ -266,7 +266,7 @@ let output = Processor::new()
     .with(md::Parse::default())
     .with(md::ToHtml::default())
     .with(html::Slug::default())
-    .with(html::ExtractToc)
+    .with(html::ExtractToc::default())
     .with(html::Stringify::default())
     .freeze()?
     .process("# Guide\n\n## Install")?;
@@ -274,11 +274,15 @@ output.file.data["toc"]
 // [{ depth: 1, value: "Guide", id: "guide", children: [{ depth: 2, value: "Install", id: "install" }] }]
 ```
 
+`skip` lists attributes that keep a heading out, such as `data-toc-hidden`; what would nest under it nests under the heading before. A `hidden` heading stays listed, which suits a heading meant for the table of contents alone.
+
 <!-- generated:options html.extractToc -->
 
 Follows [@stefanprobst/rehype-extract-toc](https://www.npmjs.com/package/@stefanprobst/rehype-extract-toc).
 
-No options.
+| Option | Type       | Default | Description                                                                                                                                       |
+| ------ | ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `skip` | `string[]` | `[]`    | Attributes, such as `data-toc-hidden`, that keep a heading out of the table of contents; what would nest under it nests under the heading before. |
 
 <!-- /generated -->
 

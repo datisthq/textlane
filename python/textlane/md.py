@@ -298,12 +298,19 @@ class PackageCommandOptions(TypedDict, total=False):
     ecosystems: Ecosystems
 
 
+# An attribute a heading marker sets: its value, or `true` for the bare attribute.
+MarkerValue = Union[bool, str]
+
+
 # `md.headingId`: `{#id}` at the end of a heading, after a space, as its id, as
 # remark-heading-id reads it; headings without one keep none.
 class HeadingIdOptions(TypedDict, total=False):
     # Read a whole attribute list, `{#id .class key=value key="v w"}`, as directives
     # write theirs: classes become `className` and other keys properties.
     attributes: bool
+    # Literal suffixes, such as `[step]`, stripped from a heading's end for the attributes
+    # each names, a value or `true` for a bare one: `{"[step]": {"data-step": true}}`.
+    markers: Dict[str, Dict[str, MarkerValue]]
 
 
 # A node with a URL.

@@ -118,8 +118,7 @@ pub(crate) const PLUGINS: &[PluginEntry] = &[
     plugin!(
         "html.extractToc",
         textlane_html::ExtractToc,
-        "@stefanprobst/rehype-extract-toc",
-        unit
+        "@stefanprobst/rehype-extract-toc"
     ),
     #[cfg(feature = "highlight")]
     plugin!(

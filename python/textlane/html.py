@@ -20,6 +20,7 @@ __all__ = [
     "ExternalLinksOptions",
     "unwrap_images",
     "extract_toc",
+    "ExtractTocOptions",
     "highlight",
     "HighlightOptions",
     "katex",
@@ -130,6 +131,14 @@ class ExternalLinksOptions(TypedDict, total=False):
     content: Any
     # The properties of that `<span>`.
     contentProperties: Optional[Dict[str, Any]]
+
+
+# `html.extractToc`: the headings, nested by rank, as the file's `data.toc`, as
+# @stefanprobst/rehype-extract-toc stores them.
+class ExtractTocOptions(TypedDict, total=False):
+    # Attributes, such as `data-toc-hidden`, that keep a heading out of the table of
+    # contents; what would nest under it nests under the heading before.
+    skip: List[str]
 
 
 # A replacement color, or a theme's own replacements.
@@ -385,9 +394,9 @@ def unwrap_images() -> Plugin:
     return describe_plugin("html.unwrapImages")
 
 
-def extract_toc() -> Plugin:
+def extract_toc(options: Optional[ExtractTocOptions] = None) -> Plugin:
     """The `html.extractToc` plugin."""
-    return describe_plugin("html.extractToc")
+    return describe_plugin("html.extractToc", options)
 
 
 def highlight(options: Optional[HighlightOptions] = None) -> Plugin:

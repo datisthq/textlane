@@ -381,7 +381,7 @@ pub use models::options::{
     AlertRule, AttributeRule, CargoManager, CodeGroupRule, CodeRule, Component,
     DefinitionListSlot, Directive, DirectiveKind, DirectiveRule, DirectiveSlot,
     Ecosystems, Frontmatter, FrontmatterSlot, Gfm, GfmSlot, GroupRule, HeadingId,
-    MarkdownLinks, Math, MathSlot, Matter, Mdx, MdxSlot, Names, NpmManager,
+    MarkdownLinks, MarkerValue, Math, MathSlot, Matter, Mdx, MdxSlot, Names, NpmManager,
     PackageCommand, ParentCheck, ParentTest, Parse, PathRewrite, PipManager, Stringify,
     Strip, TaskListLabels, ToHtml, ToNaturalLanguage, Toc, UnknownDirectives,
     UnsafePattern, UrlNode,

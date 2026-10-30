@@ -199,5 +199,136 @@
         }
       }
     ]
+  },
+  {
+    "description": "skip leaves headings with an attribute out",
+    "comment": "textlane's own option; rehype-extract-toc has none",
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      ["html.slug"],
+      [
+        "html.extractToc",
+        {
+          "skip": ["data-step", "data-toc-hidden"]
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "skipped headings stay out",
+        "input": "<h2>A</h2><h2 data-step>Step</h2><h2 data-toc-hidden>Hidden</h2><h2>B</h2>",
+        "expected": {
+          "fileData": {
+            "toc": [
+              {
+                "depth": 2,
+                "value": "A",
+                "id": "a"
+              },
+              {
+                "depth": 2,
+                "value": "B",
+                "id": "b"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "what nests under a skipped heading nests under the one before",
+        "input": "<h2>A</h2><h2 data-toc-hidden>Hidden</h2><h3>C</h3>",
+        "expected": {
+          "fileData": {
+            "toc": [
+              {
+                "depth": 2,
+                "value": "A",
+                "id": "a",
+                "children": [
+                  {
+                    "depth": 3,
+                    "value": "C",
+                    "id": "c"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a hidden heading is still listed",
+        "input": "<h2>A</h2><h2 hidden>Only in the TOC</h2>",
+        "expected": {
+          "fileData": {
+            "toc": [
+              {
+                "depth": 2,
+                "value": "A",
+                "id": "a"
+              },
+              {
+                "depth": 2,
+                "value": "Only in the TOC",
+                "id": "only-in-the-toc"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "skip reads attributes a marker set",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.headingId",
+        {
+          "markers": {
+            "[!toc]": {
+              "data-toc-hidden": true
+            }
+          }
+        }
+      ],
+      ["md.toHtml"],
+      ["html.slug"],
+      [
+        "html.extractToc",
+        {
+          "skip": ["data-toc-hidden"]
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a hidden heading from Markdown",
+        "input": "## A\n\n## Hidden [!toc]\n\n## B",
+        "expected": {
+          "fileData": {
+            "toc": [
+              {
+                "depth": 2,
+                "value": "A",
+                "id": "a"
+              },
+              {
+                "depth": 2,
+                "value": "B",
+                "id": "b"
+              }
+            ]
+          }
+        }
+      }
+    ]
   }
 ]

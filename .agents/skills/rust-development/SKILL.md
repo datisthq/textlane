@@ -280,7 +280,9 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   cases); `md.strip` handles each sibling list once, a handler's children going back on that
   list's pending stack, never recursion. `md.headingId`'s `attributes` reuses
   `md.directive`'s `scan_attributes`, trying ` {` from the right so a hostile run of braces
-  fails fast
+  fails fast; `markers` strip literal suffixes repeatedly, longest first, while the
+  attribute list (or `{#id}`) is read once. `html.extractToc`'s `skip` compares attributes
+  through property-information, so `data-step` and `dataStep` match
 - `md.toc` ports remark-toc 9.0.0 over mdast-util-toc 7.1.0 (`import:toc`, which also runs
   their fixtures): every heading is slugged in document order, ids `md.headingId` stored in
   `data.hProperties.id` win over the text, and the list is built in a flat store of lists

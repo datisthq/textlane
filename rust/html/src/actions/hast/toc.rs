@@ -1,16 +1,26 @@
 use serde_json::{Map, Value, json};
 use textlane_core::hast::{Node, PropertyValue};
 
+use crate::helpers::property::find_property;
+use crate::helpers::schema::HTML;
+
 /// The headings of a tree as @stefanprobst/rehype-extract-toc nests them: each
 /// `{depth, value, id?, children?}`, under the closest heading of a lower rank before it.
-pub fn extract_toc(node: &Node<'_>) -> Value {
+pub fn extract_toc(node: &Node<'_>, skip: &[String]) -> Value {
+    let skipped: Vec<String> = skip.iter().map(|name| read_attribute(name)).collect();
     let mut headings = Vec::new();
     let mut stack: Vec<&Node<'_>> = vec![node];
     while let Some(node) = stack.pop() {
         let children = match node {
             Node::Root(root) => &root.children,
             Node::Element(element) => {
-                if let Some(depth) = read_rank(element.tag_name) {
+                let left_out = element.properties.iter().any(|property| {
+                    !matches!(
+                        property.value,
+                        PropertyValue::Null | PropertyValue::Boolean(false)
+                    ) && skipped.contains(&read_attribute(property.name))
+                });
+                if let Some(depth) = read_rank(element.tag_name).filter(|_| !left_out) {
                     let mut heading = Map::new();
                     heading.insert("depth".into(), json!(depth));
                     heading.insert("value".into(), json!(read_text(node)));
@@ -103,4 +113,9 @@ fn read_id(element: &textlane_core::hast::Element<'_>) -> Option<Value> {
         PropertyValue::Boolean(id) => Some(json!(id)),
         PropertyValue::List(_) | PropertyValue::Null => None,
     }
+}
+
+// The HTML attribute a property or attribute name stands for, `dataStep` and `data-step` alike
+fn read_attribute(name: &str) -> String {
+    find_property(&HTML, name).attribute.to_lowercase()
 }

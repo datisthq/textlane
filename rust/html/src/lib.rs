@@ -235,9 +235,9 @@ mod plugins {
 // models
 pub use models::options::{
     AttributeDefinition, Classes, ColorReplacement, ConfiguredTransformer, ExternalLinks,
-    Format, Highlight, HighlightTransformer, Indent, InlineCode, Katex, KatexOutput,
-    KatexStrict, KatexStrictMode, Parse, Primitive, Raw, Sanitize, Slug, Stringify,
-    ToMarkdown, Tokens, TransformerName,
+    ExtractToc, Format, Highlight, HighlightTransformer, Indent, InlineCode, Katex,
+    KatexOutput, KatexStrict, KatexStrictMode, Parse, Primitive, Raw, Sanitize, Slug,
+    Stringify, ToMarkdown, Tokens, TransformerName,
 };
 
 // actions
@@ -258,6 +258,5 @@ pub use actions::hast::unwrap::unwrap_images;
 pub use actions::html::parse::parse_html;
 
 // plugins
-pub use plugins::extract_toc::plugin::ExtractToc;
 pub use plugins::to_natural_language::plugin::ToNaturalLanguage;
 pub use plugins::unwrap_images::plugin::UnwrapImages;
