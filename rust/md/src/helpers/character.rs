@@ -42,19 +42,6 @@ pub(crate) fn find_character_before(bytes: &[u8], index: usize) -> Option<char> 
     String::from_utf8_lossy(&bytes[start..index]).chars().last()
 }
 
-/// The character before byte `index` as text sees it: none right after a container
-/// prefix (`>a`), where micromark starts the line's text, not after `>`.
-pub(crate) fn find_text_character_before(
-    bytes: &[u8],
-    prefixes: &[(usize, usize)],
-    index: usize,
-) -> Option<char> {
-    match prefixes.binary_search_by_key(&index, |(_, end)| *end) {
-        Ok(_) => None,
-        Err(_) => find_character_before(bytes, index),
-    }
-}
-
 /// The character that starts at byte `index`.
 pub(crate) fn find_character_after(bytes: &[u8], index: usize) -> Option<char> {
     match bytes.get(index) {

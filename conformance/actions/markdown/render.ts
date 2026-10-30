@@ -76,6 +76,7 @@ export type Extensions = {
   math?: Record<string, unknown>
   frontmatter?: FrontmatterOptions | null
   mdx?: Record<string, unknown>
+  definitionList?: boolean
 }
 
 /** Parse Markdown to mdast, with positions, through the pinned remark-parse and extensions. */
@@ -91,6 +92,7 @@ export function parseMarkdown(markdown: string, extensions: Extensions = {}): ob
         : [],
     )
     .use(extensions.mdx ? [[remarkMdx, extensions.mdx]] : [])
+    .use(extensions.definitionList ? [remarkDefinitionList] : [])
   // textlane keeps MDX's JavaScript as source strings, so the ESTree remark-mdx attaches is dropped
   const tree = processor.parse(markdown)
   return JSON.parse(

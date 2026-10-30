@@ -165,17 +165,14 @@
     </p>
   </dd>
   <dt>
-    <htmlpress-badge type="danger">open</htmlpress-badge> A single-pass parser that emits
+    <htmlpress-badge type="success">done</htmlpress-badge> A single-pass parser that emits
     mdast directly
   </dt>
   <dd>
     <p>
-      comrak's approach with micromark's output: the only route to comrak-class parsing
-      and the largest share of the 2–3×. It must reproduce every micromark edge case and
-      its exact positions, and reimplement each syntax extension (GFM, math, directive,
-      frontmatter, MDX) on the new parser. The ~2.3k Markdown conformance cases with trees
-      and positions are what make that verifiable; a rewrite is still the largest risk on
-      this page.
+      comrak's approach with micromark's output, now <code>md.parse</code> for every
+      extension and MDX: parsing 5–8× faster, the Markdown-to-HTML pipeline 3–5×. The
+      stage times above are from before it.
     </p>
   </dd>
 </dl>

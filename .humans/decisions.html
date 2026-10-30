@@ -15,7 +15,7 @@
 
 <htmlpress-grid cols="3">
   <htmlpress-card>
-    <h3>24 decided</h3>
+    <h3>25 decided</h3>
     <p>
       <htmlpress-badge type="success">decided</htmlpress-badge> settled by the maintainer
     </p>
@@ -28,7 +28,7 @@
     </p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>5 open</h3>
+    <h3>4 open</h3>
     <p><htmlpress-badge type="danger">open</htmlpress-badge> still to decide</p>
   </htmlpress-card>
 </htmlpress-grid>
@@ -1081,14 +1081,17 @@
     </p>
   </dd>
   <dt>
-    <htmlpress-badge type="danger">open</htmlpress-badge> Keep the micromark-port parser
-    and tune it, or replace it with a single-pass parser that emits mdast directly
+    <htmlpress-badge type="success">decided</htmlpress-badge> A single-pass parser that
+    emits mdast directly replaces the micromark port
   </dt>
   <dd>
     <p>
-      Parsing is 78% of Markdown-to-HTML time; tuning likely gives 1.5–2× on it, a
-      comrak-style parser 2–3× overall, at the risk of micromark's edge cases and
-      positions. See <a href="./optimization.html">Optimization</a>.
+      <strong>Why.</strong> Parsing was 78% of Markdown-to-HTML time; the cmark-style
+      parser makes it 5–8× faster and the pipeline 3–5×, with every syntax extension and
+      MDX on it and the conformance suite unchanged. Each difference fuzzing found is a
+      case in the differential group, decided by mdast-util-from-markdown.
+      <strong>Rejected.</strong> Tuning the micromark port, at most 1.5–2× on parsing;
+      keeping both parsers, which doubles every fix.
     </p>
   </dd>
 </dl>

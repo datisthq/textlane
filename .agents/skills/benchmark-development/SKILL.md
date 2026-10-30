@@ -20,8 +20,11 @@ this skill is how to change it without making the numbers lie.
   release addon into `.cache/addon/`, the release wheel installed into that venv, and the
   Rust adapters. Rerun it after a crate change: the wheel is not rebuilt per run
 - `pnpm -C benchmark measure` — narrowed with `--case`, `--size`, `--tool`; `--runs 1 --warmup 0`
-  for a smoke run. After a textlane change re-measure only
-  `--tool textlane-rust --tool textlane-typescript --tool textlane-python`; rivals carry over
+  for a smoke run. **By default a rerun measures only textlane:**
+  `--tool textlane-rust --tool textlane-typescript --tool textlane-python`. The rivals'
+  results carry over, as `show:report` merges the latest per tool, and re-measuring them
+  costs half an hour for numbers that did not change. Measure every tool only when asked
+  for a full run, or when a rival's version or the machine changed
 - `pnpm -C benchmark show:report` — merges `.cache/results/`, latest per case, size and tool
 - Publish a full run in `.humans/benchmark.html`: its tables, chart and cards, with the date,
   commit and machine. A stale result file from before a textlane change still merges into

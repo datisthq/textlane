@@ -1,7 +1,3 @@
-use crate::helpers::slice::Slice;
-use crate::models::event::{Event, Kind};
-use crate::models::token::Name;
-
 /// Whether `character` can start a JavaScript identifier, as estree-util-is-identifier-name
 /// decides.
 pub(crate) fn is_id_start(character: char) -> bool {
@@ -78,29 +74,4 @@ pub(crate) fn format_character(character: Option<char>) -> String {
             format!("character {shown} (U+{:04X})", u32::from(character))
         }
     }
-}
-
-/// Append to `source` the text of the `chunk` tokens and line endings among `events` from
-/// `from` on, as micromark-util-events-to-acorn collects them; returns where it stopped.
-pub(crate) fn append_script_source(
-    events: &[Event],
-    bytes: &[u8],
-    from: usize,
-    chunk: Name,
-    source: &mut String,
-) -> usize {
-    let mut index = from;
-    while index + 1 < events.len() {
-        let event = &events[index];
-        if event.kind == Kind::Enter
-            && (event.name == chunk || event.name == Name::LINE_ENDING)
-        {
-            let slice = Slice::from_points(bytes, &event.point, &events[index + 1].point);
-            source.extend(std::iter::repeat_n(' ', slice.before));
-            source.push_str(&String::from_utf8_lossy(slice.bytes));
-            source.extend(std::iter::repeat_n(' ', slice.after));
-        }
-        index += 1;
-    }
-    index
 }

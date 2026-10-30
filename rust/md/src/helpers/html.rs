@@ -66,9 +66,3 @@ pub(crate) const BLOCK_NAMES: [&str; 62] = [
 
 /// The tag names whose content is raw: their HTML block ends at their closing tag.
 pub(crate) const RAW_NAMES: [&str; 4] = ["pre", "script", "style", "textarea"];
-
-/// The longest raw tag name.
-pub(crate) const RAW_SIZE_MAX: usize = 8;
-
-/// What follows `<![` in CDATA.
-pub(crate) const CDATA_PREFIX: &[u8; 6] = b"CDATA[";

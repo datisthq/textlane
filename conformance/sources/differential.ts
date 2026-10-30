@@ -78,6 +78,101 @@ const GFM_INPUTS: { description: string; input: string }[] = [
   },
 ]
 
+// Fragments where the event engine and the one-pass parser disagreed, found by fuzzing
+// both; the pinned reference decides each
+const FUZZED_INPUTS: string[] = [
+  "+ - <!--~~~===\n\t",
+  "+ > ](http://x---\n ",
+  "- ~~~\r\n ",
+  "- + > + a]\r\n    ",
+  "\n\n1. 2) <!--\n\n ",
+]
+const FUZZED_GFM_INPUTS: string[] = [
+  "[^1]: &#x41;# [^1]** https://a.b/c>---<!--\n\t",
+  '~~#~<x@y.z>[^1]\r\n[^1]: "t"+ [^1]: \n    ',
+  ">*[a]: /uhttp://x**\r\n[^1]: \r\n ",
+  "[^1]:  &amp;www.a.b# \n    ",
+  "[^1]: https://a.b/c\n\\---\nb\r\n ",
+  "[^1]: > \r\n ",
+  "_```- \r\n  + >[x] &#x41;\n    ",
+  "[^1]: `</div>    &~~~:-**&#x41;<!--\r\n ",
+  "<http://a>2)  [a]: /u``2) \n- [^1]: )\n\n\t",
+  "[^1]: :-- [ ] (é+ </div>\n\t",
+  "[^1]: &amp;\r\n \n",
+  "[^1]: <x@y.z>b\n\n\t",
+  "[^1]: [^1]:->   \r\n    ",
+  "2) ~~~~~~| - |`\n\n\n ",
+  " 2) \n\t[ ] </div>`+     <x@y.z>```",
+  "[^1]: !```1. \n\t\t",
+  "[^1]: <!--]--- \r\n    ",
+  "[^1]: <x@y.z>>`\n    ",
+  '[^1]: <a href="x">---`<!--\n\n\t',
+  "2) [a]: /u]\n\n\t[x] )- ",
+  "[^1]: ---1. 't'|-|\n\n ",
+  "> 2) 1. |-|\n>",
+  "[^1]: [ ] !2) \n*~~~*\n\n ",
+  "2) >https://a.b/c*<2) \n ",
+  "+ >|-|[a]: /uwww.a.b[\n ",
+]
+const FUZZED_MATH_INPUTS: string[] = [
+  "2) $$\n ",
+  "2) > _ \n  ",
+  '+ > <a href="x">> &\r\n ',
+  "\t\n\n- $$\n ",
+  "2) 1. $$\n    ",
+  "!\r\n+ $$\n ",
+  "- ~~~  ~~~a$$&#x41;---!$$\n  ",
+  "1. `$$\n\t#$$<x@y.z>",
+  "\n+ <!--1. <div>`!$$\n  ",
+]
+const FUZZED_DIRECTIVE_INPUTS: string[] = ["2) *  ~~~*{\\# ::a\n2) <http://a>"]
+const FUZZED_FRONTMATTER_INPUTS: string[] = [
+  "(`---\n- > +++\n  ",
+  "&#x41;`- \n\n1. ``+++\n\t(|``&#x41;",
+  "+ 2) ~~~#2) ```  ]a: b\n ",
+  "1. + ```- ===]a!a: b\n1.  ---\n",
+  ">```---\n\t<x@y.z>\n\n\t**<x@y.z>  )",
+  "1. >+++\n  ",
+  "<\n\n---\n [a]: /u+++\né\t---\n---\n*+ ",
+  "  1. ~~~~~~\n\n\t",
+  '+++\n"t"\t  ---\n1. - <!--&a: b\n ',
+  "+ `\n\t`&#x41;a[a]: /u<div>|---\n---\n",
+  '1. 2) ===<a href="x">\n<x@y.z>\n\n    <!--\r\n>',
+  "- ~~~+++\n ",
+  "+ ~~~&#bb2) &#x41;```a: b\n ",
+  "+ <!--!\r\n  ",
+  '\\+ \r\n\n+++\n\\\r\n1. >"t"+++\n  ',
+  "[a]: /uhttp://x</div>    ((<2) \t",
+  '- + 1. ~~~"t"    &é---\n    ',
+]
+const FUZZED_DEFINITION_LIST_INPUTS: string[] = [
+  '\\<a href="x">ba\t\\\r\n2) \n: **```',
+  "-->> \t  ~~~\\\r\n(+ + \n: ",
+  "\\\n&amp;```<div>_\n: ",
+  "(\t\\\n`\n: \n\n>     http://x",
+  ":   ---+ <!--_\\\r\n<http://a>a+ )\n: ",
+  "`(\\\n&#x41;</div>`'t'\n: (",
+  ": <a href=\"x\">\\\r\n] \n:  't'",
+  " 2) ] <x@y.z>2) *\n    :   &",
+  '---http://x"t"]\\\r\na\n\n: ]*',
+  "\\\n]\"t\"**b 't'\n: ",
+  "  1. ~~~~~~\n\n\t",
+  "> [a]: /u\r\n    + `\n: ",
+  "\\\r\n \n: \\",
+  "+ `\n\t`&#x41;a[a]: /u<div>|: : ",
+  "# _- \n: \t\n\n\t# [a]: /u\n*",
+  "\n\n&#x41;\\\r\n[a]: /u**:   _\n: <**(",
+  ": ~~~é\n: \n :   ",
+  "&amp;<\t> \\\n`[\n:   |",
+  "\\\t    \r\n[a]: /u# \n: </div>",
+  "===<http://a>\\\n(:   <x@y.z>\n: + <http://a>",
+  "\\\r\nba+ |\n: ",
+  '"t"\\\n]<http://a>&amp;http://x--- \n: ]',
+  '&~~~[a]: /u\\\n"t"*&#x41;: \n: -  ',
+  '1. 2) ===<a href="x">\n<x@y.z>\n\n    <!--\r\n>',
+  "`    \\\n \\\n: ~~~[``",
+]
+
 // Directives have no mdast-util-to-hast handler, so its unknown handler and `data` apply
 const DIRECTIVE_INPUTS: { description: string; input: string }[] = [
   { description: "a container directive", input: ":::note\nalpha\n:::" },
@@ -181,9 +276,40 @@ function importDifferential() {
       expected: { tree: parseMarkdown(test.input, { gfm: {} }) },
     })),
   }
+  const fuzzed = (
+    description: string,
+    plugin: string | null,
+    inputs: string[],
+    extensions: Parameters<typeof parseMarkdown>[1],
+  ) => ({
+    description,
+    pipeline: plugin ? [["md.parse"], [plugin]] : [["md.parse"]],
+    tests: inputs.map((input, index) => ({
+      description: `fragment ${index + 1}`,
+      input,
+      expected: { tree: parseMarkdown(input, extensions) },
+    })),
+  })
   const groups = [
     group,
     gfm,
+    fuzzed("fuzzed", null, FUZZED_INPUTS, {}),
+    fuzzed("fuzzed with GFM", "md.gfm", FUZZED_GFM_INPUTS, { gfm: {} }),
+    fuzzed("fuzzed with math", "md.math", FUZZED_MATH_INPUTS, { math: {} }),
+    fuzzed("fuzzed with directives", "md.directive", FUZZED_DIRECTIVE_INPUTS, {
+      directive: {},
+    }),
+    fuzzed("fuzzed with frontmatter", "md.frontmatter", FUZZED_FRONTMATTER_INPUTS, {
+      frontmatter: null,
+    }),
+    fuzzed(
+      "fuzzed with definition lists",
+      "md.definitionList",
+      FUZZED_DEFINITION_LIST_INPUTS,
+      {
+        definitionList: true,
+      },
+    ),
     directives,
     createTreeGroup(DIRECTIVE_TREES),
     createTreeGroup(PASS_THROUGH_TREES, { passThrough: ["textDirective"] }),

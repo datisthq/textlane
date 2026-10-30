@@ -2,12 +2,13 @@ use textlane_core::{
     Allocator, Attach, Error, File, Parser, Plugin, ScriptParserSlot, Tree, TreeKind,
 };
 
-use crate::actions::markdown::parse::{ParseSettings, parse_markdown_with};
+use crate::actions::markdown::parse::ParseSettings;
 use crate::models::mdx::MdxScript;
 use crate::models::options::{
     DefinitionListSlot, DirectiveSlot, FrontmatterSlot, GfmOptions, GfmSlot, MathOptions,
     MathSlot, Matter, MdxSlot, ParseOptions,
 };
+use crate::utils::onepass::build::parse_onepass_source;
 
 /// `md.parse`: Markdown into mdast.
 #[derive(Clone, Debug, Default)]
@@ -90,6 +91,6 @@ impl Parser for MarkdownParser {
             definition_list: self.definition_list,
             mdx: self.mdx.as_ref(),
         };
-        parse_markdown_with(input, &settings, alloc).map(Tree::Mdast)
+        parse_onepass_source(input, &settings, alloc).map(Tree::Mdast)
     }
 }

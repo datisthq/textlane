@@ -970,12 +970,12 @@ interface Measure {
 
 // The 100KB `spec` case of benchmark/, Markdown to HTML, median time per document
 const measures: Measure[] = [
-  { tool: "textlane (Rust)", ms: 18, mb: 24, isTextlane: true },
-  { tool: "textlane (Node.js)", ms: 17, mb: 67, isTextlane: true },
-  { tool: "textlane (Python)", ms: 20, mb: 30, isTextlane: true },
-  { tool: "markdown-rs", ms: 140, mb: 48 },
-  { tool: "micromark", ms: 563, mb: 562 },
-  { tool: "unified (remark + rehype)", ms: 604, mb: 572 },
+  { tool: "textlane (Rust)", ms: 4.5, mb: 10, isTextlane: true },
+  { tool: "textlane (Node.js)", ms: 4.5, mb: 46, isTextlane: true },
+  { tool: "textlane (Python)", ms: 5.5, mb: 17, isTextlane: true },
+  { tool: "markdown-rs", ms: 127, mb: 48 },
+  { tool: "micromark", ms: 538, mb: 600 },
+  { tool: "unified (remark + rehype)", ms: 554, mb: 580 },
 ]
 
 function Benchmark() {
@@ -986,11 +986,11 @@ function Benchmark() {
         <Reveal>
           <div className="text-center max-w-2xl mx-auto mb-10 md:mb-16">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-              30× faster than remark + rehype
+              120× faster than remark + rehype
             </h2>
             <p className="mt-4 text-muted-foreground text-lg">
-              The same Markdown-to-HTML pipeline in a tenth of the memory, from every
-              language.
+              The same Markdown-to-HTML pipeline in under a tenth of the memory, from
+              every language.
             </p>
           </div>
         </Reveal>
@@ -1032,8 +1032,8 @@ function Benchmark() {
                 <Gauge className="mt-0.5 size-3.5 shrink-0" />
                 <span>
                   Median time per document and peak memory, on an AMD Ryzen 5 PRO 7545U.
-                  Early numbers: streaming renderers without a syntax tree, such as
-                  pulldown-cmark and comrak, are faster still. Reproduce with{" "}
+                  pulldown-cmark, which streams events without a syntax tree, is faster
+                  still; comrak, which builds one, is about level. Reproduce with{" "}
                   <code className="font-mono text-foreground">
                     pnpm -C benchmark measure
                   </code>

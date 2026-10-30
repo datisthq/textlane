@@ -49,7 +49,7 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
 - Beside `actions/`, as in fairspec: `models/` for types, `helpers/` for small free functions,
   `plugins/<name>/` for one `.use()` stage each (`plugin.rs` plus its own `actions/`), and
   `utils/<name>/` for a bounded internal system whose files are mutually recursive (`md`'s
-  `tokenizer`, `compiler`, `serializer`, `converter`); only it is exempt from one action per file
+  `onepass`, `serializer`, `converter`); only it is exempt from one action per file
 - Trees live in one `bumpalo` arena per document (`textlane_core::Allocator`, `ArenaVec`);
   strings borrow the input or the arena. Input decides how deep a tree nests, so nothing
   walks one by recursion on the plain stack: `ArenaVec` never drops its items, conversion
@@ -59,42 +59,27 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   or dropping it recurses. Watch for
   quadratic passes too: `processor_unit.rs` runs 100,000-deep and 50,000-run inputs,
   and unclosed code spans of growing length. A construct that scans ahead and can fail
-  needs a memo of what the failed scan saw, as `code_text_runs` is for code spans and
-  `thematic_break_failed` for nested list markers. Nested containers all close at one
-  place, so a walk back over their exits must be precomputed (`helpers/spread.rs`);
-  blank lines skip list items that continue for free (`document_blank_ends`). Text joins
-  pieces through a growable arena buffer, a label is matched against definitions in the
-  length of the longest identifier (`ParseState::is_defined`), and a label's text is read
-  only when it names a reference. Inline HTML remembers which kinds scanned to the end
-  unclosed (`html_text_unclosed`). A GFM literal autolink remembers where its last trail
-  check and failed domain ended (`literal_trail`, `literal_domain_failed`): a check or
-  domain starting in between ends the same way; the find-and-replace pass after parsing
-  shares one domain run and one atext run among the starts inside it. The serializer
+  needs a memo of what the failed scan saw: in `md`'s parser, unclosed code and math runs,
+  inline HTML (`HtmlMemo`), GFM literal autolinks' trails and domains (`LiteralMemo`) and
+  MDX's tries at a `}` and ESM (a parse budget). Per line, work stays O(1) in nesting depth:
+  `touch` stops at an ancestor already ending there, blank lines reuse the last container
+  match (`blank_match`), an unclosed link bracket's deactivation stops at one already off,
+  and runs pair through buckets. A label is matched against definitions only up to the
+  longest identifier. The find-and-replace pass for GFM literals after parsing shares one
+  domain run and one atext run among the starts inside it. The serializer
   never re-indents a container's text: `utils/serializer/sink.rs` records each container as a layer and writes every prefix
   once, deciding a blank line from the innermost prefix out. Nested emphasis renders into
   one shared token buffer, and a delimiter run's token list is shared, not copied per
   token. Time
   growth in release mode, best of several runs: single debug timings are noisy.
-- Constant factors in `md`'s tokenizer are memory traffic: each document pass reads and
-  rewrites every event, so an `Event` stays at 32 bytes (`Name` a `u16` index into `NAMES`,
-  `Point` fields `u32`, which caps input at 4 GiB with `input-too-long`, `Link` indices
-  `NonZeroU32` held plus one), `EditMap::consume` moves kept runs
-  in place (left movers front to back, right movers back to front) and writes added
-  events into the gaps, a child list split into chunks goes into the map's `pool` once,
-  strings are tokenized inside each child rather than in a pass of their own, and data,
-  paragraph and chunk lines take runs of plain bytes at once (`Tokenizer::consume_while`).
-  Per-event side tables pay the same: keep them sparse, as the compiler's trailing runs are
-- Page faults cost as much as the passes: glibc hands large freed buffers back and faults
-  them in again, so document-sized event lists go back to `utils/tokenizer/recycle.rs`
-  (a few per thread, within a size band) instead of being dropped, a pass never
-  allocates a second list, and `process` takes the thread's last arena, reset, from
-  `with_allocator` (`textlane/src/actions/allocator/reuse.rs`, up to 64 MB kept). An arena never frees a
-  vector it outgrew, so trees are built at their exact size: the compiler collects open
-  nodes' children in one scratch `Vec` and moves them into the arena when the node closes
-  (`pop_node`), and `md.toHtml` gives wrapped parents room for their line endings up front
-  (`wrap` works in place); an arena past 64 MB is dropped and faulted in again per
-  document. Scan bytes with `memchr`, never `slice.contains` per byte. Count faults with `/usr/bin/time -f %R` beside the timing; the
-  pprof harness must not blocklist `libc`, or malloc, free and memcpy vanish from it.
+- `process` takes the thread's last arena, reset, from `with_allocator`
+  (`textlane/src/actions/allocator/reuse.rs`, up to 64 MB kept), as glibc hands large freed
+  buffers back and faults them in again. An arena never frees a vector it outgrew, so trees
+  are built at their exact size where it is known, and `md.toHtml` gives wrapped parents
+  room for their line endings up front (`wrap` works in place); an arena past 64 MB is
+  dropped and faulted in again per document. Scan bytes with `memchr`, never
+  `slice.contains` per byte. Count faults with `/usr/bin/time -f %R` beside the timing;
+  the pprof harness must not blocklist `libc`, or malloc, free and memcpy vanish from it.
   Measure a change A/B against the previous build, interleaved, best of many runs: a
   loaded machine drifts by more than most wins
 - Container ends follow micromark, not markdown-rs: a list item ends at the first line
@@ -105,44 +90,29 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   whose last construct swallowed its line ending (an unclosed fence) ends after the next
   item's prefix. A `Point` is a byte offset whose top two bits hold a tab's virtual
   spaces; `Lines` turns it into unist's UTF-16 line, column and offset
-- `utils/tokenizer/document.rs` follows micromark's `document.js`, where markdown-rs
-  differs: `interrupt` is decided once a line, before any container opens on it
-  (`document_opened`); the last line is flushed before laziness is judged; the empty line
-  after a final line ending is lazy inside a block quote the line continued; closing
-  containers after a line keeps the child's `interrupt`. A new container always closes the
-  flow (micromark's `closeFlow`), even with no container to exit, or a pending GFM table head
-  sees its line. A setext underline needs a paragraph in the content above, checked once the
-  underline matched; after definitions only it fails and its line starts new content
-  (`ParseState::content_breaks`). micromark drops a leading byte order mark before it
-  tokenizes: `Parser::source` hands the parser the input without it, and positions count from
-  there. Text right after a container prefix (`>*a*`) has no character before it Sizes are columns, not bytes: a
-  tab after a list marker widens the prefix to the next tab stop. Differences show best
-  by fuzzing random fragments through `md.parse` and the pinned from-markdown; each one
-  fixed becomes a case in `conformance/sources/differential.ts`
-- `md`'s engine is a port of markdown-rs (micromark's design in Rust): a state is a plain
-  `fn(&mut Tokenizer) -> State`, a token name a `Name::new("…")` constant, its text listed in `NAMES` (`models/token.rs`) or
-  it fails to compile. A construct not
-  ported yet is marked where it joins, in `utils/tokenizer/{document,flow,text}.rs`. Where
-  markdown-rs differs from micromark or unified, the corpus wins (flow nodes start after their
-  indent: `tail_push_after_prefix`; `*` and `_` never count as punctuation next to attention;
-  an escape's text starts at its backslash, as from-markdown opens it on `characterEscape`;
-  string content is never trimmed; a token's slice leaves out container prefixes of its later
-  lines and reads NUL as U+FFFD, as micromark's chunks do; each line of a label or title is
-  a string of its own, a title's indent after a line ending belongs to neither; a point
-  inside a tab is one column and one offset past the tab's start; GFM follows micromark's
-  extensions: an email literal tokenizes in text, without `mailto:` or `xmpp:`, then
-  mdast-util-gfm-autolink-literal's find-and-replace links what micromark left, and a task
-  check goes in the first content of an item: after one blank line ending, or definitions).
-  Attention and strikethrough classify a neighbour as micromark does a UTF-16 code unit
-  (`classify_character_unit`); the serializer reads
-  characters as upstream reads UTF-16 code units: nothing, or an astral character, is
-  neither whitespace nor punctuation (`classify_unit`), and a reference without a
-  `referenceType` is collapsed. GFM footnote calls follow micromark, not markdown-rs: a
-  construct of their own at `[`, tried before a link start, that needs a definition the
-  document pass already found (`ParseState::gfm_footnote_definitions`), plus a `]` after a
-  failed label end that turns `![^a]` into `!` and a call (`gfm_footnote_image`).
-  `helpers/entities.rs` and `helpers/unicode.rs` are tables generated from markdown-rs's,
-  sorted for binary search
+- `md.parse` is `utils/onepass/`, a cmark-style parser that builds mdast with no event
+  list: `block.rs` takes each line through a stack of open blocks, leaves keeping their
+  lines, with `FlowText` reading ahead through container prefixes for MDX's multi-line
+  constructs; `inline.rs` runs once per leaf: items, then pairing runs, then the tree;
+  `build.rs` turns blocks into nodes, groups definition lists and assembles JSX elements.
+  It reproduces micromark's and from-markdown's trees and positions, quirks included:
+  `interrupt` is decided once a line, before any container opens on it; unclosed fences
+  and HTML take their last line ending unless the next line is lazy; a setext underline
+  after definitions only starts new content; a description line never continues a
+  paragraph lazily; GFM's `~` and emphasis pair in the order their kind first appears,
+  the second inside the first's nodes. micromark drops a leading byte order mark:
+  `Parser::source` hands the parser the input without it. Text right after a container
+  prefix (`>*a*`) has no character before it. Sizes are columns, not bytes. Where unified
+  differs from CommonMark's prose, the corpus wins (an escape's text starts at its
+  backslash; a token's slice leaves out container prefixes of its later lines and reads
+  NUL as U+FFFD; a label keeps its continuation indent, a title and inline HTML do not;
+  an email literal tokenizes in text, then mdast-util-gfm-autolink-literal's
+  find-and-replace links what micromark left; a task check goes in an item's first
+  content). Neighbours of attention and strikethrough classify as micromark classifies a
+  UTF-16 code unit (`classify_character_unit`). Differences show best by fuzzing random
+  fragments through `md.parse` and the pinned from-markdown; each one becomes a case in
+  `conformance/sources/differential.ts`. `helpers/entities.rs` and `helpers/unicode.rs`
+  are tables generated from markdown-rs's, sorted for binary search
 - `html`'s parser is a port of parse5 7.3.0, the tree hast-util-from-parse5 and hastscript
   make from it. The tokenizer is pulled (`next_token`) where parse5 calls back: it stops
   after each non-character token so the tree builder can switch its `state` and
@@ -250,19 +220,17 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   check closes the flow even when no list opens, and `Resolver::DefList` splits the
   paragraph above into terms, as micromark-extension-definition-list does
 - `md.mdx` ports micromark-extension-mdxjs (JSX, expressions, ESM; indented code,
-  autolinks and raw HTML off, so flow constructs take any indent: `ParseState::indent_max`)
-  and mdast-util-mdx. Core holds the MDX nodes for mdast and hast alike (`models/mdx.rs`);
-  `md.toHtml` passes them into hast unchanged, as @mdx-js/mdx's remark-rehype does. md
-  asks acorn's questions through core's `ScriptParser` in `ScriptParserSlot`, which the
-  mdx crate implements on oxc (`OxcScriptParser`, a module checked by oxc_semantic too,
-  for acorn's early errors) and `Processor::freeze_with` seeds under `mdx`. A syntax
-  error is `State::Error`: `Tokenizer::crash` keeps the first one in `ParseState::error`
-  and every tokenizer stops; the compiler's `error` does the same for
-  mdast-util-mdx-jsx's tag mismatches, found on its own token stack (`stack_tokens`,
-  which buffers are not on, as from-markdown's). An expression tries each `}` with the
-  parser, as micromark does; a failure before the end of the value
-  (`ScriptError::end`) is one no later text fixes, so no `}` after it is tried
-  (`MdxState::hard_crash`), and the value grows per event, not per try. oxc parses
+  autolinks and raw HTML off, so flow constructs take any indent) and mdast-util-mdx. Core
+  holds the MDX nodes for mdast and hast alike (`models/mdx.rs`); `md.toHtml` passes them
+  into hast unchanged, as @mdx-js/mdx's remark-rehype does. md asks acorn's questions
+  through core's `ScriptParser` in `ScriptParserSlot`, which the mdx crate implements on
+  oxc (`OxcScriptParser`, a module checked by oxc_semantic too, for acorn's early errors)
+  and `Processor::freeze_with` seeds under `mdx`. A syntax error micromark throws while
+  tokenizing beats any mdast-util-mdx-jsx raises while compiling (`MdxErrors`): the block
+  pass stops at the first, the inline passes record theirs and the tree's tag mismatches
+  after. An expression tries each `}` with the parser, as micromark does; a failure before
+  the end of the value (`ScriptError::end`) is one no later text fixes, so no `}` after it
+  is tried. oxc parses
   shallow sources on the caller's stack and deeper ones on a grown one, past 1024 open
   brackets not at all. A JSX text element's tags and children go into its parent's
   phrasing items (`phrasing_into`): copying each nested element's text is quadratic
@@ -318,10 +286,10 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   sibling list instead of splicing, keeping upstream's walk quirks (an ellipsis skips as
   many siblings as it removed). Word lists are generated from the pinned packages
   (`helpers/contraction_table.rs`, `helpers/article_table.rs`), never hand-copied
-- `md` names entities by syntax construct or mdast node and verbs by layer: `tokenize` and
-  `resolve` (micromark), `compile` (from-markdown), `stringify` (to-markdown), `convert`
-  (to-hast), so `actions/heading/compile.rs` exports `compile_heading`. No file named after
-  its parent module (`utils/tokenizer/tokenizer.rs`): clippy's `module_inception` rejects it
+- `md` names entities by syntax construct or mdast node and verbs by layer: `stringify`
+  (to-markdown), `convert` (to-hast), so `actions/heading/convert.rs` exports
+  `convert_heading`. No file named after its parent module (`utils/onepass/onepass.rs`):
+  clippy's `module_inception` rejects it
 - `textlane/src/bindings/node.rs` and `python.rs` only map crate functions to their
   language: `version()`, `plugin_names()` and a `Pipeline` class over `models/pipeline.rs`
   whose methods are its calls (`run`/`runSync`, `process`/`processSync` pick `Api::Async` or
