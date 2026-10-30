@@ -109,9 +109,11 @@ release-please wraps TOML values; without it `cargo publish` finds a dirty lockf
 
 ## First publish
 
-Trusted publishing only covers packages that exist: the first npm publish of each platform
-package and the first `cargo publish` of each crate need tokens (`NPM_TOKEN`, `CARGO_REGISTRY_TOKEN`); PyPI
-accepts a pending trusted publisher for a new project. Publish a `0.0.0` placeholder by hand so
-release-please's first version still reaches CI; a token made for that first publish may lack
-`publish-update` and cannot publish later versions. Unscoped npm names can trip npm's spam
-check, hence the `@textlane` scope.
+Trusted publishing only covers packages that exist: each npm package and each crate gets a
+`0.0.0` placeholder published by hand (npm's 2FA is a browser prompt, so run it yourself), then
+a trusted publisher; PyPI accepts a pending trusted publisher for a new project. The `npm` job
+carries no token: each package is `npm trust github <pkg> --file release.yaml --repo
+datisthq/textlane --env release --allow-publish` and `npm access set mfa=publish <pkg>`, which
+forbids tokens, so a package missing either fails CI. A crates.io token made for the first
+publish may lack `publish-update`. Unscoped npm names can trip npm's spam check, hence the
+`@textlane` scope.

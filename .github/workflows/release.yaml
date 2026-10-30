@@ -148,8 +148,6 @@ jobs:
         run: pnpm -C typescript pack:platforms --addons ../addons
       - name: Publish Packages
         run: pnpm -C typescript release
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   pypi:
     needs: [addons]
