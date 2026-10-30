@@ -58,8 +58,8 @@ importers:
         specifier: 2.1.1
         version: 2.1.1
       livemark:
-        specifier: 0.32.1
-        version: 0.32.1(@date-fns/tz@1.5.0)(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(@tanstack/query-core@5.104.2)(@tanstack/router-core@1.171.35)(@types/node@24.2.0)(commander@14.0.3)(csstype@3.2.3)(date-fns@4.4.0)(esbuild@0.27.3)(jiti@2.7.0)(react-dom@19.3.0(react@19.3.0))(react-is@17.0.2)(react@19.3.0)(redux@5.0.1)(solid-js@1.9.17)(supports-color@10.2.2)(typescript@6.0.3)
+        specifier: 0.34.0
+        version: 0.34.0(@date-fns/tz@1.5.0)(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(@tanstack/query-core@5.104.2)(@tanstack/router-core@1.171.35)(@types/node@24.2.0)(commander@14.0.3)(csstype@3.2.3)(date-fns@4.4.0)(esbuild@0.27.3)(jiti@2.7.0)(react-dom@19.3.0(react@19.3.0))(react-is@17.0.2)(react@19.3.0)(redux@5.0.1)(solid-js@1.9.17)(supports-color@10.2.2)(typescript@6.0.3)
       lucide-react:
         specifier: 0.577.0
         version: 0.577.0(react@19.3.0)
@@ -985,6 +985,16 @@ packages:
     resolution: {integrity: sha512-AaO9ngONf9XBjE3pU6eWzlLjxOjkvVZeOtT7I65mlHtPHk9chCNShS8hREsUcvlcQGR3CCX97GZ6T3BAUHaTBg==}
     cpu: [x64]
     os: [linux]
+
+  '@htmlpress/win32-arm64@0.4.2':
+    resolution: {integrity: sha512-EfFSXIu8ZCaUBNIhRdMIYKEHwCJitffmg5NQHpa/ce8cHYZdZWigCpMfV9aFJC2TnO8Umkg6wYUUF2FH8bGo/w==}
+    cpu: [arm64]
+    os: [win32]
+
+  '@htmlpress/win32-x64@0.4.2':
+    resolution: {integrity: sha512-m6lMxS1wCPX96Dmis35nEATxPoK4wJcKPiWhcGH1mXyAoAuYJtrHd2ofcO+yywwIV9H6YGjckTKHR5gIJZnUjQ==}
+    cpu: [x64]
+    os: [win32]
 
   '@iconify/types@2.0.0':
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
@@ -4538,8 +4548,8 @@ packages:
   linkify-it@6.1.0:
     resolution: {integrity: sha512-wJ/TwpSDTLepCrQoYWYIExIKg5Zchex2Nn5yk2mFnB+6PtdkHtyLx742md9csRjjOnGkKIS/RrbY7l8D6gT9Vw==}
 
-  livemark@0.32.1:
-    resolution: {integrity: sha512-tfaTMGdlv4w8iLWv/SttCzBb8tto79nGcUFIgK2LpSJg5BMrpE0MAcdEye1tKnxd685ZaeOPLpZ/uHJ7YHblqg==}
+  livemark@0.34.0:
+    resolution: {integrity: sha512-Mok/MOogRmxpPaeExUGctdfeU9AXxB6jGgXyFT6H/edQZbTHSGvQWtlZORsvsf7YYXh/7XN25Wq5PxsafXB3wQ==}
     engines: {node: ^24.11.0, pnpm: ^11.0.0}
     hasBin: true
     peerDependencies:
@@ -6763,6 +6773,12 @@ snapshots:
     optional: true
 
   '@htmlpress/linux-x64@0.4.2':
+    optional: true
+
+  '@htmlpress/win32-arm64@0.4.2':
+    optional: true
+
+  '@htmlpress/win32-x64@0.4.2':
     optional: true
 
   '@iconify/types@2.0.0': {}
@@ -9561,6 +9577,8 @@ snapshots:
       '@htmlpress/darwin-x64': 0.4.2
       '@htmlpress/linux-arm64': 0.4.2
       '@htmlpress/linux-x64': 0.4.2
+      '@htmlpress/win32-arm64': 0.4.2
+      '@htmlpress/win32-x64': 0.4.2
 
   github-slugger@2.0.0: {}
 
@@ -10181,7 +10199,7 @@ snapshots:
     dependencies:
       uc.micro: 3.0.0
 
-  livemark@0.32.1(@date-fns/tz@1.5.0)(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(@tanstack/query-core@5.104.2)(@tanstack/router-core@1.171.35)(@types/node@24.2.0)(commander@14.0.3)(csstype@3.2.3)(date-fns@4.4.0)(esbuild@0.27.3)(jiti@2.7.0)(react-dom@19.3.0(react@19.3.0))(react-is@17.0.2)(react@19.3.0)(redux@5.0.1)(solid-js@1.9.17)(supports-color@10.2.2)(typescript@6.0.3):
+  livemark@0.34.0(@date-fns/tz@1.5.0)(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(@tanstack/query-core@5.104.2)(@tanstack/router-core@1.171.35)(@types/node@24.2.0)(commander@14.0.3)(csstype@3.2.3)(date-fns@4.4.0)(esbuild@0.27.3)(jiti@2.7.0)(react-dom@19.3.0(react@19.3.0))(react-is@17.0.2)(react@19.3.0)(redux@5.0.1)(solid-js@1.9.17)(supports-color@10.2.2)(typescript@6.0.3):
     dependencies:
       '@base-ui/react': 1.9.0(@date-fns/tz@1.5.0)(@types/react@19.3.0)(date-fns@4.4.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@clack/prompts': 1.8.1
