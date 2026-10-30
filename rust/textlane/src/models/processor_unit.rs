@@ -1205,3 +1205,61 @@ fn gives_up_on_mdx_scripts_that_keep_failing_in_linear_time() -> Result<(), Erro
     }
     Ok(())
 }
+
+fn render_components(
+    input: &str,
+    component: textlane_md::Component,
+) -> Result<String, Error> {
+    let processor = Processor::new()
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::Directive::default())
+        .with(textlane_md::Mdx::default())
+        .with(component)
+        .with(textlane_md::Stringify::default())
+        .freeze()?;
+    Ok(processor.process(input)?.value)
+}
+
+#[test]
+fn turns_directives_into_components() -> Result<(), Error> {
+    let rule = textlane_md::DirectiveRule {
+        name: textlane_md::Names::One("note".into()),
+        component: "Callout".into(),
+        name_as: Some("type".into()),
+        label_as: Some("title".into()),
+        ..Default::default()
+    };
+    let component = textlane_md::Component {
+        directives: vec![rule],
+        ..Default::default()
+    };
+    let output = render_components(":::note[Heads up]\nRead *this*.\n:::", component)?;
+    let expected =
+        "<Callout type=\"note\" title=\"Heads up\">\n  Read *this*.\n</Callout>\n";
+    assert_eq!(output, expected);
+    Ok(())
+}
+
+#[test]
+fn groups_many_components_in_linear_time() -> Result<(), Error> {
+    let rule = textlane_md::DirectiveRule {
+        name: textlane_md::Names::One("card".into()),
+        component: "Card".into(),
+        group: Some(textlane_md::GroupRule {
+            component: "Cards".into(),
+            min: None,
+            inherit: Vec::new(),
+        }),
+        ..Default::default()
+    };
+    let component = textlane_md::Component {
+        directives: vec![rule],
+        ..Default::default()
+    };
+    let input = ":::card\na\n:::\n\n".repeat(50_000);
+    let started = std::time::Instant::now();
+    let output = render_components(&input, component)?;
+    assert!(output.starts_with("<Cards>"));
+    assert!(started.elapsed().as_secs() < LIMIT_SECS);
+    Ok(())
+}

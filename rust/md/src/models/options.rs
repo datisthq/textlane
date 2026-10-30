@@ -1,4 +1,5 @@
 use serde::Deserialize;
+use std::collections::BTreeMap;
 use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
 
@@ -153,6 +154,12 @@ pub enum Names {
     Many(Vec<String>),
 }
 
+impl Default for Names {
+    fn default() -> Self {
+        Names::Many(Vec::new())
+    }
+}
+
 impl Names {
     /// The names as a slice.
     pub fn as_slice(&self) -> &[String] {
@@ -215,6 +222,126 @@ impl Default for Math {
             single_dollar_text_math: true,
         }
     }
+}
+
+/// `md.component`: directives, GitHub alerts and other nodes into MDX JSX elements, the
+/// components an MDX runtime renders, by declarative rules.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", schemars(rename = "ComponentOptions"))]
+pub struct Component {
+    /// Rules for directives; the first that matches a directive converts it.
+    pub directives: Vec<DirectiveRule>,
+    /// GitHub alerts, `> [!NOTE]`, into a component.
+    pub alerts: Option<AlertRule>,
+    /// Node types, such as `defList`, into components keeping their children.
+    pub nodes: BTreeMap<String, String>,
+    /// What becomes of a directive no rule converts.
+    pub unknown_directives: UnknownDirectives,
+}
+
+/// How `md.component` turns matching directives into one component.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "camelCase")]
+pub struct DirectiveRule {
+    /// The directive's name, or several.
+    pub name: Names,
+    /// The kind of directive: `text`, `leaf` or `container`; any when left out.
+    #[serde(default)]
+    pub kind: Option<DirectiveKind>,
+    /// Attribute values the directive must have.
+    #[serde(default, rename = "where")]
+    pub condition: BTreeMap<String, String>,
+    /// The component: a text element for a text directive, else a flow element.
+    pub component: String,
+    /// The attribute that gets the directive's name.
+    #[serde(default)]
+    pub name_as: Option<String>,
+    /// The attribute that gets the label's text: a container's label paragraph or a text
+    /// or leaf directive's content, which is then dropped.
+    #[serde(default)]
+    pub label_as: Option<String>,
+    /// The label's text when there is none.
+    #[serde(default)]
+    pub label_default: Option<String>,
+    /// The attributes to keep, in order; every one, as written, when left out.
+    #[serde(default)]
+    pub attributes: Option<Vec<AttributeRule>>,
+    /// Attributes without which the directive is left to `unknownDirectives`.
+    #[serde(default)]
+    pub required: Vec<String>,
+    /// Wrap runs of adjacent siblings this rule converted in another component.
+    #[serde(default)]
+    pub group: Option<GroupRule>,
+}
+
+/// A directive's kind, by how many colons open it.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "camelCase")]
+pub enum DirectiveKind {
+    Text,
+    Leaf,
+    Container,
+}
+
+/// An attribute to keep: its name, or its name with what to call it and a default.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(untagged)]
+pub enum AttributeRule {
+    Name(String),
+    Rule {
+        name: String,
+        #[serde(default)]
+        rename: Option<String>,
+        #[serde(default)]
+        default: Option<String>,
+    },
+}
+
+/// The component wrapping a run of adjacent siblings one rule converted.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "camelCase")]
+pub struct GroupRule {
+    /// The wrapping component.
+    pub component: String,
+    /// The shortest run wrapped; 2 when left out.
+    #[serde(default)]
+    pub min: Option<usize>,
+    /// Attributes the wrapper copies from the run's first element.
+    #[serde(default)]
+    pub inherit: Vec<String>,
+}
+
+/// How `md.component` turns GitHub alerts, a block quote opening with `[!TYPE]`, into a
+/// component.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "camelCase")]
+pub struct AlertRule {
+    /// The component an alert becomes.
+    pub component: String,
+    /// The attribute that gets the alert's type.
+    pub type_as: String,
+    /// Each alert type, as written, to the value of `typeAs`; other types stay block quotes.
+    pub types: BTreeMap<String, String>,
+}
+
+/// What `md.component` does with a directive no rule converts.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "camelCase")]
+pub enum UnknownDirectives {
+    /// Leave it a directive, as unified does.
+    #[default]
+    Keep,
+    /// Put a text or leaf directive back as the text it was written as, such as the `:1` of
+    /// `3:1`; container directives stay.
+    Source,
 }
 
 /// `md.directive`: generic directives, `:a`, `::b` and `:::c`, read by `md.parse` and

@@ -277,6 +277,108 @@ No options.
 
 <!-- /generated -->
 
+## md.component
+
+Turns directives, GitHub alerts and other nodes into MDX JSX elements, the components an MDX
+runtime renders, by declarative rules, so a site's `:::note` or `::button` needs no
+JavaScript plugin. Each directive rule names the directive and the component, where its name
+and label go, which attributes it keeps, what it requires and whether adjacent elements are
+grouped, as livemark's cards and tabs are. Run it after `md.directive` and before `md.toHtml`
+and `mdx.compile`, which compile the elements to component calls.
+
+```js
+import { textlane } from "textlane"
+import * as md from "textlane/md"
+
+const file = textlane()
+  .use(md.parse())
+  .use(md.directive())
+  .use(md.mdx())
+  .use(
+    md.component({
+      directives: [{ name: "note", component: "Callout", nameAs: "type", labelAs: "title" }],
+    }),
+  )
+  .use(md.stringify())
+  .processSync(":::note[Heads up]\nRead *this*.\n:::")
+file.value
+// <Callout type="note" title="Heads up">
+//   Read *this*.
+// </Callout>
+```
+
+<!-- generated:options md.component -->
+
+| Option              | Type                     | Default | Description                                                            |
+| ------------------- | ------------------------ | ------- | ---------------------------------------------------------------------- |
+| `directives`        | `DirectiveRule[]`        |         | Rules for directives; the first that matches a directive converts it.  |
+| `alerts`            | `AlertRule \| null`      |         | GitHub alerts, `> [!NOTE]`, into a component.                          |
+| `nodes`             | `Record<string, string>` | `{}`    | Node types, such as `defList`, into components keeping their children. |
+| `unknownDirectives` | `UnknownDirectives`      |         | What becomes of a directive no rule converts.                          |
+
+**`DirectiveRule`**
+
+How `md.component` turns matching directives into one component.
+
+| Option         | Type                      | Default | Description                                                                                                                           |
+| -------------- | ------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`         | `Names`                   |         | The directive's name, or several.                                                                                                     |
+| `kind`         | `DirectiveKind \| null`   |         | The kind of directive: `text`, `leaf` or `container`; any when left out.                                                              |
+| `where`        | `Record<string, string>`  | `{}`    | Attribute values the directive must have.                                                                                             |
+| `component`    | `string`                  |         | The component: a text element for a text directive, else a flow element.                                                              |
+| `nameAs`       | `string \| null`          | `null`  | The attribute that gets the directive's name.                                                                                         |
+| `labelAs`      | `string \| null`          | `null`  | The attribute that gets the label's text: a container's label paragraph or a text or leaf directive's content, which is then dropped. |
+| `labelDefault` | `string \| null`          | `null`  | The label's text when there is none.                                                                                                  |
+| `attributes`   | `AttributeRule[] \| null` |         | The attributes to keep, in order; every one, as written, when left out.                                                               |
+| `required`     | `string[]`                | `[]`    | Attributes without which the directive is left to `unknownDirectives`.                                                                |
+| `group`        | `GroupRule \| null`       |         | Wrap runs of adjacent siblings this rule converted in another component.                                                              |
+
+**`AlertRule`**
+
+How `md.component` turns GitHub alerts, a block quote opening with `[!TYPE]`, into a component.
+
+| Option      | Type                     | Default | Description                                                                           |
+| ----------- | ------------------------ | ------- | ------------------------------------------------------------------------------------- |
+| `component` | `string`                 |         | The component an alert becomes.                                                       |
+| `typeAs`    | `string`                 |         | The attribute that gets the alert's type.                                             |
+| `types`     | `Record<string, string>` |         | Each alert type, as written, to the value of `typeAs`; other types stay block quotes. |
+
+**`UnknownDirectives`**
+
+What `md.component` does with a directive no rule converts.
+
+Takes `"keep" | "source"`.
+
+**`Names`**
+
+One name or several.
+
+Takes `string | string[]`.
+
+**`DirectiveKind`**
+
+A directive's kind, by how many colons open it.
+
+Takes `"text" | "leaf" | "container"`.
+
+**`AttributeRule`**
+
+An attribute to keep: its name, or its name with what to call it and a default.
+
+Takes `string | { name: string; rename?: string | null; default?: string | null }`.
+
+**`GroupRule`**
+
+The component wrapping a run of adjacent siblings one rule converted.
+
+| Option      | Type             | Default | Description                                                 |
+| ----------- | ---------------- | ------- | ----------------------------------------------------------- |
+| `component` | `string`         |         | The wrapping component.                                     |
+| `min`       | `number \| null` | `null`  | The shortest run wrapped; 2 when left out.                  |
+| `inherit`   | `string[]`       | `[]`    | Attributes the wrapper copies from the run's first element. |
+
+<!-- /generated -->
+
 ## md.stringify
 
 Serializes mdast back into Markdown; its options pick the markers and spacing it writes.

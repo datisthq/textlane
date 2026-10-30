@@ -194,6 +194,30 @@ mod helpers {
     pub(crate) mod uri;
 }
 mod plugins {
+    pub(crate) mod component {
+        pub(crate) mod actions {
+            pub(crate) mod alert {
+                pub(crate) mod convert;
+            }
+            pub(crate) mod children {
+                pub(crate) mod group;
+            }
+            pub(crate) mod directive {
+                pub(crate) mod convert;
+                pub(crate) mod restore;
+            }
+            pub(crate) mod element {
+                pub(crate) mod create;
+            }
+            pub(crate) mod node {
+                pub(crate) mod convert;
+            }
+            pub(crate) mod text {
+                pub(crate) mod read;
+            }
+        }
+        pub(crate) mod plugin;
+    }
     pub(crate) mod definition_list {
         pub(crate) mod plugin;
     }
@@ -242,9 +266,10 @@ mod plugins {
 
 // models
 pub use models::options::{
-    DefinitionListSlot, Directive, DirectiveSlot, Frontmatter, FrontmatterSlot, Gfm,
-    GfmSlot, Math, MathSlot, Matter, Mdx, MdxSlot, Names, Parse, Stringify, ToHtml,
-    ToNaturalLanguage, UnsafePattern,
+    AlertRule, AttributeRule, Component, DefinitionListSlot, Directive, DirectiveKind,
+    DirectiveRule, DirectiveSlot, Frontmatter, FrontmatterSlot, Gfm, GfmSlot, GroupRule,
+    Math, MathSlot, Matter, Mdx, MdxSlot, Names, Parse, Stringify, ToHtml,
+    ToNaturalLanguage, UnknownDirectives, UnsafePattern,
 };
 
 // actions

@@ -220,6 +220,13 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   linear. Custom types are `Literal` nodes, as is any unknown JSON node with only a string
   `value`; any other unknown type is an `Unknown` node (mdast and hast alike) keeping its
   fields as `Data` and its children, so `md.toHtml`'s `passThrough` can copy it into hast
+- `md.component` is textlane's own plugin, with no upstream: `conformance/tests/md/component.json`
+  is its specification. It walks with a stack of sibling lists, converting each list's items
+  before pushing their children, so a list groups (`actions/children/group.rs`) once its own
+  items are elements and nesting never recurses. A rule that fails `where` or `required`
+  hands the directive back (`DirectiveParts`) for the next rule, so read the label and build
+  attributes before dropping anything. Attribute order is part of the output: `nameAs`, then
+  `labelAs` unless listed, then the list, the order livemark's components were written against
 - `md.math`, `md.directive` and `md.definitionList` use slots the same way, and each adds a
   flag to `tokenize_input` and `parse_markdown_with`, in that order after `frontmatter`.
   Every mdast node carries unist `data` (`None` unless a tree from JSON or a plugin set it);

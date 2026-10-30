@@ -126,6 +126,8 @@ the case: `unknown-plugin`, `invalid-options`, `missing-parser`, `missing-compil
   returns over the JSON tree; its file is vfile-shaped, its path from `process({value, path})`.
   The tree crosses as JSON, so non-JSON values in nodes or `data` do not survive a native
   stage. Syntax plugins (remark-gfm, remark-directive, remark-math) need the native ones; do
-  not port a pipeline that needs one textlane lacks, say so.
+  not port a pipeline that needs one textlane lacks, say so. A remark plugin that only turns
+  directives, `> [!NOTE]` alerts or definition lists into MDX JSX elements is a rule of
+  `md.component` instead.
 - remark-stringify reads `settings` from processor data; textlane's `md.stringify` takes its
   options directly.

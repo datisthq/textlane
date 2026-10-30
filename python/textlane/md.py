@@ -20,6 +20,8 @@ __all__ = [
     "frontmatter",
     "FrontmatterOptions",
     "gemoji",
+    "component",
+    "ComponentOptions",
     "stringify",
     "StringifyOptions",
     "to_html",
@@ -114,6 +116,96 @@ FrontmatterOptions = Union[Literal["yaml", "toml"], Matter, List[Union[Literal["
 
 # One name or several.
 Names = Union[str, List[str]]
+
+
+# A directive's kind, by how many colons open it.
+DirectiveKind = Literal["text", "leaf", "container"]
+
+
+class _AttributeRule1Required(TypedDict):
+    name: str
+
+
+class AttributeRule1(_AttributeRule1Required, total=False):
+    rename: Optional[str]
+    default: Optional[str]
+
+
+# An attribute to keep: its name, or its name with what to call it and a default.
+AttributeRule = Union[str, AttributeRule1]
+
+
+class _GroupRuleRequired(TypedDict):
+    # The wrapping component.
+    component: str
+
+
+# The component wrapping a run of adjacent siblings one rule converted.
+class GroupRule(_GroupRuleRequired, total=False):
+    # The shortest run wrapped; 2 when left out.
+    min: Optional[int]
+    # Attributes the wrapper copies from the run's first element.
+    inherit: List[str]
+
+
+class _DirectiveRuleRequired(TypedDict):
+    # The directive's name, or several.
+    name: Names
+    # The component: a text element for a text directive, else a flow element.
+    component: str
+
+
+# How `md.component` turns matching directives into one component.
+class DirectiveRule(_DirectiveRuleRequired, total=False):
+    # The kind of directive: `text`, `leaf` or `container`; any when left out.
+    kind: Optional[DirectiveKind]
+    # Attribute values the directive must have.
+    where: Dict[str, str]
+    # The attribute that gets the directive's name.
+    nameAs: Optional[str]
+    # The attribute that gets the label's text: a container's label paragraph or a text
+    # or leaf directive's content, which is then dropped.
+    labelAs: Optional[str]
+    # The label's text when there is none.
+    labelDefault: Optional[str]
+    # The attributes to keep, in order; every one, as written, when left out.
+    attributes: Optional[List[AttributeRule]]
+    # Attributes without which the directive is left to `unknownDirectives`.
+    required: List[str]
+    # Wrap runs of adjacent siblings this rule converted in another component.
+    group: Optional[GroupRule]
+
+
+class _AlertRuleRequired(TypedDict):
+    # The component an alert becomes.
+    component: str
+    # The attribute that gets the alert's type.
+    typeAs: str
+    # Each alert type, as written, to the value of `typeAs`; other types stay block quotes.
+    types: Dict[str, str]
+
+
+# How `md.component` turns GitHub alerts, a block quote opening with `[!TYPE]`, into a
+# component.
+class AlertRule(_AlertRuleRequired, total=False):
+    pass
+
+
+# What `md.component` does with a directive no rule converts.
+UnknownDirectives = Union[Literal["keep"], Literal["source"]]
+
+
+# `md.component`: directives, GitHub alerts and other nodes into MDX JSX elements, the
+# components an MDX runtime renders, by declarative rules.
+class ComponentOptions(TypedDict, total=False):
+    # Rules for directives; the first that matches a directive converts it.
+    directives: List[DirectiveRule]
+    # GitHub alerts, `> [!NOTE]`, into a component.
+    alerts: Optional[AlertRule]
+    # Node types, such as `defList`, into components keeping their children.
+    nodes: Dict[str, str]
+    # What becomes of a directive no rule converts.
+    unknownDirectives: UnknownDirectives
 
 
 # A character to escape where it would otherwise start or end syntax.
@@ -248,6 +340,11 @@ def frontmatter(options: Optional[FrontmatterOptions] = None) -> Plugin:
 def gemoji() -> Plugin:
     """The `md.gemoji` plugin."""
     return describe_plugin("md.gemoji")
+
+
+def component(options: Optional[ComponentOptions] = None) -> Plugin:
+    """The `md.component` plugin."""
+    return describe_plugin("md.component", options)
 
 
 def stringify(options: Optional[StringifyOptions] = None) -> Plugin:

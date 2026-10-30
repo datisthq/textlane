@@ -1,0 +1,1655 @@
+[
+  {
+    "description": "a container rule names its component from the directive and takes its label",
+    "pipeline": [
+      ["md.parse"],
+      ["md.directive"],
+      [
+        "md.component",
+        {
+          "directives": [
+            {
+              "name": ["note", "tip", "info", "warning", "danger"],
+              "kind": "container",
+              "component": "Callout",
+              "nameAs": "type",
+              "labelAs": "title",
+              "attributes": []
+            }
+          ]
+        }
+      ]
+    ],
+    "positions": false,
+    "tests": [
+      {
+        "description": "the label becomes an attribute",
+        "input": ":::note[Heads up]\nBody\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "Callout",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "type",
+                    "value": "note"
+                  },
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "title",
+                    "value": "Heads up"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "value": "Body",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "no label, no attribute",
+        "input": ":::tip\nBody\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "Callout",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "type",
+                    "value": "tip"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "value": "Body",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "the label's whole text, emphasis included",
+        "input": ":::note[Heads *up*]\nBody\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "Callout",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "type",
+                    "value": "note"
+                  },
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "title",
+                    "value": "Heads up"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "value": "Body",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "another kind of directive stays",
+        "input": "::note",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "note",
+                "attributes": {},
+                "type": "leafDirective",
+                "children": []
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "other attributes are dropped when the list is empty",
+        "input": ":::warning{x=1}\nBody\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "Callout",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "type",
+                    "value": "warning"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "value": "Body",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "comment": "md.component is textlane's own plugin, with no upstream: these cases are its specification, written for livemark's components (Callout, Card, ContentTabs and the rest)"
+  },
+  {
+    "description": "text rules take their content as an attribute",
+    "pipeline": [
+      ["md.parse"],
+      ["md.directive"],
+      [
+        "md.component",
+        {
+          "directives": [
+            {
+              "name": "badge",
+              "kind": "text",
+              "component": "InlineBadge",
+              "labelAs": "label",
+              "attributes": ["variant"]
+            },
+            {
+              "name": "abbr",
+              "kind": "text",
+              "component": "Abbr",
+              "labelAs": "text",
+              "attributes": [
+                {
+                  "name": "title",
+                  "default": ""
+                }
+              ]
+            },
+            {
+              "name": "icon",
+              "kind": "text",
+              "component": "InlineIcon",
+              "attributes": ["name", "className"],
+              "required": ["name"]
+            }
+          ]
+        }
+      ]
+    ],
+    "positions": false,
+    "tests": [
+      {
+        "description": "a badge",
+        "input": "New :badge[beta]{variant=info}",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "value": "New ",
+                    "type": "text"
+                  },
+                  {
+                    "name": "InlineBadge",
+                    "attributes": [
+                      {
+                        "type": "mdxJsxAttribute",
+                        "name": "label",
+                        "value": "beta"
+                      },
+                      {
+                        "type": "mdxJsxAttribute",
+                        "name": "variant",
+                        "value": "info"
+                      }
+                    ],
+                    "type": "mdxJsxTextElement",
+                    "children": [],
+                    "data": {
+                      "_mdxExplicitJsx": true
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "an abbreviation",
+        "input": "The :abbr[HTML]{title=\"HyperText Markup Language\"} spec",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "value": "The ",
+                    "type": "text"
+                  },
+                  {
+                    "name": "Abbr",
+                    "attributes": [
+                      {
+                        "type": "mdxJsxAttribute",
+                        "name": "text",
+                        "value": "HTML"
+                      },
+                      {
+                        "type": "mdxJsxAttribute",
+                        "name": "title",
+                        "value": "HyperText Markup Language"
+                      }
+                    ],
+                    "type": "mdxJsxTextElement",
+                    "children": [],
+                    "data": {
+                      "_mdxExplicitJsx": true
+                    }
+                  },
+                  {
+                    "value": " spec",
+                    "type": "text"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "an abbreviation without a title takes the default",
+        "input": ":abbr[CSS]",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "name": "Abbr",
+                    "attributes": [
+                      {
+                        "type": "mdxJsxAttribute",
+                        "name": "text",
+                        "value": "CSS"
+                      },
+                      {
+                        "type": "mdxJsxAttribute",
+                        "name": "title",
+                        "value": ""
+                      }
+                    ],
+                    "type": "mdxJsxTextElement",
+                    "children": [],
+                    "data": {
+                      "_mdxExplicitJsx": true
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "an icon",
+        "input": ":icon{name=star className=big}",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "name": "InlineIcon",
+                    "attributes": [
+                      {
+                        "type": "mdxJsxAttribute",
+                        "name": "name",
+                        "value": "star"
+                      },
+                      {
+                        "type": "mdxJsxAttribute",
+                        "name": "className",
+                        "value": "big"
+                      }
+                    ],
+                    "type": "mdxJsxTextElement",
+                    "children": [],
+                    "data": {
+                      "_mdxExplicitJsx": true
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "an icon without its required name stays a directive",
+        "input": ":icon{className=big}",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "name": "icon",
+                    "attributes": {
+                      "className": "big"
+                    },
+                    "type": "textDirective",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a leaf rule's label beats an attribute of the same name",
+    "pipeline": [
+      ["md.parse"],
+      ["md.directive"],
+      [
+        "md.component",
+        {
+          "directives": [
+            {
+              "name": "button",
+              "kind": "leaf",
+              "component": "LinkButton",
+              "labelAs": "label",
+              "attributes": ["href", "label", "variant"],
+              "required": ["href", "label"]
+            }
+          ]
+        }
+      ]
+    ],
+    "positions": false,
+    "tests": [
+      {
+        "description": "the label",
+        "input": "::button[Start]{href=/start variant=primary}",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "LinkButton",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "href",
+                    "value": "/start"
+                  },
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "label",
+                    "value": "Start"
+                  },
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "variant",
+                    "value": "primary"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "the attribute when there is no label",
+        "input": "::button{href=/start label=Go}",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "LinkButton",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "href",
+                    "value": "/start"
+                  },
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "label",
+                    "value": "Go"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "without the required href it stays",
+        "input": "::button[Start]",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "button",
+                "attributes": {},
+                "type": "leafDirective",
+                "children": [
+                  {
+                    "value": "Start",
+                    "type": "text"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a rule matches only directives whose attributes it names in where",
+    "pipeline": [
+      ["md.parse"],
+      ["md.directive"],
+      [
+        "md.component",
+        {
+          "directives": [
+            {
+              "name": "video",
+              "kind": "leaf",
+              "where": {
+                "type": "youtube"
+              },
+              "component": "YouTube",
+              "attributes": ["id"],
+              "required": ["id"]
+            }
+          ]
+        }
+      ]
+    ],
+    "positions": false,
+    "tests": [
+      {
+        "description": "a matching directive",
+        "input": "::video{type=youtube id=abc}",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "YouTube",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "id",
+                    "value": "abc"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "another value stays",
+        "input": "::video{type=vimeo id=abc}",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "video",
+                "attributes": {
+                  "type": "vimeo",
+                  "id": "abc"
+                },
+                "type": "leafDirective",
+                "children": []
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "attributes are renamed and defaulted in the order listed",
+    "pipeline": [
+      ["md.parse"],
+      ["md.directive"],
+      [
+        "md.component",
+        {
+          "directives": [
+            {
+              "name": "card",
+              "kind": "container",
+              "component": "Card",
+              "attributes": [
+                {
+                  "name": "title",
+                  "default": ""
+                },
+                {
+                  "name": "to",
+                  "rename": "href"
+                },
+                "icon"
+              ]
+            }
+          ]
+        }
+      ]
+    ],
+    "positions": false,
+    "tests": [
+      {
+        "description": "renamed, defaulted and ordered",
+        "input": ":::card{icon=book to=/docs}\nRead\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "Card",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "title",
+                    "value": ""
+                  },
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "href",
+                    "value": "/docs"
+                  },
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "icon",
+                    "value": "book"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "value": "Read",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a label the rule does not take stays content",
+        "input": ":::card[Docs]\nRead\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "Card",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "title",
+                    "value": ""
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "value": "Docs",
+                        "type": "text"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "value": "Read",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a rule without an attribute list keeps every attribute as written",
+    "pipeline": [
+      ["md.parse"],
+      ["md.directive"],
+      [
+        "md.component",
+        {
+          "directives": [
+            {
+              "name": "box",
+              "component": "Box"
+            }
+          ]
+        }
+      ]
+    ],
+    "positions": false,
+    "tests": [
+      {
+        "description": "shortcuts and values in order",
+        "input": "::box{#main .wide data-x=1}",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "Box",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "id",
+                    "value": "main"
+                  },
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "class",
+                    "value": "wide"
+                  },
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "data-x",
+                    "value": "1"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a label default stands in for a missing label",
+    "pipeline": [
+      ["md.parse"],
+      ["md.directive"],
+      [
+        "md.component",
+        {
+          "directives": [
+            {
+              "name": "details",
+              "kind": "container",
+              "component": "Details",
+              "labelAs": "summary",
+              "labelDefault": "Details",
+              "attributes": []
+            }
+          ]
+        }
+      ]
+    ],
+    "positions": false,
+    "tests": [
+      {
+        "description": "no label",
+        "input": ":::details\nHidden\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "Details",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "summary",
+                    "value": "Details"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "value": "Hidden",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a label",
+        "input": ":::details[More]\nHidden\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "Details",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "summary",
+                    "value": "More"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "value": "Hidden",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "adjacent siblings one rule converted are grouped",
+    "pipeline": [
+      ["md.parse"],
+      ["md.directive"],
+      [
+        "md.component",
+        {
+          "directives": [
+            {
+              "name": "card",
+              "kind": "container",
+              "component": "Card",
+              "attributes": [],
+              "group": {
+                "component": "Cards"
+              }
+            },
+            {
+              "name": "tab",
+              "kind": "container",
+              "component": "ContentTab",
+              "attributes": ["title", "sync"],
+              "group": {
+                "component": "ContentTabs",
+                "min": 1,
+                "inherit": ["sync"]
+              }
+            }
+          ]
+        }
+      ]
+    ],
+    "positions": false,
+    "tests": [
+      {
+        "description": "two cards",
+        "input": ":::card\nA\n:::\n\n:::card\nB\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "Cards",
+                "attributes": [],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "name": "Card",
+                    "attributes": [],
+                    "type": "mdxJsxFlowElement",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "value": "A",
+                            "type": "text"
+                          }
+                        ]
+                      }
+                    ],
+                    "data": {
+                      "_mdxExplicitJsx": true
+                    }
+                  },
+                  {
+                    "name": "Card",
+                    "attributes": [],
+                    "type": "mdxJsxFlowElement",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "value": "B",
+                            "type": "text"
+                          }
+                        ]
+                      }
+                    ],
+                    "data": {
+                      "_mdxExplicitJsx": true
+                    }
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "one card is not grouped below the minimum",
+        "input": ":::card\nA\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "Card",
+                "attributes": [],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "value": "A",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a paragraph between cards splits the run",
+        "input": ":::card\nA\n:::\n\nx\n\n:::card\nB\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "Card",
+                "attributes": [],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "value": "A",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "value": "x",
+                    "type": "text"
+                  }
+                ]
+              },
+              {
+                "name": "Card",
+                "attributes": [],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "value": "B",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "one tab is a group of its own, inheriting sync",
+        "input": ":::tab{title=A sync=pm}\nA\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "ContentTabs",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "sync",
+                    "value": "pm"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "name": "ContentTab",
+                    "attributes": [
+                      {
+                        "type": "mdxJsxAttribute",
+                        "name": "title",
+                        "value": "A"
+                      },
+                      {
+                        "type": "mdxJsxAttribute",
+                        "name": "sync",
+                        "value": "pm"
+                      }
+                    ],
+                    "type": "mdxJsxFlowElement",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "value": "A",
+                            "type": "text"
+                          }
+                        ]
+                      }
+                    ],
+                    "data": {
+                      "_mdxExplicitJsx": true
+                    }
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "cards inside a tab group too",
+        "input": "::::tab{title=A}\n:::card\nA\n:::\n\n:::card\nB\n:::\n::::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "ContentTabs",
+                "attributes": [],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "name": "ContentTab",
+                    "attributes": [
+                      {
+                        "type": "mdxJsxAttribute",
+                        "name": "title",
+                        "value": "A"
+                      }
+                    ],
+                    "type": "mdxJsxFlowElement",
+                    "children": [
+                      {
+                        "name": "Cards",
+                        "attributes": [],
+                        "type": "mdxJsxFlowElement",
+                        "children": [
+                          {
+                            "name": "Card",
+                            "attributes": [],
+                            "type": "mdxJsxFlowElement",
+                            "children": [
+                              {
+                                "type": "paragraph",
+                                "children": [
+                                  {
+                                    "value": "A",
+                                    "type": "text"
+                                  }
+                                ]
+                              }
+                            ],
+                            "data": {
+                              "_mdxExplicitJsx": true
+                            }
+                          },
+                          {
+                            "name": "Card",
+                            "attributes": [],
+                            "type": "mdxJsxFlowElement",
+                            "children": [
+                              {
+                                "type": "paragraph",
+                                "children": [
+                                  {
+                                    "value": "B",
+                                    "type": "text"
+                                  }
+                                ]
+                              }
+                            ],
+                            "data": {
+                              "_mdxExplicitJsx": true
+                            }
+                          }
+                        ],
+                        "data": {
+                          "_mdxExplicitJsx": true
+                        }
+                      }
+                    ],
+                    "data": {
+                      "_mdxExplicitJsx": true
+                    }
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "GitHub alerts become a component",
+    "pipeline": [
+      ["md.parse"],
+      ["md.directive"],
+      [
+        "md.component",
+        {
+          "alerts": {
+            "component": "Callout",
+            "typeAs": "type",
+            "types": {
+              "NOTE": "note",
+              "CAUTION": "danger"
+            }
+          }
+        }
+      ]
+    ],
+    "positions": false,
+    "tests": [
+      {
+        "description": "an alert on its own line",
+        "input": "> [!NOTE]\n> Read this",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "Callout",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "type",
+                    "value": "note"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "value": "Read this",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "an alert with text after its marker",
+        "input": "> [!CAUTION] Hot",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "Callout",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "type",
+                    "value": "danger"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "value": "Hot",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "an alert with nothing after it",
+        "input": "> [!NOTE]",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "Callout",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "type",
+                    "value": "note"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "an unknown type stays a block quote",
+        "input": "> [!FOO]\n> Text",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "value": "[!FOO]\nText",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a lowercase type is another type",
+        "input": "> [!note]\n> Text",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "value": "[!note]\nText",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "nodes map to components keeping their children",
+    "pipeline": [
+      ["md.parse"],
+      ["md.definitionList"],
+      [
+        "md.component",
+        {
+          "nodes": {
+            "defList": "DefinitionList",
+            "defListTerm": "DefinitionTerm",
+            "defListDescription": "DefinitionDetail"
+          }
+        }
+      ]
+    ],
+    "positions": false,
+    "tests": [
+      {
+        "description": "a definition list",
+        "input": "Term\n: Detail",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "DefinitionList",
+                "attributes": [],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "name": "DefinitionTerm",
+                    "attributes": [],
+                    "type": "mdxJsxFlowElement",
+                    "children": [
+                      {
+                        "value": "Term",
+                        "type": "text"
+                      }
+                    ],
+                    "data": {
+                      "_mdxExplicitJsx": true
+                    }
+                  },
+                  {
+                    "name": "DefinitionDetail",
+                    "attributes": [],
+                    "type": "mdxJsxFlowElement",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "value": "Detail",
+                            "type": "text"
+                          }
+                        ]
+                      }
+                    ],
+                    "data": {
+                      "_mdxExplicitJsx": true
+                    }
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "unknown directives can be put back as written",
+    "pipeline": [
+      ["md.parse"],
+      ["md.directive"],
+      [
+        "md.component",
+        {
+          "unknownDirectives": "source"
+        }
+      ]
+    ],
+    "positions": false,
+    "tests": [
+      {
+        "description": "a text directive",
+        "input": "Call :foo[bar]{a=b} now",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "value": "Call ",
+                    "type": "text"
+                  },
+                  {
+                    "value": ":foo[bar]{a=b}",
+                    "type": "text"
+                  },
+                  {
+                    "value": " now",
+                    "type": "text"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a leaf directive",
+        "input": "::foo{a=b}",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "value": "::foo{a=b}",
+                    "type": "text"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a container directive stays",
+        "input": ":::foo\nBody\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "foo",
+                "attributes": {},
+                "type": "containerDirective",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "value": "Body",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "unknown directives stay by default",
+    "pipeline": [["md.parse"], ["md.directive"], ["md.component", {}]],
+    "positions": false,
+    "tests": [
+      {
+        "description": "a text directive",
+        "input": "Call :foo now",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "value": "Call ",
+                    "type": "text"
+                  },
+                  {
+                    "name": "foo",
+                    "attributes": {},
+                    "type": "textDirective",
+                    "children": []
+                  },
+                  {
+                    "value": " now",
+                    "type": "text"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "converted elements serialize as JSX with md.mdx",
+    "pipeline": [
+      ["md.parse"],
+      ["md.directive"],
+      ["md.mdx"],
+      [
+        "md.component",
+        {
+          "directives": [
+            {
+              "name": "note",
+              "kind": "container",
+              "component": "Callout",
+              "nameAs": "type",
+              "labelAs": "title"
+            }
+          ]
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a callout",
+        "input": ":::note[Heads up]\nRead *this*.\n:::",
+        "expected": {
+          "md": "<Callout type=\"note\" title=\"Heads up\">\n  Read *this*.\n</Callout>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "converted elements compile to component calls",
+    "pipeline": [
+      ["md.parse"],
+      ["md.directive"],
+      [
+        "md.component",
+        {
+          "directives": [
+            {
+              "name": "note",
+              "kind": "container",
+              "component": "Callout",
+              "nameAs": "type",
+              "labelAs": "title"
+            }
+          ]
+        }
+      ],
+      ["md.toHtml"],
+      [
+        "mdx.compile",
+        {
+          "outputFormat": "function-body"
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "a callout",
+        "input": ":::note[Heads up]\nRead *this*.\n:::",
+        "expected": {
+          "js": "\"use strict\";\nconst {jsx: _jsx, jsxs: _jsxs} = arguments[0];\nfunction _createMdxContent(props) {\n  const _components = {\n    em: \"em\",\n    p: \"p\",\n    ...props.components\n  }, {Callout} = _components;\n  if (!Callout) _missingMdxReference(\"Callout\", true);\n  return _jsx(Callout, {\n    type: \"note\",\n    title: \"Heads up\",\n    children: _jsxs(_components.p, {\n      children: [\"Read \", _jsx(_components.em, {\n        children: \"this\"\n      }), \".\"]\n    })\n  });\n}\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\nreturn {\n  default: MDXContent\n};\nfunction _missingMdxReference(id, component) {\n  throw new Error(\"Expected \" + (component ? \"component\" : \"object\") + \" `\" + id + \"` to be defined: you likely forgot to import, pass, or provide it.\");\n}\n"
+        }
+      }
+    ]
+  }
+]

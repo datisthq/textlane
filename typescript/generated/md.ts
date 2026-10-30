@@ -69,6 +69,74 @@ export interface FencePair {
 /** A fence, or its opening and closing ones. */
 export type Fence = string | FencePair
 
+/** `md.component`: directives, GitHub alerts and other nodes into MDX JSX elements, the components an MDX runtime renders, by declarative rules. */
+export interface ComponentOptions {
+  /** Rules for directives; the first that matches a directive converts it. */
+  directives?: DirectiveRule[]
+  /** GitHub alerts, `> [!NOTE]`, into a component. */
+  alerts?: AlertRule | null
+  /** Node types, such as `defList`, into components keeping their children. @default {} */
+  nodes?: Record<string, string>
+  /** What becomes of a directive no rule converts. */
+  unknownDirectives?: UnknownDirectives
+}
+
+/** How `md.component` turns matching directives into one component. */
+export interface DirectiveRule {
+  /** The directive's name, or several. */
+  name: Names
+  /** The kind of directive: `text`, `leaf` or `container`; any when left out. */
+  kind?: DirectiveKind | null
+  /** Attribute values the directive must have. @default {} */
+  where?: Record<string, string>
+  /** The component: a text element for a text directive, else a flow element. */
+  component: string
+  /** The attribute that gets the directive's name. */
+  nameAs?: string | null
+  /** The attribute that gets the label's text: a container's label paragraph or a text or leaf directive's content, which is then dropped. */
+  labelAs?: string | null
+  /** The label's text when there is none. */
+  labelDefault?: string | null
+  /** The attributes to keep, in order; every one, as written, when left out. */
+  attributes?: AttributeRule[] | null
+  /** Attributes without which the directive is left to `unknownDirectives`. @default [] */
+  required?: string[]
+  /** Wrap runs of adjacent siblings this rule converted in another component. */
+  group?: GroupRule | null
+}
+
+/** One name or several. */
+export type Names = string | string[]
+
+/** A directive's kind, by how many colons open it. */
+export type DirectiveKind = "text" | "leaf" | "container"
+
+/** An attribute to keep: its name, or its name with what to call it and a default. */
+export type AttributeRule = string | { name: string; rename?: string | null; default?: string | null }
+
+/** The component wrapping a run of adjacent siblings one rule converted. */
+export interface GroupRule {
+  /** The wrapping component. */
+  component: string
+  /** The shortest run wrapped; 2 when left out. */
+  min?: number | null
+  /** Attributes the wrapper copies from the run's first element. @default [] */
+  inherit?: string[]
+}
+
+/** How `md.component` turns GitHub alerts, a block quote opening with `[!TYPE]`, into a component. */
+export interface AlertRule {
+  /** The component an alert becomes. */
+  component: string
+  /** The attribute that gets the alert's type. */
+  typeAs: string
+  /** Each alert type, as written, to the value of `typeAs`; other types stay block quotes. */
+  types: Record<string, string>
+}
+
+/** What `md.component` does with a directive no rule converts. */
+export type UnknownDirectives = "keep" | "source"
+
 /** `md.stringify`: mdast into Markdown; options named as mdast-util-to-markdown names them. */
 export interface StringifyOptions {
   /** The marker of unordered list items: `*`, `+` or `-`. */
@@ -130,9 +198,6 @@ export interface UnsafePattern {
   /** Read `before` and `after` with Unicode classes such as `\p{L}`. @default false */
   unicode?: boolean
 }
-
-/** One name or several. */
-export type Names = string | string[]
 
 /** `md.toHtml`: mdast into hast; options named as remark-rehype names them. */
 export interface ToHtmlOptions {
@@ -204,6 +269,12 @@ export function frontmatter(options?: FrontmatterOptions): Plugin<"md.frontmatte
 /** The `md.gemoji` plugin. */
 export function gemoji(): Plugin<"md.gemoji"> {
   return { name: "md.gemoji" }
+}
+
+/** The `md.component` plugin. */
+export function component(options?: ComponentOptions): Plugin<"md.component", ComponentOptions> {
+  if (options === undefined) return { name: "md.component" }
+  return { name: "md.component", options }
 }
 
 /** The `md.stringify` plugin. */
