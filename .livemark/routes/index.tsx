@@ -985,7 +985,7 @@ const measures: Measure[] = [
   { tool: "cmark (C, via cmarkgfm)", mbps: 68.6 },
   { tool: "comrak", mbps: 66.8 },
   { tool: "textlane (Rust)", mbps: 52.5, isTextlane: true },
-  { tool: "textlane (Node.js)", mbps: 47.0, isTextlane: true },
+  { tool: "textlane (TypeScript)", mbps: 47.0, isTextlane: true },
   { tool: "textlane (Python)", mbps: 46.5, isTextlane: true },
   { tool: "marked", mbps: 14.6 },
   { tool: "markdown-it", mbps: 13.2 },
