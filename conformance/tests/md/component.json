@@ -1995,5 +1995,248 @@
         }
       }
     ]
+  },
+  {
+    "description": "treeAs reads a container's lists as a file tree",
+    "comment": "textlane's own, after Starlight's FileTree list rules",
+    "pipeline": [
+      ["md.parse"],
+      ["md.directive"],
+      [
+        "md.component",
+        {
+          "directives": [
+            {
+              "name": "filetree",
+              "kind": "container",
+              "component": "FileTree",
+              "attributes": [],
+              "treeAs": "tree"
+            }
+          ]
+        }
+      ]
+    ],
+    "positions": false,
+    "tests": [
+      {
+        "description": "directories, files and nesting",
+        "input": ":::filetree\n- src/\n  - components/\n    - Button.tsx\n  - index.ts\n- package.json\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "FileTree",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "tree",
+                    "value": "[{\"name\":\"src\",\"type\":\"directory\",\"children\":[{\"name\":\"components\",\"type\":\"directory\",\"children\":[{\"name\":\"Button.tsx\",\"type\":\"file\"}]},{\"name\":\"index.ts\",\"type\":\"file\"}]},{\"name\":\"package.json\",\"type\":\"file\"}]"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a nested list makes a directory without a slash",
+        "input": ":::filetree\n- src\n  - a.ts\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "FileTree",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "tree",
+                    "value": "[{\"name\":\"src\",\"type\":\"directory\",\"children\":[{\"name\":\"a.ts\",\"type\":\"file\"}]}]"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a bold name is highlighted, the text after it a comment",
+        "input": ":::filetree\n- **Button.tsx** the one to edit\n- Card.tsx the card\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "FileTree",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "tree",
+                    "value": "[{\"name\":\"Button.tsx\",\"type\":\"file\",\"comment\":\"the one to edit\",\"highlighted\":true},{\"name\":\"Card.tsx\",\"type\":\"file\",\"comment\":\"the card\"}]"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "inline code names a file with spaces",
+        "input": ":::filetree\n- `my file.txt` notes\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "FileTree",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "tree",
+                    "value": "[{\"name\":\"my file.txt\",\"type\":\"file\",\"comment\":\"notes\"}]"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "placeholders",
+        "input": ":::filetree\n- src/\n  - a.ts\n  - …\n- ...\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "FileTree",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "tree",
+                    "value": "[{\"name\":\"src\",\"type\":\"directory\",\"children\":[{\"name\":\"a.ts\",\"type\":\"file\"},{\"name\":\"…\",\"type\":\"placeholder\"}]},{\"name\":\"...\",\"type\":\"placeholder\"}]"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "other content stays",
+        "input": ":::filetree\nA tree:\n\n- a.ts\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "FileTree",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "tree",
+                    "value": "[{\"name\":\"a.ts\",\"type\":\"file\"}]"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "value": "A tree:",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "an item without a paragraph is left out",
+        "input": ":::filetree\n-\n- a.ts\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "FileTree",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "tree",
+                    "value": "[{\"name\":\"a.ts\",\"type\":\"file\"}]"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "two lists join",
+        "input": ":::filetree\n- a.ts\n\n1. b.ts\n:::",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "FileTree",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "tree",
+                    "value": "[{\"name\":\"a.ts\",\"type\":\"file\"},{\"name\":\"b.ts\",\"type\":\"file\"}]"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
   }
 ]

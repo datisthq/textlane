@@ -115,6 +115,8 @@ export interface DirectiveRule {
   required?: string[]
   /** Wrap runs of adjacent siblings this rule converted in another component. */
   group?: GroupRule | null
+  /** The attribute that gets the lists of a container directive as a file tree, JSON items `{name, type, comment?, highlighted?, children?}`; the lists leave its content. */
+  treeAs?: string | null
 }
 
 /** One name or several. */

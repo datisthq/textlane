@@ -129,7 +129,7 @@ the case: `unknown-plugin`, `invalid-options`, `missing-parser`, `missing-compil
   stage. Syntax plugins (remark-gfm, remark-directive, remark-math) need the native ones; do
   not port a pipeline that needs one textlane lacks, say so. A remark plugin that only turns
   directives, `> [!NOTE]` alerts, definition lists or fenced code into MDX JSX elements is a
-  rule of `md.component` instead. remark-heading-id, strip-markdown, rehype-unwrap-images and
+  rule of `md.component` instead. A file-tree directive (livemark's `:::filetree`) is a rule with `treeAs`. remark-heading-id, strip-markdown, rehype-unwrap-images and
   @stefanprobst/rehype-extract-toc are `md.headingId`, `md.strip`, `html.unwrapImages` and
   `html.extractToc`; the table of contents lands in the result's `data.toc`. rehype-external-links is `html.externalLinks` (JSON options, no functions), and
   `md.headingId({ attributes: true })` reads `{#id .class key=value}`. vfile-matter is

@@ -291,7 +291,8 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   attributes before dropping anything. Attribute order is part of the output: `nameAs`, then
   `labelAs` unless listed, then the list, the order livemark's components were written against.
   Its code rules (`codes`) mark matched blocks with `Mark::Code`; a code group's wrapper reads
-  and strips meta pairs (`actions/meta/read.rs`), its blocks staying code
+  and strips meta pairs (`actions/meta/read.rs`), its blocks staying code. A rule's `treeAs` reads a container's lists into a JSON file tree
+  (`actions/tree/read.rs`, recursing under `stacker`) and drops them from the content
 - `md.packageCommand` ports npm-to-yarn 3.2.0's `convert` per line of an `npm` block
   (`plugins/package_command/actions/<manager>/convert.rs`, tables in
   `helpers/command_table.rs`), quirks included: `npm` matches inside `pnpm`, a bare `npm`

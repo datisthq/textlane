@@ -440,6 +440,10 @@ pub struct DirectiveRule {
     /// Wrap runs of adjacent siblings this rule converted in another component.
     #[serde(default)]
     pub group: Option<GroupRule>,
+    /// The attribute that gets the lists of a container directive as a file tree, JSON
+    /// items `{name, type, comment?, highlighted?, children?}`; the lists leave its content.
+    #[serde(default)]
+    pub tree_as: Option<String>,
 }
 
 /// A directive's kind, by how many colons open it.

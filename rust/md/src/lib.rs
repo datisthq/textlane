@@ -231,6 +231,9 @@ mod plugins {
             pub(crate) mod text {
                 pub(crate) mod read;
             }
+            pub(crate) mod tree {
+                pub(crate) mod read;
+            }
         }
         pub(crate) mod plugin;
     }

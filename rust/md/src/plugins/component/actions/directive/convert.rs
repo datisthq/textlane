@@ -6,6 +6,7 @@ use textlane_core::{Allocator, ArenaVec, Data, Position};
 use crate::models::options::{AttributeRule, DirectiveKind, DirectiveRule};
 use crate::plugins::component::actions::element::create::create_element;
 use crate::plugins::component::actions::text::read::read_text;
+use crate::plugins::component::actions::tree::read::read_tree;
 
 /// A directive of any kind, taken apart so a rule can rebuild it as an element.
 pub(crate) struct DirectiveParts<'a> {
@@ -29,7 +30,12 @@ pub(crate) fn convert_directive<'a>(
         return Err(parts);
     }
     let label = read_label(rule, &parts);
-    let attributes = write_attributes(rule, &parts, label.as_deref());
+    let mut attributes = write_attributes(rule, &parts, label.as_deref());
+    if let Some(name) = &rule.tree_as
+        && parts.kind == DirectiveKind::Container
+    {
+        attributes.push((name.clone(), read_tree(&parts.children).to_string()));
+    }
     let missing = |name: &String| {
         !attributes
             .iter()
@@ -40,6 +46,11 @@ pub(crate) fn convert_directive<'a>(
     }
     if rule.label_as.is_some() {
         drop_label(&mut parts);
+    }
+    if rule.tree_as.is_some() && parts.kind == DirectiveKind::Container {
+        parts
+            .children
+            .retain(|child| !matches!(child, Node::List(_)));
     }
     let text = parts.kind == DirectiveKind::Text;
     Ok(create_element(

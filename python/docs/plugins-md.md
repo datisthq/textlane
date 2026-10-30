@@ -310,7 +310,7 @@ No options.
 Turns directives, GitHub alerts and other nodes into MDX JSX elements, the components an MDX
 runtime renders, by declarative rules, so a site's `:::note` or `::button` needs no plugin of
 its own. Each directive rule names the directive and the component, where its name and label
-go, which attributes it keeps, what it requires and whether adjacent elements are grouped. Code rules (`codes`) do the same for fenced code: a block becomes a component by its language or a meta `key="value"`, or adjacent blocks are wrapped together, as tabbed code is.
+go, which attributes it keeps, what it requires and whether adjacent elements are grouped. Code rules (`codes`) do the same for fenced code: a block becomes a component by its language or a meta `key="value"`, or adjacent blocks are wrapped together, as tabbed code is. A container rule's `"treeAs"` reads its lists as a file tree, as Starlight's `<FileTree>` reads one, into a JSON attribute of items `{ name, type, comment?, highlighted?, children? }`: a name ending in `/` or holding a list is a directory, a **bold** name is highlighted, text after the name is its comment and `…` stands for more files.
 Run it after `md.directive` and before `md.to_html` and `mdx.compile`, which compile the
 elements to component calls.
 
@@ -347,18 +347,19 @@ file["value"]
 
 How `md.component` turns matching directives into one component.
 
-| Option         | Type                            | Default | Description                                                                                                                           |
-| -------------- | ------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`         | `Names`                         |         | The directive's name, or several.                                                                                                     |
-| `kind`         | `Optional[DirectiveKind]`       |         | The kind of directive: `text`, `leaf` or `container`; any when left out.                                                              |
-| `where`        | `Dict[str, str]`                | `{}`    | Attribute values the directive must have.                                                                                             |
-| `component`    | `str`                           |         | The component: a text element for a text directive, else a flow element.                                                              |
-| `nameAs`       | `Optional[str]`                 | `None`  | The attribute that gets the directive's name.                                                                                         |
-| `labelAs`      | `Optional[str]`                 | `None`  | The attribute that gets the label's text: a container's label paragraph or a text or leaf directive's content, which is then dropped. |
-| `labelDefault` | `Optional[str]`                 | `None`  | The label's text when there is none.                                                                                                  |
-| `attributes`   | `Optional[List[AttributeRule]]` |         | The attributes to keep, in order; every one, as written, when left out.                                                               |
-| `required`     | `List[str]`                     | `[]`    | Attributes without which the directive is left to `unknownDirectives`.                                                                |
-| `group`        | `Optional[GroupRule]`           |         | Wrap runs of adjacent siblings this rule converted in another component.                                                              |
+| Option         | Type                            | Default | Description                                                                                                                                                           |
+| -------------- | ------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`         | `Names`                         |         | The directive's name, or several.                                                                                                                                     |
+| `kind`         | `Optional[DirectiveKind]`       |         | The kind of directive: `text`, `leaf` or `container`; any when left out.                                                                                              |
+| `where`        | `Dict[str, str]`                | `{}`    | Attribute values the directive must have.                                                                                                                             |
+| `component`    | `str`                           |         | The component: a text element for a text directive, else a flow element.                                                                                              |
+| `nameAs`       | `Optional[str]`                 | `None`  | The attribute that gets the directive's name.                                                                                                                         |
+| `labelAs`      | `Optional[str]`                 | `None`  | The attribute that gets the label's text: a container's label paragraph or a text or leaf directive's content, which is then dropped.                                 |
+| `labelDefault` | `Optional[str]`                 | `None`  | The label's text when there is none.                                                                                                                                  |
+| `attributes`   | `Optional[List[AttributeRule]]` |         | The attributes to keep, in order; every one, as written, when left out.                                                                                               |
+| `required`     | `List[str]`                     | `[]`    | Attributes without which the directive is left to `unknownDirectives`.                                                                                                |
+| `group`        | `Optional[GroupRule]`           |         | Wrap runs of adjacent siblings this rule converted in another component.                                                                                              |
+| `treeAs`       | `Optional[str]`                 | `None`  | The attribute that gets the lists of a container directive as a file tree, JSON items `{name, type, comment?, highlighted?, children?}`; the lists leave its content. |
 
 **`AlertRule`**
 

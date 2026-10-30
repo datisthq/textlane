@@ -1379,3 +1379,31 @@ fn rewrites_paths_from_where_the_document_lives() -> Result<(), Error> {
     );
     Ok(())
 }
+
+#[test]
+fn reads_deep_file_trees_without_overflowing() -> Result<(), Error> {
+    let rule = textlane_md::DirectiveRule {
+        name: textlane_md::Names::One("filetree".into()),
+        component: "FileTree".into(),
+        tree_as: Some("tree".into()),
+        ..Default::default()
+    };
+    let processor = Processor::new()
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::Directive::default())
+        .with(textlane_md::Component {
+            directives: vec![rule],
+            ..Default::default()
+        })
+        .with(textlane_md::Stringify::default())
+        .with(textlane_md::Mdx::default())
+        .freeze()?;
+    let mut input = String::from(":::filetree\n");
+    for depth in 0..2_000 {
+        input.push_str(&format!("{}- d{depth}/\n", "  ".repeat(depth)));
+    }
+    input.push_str(":::\n");
+    let output = processor.process(&input)?;
+    assert!(output.value.contains("FileTree"));
+    Ok(())
+}

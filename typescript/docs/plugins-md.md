@@ -305,7 +305,7 @@ Turns directives, GitHub alerts and other nodes into MDX JSX elements, the compo
 runtime renders, by declarative rules, so a site's `:::note` or `::button` needs no
 JavaScript plugin. Each directive rule names the directive and the component, where its name
 and label go, which attributes it keeps, what it requires and whether adjacent elements are
-grouped, as livemark's cards and tabs are. Code rules (`codes`) do the same for fenced code: a block becomes a component by its language or a meta `key="value"`, or adjacent blocks are wrapped together, as tabbed code is. Run it after `md.directive` and before `md.toHtml`
+grouped, as livemark's cards and tabs are. Code rules (`codes`) do the same for fenced code: a block becomes a component by its language or a meta `key="value"`, or adjacent blocks are wrapped together, as tabbed code is. A container rule's `treeAs` reads its lists as a file tree, as Starlight's `<FileTree>` reads one, into a JSON attribute of items `{ name, type, comment?, highlighted?, children? }`: a name ending in `/` or holding a list is a directory, a **bold** name is highlighted, text after the name is its comment and `…` stands for more files. Run it after `md.directive` and before `md.toHtml`
 and `mdx.compile`, which compile the elements to component calls.
 
 ```js
@@ -343,18 +343,19 @@ file.value
 
 How `md.component` turns matching directives into one component.
 
-| Option         | Type                      | Default | Description                                                                                                                           |
-| -------------- | ------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`         | `Names`                   |         | The directive's name, or several.                                                                                                     |
-| `kind`         | `DirectiveKind \| null`   |         | The kind of directive: `text`, `leaf` or `container`; any when left out.                                                              |
-| `where`        | `Record<string, string>`  | `{}`    | Attribute values the directive must have.                                                                                             |
-| `component`    | `string`                  |         | The component: a text element for a text directive, else a flow element.                                                              |
-| `nameAs`       | `string \| null`          | `null`  | The attribute that gets the directive's name.                                                                                         |
-| `labelAs`      | `string \| null`          | `null`  | The attribute that gets the label's text: a container's label paragraph or a text or leaf directive's content, which is then dropped. |
-| `labelDefault` | `string \| null`          | `null`  | The label's text when there is none.                                                                                                  |
-| `attributes`   | `AttributeRule[] \| null` |         | The attributes to keep, in order; every one, as written, when left out.                                                               |
-| `required`     | `string[]`                | `[]`    | Attributes without which the directive is left to `unknownDirectives`.                                                                |
-| `group`        | `GroupRule \| null`       |         | Wrap runs of adjacent siblings this rule converted in another component.                                                              |
+| Option         | Type                      | Default | Description                                                                                                                                                           |
+| -------------- | ------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`         | `Names`                   |         | The directive's name, or several.                                                                                                                                     |
+| `kind`         | `DirectiveKind \| null`   |         | The kind of directive: `text`, `leaf` or `container`; any when left out.                                                                                              |
+| `where`        | `Record<string, string>`  | `{}`    | Attribute values the directive must have.                                                                                                                             |
+| `component`    | `string`                  |         | The component: a text element for a text directive, else a flow element.                                                                                              |
+| `nameAs`       | `string \| null`          | `null`  | The attribute that gets the directive's name.                                                                                                                         |
+| `labelAs`      | `string \| null`          | `null`  | The attribute that gets the label's text: a container's label paragraph or a text or leaf directive's content, which is then dropped.                                 |
+| `labelDefault` | `string \| null`          | `null`  | The label's text when there is none.                                                                                                                                  |
+| `attributes`   | `AttributeRule[] \| null` |         | The attributes to keep, in order; every one, as written, when left out.                                                                                               |
+| `required`     | `string[]`                | `[]`    | Attributes without which the directive is left to `unknownDirectives`.                                                                                                |
+| `group`        | `GroupRule \| null`       |         | Wrap runs of adjacent siblings this rule converted in another component.                                                                                              |
+| `treeAs`       | `string \| null`          | `null`  | The attribute that gets the lists of a container directive as a file tree, JSON items `{name, type, comment?, highlighted?, children?}`; the lists leave its content. |
 
 **`AlertRule`**
 
