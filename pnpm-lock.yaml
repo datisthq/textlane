@@ -52,8 +52,8 @@ importers:
         specifier: 0.2.4
         version: 0.2.4
       gethtmlpress:
-        specifier: 0.4.2
-        version: 0.4.2
+        specifier: 0.5.0
+        version: 0.5.0
       lefthook:
         specifier: 2.1.1
         version: 2.1.1
@@ -966,33 +966,23 @@ packages:
     peerDependencies:
       hono: ^4 || ^5.0.0-0
 
-  '@htmlpress/darwin-arm64@0.4.2':
-    resolution: {integrity: sha512-hxVwF/pHeEZ7/U0NTvxHJRFmMDHdpVdqW0x2t4KtPPpdVrt3hhfzyxCb2r7l5R3SUsB9nqTx8k74SgVOhnTJuw==}
+  '@htmlpress/darwin-arm64@0.5.0':
+    resolution: {integrity: sha512-0xzSwJ1hIMTp2h38GUmhChblQc7ays2s5rN2l3qorkMy/AR/cGDL0uSsb3swh4Dl5olI0NShQcmCcvMl7Cv00Q==}
     cpu: [arm64]
     os: [darwin]
 
-  '@htmlpress/darwin-x64@0.4.2':
-    resolution: {integrity: sha512-qj5Eo357+B61nYg/X/iWADPR/lTemPlwOdU2r0oOdzd9BzV3kyY2EhR56ZeQ5pRSaTWdxbMzwTSZZzqWdHn6rA==}
-    cpu: [x64]
-    os: [darwin]
-
-  '@htmlpress/linux-arm64@0.4.2':
-    resolution: {integrity: sha512-0dJhCPpF0lwOESIRQBYVsEYDuoKAAogbYFkokPRLBTWCRkqBr7oW+78dflpoiRgkme+1986NUE/gMaAiKv5NUA==}
-    cpu: [arm64]
-    os: [linux]
-
-  '@htmlpress/linux-x64@0.4.2':
-    resolution: {integrity: sha512-AaO9ngONf9XBjE3pU6eWzlLjxOjkvVZeOtT7I65mlHtPHk9chCNShS8hREsUcvlcQGR3CCX97GZ6T3BAUHaTBg==}
+  '@htmlpress/linux-x64@0.5.0':
+    resolution: {integrity: sha512-LcaubpMnTyWRWPxvojDfYn0T6lD5afROiUaUoWrvdjam6kmUD4ybdwRMJP1UmGuYrulBDsTSc2z/AsFqAa+xGg==}
     cpu: [x64]
     os: [linux]
 
-  '@htmlpress/win32-arm64@0.4.2':
-    resolution: {integrity: sha512-EfFSXIu8ZCaUBNIhRdMIYKEHwCJitffmg5NQHpa/ce8cHYZdZWigCpMfV9aFJC2TnO8Umkg6wYUUF2FH8bGo/w==}
+  '@htmlpress/win32-arm64@0.5.0':
+    resolution: {integrity: sha512-WC+K/OPWNMbnP/IMfJO0L72pyaD3HCrwD8oQnOd2czLYKaZrVrhMRCOcGMlTORvoqwebXcevicjgaH5HbTIS4g==}
     cpu: [arm64]
     os: [win32]
 
-  '@htmlpress/win32-x64@0.4.2':
-    resolution: {integrity: sha512-m6lMxS1wCPX96Dmis35nEATxPoK4wJcKPiWhcGH1mXyAoAuYJtrHd2ofcO+yywwIV9H6YGjckTKHR5gIJZnUjQ==}
+  '@htmlpress/win32-x64@0.5.0':
+    resolution: {integrity: sha512-EO2u0rk9oLdEvz6tnt9za6Culqvo4gB+hb2p5++SBMkGRQ+068wUCKktVHA1QGkjRx337yIdoBTHOaRXzdX5hA==}
     cpu: [x64]
     os: [win32]
 
@@ -3933,8 +3923,8 @@ packages:
     resolution: {integrity: sha512-kVCxPF3vQM/N0B1PmoqVUqgHP+EeVjmZSQn+1oCRPxd2P21P2F19lIgbR3HBosbB1PUhOAoctJnfEn2GbN2eZA==}
     engines: {node: '>=18'}
 
-  gethtmlpress@0.4.2:
-    resolution: {integrity: sha512-68cYw7R0qVlZOWZSAVBH72p92nHz3b7SxQWUQ7lRVI7LTuJFW9O20piyv9s6CgAnlwYQohWie+YHBIlZ1usFNw==}
+  gethtmlpress@0.5.0:
+    resolution: {integrity: sha512-rJ8Lm+1zGau8AqpAmuwve/hR5DjdgJqotHwnKfp41TrHABSMZGmR9mVzw7xlhLhCbOzGxek2s7bsJXM2loWuyA==}
     engines: {node: '>=20'}
     hasBin: true
 
@@ -6763,22 +6753,16 @@ snapshots:
     dependencies:
       hono: 4.13.13
 
-  '@htmlpress/darwin-arm64@0.4.2':
+  '@htmlpress/darwin-arm64@0.5.0':
     optional: true
 
-  '@htmlpress/darwin-x64@0.4.2':
+  '@htmlpress/linux-x64@0.5.0':
     optional: true
 
-  '@htmlpress/linux-arm64@0.4.2':
+  '@htmlpress/win32-arm64@0.5.0':
     optional: true
 
-  '@htmlpress/linux-x64@0.4.2':
-    optional: true
-
-  '@htmlpress/win32-arm64@0.4.2':
-    optional: true
-
-  '@htmlpress/win32-x64@0.4.2':
+  '@htmlpress/win32-x64@0.5.0':
     optional: true
 
   '@iconify/types@2.0.0': {}
@@ -9571,14 +9555,12 @@ snapshots:
       '@sec-ant/readable-stream': 0.4.1
       is-stream: 4.0.1
 
-  gethtmlpress@0.4.2:
+  gethtmlpress@0.5.0:
     optionalDependencies:
-      '@htmlpress/darwin-arm64': 0.4.2
-      '@htmlpress/darwin-x64': 0.4.2
-      '@htmlpress/linux-arm64': 0.4.2
-      '@htmlpress/linux-x64': 0.4.2
-      '@htmlpress/win32-arm64': 0.4.2
-      '@htmlpress/win32-x64': 0.4.2
+      '@htmlpress/darwin-arm64': 0.5.0
+      '@htmlpress/linux-x64': 0.5.0
+      '@htmlpress/win32-arm64': 0.5.0
+      '@htmlpress/win32-x64': 0.5.0
 
   github-slugger@2.0.0: {}
 
