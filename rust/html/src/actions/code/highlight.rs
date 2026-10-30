@@ -17,7 +17,8 @@ pub(crate) fn highlight_code<'a>(
     options: &Highlight,
     alloc: &'a Allocator,
 ) -> Result<Node<'a>, Error> {
-    let lines = tokenize_code(code, language, themes)?;
+    let max_line_length = options.tokenize_max_line_length.unwrap_or(2_000);
+    let lines = tokenize_code(code, language, themes, max_line_length)?;
     let mut block = CodeBlock {
         lines: lines
             .into_iter()

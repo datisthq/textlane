@@ -137,6 +137,10 @@ pub struct Highlight {
     pub meta_property: Option<String>,
     /// The transformers of @shikijs/transformers to run, in order, by name or with options.
     pub transformers: Vec<HighlightTransformer>,
+    /// Lines at least this long, in UTF-16 units, are left one plain token as Shiki's own
+    /// option leaves them; 2,000 when left out, where Shiki has no limit, since a grammar's
+    /// time grows with the square of a line's length. `0` lifts it.
+    pub tokenize_max_line_length: Option<usize>,
 }
 
 /// A replacement color, or a theme's own replacements.

@@ -231,3 +231,18 @@ fn caps_meta_words_on_one_long_line() -> Result<(), Error> {
     assert!(started.elapsed().as_secs() < 20);
     Ok(())
 }
+
+#[test]
+fn leaves_a_long_line_plain_and_keeps_the_rest_colored() -> Result<(), Error> {
+    let long = "a ".repeat(50_000);
+    let input = format!(
+        "<pre><code class=\"language-js\">let a = 1\n{}\nlet b = 2</code></pre>",
+        long.trim_end()
+    );
+    let started = std::time::Instant::now();
+    let html = highlight(&input, json!({ "theme": "github-light" }))?;
+    assert!(started.elapsed().as_secs() < 5);
+    assert!(html.contains("<span class=\"line\"><span>a a a"));
+    assert_eq!(html.matches("color:#D73A49\">let</span>").count(), 2);
+    Ok(())
+}

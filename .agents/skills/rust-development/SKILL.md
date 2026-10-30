@@ -169,7 +169,10 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   over hast: line hooks (`metaHighlight`, `renderLineNumber`) per line, then the notation
   `code` hooks sharing one `parseComments` (`utils/notation/`, matching `v3`). A notation
   marks tokens `None` and lines `removed` instead of splicing, so the indexes parsed comments
-  hold stay valid; Shiki's line ending after a removed line goes with it. `metaWordHighlight`
+  hold stay valid; Shiki's line ending after a removed line goes with it. giallo's time grows with the square of a
+  line's length and cannot be interrupted, so `tokenizeMaxLineLength` (2,000 by default,
+  Shiki's 0) drops long lines from the code giallo sees, which keeps the grammar state passing
+  them by as Shiki's does. `metaWordHighlight`
   ports Shiki's decorations engine (`actions/code/decorate.rs`): tokens split at UTF-16
   offsets before the hooks, decorations applied to the finished hast last, as Shiki's own
   transformer runs after every caller's. Cases come from the

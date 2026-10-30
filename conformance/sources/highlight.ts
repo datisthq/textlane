@@ -305,6 +305,37 @@ const TRANSFORMER_GROUPS: {
   tests: TransformerTest[]
 }[] = [
   {
+    description: "tokenizeMaxLineLength leaves long lines plain",
+    options: { tokenizeMaxLineLength: 12 },
+    tests: [
+      {
+        description: "a long line between short ones",
+        language: "js",
+        code: "let a = 1\nconst longer = 2\nlet b = 3",
+      },
+      {
+        description: "a long line inside a comment keeps the state",
+        language: "js",
+        code: "/* a\nstill a comment here\n*/ let c",
+      },
+      {
+        description: "a line exactly at the limit",
+        language: "js",
+        code: "let abc = 123",
+      },
+      {
+        description: "every line long",
+        language: "js",
+        code: "const first = 1\nconst second = 2",
+      },
+    ],
+  },
+  {
+    description: "tokenizeMaxLineLength 0 lifts the limit",
+    options: { tokenizeMaxLineLength: 0 },
+    tests: [{ description: "a long line", language: "js", code: "const longer = 2" }],
+  },
+  {
     description: "colorReplacements for every theme",
     options: { colorReplacements: { "#40a02b": "#2a7e16", "#eff1f5": "#ffffff" } },
     tests: [

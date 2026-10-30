@@ -1,5 +1,92 @@
 [
   {
+    "description": "tokenizeMaxLineLength leaves long lines plain",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "tokenizeMaxLineLength": 12
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a long line between short ones",
+        "input": "```js\nlet a = 1\nconst longer = 2\nlet b = 3\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> a </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 1</span></span>\n<span class=\"line\"><span>const longer = 2</span></span>\n<span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> b </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 3</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a long line inside a comment keeps the state",
+        "input": "```js\n/* a\nstill a comment here\n*/ let c\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#7C7F93;--shiki-light-font-style:italic;--shiki-dark:#9399B2;--shiki-dark-font-style:italic\">/* a</span></span>\n<span class=\"line\"><span>still a comment here</span></span>\n<span class=\"line\"><span style=\"color:#7C7F93;--shiki-light-font-style:italic;--shiki-dark:#9399B2;--shiki-dark-font-style:italic\">*/</span><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\"> let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> c</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a line exactly at the limit",
+        "input": "```js\nlet abc = 123\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span>let abc = 123</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "every line long",
+        "input": "```js\nconst first = 1\nconst second = 2\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span>const first = 1</span></span>\n<span class=\"line\"><span>const second = 2</span></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "tokenizeMaxLineLength 0 lifts the limit",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "tokenizeMaxLineLength": 0
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a long line",
+        "input": "```js\nconst longer = 2\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">const</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> longer </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 2</span></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
     "description": "colorReplacements for every theme",
     "source": {
       "repository": "https://github.com/shikijs/shiki",

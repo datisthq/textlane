@@ -11,6 +11,7 @@ pub(crate) fn tokenize_code(
     code: &str,
     language: &str,
     themes: &Themes,
+    max_line_length: usize,
 ) -> Result<Vec<Vec<CodeToken>>, Error> {
     if is_plain_language(language) {
         let lines = code
@@ -33,15 +34,39 @@ pub(crate) fn tokenize_code(
             .map(|line| merge_whitespace(line, themes))
             .collect());
     }
-    let mut lines = highlight_lines(code, language, themes)?;
+    // `tokenizeMaxLineLength`: a long line is one plain token and the grammar's state passes
+    // it by, so the grammar never sees it
+    let sources: Vec<&str> = code.split('\n').collect();
+    let long = |line: &&str| {
+        max_line_length > 0 && line.encode_utf16().count() >= max_line_length
+    };
+    let kept: Vec<&str> = sources.iter().filter(|line| !long(line)).copied().collect();
+    let mut highlighted = match kept.is_empty() {
+        true => Vec::new(),
+        false => highlight_lines(&kept.join("\n"), language, themes)?,
+    };
     // giallo gives empty code no line, where Shiki gives it one empty line
-    if lines.is_empty() {
-        lines.push(vec![]);
+    if highlighted.is_empty() && !kept.is_empty() {
+        highlighted.push(vec![]);
     }
-    Ok(lines
-        .into_iter()
-        .map(|line| merge_whitespace(read_styles(merge_styles(line), themes), themes))
-        .collect())
+    let mut highlighted = highlighted.into_iter();
+    let mut lines = Vec::with_capacity(sources.len());
+    for source in &sources {
+        if long(source) {
+            lines.push(vec![CodeToken {
+                classes: Vec::new(),
+                text: (*source).to_owned(),
+                style: String::new(),
+            }]);
+            continue;
+        }
+        let line = highlighted.next().unwrap_or_default();
+        lines.push(merge_whitespace(
+            read_styles(merge_styles(line), themes),
+            themes,
+        ));
+    }
+    Ok(lines)
 }
 
 /// Whether Shiki takes a language as plain text, which it leaves uncolored.

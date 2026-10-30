@@ -311,21 +311,24 @@ html.highlight({
 })
 ```
 
+A grammar's time grows with the square of a line's length, so a line of 2,000 characters or more, typically minified code, is left one plain token, as Shiki's `tokenizeMaxLineLength` leaves it; Shiki has no such limit by default, and `0` lifts it.
+
 <!-- generated:options html.highlight -->
 
 Follows [@shikijs/rehype](https://www.npmjs.com/package/@shikijs/rehype).
 
-| Option              | Type                               | Default | Description                                                                                                                                      |
-| ------------------- | ---------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `themes`            | `Record<string, unknown> \| null`  | `null`  | The theme of each color mode, `light` first, as `{"light": …, "dark": …}`.                                                                       |
-| `theme`             | `string \| null`                   | `null`  | The one theme, when `themes` is not given.                                                                                                       |
-| `defaultLanguage`   | `string \| null`                   | `null`  | The language of a block that names none; such a block is left alone without it.                                                                  |
-| `fallbackLanguage`  | `string \| null`                   | `null`  | The language of a block naming one Shiki does not know; left alone without it.                                                                   |
-| `colorReplacements` | `Record<string, ColorReplacement>` |         | Colors to replace, by their lowercase spelling: a color for every theme, or a theme's name to a map of its own.                                  |
-| `addLanguageClass`  | `boolean`                          | `false` | Add `language-<name>` to each highlighted `<code>`.                                                                                              |
-| `inline`            | `InlineCode \| null`               |         | Highlight inline code too, by how it names its language: `tailing-curly-colon` reads `` `a(){:js}` ``.                                           |
-| `metaProperty`      | `string \| null`                   | `null`  | The `<pre>` property that gets a block's meta, the text after its language; the JSON stand-in for `parseMetaString: meta => ({ [name]: meta })`. |
-| `transformers`      | `HighlightTransformer[]`           |         | The transformers of @shikijs/transformers to run, in order, by name or with options.                                                             |
+| Option                  | Type                               | Default | Description                                                                                                                                                                                                                          |
+| ----------------------- | ---------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `themes`                | `Record<string, unknown> \| null`  | `null`  | The theme of each color mode, `light` first, as `{"light": …, "dark": …}`.                                                                                                                                                           |
+| `theme`                 | `string \| null`                   | `null`  | The one theme, when `themes` is not given.                                                                                                                                                                                           |
+| `defaultLanguage`       | `string \| null`                   | `null`  | The language of a block that names none; such a block is left alone without it.                                                                                                                                                      |
+| `fallbackLanguage`      | `string \| null`                   | `null`  | The language of a block naming one Shiki does not know; left alone without it.                                                                                                                                                       |
+| `colorReplacements`     | `Record<string, ColorReplacement>` |         | Colors to replace, by their lowercase spelling: a color for every theme, or a theme's name to a map of its own.                                                                                                                      |
+| `addLanguageClass`      | `boolean`                          | `false` | Add `language-<name>` to each highlighted `<code>`.                                                                                                                                                                                  |
+| `inline`                | `InlineCode \| null`               |         | Highlight inline code too, by how it names its language: `tailing-curly-colon` reads `` `a(){:js}` ``.                                                                                                                               |
+| `metaProperty`          | `string \| null`                   | `null`  | The `<pre>` property that gets a block's meta, the text after its language; the JSON stand-in for `parseMetaString: meta => ({ [name]: meta })`.                                                                                     |
+| `transformers`          | `HighlightTransformer[]`           |         | The transformers of @shikijs/transformers to run, in order, by name or with options.                                                                                                                                                 |
+| `tokenizeMaxLineLength` | `number \| null`                   | `null`  | Lines at least this long, in UTF-16 units, are left one plain token as Shiki's own option leaves them; 2,000 when left out, where Shiki has no limit, since a grammar's time grows with the square of a line's length. `0` lifts it. |
 
 **`ColorReplacement`**
 
