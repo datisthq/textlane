@@ -30,7 +30,8 @@ this skill is how to change it without making the numbers lie.
   commit and machine. A stale result file from before a textlane change still merges into
   `show:report`, so pass the run's own file (`show:report <path>`) when the page is regenerated
 - A full run takes about half an hour; unified and micromark dominate it and grow faster than
-  their input, so keep the largest sizes at a few megabytes and the timeout at 180s
+  their input, so keep the all-tool sizes at 1MB and the timeout at 180s. A larger size runs
+  only the fastest tools, listed under the case's `tools` (`realistic`'s 10MB, for memory)
 
 ## Layout
 
@@ -44,7 +45,10 @@ generated lives in its `.cache/` (gitignored repo-wide).
 An adapter takes `<document> <repeat>`, imports its library and reads the document untimed,
 then converts `repeat` times and prints `{"elapsedMs", "outputBytes"}` last. The harness picks
 `repeat` so a run converts at least 8MB, and divides. Every library gets the same job:
-CommonMark only, raw HTML passed through (`allowDangerousHtml`, `unsafe`, `html: true`).
+GFM, as most READMEs are written (tables, task lists, strikethrough, autolink literals,
+footnotes, through a plugin where the library has none built in), raw HTML passed through
+(`allowDangerousHtml`, `unsafe`, `html: true`). A GFM piece a library cannot do goes in its
+`caveats`. The `conformance` case's CommonMark edge cases run under the same GFM setup
 
 ## Adding a library
 
@@ -53,7 +57,7 @@ and run `measure --size 10KB --size 100KB --runs 1 --warmup 0 --tool <name>`: it
 must sit near the others', or it renders a different document. Pin it: npm by exact version
 (the workspace's seven-day quarantine applies), Python in `pyproject.toml` under
 `exclude-newer`, Rust in `adapters/rust/Cargo.lock`. Whatever it does differently from textlane
-(no tree, not CommonMark) goes in its `caveats`, which the report prints.
+(no tree, not CommonMark, a GFM piece missing) goes in its `caveats`, which the report prints.
 
 ## Traps
 

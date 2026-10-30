@@ -8,6 +8,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut pipeline = Pipeline::new();
     let dangerous = json!({ "allowDangerousHtml": true });
     pipeline.use_value(&json!("md.parse"), None)?;
+    pipeline.use_value(&json!("md.gfm"), None)?;
     pipeline.use_value(&json!("md.toHtml"), Some(dangerous.clone()))?;
     pipeline.use_value(&json!("html.stringify"), Some(dangerous))?;
     let processor = pipeline.freeze()?;

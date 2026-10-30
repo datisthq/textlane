@@ -47,7 +47,11 @@ for (const benchmarkCase of await loadCases(values.case)) {
     })
     console.log(`\n${benchmarkCase.name}: ${describeDataset(dataset)}`)
 
-    for (const tool of selectTools(values.tool)) {
+    const limit = benchmarkCase.tools?.[size]
+    const tools = selectTools(values.tool).filter(
+      tool => !limit || limit.includes(tool.name),
+    )
+    for (const tool of tools) {
       const result = await measureTool({
         caseName: benchmarkCase.name,
         tool,

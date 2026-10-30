@@ -5,6 +5,7 @@ import { runAdapter } from "./common.ts"
 
 const processor = textlane()
   .use(md.parse())
+  .use(md.gfm())
   .use(md.toHtml({ allowDangerousHtml: true }))
   .use(html.stringify({ allowDangerousHtml: true }))
   .freeze()

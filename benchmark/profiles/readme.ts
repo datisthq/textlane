@@ -10,19 +10,22 @@ const WORDS = (
 
 const LANGUAGES = ["js", "rust", "python", "sh", "json", ""]
 
-/** A README-like document: headings, paragraphs with inline markup, lists, quotes and code. */
+/** A README-like GFM document: headings, rich paragraphs, lists, tables, quotes and code. */
 export const readmeProfile: Profile = {
   name: "readme",
-  description: "README-like CommonMark: headings, rich paragraphs, lists, quotes, code",
-  version: 1,
+  description: "README-like GFM: headings, rich paragraphs, lists, tables, quotes, code",
+  version: 2,
   createBlock: (random, index) => {
     if (index % 12 === 0)
       return `${"#".repeat(random.integer(1, 3))} ${createWords(random, 4)}\n\n`
     const kind = random.next()
-    if (kind < 0.5) return `${createParagraph(random)}\n\n`
-    if (kind < 0.7) return createList(random)
-    if (kind < 0.8) return `> ${createParagraph(random).replaceAll("\n", "\n> ")}\n\n`
-    if (kind < 0.95) return createCode(random)
+    if (kind < 0.4) return `${createParagraph(random)}\n\n`
+    if (kind < 0.5) return createFootnoted(random, index)
+    if (kind < 0.62) return createList(random)
+    if (kind < 0.7) return createTasks(random)
+    if (kind < 0.8) return createTable(random)
+    if (kind < 0.86) return `> ${createParagraph(random).replaceAll("\n", "\n> ")}\n\n`
+    if (kind < 0.97) return createCode(random)
     return "---\n\n"
   },
 }
@@ -39,6 +42,9 @@ function createParagraph(random: Random) {
     else if (kind < 0.5) words[at] = `\`${word}()\``
     else if (kind < 0.65) words[at] = `[${word}](https://example.com/${word}?id=${at})`
     else if (kind < 0.7) words[at] = `${word} &amp; ${word}`
+    else if (kind < 0.78) words[at] = `~~${word}~~`
+    else if (kind < 0.84) words[at] = `https://example.com/${word}`
+    else if (kind < 0.88) words[at] = `www.example.org/${word}`
     const sentence = words.join(" ")
     sentences.push(`${sentence.charAt(0).toUpperCase()}${sentence.slice(1)}.`)
   }
@@ -57,6 +63,35 @@ function createList(random: Random) {
     }
   }
   return `${lines.join("\n")}\n\n`
+}
+
+function createFootnoted(random: Random, index: number) {
+  const paragraph = createParagraph(random).replace(/\.$/, `[^${index}].`)
+  return `${paragraph}\n\n[^${index}]: ${createWords(random, random.integer(4, 10))}.\n\n`
+}
+
+function createTasks(random: Random) {
+  const lines: string[] = []
+  for (let index = random.integer(2, 6); index > 0; index--) {
+    const mark = random.next() < 0.5 ? "x" : " "
+    lines.push(`- [${mark}] ${createWords(random, random.integer(3, 8))}`)
+  }
+  return `${lines.join("\n")}\n\n`
+}
+
+function createTable(random: Random) {
+  const columns = random.integer(2, 5)
+  const createRow = () => {
+    const cells = Array.from({ length: columns }, () =>
+      createWords(random, random.integer(1, 3)),
+    )
+    return `| ${cells.join(" | ")} |`
+  }
+  const align = Array.from({ length: columns }, () =>
+    random.pick(["---", ":--", "--:", ":-:"]),
+  )
+  const rows = Array.from({ length: random.integer(2, 8) }, createRow)
+  return `${createRow()}\n| ${align.join(" | ")} |\n${rows.join("\n")}\n\n`
 }
 
 function createCode(random: Random) {

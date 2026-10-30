@@ -8,9 +8,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         compile: CompileOptions {
             allow_dangerous_html: true,
             allow_dangerous_protocol: true,
-            ..CompileOptions::default()
+            ..CompileOptions::gfm()
         },
-        ..Options::default()
+        ..Options::gfm()
     };
     run_adapter(|markdown| Ok(to_html_with_options(markdown, &options).map_err(|e| e.to_string())?))
 }

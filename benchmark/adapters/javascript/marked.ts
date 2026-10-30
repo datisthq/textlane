@@ -1,7 +1,8 @@
 import { Marked } from "marked"
+import markedFootnote from "marked-footnote"
 import { runAdapter } from "./common.ts"
 
-const marked = new Marked({ gfm: false, async: false })
+const marked = new Marked({ gfm: true, async: false }).use(markedFootnote())
 
 runAdapter(markdown => {
   const html = marked.parse(markdown)

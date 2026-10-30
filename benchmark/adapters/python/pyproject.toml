@@ -4,9 +4,12 @@ version = "0.0.0"
 requires-python = ">=3.12,<3.13"
 dependencies = [
   "cmarkgfm==2025.10.22",
+  "linkify-it-py==2.2.0",
   "markdown==3.11.2",
   "markdown-it-py==4.2.0",
+  "mdit-py-plugins==0.6.1",
   "mistune==3.4.0",
+  "pymdown-extensions==12.3",
 ]
 
 [tool.uv]

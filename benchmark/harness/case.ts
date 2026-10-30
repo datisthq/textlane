@@ -7,6 +7,8 @@ export type Case = {
   description: string
   profile: string
   sizes: Size[]
+  /** The only tools measured at a size, for sizes too slow for every rival. */
+  tools?: Record<Size, string[]>
   seed?: number
 }
 

@@ -5,6 +5,7 @@ from common import run_adapter
 PROCESSOR = (
     textlane()
     .use(md.parse())
+    .use(md.gfm())
     .use(md.to_html({"allowDangerousHtml": True}))
     .use(html.stringify({"allowDangerousHtml": True}))
     .freeze()

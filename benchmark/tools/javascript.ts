@@ -34,7 +34,7 @@ export const markedTool = createJavascriptTool({
   title: "marked",
   adapter: "marked.ts",
   distribution: "marked",
-  caveats: ["not CommonMark compliant; GFM off"],
+  caveats: ["not CommonMark compliant"],
 })
 
 export function createJavascriptTool(props: {

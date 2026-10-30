@@ -19,7 +19,10 @@ export const pulldownCmarkTool = createRustTool({
   title: "pulldown-cmark",
   binary: "pulldown-cmark",
   distribution: "pulldown-cmark",
-  caveats: ["renders from a pull parser's events, building no syntax tree"],
+  caveats: [
+    "renders from a pull parser's events, building no syntax tree",
+    "no GFM autolink literals",
+  ],
 })
 
 export const markdownRsTool = createRustTool({

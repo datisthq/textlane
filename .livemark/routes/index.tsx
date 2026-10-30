@@ -965,22 +965,22 @@ interface Measure {
   isTextlane?: boolean
 }
 
-// The 4 MB `readme` case of benchmark/, Markdown to HTML, input MB/s at the median
+// The 1 MB `realistic` case of benchmark/, GFM to HTML, input MB/s at the median
 const measures: Measure[] = [
-  { tool: "pulldown-cmark", mbps: 176.4 },
-  { tool: "cmark (C, via cmarkgfm)", mbps: 63.1 },
-  { tool: "comrak", mbps: 51.7 },
-  { tool: "textlane (Rust)", mbps: 46.7, isTextlane: true },
-  { tool: "textlane (Node.js)", mbps: 46.5, isTextlane: true },
-  { tool: "textlane (Python)", mbps: 42.2, isTextlane: true },
-  { tool: "marked", mbps: 18.1 },
-  { tool: "markdown-it", mbps: 16.1 },
-  { tool: "mistune", mbps: 4.3 },
-  { tool: "Python-Markdown", mbps: 2.8 },
-  { tool: "markdown-it-py", mbps: 2.6 },
-  { tool: "markdown-rs", mbps: 2.1 },
-  { tool: "micromark", mbps: 0.2 },
-  { tool: "unified (remark + rehype)", mbps: 0.2 },
+  { tool: "pulldown-cmark", mbps: 218.2 },
+  { tool: "comrak", mbps: 53.8 },
+  { tool: "textlane (Rust)", mbps: 33.0, isTextlane: true },
+  { tool: "cmark (C, via cmarkgfm)", mbps: 32.1 },
+  { tool: "textlane (Node.js)", mbps: 30.0, isTextlane: true },
+  { tool: "textlane (Python)", mbps: 26.8, isTextlane: true },
+  { tool: "marked", mbps: 10.1 },
+  { tool: "mistune", mbps: 3.4 },
+  { tool: "markdown-it", mbps: 2.8 },
+  { tool: "Python-Markdown", mbps: 1.5 },
+  { tool: "markdown-rs", mbps: 1.5 },
+  { tool: "markdown-it-py", mbps: 1.4 },
+  { tool: "micromark", mbps: 0.6 },
+  { tool: "unified (remark + rehype)", mbps: 0.5 },
 ]
 
 function Benchmark() {
@@ -999,7 +999,7 @@ function Benchmark() {
           </div>
         </Reveal>
         <Reveal>
-          <WindowCard label="benchmark · throughput on a 4 MB README">
+          <WindowCard label="benchmark · throughput on a 1 MB GFM README">
             <div className="p-5 sm:p-6">
               <ul className="space-y-3">
                 {measures.map(measure => (
@@ -1035,8 +1035,8 @@ function Benchmark() {
               <p className="mt-6 flex items-start gap-2 text-xs leading-relaxed text-muted-foreground">
                 <Gauge className="mt-0.5 size-3.5 shrink-0" />
                 <span>
-                  Input megabytes per second at the median, on an AMD Ryzen 5 PRO 7545U.
-                  Reproduce with{" "}
+                  GFM in every library, input megabytes per second at the median, on an
+                  AMD Ryzen 5 PRO 7545U. Reproduce with{" "}
                   <code className="font-mono text-foreground">
                     pnpm -C benchmark measure
                   </code>

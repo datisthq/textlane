@@ -102,15 +102,30 @@ importers:
       markdown-it:
         specifier: 15.0.3
         version: 15.0.3
+      markdown-it-footnote:
+        specifier: 4.0.0
+        version: 4.0.0
+      markdown-it-task-lists:
+        specifier: 2.1.1
+        version: 2.1.1
       marked:
         specifier: 18.1.1
         version: 18.1.1
+      marked-footnote:
+        specifier: 1.4.0
+        version: 1.4.0(marked@18.1.1)
       micromark:
         specifier: 4.0.3
         version: 4.0.3(supports-color@10.2.2)
+      micromark-extension-gfm:
+        specifier: 3.0.0
+        version: 3.0.0
       rehype-stringify:
         specifier: 10.0.1
         version: 10.0.1
+      remark-gfm:
+        specifier: 4.0.1
+        version: 4.0.1(supports-color@10.2.2)
       remark-parse:
         specifier: 11.0.0
         version: 11.0.0(supports-color@10.2.2)
@@ -4583,12 +4598,23 @@ packages:
     resolution: {integrity: sha512-o5vL7aDWatOTX8LzaS1WMoaoxIiLRQJuIKKe2wAw6IeULDHaqbiqiggmx+pKvZDb1Sj+pE46Sn1T7lCqfFtg1Q==}
     engines: {node: '>=16'}
 
+  markdown-it-footnote@4.0.0:
+    resolution: {integrity: sha512-WYJ7urf+khJYl3DqofQpYfEYkZKbmXmwxQV8c8mO/hGIhgZ1wOe7R4HLFNwqx7TjILbnC98fuyeSsin19JdFcQ==}
+
+  markdown-it-task-lists@2.1.1:
+    resolution: {integrity: sha512-TxFAc76Jnhb2OUu+n3yz9RMu4CwGfaT788br6HhEDlvWfdeJcLUsxk1Hgw2yJio0OXsxv7pyIPmvECY7bMbluA==}
+
   markdown-it@15.0.3:
     resolution: {integrity: sha512-+Az7Ojz3iRGu8KYMvJ6xVhvrxP3eE+vEtJX75Ow88XBpcQNV/0lGX5ZynIIBftREo4DC2jsveAMDaeltmm8QvQ==}
     hasBin: true
 
   markdown-table@3.0.4:
     resolution: {integrity: sha512-wiYz4+JrLyb/DqW2hkFJxP7Vd7JuTDm77fvbM8VfEQdmSMqcImWeeRbHwZjBjIFki/VaMK2BhFi7oUUZeM5bqw==}
+
+  marked-footnote@1.4.0:
+    resolution: {integrity: sha512-fZTxAhI1TcLEs5UOjCfYfTHpyKGaWQevbxaGTEA68B51l7i87SctPFtHETYqPkEN0ka5opvy4Dy1l/yXVC+hmg==}
+    peerDependencies:
+      marked: '>=7.0.0'
 
   marked@16.4.2:
     resolution: {integrity: sha512-TI3V8YYWvkVf3KJe1dRkpnjs68JUPyEa5vjKrp1XEEJUAOaQc+Qj+L1qWbPd0SJuAdQkFU0h73sXXqwDYxsiDA==}
@@ -10340,6 +10366,10 @@ snapshots:
 
   markdown-extensions@2.0.0: {}
 
+  markdown-it-footnote@4.0.0: {}
+
+  markdown-it-task-lists@2.1.1: {}
+
   markdown-it@15.0.3:
     dependencies:
       argparse: 3.0.3
@@ -10350,6 +10380,10 @@ snapshots:
       uc.micro: 3.0.0
 
   markdown-table@3.0.4: {}
+
+  marked-footnote@1.4.0(marked@18.1.1):
+    dependencies:
+      marked: 18.1.1
 
   marked@16.4.2: {}
 
