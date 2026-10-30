@@ -1,11 +1,11 @@
-import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs"
+import { mkdtempSync, readdirSync, readFileSync } from "node:fs"
 import { createRequire } from "node:module"
 import { tmpdir } from "node:os"
 import { join, relative, resolve } from "node:path"
 import { afterAll, beforeAll, describe, expect, it } from "vite-plus/test"
 import { resolveAddon } from "../actions/addon/resolve.ts"
 import { ADDON_ENV } from "../settings.ts"
-import { buildAddon } from "./addon.ts"
+import { buildAddon, removeAddon } from "./addon.ts"
 import { createHosts } from "./hosts.ts"
 
 const ROOT = resolve(import.meta.dirname, "..", "..")
@@ -56,7 +56,7 @@ beforeAll(async () => {
 }, 600_000)
 
 afterAll(() => {
-  if (addonDir) rmSync(addonDir, { recursive: true, force: true })
+  if (addonDir) removeAddon(addonDir)
 })
 
 describe("conformance", () => {

@@ -1,10 +1,10 @@
-import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs"
+import { mkdtempSync, readdirSync, readFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join, relative, resolve } from "node:path"
 import { afterAll, beforeAll, describe, expect, it } from "vite-plus/test"
 import type { Node, Plugin } from "../index.ts"
 import { ADDON_ENV } from "../settings.ts"
-import { buildAddon } from "./addon.ts"
+import { buildAddon, removeAddon } from "./addon.ts"
 
 // The conformance runner goes through `runCase`; this samples the suite through the
 // public API instead, so a mapping the runner never sees cannot drift unnoticed.
@@ -41,7 +41,7 @@ beforeAll(async () => {
 }, 600_000)
 
 afterAll(() => {
-  if (addonDir) rmSync(addonDir, { recursive: true, force: true })
+  if (addonDir) removeAddon(addonDir)
 })
 
 describe("retained memory", () => {

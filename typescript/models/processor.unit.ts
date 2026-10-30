@@ -1,8 +1,8 @@
-import { mkdtempSync, rmSync } from "node:fs"
+import { mkdtempSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { afterAll, beforeAll, describe, expect, it } from "vite-plus/test"
-import { buildAddon } from "../-test/addon.ts"
+import { buildAddon, removeAddon } from "../-test/addon.ts"
 import * as html from "../generated/html.ts"
 import * as md from "../generated/md.ts"
 import * as nl from "../generated/nl.ts"
@@ -21,7 +21,7 @@ beforeAll(async () => {
 }, 600_000)
 
 afterAll(() => {
-  if (addonDir) rmSync(addonDir, { recursive: true, force: true })
+  if (addonDir) removeAddon(addonDir)
 })
 
 const toHtml = () =>

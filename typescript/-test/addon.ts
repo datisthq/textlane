@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process"
-import { copyFileSync } from "node:fs"
+import { copyFileSync, rmSync } from "node:fs"
 import { join, resolve } from "node:path"
 
 const RUST = resolve(import.meta.dirname, "..", "..", "rust")
@@ -21,4 +21,14 @@ export function buildAddon(directory: string) {
   const addonPath = join(directory, "textlane.node")
   copyFileSync(join(RUST, "target", "debug", library), addonPath)
   return addonPath
+}
+
+/** Remove a directory `buildAddon` filled, leaving it where the addon is still loaded. */
+export function removeAddon(directory: string) {
+  try {
+    rmSync(directory, { recursive: true, force: true })
+  } catch (error) {
+    // Windows locks a loaded `.node` until the process exits, so the temp dir stays behind
+    if (process.platform !== "win32") throw error
+  }
 }
