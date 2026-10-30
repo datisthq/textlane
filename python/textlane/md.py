@@ -26,6 +26,8 @@ __all__ = [
     "PackageCommandOptions",
     "heading_id",
     "HeadingIdOptions",
+    "path_rewrite",
+    "PathRewriteOptions",
     "strip",
     "StripOptions",
     "toc",
@@ -301,6 +303,33 @@ class HeadingIdOptions(TypedDict, total=False):
     attributes: bool
 
 
+# A node with a URL.
+UrlNode = Literal["image", "link", "definition"]
+
+
+# How a link to a Markdown file becomes a URL.
+MarkdownLinks = Union[Literal["keep"], Literal["directory"], Literal["html"]]
+
+
+# `md.pathRewrite`: the URLs of images, links and definitions as a site serves them:
+# relative ones resolved against the file's path and made root-relative, every root-relative
+# one under `base`, and links to Markdown files turned into page URLs.
+class PathRewriteOptions(TypedDict, total=False):
+    # The directory URLs count from, as the file's path spells it; the path's own
+    # starting point when left out.
+    root: Optional[str]
+    # The URL the site is served at, such as `/docs`, put before every root-relative URL
+    # once.
+    base: Optional[str]
+    # The nodes whose URLs are rewritten; images, links and definitions when left out.
+    nodes: Optional[List[UrlNode]]
+    # Markdown files, relative to `root`, to the URL of their page; a link to one of them
+    # takes it, before `markdownLinks` applies.
+    pages: Dict[str, str]
+    # How a link to a Markdown file no page names becomes a URL.
+    markdownLinks: MarkdownLinks
+
+
 # `md.strip`: mdast down to its text, as strip-markdown does: code, HTML, tables and
 # the like dropped, headings made paragraphs, formatting unwrapped.
 class StripOptions(TypedDict, total=False):
@@ -491,6 +520,11 @@ def package_command(options: Optional[PackageCommandOptions] = None) -> Plugin:
 def heading_id(options: Optional[HeadingIdOptions] = None) -> Plugin:
     """The `md.headingId` plugin."""
     return describe_plugin("md.headingId", options)
+
+
+def path_rewrite(options: Optional[PathRewriteOptions] = None) -> Plugin:
+    """The `md.pathRewrite` plugin."""
+    return describe_plugin("md.pathRewrite", options)
 
 
 def strip(options: Optional[StripOptions] = None) -> Plugin:

@@ -1353,3 +1353,29 @@ fn reads_heading_attributes_in_linear_time_without_handlers() -> Result<(), Erro
     assert_eq!(output.value, "<h1 id=\"a\" data-x=\"1\">A</h1>");
     Ok(())
 }
+
+#[test]
+fn rewrites_paths_from_where_the_document_lives() -> Result<(), Error> {
+    let rewrite = textlane_md::PathRewrite {
+        root: Some("/repo/docs".into()),
+        base: Some("/site".into()),
+        markdown_links: textlane_md::MarkdownLinks::Directory,
+        ..Default::default()
+    };
+    let file = textlane_core::File {
+        path: Some("/repo/docs/guide/intro.md".into()),
+        ..textlane_core::File::new()
+    };
+    let output = Processor::new()
+        .with(textlane_md::Parse::default())
+        .with(rewrite)
+        .with(textlane_md::ToHtml::default())
+        .with(textlane_html::Stringify::default())
+        .freeze()?
+        .process_file("![logo](../logo.png) and [next](./next.md)", file)?;
+    assert_eq!(
+        output.value,
+        "<p><img src=\"/site/logo.png\" alt=\"logo\"> and <a href=\"/site/guide/next/\">next</a></p>"
+    );
+    Ok(())
+}

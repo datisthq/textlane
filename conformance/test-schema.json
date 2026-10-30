@@ -131,6 +131,10 @@
           "description": "The source text",
           "type": "string"
         },
+        "path": {
+          "description": "Where the document lives, the file's `path`, which plugins resolve URLs against",
+          "type": "string"
+        },
         "tree": {
           "description": "A tree for stringify-only and transform cases",
           "type": "object"

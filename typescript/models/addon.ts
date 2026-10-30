@@ -11,11 +11,11 @@ export interface NativePipeline {
   run(tree: Node, value?: string): Node
   runSync(tree: Node, value?: string): Node
   stringify(tree: Node): string
-  process(text: string): VFile
-  processSync(text: string): VFile
+  process(text: string, path?: string): VFile
+  processSync(text: string, path?: string): VFile
   hosts(): number[]
   startRun(tree: Node, value: string | undefined, sync: boolean): NativeRun<Node>
-  startProcess(text: string, sync: boolean): NativeRun<VFile>
+  startProcess(text: string, sync: boolean, path?: string): NativeRun<VFile>
 }
 
 /** A run paused before host plugins until `resume`, then finished with `result`. */

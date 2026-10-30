@@ -142,5 +142,7 @@ the case: `unknown-plugin`, `invalid-options`, `missing-parser`, `missing-compil
   `md.toc`: `heading` and `skip` are regex source strings, `parents` a JSON unist-util-is
   test, never a function; JavaScript lookaround and back references fail with
   `invalid-options`.
+- Asset and page URLs relative to a Markdown file are `md.pathRewrite({ root, base, pages,
+markdownLinks })`; pass the document as `{ value, path }` so it knows where the file lives.
 - remark-stringify reads `settings` from processor data; textlane's `md.stringify` takes its
   options directly.

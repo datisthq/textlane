@@ -128,19 +128,28 @@ impl Pipeline {
     }
 
     #[napi]
-    pub fn start_process(&mut self, text: String, sync: bool) -> Result<Run> {
-        let progress = self.inner.start_process(&text, File::new(), read_api(sync));
+    pub fn start_process(
+        &mut self,
+        text: String,
+        sync: bool,
+        path: Option<String>,
+    ) -> Result<Run> {
+        let file = File {
+            path,
+            ..File::new()
+        };
+        let progress = self.inner.start_process(&text, file, read_api(sync));
         progress.map(Run::new).map_err(throw)
     }
 
     #[napi]
-    pub fn process(&mut self, text: String) -> Result<Value> {
-        self.process_with(&text, Api::Async)
+    pub fn process(&mut self, text: String, path: Option<String>) -> Result<Value> {
+        self.process_with(&text, path, Api::Async)
     }
 
     #[napi]
-    pub fn process_sync(&mut self, text: String) -> Result<Value> {
-        self.process_with(&text, Api::Sync)
+    pub fn process_sync(&mut self, text: String, path: Option<String>) -> Result<Value> {
+        self.process_with(&text, path, Api::Sync)
     }
 
     fn run_with(
@@ -156,8 +165,16 @@ impl Pipeline {
         self.inner.run(tree, &mut file, api).map_err(throw)
     }
 
-    fn process_with(&mut self, text: &str, api: Api) -> Result<Value> {
-        let mut file = File::new();
+    fn process_with(
+        &mut self,
+        text: &str,
+        path: Option<String>,
+        api: Api,
+    ) -> Result<Value> {
+        let mut file = File {
+            path,
+            ..File::new()
+        };
         let value = self.inner.process(text, &mut file, api).map_err(throw)?;
         Ok(crate::write_file(&file, &value))
     }

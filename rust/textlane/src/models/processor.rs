@@ -98,7 +98,11 @@ impl Processor {
 impl FrozenProcessor {
     /// Parse, run and stringify one document.
     pub fn process(&self, input: &str) -> Result<Output, Error> {
-        let mut file = File::new();
+        self.process_file(input, File::new())
+    }
+
+    /// Parse, run and stringify one document into `file`, whose `path` says where it lives.
+    pub fn process_file(&self, input: &str, mut file: File) -> Result<Output, Error> {
         let value = with_allocator(|alloc| {
             let tree = self.parse(input, &mut file, alloc)?;
             let tree = self.run(tree, &mut file, alloc)?;

@@ -22,6 +22,7 @@ type Expected = { error?: { code: string; message?: string } } & Record<string, 
 type Test = {
   description: string
   input?: string
+  path?: string
   tree?: object
   operations?: unknown[]
   expected: Expected
@@ -107,6 +108,7 @@ function runNative(group: Group, test: Test): Expected {
       JSON.stringify({
         pipeline: group.pipeline,
         input: test.input,
+        path: test.path,
         tree: test.tree,
         operations: test.operations,
       }),

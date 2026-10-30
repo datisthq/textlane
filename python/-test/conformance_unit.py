@@ -58,7 +58,7 @@ def test_conformance(group, test, entry):
 
 def run_native(group, test):
     case = {"pipeline": group["pipeline"]}
-    for key in ("input", "tree", "operations"):
+    for key in ("input", "path", "tree", "operations"):
         if key in test:
             case[key] = test[key]
     return json.loads(textlane.run_case(json.dumps(case)))

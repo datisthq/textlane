@@ -47,22 +47,23 @@ def test_api(group, test):
         return textlane.textlane().use(plugins)
 
     source = test["input"]
+    document = {"value": source, "path": test["path"]} if "path" in test else source
     expected = test["expected"]
     output = next((key for key in OUTPUTS if key in expected), None)
     if "error" in expected:
         with pytest.raises(textlane.TextlaneError) as error:
             if output:
-                processor().process(source)
+                processor().process(document)
             else:
                 processor().run(processor().parse(source), source)
         assert error.value.code == expected["error"]["code"]
         return
     if output:
-        assert processor().process(source)["value"] == expected[output]
+        assert processor().process(document)["value"] == expected[output]
         return
     # What plugins stored in the file is the vfile's `data`
     if "fileData" in expected:
-        assert processor().process(source)["data"] == expected["fileData"]
+        assert processor().process(document)["data"] == expected["fileData"]
         return
     if "tree" in expected:
         tree = processor().run(processor().parse(source), source)
@@ -79,7 +80,7 @@ def test_api(group, test):
         return
     messages = [
         {key: message[key] for key in ("ruleId", "source", "place")}
-        for message in processor().process(source)["messages"]
+        for message in processor().process(document)["messages"]
     ]
     assert messages == expected["messages"]
 

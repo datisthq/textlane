@@ -12,7 +12,12 @@ use crate::utils::testing::plugins::take_trace;
 /// extension, `data`, `messages`, `trace`), or only `error`.
 pub fn run_case(case: &Value) -> Value {
     take_trace();
-    let mut file = File::new();
+    // A case's `path` is where its document lives, which plugins resolve URLs against
+    let path = case.get("path").and_then(Value::as_str).map(str::to_owned);
+    let mut file = File {
+        path: path.clone(),
+        ..File::new()
+    };
     let result = match read_case(case) {
         Ok((pipeline, _, Some(operations))) => {
             run_operations(pipeline, operations, &mut file)
@@ -98,7 +103,11 @@ fn run_hosted(
         .get("input")
         .and_then(Value::as_str)
         .unwrap_or_default();
-    let mut progress = pipeline.start_process(input, File::new(), Api::Async)?;
+    let start = File {
+        path: file.path.clone(),
+        ..File::new()
+    };
+    let mut progress = pipeline.start_process(input, start, Api::Async)?;
     loop {
         match progress {
             Progress::Paused(mut pause) => {

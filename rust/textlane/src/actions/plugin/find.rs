@@ -76,6 +76,8 @@ pub(crate) const PLUGINS: &[PluginEntry] = &[
     #[cfg(feature = "md")]
     plugin!("md.headingId", textlane_md::HeadingId, "remark-heading-id"),
     #[cfg(feature = "md")]
+    plugin!("md.pathRewrite", textlane_md::PathRewrite, ""),
+    #[cfg(feature = "md")]
     plugin!("md.strip", textlane_md::Strip, "strip-markdown"),
     #[cfg(feature = "md")]
     plugin!("md.toc", textlane_md::Toc, "remark-toc"),

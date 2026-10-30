@@ -78,7 +78,7 @@ fn run_group(
             report.matched_entries.push(entry.clone());
         }
         let mut case = json!({ "pipeline": group["pipeline"] });
-        for key in ["input", "tree", "operations"] {
+        for key in ["input", "path", "tree", "operations"] {
             if let Some(value) = test.get(key) {
                 case[key] = value.clone();
             }

@@ -210,6 +210,26 @@ export interface HeadingIdOptions {
   attributes?: boolean
 }
 
+/** `md.pathRewrite`: the URLs of images, links and definitions as a site serves them: relative ones resolved against the file's path and made root-relative, every root-relative one under `base`, and links to Markdown files turned into page URLs. */
+export interface PathRewriteOptions {
+  /** The directory URLs count from, as the file's path spells it; the path's own starting point when left out. */
+  root?: string | null
+  /** The URL the site is served at, such as `/docs`, put before every root-relative URL once. */
+  base?: string | null
+  /** The nodes whose URLs are rewritten; images, links and definitions when left out. */
+  nodes?: UrlNode[] | null
+  /** Markdown files, relative to `root`, to the URL of their page; a link to one of them takes it, before `markdownLinks` applies. @default {} */
+  pages?: Record<string, string>
+  /** How a link to a Markdown file no page names becomes a URL. */
+  markdownLinks?: MarkdownLinks
+}
+
+/** A node with a URL. */
+export type UrlNode = "image" | "link" | "definition"
+
+/** How a link to a Markdown file becomes a URL. */
+export type MarkdownLinks = "keep" | "directory" | "html"
+
 /** `md.strip`: mdast down to its text, as strip-markdown does: code, HTML, tables and the like dropped, headings made paragraphs, formatting unwrapped. */
 export interface StripOptions {
   /** Node types to leave as they are, such as `inlineCode`. @default [] */
@@ -394,6 +414,12 @@ export function packageCommand(options?: PackageCommandOptions): Plugin<"md.pack
 export function headingId(options?: HeadingIdOptions): Plugin<"md.headingId", HeadingIdOptions> {
   if (options === undefined) return { name: "md.headingId" }
   return { name: "md.headingId", options }
+}
+
+/** The `md.pathRewrite` plugin. */
+export function pathRewrite(options?: PathRewriteOptions): Plugin<"md.pathRewrite", PathRewriteOptions> {
+  if (options === undefined) return { name: "md.pathRewrite" }
+  return { name: "md.pathRewrite", options }
 }
 
 /** The `md.strip` plugin. */

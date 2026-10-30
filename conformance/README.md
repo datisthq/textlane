@@ -37,7 +37,8 @@ A file is an array of groups. A group fixes the pipeline; its tests vary only th
   and a `source` (repository, a commit or release `version`, path, test name, licence),
   required for anything ported from upstream. Ported groups follow upstream's grouping: one
   per spec section or test block.
-- A test has a `description`, an `input` string or a `tree`, and exactly one `expected`
+- A test has a `description`, an `input` string or a `tree` (and a `path` when a plugin
+  resolves URLs against where the document lives), and exactly one `expected`
   outcome. Serialized output is keyed by its file extension: `html`, `md`, `js`, `txt`. A
   `tree` compares as JSON, positions in UTF-16 code units (dropped on both sides when the group
   says `positions: false`); `messages` compare on `ruleId`, `source` and `place`, in place order; an `error`

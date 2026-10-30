@@ -518,6 +518,52 @@ Follows [remark-heading-id](https://www.npmjs.com/package/remark-heading-id).
 
 <!-- /generated -->
 
+## md.pathRewrite
+
+Rewrites the URLs of images, links and definitions as a site serves them, from where the document lives: a relative URL is resolved against the file's path and made relative to `root`, every root-relative URL gets `base` once, and a link to a Markdown file becomes its page's URL, from `pages` or by `markdownLinks` (`keep`, `directory` or `html`). URLs with a scheme, protocol-relative ones and fragments stay as they are. Pass the document's path with the text.
+
+```js
+import { textlane } from "textlane"
+import * as html from "textlane/html"
+import * as md from "textlane/md"
+
+const file = textlane()
+  .use(md.parse())
+  .use(md.pathRewrite({ root: "/repo/docs", base: "/site", markdownLinks: "directory" }))
+  .use(md.toHtml())
+  .use(html.stringify())
+  .processSync({
+    value: "![logo](../logo.png) and [next](./next.md)",
+    path: "/repo/docs/guide/intro.md",
+  })
+file.value
+// <p><img src="/site/logo.png" alt="logo"> and <a href="/site/guide/next/">next</a></p>
+```
+
+<!-- generated:options md.pathRewrite -->
+
+| Option          | Type                     | Default | Description                                                                                                                   |
+| --------------- | ------------------------ | ------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `root`          | `string \| null`         | `null`  | The directory URLs count from, as the file's path spells it; the path's own starting point when left out.                     |
+| `base`          | `string \| null`         | `null`  | The URL the site is served at, such as `/docs`, put before every root-relative URL once.                                      |
+| `nodes`         | `UrlNode[] \| null`      |         | The nodes whose URLs are rewritten; images, links and definitions when left out.                                              |
+| `pages`         | `Record<string, string>` | `{}`    | Markdown files, relative to `root`, to the URL of their page; a link to one of them takes it, before `markdownLinks` applies. |
+| `markdownLinks` | `MarkdownLinks`          |         | How a link to a Markdown file no page names becomes a URL.                                                                    |
+
+**`UrlNode`**
+
+A node with a URL.
+
+Takes `"image" | "link" | "definition"`.
+
+**`MarkdownLinks`**
+
+How a link to a Markdown file becomes a URL.
+
+Takes `"keep" | "directory" | "html"`.
+
+<!-- /generated -->
+
 ## md.strip
 
 Strips mdast down to its text, as strip-markdown does: code, HTML, tables and definitions go, headings become paragraphs and formatting gives way to its content, which suits search indexes and plain-text summaries. `keep` leaves node types as they are and `remove` drops more.

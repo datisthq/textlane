@@ -686,6 +686,9 @@ const domains: Domain[] = [
       ["md.definitionList", "remark-definition-list"],
       ["md.headingId", "remark-heading-id"],
       ["md.strip", "strip-markdown"],
+      ["md.toc", "remark-toc"],
+      ["md.packageCommand", "npm-to-yarn"],
+      ["md.pathRewrite", "textlane"],
       ["md.component", "textlane"],
       ["md.mdx", "remark-mdx"],
       ["mdx.compile", "@mdx-js/mdx"],
@@ -704,6 +707,7 @@ const domains: Domain[] = [
       ["html.sanitize", "rehype-sanitize"],
       ["html.slug", "rehype-slug"],
       ["html.extractToc", "rehype-extract-toc"],
+      ["html.externalLinks", "rehype-external-links"],
       ["html.unwrapImages", "rehype-unwrap-images"],
       ["html.format", "rehype-format"],
       ["html.highlight", "@shikijs/rehype"],
@@ -866,7 +870,7 @@ const SUITE = "https://github.com/datisthq/textlane/tree/main/conformance"
 
 const conformanceStats = [
   { value: "10k+", label: "tests" },
-  { value: "30+", label: "plugins" },
+  { value: "40+", label: "plugins" },
   { value: "3", label: "languages" },
 ]
 

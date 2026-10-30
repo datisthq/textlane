@@ -21,6 +21,7 @@ type Expected = { error?: { code: string } } & Record<string, unknown>
 type Test = {
   description: string
   input?: string
+  path?: string
   operations?: unknown
   expected: Expected
 }
@@ -87,21 +88,22 @@ function runTest(group: Group, test: Test) {
   )
   const processor = () => entry.textlane().use(plugins)
   const input = test.input ?? ""
+  const document = test.path ? { value: input, path: test.path } : input
   const output = OUTPUTS.find(key => key in test.expected)
   if (test.expected.error) {
     const call = output
-      ? () => processor().processSync(input)
+      ? () => processor().processSync(document)
       : () => processor().runSync(processor().parse(input), input)
     return expect(call).toThrow(
       expect.objectContaining({ code: test.expected.error.code }),
     )
   }
   if (output) {
-    return expect(processor().processSync(input).value).toEqual(test.expected[output])
+    return expect(processor().processSync(document).value).toEqual(test.expected[output])
   }
   // What plugins stored in the file is the vfile's `data`
   if ("fileData" in test.expected) {
-    return expect(processor().processSync(input).data).toEqual(test.expected.fileData)
+    return expect(processor().processSync(document).data).toEqual(test.expected.fileData)
   }
   if ("tree" in test.expected) {
     const tree: Node = processor().runSync(processor().parse(input), input)
@@ -116,7 +118,7 @@ function runTest(group: Group, test: Test) {
   // Messages-only cases whose pipeline has no compiler are the runner's alone
   if (!group.pipeline.some(([name]) => name.endsWith("stringify"))) return
   const messages = processor()
-    .processSync(input)
+    .processSync(document)
     .messages.map(message => ({
       ruleId: message.ruleId,
       source: message.source,

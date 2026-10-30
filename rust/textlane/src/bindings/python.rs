@@ -133,8 +133,14 @@ mod native {
             value.map_err(|error| throw(py, error))
         }
 
-        fn process(&mut self, py: Python<'_>, text: &str) -> PyResult<String> {
-            self.process_with(py, text, Api::Async)
+        #[pyo3(signature = (text, path=None))]
+        fn process(
+            &mut self,
+            py: Python<'_>,
+            text: &str,
+            path: Option<String>,
+        ) -> PyResult<String> {
+            self.process_with(py, text, path, Api::Async)
         }
 
         /// The ids of the enabled host plugins, in the order their stages run.
@@ -159,18 +165,30 @@ mod native {
             Ok(Run::new(progress.map_err(|error| throw(py, error))?))
         }
 
+        #[pyo3(signature = (text, sync, path=None))]
         fn start_process(
             &mut self,
             py: Python<'_>,
             text: &str,
             sync: bool,
+            path: Option<String>,
         ) -> PyResult<Run> {
-            let progress = self.inner.start_process(text, File::new(), read_api(sync));
+            let file = File {
+                path,
+                ..File::new()
+            };
+            let progress = self.inner.start_process(text, file, read_api(sync));
             Ok(Run::new(progress.map_err(|error| throw(py, error))?))
         }
 
-        fn process_sync(&mut self, py: Python<'_>, text: &str) -> PyResult<String> {
-            self.process_with(py, text, Api::Sync)
+        #[pyo3(signature = (text, path=None))]
+        fn process_sync(
+            &mut self,
+            py: Python<'_>,
+            text: &str,
+            path: Option<String>,
+        ) -> PyResult<String> {
+            self.process_with(py, text, path, Api::Sync)
         }
     }
 
@@ -195,9 +213,13 @@ mod native {
             &mut self,
             py: Python<'_>,
             text: &str,
+            path: Option<String>,
             api: Api,
         ) -> PyResult<String> {
-            let mut file = File::new();
+            let mut file = File {
+                path,
+                ..File::new()
+            };
             let value = self.inner.process(text, &mut file, api);
             let value = value.map_err(|error| throw(py, error))?;
             Ok(crate::write_file(&file, &value).to_string())

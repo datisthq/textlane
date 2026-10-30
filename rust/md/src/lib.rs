@@ -317,6 +317,14 @@ mod plugins {
     pub(crate) mod parse {
         pub(crate) mod plugin;
     }
+    pub(crate) mod path_rewrite {
+        pub(crate) mod actions {
+            pub(crate) mod url {
+                pub(crate) mod rewrite;
+            }
+        }
+        pub(crate) mod plugin;
+    }
     pub(crate) mod stringify {
         pub(crate) mod plugin;
     }
@@ -363,10 +371,10 @@ mod plugins {
 pub use models::options::{
     AlertRule, AttributeRule, CargoManager, CodeGroupRule, CodeRule, Component,
     DefinitionListSlot, Directive, DirectiveKind, DirectiveRule, DirectiveSlot,
-    Ecosystems, Frontmatter, FrontmatterSlot, Gfm, GfmSlot, GroupRule, HeadingId, Math,
-    MathSlot, Matter, Mdx, MdxSlot, Names, NpmManager, PackageCommand, ParentCheck,
-    ParentTest, Parse, PipManager, Stringify, Strip, ToHtml, ToNaturalLanguage, Toc,
-    UnknownDirectives, UnsafePattern,
+    Ecosystems, Frontmatter, FrontmatterSlot, Gfm, GfmSlot, GroupRule, HeadingId,
+    MarkdownLinks, Math, MathSlot, Matter, Mdx, MdxSlot, Names, NpmManager,
+    PackageCommand, ParentCheck, ParentTest, Parse, PathRewrite, PipManager, Stringify,
+    Strip, ToHtml, ToNaturalLanguage, Toc, UnknownDirectives, UnsafePattern, UrlNode,
 };
 
 // actions

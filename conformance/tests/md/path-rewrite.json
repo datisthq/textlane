@@ -1,0 +1,285 @@
+[
+  {
+    "description": "relative URLs resolve against the file and the root",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.pathRewrite",
+        {
+          "root": "/repo/docs",
+          "base": "/site"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "an image beside the file",
+        "input": "![a](./img/a.png)",
+        "path": "/repo/docs/guide/intro.md",
+        "expected": {
+          "md": "![a](/site/guide/img/a.png)\n"
+        }
+      },
+      {
+        "description": "an image up a level",
+        "input": "![a](../logo.png)",
+        "path": "/repo/docs/guide/intro.md",
+        "expected": {
+          "md": "![a](/site/logo.png)\n"
+        }
+      },
+      {
+        "description": "a root-relative URL takes the base once",
+        "input": "![a](/logo.png) ![b](/site/b.png)",
+        "path": "/repo/docs/guide/intro.md",
+        "expected": {
+          "md": "![a](/site/logo.png) ![b](/site/b.png)\n"
+        }
+      },
+      {
+        "description": "URLs with a scheme or a fragment stay",
+        "input": "[a](https://x.org) [b](mailto:a@b.c) [c](#top) ![d](data:image/png;base64,AA) [e](//cdn.org/x)",
+        "path": "/repo/docs/guide/intro.md",
+        "expected": {
+          "md": "[a](https://x.org) [b](mailto:a@b.c) [c](#top) ![d](data:image/png;base64,AA) [e](//cdn.org/x)\n"
+        }
+      },
+      {
+        "description": "a query and a fragment are kept",
+        "input": "![a](img/a.png?v=1#x)",
+        "path": "/repo/docs/guide/intro.md",
+        "expected": {
+          "md": "![a](/site/guide/img/a.png?v=1#x)\n"
+        }
+      },
+      {
+        "description": "climbing out of the root stays",
+        "input": "![a](../../../out.png)",
+        "path": "/repo/docs/guide/intro.md",
+        "expected": {
+          "md": "![a](../../../out.png)\n"
+        }
+      },
+      {
+        "description": "a reference definition",
+        "input": "![a][logo]\n\n[logo]: ./logo.png",
+        "path": "/repo/docs/guide/intro.md",
+        "expected": {
+          "md": "![a][logo]\n\n[logo]: /site/guide/logo.png\n"
+        }
+      },
+      {
+        "description": "without a path, relative URLs stay",
+        "input": "![a](img/a.png) ![b](/b.png)",
+        "expected": {
+          "md": "![a](img/a.png) ![b](/site/b.png)\n"
+        }
+      }
+    ],
+    "comment": "md.pathRewrite is textlane's own, with no upstream: these cases are its specification"
+  },
+  {
+    "description": "links to Markdown files keep their path by default",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.pathRewrite",
+        {
+          "root": "/repo/docs"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a Markdown link",
+        "input": "[next](./next.md#setup)",
+        "path": "/repo/docs/guide/intro.md",
+        "expected": {
+          "md": "[next](/guide/next.md#setup)\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "links to Markdown files as directories",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.pathRewrite",
+        {
+          "root": "/repo/docs",
+          "base": "/site",
+          "markdownLinks": "directory"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a page",
+        "input": "[next](next.md)",
+        "path": "/repo/docs/guide/intro.md",
+        "expected": {
+          "md": "[next](/site/guide/next/)\n"
+        }
+      },
+      {
+        "description": "an index",
+        "input": "[home](../index.md)",
+        "path": "/repo/docs/guide/intro.md",
+        "expected": {
+          "md": "[home](/site/)\n"
+        }
+      },
+      {
+        "description": "an mdx page",
+        "input": "[x](x.mdx)",
+        "path": "/repo/docs/guide/intro.md",
+        "expected": {
+          "md": "[x](/site/guide/x/)\n"
+        }
+      },
+      {
+        "description": "an image of a Markdown name stays a file",
+        "input": "![a](a.md)",
+        "path": "/repo/docs/guide/intro.md",
+        "expected": {
+          "md": "![a](/site/guide/a.md)\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "links to Markdown files as HTML pages",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.pathRewrite",
+        {
+          "root": "/repo/docs",
+          "markdownLinks": "html"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a page",
+        "input": "[next](next.md#a)",
+        "path": "/repo/docs/guide/intro.md",
+        "expected": {
+          "md": "[next](/guide/next.html#a)\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "pages map Markdown files to their URLs first",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.pathRewrite",
+        {
+          "root": "/repo/docs",
+          "base": "/site",
+          "markdownLinks": "directory",
+          "pages": {
+            "guide/next.md": "/python/next"
+          }
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a mapped page",
+        "input": "[next](./next.md#a)",
+        "path": "/repo/docs/guide/intro.md",
+        "expected": {
+          "md": "[next](/site/python/next#a)\n"
+        }
+      },
+      {
+        "description": "an unmapped page",
+        "input": "[other](./other.md)",
+        "path": "/repo/docs/guide/intro.md",
+        "expected": {
+          "md": "[other](/site/guide/other/)\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "only the nodes named are rewritten",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.pathRewrite",
+        {
+          "root": "/repo/docs",
+          "base": "/site",
+          "nodes": ["image"]
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a link stays",
+        "input": "[a](./a.png) ![b](./b.png)",
+        "path": "/repo/docs/guide/intro.md",
+        "expected": {
+          "md": "[a](./a.png) ![b](/site/guide/b.png)\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "a relative root and path",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.pathRewrite",
+        {
+          "root": "docs"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "an image",
+        "input": "![a](./a.png)",
+        "path": "docs/guide/intro.md",
+        "expected": {
+          "md": "![a](/guide/a.png)\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "Windows separators in the path",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.pathRewrite",
+        {
+          "root": "C:\\repo"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "an image",
+        "input": "![a](./a.png)",
+        "path": "C:\\repo\\guide\\intro.md",
+        "expected": {
+          "md": "![a](/guide/a.png)\n"
+        }
+      }
+    ]
+  }
+]

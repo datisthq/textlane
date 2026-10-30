@@ -93,8 +93,8 @@ class Processor:
         """Parse, run and compile a document, finishing asynchronous stages."""
         text = _read_value(document) or ""
         if not self._attach():
-            return _with_path(json.loads(self._native.process(text)), document)
-        run = self._native.start_process(text, False)
+            return _with_path(json.loads(self._native.process(text, _read_path(document))), document)
+        run = self._native.start_process(text, False, _read_path(document))
         file = HostFile(run.value() or text, _read_path(document))
         await finish(run, self._hosts, file)
         return _with_path(_merge_data(json.loads(run.result()), file.data), document)
@@ -104,8 +104,8 @@ class Processor:
         stage."""
         text = _read_value(document) or ""
         if not self._attach():
-            return _with_path(json.loads(self._native.process_sync(text)), document)
-        run = self._native.start_process(text, True)
+            return _with_path(json.loads(self._native.process_sync(text, _read_path(document))), document)
+        run = self._native.start_process(text, True, _read_path(document))
         file = HostFile(run.value() or text, _read_path(document))
         finish_sync(run, self._hosts, file, "process")
         return _with_path(_merge_data(json.loads(run.result()), file.data), document)

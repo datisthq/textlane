@@ -104,8 +104,9 @@ export class Processor {
   /** Parse, run and compile a document, finishing asynchronous stages. */
   async process(document: Compatible): Promise<VFile> {
     const text = readValue(document) ?? ""
-    if (!this.#attach()) return withPath(this.#native.process(text), document)
-    const run = this.#native.startProcess(text, false)
+    if (!this.#attach())
+      return withPath(this.#native.process(text, readPath(document)), document)
+    const run = this.#native.startProcess(text, false, readPath(document))
     const file = new HostFile({ value: run.value() ?? text, path: readPath(document) })
     await finishRun({ run, hosts: this.#hosts, file, sync: false, call: "process" })
     return withPath(mergeData(run.result(), file.data), document)
@@ -114,8 +115,9 @@ export class Processor {
   /** Parse, run and compile a document; fails with `async-in-sync` on an asynchronous stage. */
   processSync(document: Compatible): VFile {
     const text = readValue(document) ?? ""
-    if (!this.#attach()) return withPath(this.#native.processSync(text), document)
-    const run = this.#native.startProcess(text, true)
+    if (!this.#attach())
+      return withPath(this.#native.processSync(text, readPath(document)), document)
+    const run = this.#native.startProcess(text, true, readPath(document))
     const file = new HostFile({ value: run.value() ?? text, path: readPath(document) })
     void finishRun({ run, hosts: this.#hosts, file, sync: true, call: "process" })
     return withPath(mergeData(run.result(), file.data), document)

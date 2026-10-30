@@ -236,6 +236,53 @@ pub struct HeadingId {
     pub attributes: bool,
 }
 
+/// `md.pathRewrite`: the URLs of images, links and definitions as a site serves them:
+/// relative ones resolved against the file's path and made root-relative, every root-relative
+/// one under `base`, and links to Markdown files turned into page URLs.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", schemars(rename = "PathRewriteOptions"))]
+pub struct PathRewrite {
+    /// The directory URLs count from, as the file's path spells it; the path's own
+    /// starting point when left out.
+    pub root: Option<String>,
+    /// The URL the site is served at, such as `/docs`, put before every root-relative URL
+    /// once.
+    pub base: Option<String>,
+    /// The nodes whose URLs are rewritten; images, links and definitions when left out.
+    pub nodes: Option<Vec<UrlNode>>,
+    /// Markdown files, relative to `root`, to the URL of their page; a link to one of them
+    /// takes it, before `markdownLinks` applies.
+    pub pages: BTreeMap<String, String>,
+    /// How a link to a Markdown file no page names becomes a URL.
+    pub markdown_links: MarkdownLinks,
+}
+
+/// A node with a URL.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "camelCase")]
+pub enum UrlNode {
+    Image,
+    Link,
+    Definition,
+}
+
+/// How a link to a Markdown file becomes a URL.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "camelCase")]
+pub enum MarkdownLinks {
+    /// The file's own path, `/guide/intro.md`.
+    #[default]
+    Keep,
+    /// A directory, `/guide/intro/`, an `index` file its parent's.
+    Directory,
+    /// An HTML page, `/guide/intro.html`.
+    Html,
+}
+
 /// `md.strip`: mdast down to its text, as strip-markdown does: code, HTML, tables and
 /// the like dropped, headings made paragraphs, formatting unwrapped.
 #[derive(Clone, Debug, Default, Deserialize)]
