@@ -79,7 +79,35 @@ export interface HighlightOptions {
   defaultLanguage?: string | null
   /** The language of a block naming one Shiki does not know; left alone without it. */
   fallbackLanguage?: string | null
+  /** Colors to replace, by their lowercase spelling: a color for every theme, or a theme's name to a map of its own. */
+  colorReplacements?: Record<string, ColorReplacement>
+  /** Add `language-<name>` to each highlighted `<code>`. @default false */
+  addLanguageClass?: boolean
+  /** Highlight inline code too, by how it names its language: `tailing-curly-colon` reads `` `a(){:js}` ``. */
+  inline?: InlineCode | null
+  /** The `<pre>` property that gets a block's meta, the text after its language; the JSON stand-in for `parseMetaString: meta => ({ [name]: meta })`. */
+  metaProperty?: string | null
+  /** The transformers of @shikijs/transformers to run, in order, by name or with options. */
+  transformers?: HighlightTransformer[]
 }
+
+/** A replacement color, or a theme's own replacements. */
+export type ColorReplacement = string | Record<string, string>
+
+/** How inline code names its language. */
+export type InlineCode = "tailing-curly-colon"
+
+/** A transformer of @shikijs/transformers: its name alone, or its name and options. */
+export type HighlightTransformer = TransformerName | ConfiguredTransformer
+
+/** The transformers `html.highlight` runs natively. */
+export type TransformerName = "notationDiff" | "notationFocus" | "notationHighlight" | "notationErrorLevel" | "metaHighlight" | "renderLineNumber"
+
+/** A transformer with its options, as @shikijs/transformers names them. */
+export type ConfiguredTransformer = { name: "notationDiff"; classLineAdd?: Classes | null; classLineRemove?: Classes | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "notationFocus"; classActiveLine?: Classes | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "notationHighlight"; classActiveLine?: Classes | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "notationErrorLevel"; classMap?: Record<string, Classes> | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "metaHighlight"; className?: Classes | null; zeroIndexed?: boolean } | { name: "renderLineNumber"; classLineNumber?: Classes | null; start?: number | null }
+
+/** Class names: a list, or one string of them separated by white space. */
+export type Classes = string | string[]
 
 /** `html.toMarkdown`: hast into mdast; options named as hast-util-to-mdast names them. */
 export interface ToMarkdownOptions {

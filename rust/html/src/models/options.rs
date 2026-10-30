@@ -124,6 +124,116 @@ pub struct Highlight {
     pub default_language: Option<String>,
     /// The language of a block naming one Shiki does not know; left alone without it.
     pub fallback_language: Option<String>,
+    /// Colors to replace, by their lowercase spelling: a color for every theme, or a theme's
+    /// name to a map of its own.
+    pub color_replacements: BTreeMap<String, ColorReplacement>,
+    /// Add `language-<name>` to each highlighted `<code>`.
+    pub add_language_class: bool,
+    /// Highlight inline code too, by how it names its language: `tailing-curly-colon`
+    /// reads `` `a(){:js}` ``.
+    pub inline: Option<InlineCode>,
+    /// The `<pre>` property that gets a block's meta, the text after its language; the JSON
+    /// stand-in for `parseMetaString: meta => ({ [name]: meta })`.
+    pub meta_property: Option<String>,
+    /// The transformers of @shikijs/transformers to run, in order, by name or with options.
+    pub transformers: Vec<HighlightTransformer>,
+}
+
+/// A replacement color, or a theme's own replacements.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(untagged)]
+pub enum ColorReplacement {
+    Color(String),
+    Theme(BTreeMap<String, String>),
+}
+
+/// How inline code names its language.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+pub enum InlineCode {
+    #[serde(rename = "tailing-curly-colon")]
+    TailingCurlyColon,
+}
+
+/// A transformer of @shikijs/transformers: its name alone, or its name and options.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(untagged)]
+pub enum HighlightTransformer {
+    Name(TransformerName),
+    Configured(ConfiguredTransformer),
+}
+
+/// The transformers `html.highlight` runs natively.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "camelCase")]
+pub enum TransformerName {
+    NotationDiff,
+    NotationFocus,
+    NotationHighlight,
+    NotationErrorLevel,
+    MetaHighlight,
+    RenderLineNumber,
+}
+
+/// A transformer with its options, as @shikijs/transformers names them.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(tag = "name", rename_all = "camelCase")]
+pub enum ConfiguredTransformer {
+    /// `[!code ++]` and `[!code --]` mark added and removed lines.
+    #[serde(rename_all = "camelCase")]
+    NotationDiff {
+        class_line_add: Option<Classes>,
+        class_line_remove: Option<Classes>,
+        class_active_pre: Option<Classes>,
+        class_active_code: Option<Classes>,
+    },
+    /// `[!code focus]` marks focused lines.
+    #[serde(rename_all = "camelCase")]
+    NotationFocus {
+        class_active_line: Option<Classes>,
+        class_active_pre: Option<Classes>,
+        class_active_code: Option<Classes>,
+    },
+    /// `[!code highlight]` and `[!code hl]` mark highlighted lines.
+    #[serde(rename_all = "camelCase")]
+    NotationHighlight {
+        class_active_line: Option<Classes>,
+        class_active_pre: Option<Classes>,
+        class_active_code: Option<Classes>,
+    },
+    /// `[!code error]`, `[!code warning]` and `[!code info]` mark lines by level.
+    #[serde(rename_all = "camelCase")]
+    NotationErrorLevel {
+        class_map: Option<BTreeMap<String, Classes>>,
+        class_active_pre: Option<Classes>,
+        class_active_code: Option<Classes>,
+    },
+    /// `{1,3-5}` in the meta marks highlighted lines.
+    #[serde(rename_all = "camelCase")]
+    MetaHighlight {
+        class_name: Option<Classes>,
+        #[serde(default)]
+        zero_indexed: bool,
+    },
+    /// A number at the start of each line.
+    #[serde(rename_all = "camelCase")]
+    RenderLineNumber {
+        class_line_number: Option<Classes>,
+        start: Option<usize>,
+    },
+}
+
+/// Class names: a list, or one string of them separated by white space.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(untagged)]
+pub enum Classes {
+    One(String),
+    Many(Vec<String>),
 }
 
 /// `html.slug`: ids on headings, from their text; options named as rehype-slug names

@@ -103,6 +103,89 @@ class SlugOptions(TypedDict, total=False):
     prefix: str
 
 
+# A replacement color, or a theme's own replacements.
+ColorReplacement = Union[str, Dict[str, str]]
+
+
+# How inline code names its language.
+InlineCode = Literal["tailing-curly-colon"]
+
+
+# The transformers `html.highlight` runs natively.
+TransformerName = Literal["notationDiff", "notationFocus", "notationHighlight", "notationErrorLevel", "metaHighlight", "renderLineNumber"]
+
+
+# Class names: a list, or one string of them separated by white space.
+Classes = Union[str, List[str]]
+
+
+class _ConfiguredTransformer0Required(TypedDict):
+    name: Literal["notationDiff"]
+
+
+class ConfiguredTransformer0(_ConfiguredTransformer0Required, total=False):
+    classLineAdd: Optional[Classes]
+    classLineRemove: Optional[Classes]
+    classActivePre: Optional[Classes]
+    classActiveCode: Optional[Classes]
+
+
+class _ConfiguredTransformer1Required(TypedDict):
+    name: Literal["notationFocus"]
+
+
+class ConfiguredTransformer1(_ConfiguredTransformer1Required, total=False):
+    classActiveLine: Optional[Classes]
+    classActivePre: Optional[Classes]
+    classActiveCode: Optional[Classes]
+
+
+class _ConfiguredTransformer2Required(TypedDict):
+    name: Literal["notationHighlight"]
+
+
+class ConfiguredTransformer2(_ConfiguredTransformer2Required, total=False):
+    classActiveLine: Optional[Classes]
+    classActivePre: Optional[Classes]
+    classActiveCode: Optional[Classes]
+
+
+class _ConfiguredTransformer3Required(TypedDict):
+    name: Literal["notationErrorLevel"]
+
+
+class ConfiguredTransformer3(_ConfiguredTransformer3Required, total=False):
+    classMap: Optional[Dict[str, Classes]]
+    classActivePre: Optional[Classes]
+    classActiveCode: Optional[Classes]
+
+
+class _ConfiguredTransformer4Required(TypedDict):
+    name: Literal["metaHighlight"]
+
+
+class ConfiguredTransformer4(_ConfiguredTransformer4Required, total=False):
+    className: Optional[Classes]
+    zeroIndexed: bool
+
+
+class _ConfiguredTransformer5Required(TypedDict):
+    name: Literal["renderLineNumber"]
+
+
+class ConfiguredTransformer5(_ConfiguredTransformer5Required, total=False):
+    classLineNumber: Optional[Classes]
+    start: Optional[int]
+
+
+# A transformer with its options, as @shikijs/transformers names them.
+ConfiguredTransformer = Union[ConfiguredTransformer0, ConfiguredTransformer1, ConfiguredTransformer2, ConfiguredTransformer3, ConfiguredTransformer4, ConfiguredTransformer5]
+
+
+# A transformer of @shikijs/transformers: its name alone, or its name and options.
+HighlightTransformer = Union[TransformerName, ConfiguredTransformer]
+
+
 # `html.highlight`: code blocks colored as Shiki colors them, natively by giallo;
 # options named as @shikijs/rehype names them.
 class HighlightOptions(TypedDict, total=False):
@@ -114,6 +197,19 @@ class HighlightOptions(TypedDict, total=False):
     defaultLanguage: Optional[str]
     # The language of a block naming one Shiki does not know; left alone without it.
     fallbackLanguage: Optional[str]
+    # Colors to replace, by their lowercase spelling: a color for every theme, or a theme's
+    # name to a map of its own.
+    colorReplacements: Dict[str, ColorReplacement]
+    # Add `language-<name>` to each highlighted `<code>`.
+    addLanguageClass: bool
+    # Highlight inline code too, by how it names its language: `tailing-curly-colon`
+    # reads `` `a(){:js}` ``.
+    inline: Optional[InlineCode]
+    # The `<pre>` property that gets a block's meta, the text after its language; the JSON
+    # stand-in for `parseMetaString: meta => ({ [name]: meta })`.
+    metaProperty: Optional[str]
+    # The transformers of @shikijs/transformers to run, in order, by name or with options.
+    transformers: List[HighlightTransformer]
 
 
 # `html.toMarkdown`: hast into mdast; options named as hast-util-to-mdast names them.

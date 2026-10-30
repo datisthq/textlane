@@ -79,3 +79,71 @@ fn checks_themes_only_once_a_block_is_highlighted() -> Result<(), Error> {
     assert_eq!(highlight("<p>a</p>", json!({}))?, "<p>a</p>");
     Ok(())
 }
+
+#[test]
+fn runs_transformers_named_through_the_rust_api() -> Result<(), Error> {
+    use crate::models::options::{HighlightTransformer, TransformerName};
+    let options = Highlight {
+        theme: Some("github-light".into()),
+        transformers: vec![HighlightTransformer::Name(TransformerName::NotationDiff)],
+        ..Default::default()
+    };
+    let alloc = Allocator::new();
+    let parse = Parse {
+        fragment: true,
+        ..Default::default()
+    };
+    let input = "<pre><code class=\"language-js\">a // [!code ++]\n</code></pre>";
+    let mut node = parse_html(input, &parse, &mut File::new(), &alloc);
+    highlight_hast(&mut node, &options, &alloc)?;
+    let html = stringify_hast(&node, &Stringify::default())?;
+    assert!(html.starts_with("<pre class=\"shiki github-light has-diff\""));
+    assert!(html.contains("<span class=\"line diff add\">"));
+    assert!(!html.contains("[!code"));
+    Ok(())
+}
+
+#[test]
+fn notations_stay_linear_over_many_lines() -> Result<(), Error> {
+    let line = "let a = 1 // [!code ++]\n";
+    let input = format!(
+        "<pre><code class=\"language-js\">{}</code></pre>",
+        line.repeat(20_000)
+    );
+    let started = std::time::Instant::now();
+    let html = highlight(
+        &input,
+        json!({ "theme": "github-light", "transformers": ["notationDiff"] }),
+    )?;
+    assert_eq!(html.matches("diff add").count(), 20_000);
+    assert!(started.elapsed().as_secs() < 20);
+    Ok(())
+}
+
+#[test]
+fn reads_a_huge_meta_range_without_expanding_it() -> Result<(), Error> {
+    let options = json!({ "theme": "github-light", "transformers": ["metaHighlight"] });
+    let html = highlight_meta("a\nb", "{2-99999999999999}", options)?;
+    assert_eq!(html.matches("highlighted").count(), 1);
+    Ok(())
+}
+
+fn highlight_meta(
+    code: &str,
+    meta: &str,
+    options: serde_json::Value,
+) -> Result<String, Error> {
+    let options: Highlight = serde_json::from_value(options)
+        .map_err(|error| Error::new("invalid-options", error.to_string()))?;
+    let alloc = Allocator::new();
+    let input = format!(
+        "<pre><code class=\"language-js\" metastring=\"{meta}\">{code}</code></pre>"
+    );
+    let parse = Parse {
+        fragment: true,
+        ..Default::default()
+    };
+    let mut node = parse_html(&input, &parse, &mut File::new(), &alloc);
+    highlight_hast(&mut node, &options, &alloc)?;
+    stringify_hast(&node, &Stringify::default())
+}

@@ -2,7 +2,7 @@ use giallo::{FontStyle, HighlightOptions, Style, ThemeVariant};
 use textlane_core::Error;
 
 use crate::helpers::registry::load_registry;
-use crate::models::highlight::{CodeToken, Themes};
+use crate::models::highlight::{CodeToken, Theme, Themes};
 
 /// Split code into lines of styled tokens as Shiki's `codeToTokens` and its whitespace
 /// merging do, for a language giallo or Shiki's plain text knows.
@@ -18,6 +18,7 @@ pub(crate) fn tokenize_code(
         return Ok(lines
             .map(|text| {
                 vec![CodeToken {
+                    classes: Vec::new(),
                     text: text.to_owned(),
                     style: String::new(),
                 }]
@@ -133,18 +134,28 @@ fn merge_whitespace(line: Line, themes: &Themes) -> Vec<CodeToken> {
             if could_merge {
                 carry.push_str(&text);
                 tokens.push(CodeToken {
+                    classes: Vec::new(),
                     text: std::mem::take(&mut carry),
                     style,
                 });
             } else {
                 tokens.push(CodeToken {
+                    classes: Vec::new(),
                     text: std::mem::take(&mut carry),
                     style: String::new(),
                 });
-                tokens.push(CodeToken { text, style });
+                tokens.push(CodeToken {
+                    text,
+                    style,
+                    classes: Vec::new(),
+                });
             }
         } else {
-            tokens.push(CodeToken { text, style });
+            tokens.push(CodeToken {
+                text,
+                style,
+                classes: Vec::new(),
+            });
         }
     }
     tokens
@@ -163,6 +174,14 @@ fn is_whitespace(text: &str) -> bool {
             .all(|c| (c.is_whitespace() && c != '\u{85}') || c == '\u{FEFF}')
 }
 
+/// A theme's color after Shiki's `applyColorReplacements`, which looks it up in lowercase.
+pub(crate) fn replace_color(color: String, theme: &Theme) -> String {
+    match theme.replacements.get(&color.to_lowercase()) {
+        Some(replacement) if !replacement.is_empty() => replacement.clone(),
+        _ => color,
+    }
+}
+
 // Shiki's `getTokenStyleObject` per theme, then `flatTokenVariants`: the default theme's
 // color is plain, everything else a `--shiki-<mode>…` variable, `inherit` where unset
 fn stringify_style(styles: &[Style], themes: &Themes) -> String {
@@ -172,6 +191,7 @@ fn stringify_style(styles: &[Style], themes: &Themes) -> String {
             let spelled = (theme.colors.spellings.iter())
                 .find(|(written, _)| *written == color)
                 .map_or(color.clone(), |(_, spelled)| (*spelled).to_owned());
+            let spelled = replace_color(spelled, theme);
             let mut object = vec![("color", spelled)];
             if style.font_style.contains(FontStyle::ITALIC) {
                 object.push(("font-style", "italic".to_owned()));

@@ -147,7 +147,13 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   lose (each theme's `fg`/`bg` as written, colors spelled `#fff` or `#…ff`);
   `helpers/registry.rs` aliases `injectTo` scopes to languages, since giallo links injections
   by language name. giallo exposes no scopes, so Shiki's token-type splits (same color, one
-  scope naming `string`) cannot be followed; those cases are pending one by one
+  scope naming `string`) cannot be followed; those cases are pending one by one. Its
+  transformers port @shikijs/transformers over `models/highlight.rs`'s `CodeBlock`, never
+  over hast: line hooks (`metaHighlight`, `renderLineNumber`) per line, then the notation
+  `code` hooks sharing one `parseComments` (`utils/notation/`, matching `v3`). A notation
+  marks tokens `None` and lines `removed` instead of splicing, so the indexes parsed comments
+  hold stay valid; Shiki's line ending after a removed line goes with it. Cases come from the
+  pinned packages through `import:highlight` (`highlight-transformers.json`)
   `html.toMarkdown` ports hast-util-to-mdast 10.1.2 with rehype-minify-whitespace run first
   (`actions/hast/minify.rs`, which works out `collapsableAfter` for every node in one pass).
   Handlers build into `utils/converter/store.rs`, a flat store that keeps per-subtree flags

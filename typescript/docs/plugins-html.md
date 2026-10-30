@@ -204,16 +204,72 @@ file.value
 // <pre class="shiki github-light" style="background-color:#fff;color:#24292e"  …
 ````
 
+`transformers` runs @shikijs/transformers natively, by name or with their options:
+`notationDiff`, `notationFocus`, `notationHighlight` and `notationErrorLevel` read
+`// [!code ++]`-style comments, `metaHighlight` reads `{1,3-5}` after the fence's language
+and `renderLineNumber` numbers lines, each marking lines with Shiki's classes. `inline:
+"tailing-curly-colon"` colors inline code written `` `a(){:js}` ``, `colorReplacements` and
+`addLanguageClass` are Shiki's own, and `metaProperty` puts a fence's meta on its `<pre>`.
+`transformerMetaWordHighlight` (`/word/`) is not native yet.
+
+```js
+html.highlight({
+  themes: { light: "github-light", dark: "github-dark" },
+  transformers: ["notationDiff", { name: "renderLineNumber", start: 10 }],
+})
+```
+
 <!-- generated:options html.highlight -->
 
 Follows [@shikijs/rehype](https://www.npmjs.com/package/@shikijs/rehype).
 
-| Option             | Type                              | Default | Description                                                                     |
-| ------------------ | --------------------------------- | ------- | ------------------------------------------------------------------------------- |
-| `themes`           | `Record<string, unknown> \| null` | `null`  | The theme of each color mode, `light` first, as `{"light": …, "dark": …}`.      |
-| `theme`            | `string \| null`                  | `null`  | The one theme, when `themes` is not given.                                      |
-| `defaultLanguage`  | `string \| null`                  | `null`  | The language of a block that names none; such a block is left alone without it. |
-| `fallbackLanguage` | `string \| null`                  | `null`  | The language of a block naming one Shiki does not know; left alone without it.  |
+| Option              | Type                               | Default | Description                                                                                                                                      |
+| ------------------- | ---------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `themes`            | `Record<string, unknown> \| null`  | `null`  | The theme of each color mode, `light` first, as `{"light": …, "dark": …}`.                                                                       |
+| `theme`             | `string \| null`                   | `null`  | The one theme, when `themes` is not given.                                                                                                       |
+| `defaultLanguage`   | `string \| null`                   | `null`  | The language of a block that names none; such a block is left alone without it.                                                                  |
+| `fallbackLanguage`  | `string \| null`                   | `null`  | The language of a block naming one Shiki does not know; left alone without it.                                                                   |
+| `colorReplacements` | `Record<string, ColorReplacement>` |         | Colors to replace, by their lowercase spelling: a color for every theme, or a theme's name to a map of its own.                                  |
+| `addLanguageClass`  | `boolean`                          | `false` | Add `language-<name>` to each highlighted `<code>`.                                                                                              |
+| `inline`            | `InlineCode \| null`               |         | Highlight inline code too, by how it names its language: `tailing-curly-colon` reads `` `a(){:js}` ``.                                           |
+| `metaProperty`      | `string \| null`                   | `null`  | The `<pre>` property that gets a block's meta, the text after its language; the JSON stand-in for `parseMetaString: meta => ({ [name]: meta })`. |
+| `transformers`      | `HighlightTransformer[]`           |         | The transformers of @shikijs/transformers to run, in order, by name or with options.                                                             |
+
+**`ColorReplacement`**
+
+A replacement color, or a theme's own replacements.
+
+Takes `string | Record<string, string>`.
+
+**`InlineCode`**
+
+How inline code names its language.
+
+Takes `"tailing-curly-colon"`.
+
+**`HighlightTransformer`**
+
+A transformer of @shikijs/transformers: its name alone, or its name and options.
+
+Takes `TransformerName | ConfiguredTransformer`.
+
+**`TransformerName`**
+
+The transformers `html.highlight` runs natively.
+
+Takes `"notationDiff" | "notationFocus" | "notationHighlight" | "notationErrorLevel" | "metaHighlight" | "renderLineNumber"`.
+
+**`ConfiguredTransformer`**
+
+A transformer with its options, as @shikijs/transformers names them.
+
+Takes `{ name: "notationDiff"; classLineAdd?: Classes | null; classLineRemove?: Classes | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "notationFocus"; classActiveLine?: Classes | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "notationHighlight"; classActiveLine?: Classes | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "notationErrorLevel"; classMap?: Record<string, Classes> | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "metaHighlight"; className?: Classes | null; zeroIndexed?: boolean } | { name: "renderLineNumber"; classLineNumber?: Classes | null; start?: number | null }`.
+
+**`Classes`**
+
+Class names: a list, or one string of them separated by white space.
+
+Takes `string | string[]`.
 
 <!-- /generated -->
 

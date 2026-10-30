@@ -22,6 +22,11 @@ mod utils {
         pub(crate) mod store;
         pub(crate) mod wrap;
     }
+    #[cfg(feature = "highlight")]
+    pub(crate) mod notation {
+        pub(crate) mod apply;
+        pub(crate) mod parse;
+    }
     pub(crate) mod tokenizer {
         pub(crate) mod entity;
         pub(crate) mod machine;
@@ -47,6 +52,8 @@ mod actions {
         pub(crate) mod highlight;
         #[cfg(feature = "highlight")]
         pub(crate) mod tokenize;
+        #[cfg(feature = "highlight")]
+        pub(crate) mod transform;
     }
     pub(crate) mod comment {
         pub(crate) mod convert;
@@ -196,8 +203,9 @@ mod plugins {
 
 // models
 pub use models::options::{
-    AttributeDefinition, Format, Highlight, Indent, Parse, Primitive, Raw, Sanitize,
-    Slug, Stringify, ToMarkdown,
+    AttributeDefinition, Classes, ColorReplacement, ConfiguredTransformer, Format,
+    Highlight, HighlightTransformer, Indent, InlineCode, Parse, Primitive, Raw, Sanitize,
+    Slug, Stringify, ToMarkdown, TransformerName,
 };
 
 // actions

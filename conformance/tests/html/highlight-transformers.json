@@ -1,0 +1,612 @@
+[
+  {
+    "description": "colorReplacements for every theme",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "colorReplacements": {
+            "#40a02b": "#2a7e16",
+            "#eff1f5": "#ffffff"
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a string and the background",
+        "input": "```js\nlet a = \"b\"\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#ffffff;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> a </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#2a7e16;--shiki-dark:#A6E3A1\"> \"b\"</span></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "colorReplacements for one theme",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "colorReplacements": {
+            "catppuccin-mocha": {
+              "#a6e3a1": "#00ff00"
+            }
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "the dark theme's string",
+        "input": "```js\nlet a = \"b\"\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> a </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#40A02B;--shiki-dark:#00ff00\"> \"b\"</span></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "addLanguageClass",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "addLanguageClass": true
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a block",
+        "input": "```js\nlet a = 1\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code class=\"language-js\"><span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> a </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 1</span></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "the meta as a property of <pre>",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "metaProperty": "data-meta"
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a meta",
+        "input": "```js title=\"a.js\" {1}\nlet a = 1\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\" data-meta=\"title=&#x22;a.js&#x22; {1}\"><code><span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> a </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 1</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "no meta",
+        "input": "```js\nlet a = 1\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> a </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 1</span></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "inline code naming its language",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "inline": "tailing-curly-colon"
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a language",
+        "input": "Call `a(1){:js}` now",
+        "expected": {
+          "html": "<p>Call <span class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic\">a</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\">(</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\">1</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\">)</span></span></code></span> now</p>"
+        }
+      },
+      {
+        "description": "no language",
+        "input": "Call `a(1)` now",
+        "expected": {
+          "html": "<p>Call <code>a(1)</code> now</p>"
+        }
+      },
+      {
+        "description": "an unknown language",
+        "input": "Call `a(1){:nope}` now",
+        "expected": {
+          "html": "<p>Call <code>a(1){:nope}</code> now</p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "inline code taking the fallback language",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "inline": "tailing-curly-colon",
+          "fallbackLanguage": "text"
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "an unknown language",
+        "input": "Call `a(1){:nope}` now",
+        "expected": {
+          "html": "<p>Call <span class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span>a(1)</span></span></code></span> now</p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "transformerNotationDiff",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "transformers": ["notationDiff"]
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "added and removed lines",
+        "input": "```ts\nlet a = 1 // [!code ++]\nlet b = 2 // [!code --]\nlet c = 3\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha has-diff\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line diff add\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> a </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 1</span></span>\n<span class=\"line diff remove\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> b </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 2</span></span>\n<span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> c </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 3</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a notation on its own line marks the lines after it",
+        "input": "```ts\n// [!code ++:2]\nlet a = 1\nlet b = 2\nlet c = 3\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha has-diff\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line diff add\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> a </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 1</span></span>\n<span class=\"line diff add\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> b </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 2</span></span>\n<span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> c </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 3</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a Python comment",
+        "input": "```py\na = 1 # [!code ++]\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha has-diff\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line diff add\"><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\">a </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 1</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "an HTML comment",
+        "input": "```html\n<a></a> <!-- [!code --] -->\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha has-diff\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line diff remove\"><span style=\"color:#179299;--shiki-dark:#94E2D5\">&#x3C;</span><span style=\"color:#1E66F5;--shiki-dark:#89B4FA\">a</span><span style=\"color:#179299;--shiki-dark:#94E2D5\">>&#x3C;/</span><span style=\"color:#1E66F5;--shiki-dark:#89B4FA\">a</span><span style=\"color:#179299;--shiki-dark:#94E2D5\">></span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a block comment",
+        "input": "```css\na { color: red } /* [!code ++] */\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha has-diff\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line diff add\"><span style=\"color:#1E66F5;--shiki-dark:#89B4FA\">a</span><span style=\"color:#7C7F93;--shiki-dark:#9399B2\"> {</span><span style=\"color:#1E66F5;--shiki-dark:#89B4FA\"> color</span><span style=\"color:#179299;--shiki-dark:#94E2D5\">:</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> red </span><span style=\"color:#7C7F93;--shiki-dark:#9399B2\">}</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a JSX comment",
+        "input": "```tsx\nconst a = (\n  <div>\n    {/* [!code ++] */}\n    <b />\n  </div>\n)\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha has-diff\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">const</span><span style=\"color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic\"> a</span><span style=\"color:#179299;--shiki-dark:#94E2D5\"> =</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> (</span></span>\n<span class=\"line\"><span style=\"color:#179299;--shiki-dark:#94E2D5\">  &#x3C;</span><span style=\"color:#1E66F5;--shiki-dark:#89B4FA\">div</span><span style=\"color:#179299;--shiki-dark:#94E2D5\">></span></span>\n<span class=\"line diff add\"><span style=\"color:#179299;--shiki-dark:#94E2D5\">    &#x3C;</span><span style=\"color:#1E66F5;--shiki-dark:#89B4FA\">b</span><span style=\"color:#179299;--shiki-dark:#94E2D5\"> /></span></span>\n<span class=\"line\"><span style=\"color:#179299;--shiki-dark:#94E2D5\">  &#x3C;/</span><span style=\"color:#1E66F5;--shiki-dark:#89B4FA\">div</span><span style=\"color:#179299;--shiki-dark:#94E2D5\">></span></span>\n<span class=\"line\"><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\">)</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a comment that keeps more text",
+        "input": "```ts\nlet a = 1 // keep [!code ++]\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha has-diff\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line diff add\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> a </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 1</span><span style=\"color:#7C7F93;--shiki-light-font-style:italic;--shiki-dark:#9399B2;--shiki-dark-font-style:italic\"> // keep</span></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "transformerNotationDiff with its classes",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "transformers": [
+            {
+              "name": "notationDiff",
+              "classLineAdd": "plus",
+              "classLineRemove": ["minus"],
+              "classActiveCode": "x"
+            }
+          ]
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "both",
+        "input": "```ts\nlet a = 1 // [!code ++]\nlet b = 2 // [!code --]\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha has-diff\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code class=\"x\"><span class=\"line plus\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> a </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 1</span></span>\n<span class=\"line minus\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> b </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 2</span></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "transformerNotationFocus",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "transformers": ["notationFocus"]
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a focused line",
+        "input": "```ts\nlet a = 1\nlet b = 2 // [!code focus]\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha has-focused\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> a </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 1</span></span>\n<span class=\"line focused\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> b </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 2</span></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "transformerNotationHighlight",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "transformers": ["notationHighlight"]
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "highlight",
+        "input": "```ts\nlet a = 1 // [!code highlight]\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha has-highlighted\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line highlighted\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> a </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 1</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "hl",
+        "input": "```ts\nlet a = 1 // [!code hl]\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha has-highlighted\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line highlighted\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> a </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 1</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "uppercase",
+        "input": "```ts\nlet a = 1 // [!code HIGHLIGHT]\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha has-highlighted\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> a </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 1</span></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "transformerNotationErrorLevel",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "transformers": ["notationErrorLevel"]
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "each level",
+        "input": "```ts\na() // [!code error]\nb() // [!code warning]\nc() // [!code info]\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha has-highlighted\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line highlighted error\"><span style=\"color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic\">a</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\">() </span></span>\n<span class=\"line highlighted warning\"><span style=\"color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic\">b</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\">() </span></span>\n<span class=\"line highlighted info\"><span style=\"color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic\">c</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\">() </span></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "transformerMetaHighlight",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "transformers": ["metaHighlight"]
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "lines and a range",
+        "input": "```ts {1,3-4}\na\nb\nc\nd\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line highlighted\"><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\">a</span></span>\n<span class=\"line\"><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\">b</span></span>\n<span class=\"line highlighted\"><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\">c</span></span>\n<span class=\"line highlighted\"><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\">d</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "no meta",
+        "input": "```ts\na\nb\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\">a</span></span>\n<span class=\"line\"><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\">b</span></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "transformerMetaHighlight zero-indexed",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "transformers": [
+            {
+              "name": "metaHighlight",
+              "zeroIndexed": true,
+              "className": "hi"
+            }
+          ]
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "the first line",
+        "input": "```ts {0}\na\nb\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line hi\"><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\">a</span></span>\n<span class=\"line\"><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\">b</span></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "transformerRenderLineNumber",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "transformers": [
+            {
+              "name": "renderLineNumber",
+              "start": 5
+            }
+          ]
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "from five",
+        "input": "```ts\na\nb\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span class=\"line-number\">5</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\">a</span></span>\n<span class=\"line\"><span class=\"line-number\">6</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\">b</span></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "transformers run together, in order",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "transformers": [
+            "renderLineNumber",
+            "metaHighlight",
+            "notationDiff",
+            "notationFocus"
+          ]
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "numbers, meta lines and notations",
+        "input": "```ts {3}\n// [!code ++]\nlet a = 1 // [!code focus]\nlet b = 2\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha has-diff has-focused\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line diff add\"><span class=\"line-number\">1</span></span>\n<span class=\"line focused\"><span class=\"line-number\">2</span><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> a </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 1</span></span>\n<span class=\"line highlighted\"><span class=\"line-number\">3</span><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> b </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 2</span></span></code></pre>"
+        }
+      }
+    ]
+  }
+]

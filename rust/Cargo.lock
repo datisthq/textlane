@@ -1407,6 +1407,7 @@ dependencies = [
  "bumpalo",
  "giallo",
  "memchr",
+ "regex",
  "schemars",
  "serde",
  "serde_json",

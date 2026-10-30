@@ -1,10 +1,12 @@
+use std::collections::BTreeMap;
+
 use serde_json::Value;
 use textlane_core::Error;
 
 use crate::helpers::registry::load_registry;
 use crate::helpers::theme_table::THEMES;
 use crate::models::highlight::{Theme, Themes};
-use crate::models::options::Highlight;
+use crate::models::options::{ColorReplacement, Highlight};
 
 // Shiki's `defaultColor`, which takes plain `color` while the others take CSS variables
 const DEFAULT_MODE: &str = "light";
@@ -16,14 +18,16 @@ pub(crate) fn resolve_themes(options: &Highlight) -> Result<Themes, Error> {
             return Err(invalid("either `theme` or `themes` must be provided"));
         };
         return Ok(Themes {
-            list: vec![find_theme(DEFAULT_MODE, name)?],
+            list: vec![find_theme(DEFAULT_MODE, name, options)?],
             single: true,
         });
     };
     let mut list = vec![];
     for (mode, name) in themes {
         match name {
-            Value::String(name) if !name.is_empty() => list.push(find_theme(mode, name)?),
+            Value::String(name) if !name.is_empty() => {
+                list.push(find_theme(mode, name, options)?);
+            }
             Value::Null | Value::Bool(false) | Value::String(_) => {}
             _ => return Err(invalid("a theme must be the name of one Shiki bundles")),
         }
@@ -41,7 +45,7 @@ pub(crate) fn resolve_themes(options: &Highlight) -> Result<Themes, Error> {
     })
 }
 
-fn find_theme(mode: &str, name: &str) -> Result<Theme, Error> {
+fn find_theme(mode: &str, name: &str, options: &Highlight) -> Result<Theme, Error> {
     let colors = THEMES.iter().find(|theme| theme.name == name);
     let registry = load_registry().ok_or_else(|| {
         Error::new("highlight-unavailable", "giallo's registry failed to load")
@@ -50,9 +54,27 @@ fn find_theme(mode: &str, name: &str) -> Result<Theme, Error> {
         Some(colors) if registry.contains_theme(name) => Ok(Theme {
             mode: mode.to_owned(),
             colors,
+            replacements: resolve_replacements(name, options),
         }),
         _ => Err(invalid(&format!("theme `{name}` is not one Shiki bundles"))),
     }
+}
+
+// Shiki's `resolveColorReplacements`: a color for every theme, then this theme's own map
+fn resolve_replacements(name: &str, options: &Highlight) -> BTreeMap<String, String> {
+    let mut replacements = BTreeMap::new();
+    for (key, value) in &options.color_replacements {
+        match value {
+            ColorReplacement::Color(color) => {
+                replacements.insert(key.clone(), color.clone());
+            }
+            ColorReplacement::Theme(map) if key == name => {
+                replacements.extend(map.iter().map(|(a, b)| (a.clone(), b.clone())));
+            }
+            ColorReplacement::Theme(_) => {}
+        }
+    }
+    replacements
 }
 
 fn invalid(message: &str) -> Error {
