@@ -2,7 +2,7 @@ use napi_derive::napi;
 use serde_json::Value;
 use textlane_core::File;
 
-use crate::Api;
+use crate::{Api, Outcome, Progress};
 
 /// The package version.
 #[napi]
@@ -110,6 +110,33 @@ impl Pipeline {
         self.inner.stringify(&tree, &mut File::new()).map_err(throw)
     }
 
+    /// The ids of the enabled host plugins, in the order their stages run.
+    #[napi]
+    pub fn hosts(&self) -> Vec<u32> {
+        self.inner.hosts()
+    }
+
+    #[napi]
+    pub fn start_run(
+        &mut self,
+        tree: Value,
+        value: Option<String>,
+        sync: bool,
+    ) -> Result<Run> {
+        let file = File {
+            value,
+            ..File::new()
+        };
+        let progress = self.inner.start_run(&tree, file, read_api(sync));
+        progress.map(Run::new).map_err(throw)
+    }
+
+    #[napi]
+    pub fn start_process(&mut self, text: String, sync: bool) -> Result<Run> {
+        let progress = self.inner.start_process(&text, File::new(), read_api(sync));
+        progress.map(Run::new).map_err(throw)
+    }
+
     #[napi]
     pub fn process(&mut self, text: String) -> Result<Value> {
         self.process_with(&text, Api::Async)
@@ -138,6 +165,79 @@ impl Pipeline {
         let value = self.inner.process(text, &mut file, api).map_err(throw)?;
         Ok(crate::write_file(&file, &value))
     }
+}
+
+/// The crate's `Progress`: a run paused before host plugins until `resume`, then finished.
+#[napi]
+pub struct Run {
+    progress: Option<Progress>,
+}
+
+#[napi]
+impl Run {
+    fn new(progress: Progress) -> Self {
+        Self {
+            progress: Some(progress),
+        }
+    }
+
+    /// The ids of the host plugins to run next, in order; empty once finished.
+    #[napi]
+    pub fn hosts(&self) -> Vec<u32> {
+        match &self.progress {
+            Some(Progress::Paused(pause)) => pause.hosts().to_vec(),
+            _ => Vec::new(),
+        }
+    }
+
+    /// The tree the next host plugin takes.
+    #[napi]
+    pub fn tree(&self) -> Value {
+        match &self.progress {
+            Some(Progress::Paused(pause)) => pause.tree().clone(),
+            _ => Value::Null,
+        }
+    }
+
+    /// The document's text, which the tree's positions point into.
+    #[napi]
+    pub fn value(&self) -> Option<String> {
+        match &self.progress {
+            Some(Progress::Paused(pause)) => pause.file().value.clone(),
+            _ => None,
+        }
+    }
+
+    /// Continue with the tree the host plugins returned and the messages they reported.
+    #[napi]
+    pub fn resume(&mut self, tree: Value, messages: Value) -> Result<()> {
+        let Some(Progress::Paused(mut pause)) = self.progress.take() else {
+            return Err(napi::Error::new(
+                "finished-run".to_string(),
+                "Cannot resume a finished run",
+            ));
+        };
+        let messages = crate::read_messages(&messages).map_err(throw)?;
+        pause.file_mut().messages.extend(messages);
+        self.progress = Some(pause.resume(&tree).map_err(throw)?);
+        Ok(())
+    }
+
+    /// What the finished run produced: a vfile for a process, a tree for a run.
+    #[napi]
+    pub fn result(&self) -> Value {
+        match &self.progress {
+            Some(Progress::Finished(finished)) => match &finished.output {
+                Outcome::Text(text) => crate::write_file(&finished.file, text),
+                Outcome::Tree(tree) => tree.clone(),
+            },
+            _ => Value::Null,
+        }
+    }
+}
+
+fn read_api(sync: bool) -> Api {
+    if sync { Api::Sync } else { Api::Async }
 }
 
 // napi sets a thrown error's `code` from its status, so the crate's code becomes `code`

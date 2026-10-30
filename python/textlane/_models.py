@@ -14,11 +14,11 @@ class Plugin(_PluginRequired, total=False):
 
 
 class Point(TypedDict):
-    """One place in a file: a 1-indexed line and column and a 0-indexed offset."""
+    """One place in a file: a 1-indexed line and column and a 0-indexed offset, when known."""
 
     line: int
     column: int
-    offset: int
+    offset: Optional[int]
 
 
 class Place(TypedDict):

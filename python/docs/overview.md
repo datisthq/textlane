@@ -30,8 +30,7 @@ retext and MDX test suites. Every implementation, Python included, runs the same
 
 Textlane is pre-release. `textlane()` builds a processor over the native pipeline, and
 `textlane.md`, `textlane.html`, `textlane.mdx` and `textlane.nl` hold one function per
-plugin, its options typed as a `TypedDict` generated from the crate's option structs. Python
-plugins cannot join a pipeline yet.
+plugin, its options typed as a `TypedDict` generated from the crate's option structs.
 
 ```python
 from textlane import html, md, textlane
@@ -39,6 +38,27 @@ from textlane import html, md, textlane
 file = textlane().use(md.parse()).use(md.to_html()).use(html.stringify()).process_sync("# hi")
 file["value"]  # "<h1>hi</h1>"
 ```
+
+## Python plugins
+
+A callable passed to `use` is an attacher: called with the processor and its options when the
+processor freezes, it returns a transformer taking the tree, as a dict, and the file. A run
+pauses before each run of consecutive Python plugins and hands them the tree, mdast or hast as
+the stage before left it; they change it in place or return a new one, and `process` awaits
+one returning an awaitable, which `process_sync` refuses with `async-in-sync`.
+`file.message()` reports into the result's `messages` and `file.data` becomes its `data`.
+
+```python
+def strong(processor, options=None):
+    def transformer(tree, file):
+        tree["children"][0]["children"][0]["type"] = "strong"
+
+    return transformer
+
+textlane().use(md.parse()).use(strong).use(md.to_html()).use(html.stringify()).process_sync("*a*")
+```
+
+A Python plugin only transforms: syntax, parsers and compilers need native plugins.
 
 ## Memory
 

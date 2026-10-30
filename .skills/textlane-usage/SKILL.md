@@ -117,11 +117,13 @@ than 256 MB of working memory; lower it, or set `0`, when idle memory matters mo
 
 Failures raise an `Error` (Node.js) or `textlane.TextlaneError` (Python) whose `code` names
 the case: `unknown-plugin`, `invalid-options`, `missing-parser`, `missing-compiler`,
-`frozen-processor`, `async-in-sync`. Handle by code, not by message.
+`frozen-processor`, `async-in-sync`, `invalid-message`. Handle by code, not by message.
 
 ## Not yet
 
-- JavaScript and Python plugins cannot join a pipeline: `use` takes native plugins only, and a
-  function fails. Do not port a pipeline that needs a plugin textlane lacks; say so.
+- A JavaScript or Python plugin joins only as a transformer: `use(fn, options)` calls it at
+  freeze (`this` is the processor in JavaScript, the first argument in Python) and runs what it
+  returns over the JSON tree. Syntax plugins (remark-gfm, remark-directive, remark-math) need
+  the native ones; do not port a pipeline that needs one textlane lacks, say so.
 - remark-stringify reads `settings` from processor data; textlane's `md.stringify` takes its
   options directly.

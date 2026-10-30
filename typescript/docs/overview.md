@@ -30,7 +30,7 @@ retext and MDX test suites. Every implementation, TypeScript included, runs the 
 
 Textlane is pre-release. `textlane()` builds a processor over the native pipeline, and
 `textlane/md`, `textlane/html`, `textlane/mdx` and `textlane/nl` export one function per
-plugin, typed from the crate's option structs. JavaScript plugins cannot join a pipeline yet.
+plugin, typed from the crate's option structs.
 
 ```js
 import { textlane } from "textlane"
@@ -40,6 +40,28 @@ import * as md from "textlane/md"
 const file = await textlane().use(md.parse()).use(md.toHtml()).use(html.stringify()).process("# hi")
 file.value // "<h1>hi</h1>"
 ```
+
+## JavaScript plugins
+
+A function passed to `use` is a unified attacher: called with the processor as `this` and its
+options when the processor freezes, it returns a transformer. A run pauses before each run of
+consecutive JavaScript plugins and hands them the tree as JSON, mdast or hast as the stage
+before left it; they change it in place or return a new one, directly, through a promise or
+through `next`, and the run goes on natively. `processSync` fails with `async-in-sync` on a
+transformer that finishes later. `file.message()` reports into the result's `messages` and
+`file.data` becomes its `data`.
+
+```js
+const strong = () => tree => {
+  tree.children[0].children[0].type = "strong"
+}
+
+await textlane().use(md.parse()).use(strong).use(md.toHtml()).use(html.stringify()).process("*a*")
+```
+
+Each pause serializes the tree, so a plugin costs one round trip per batch, not per node. A
+JavaScript plugin only transforms: syntax extensions such as remark-gfm need the native
+plugin.
 
 ## Memory
 

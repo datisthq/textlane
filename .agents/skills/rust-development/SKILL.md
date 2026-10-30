@@ -310,6 +310,16 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   error whose `code` is the crate's (napi's status, an attribute on `TextlaneError`).
   `Pipeline::use_value` reads the bindings' descriptors (`{name, options?}`) as plugins, alone
   or first in a tuple, and `write_file` (`actions/file/write.rs`) shapes `process`'s vfile
+- Host plugins (a JavaScript or Python function) are `{host: id}` descriptors; their options
+  never cross, since they may hold functions, so the loader keeps and merges them as unified's
+  `addPlugin` does and the crate only orders and switches them (`Pipeline::hosts`). Each becomes
+  a `models/host.rs` stage whose `Transform::host()` is `Some(id)`: freeze skips it in the kind
+  check, and `FrozenProcessor::advance` stops before a batch of them. `start_process` /
+  `start_run` hand back `Progress`; a `Pause` (`models/run.rs`) owns the tree as JSON, the file
+  and an `Arc` of the frozen processor, never an arena, so a binding can await between
+  `resume`s. The napi and PyO3 `Run` classes wrap it; the loader's `finishRun`
+  (`typescript/actions/run/finish.ts`) and `python/textlane/_host.py` drive the loop. The plain
+  `run`/`process` fail with `missing-host` on a host stage
 - `actions/plugin/find.rs` holds `PLUGINS`, the one table of public plugins: name, builder
   and, under the `schema` feature, its options' `JsonSchema`. `list_plugins` and
   `describe_plugins` (what `examples/schema.rs` prints for `pnpm generate:bindings`) read it,

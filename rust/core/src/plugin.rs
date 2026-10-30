@@ -51,6 +51,12 @@ pub trait Transform: Send + Sync {
     ) -> Result<Step<'a>, Error> {
         self.run(tree, file, alloc).map(Step::Done)
     }
+
+    /// The id of the binding function this stage stands for, which takes and returns
+    /// whatever tree reaches it; `None` for a stage the crate runs.
+    fn host(&self) -> Option<u32> {
+        None
+    }
 }
 
 /// Deferred work a stage hands back, finished only by the asynchronous API.

@@ -1,9 +1,13 @@
+use std::sync::Arc;
+
 use serde_json::{Map, Value};
 use textlane_core::{Allocator, Error, File, Lines, Tree, TreeKind};
 
 use crate::actions::allocator::reuse::with_allocator;
 use crate::actions::plugin::find::find_plugin;
+use crate::models::host::Host;
 use crate::models::processor::{FrozenProcessor, Processor};
+use crate::models::run::{Progress, Run};
 
 /// Whether a call may finish asynchronous stages, as unified's `process` and `run` do, or
 /// must fail on them, as `processSync` and `runSync` do.
@@ -18,9 +22,16 @@ pub enum Api {
 #[derive(Default)]
 pub struct Pipeline {
     // Each plugin once, in first-use order, with its latest options; `false` turns it off
-    entries: Vec<(String, Option<Value>)>,
+    entries: Vec<(Key, Option<Value>)>,
     data: Map<String, Value>,
-    frozen: Option<FrozenProcessor>,
+    frozen: Option<Arc<FrozenProcessor>>,
+}
+
+// A host plugin is known by the id its binding gave it; its options stay in the binding
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum Key {
+    Name(String),
+    Host(u32),
 }
 
 /// The data plugins set while they attach, shared through the attach slots.
@@ -34,7 +45,8 @@ impl Pipeline {
         Self::default()
     }
 
-    /// Add a plugin by name or descriptor (`{name, options?}`), a list of plugins, or a preset
+    /// Add a plugin by name or descriptor (`{name, options?}`, or `{host}` for a binding's
+    /// function), a list of plugins, or a preset
     /// (`{plugins, settings}`); a plugin used again is reconfigured, its object options merged
     /// into the earlier ones.
     pub fn use_value(
@@ -45,10 +57,10 @@ impl Pipeline {
         self.check_unfrozen("use")?;
         match value {
             Value::Null => Ok(()),
-            Value::String(name) => self.add_plugin(name, options),
+            Value::String(name) => self.add_entry(Key::Name(name.clone()), options),
             Value::Array(list) => self.add_list(list),
             Value::Object(object) => match read_descriptor(object) {
-                Some((name, own)) => self.add_plugin(name, options.or(own)),
+                Some((key, own)) => self.add_entry(key, options.or(own)),
                 None => self.add_preset(object),
             },
             other => Err(Error::new(
@@ -87,15 +99,39 @@ impl Pipeline {
         }
     }
 
+    /// The ids of the enabled host plugins, in the order their stages run.
+    pub fn hosts(&self) -> Vec<u32> {
+        let enabled = self.entries.iter().filter_map(|(key, options)| match key {
+            Key::Host(id) if options != &Some(Value::Bool(false)) => Some(*id),
+            _ => None,
+        });
+        enabled.collect()
+    }
+
     /// Attach every enabled plugin once; later calls return the same processor.
     pub fn freeze(&mut self) -> Result<&FrozenProcessor, Error> {
+        self.freeze_shared().map(|_| ())?;
+        match &self.frozen {
+            Some(frozen) => Ok(frozen),
+            None => unreachable!("the pipeline froze above"),
+        }
+    }
+
+    fn freeze_shared(&mut self) -> Result<Arc<FrozenProcessor>, Error> {
         if self.frozen.is_none() {
             let mut processor = Processor::new();
-            for (name, options) in &self.entries {
+            for (key, options) in &self.entries {
                 let options = match options {
                     Some(Value::Bool(false)) => continue,
                     Some(Value::Bool(true)) | None => Value::Null,
                     Some(options) => options.clone(),
+                };
+                let name = match key {
+                    Key::Name(name) => name,
+                    Key::Host(id) => {
+                        processor = processor.with_boxed(Box::new(Host { id: *id }));
+                        continue;
+                    }
                 };
                 let build = find_plugin(name).ok_or_else(|| unknown_plugin(name))?;
                 processor = processor.with_boxed(build(name, options)?);
@@ -111,10 +147,10 @@ impl Pipeline {
                 },
             )?;
             self.data = attached;
-            self.frozen = Some(frozen);
+            self.frozen = Some(Arc::new(frozen));
         }
         match &self.frozen {
-            Some(frozen) => Ok(frozen),
+            Some(frozen) => Ok(Arc::clone(frozen)),
             None => unreachable!("the pipeline froze above"),
         }
     }
@@ -177,6 +213,56 @@ impl Pipeline {
         })
     }
 
+    /// Run the transforms over a tree given as JSON, as `run` does, pausing before the
+    /// stages of host plugins for the binding to run them.
+    pub fn start_run(
+        &mut self,
+        tree: &Value,
+        mut file: File,
+        api: Api,
+    ) -> Result<Progress, Error> {
+        let processor = self.freeze_shared()?;
+        if let Some(value) = &file.value {
+            file.value = Some(processor.source(value).to_string());
+        }
+        let run = Run {
+            processor: &processor,
+            api,
+            compile: false,
+        };
+        let alloc = Allocator::new();
+        let tree = read_tree(tree, processor.input_kind(), &alloc)?;
+        let step = run.advance(tree, &mut file, &alloc, 0)?;
+        Ok(run.progress(step, file))
+    }
+
+    /// Parse, run and compile a document, as `process` does, pausing before the stages of
+    /// host plugins for the binding to run them.
+    pub fn start_process(
+        &mut self,
+        input: &str,
+        mut file: File,
+        api: Api,
+    ) -> Result<Progress, Error> {
+        let processor = self.freeze_shared()?;
+        let call = match api {
+            Api::Sync => "processSync",
+            Api::Async => "process",
+        };
+        check_parser(&processor, call)?;
+        check_compiler(&processor, call)?;
+        let run = Run {
+            processor: &processor,
+            api,
+            compile: true,
+        };
+        let step = with_allocator(|alloc| {
+            let tree = processor.parse(input, &mut file, alloc)?;
+            run.advance(tree, &mut file, alloc, 0)
+        })?;
+        Ok(run.progress(step, file))
+    }
+
     fn check_unfrozen(&self, call: &str) -> Result<(), Error> {
         match self.frozen {
             Some(_) => Err(Error::new(
@@ -187,10 +273,12 @@ impl Pipeline {
         }
     }
 
-    fn add_plugin(&mut self, name: &str, options: Option<Value>) -> Result<(), Error> {
-        find_plugin(name).ok_or_else(|| unknown_plugin(name))?;
-        let Some(index) = self.entries.iter().position(|(known, _)| known == name) else {
-            self.entries.push((name.to_string(), options));
+    fn add_entry(&mut self, key: Key, options: Option<Value>) -> Result<(), Error> {
+        if let Key::Name(name) = &key {
+            find_plugin(name).ok_or_else(|| unknown_plugin(name))?;
+        }
+        let Some(index) = self.entries.iter().position(|(known, _)| known == &key) else {
+            self.entries.push((key, options));
             return Ok(());
         };
         let Some(mut options) = options else {
@@ -210,15 +298,15 @@ impl Pipeline {
     fn add_list(&mut self, list: &[Value]) -> Result<(), Error> {
         for entry in list {
             match entry {
-                Value::String(name) => self.add_plugin(name, None)?,
+                Value::String(name) => self.add_entry(Key::Name(name.clone()), None)?,
                 Value::Array(tuple) => match tuple.split_first() {
                     Some((Value::String(name), rest)) => {
-                        self.add_plugin(name, rest.first().cloned())?;
+                        self.add_entry(Key::Name(name.clone()), rest.first().cloned())?;
                     }
                     Some((Value::Object(object), rest)) => {
                         match read_descriptor(object) {
-                            Some((name, own)) => {
-                                self.add_plugin(name, rest.first().cloned().or(own))?;
+                            Some((key, own)) => {
+                                self.add_entry(key, rest.first().cloned().or(own))?;
                             }
                             None => return Err(invalid_entry(entry)),
                         }
@@ -226,7 +314,7 @@ impl Pipeline {
                     _ => return Err(invalid_entry(entry)),
                 },
                 Value::Object(object) => match read_descriptor(object) {
-                    Some((name, own)) => self.add_plugin(name, own)?,
+                    Some((key, own)) => self.add_entry(key, own)?,
                     None => self.add_preset(object)?,
                 },
                 _ => return Err(invalid_entry(entry)),
@@ -301,9 +389,13 @@ fn check_compiler(processor: &FrozenProcessor, call: &str) -> Result<(), Error> 
 }
 
 // An absent `options` is None, not null: `use(md.gfm())` must keep earlier options
-fn read_descriptor(object: &Map<String, Value>) -> Option<(&str, Option<Value>)> {
-    let name = object.get("name")?.as_str()?;
-    Some((name, object.get("options").cloned()))
+fn read_descriptor(object: &Map<String, Value>) -> Option<(Key, Option<Value>)> {
+    let key = match (object.get("name"), object.get("host")) {
+        (Some(Value::String(name)), _) => Key::Name(name.clone()),
+        (None, Some(id)) => Key::Host(u32::try_from(id.as_u64()?).ok()?),
+        _ => return None,
+    };
+    Some((key, object.get("options").cloned()))
 }
 
 fn unknown_plugin(name: &str) -> Error {

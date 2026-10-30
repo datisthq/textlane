@@ -1,4 +1,4 @@
-import type { Node, VFile } from "./file.ts"
+import type { Message, Node, VFile } from "./file.ts"
 
 /** The crate's pipeline as the addon exposes it: values cross as JSON. */
 export interface NativePipeline {
@@ -13,6 +13,18 @@ export interface NativePipeline {
   stringify(tree: Node): string
   process(text: string): VFile
   processSync(text: string): VFile
+  hosts(): number[]
+  startRun(tree: Node, value: string | undefined, sync: boolean): NativeRun<Node>
+  startProcess(text: string, sync: boolean): NativeRun<VFile>
+}
+
+/** A run paused before host plugins until `resume`, then finished with `result`. */
+export interface NativeRun<Result> {
+  hosts(): number[]
+  tree(): Node
+  value(): string | null
+  resume(tree: Node, messages: Message[]): void
+  result(): Result
 }
 
 /** What the napi addon exports. */

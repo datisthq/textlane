@@ -147,3 +147,80 @@ def test_reads_back_the_retained_memory():
     textlane.set_retained_memory(256 * 1024**2)
     with pytest.raises(OverflowError):
         textlane.set_retained_memory(-1)
+
+
+def strong_emphasis(processor, options=None):
+    def transformer(tree, file):
+        visit(tree, lambda node: node.update(type="strong") if node["type"] == "emphasis" else None)
+
+    return transformer
+
+
+def visit(tree, visitor):
+    visitor(tree)
+    for child in tree.get("children", []):
+        visit(child, visitor)
+
+
+def test_runs_a_python_plugin_between_native_stages():
+    processor = textlane.textlane().use(md.parse()).use(strong_emphasis).use(md.to_html()).use(html.stringify())
+    assert processor.process_sync("*a*")["value"] == "<p><strong>a</strong></p>"
+
+
+def test_calls_the_attacher_with_the_processor_and_merged_options():
+    seen = []
+
+    def record(processor, options=None):
+        seen.extend([options, processor.data("key")])
+
+    processor = (
+        textlane.textlane()
+        .data("key", "value")
+        .use(md.parse())
+        .use(record, {"a": {"b": 1}})
+        .use([[record, {"a": {"c": 2}}]])
+        .use(md.stringify())
+    )
+    processor.process_sync("a")
+    assert seen == [{"a": {"b": 1, "c": 2}}, "value"]
+
+
+def test_awaits_an_async_transformer():
+    def replace(processor):
+        async def transformer(tree, file):
+            paragraph = {"type": "paragraph", "children": [{"type": "text", "value": "b"}]}
+            return {"type": "root", "children": [paragraph]}
+
+        return transformer
+
+    processor = textlane.textlane().use([md.parse(), replace, md.stringify()])
+    assert asyncio.run(processor.process("a"))["value"] == "b\n"
+    with pytest.raises(TextlaneError) as raised:
+        processor.process_sync("a")
+    assert raised.value.code == "async-in-sync"
+
+
+def test_keeps_the_messages_and_data_a_python_plugin_reports():
+    def warn(processor):
+        def transformer(tree, file):
+            file.data["seen"] = True
+            file.message("look", {"line": 1, "column": 1}, rule_id="rule", source="py")
+
+        return transformer
+
+    file = textlane.textlane().use([md.parse(), warn, md.stringify()]).process_sync("a")
+    assert file["data"] == {"seen": True}
+    point = {"line": 1, "column": 1, "offset": None}
+    place = {"start": point, "end": point}
+    assert file["messages"] == [{"reason": "look", "ruleId": "rule", "source": "py", "place": place}]
+
+
+def test_skips_a_python_plugin_turned_off():
+    def fail(processor):
+        def transformer(tree, file):
+            raise RuntimeError("ran")
+
+        return transformer
+
+    processor = textlane.textlane().use([md.parse(), fail, md.stringify()]).use(fail, False)
+    assert processor.process_sync("a")["value"] == "a\n"

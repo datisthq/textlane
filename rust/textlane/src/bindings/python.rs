@@ -9,7 +9,7 @@ mod native {
     use serde_json::Value;
     use textlane_core::File;
 
-    use crate::Api;
+    use crate::{Api, Outcome, Progress};
 
     #[pymodule_export]
     use super::TextlaneError;
@@ -137,6 +137,38 @@ mod native {
             self.process_with(py, text, Api::Async)
         }
 
+        /// The ids of the enabled host plugins, in the order their stages run.
+        fn hosts(&self) -> Vec<u32> {
+            self.inner.hosts()
+        }
+
+        #[pyo3(signature = (tree, value, sync))]
+        fn start_run(
+            &mut self,
+            py: Python<'_>,
+            tree: &str,
+            value: Option<String>,
+            sync: bool,
+        ) -> PyResult<Run> {
+            let tree = read_json(py, tree)?;
+            let file = File {
+                value,
+                ..File::new()
+            };
+            let progress = self.inner.start_run(&tree, file, read_api(sync));
+            Ok(Run::new(progress.map_err(|error| throw(py, error))?))
+        }
+
+        fn start_process(
+            &mut self,
+            py: Python<'_>,
+            text: &str,
+            sync: bool,
+        ) -> PyResult<Run> {
+            let progress = self.inner.start_process(text, File::new(), read_api(sync));
+            Ok(Run::new(progress.map_err(|error| throw(py, error))?))
+        }
+
         fn process_sync(&mut self, py: Python<'_>, text: &str) -> PyResult<String> {
             self.process_with(py, text, Api::Sync)
         }
@@ -170,6 +202,82 @@ mod native {
             let value = value.map_err(|error| throw(py, error))?;
             Ok(crate::write_file(&file, &value).to_string())
         }
+    }
+
+    /// The crate's `Progress`: a run paused before host plugins until `resume`, then
+    /// finished; trees and messages cross as JSON text.
+    #[pyclass(unsendable)]
+    struct Run {
+        progress: Option<Progress>,
+    }
+
+    impl Run {
+        fn new(progress: Progress) -> Self {
+            Self {
+                progress: Some(progress),
+            }
+        }
+    }
+
+    #[pymethods]
+    impl Run {
+        /// The ids of the host plugins to run next, in order; empty once finished.
+        fn hosts(&self) -> Vec<u32> {
+            match &self.progress {
+                Some(Progress::Paused(pause)) => pause.hosts().to_vec(),
+                _ => Vec::new(),
+            }
+        }
+
+        /// The tree the next host plugin takes.
+        fn tree(&self) -> String {
+            match &self.progress {
+                Some(Progress::Paused(pause)) => pause.tree().to_string(),
+                _ => Value::Null.to_string(),
+            }
+        }
+
+        /// The document's text, which the tree's positions point into.
+        fn value(&self) -> Option<String> {
+            match &self.progress {
+                Some(Progress::Paused(pause)) => pause.file().value.clone(),
+                _ => None,
+            }
+        }
+
+        /// Continue with the tree the host plugins returned and the messages they reported.
+        fn resume(&mut self, py: Python<'_>, tree: &str, messages: &str) -> PyResult<()> {
+            let Some(Progress::Paused(mut pause)) = self.progress.take() else {
+                let error =
+                    crate::Error::new("finished-run", "Cannot resume a finished run");
+                return Err(throw(py, error));
+            };
+            let tree = read_json(py, tree)?;
+            let messages = read_json(py, messages)?;
+            let messages =
+                crate::read_messages(&messages).map_err(|error| throw(py, error))?;
+            pause.file_mut().messages.extend(messages);
+            let progress = pause.resume(&tree).map_err(|error| throw(py, error))?;
+            self.progress = Some(progress);
+            Ok(())
+        }
+
+        /// What the finished run produced: a vfile for a process, a tree for a run.
+        fn result(&self) -> String {
+            match &self.progress {
+                Some(Progress::Finished(finished)) => match &finished.output {
+                    Outcome::Text(text) => {
+                        crate::write_file(&finished.file, text).to_string()
+                    }
+                    Outcome::Tree(tree) => tree.to_string(),
+                },
+                _ => Value::Null.to_string(),
+            }
+        }
+    }
+
+    fn read_api(sync: bool) -> Api {
+        if sync { Api::Sync } else { Api::Async }
     }
 
     fn read_json(py: Python<'_>, text: &str) -> PyResult<Value> {

@@ -30,8 +30,9 @@ retext and MDX test suites. Every implementation runs the same cases.
 
 Textlane is pre-release. In Rust, `Processor::new().with(plugin)` builds a typed pipeline;
 the Node.js and Python packages drive `textlane::Pipeline`, which takes plugins by name with
-JSON options and follows unified's `use`, `data` and `freeze`. JavaScript and Python plugins
-cannot join a pipeline yet.
+JSON options and follows unified's `use`, `data` and `freeze`. A binding adds its own
+functions as `{host: id}` descriptors: `start_process` and `start_run` pause before them with
+the tree as JSON, and `Pause::resume` goes on with the tree they returned.
 
 ## Memory
 

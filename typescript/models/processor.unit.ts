@@ -7,6 +7,8 @@ import * as html from "../generated/html.ts"
 import * as md from "../generated/md.ts"
 import * as nl from "../generated/nl.ts"
 import { ADDON_ENV } from "../settings.ts"
+import type { HostFile, Node } from "./file.ts"
+import type { Processor } from "./processor.ts"
 
 let entry: typeof import("../index.ts")
 let addonDir = ""
@@ -149,4 +151,139 @@ describe("Processor", () => {
   it("reports the version", () => {
     expect(entry.version()).toMatch(/^\d+\.\d+\.\d+/)
   })
+
+  describe("JavaScript plugins", () => {
+    const strongEmphasis = () => (tree: Node) => {
+      visit(tree, node => {
+        if (node.type === "emphasis") node.type = "strong"
+      })
+    }
+
+    it("runs a transformer between native stages", () => {
+      const processor = entry
+        .textlane()
+        .use(md.parse())
+        .use(strongEmphasis)
+        .use(md.toHtml())
+        .use(html.stringify())
+      expect(processor.processSync("*a*").value).toBe("<p><strong>a</strong></p>")
+    })
+
+    it("hands the hast tree to a plugin after md.toHtml", () => {
+      const addClass = () => (tree: Node) => {
+        visit(tree, node => {
+          if (node.tagName === "p") node.properties = { className: ["lead"] }
+        })
+      }
+      const processor = entry
+        .textlane()
+        .use([md.parse(), md.toHtml(), addClass, html.stringify()])
+      expect(processor.processSync("a").value).toBe('<p class="lead">a</p>')
+    })
+
+    it("calls the attacher with the processor and merged options", () => {
+      const seen: unknown[] = []
+      function record(this: Processor, options: unknown) {
+        seen.push(options, this.data("key"))
+      }
+      const processor = entry
+        .textlane()
+        .data("key", "value")
+        .use(md.parse())
+        .use(record, { a: { b: 1 } })
+        .use([[record, { a: { c: 2 } }]])
+        .use(md.stringify())
+      processor.processSync("a")
+      expect(seen).toEqual([{ a: { b: 1, c: 2 } }, "value"])
+    })
+
+    it("replaces the tree with the one a transformer returns", async () => {
+      const replace = () => async () => ({
+        type: "root",
+        children: [{ type: "paragraph", children: [{ type: "text", value: "b" }] }],
+      })
+      const processor = entry.textlane().use([md.parse(), replace, md.stringify()])
+      expect((await processor.process("a")).value).toBe("b\n")
+    })
+
+    it("fails a synchronous run on a transformer that finishes later", () => {
+      const later = () => async () => {}
+      const processor = entry.textlane().use([md.parse(), later, md.stringify()])
+      expect(() => processor.processSync("a")).toThrow(
+        expect.objectContaining({ code: "async-in-sync" }),
+      )
+    })
+
+    it("waits for a transformer's next callback", async () => {
+      const callback =
+        () => (_tree: Node, _file: unknown, next: (e?: unknown) => void) => {
+          setTimeout(() => next(), 1)
+          return undefined
+        }
+      const processor = entry.textlane().use([md.parse(), callback, md.stringify()])
+      expect((await processor.process("a")).value).toBe("a\n")
+    })
+
+    it("keeps the messages and data a plugin reports", async () => {
+      const warn = () => (tree: Node, file: HostFile) => {
+        file.data.seen = true
+        file.message("look", {
+          place: { line: 1, column: 1 },
+          ruleId: "rule",
+          source: "js",
+        })
+        return tree
+      }
+      const file = await entry
+        .textlane()
+        .use([md.parse(), warn, md.stringify()])
+        .process("a")
+      expect(file.data).toEqual({ seen: true })
+      expect(file.messages).toEqual([
+        {
+          reason: "look",
+          ruleId: "rule",
+          source: "js",
+          place: {
+            start: { line: 1, column: 1, offset: null },
+            end: { line: 1, column: 1, offset: null },
+          },
+        },
+      ])
+    })
+
+    it("skips a plugin turned off", () => {
+      const fail = () => () => {
+        throw new Error("ran")
+      }
+      const processor = entry
+        .textlane()
+        .use([md.parse(), fail, md.stringify()])
+        .use(fail, false)
+      expect(processor.processSync("a").value).toBe("a\n")
+    })
+
+    it("rethrows what a transformer throws", async () => {
+      const fail = () => () => {
+        throw new Error("boom")
+      }
+      const processor = entry.textlane().use([md.parse(), fail, md.stringify()])
+      await expect(processor.process("a")).rejects.toThrow("boom")
+    })
+
+    it("runs a tree through native and JavaScript stages", async () => {
+      const tree = { type: "root", children: [{ type: "emphasis", children: [] }] }
+      const result = await entry.textlane().use(strongEmphasis).use(md.toHtml()).run(tree)
+      expect(result).toEqual({
+        type: "root",
+        children: [{ type: "element", tagName: "strong", properties: {}, children: [] }],
+      })
+    })
+  })
 })
+
+function visit(tree: Node, visitor: (node: Node) => void) {
+  visitor(tree)
+  const children = Array.isArray(tree.children) ? tree.children : []
+  for (const child of children) visit(child, visitor)
+}

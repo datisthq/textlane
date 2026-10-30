@@ -64,8 +64,9 @@ file["value"]  # "<h1>hi</h1>"
 
 Node.js and Python also offer `parse`, `run`, `stringify`, `data` and `freeze`, with
 `process`/`run` returning a Promise or coroutine and `processSync`/`process_sync` the result.
-Errors carry the crate's `code`, such as `unknown-plugin`. Only native plugins can join a
-pipeline so far; JavaScript and Python plugins are planned.
+Errors carry the crate's `code`, such as `unknown-plugin`. A JavaScript or Python function
+joins a pipeline as a unified attacher returning a transformer; it cannot add syntax, a parser
+or a compiler.
 
 ## Documentation
 

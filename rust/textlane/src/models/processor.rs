@@ -4,6 +4,8 @@ use textlane_core::{
 };
 
 use crate::actions::allocator::reuse::with_allocator;
+use crate::models::host::missing_host;
+use crate::models::pipeline::Api;
 
 /// A pipeline being composed: `.with()` adds a plugin, as unified's `.use()` does.
 #[derive(Default)]
@@ -16,6 +18,17 @@ pub struct FrozenProcessor {
     parser: Option<Box<dyn Parser>>,
     transforms: Vec<Box<dyn Transform>>,
     compiler: Option<Box<dyn Compiler>>,
+}
+
+/// Where running the transforms stopped: at the end, or before stages a binding runs.
+pub(crate) enum Advance<'a> {
+    Done(Tree<'a>),
+    /// The consecutive host stages' ids, and the index of the stage after them.
+    Host {
+        hosts: Vec<u32>,
+        next: usize,
+        tree: Tree<'a>,
+    },
 }
 
 /// What processing one document produced: the output and the kind of text it is.
@@ -64,7 +77,10 @@ impl Processor {
         collect(&mut context);
         let (parser, transforms, compiler) = context.finish()?;
         let mut kind = parser.as_ref().map(|parser| parser.output());
-        for transform in &transforms {
+        for transform in transforms
+            .iter()
+            .filter(|transform| transform.host().is_none())
+        {
             check_kind(kind, transform.input())?;
             kind = Some(transform.output());
         }
@@ -115,36 +131,68 @@ impl FrozenProcessor {
     /// hand back.
     pub fn run<'a>(
         &self,
-        mut tree: Tree<'a>,
+        tree: Tree<'a>,
         file: &mut File,
         alloc: &'a Allocator,
     ) -> Result<Tree<'a>, Error> {
-        for transform in &self.transforms {
-            tree = match transform.start(tree, file, alloc)? {
-                Step::Done(tree) => tree,
-                Step::Job(job) => job(file)?,
-            };
-        }
-        Ok(tree)
+        self.run_all(tree, file, alloc, Api::Async)
     }
 
     /// Run every transform over a tree, failing with `async-in-sync` when one hands back a
     /// job.
     pub fn run_sync<'a>(
         &self,
-        mut tree: Tree<'a>,
+        tree: Tree<'a>,
         file: &mut File,
         alloc: &'a Allocator,
     ) -> Result<Tree<'a>, Error> {
-        for transform in &self.transforms {
-            tree = match transform.start(tree, file, alloc)? {
-                Step::Done(tree) => tree,
-                Step::Job(_) => {
+        self.run_all(tree, file, alloc, Api::Sync)
+    }
+
+    /// Run the transforms from the one at `from` until the end or the next host stage.
+    pub(crate) fn advance<'a>(
+        &self,
+        mut tree: Tree<'a>,
+        file: &mut File,
+        alloc: &'a Allocator,
+        from: usize,
+        api: Api,
+    ) -> Result<Advance<'a>, Error> {
+        let mut index = from;
+        while let Some(transform) = self.transforms.get(index) {
+            if transform.host().is_some() {
+                let hosts: Vec<u32> = self.transforms[index..]
+                    .iter()
+                    .map_while(|transform| transform.host())
+                    .collect();
+                let next = index + hosts.len();
+                return Ok(Advance::Host { hosts, next, tree });
+            }
+            tree = match (transform.start(tree, file, alloc)?, api) {
+                (Step::Done(tree), _) => tree,
+                (Step::Job(job), Api::Async) => job(file)?,
+                (Step::Job(_), Api::Sync) => {
                     return Err(Error::new("async-in-sync", "a stage finished async"));
                 }
             };
+            index += 1;
         }
-        Ok(tree)
+        Ok(Advance::Done(tree))
+    }
+
+    fn run_all<'a>(
+        &self,
+        tree: Tree<'a>,
+        file: &mut File,
+        alloc: &'a Allocator,
+        api: Api,
+    ) -> Result<Tree<'a>, Error> {
+        match self.advance(tree, file, alloc, 0, api)? {
+            Advance::Done(tree) => Ok(tree),
+            Advance::Host { hosts, .. } => {
+                Err(missing_host(hosts.first().copied().unwrap_or_default()))
+            }
+        }
     }
 
     pub fn stringify(&self, tree: &Tree<'_>, file: &mut File) -> Result<String, Error> {
@@ -186,7 +234,8 @@ impl FrozenProcessor {
     /// The kind of tree the first stage after parsing takes.
     pub fn input_kind(&self) -> Option<TreeKind> {
         self.transforms
-            .first()
+            .iter()
+            .find(|transform| transform.host().is_none())
             .map(|transform| transform.input())
             .or_else(|| self.compiler.as_ref().map(|compiler| compiler.input()))
     }
