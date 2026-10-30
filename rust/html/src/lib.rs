@@ -213,5 +213,4 @@ pub use actions::hast::stringify::stringify_hast;
 pub use actions::html::parse::parse_html;
 
 // plugins
-#[cfg(feature = "highlight")]
 pub use plugins::to_natural_language::plugin::ToNaturalLanguage;
