@@ -737,19 +737,31 @@ file.value
 // <p>Hi <kbd>Ctrl</kbd></p>
 ```
 
+`taskListLabels: { checked, unchecked }` gives each GFM task-list checkbox an `aria-label`, so screen readers name it; remark-rehype writes none, so it is off by default.
+
 <!-- generated:options md.toHtml -->
 
 Follows [remark-rehype](https://www.npmjs.com/package/remark-rehype).
 
-| Option                 | Type             | Default | Description                                                                                     |
-| ---------------------- | ---------------- | ------- | ----------------------------------------------------------------------------------------------- |
-| `allowDangerousHtml`   | `boolean`        | `false` | Keep raw HTML in the tree instead of dropping it.                                               |
-| `clobberPrefix`        | `string \| null` | `null`  | What footnote `id`s start with, so they cannot clobber the page's; `user-content-` when unset.  |
-| `footnoteBackContent`  | `string \| null` | `null`  | The text of each footnote's back reference; `↩`, numbered from the second, when unset.          |
-| `footnoteBackLabel`    | `string \| null` | `null`  | The `aria-label` of each footnote's back reference; `Back to reference 1` and so on when unset. |
-| `footnoteLabel`        | `string \| null` | `null`  | The heading of the footnotes section; `Footnotes` when unset.                                   |
-| `footnoteLabelTagName` | `string \| null` | `null`  | The tag name of the footnotes section's heading; `h2` when unset.                               |
-| `passThrough`          | `string[]`       | `[]`    | Node types without a handler to copy into hast as they are, their children converted.           |
+| Option                 | Type                     | Default | Description                                                                                                               |
+| ---------------------- | ------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `allowDangerousHtml`   | `boolean`                | `false` | Keep raw HTML in the tree instead of dropping it.                                                                         |
+| `clobberPrefix`        | `string \| null`         | `null`  | What footnote `id`s start with, so they cannot clobber the page's; `user-content-` when unset.                            |
+| `footnoteBackContent`  | `string \| null`         | `null`  | The text of each footnote's back reference; `↩`, numbered from the second, when unset.                                    |
+| `footnoteBackLabel`    | `string \| null`         | `null`  | The `aria-label` of each footnote's back reference; `Back to reference 1` and so on when unset.                           |
+| `footnoteLabel`        | `string \| null`         | `null`  | The heading of the footnotes section; `Footnotes` when unset.                                                             |
+| `footnoteLabelTagName` | `string \| null`         | `null`  | The tag name of the footnotes section's heading; `h2` when unset.                                                         |
+| `passThrough`          | `string[]`               | `[]`    | Node types without a handler to copy into hast as they are, their children converted.                                     |
+| `taskListLabels`       | `TaskListLabels \| null` |         | An `aria-label` for each task-list checkbox, so screen readers name it; none when left out, as remark-rehype writes none. |
+
+**`TaskListLabels`**
+
+The labels of task-list checkboxes.
+
+| Option      | Type     | Default | Description                                           |
+| ----------- | -------- | ------- | ----------------------------------------------------- |
+| `checked`   | `string` |         | The label of a checked box, such as `Completed task`. |
+| `unchecked` | `string` |         | The label of an unchecked box, such as `Task`.        |
 
 <!-- /generated -->
 

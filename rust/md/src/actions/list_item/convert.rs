@@ -78,6 +78,17 @@ fn add_checkbox<'a>(
         name: "disabled",
         value: PropertyValue::Boolean(true),
     });
+    if let Some(labels) = &converter.options.task_list_labels {
+        let label = if checked {
+            &labels.checked
+        } else {
+            &labels.unchecked
+        };
+        properties.push(Property {
+            name: "ariaLabel",
+            value: PropertyValue::String(converter.alloc.alloc_str(label)),
+        });
+    }
     let input = hast::Node::Element(Element {
         tag_name: "input",
         properties,

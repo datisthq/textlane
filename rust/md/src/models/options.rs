@@ -34,6 +34,20 @@ pub struct ToHtml {
     /// Node types without a handler to copy into hast as they are, their children
     /// converted.
     pub pass_through: Vec<String>,
+    /// An `aria-label` for each task-list checkbox, so screen readers name it; none when
+    /// left out, as remark-rehype writes none.
+    pub task_list_labels: Option<TaskListLabels>,
+}
+
+/// The labels of task-list checkboxes.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "camelCase")]
+pub struct TaskListLabels {
+    /// The label of a checked box, such as `Completed task`.
+    pub checked: String,
+    /// The label of an unchecked box, such as `Task`.
+    pub unchecked: String,
 }
 
 /// `md.toNaturalLanguage`: mdast into nlcst, tokenized by the processor's natural-language parser; options

@@ -383,7 +383,8 @@ pub use models::options::{
     Ecosystems, Frontmatter, FrontmatterSlot, Gfm, GfmSlot, GroupRule, HeadingId,
     MarkdownLinks, Math, MathSlot, Matter, Mdx, MdxSlot, Names, NpmManager,
     PackageCommand, ParentCheck, ParentTest, Parse, PathRewrite, PipManager, Stringify,
-    Strip, ToHtml, ToNaturalLanguage, Toc, UnknownDirectives, UnsafePattern, UrlNode,
+    Strip, TaskListLabels, ToHtml, ToNaturalLanguage, Toc, UnknownDirectives,
+    UnsafePattern, UrlNode,
 };
 
 // actions

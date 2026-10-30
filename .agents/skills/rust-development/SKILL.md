@@ -291,6 +291,9 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   takes a code point, not a UTF-16 unit. `parents` is unist-util-is as JSON (`ParentTest`),
   fields compared as `===`; a closing heading before the opening's index repeats the
   children between, as upstream's slices do, by `copy_nodes` (`CopyMode::Whole`)
+- A checkbox is written twice over: by `actions/list_item/convert.rs` into hast and by
+  `utils/writer/state.rs` straight into HTML; an option that changes one (`taskListLabels`)
+  changes both, and `conformance/tests/md/task-list-labels.json` runs both paths
 - `md.pathRewrite` is textlane's own (`conformance/tests/md/path-rewrite.json` is its
   specification): pure path arithmetic over `File::path`, which a test's `path`, the loaders'
   `process({ value, path })` and `FrozenProcessor::process_file` set; a URL it cannot place

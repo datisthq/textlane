@@ -439,6 +439,18 @@ class StringifyOptions(TypedDict, total=False):
     unsafe: List[UnsafePattern]
 
 
+class _TaskListLabelsRequired(TypedDict):
+    # The label of a checked box, such as `Completed task`.
+    checked: str
+    # The label of an unchecked box, such as `Task`.
+    unchecked: str
+
+
+# The labels of task-list checkboxes.
+class TaskListLabels(_TaskListLabelsRequired, total=False):
+    pass
+
+
 # `md.toHtml`: mdast into hast; options named as remark-rehype names them.
 class ToHtmlOptions(TypedDict, total=False):
     # Keep raw HTML in the tree instead of dropping it.
@@ -459,6 +471,9 @@ class ToHtmlOptions(TypedDict, total=False):
     # Node types without a handler to copy into hast as they are, their children
     # converted.
     passThrough: List[str]
+    # An `aria-label` for each task-list checkbox, so screen readers name it; none when
+    # left out, as remark-rehype writes none.
+    taskListLabels: Optional[TaskListLabels]
 
 
 # `md.toNaturalLanguage`: mdast into nlcst, tokenized by the processor's natural-language parser; options

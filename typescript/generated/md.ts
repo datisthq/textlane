@@ -344,6 +344,16 @@ export interface ToHtmlOptions {
   footnoteLabelTagName?: string | null
   /** Node types without a handler to copy into hast as they are, their children converted. @default [] */
   passThrough?: string[]
+  /** An `aria-label` for each task-list checkbox, so screen readers name it; none when left out, as remark-rehype writes none. */
+  taskListLabels?: TaskListLabels | null
+}
+
+/** The labels of task-list checkboxes. */
+export interface TaskListLabels {
+  /** The label of a checked box, such as `Completed task`. */
+  checked: string
+  /** The label of an unchecked box, such as `Task`. */
+  unchecked: string
 }
 
 /** `md.toNaturalLanguage`: mdast into nlcst, tokenized by the processor's natural-language parser; options named as remark-retext and mdast-util-to-nlcst name them. */

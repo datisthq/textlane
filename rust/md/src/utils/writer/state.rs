@@ -400,10 +400,21 @@ impl<'a> Writer<'_, 'a> {
 
     fn write_checkbox(&mut self, checked: bool, space: bool) {
         self.output.push_str(if checked {
-            "<input type=\"checkbox\" checked disabled>"
+            "<input type=\"checkbox\" checked disabled"
         } else {
-            "<input type=\"checkbox\" disabled>"
+            "<input type=\"checkbox\" disabled"
         });
+        if let Some(labels) = &self.options.task_list_labels {
+            let label = if checked {
+                &labels.checked
+            } else {
+                &labels.unchecked
+            };
+            self.output.push_str(" aria-label=\"");
+            push_attribute(&mut self.output, label);
+            self.output.push('"');
+        }
+        self.output.push('>');
         if space {
             self.output.push(' ');
         }

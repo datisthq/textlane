@@ -1,0 +1,110 @@
+[
+  {
+    "description": "task-list labels, written straight from mdast",
+    "comment": "textlane's own option: an aria-label on each GFM checkbox, as livemark's rehype-task-list-a11y adds one",
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toHtml",
+        {
+          "taskListLabels": {
+            "checked": "Completed task",
+            "unchecked": "Task"
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "checked, unchecked and an empty item",
+        "input": "- [x] done\n- [ ] todo\n\n* [ ]\n\n  loose & \"quoted\"",
+        "expected": {
+          "html": "<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" checked disabled aria-label=\"Completed task\"> done</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled aria-label=\"Task\"> todo</li>\n</ul>\n<ul>\n<li>\n<p>[ ]</p>\n<p>loose &#x26; \"quoted\"</p>\n</li>\n</ul>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "task-list labels, written straight from mdast, a label to escape",
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toHtml",
+        {
+          "taskListLabels": {
+            "checked": "Done & \"ok\"",
+            "unchecked": "x"
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a label to escape",
+        "input": "- [x] a",
+        "expected": {
+          "html": "<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" checked disabled aria-label=\"Done &#x26; &#x22;ok&#x22;\"> a</li>\n</ul>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "task-list labels through hast",
+    "comment": "textlane's own option: an aria-label on each GFM checkbox, as livemark's rehype-task-list-a11y adds one",
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toHtml",
+        {
+          "taskListLabels": {
+            "checked": "Completed task",
+            "unchecked": "Task"
+          }
+        }
+      ],
+      ["html.slug"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "checked, unchecked and an empty item",
+        "input": "- [x] done\n- [ ] todo\n\n* [ ]\n\n  loose & \"quoted\"",
+        "expected": {
+          "html": "<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" checked disabled aria-label=\"Completed task\"> done</li>\n<li class=\"task-list-item\"><input type=\"checkbox\" disabled aria-label=\"Task\"> todo</li>\n</ul>\n<ul>\n<li>\n<p>[ ]</p>\n<p>loose &#x26; \"quoted\"</p>\n</li>\n</ul>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "task-list labels through hast, a label to escape",
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toHtml",
+        {
+          "taskListLabels": {
+            "checked": "Done & \"ok\"",
+            "unchecked": "x"
+          }
+        }
+      ],
+      ["html.slug"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a label to escape",
+        "input": "- [x] a",
+        "expected": {
+          "html": "<ul class=\"contains-task-list\">\n<li class=\"task-list-item\"><input type=\"checkbox\" checked disabled aria-label=\"Done &#x26; &#x22;ok&#x22;\"> a</li>\n</ul>"
+        }
+      }
+    ]
+  }
+]
