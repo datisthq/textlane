@@ -19,7 +19,7 @@ export const ADDON_PATH = join(
 export const textlaneRustTool: Tool = {
   ...createRustTool({
     name: "textlane-rust",
-    title: "textlane (Rust)",
+    title: "textlane (Rust, mdast)",
     binary: "textlane",
   }),
   isTextlane: true,
@@ -28,7 +28,7 @@ export const textlaneRustTool: Tool = {
 
 const typescriptAdapter = createJavascriptTool({
   name: "textlane-typescript",
-  title: "textlane (Node.js)",
+  title: "textlane (Node.js, mdast)",
   adapter: "textlane.ts",
   caveats: [],
 })
@@ -48,7 +48,7 @@ export const textlaneTypescriptTool: Tool = {
 export const textlanePythonTool: Tool = {
   ...createPythonTool({
     name: "textlane-python",
-    title: "textlane (Python)",
+    title: "textlane (Python, mdast)",
     adapter: "convert_textlane.py",
     distribution: "textlane",
     caveats: [],
@@ -67,7 +67,7 @@ function createHastTool(tool: Tool): Tool {
   return {
     ...tool,
     name: `${tool.name}-hast`,
-    title: `${tool.title} + HTML plugins`,
+    title: tool.title.replace(", mdast)", ", mdast + hast)"),
     caveats: [
       "builds hast as any HTML plugin makes it, with a no-op in the plugin's place",
     ],
