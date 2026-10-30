@@ -13,7 +13,7 @@ use crate::helpers::identifier::normalize_identifier;
 use crate::helpers::math::create_math_data;
 use crate::plugins::gfm::actions::text::autolink::autolink_text;
 use crate::utils::onepass::block::{
-    Block, Blocks, Kind, Line, NONE, join_lines, parse_blocks,
+    Block, Blocks, Kind, Line, NONE, join_lines_in, parse_blocks,
 };
 use std::cell::RefCell;
 
@@ -520,11 +520,7 @@ fn build_phrasing<'a>(
             checked: None,
         };
     }
-    let (text, segments) = join_lines(input.as_bytes(), lines);
-    let text: &'a str = match text {
-        std::borrow::Cow::Borrowed(_) => &input[lines[0].start..lines[0].end],
-        std::borrow::Cow::Owned(owned) => alloc.alloc_str(&owned),
-    };
+    let (text, segments) = join_lines_in(input, lines, alloc);
     let mut context = context(blocks, task, false, mdx);
     context.leaf = leaf;
     parse_inline(alloc, text, &segments, &context)

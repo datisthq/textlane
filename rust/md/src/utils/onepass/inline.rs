@@ -1229,6 +1229,7 @@ impl<'a> Inline<'a, '_> {
                 children: ArenaVec::new_in(self.alloc),
             }],
             pending: None,
+            nul: memchr::memchr(0, self.bytes).is_some(),
         };
         for item in self.items {
             match item {
@@ -1465,6 +1466,9 @@ struct Builder<'a, 'd> {
     jsx_frames: Vec<usize>,
     frames: Vec<Frame<'a>>,
     pending: Option<Pending<'a>>,
+    // Whether the text holds a NUL anywhere: one scan of the leaf instead of one per text
+    // node; decoding never makes one, as `&#0;` is U+FFFD
+    nul: bool,
 }
 
 impl<'a> Builder<'a, '_> {
@@ -1681,7 +1685,11 @@ impl<'a> Builder<'a, '_> {
                 Some(owned) => owned.into_bump_str(),
                 None => &self.text[pending.start..pending.end],
             };
-            let value = clean(self.alloc, value);
+            let value = if self.nul {
+                clean(self.alloc, value)
+            } else {
+                value
+            };
             let position = Some(self.span(pending.start, pending.end));
             self.push(Node::Text(Text {
                 value,

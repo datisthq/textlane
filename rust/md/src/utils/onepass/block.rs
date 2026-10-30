@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use textlane_core::Point;
+use textlane_core::{Allocator, ArenaString, Point};
 
 use crate::actions::markdown::parse::ParseSettings;
 use crate::helpers::decode::decode_string;
@@ -1864,7 +1864,7 @@ impl Blocks<'_> {
             return true;
         }
         let (text, segments) =
-            join_lines(self.bytes, &self.lines[first as usize..last as usize]);
+            join_lines(self.source, &self.lines[first as usize..last as usize]);
         let bytes = text.as_bytes();
         let mut at = 0;
         let mut consumed = first;
@@ -1951,30 +1951,58 @@ impl Blocks<'_> {
 /// The lines of a leaf as one string with their line endings, borrowing a single line, and
 /// where each line starts in it and in the source.
 pub(crate) fn join_lines<'s>(
-    bytes: &'s [u8],
+    source: &'s str,
     lines: &[Line],
 ) -> (std::borrow::Cow<'s, str>, Vec<(usize, usize)>) {
-    let text =
-        |from: usize, to: usize| std::str::from_utf8(&bytes[from..to]).unwrap_or("");
     if let [line] = lines {
-        return (
-            std::borrow::Cow::Borrowed(text(line.start, line.end)),
-            vec![(0, line.start)],
-        );
+        let text = source.get(line.start..line.end).unwrap_or("");
+        return (std::borrow::Cow::Borrowed(text), vec![(0, line.start)]);
     }
-    let mut value =
-        String::with_capacity(lines.iter().map(|line| line.next - line.start).sum());
+    let mut value = String::with_capacity(joined_size(lines));
+    let segments = push_lines(source, lines, |text| value.push_str(text));
+    (std::borrow::Cow::Owned(value), segments)
+}
+
+/// `join_lines` writing straight into the arena, where the text ends up anyway.
+pub(crate) fn join_lines_in<'a>(
+    source: &'a str,
+    lines: &[Line],
+    alloc: &'a Allocator,
+) -> (&'a str, Vec<(usize, usize)>) {
+    if let [line] = lines {
+        let text = source.get(line.start..line.end).unwrap_or("");
+        return (text, vec![(0, line.start)]);
+    }
+    let mut value = ArenaString::with_capacity_in(joined_size(lines), alloc);
+    let segments = push_lines(source, lines, |text| value.push_str(text));
+    (value.into_bump_str(), segments)
+}
+
+fn joined_size(lines: &[Line]) -> usize {
+    lines.iter().map(|line| line.next - line.start).sum()
+}
+
+// Each line through its line ending, the last without; where each starts in the result.
+// Slicing the source, already valid UTF-8, saves validating it again line by line
+fn push_lines(
+    source: &str,
+    lines: &[Line],
+    mut push: impl FnMut(&str),
+) -> Vec<(usize, usize)> {
     let mut segments = Vec::with_capacity(lines.len());
+    let mut length = 0;
     for (index, line) in lines.iter().enumerate() {
-        segments.push((value.len(), line.start));
+        segments.push((length, line.start));
         let end = if index + 1 == lines.len() {
             line.end
         } else {
             line.next
         };
-        value.push_str(text(line.start, end));
+        let text = source.get(line.start..end).unwrap_or("");
+        length += text.len();
+        push(text);
     }
-    (std::borrow::Cow::Owned(value), segments)
+    segments
 }
 
 fn map_segment(segments: &[(usize, usize)], at: usize) -> Point {
