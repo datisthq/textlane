@@ -7,6 +7,8 @@ pub struct File {
     /// The text the tree was parsed from, which byte spans point into.
     pub value: Option<String>,
     pub messages: Vec<Message>,
+    /// What plugins store for whoever reads the result, as vfile's `data` holds it.
+    pub data: serde_json::Map<String, serde_json::Value>,
 }
 
 /// A diagnostic a plugin reported, as vfile-message does.

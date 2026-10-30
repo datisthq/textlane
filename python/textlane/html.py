@@ -16,6 +16,8 @@ __all__ = [
     "SanitizeOptions",
     "slug",
     "SlugOptions",
+    "unwrap_images",
+    "extract_toc",
     "highlight",
     "HighlightOptions",
     "to_markdown",
@@ -290,6 +292,16 @@ def sanitize(options: Optional[SanitizeOptions] = None) -> Plugin:
 def slug(options: Optional[SlugOptions] = None) -> Plugin:
     """The `html.slug` plugin."""
     return describe_plugin("html.slug", options)
+
+
+def unwrap_images() -> Plugin:
+    """The `html.unwrapImages` plugin."""
+    return describe_plugin("html.unwrapImages")
+
+
+def extract_toc() -> Plugin:
+    """The `html.extractToc` plugin."""
+    return describe_plugin("html.extractToc")
 
 
 def highlight(options: Optional[HighlightOptions] = None) -> Plugin:

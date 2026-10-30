@@ -344,6 +344,17 @@ describe("Processor", () => {
       expect(file.messages.map(message => message.reason)).toEqual(["native", "from js"])
     })
 
+    it("merges the data native stages and plugins store in the file", () => {
+      const mark = () => (_tree: Node, file: HostFile) => {
+        file.data.seen = true
+      }
+      const file = entry
+        .textlane()
+        .use([md.parse(), md.toHtml(), html.extractToc(), mark, html.stringify()])
+        .processSync("# A")
+      expect(file.data).toEqual({ toc: [{ depth: 1, value: "A" }], seen: true })
+    })
+
     it("runs a tree through native and JavaScript stages", async () => {
       const tree = { type: "root", children: [{ type: "emphasis", children: [] }] }
       const result = await entry.textlane().use(strongEmphasis).use(md.toHtml()).run(tree)

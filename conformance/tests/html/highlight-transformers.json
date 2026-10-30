@@ -572,6 +572,38 @@
     ]
   },
   {
+    "description": "ansi code in a fence",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "colors and a decoration",
+        "input": "```ansi\n\u001b[31mred\u001b[0m \u001b[1;32mbold green\u001b[0m\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#d20f39;--shiki-dark:#f38ba8\">red</span><span style=\"color:#40a02b;--shiki-light-font-weight:bold;--shiki-dark:#a6e3a1;--shiki-dark-font-weight:bold\"> bold green</span></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
     "description": "transformers run together, in order",
     "source": {
       "repository": "https://github.com/shikijs/shiki",

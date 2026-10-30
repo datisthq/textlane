@@ -1,0 +1,187 @@
+[
+  {
+    "description": "Markdown down to its text",
+    "source": {
+      "repository": "https://github.com/remarkjs/strip-markdown",
+      "version": "6.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.strip"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "a heading",
+        "input": "# Alpha",
+        "expected": {
+          "md": "Alpha\n"
+        }
+      },
+      {
+        "description": "emphasis, strong and links",
+        "input": "Some *emphasis*, **strong** and [a link](https://example.com).",
+        "expected": {
+          "md": "Some emphasis, strong and a link.\n"
+        }
+      },
+      {
+        "description": "an image takes its alt",
+        "input": "An ![alt text](a.png) image",
+        "expected": {
+          "md": "An alt text image\n"
+        }
+      },
+      {
+        "description": "an image without alt takes its title",
+        "input": "![](a.png \"Title\")",
+        "expected": {
+          "md": "Title\n"
+        }
+      },
+      {
+        "description": "code blocks are dropped",
+        "input": "Before\n\n```js\nlet a = 1\n```\n\nAfter",
+        "expected": {
+          "md": "Before\n\nAfter\n"
+        }
+      },
+      {
+        "description": "inline code keeps its text",
+        "input": "Use `npm i` now",
+        "expected": {
+          "md": "Use npm i now\n"
+        }
+      },
+      {
+        "description": "HTML is dropped",
+        "input": "a <b>bold</b> c\n\n<div>block</div>",
+        "expected": {
+          "md": "a bold c\n"
+        }
+      },
+      {
+        "description": "a list",
+        "input": "- one\n- two\n  - three",
+        "expected": {
+          "md": "one\n\ntwo\n\nthree\n"
+        }
+      },
+      {
+        "description": "a block quote",
+        "input": "> quoted *text*",
+        "expected": {
+          "md": "quoted text\n"
+        }
+      },
+      {
+        "description": "a hard break",
+        "input": "a  \nb",
+        "expected": {
+          "md": "a\nb\n"
+        }
+      },
+      {
+        "description": "a thematic break",
+        "input": "a\n\n***\n\nb",
+        "expected": {
+          "md": "a\n\nb\n"
+        }
+      },
+      {
+        "description": "a definition and a reference",
+        "input": "[a][b]\n\n[b]: https://example.com",
+        "expected": {
+          "md": "a\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "GFM down to its text",
+    "source": {
+      "repository": "https://github.com/remarkjs/strip-markdown",
+      "version": "6.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.strip"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "a table is dropped",
+        "input": "| a | b |\n| - | - |\n| 1 | 2 |",
+        "expected": {
+          "md": ""
+        }
+      },
+      {
+        "description": "strikethrough keeps its text",
+        "input": "~~gone~~ here",
+        "expected": {
+          "md": "gone here\n"
+        }
+      },
+      {
+        "description": "a footnote is dropped",
+        "input": "a[^1]\n\n[^1]: note",
+        "expected": {
+          "md": "a\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "keep leaves a type as it is",
+    "source": {
+      "repository": "https://github.com/remarkjs/strip-markdown",
+      "version": "6.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.strip",
+        {
+          "keep": ["inlineCode"]
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "inline code stays",
+        "input": "Use `npm i` now",
+        "expected": {
+          "md": "Use `npm i` now\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remove drops a type",
+    "source": {
+      "repository": "https://github.com/remarkjs/strip-markdown",
+      "version": "6.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.strip",
+        {
+          "remove": ["list"]
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "lists go",
+        "input": "a\n\n- one\n- two\n\nb",
+        "expected": {
+          "md": "a\n\nb\n"
+        }
+      }
+    ]
+  }
+]

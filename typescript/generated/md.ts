@@ -79,6 +79,8 @@ export interface ComponentOptions {
   nodes?: Record<string, string>
   /** What becomes of a directive no rule converts. */
   unknownDirectives?: UnknownDirectives
+  /** Rules for fenced code; the first that matches a block applies. */
+  codes?: CodeRule[]
 }
 
 /** How `md.component` turns matching directives into one component. */
@@ -136,6 +138,42 @@ export interface AlertRule {
 
 /** What `md.component` does with a directive no rule converts. */
 export type UnknownDirectives = "keep" | "source"
+
+/** How `md.component` turns matching code blocks into a component, or groups them. */
+export interface CodeRule {
+  /** The block's language, or several; any when left out. */
+  lang?: Names | null
+  /** A `key="value"` the block's meta must hold. */
+  meta?: string | null
+  /** The component the block becomes; left out, the block stays code and only groups. */
+  component?: string | null
+  /** The attribute that gets the code; left out, the code is the component's text. */
+  valueAs?: string | null
+  /** Meta `key="value"` pairs to keep as attributes, in order. */
+  attributes?: AttributeRule[]
+  /** Wrap runs of adjacent blocks this rule matched in another component. */
+  group?: CodeGroupRule | null
+}
+
+/** The component wrapping a run of adjacent code blocks one rule matched; the meta keys it reads are taken out of each block's meta. */
+export interface CodeGroupRule {
+  /** The wrapping component. */
+  component: string
+  /** The shortest run wrapped; 2 when left out. */
+  min?: number | null
+  /** The attribute that gets the run's values of the rule's `meta` key, as a JSON list. */
+  collect?: string | null
+  /** Meta keys the wrapper copies from the run's first block as attributes. @default [] */
+  inherit?: string[]
+}
+
+/** `md.strip`: mdast down to its text, as strip-markdown does: code, HTML, tables and the like dropped, headings made paragraphs, formatting unwrapped. */
+export interface StripOptions {
+  /** Node types to leave as they are, such as `inlineCode`. @default [] */
+  keep?: string[]
+  /** Node types to drop, besides those strip-markdown drops. @default [] */
+  remove?: string[]
+}
 
 /** `md.stringify`: mdast into Markdown; options named as mdast-util-to-markdown names them. */
 export interface StringifyOptions {
@@ -275,6 +313,17 @@ export function gemoji(): Plugin<"md.gemoji"> {
 export function component(options?: ComponentOptions): Plugin<"md.component", ComponentOptions> {
   if (options === undefined) return { name: "md.component" }
   return { name: "md.component", options }
+}
+
+/** The `md.headingId` plugin. */
+export function headingId(): Plugin<"md.headingId"> {
+  return { name: "md.headingId" }
+}
+
+/** The `md.strip` plugin. */
+export function strip(options?: StripOptions): Plugin<"md.strip", StripOptions> {
+  if (options === undefined) return { name: "md.strip" }
+  return { name: "md.strip", options }
 }
 
 /** The `md.stringify` plugin. */

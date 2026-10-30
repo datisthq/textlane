@@ -97,7 +97,7 @@ class Processor:
         run = self._native.start_process(text, False)
         file = HostFile(run.value() or text, _read_path(document))
         await finish(run, self._hosts, file)
-        return _with_path({**json.loads(run.result()), "data": file.data}, document)
+        return _with_path(_merge_data(json.loads(run.result()), file.data), document)
 
     def process(self, document: Compatible) -> VFile:
         """Parse, run and compile a document; fails with `async-in-sync` on an asynchronous
@@ -108,7 +108,7 @@ class Processor:
         run = self._native.start_process(text, True)
         file = HostFile(run.value() or text, _read_path(document))
         finish_sync(run, self._hosts, file, "process")
-        return _with_path({**json.loads(run.result()), "data": file.data}, document)
+        return _with_path(_merge_data(json.loads(run.result()), file.data), document)
 
     # unified's addPlugin: the same attacher is one plugin, its dict options merged
     def _register(self, attacher: Callable[..., Any], parameters: List[Any]) -> List[Any]:
@@ -180,6 +180,11 @@ def _read_path(file: Compatible) -> Optional[str]:
     if isinstance(file, dict):
         return file.get("path")
     return None
+
+
+# Native stages' data first, then what Python plugins stored over it
+def _merge_data(result: VFile, data: Dict[str, Any]) -> VFile:
+    return {**result, "data": {**result["data"], **data}}
 
 
 def _with_path(file: VFile, document: Compatible) -> VFile:

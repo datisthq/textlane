@@ -220,6 +220,10 @@
           "description": "The processor's data after the last operation",
           "type": "object"
         },
+        "fileData": {
+          "description": "The file's data, what plugins stored for whoever reads the result",
+          "type": "object"
+        },
         "trace": {
           "description": "Labels test.trace stages appended to the file, in the order they ran",
           "type": "array",

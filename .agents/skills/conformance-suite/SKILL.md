@@ -52,7 +52,8 @@ otherwise.
   `parse`, `run`, `stringify`, `process`); the last call's output is the case's, beside
   `data`, `messages` and the labels `test.trace:<label>` recorded (`trace`).
 - Every result also carries the file's `messages`, in the order they were reported, as
-  `{ruleId, source, place}`; a test names the one outcome it compares.
+  `{ruleId, source, place}`, and its `fileData`, what plugins stored in `File::data`; a test
+  names the one outcome it compares.
 - Each runner compares exactly, except `expected.error`: its `code` must match and its
   `message`, if given, is a substring. Change that rule in all three runners at once.
 

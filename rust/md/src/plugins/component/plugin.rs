@@ -1,11 +1,14 @@
-use textlane_core::mdast::{Node, Text};
+use textlane_core::mdast::{Code, Node, Text};
 use textlane_core::{
     Allocator, ArenaVec, Attach, Error, File, Plugin, Transform, Tree, TreeKind,
 };
 
 use crate::models::options::{Component, UnknownDirectives};
 use crate::plugins::component::actions::alert::convert::convert_alert;
-use crate::plugins::component::actions::children::group::group_children;
+use crate::plugins::component::actions::children::group::{
+    Mark, group_children, read_group,
+};
+use crate::plugins::component::actions::code::convert::{convert_code, matches_code};
 use crate::plugins::component::actions::directive::convert::{
     DirectiveParts, convert_directive,
 };
@@ -60,36 +63,40 @@ impl Component {
         source: Option<&str>,
         alloc: &'a Allocator,
     ) {
-        let mut rules = Vec::with_capacity(children.len());
+        let mut marks = Vec::with_capacity(children.len());
         for child in children.iter_mut() {
             let node = std::mem::replace(child, placeholder());
-            let (node, rule) = self.convert_child(node, source, alloc);
+            let (node, mark) = self.convert_child(node, source, alloc);
             *child = node;
-            rules.push(rule);
+            marks.push(mark);
         }
-        if rules
+        if marks
             .iter()
             .flatten()
-            .any(|&index| self.directives[index].group.is_some())
+            .any(|&mark| read_group(self, mark).is_some())
         {
-            group_children(&self.directives, children, &rules, alloc);
+            group_children(self, children, &marks, alloc);
         }
     }
 
-    // A converted directive reports the index of its rule, which grouping reads
+    // A converted directive or a matched code block reports its rule, which grouping reads
     fn convert_child<'a>(
         &self,
         node: Node<'a>,
         source: Option<&str>,
         alloc: &'a Allocator,
-    ) -> (Node<'a>, Option<usize>) {
+    ) -> (Node<'a>, Option<Mark>) {
+        let node = match node {
+            Node::Code(code) => return self.convert_code(code, alloc),
+            node => node,
+        };
         let mut parts = match DirectiveParts::take(node) {
             Ok(parts) => parts,
             Err(node) => return (self.convert_other(node, alloc), None),
         };
         for (index, rule) in self.directives.iter().enumerate() {
             match convert_directive(rule, parts, alloc) {
-                Ok(node) => return (node, Some(index)),
+                Ok(node) => return (node, Some(Mark::Directive(index))),
                 Err(given) => parts = given,
             }
         }
@@ -97,6 +104,23 @@ impl Component {
             UnknownDirectives::Keep => (parts.into_node(), None),
             UnknownDirectives::Source => (restore_directive(parts, source, alloc), None),
         }
+    }
+
+    fn convert_code<'a>(
+        &self,
+        code: Code<'a>,
+        alloc: &'a Allocator,
+    ) -> (Node<'a>, Option<Mark>) {
+        let Some(index) = self.codes.iter().position(|rule| matches_code(rule, &code))
+        else {
+            return (Node::Code(code), None);
+        };
+        let rule = &self.codes[index];
+        let node = match &rule.component {
+            Some(component) => convert_code(rule, component, code, alloc),
+            None => Node::Code(code),
+        };
+        (node, Some(Mark::Code(index)))
     }
 
     fn convert_other<'a>(&self, node: Node<'a>, alloc: &'a Allocator) -> Node<'a> {

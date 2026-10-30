@@ -224,6 +224,19 @@ impl Default for Math {
     }
 }
 
+/// `md.strip`: mdast down to its text, as strip-markdown does: code, HTML, tables and
+/// the like dropped, headings made paragraphs, formatting unwrapped.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", schemars(rename = "StripOptions"))]
+pub struct Strip {
+    /// Node types to leave as they are, such as `inlineCode`.
+    pub keep: Vec<String>,
+    /// Node types to drop, besides those strip-markdown drops.
+    pub remove: Vec<String>,
+}
+
 /// `md.component`: directives, GitHub alerts and other nodes into MDX JSX elements, the
 /// components an MDX runtime renders, by declarative rules.
 #[derive(Clone, Debug, Default, Deserialize)]
@@ -239,6 +252,46 @@ pub struct Component {
     pub nodes: BTreeMap<String, String>,
     /// What becomes of a directive no rule converts.
     pub unknown_directives: UnknownDirectives,
+    /// Rules for fenced code; the first that matches a block applies.
+    pub codes: Vec<CodeRule>,
+}
+
+/// How `md.component` turns matching code blocks into a component, or groups them.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+pub struct CodeRule {
+    /// The block's language, or several; any when left out.
+    pub lang: Option<Names>,
+    /// A `key="value"` the block's meta must hold.
+    pub meta: Option<String>,
+    /// The component the block becomes; left out, the block stays code and only groups.
+    pub component: Option<String>,
+    /// The attribute that gets the code; left out, the code is the component's text.
+    pub value_as: Option<String>,
+    /// Meta `key="value"` pairs to keep as attributes, in order.
+    pub attributes: Vec<AttributeRule>,
+    /// Wrap runs of adjacent blocks this rule matched in another component.
+    pub group: Option<CodeGroupRule>,
+}
+
+/// The component wrapping a run of adjacent code blocks one rule matched; the meta keys it
+/// reads are taken out of each block's meta.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "camelCase")]
+pub struct CodeGroupRule {
+    /// The wrapping component.
+    pub component: String,
+    /// The shortest run wrapped; 2 when left out.
+    #[serde(default)]
+    pub min: Option<usize>,
+    /// The attribute that gets the run's values of the rule's `meta` key, as a JSON list.
+    #[serde(default)]
+    pub collect: Option<String>,
+    /// Meta keys the wrapper copies from the run's first block as attributes.
+    #[serde(default)]
+    pub inherit: Vec<String>,
 }
 
 /// How `md.component` turns matching directives into one component.

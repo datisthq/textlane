@@ -140,6 +140,7 @@ fn read_language<'a>(code: &Element<'a>) -> Option<&'a str> {
 // Shiki names its languages and aliases in lowercase and matches them exactly
 fn is_known_language(language: &str) -> bool {
     is_plain_language(language)
+        || language == "ansi"
         || (!language.chars().any(char::is_uppercase)
             && !INJECTION_TARGETS
                 .iter()

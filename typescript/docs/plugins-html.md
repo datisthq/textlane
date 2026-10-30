@@ -185,6 +185,59 @@ Follows [rehype-slug](https://www.npmjs.com/package/rehype-slug).
 
 <!-- /generated -->
 
+## html.unwrapImages
+
+Replaces each paragraph that holds only images, links around them and white space with its content, as rehype-unwrap-images does, so images are not wrapped in `<p>`.
+
+```js
+import { textlane } from "textlane"
+import * as html from "textlane/html"
+
+const file = textlane()
+  .use(html.parse({ fragment: true }))
+  .use(html.unwrapImages())
+  .use(html.stringify())
+  .processSync('<p><img src="a.png"></p>')
+file.value
+// <img src="a.png">
+```
+
+<!-- generated:options html.unwrapImages -->
+
+Follows [rehype-unwrap-images](https://www.npmjs.com/package/rehype-unwrap-images).
+
+No options.
+
+<!-- /generated -->
+
+## html.extractToc
+
+Stores the headings, nested by rank, as the file's `data.toc`, as @stefanprobst/rehype-extract-toc does: each `{ depth, value, id?, children? }`. Run it after `html.slug` so headings carry their ids.
+
+```js
+import { textlane } from "textlane"
+import * as html from "textlane/html"
+import * as md from "textlane/md"
+
+const file = textlane()
+  .use(md.parse())
+  .use(md.toHtml())
+  .use(html.slug())
+  .use(html.extractToc())
+  .use(html.stringify())
+  .processSync("# Guide\n\n## Install")
+file.data.toc
+// [{ depth: 1, value: "Guide", id: "guide", children: [{ depth: 2, value: "Install", id: "install" }] }]
+```
+
+<!-- generated:options html.extractToc -->
+
+Follows [@stefanprobst/rehype-extract-toc](https://www.npmjs.com/package/@stefanprobst/rehype-extract-toc).
+
+No options.
+
+<!-- /generated -->
+
 ## html.highlight
 
 Colors code blocks with TextMate grammars and themes, as Shiki does, natively.

@@ -17,6 +17,19 @@ pub(crate) struct Theme {
     pub(crate) replacements: BTreeMap<String, String>,
 }
 
+// A token's colors and font style in one theme, as Shiki's `getTokenStyleObject` reads them
+pub(crate) struct TokenStyle {
+    pub(crate) color: Option<String>,
+    pub(crate) background: Option<String>,
+    pub(crate) italic: bool,
+    pub(crate) bold: bool,
+    pub(crate) underline: bool,
+    pub(crate) strikethrough: bool,
+}
+
+// A line's tokens before whitespace merging, each with its style in every theme
+pub(crate) type StyledLine = Vec<(String, Vec<TokenStyle>)>;
+
 // One span of a highlighted line, its style empty for none
 pub(crate) struct CodeToken {
     pub(crate) text: String,

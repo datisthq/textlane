@@ -1,0 +1,92 @@
+[
+  {
+    "description": "custom heading ids",
+    "comment": "remark-heading-id's `defaults` option is not ported: html.slug makes ids",
+    "source": {
+      "repository": "https://github.com/imcuttle/remark-heading-id",
+      "version": "1.0.1",
+      "path": "index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.headingId"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "an id after a space",
+        "input": "# Hello {#hi}",
+        "expected": {
+          "html": "<h1 id=\"hi\">Hello</h1>"
+        }
+      },
+      {
+        "description": "trailing spaces after the id",
+        "input": "# Hello {#hi}   ",
+        "expected": {
+          "html": "<h1 id=\"hi\">Hello</h1>"
+        }
+      },
+      {
+        "description": "no space before the id",
+        "input": "# Hello{#hi}",
+        "expected": {
+          "html": "<h1>Hello{#hi}</h1>"
+        }
+      },
+      {
+        "description": "an id after emphasis",
+        "input": "# Hello *big* {#x}",
+        "expected": {
+          "html": "<h1 id=\"x\">Hello <em>big</em></h1>"
+        }
+      },
+      {
+        "description": "an id after code",
+        "input": "# A `b` {#c}",
+        "expected": {
+          "html": "<h1 id=\"c\">A <code>b</code></h1>"
+        }
+      },
+      {
+        "description": "the last braces of two",
+        "input": "## A {#a} {#b}",
+        "expected": {
+          "html": "<h2 id=\"a} {#b\">A</h2>"
+        }
+      },
+      {
+        "description": "an empty id",
+        "input": "# A {#}",
+        "expected": {
+          "html": "<h1>A {#}</h1>"
+        }
+      },
+      {
+        "description": "an id with a space",
+        "input": "# A {#x y}",
+        "expected": {
+          "html": "<h1 id=\"x y\">A</h1>"
+        }
+      },
+      {
+        "description": "a setext heading",
+        "input": "A {#s}\n===",
+        "expected": {
+          "html": "<h1 id=\"s\">A</h1>"
+        }
+      },
+      {
+        "description": "a heading without an id",
+        "input": "# Plain",
+        "expected": {
+          "html": "<h1>Plain</h1>"
+        }
+      },
+      {
+        "description": "several headings",
+        "input": "# A {#one}\n\n## B\n\n### C {#three}",
+        "expected": {
+          "html": "<h1 id=\"one\">A</h1>\n<h2>B</h2>\n<h3 id=\"three\">C</h3>"
+        }
+      }
+    ]
+  }
+]

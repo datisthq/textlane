@@ -26,6 +26,7 @@ pub fn run_case(case: &Value) -> Value {
     match result {
         Ok(mut result) => {
             result["messages"] = write_messages(&file);
+            result["fileData"] = Value::Object(file.data);
             result["trace"] = json!(take_trace());
             result
         }

@@ -286,7 +286,7 @@ No options.
 Turns directives, GitHub alerts and other nodes into MDX JSX elements, the components an MDX
 runtime renders, by declarative rules, so a site's `:::note` or `::button` needs no plugin of
 its own. Each directive rule names the directive and the component, where its name and label
-go, which attributes it keeps, what it requires and whether adjacent elements are grouped.
+go, which attributes it keeps, what it requires and whether adjacent elements are grouped. Code rules (`codes`) do the same for fenced code: a block becomes a component by its language or a meta `key="value"`, or adjacent blocks are wrapped together, as tabbed code is.
 Run it after `md.directive` and before `md.to_html` and `mdx.compile`, which compile the
 elements to component calls.
 
@@ -317,6 +317,7 @@ file["value"]
 | `alerts`            | `Optional[AlertRule]` |         | GitHub alerts, `> [!NOTE]`, into a component.                          |
 | `nodes`             | `Dict[str, str]`      | `{}`    | Node types, such as `defList`, into components keeping their children. |
 | `unknownDirectives` | `UnknownDirectives`   |         | What becomes of a directive no rule converts.                          |
+| `codes`             | `List[CodeRule]`      |         | Rules for fenced code; the first that matches a block applies.         |
 
 **`DirectiveRule`**
 
@@ -351,6 +352,19 @@ What `md.component` does with a directive no rule converts.
 
 Takes `Union[Literal["keep"], Literal["source"]]`.
 
+**`CodeRule`**
+
+How `md.component` turns matching code blocks into a component, or groups them.
+
+| Option       | Type                      | Default | Description                                                                      |
+| ------------ | ------------------------- | ------- | -------------------------------------------------------------------------------- |
+| `lang`       | `Optional[Names]`         |         | The block's language, or several; any when left out.                             |
+| `meta`       | `Optional[str]`           | `None`  | A `key="value"` the block's meta must hold.                                      |
+| `component`  | `Optional[str]`           | `None`  | The component the block becomes; left out, the block stays code and only groups. |
+| `valueAs`    | `Optional[str]`           | `None`  | The attribute that gets the code; left out, the code is the component's text.    |
+| `attributes` | `List[AttributeRule]`     |         | Meta `key="value"` pairs to keep as attributes, in order.                        |
+| `group`      | `Optional[CodeGroupRule]` |         | Wrap runs of adjacent blocks this rule matched in another component.             |
+
 **`Names`**
 
 One name or several.
@@ -378,6 +392,75 @@ The component wrapping a run of adjacent siblings one rule converted.
 | `component` | `str`           |         | The wrapping component.                                     |
 | `min`       | `Optional[int]` | `None`  | The shortest run wrapped; 2 when left out.                  |
 | `inherit`   | `List[str]`     | `[]`    | Attributes the wrapper copies from the run's first element. |
+
+**`CodeGroupRule`**
+
+The component wrapping a run of adjacent code blocks one rule matched; the meta keys it reads are taken out of each block's meta.
+
+| Option      | Type            | Default | Description                                                                        |
+| ----------- | --------------- | ------- | ---------------------------------------------------------------------------------- |
+| `component` | `str`           |         | The wrapping component.                                                            |
+| `min`       | `Optional[int]` | `None`  | The shortest run wrapped; 2 when left out.                                         |
+| `collect`   | `Optional[str]` | `None`  | The attribute that gets the run's values of the rule's `meta` key, as a JSON list. |
+| `inherit`   | `List[str]`     | `[]`    | Meta keys the wrapper copies from the run's first block as attributes.             |
+
+<!-- /generated -->
+
+## md.headingId
+
+Reads `{#id}` at the end of a heading, after a space, as its id, as remark-heading-id does; `md.toHtml` puts it on the heading. remark-heading-id's `defaults` is not ported: `html.slug` gives the other headings ids.
+
+```python
+from textlane import html, md, textlane
+
+file = (
+    textlane()
+    .use(md.parse())
+    .use(md.heading_id())
+    .use(md.to_html())
+    .use(html.stringify())
+    .process_sync("# Install {#setup}")
+)
+file["value"]
+# <h1 id="setup">Install</h1>
+```
+
+<!-- generated:options md.headingId -->
+
+Follows [remark-heading-id](https://www.npmjs.com/package/remark-heading-id).
+
+No options.
+
+<!-- /generated -->
+
+## md.strip
+
+Strips mdast down to its text, as strip-markdown does: code, HTML, tables and definitions go, headings become paragraphs and formatting gives way to its content, which suits search indexes and plain-text summaries. `keep` leaves node types as they are and `remove` drops more.
+
+```python
+from textlane import md, textlane
+
+file = (
+    textlane()
+    .use(md.parse())
+    .use(md.strip())
+    .use(md.stringify())
+    .process_sync("# Hello *world*\n\nSee [the docs](/docs).")
+)
+file["value"]
+# Hello world
+#
+# See the docs.
+```
+
+<!-- generated:options md.strip -->
+
+Follows [strip-markdown](https://www.npmjs.com/package/strip-markdown).
+
+| Option   | Type        | Default | Description                                             |
+| -------- | ----------- | ------- | ------------------------------------------------------- |
+| `keep`   | `List[str]` | `[]`    | Node types to leave as they are, such as `inlineCode`.  |
+| `remove` | `List[str]` | `[]`    | Node types to drop, besides those strip-markdown drops. |
 
 <!-- /generated -->
 

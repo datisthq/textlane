@@ -12,11 +12,11 @@ keywords = ["unist", "mdast", "hast", "plugin", "textlane"]
 categories = ["text-processing", "data-structures"]
 
 [features]
-json = ["dep:serde_json"]
+json = []
 
 [dependencies]
 bumpalo.workspace = true
-serde_json = { workspace = true, optional = true }
+serde_json.workspace = true
 
 [lints]
 workspace = true

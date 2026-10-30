@@ -99,6 +99,10 @@ function runTest(group: Group, test: Test) {
   if (output) {
     return expect(processor().processSync(input).value).toEqual(test.expected[output])
   }
+  // What plugins stored in the file is the vfile's `data`
+  if ("fileData" in test.expected) {
+    return expect(processor().processSync(input).data).toEqual(test.expected.fileData)
+  }
   if ("tree" in test.expected) {
     const tree: Node = processor().runSync(processor().parse(input), input)
     // A tree read back from JSON keeps unist positions, which a bridge into nlcst cannot

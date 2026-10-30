@@ -291,3 +291,18 @@ def test_shows_python_plugins_what_native_stages_reported():
 
 def test_parses_a_document():
     assert textlane.textlane().use(md.parse()).parse({"value": "a"})["type"] == "root"
+
+
+def test_merges_the_data_native_stages_and_python_plugins_store():
+    def mark(processor):
+        def transformer(tree, file):
+            file.data["seen"] = True
+
+        return transformer
+
+    file = (
+        textlane.textlane()
+        .use([md.parse(), md.to_html(), html.extract_toc(), mark, html.stringify()])
+        .process_sync("# A")
+    )
+    assert file["data"] == {"toc": [{"depth": 1, "value": "A"}], "seen": True}

@@ -1,0 +1,93 @@
+[
+  {
+    "description": "paragraphs of images unwrapped",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-unwrap-images",
+      "version": "1.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      ["html.unwrapImages"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "an image alone",
+        "input": "<p><img src=\"a.png\"></p>",
+        "expected": {
+          "html": "<img src=\"a.png\">"
+        }
+      },
+      {
+        "description": "images and white space",
+        "input": "<p><img src=\"a.png\"> <img src=\"b.png\">\n</p>",
+        "expected": {
+          "html": "<img src=\"a.png\"> <img src=\"b.png\">\n"
+        }
+      },
+      {
+        "description": "an image in a link",
+        "input": "<p><a href=\"/x\"><img src=\"a.png\"></a></p>",
+        "expected": {
+          "html": "<a href=\"/x\"><img src=\"a.png\"></a>"
+        }
+      },
+      {
+        "description": "an image beside text",
+        "input": "<p>Look <img src=\"a.png\"></p>",
+        "expected": {
+          "html": "<p>Look <img src=\"a.png\"></p>"
+        }
+      },
+      {
+        "description": "a link without href is not interactive",
+        "input": "<p><a><img src=\"a.png\"></a></p>",
+        "expected": {
+          "html": "<p><a><img src=\"a.png\"></a></p>"
+        }
+      },
+      {
+        "description": "a link holding text too",
+        "input": "<p><a href=\"/x\"><img src=\"a.png\"> more</a></p>",
+        "expected": {
+          "html": "<p><a href=\"/x\"><img src=\"a.png\"> more</a></p>"
+        }
+      },
+      {
+        "description": "an empty paragraph",
+        "input": "<p></p>",
+        "expected": {
+          "html": "<p></p>"
+        }
+      },
+      {
+        "description": "an image in a button",
+        "input": "<p><button><img src=\"a.png\"></button></p>",
+        "expected": {
+          "html": "<button><img src=\"a.png\"></button>"
+        }
+      },
+      {
+        "description": "nested in a div",
+        "input": "<div><p><img src=\"a.png\"></p></div>",
+        "expected": {
+          "html": "<div><img src=\"a.png\"></div>"
+        }
+      },
+      {
+        "description": "a link in a link is other content",
+        "input": "<p><a href=\"/x\"><a href=\"/y\"><img src=\"a.png\"></a></a></p>",
+        "expected": {
+          "html": "<a href=\"/x\"></a><a href=\"/y\"><img src=\"a.png\"></a>"
+        }
+      }
+    ]
+  }
+]

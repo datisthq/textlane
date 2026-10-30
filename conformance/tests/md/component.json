@@ -1651,5 +1651,349 @@
         }
       }
     ]
+  },
+  {
+    "description": "code rules make a component of a block, its code as text",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.component",
+        {
+          "codes": [
+            {
+              "lang": "mermaid",
+              "component": "Mermaid"
+            }
+          ]
+        }
+      ]
+    ],
+    "positions": false,
+    "tests": [
+      {
+        "description": "a mermaid block",
+        "input": "```mermaid\ngraph TD\n  A --> B\n```",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "Mermaid",
+                "attributes": [],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "value": "graph TD\n  A --> B",
+                    "type": "text"
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "another language stays code",
+        "input": "```js\nlet a\n```",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "lang": "js",
+                "meta": null,
+                "value": "let a",
+                "type": "code"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "code rules put the code in an attribute and meta pairs in others",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.component",
+        {
+          "codes": [
+            {
+              "lang": ["npm", "package-install"],
+              "component": "PackageTabs",
+              "valueAs": "command",
+              "attributes": [
+                "title",
+                {
+                  "name": "pm",
+                  "rename": "manager",
+                  "default": "npm"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    ],
+    "positions": false,
+    "tests": [
+      {
+        "description": "value, meta pair and default",
+        "input": "```npm title=\"Install\"\nnpm i textlane\n```",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "PackageTabs",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "command",
+                    "value": "npm i textlane"
+                  },
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "title",
+                    "value": "Install"
+                  },
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "manager",
+                    "value": "npm"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a second language",
+        "input": "```package-install pm=pnpm\nnpm i a\n```",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "PackageTabs",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "command",
+                    "value": "npm i a"
+                  },
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "manager",
+                    "value": "pnpm"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "code rules require a meta key",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.component",
+        {
+          "codes": [
+            {
+              "meta": "title",
+              "component": "Titled",
+              "attributes": ["title"]
+            }
+          ]
+        }
+      ]
+    ],
+    "positions": false,
+    "tests": [
+      {
+        "description": "with the key",
+        "input": "```js title='a.js'\nlet a\n```",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "Titled",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "title",
+                    "value": "a.js"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "value": "let a",
+                    "type": "text"
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "without it stays code",
+        "input": "```js\nlet a\n```",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "lang": "js",
+                "meta": null,
+                "value": "let a",
+                "type": "code"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "code rules group adjacent blocks, collecting a meta key",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.component",
+        {
+          "codes": [
+            {
+              "meta": "tab",
+              "group": {
+                "component": "CodeTabs",
+                "collect": "tabs",
+                "inherit": ["sync"]
+              }
+            }
+          ]
+        }
+      ]
+    ],
+    "positions": false,
+    "tests": [
+      {
+        "description": "two tabs",
+        "input": "```sh tab=\"npm\" sync=\"pm\"\nnpm i\n```\n\n```sh tab=\"pnpm\" {1}\npnpm i\n```",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "name": "CodeTabs",
+                "attributes": [
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "tabs",
+                    "value": "[\"npm\",\"pnpm\"]"
+                  },
+                  {
+                    "type": "mdxJsxAttribute",
+                    "name": "sync",
+                    "value": "pm"
+                  }
+                ],
+                "type": "mdxJsxFlowElement",
+                "children": [
+                  {
+                    "lang": "sh",
+                    "meta": null,
+                    "value": "npm i",
+                    "type": "code"
+                  },
+                  {
+                    "lang": "sh",
+                    "meta": "{1}",
+                    "value": "pnpm i",
+                    "type": "code"
+                  }
+                ],
+                "data": {
+                  "_mdxExplicitJsx": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "one tab is not grouped",
+        "input": "```sh tab=\"npm\"\nnpm i\n```",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "lang": "sh",
+                "meta": "tab=\"npm\"",
+                "value": "npm i",
+                "type": "code"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a paragraph splits the run",
+        "input": "```sh tab=\"a\"\na\n```\n\nx\n\n```sh tab=\"b\"\nb\n```",
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "lang": "sh",
+                "meta": "tab=\"a\"",
+                "value": "a",
+                "type": "code"
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "value": "x",
+                    "type": "text"
+                  }
+                ]
+              },
+              {
+                "lang": "sh",
+                "meta": "tab=\"b\"",
+                "value": "b",
+                "type": "code"
+              }
+            ]
+          }
+        }
+      }
+    ]
   }
 ]

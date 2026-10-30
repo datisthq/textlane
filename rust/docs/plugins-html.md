@@ -186,6 +186,58 @@ Follows [rehype-slug](https://www.npmjs.com/package/rehype-slug).
 
 <!-- /generated -->
 
+## html.unwrapImages
+
+Replaces each paragraph that holds only images, links around them and white space with its content, as rehype-unwrap-images does, so images are not wrapped in `<p>`.
+
+```rust
+use textlane::{Processor, html};
+
+let output = Processor::new()
+    .with(html::Parse { fragment: true, ..Default::default() })
+    .with(html::UnwrapImages)
+    .with(html::Stringify::default())
+    .freeze()?
+    .process(r#"<p><img src="a.png"></p>"#)?;
+output.value
+// <img src="a.png">
+```
+
+<!-- generated:options html.unwrapImages -->
+
+Follows [rehype-unwrap-images](https://www.npmjs.com/package/rehype-unwrap-images).
+
+No options.
+
+<!-- /generated -->
+
+## html.extractToc
+
+Stores the headings, nested by rank, as the file's `data.toc`, as @stefanprobst/rehype-extract-toc does: each `{ depth, value, id?, children? }`. Run it after `html.slug` so headings carry their ids.
+
+```rust
+use textlane::{Processor, html, md};
+
+let output = Processor::new()
+    .with(md::Parse::default())
+    .with(md::ToHtml::default())
+    .with(html::Slug::default())
+    .with(html::ExtractToc)
+    .with(html::Stringify::default())
+    .freeze()?
+    .process("# Guide\n\n## Install")?;
+output.file.data["toc"]
+// [{ depth: 1, value: "Guide", id: "guide", children: [{ depth: 2, value: "Install", id: "install" }] }]
+```
+
+<!-- generated:options html.extractToc -->
+
+Follows [@stefanprobst/rehype-extract-toc](https://www.npmjs.com/package/@stefanprobst/rehype-extract-toc).
+
+No options.
+
+<!-- /generated -->
+
 ## html.highlight
 
 Colors code blocks with TextMate grammars and themes, as Shiki does, natively.

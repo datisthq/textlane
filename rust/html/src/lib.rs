@@ -9,6 +9,11 @@ mod models {
     pub(crate) mod token;
 }
 mod utils {
+    #[cfg(feature = "highlight")]
+    pub(crate) mod ansi {
+        pub(crate) mod palette;
+        pub(crate) mod parse;
+    }
     pub(crate) mod builder {
         pub(crate) mod convert;
         pub(crate) mod dom;
@@ -36,6 +41,10 @@ mod utils {
 mod actions {
     pub(crate) mod a {
         pub(crate) mod convert;
+    }
+    #[cfg(feature = "highlight")]
+    pub(crate) mod ansi {
+        pub(crate) mod tokenize;
     }
     pub(crate) mod base {
         pub(crate) mod convert;
@@ -78,6 +87,8 @@ mod actions {
         pub(crate) mod sanitize;
         pub(crate) mod slug;
         pub(crate) mod stringify;
+        pub(crate) mod toc;
+        pub(crate) mod unwrap;
     }
     pub(crate) mod heading {
         pub(crate) mod convert;
@@ -171,6 +182,9 @@ mod helpers {
     pub(crate) mod value;
 }
 mod plugins {
+    pub(crate) mod extract_toc {
+        pub(crate) mod plugin;
+    }
     pub(crate) mod format {
         pub(crate) mod plugin;
     }
@@ -199,6 +213,9 @@ mod plugins {
     pub(crate) mod to_natural_language {
         pub(crate) mod plugin;
     }
+    pub(crate) mod unwrap_images {
+        pub(crate) mod plugin;
+    }
 }
 
 // models
@@ -218,7 +235,11 @@ pub use actions::hast::raw::raw_hast;
 pub use actions::hast::sanitize::sanitize_hast;
 pub use actions::hast::slug::slug_hast;
 pub use actions::hast::stringify::stringify_hast;
+pub use actions::hast::toc::extract_toc;
+pub use actions::hast::unwrap::unwrap_images;
 pub use actions::html::parse::parse_html;
 
 // plugins
+pub use plugins::extract_toc::plugin::ExtractToc;
 pub use plugins::to_natural_language::plugin::ToNaturalLanguage;
+pub use plugins::unwrap_images::plugin::UnwrapImages;

@@ -128,7 +128,9 @@ the case: `unknown-plugin`, `invalid-options`, `missing-parser`, `missing-compil
   The tree crosses as JSON, so non-JSON values in nodes or `data` do not survive a native
   stage. Syntax plugins (remark-gfm, remark-directive, remark-math) need the native ones; do
   not port a pipeline that needs one textlane lacks, say so. A remark plugin that only turns
-  directives, `> [!NOTE]` alerts or definition lists into MDX JSX elements is a rule of
-  `md.component` instead.
+  directives, `> [!NOTE]` alerts, definition lists or fenced code into MDX JSX elements is a
+  rule of `md.component` instead. remark-heading-id, strip-markdown, rehype-unwrap-images and
+  @stefanprobst/rehype-extract-toc are `md.headingId`, `md.strip`, `html.unwrapImages` and
+  `html.extractToc`; the table of contents lands in the result's `data.toc`.
 - remark-stringify reads `settings` from processor data; textlane's `md.stringify` takes its
   options directly.

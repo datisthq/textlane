@@ -147,3 +147,47 @@ fn highlight_meta(
     highlight_hast(&mut node, &options, &alloc)?;
     stringify_hast(&node, &Stringify::default())
 }
+
+#[test]
+fn colors_ansi_code_from_its_escapes() -> Result<(), Error> {
+    let input = "<pre><code class=\"language-ansi\">\x1b[1;31ma\x1b[0m b</code></pre>";
+    assert_eq!(
+        highlight(input, json!({ "theme": "github-light" }))?,
+        "<pre class=\"shiki github-light\" style=\"background-color:#fff;color:#24292e\" \
+         tabindex=\"0\"><code><span class=\"line\"><span \
+         style=\"color:#d73a49;font-weight:bold\">a</span><span \
+         style=\"color:#24292e\"> b</span></span></code></pre>"
+    );
+    Ok(())
+}
+
+#[test]
+fn fails_as_shiki_does_dimming_a_color_past_the_table() {
+    let input = "<pre><code class=\"language-ansi\">\x1b[2;38;5;300ma</code></pre>";
+    let error = highlight(input, json!({ "theme": "github-light" })).err();
+    assert_eq!(
+        error.map(|error| error.code).as_deref(),
+        Some("highlight-failed")
+    );
+}
+
+#[test]
+fn colors_long_ansi_code_in_linear_time() -> Result<(), Error> {
+    let line = "\x1b[32m✓\x1b[39m \x1b[2mok\x1b[22m\n";
+    let input = format!(
+        "<pre><code class=\"language-ansi\">{}</code></pre>",
+        line.repeat(20_000)
+    );
+    let started = std::time::Instant::now();
+    let html = highlight(
+        &input,
+        json!({ "themes": { "light": "github-light", "dark": "github-dark" } }),
+    )?;
+    assert_eq!(html.matches("class=\"line\"").count(), 20_000);
+    assert!(
+        started.elapsed().as_secs() < 20,
+        "took {:?}",
+        started.elapsed()
+    );
+    Ok(())
+}

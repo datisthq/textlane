@@ -1,0 +1,1338 @@
+[
+  {
+    "description": "ansi under catppuccin-latte / catppuccin-mocha",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/core/src/highlight/code-to-tokens-ansi.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "plain text",
+        "input": "<pre><code class=\"language-ansi\">hello world\nsecond line</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\">hello world</span></span>\n<span class=\"line\"><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\">second line</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "the 8 foreground colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[30mc30 \u001b[31mc31 \u001b[32mc32 \u001b[33mc33 \u001b[34mc34 \u001b[35mc35 \u001b[36mc36 \u001b[37mc37</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#5c5f77;--shiki-dark:#45475a\">c30 </span><span style=\"color:#d20f39;--shiki-dark:#f38ba8\">c31 </span><span style=\"color:#40a02b;--shiki-dark:#a6e3a1\">c32 </span><span style=\"color:#df8e1d;--shiki-dark:#f9e2af\">c33 </span><span style=\"color:#1e66f5;--shiki-dark:#89b4fa\">c34 </span><span style=\"color:#ea76cb;--shiki-dark:#f5c2e7\">c35 </span><span style=\"color:#179299;--shiki-dark:#94e2d5\">c36 </span><span style=\"color:#acb0be;--shiki-dark:#a6adc8\">c37</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "the 8 background colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[40mc40 \u001b[41mc41 \u001b[42mc42 \u001b[43mc43 \u001b[44mc44 \u001b[45mc45 \u001b[46mc46 \u001b[47mc47</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#4c4f69;background-color:#5c5f77;--shiki-dark:#cdd6f4;--shiki-dark-bg:#45475a\">c40 </span><span style=\"color:#4c4f69;background-color:#d20f39;--shiki-dark:#cdd6f4;--shiki-dark-bg:#f38ba8\">c41 </span><span style=\"color:#4c4f69;background-color:#40a02b;--shiki-dark:#cdd6f4;--shiki-dark-bg:#a6e3a1\">c42 </span><span style=\"color:#4c4f69;background-color:#df8e1d;--shiki-dark:#cdd6f4;--shiki-dark-bg:#f9e2af\">c43 </span><span style=\"color:#4c4f69;background-color:#1e66f5;--shiki-dark:#cdd6f4;--shiki-dark-bg:#89b4fa\">c44 </span><span style=\"color:#4c4f69;background-color:#ea76cb;--shiki-dark:#cdd6f4;--shiki-dark-bg:#f5c2e7\">c45 </span><span style=\"color:#4c4f69;background-color:#179299;--shiki-dark:#cdd6f4;--shiki-dark-bg:#94e2d5\">c46 </span><span style=\"color:#4c4f69;background-color:#acb0be;--shiki-dark:#cdd6f4;--shiki-dark-bg:#a6adc8\">c47</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "the 8 bright foreground colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[90mc90 \u001b[91mc91 \u001b[92mc92 \u001b[93mc93 \u001b[94mc94 \u001b[95mc95 \u001b[96mc96 \u001b[97mc97</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#6c6f85;--shiki-dark:#585b70\">c90 </span><span style=\"color:#de293e;--shiki-dark:#f37799\">c91 </span><span style=\"color:#49af3d;--shiki-dark:#89d88b\">c92 </span><span style=\"color:#eea02d;--shiki-dark:#ebd391\">c93 </span><span style=\"color:#456eff;--shiki-dark:#74a8fc\">c94 </span><span style=\"color:#fe85d8;--shiki-dark:#f2aede\">c95 </span><span style=\"color:#2d9fa8;--shiki-dark:#6bd7ca\">c96 </span><span style=\"color:#bcc0cc;--shiki-dark:#bac2de\">c97</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "the 8 bright background colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[100mc100 \u001b[101mc101 \u001b[102mc102 \u001b[103mc103 \u001b[104mc104 \u001b[105mc105 \u001b[106mc106 \u001b[107mc107</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#4c4f69;background-color:#6c6f85;--shiki-dark:#cdd6f4;--shiki-dark-bg:#585b70\">c100 </span><span style=\"color:#4c4f69;background-color:#de293e;--shiki-dark:#cdd6f4;--shiki-dark-bg:#f37799\">c101 </span><span style=\"color:#4c4f69;background-color:#49af3d;--shiki-dark:#cdd6f4;--shiki-dark-bg:#89d88b\">c102 </span><span style=\"color:#4c4f69;background-color:#eea02d;--shiki-dark:#cdd6f4;--shiki-dark-bg:#ebd391\">c103 </span><span style=\"color:#4c4f69;background-color:#456eff;--shiki-dark:#cdd6f4;--shiki-dark-bg:#74a8fc\">c104 </span><span style=\"color:#4c4f69;background-color:#fe85d8;--shiki-dark:#cdd6f4;--shiki-dark-bg:#f2aede\">c105 </span><span style=\"color:#4c4f69;background-color:#2d9fa8;--shiki-dark:#cdd6f4;--shiki-dark-bg:#6bd7ca\">c106 </span><span style=\"color:#4c4f69;background-color:#bcc0cc;--shiki-dark:#cdd6f4;--shiki-dark-bg:#bac2de\">c107</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "foreground and background together",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31;42mred on green\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#d20f39;background-color:#40a02b;--shiki-dark:#f38ba8;--shiki-dark-bg:#a6e3a1\">red on green</span><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "256 colors, foreground",
+        "input": "<pre><code class=\"language-ansi\">\u001b[38;5;0mc0\u001b[38;5;9mc9\u001b[38;5;15mc15\u001b[38;5;16mc16\u001b[38;5;21mc21\u001b[38;5;100mc100\u001b[38;5;196mc196\u001b[38;5;231mc231\u001b[38;5;232mc232\u001b[38;5;244mc244\u001b[38;5;255mc255</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#5c5f77;--shiki-dark:#45475a\">c0</span><span style=\"color:#de293e;--shiki-dark:#f37799\">c9</span><span style=\"color:#bcc0cc;--shiki-dark:#bac2de\">c15</span><span style=\"color:#000000;--shiki-dark:#000000\">c16</span><span style=\"color:#0000ff;--shiki-dark:#0000ff\">c21</span><span style=\"color:#878700;--shiki-dark:#878700\">c100</span><span style=\"color:#ff0000;--shiki-dark:#ff0000\">c196</span><span style=\"color:#ffffff;--shiki-dark:#ffffff\">c231</span><span style=\"color:#080808;--shiki-dark:#080808\">c232</span><span style=\"color:#808080;--shiki-dark:#808080\">c244</span><span style=\"color:#eeeeee;--shiki-dark:#eeeeee\">c255</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "256 colors, background",
+        "input": "<pre><code class=\"language-ansi\">\u001b[48;5;0mc0\u001b[48;5;9mc9\u001b[48;5;16mc16\u001b[48;5;124mc124\u001b[48;5;231mc231\u001b[48;5;240mc240\u001b[48;5;255mc255</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#4c4f69;background-color:#5c5f77;--shiki-dark:#cdd6f4;--shiki-dark-bg:#45475a\">c0</span><span style=\"color:#4c4f69;background-color:#de293e;--shiki-dark:#cdd6f4;--shiki-dark-bg:#f37799\">c9</span><span style=\"color:#4c4f69;background-color:#000000;--shiki-dark:#cdd6f4;--shiki-dark-bg:#000000\">c16</span><span style=\"color:#4c4f69;background-color:#af0000;--shiki-dark:#cdd6f4;--shiki-dark-bg:#af0000\">c124</span><span style=\"color:#4c4f69;background-color:#ffffff;--shiki-dark:#cdd6f4;--shiki-dark-bg:#ffffff\">c231</span><span style=\"color:#4c4f69;background-color:#585858;--shiki-dark:#cdd6f4;--shiki-dark-bg:#585858\">c240</span><span style=\"color:#4c4f69;background-color:#eeeeee;--shiki-dark:#cdd6f4;--shiki-dark-bg:#eeeeee\">c255</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "256 colors past the table and not a number",
+        "input": "<pre><code class=\"language-ansi\">\u001b[38;5;256mpast\u001b[38;5;xmword\u001b[38;5;0x10mhex\u001b[38;5; mspace</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span>past</span><span>word</span><span style=\"color:#000000;--shiki-dark:#000000\">hex</span><span style=\"color:#5c5f77;--shiki-dark:#45475a\">space</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "RGB colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[38;2;255;128;0morange\u001b[48;2;10;20;30mon navy\u001b[0m \u001b[38;2;300;-5;7mclamped</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#ff8000;--shiki-dark:#ff8000\">orange</span><span style=\"color:#ff8000;background-color:#0a141e;--shiki-dark:#ff8000;--shiki-dark-bg:#0a141e\">on navy</span><span style=\"color:#ff0007;--shiki-dark:#ff0007\"> clamped</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "an RGB color missing a channel",
+        "input": "<pre><code class=\"language-ansi\">\u001b[38;2;1;2mshort\u001b[38;2;1;x;3;31mnot a number</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\">short</span><span style=\"color:#d20f39;--shiki-dark:#f38ba8\">not a number</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "bold",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1mbold\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#4c4f69;--shiki-light-font-weight:bold;--shiki-dark:#cdd6f4;--shiki-dark-font-weight:bold\">bold</span><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "dim",
+        "input": "<pre><code class=\"language-ansi\">\u001b[2mdim\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#4c4f6980;--shiki-dark:#cdd6f480\">dim</span><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "italic",
+        "input": "<pre><code class=\"language-ansi\">\u001b[3mitalic\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#4c4f69;--shiki-light-font-style:italic;--shiki-dark:#cdd6f4;--shiki-dark-font-style:italic\">italic</span><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "underline",
+        "input": "<pre><code class=\"language-ansi\">\u001b[4munderline\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#4c4f69;--shiki-light-text-decoration:underline;--shiki-dark:#cdd6f4;--shiki-dark-text-decoration:underline\">underline</span><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "strikethrough",
+        "input": "<pre><code class=\"language-ansi\">\u001b[9mstruck\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#4c4f69;--shiki-light-text-decoration:line-through;--shiki-dark:#cdd6f4;--shiki-dark-text-decoration:line-through\">struck</span><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "reverse",
+        "input": "<pre><code class=\"language-ansi\">\u001b[7mreversed\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#eff1f5;background-color:#4c4f69;--shiki-dark:#1e1e2e;--shiki-dark-bg:#cdd6f4\">reversed</span><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "reverse with colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[7;31mred\u001b[42mred on green\u001b[39mon green</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#eff1f5;background-color:#d20f39;--shiki-dark:#1e1e2e;--shiki-dark-bg:#f38ba8\">red</span><span style=\"color:#40a02b;background-color:#d20f39;--shiki-dark:#a6e3a1;--shiki-dark-bg:#f38ba8\">red on green</span><span style=\"color:#40a02b;background-color:#4c4f69;--shiki-dark:#a6e3a1;--shiki-dark-bg:#cdd6f4\">on green</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "every decoration at once",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1;3;4;9;31mall\u001b[0m</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#d20f39;--shiki-light-font-style:italic;--shiki-light-font-weight:bold;--shiki-light-text-decoration:underline line-through;--shiki-dark:#f38ba8;--shiki-dark-font-style:italic;--shiki-dark-font-weight:bold;--shiki-dark-text-decoration:underline line-through\">all</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "dim colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[2;31mred\u001b[38;5;100mtable\u001b[38;2;1;2;3mrgb\u001b[91mbright</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#d20f3980;--shiki-dark:#f38ba880\">red</span><span style=\"color:#87870080;--shiki-dark:#87870080\">table</span><span style=\"color:#01020380;--shiki-dark:#01020380\">rgb</span><span style=\"color:#de293e80;--shiki-dark:#f3779980\">bright</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "hidden and overline make no style",
+        "input": "<pre><code class=\"language-ansi\">\u001b[8mhidden\u001b[28m \u001b[53mover\u001b[55mline</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\">hidden</span><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\"> over</span><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\">line</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "resetting each decoration",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1;2;3;4;7;9;31;42mall\u001b[22mno bold\u001b[23mno italic\u001b[24mno underline\u001b[27mno reverse\u001b[29mno strike</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#40a02b80;background-color:#d20f39;--shiki-light-font-style:italic;--shiki-light-font-weight:bold;--shiki-light-text-decoration:underline line-through;--shiki-dark:#a6e3a180;--shiki-dark-bg:#f38ba8;--shiki-dark-font-style:italic;--shiki-dark-font-weight:bold;--shiki-dark-text-decoration:underline line-through\">all</span><span style=\"color:#40a02b;background-color:#d20f39;--shiki-light-font-style:italic;--shiki-light-text-decoration:underline line-through;--shiki-dark:#a6e3a1;--shiki-dark-bg:#f38ba8;--shiki-dark-font-style:italic;--shiki-dark-text-decoration:underline line-through\">no bold</span><span style=\"color:#40a02b;background-color:#d20f39;--shiki-light-text-decoration:underline line-through;--shiki-dark:#a6e3a1;--shiki-dark-bg:#f38ba8;--shiki-dark-text-decoration:underline line-through\">no italic</span><span style=\"color:#40a02b;background-color:#d20f39;--shiki-light-text-decoration:line-through;--shiki-dark:#a6e3a1;--shiki-dark-bg:#f38ba8;--shiki-dark-text-decoration:line-through\">no underline</span><span style=\"color:#d20f39;background-color:#40a02b;--shiki-light-text-decoration:line-through;--shiki-dark:#f38ba8;--shiki-dark-bg:#a6e3a1;--shiki-dark-text-decoration:line-through\">no reverse</span><span style=\"color:#d20f39;background-color:#40a02b;--shiki-dark:#f38ba8;--shiki-dark-bg:#a6e3a1\">no strike</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "resetting colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31;42mboth\u001b[39mbackground\u001b[49mnone\u001b[31mred\u001b[0mnone</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#d20f39;background-color:#40a02b;--shiki-dark:#f38ba8;--shiki-dark-bg:#a6e3a1\">both</span><span style=\"color:#4c4f69;background-color:#40a02b;--shiki-dark:#cdd6f4;--shiki-dark-bg:#a6e3a1\">background</span><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\">none</span><span style=\"color:#d20f39;--shiki-dark:#f38ba8\">red</span><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\">none</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "21 resets bold and an empty sequence nothing",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1;31mbold\u001b[21mred\u001b[mstill red</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#d20f39;--shiki-light-font-weight:bold;--shiki-dark:#f38ba8;--shiki-dark-font-weight:bold\">bold</span><span style=\"color:#d20f39;--shiki-dark:#f38ba8\">red</span><span style=\"color:#d20f39;--shiki-dark:#f38ba8\">still red</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a reset after a color in one sequence",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31;0mred\u001b[0;32mgreen\u001b[1;0mplain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#d20f39;--shiki-dark:#f38ba8\">red</span><span style=\"color:#40a02b;--shiki-dark:#a6e3a1\">green</span><span style=\"color:#4c4f69;--shiki-light-font-weight:bold;--shiki-dark:#cdd6f4;--shiki-dark-font-weight:bold\">plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "styles carry over lines",
+        "input": "<pre><code class=\"language-ansi\">\u001b[32mgreen\nstill green\u001b[0m\nplain\r\n\u001b[1mbold\r\nbold</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#40a02b;--shiki-dark:#a6e3a1\">green</span></span>\n<span class=\"line\"><span style=\"color:#40a02b;--shiki-dark:#a6e3a1\">still green</span></span>\n<span class=\"line\"><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\">plain</span></span>\n<span class=\"line\"><span style=\"color:#4c4f69;--shiki-light-font-weight:bold;--shiki-dark:#cdd6f4;--shiki-dark-font-weight:bold\">bold</span></span>\n<span class=\"line\"><span style=\"color:#4c4f69;--shiki-light-font-weight:bold;--shiki-dark:#cdd6f4;--shiki-dark-font-weight:bold\">bold</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "whitespace between colored words",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31mred\u001b[0m   \u001b[32mgreen\u001b[0m  </code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#d20f39;--shiki-dark:#f38ba8\">red</span><span style=\"color:#40a02b;--shiki-dark:#a6e3a1\">   green</span><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\">  </span></span></code></pre>"
+        }
+      },
+      {
+        "description": "whitespace before an underlined word",
+        "input": "<pre><code class=\"language-ansi\">  \u001b[4munderlined\u001b[0m \u001b[9m struck</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#4c4f69;--shiki-light-text-decoration:underline;--shiki-dark:#cdd6f4;--shiki-dark-text-decoration:underline\">  underlined</span><span style=\"color:#4c4f69;--shiki-light-text-decoration:line-through;--shiki-dark:#cdd6f4;--shiki-dark-text-decoration:line-through\">  struck</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a line of escapes alone",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31m\n\u001b[0m\u001b[1m\ntext</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"></span>\n<span class=\"line\"></span>\n<span class=\"line\"><span style=\"color:#4c4f69;--shiki-light-font-weight:bold;--shiki-dark:#cdd6f4;--shiki-dark-font-weight:bold\">text</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "an escape starting no sequence",
+        "input": "<pre><code class=\"language-ansi\">a\u001bb \u001b[31mc</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\">a\u001bb \u001b[31mc</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a sequence never closed",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31mred \u001b[1;32 green</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#d20f39;--shiki-dark:#f38ba8\">red \u001b[1;32 green</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "unknown codes",
+        "input": "<pre><code class=\"language-ansi\">\u001b[5;6;10;50;99;108;-1;foomblink</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\">blink</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a test run's log",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1m\u001b[32m✓\u001b[39m\u001b[22m parses \u001b[2m(3 ms)\u001b[22m\n\u001b[1m\u001b[31m✗\u001b[39m\u001b[22m formats\n  \u001b[31mExpected:\u001b[39m \u001b[32m\"a\"\u001b[39m\n  \u001b[90mat \u001b[4mtest.ts:1:2\u001b[24m\u001b[39m</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#40a02b;--shiki-light-font-weight:bold;--shiki-dark:#a6e3a1;--shiki-dark-font-weight:bold\">✓</span><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\"> parses </span><span style=\"color:#4c4f6980;--shiki-dark:#cdd6f480\">(3 ms)</span></span>\n<span class=\"line\"><span style=\"color:#d20f39;--shiki-light-font-weight:bold;--shiki-dark:#f38ba8;--shiki-dark-font-weight:bold\">✗</span><span style=\"color:#4c4f69;--shiki-dark:#cdd6f4\"> formats</span></span>\n<span class=\"line\"><span style=\"color:#d20f39;--shiki-dark:#f38ba8\">  Expected:</span><span style=\"color:#40a02b;--shiki-dark:#a6e3a1\"> \"a\"</span></span>\n<span class=\"line\"><span style=\"color:#6c6f85;--shiki-dark:#585b70\">  at </span><span style=\"color:#6c6f85;--shiki-light-text-decoration:underline;--shiki-dark:#585b70;--shiki-dark-text-decoration:underline\">test.ts:1:2</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "an empty block",
+        "input": "<pre><code class=\"language-ansi\"></code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "ansi under github-light / github-dark",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/core/src/highlight/code-to-tokens-ansi.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "github-light",
+            "dark": "github-dark"
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "plain text",
+        "input": "<pre><code class=\"language-ansi\">hello world\nsecond line</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#24292e;--shiki-dark:#e1e4e8\">hello world</span></span>\n<span class=\"line\"><span style=\"color:#24292e;--shiki-dark:#e1e4e8\">second line</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "the 8 foreground colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[30mc30 \u001b[31mc31 \u001b[32mc32 \u001b[33mc33 \u001b[34mc34 \u001b[35mc35 \u001b[36mc36 \u001b[37mc37</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#24292e;--shiki-dark:#586069\">c30 </span><span style=\"color:#d73a49;--shiki-dark:#ea4a5a\">c31 </span><span style=\"color:#28a745;--shiki-dark:#34d058\">c32 </span><span style=\"color:#dbab09;--shiki-dark:#ffea7f\">c33 </span><span style=\"color:#0366d6;--shiki-dark:#2188ff\">c34 </span><span style=\"color:#5a32a3;--shiki-dark:#b392f0\">c35 </span><span style=\"color:#1b7c83;--shiki-dark:#39c5cf\">c36 </span><span style=\"color:#6a737d;--shiki-dark:#d1d5da\">c37</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "the 8 background colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[40mc40 \u001b[41mc41 \u001b[42mc42 \u001b[43mc43 \u001b[44mc44 \u001b[45mc45 \u001b[46mc46 \u001b[47mc47</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#24292e;background-color:#24292e;--shiki-dark:#e1e4e8;--shiki-dark-bg:#586069\">c40 </span><span style=\"color:#24292e;background-color:#d73a49;--shiki-dark:#e1e4e8;--shiki-dark-bg:#ea4a5a\">c41 </span><span style=\"color:#24292e;background-color:#28a745;--shiki-dark:#e1e4e8;--shiki-dark-bg:#34d058\">c42 </span><span style=\"color:#24292e;background-color:#dbab09;--shiki-dark:#e1e4e8;--shiki-dark-bg:#ffea7f\">c43 </span><span style=\"color:#24292e;background-color:#0366d6;--shiki-dark:#e1e4e8;--shiki-dark-bg:#2188ff\">c44 </span><span style=\"color:#24292e;background-color:#5a32a3;--shiki-dark:#e1e4e8;--shiki-dark-bg:#b392f0\">c45 </span><span style=\"color:#24292e;background-color:#1b7c83;--shiki-dark:#e1e4e8;--shiki-dark-bg:#39c5cf\">c46 </span><span style=\"color:#24292e;background-color:#6a737d;--shiki-dark:#e1e4e8;--shiki-dark-bg:#d1d5da\">c47</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "the 8 bright foreground colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[90mc90 \u001b[91mc91 \u001b[92mc92 \u001b[93mc93 \u001b[94mc94 \u001b[95mc95 \u001b[96mc96 \u001b[97mc97</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#959da5;--shiki-dark:#959da5\">c90 </span><span style=\"color:#cb2431;--shiki-dark:#f97583\">c91 </span><span style=\"color:#22863a;--shiki-dark:#85e89d\">c92 </span><span style=\"color:#b08800;--shiki-dark:#ffea7f\">c93 </span><span style=\"color:#005cc5;--shiki-dark:#79b8ff\">c94 </span><span style=\"color:#5a32a3;--shiki-dark:#b392f0\">c95 </span><span style=\"color:#3192aa;--shiki-dark:#56d4dd\">c96 </span><span style=\"color:#d1d5da;--shiki-dark:#fafbfc\">c97</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "the 8 bright background colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[100mc100 \u001b[101mc101 \u001b[102mc102 \u001b[103mc103 \u001b[104mc104 \u001b[105mc105 \u001b[106mc106 \u001b[107mc107</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#24292e;background-color:#959da5;--shiki-dark:#e1e4e8;--shiki-dark-bg:#959da5\">c100 </span><span style=\"color:#24292e;background-color:#cb2431;--shiki-dark:#e1e4e8;--shiki-dark-bg:#f97583\">c101 </span><span style=\"color:#24292e;background-color:#22863a;--shiki-dark:#e1e4e8;--shiki-dark-bg:#85e89d\">c102 </span><span style=\"color:#24292e;background-color:#b08800;--shiki-dark:#e1e4e8;--shiki-dark-bg:#ffea7f\">c103 </span><span style=\"color:#24292e;background-color:#005cc5;--shiki-dark:#e1e4e8;--shiki-dark-bg:#79b8ff\">c104 </span><span style=\"color:#24292e;background-color:#5a32a3;--shiki-dark:#e1e4e8;--shiki-dark-bg:#b392f0\">c105 </span><span style=\"color:#24292e;background-color:#3192aa;--shiki-dark:#e1e4e8;--shiki-dark-bg:#56d4dd\">c106 </span><span style=\"color:#24292e;background-color:#d1d5da;--shiki-dark:#e1e4e8;--shiki-dark-bg:#fafbfc\">c107</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "foreground and background together",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31;42mred on green\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#d73a49;background-color:#28a745;--shiki-dark:#ea4a5a;--shiki-dark-bg:#34d058\">red on green</span><span style=\"color:#24292e;--shiki-dark:#e1e4e8\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "256 colors, foreground",
+        "input": "<pre><code class=\"language-ansi\">\u001b[38;5;0mc0\u001b[38;5;9mc9\u001b[38;5;15mc15\u001b[38;5;16mc16\u001b[38;5;21mc21\u001b[38;5;100mc100\u001b[38;5;196mc196\u001b[38;5;231mc231\u001b[38;5;232mc232\u001b[38;5;244mc244\u001b[38;5;255mc255</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#24292e;--shiki-dark:#586069\">c0</span><span style=\"color:#cb2431;--shiki-dark:#f97583\">c9</span><span style=\"color:#d1d5da;--shiki-dark:#fafbfc\">c15</span><span style=\"color:#000000;--shiki-dark:#000000\">c16</span><span style=\"color:#0000ff;--shiki-dark:#0000ff\">c21</span><span style=\"color:#878700;--shiki-dark:#878700\">c100</span><span style=\"color:#ff0000;--shiki-dark:#ff0000\">c196</span><span style=\"color:#ffffff;--shiki-dark:#ffffff\">c231</span><span style=\"color:#080808;--shiki-dark:#080808\">c232</span><span style=\"color:#808080;--shiki-dark:#808080\">c244</span><span style=\"color:#eeeeee;--shiki-dark:#eeeeee\">c255</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "256 colors, background",
+        "input": "<pre><code class=\"language-ansi\">\u001b[48;5;0mc0\u001b[48;5;9mc9\u001b[48;5;16mc16\u001b[48;5;124mc124\u001b[48;5;231mc231\u001b[48;5;240mc240\u001b[48;5;255mc255</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#24292e;background-color:#24292e;--shiki-dark:#e1e4e8;--shiki-dark-bg:#586069\">c0</span><span style=\"color:#24292e;background-color:#cb2431;--shiki-dark:#e1e4e8;--shiki-dark-bg:#f97583\">c9</span><span style=\"color:#24292e;background-color:#000000;--shiki-dark:#e1e4e8;--shiki-dark-bg:#000000\">c16</span><span style=\"color:#24292e;background-color:#af0000;--shiki-dark:#e1e4e8;--shiki-dark-bg:#af0000\">c124</span><span style=\"color:#24292e;background-color:#ffffff;--shiki-dark:#e1e4e8;--shiki-dark-bg:#ffffff\">c231</span><span style=\"color:#24292e;background-color:#585858;--shiki-dark:#e1e4e8;--shiki-dark-bg:#585858\">c240</span><span style=\"color:#24292e;background-color:#eeeeee;--shiki-dark:#e1e4e8;--shiki-dark-bg:#eeeeee\">c255</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "256 colors past the table and not a number",
+        "input": "<pre><code class=\"language-ansi\">\u001b[38;5;256mpast\u001b[38;5;xmword\u001b[38;5;0x10mhex\u001b[38;5; mspace</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span>past</span><span>word</span><span style=\"color:#000000;--shiki-dark:#000000\">hex</span><span style=\"color:#24292e;--shiki-dark:#586069\">space</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "RGB colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[38;2;255;128;0morange\u001b[48;2;10;20;30mon navy\u001b[0m \u001b[38;2;300;-5;7mclamped</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#ff8000;--shiki-dark:#ff8000\">orange</span><span style=\"color:#ff8000;background-color:#0a141e;--shiki-dark:#ff8000;--shiki-dark-bg:#0a141e\">on navy</span><span style=\"color:#ff0007;--shiki-dark:#ff0007\"> clamped</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "an RGB color missing a channel",
+        "input": "<pre><code class=\"language-ansi\">\u001b[38;2;1;2mshort\u001b[38;2;1;x;3;31mnot a number</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#24292e;--shiki-dark:#e1e4e8\">short</span><span style=\"color:#d73a49;--shiki-dark:#ea4a5a\">not a number</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "bold",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1mbold\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#24292e;--shiki-light-font-weight:bold;--shiki-dark:#e1e4e8;--shiki-dark-font-weight:bold\">bold</span><span style=\"color:#24292e;--shiki-dark:#e1e4e8\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "dim",
+        "input": "<pre><code class=\"language-ansi\">\u001b[2mdim\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#24292e80;--shiki-dark:#e1e4e880\">dim</span><span style=\"color:#24292e;--shiki-dark:#e1e4e8\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "italic",
+        "input": "<pre><code class=\"language-ansi\">\u001b[3mitalic\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#24292e;--shiki-light-font-style:italic;--shiki-dark:#e1e4e8;--shiki-dark-font-style:italic\">italic</span><span style=\"color:#24292e;--shiki-dark:#e1e4e8\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "underline",
+        "input": "<pre><code class=\"language-ansi\">\u001b[4munderline\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#24292e;--shiki-light-text-decoration:underline;--shiki-dark:#e1e4e8;--shiki-dark-text-decoration:underline\">underline</span><span style=\"color:#24292e;--shiki-dark:#e1e4e8\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "strikethrough",
+        "input": "<pre><code class=\"language-ansi\">\u001b[9mstruck\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#24292e;--shiki-light-text-decoration:line-through;--shiki-dark:#e1e4e8;--shiki-dark-text-decoration:line-through\">struck</span><span style=\"color:#24292e;--shiki-dark:#e1e4e8\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "reverse",
+        "input": "<pre><code class=\"language-ansi\">\u001b[7mreversed\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#fff;background-color:#24292e;--shiki-dark:#24292e;--shiki-dark-bg:#e1e4e8\">reversed</span><span style=\"color:#24292e;--shiki-dark:#e1e4e8\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "reverse with colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[7;31mred\u001b[42mred on green\u001b[39mon green</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#fff;background-color:#d73a49;--shiki-dark:#24292e;--shiki-dark-bg:#ea4a5a\">red</span><span style=\"color:#28a745;background-color:#d73a49;--shiki-dark:#34d058;--shiki-dark-bg:#ea4a5a\">red on green</span><span style=\"color:#28a745;background-color:#24292e;--shiki-dark:#34d058;--shiki-dark-bg:#e1e4e8\">on green</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "every decoration at once",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1;3;4;9;31mall\u001b[0m</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#d73a49;--shiki-light-font-style:italic;--shiki-light-font-weight:bold;--shiki-light-text-decoration:underline line-through;--shiki-dark:#ea4a5a;--shiki-dark-font-style:italic;--shiki-dark-font-weight:bold;--shiki-dark-text-decoration:underline line-through\">all</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "dim colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[2;31mred\u001b[38;5;100mtable\u001b[38;2;1;2;3mrgb\u001b[91mbright</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#d73a4980;--shiki-dark:#ea4a5a80\">red</span><span style=\"color:#87870080;--shiki-dark:#87870080\">table</span><span style=\"color:#01020380;--shiki-dark:#01020380\">rgb</span><span style=\"color:#cb243180;--shiki-dark:#f9758380\">bright</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "hidden and overline make no style",
+        "input": "<pre><code class=\"language-ansi\">\u001b[8mhidden\u001b[28m \u001b[53mover\u001b[55mline</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#24292e;--shiki-dark:#e1e4e8\">hidden</span><span style=\"color:#24292e;--shiki-dark:#e1e4e8\"> over</span><span style=\"color:#24292e;--shiki-dark:#e1e4e8\">line</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "resetting each decoration",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1;2;3;4;7;9;31;42mall\u001b[22mno bold\u001b[23mno italic\u001b[24mno underline\u001b[27mno reverse\u001b[29mno strike</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#28a74580;background-color:#d73a49;--shiki-light-font-style:italic;--shiki-light-font-weight:bold;--shiki-light-text-decoration:underline line-through;--shiki-dark:#34d05880;--shiki-dark-bg:#ea4a5a;--shiki-dark-font-style:italic;--shiki-dark-font-weight:bold;--shiki-dark-text-decoration:underline line-through\">all</span><span style=\"color:#28a745;background-color:#d73a49;--shiki-light-font-style:italic;--shiki-light-text-decoration:underline line-through;--shiki-dark:#34d058;--shiki-dark-bg:#ea4a5a;--shiki-dark-font-style:italic;--shiki-dark-text-decoration:underline line-through\">no bold</span><span style=\"color:#28a745;background-color:#d73a49;--shiki-light-text-decoration:underline line-through;--shiki-dark:#34d058;--shiki-dark-bg:#ea4a5a;--shiki-dark-text-decoration:underline line-through\">no italic</span><span style=\"color:#28a745;background-color:#d73a49;--shiki-light-text-decoration:line-through;--shiki-dark:#34d058;--shiki-dark-bg:#ea4a5a;--shiki-dark-text-decoration:line-through\">no underline</span><span style=\"color:#d73a49;background-color:#28a745;--shiki-light-text-decoration:line-through;--shiki-dark:#ea4a5a;--shiki-dark-bg:#34d058;--shiki-dark-text-decoration:line-through\">no reverse</span><span style=\"color:#d73a49;background-color:#28a745;--shiki-dark:#ea4a5a;--shiki-dark-bg:#34d058\">no strike</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "resetting colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31;42mboth\u001b[39mbackground\u001b[49mnone\u001b[31mred\u001b[0mnone</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#d73a49;background-color:#28a745;--shiki-dark:#ea4a5a;--shiki-dark-bg:#34d058\">both</span><span style=\"color:#24292e;background-color:#28a745;--shiki-dark:#e1e4e8;--shiki-dark-bg:#34d058\">background</span><span style=\"color:#24292e;--shiki-dark:#e1e4e8\">none</span><span style=\"color:#d73a49;--shiki-dark:#ea4a5a\">red</span><span style=\"color:#24292e;--shiki-dark:#e1e4e8\">none</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "21 resets bold and an empty sequence nothing",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1;31mbold\u001b[21mred\u001b[mstill red</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#d73a49;--shiki-light-font-weight:bold;--shiki-dark:#ea4a5a;--shiki-dark-font-weight:bold\">bold</span><span style=\"color:#d73a49;--shiki-dark:#ea4a5a\">red</span><span style=\"color:#d73a49;--shiki-dark:#ea4a5a\">still red</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a reset after a color in one sequence",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31;0mred\u001b[0;32mgreen\u001b[1;0mplain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#d73a49;--shiki-dark:#ea4a5a\">red</span><span style=\"color:#28a745;--shiki-dark:#34d058\">green</span><span style=\"color:#24292e;--shiki-light-font-weight:bold;--shiki-dark:#e1e4e8;--shiki-dark-font-weight:bold\">plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "styles carry over lines",
+        "input": "<pre><code class=\"language-ansi\">\u001b[32mgreen\nstill green\u001b[0m\nplain\r\n\u001b[1mbold\r\nbold</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#28a745;--shiki-dark:#34d058\">green</span></span>\n<span class=\"line\"><span style=\"color:#28a745;--shiki-dark:#34d058\">still green</span></span>\n<span class=\"line\"><span style=\"color:#24292e;--shiki-dark:#e1e4e8\">plain</span></span>\n<span class=\"line\"><span style=\"color:#24292e;--shiki-light-font-weight:bold;--shiki-dark:#e1e4e8;--shiki-dark-font-weight:bold\">bold</span></span>\n<span class=\"line\"><span style=\"color:#24292e;--shiki-light-font-weight:bold;--shiki-dark:#e1e4e8;--shiki-dark-font-weight:bold\">bold</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "whitespace between colored words",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31mred\u001b[0m   \u001b[32mgreen\u001b[0m  </code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#d73a49;--shiki-dark:#ea4a5a\">red</span><span style=\"color:#28a745;--shiki-dark:#34d058\">   green</span><span style=\"color:#24292e;--shiki-dark:#e1e4e8\">  </span></span></code></pre>"
+        }
+      },
+      {
+        "description": "whitespace before an underlined word",
+        "input": "<pre><code class=\"language-ansi\">  \u001b[4munderlined\u001b[0m \u001b[9m struck</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#24292e;--shiki-light-text-decoration:underline;--shiki-dark:#e1e4e8;--shiki-dark-text-decoration:underline\">  underlined</span><span style=\"color:#24292e;--shiki-light-text-decoration:line-through;--shiki-dark:#e1e4e8;--shiki-dark-text-decoration:line-through\">  struck</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a line of escapes alone",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31m\n\u001b[0m\u001b[1m\ntext</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"></span>\n<span class=\"line\"></span>\n<span class=\"line\"><span style=\"color:#24292e;--shiki-light-font-weight:bold;--shiki-dark:#e1e4e8;--shiki-dark-font-weight:bold\">text</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "an escape starting no sequence",
+        "input": "<pre><code class=\"language-ansi\">a\u001bb \u001b[31mc</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#24292e;--shiki-dark:#e1e4e8\">a\u001bb \u001b[31mc</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a sequence never closed",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31mred \u001b[1;32 green</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#d73a49;--shiki-dark:#ea4a5a\">red \u001b[1;32 green</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "unknown codes",
+        "input": "<pre><code class=\"language-ansi\">\u001b[5;6;10;50;99;108;-1;foomblink</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#24292e;--shiki-dark:#e1e4e8\">blink</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a test run's log",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1m\u001b[32m✓\u001b[39m\u001b[22m parses \u001b[2m(3 ms)\u001b[22m\n\u001b[1m\u001b[31m✗\u001b[39m\u001b[22m formats\n  \u001b[31mExpected:\u001b[39m \u001b[32m\"a\"\u001b[39m\n  \u001b[90mat \u001b[4mtest.ts:1:2\u001b[24m\u001b[39m</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#28a745;--shiki-light-font-weight:bold;--shiki-dark:#34d058;--shiki-dark-font-weight:bold\">✓</span><span style=\"color:#24292e;--shiki-dark:#e1e4e8\"> parses </span><span style=\"color:#24292e80;--shiki-dark:#e1e4e880\">(3 ms)</span></span>\n<span class=\"line\"><span style=\"color:#d73a49;--shiki-light-font-weight:bold;--shiki-dark:#ea4a5a;--shiki-dark-font-weight:bold\">✗</span><span style=\"color:#24292e;--shiki-dark:#e1e4e8\"> formats</span></span>\n<span class=\"line\"><span style=\"color:#d73a49;--shiki-dark:#ea4a5a\">  Expected:</span><span style=\"color:#28a745;--shiki-dark:#34d058\"> \"a\"</span></span>\n<span class=\"line\"><span style=\"color:#959da5;--shiki-dark:#959da5\">  at </span><span style=\"color:#959da5;--shiki-light-text-decoration:underline;--shiki-dark:#959da5;--shiki-dark-text-decoration:underline\">test.ts:1:2</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "an empty block",
+        "input": "<pre><code class=\"language-ansi\"></code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8\" tabindex=\"0\"><code><span class=\"line\"></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "ansi under one theme with an alpha in its foreground",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/core/src/highlight/code-to-tokens-ansi.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.highlight",
+        {
+          "theme": "vitesse-dark"
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "plain text",
+        "input": "<pre><code class=\"language-ansi\">hello world\nsecond line</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#dbd7caee\">hello world</span></span>\n<span class=\"line\"><span style=\"color:#dbd7caee\">second line</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "the 8 foreground colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[30mc30 \u001b[31mc31 \u001b[32mc32 \u001b[33mc33 \u001b[34mc34 \u001b[35mc35 \u001b[36mc36 \u001b[37mc37</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#393a34\">c30 </span><span style=\"color:#cb7676\">c31 </span><span style=\"color:#4d9375\">c32 </span><span style=\"color:#e6cc77\">c33 </span><span style=\"color:#6394bf\">c34 </span><span style=\"color:#d9739f\">c35 </span><span style=\"color:#5eaab5\">c36 </span><span style=\"color:#dbd7ca\">c37</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "the 8 background colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[40mc40 \u001b[41mc41 \u001b[42mc42 \u001b[43mc43 \u001b[44mc44 \u001b[45mc45 \u001b[46mc46 \u001b[47mc47</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#dbd7caee;background-color:#393a34\">c40 </span><span style=\"color:#dbd7caee;background-color:#cb7676\">c41 </span><span style=\"color:#dbd7caee;background-color:#4d9375\">c42 </span><span style=\"color:#dbd7caee;background-color:#e6cc77\">c43 </span><span style=\"color:#dbd7caee;background-color:#6394bf\">c44 </span><span style=\"color:#dbd7caee;background-color:#d9739f\">c45 </span><span style=\"color:#dbd7caee;background-color:#5eaab5\">c46 </span><span style=\"color:#dbd7caee;background-color:#dbd7ca\">c47</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "the 8 bright foreground colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[90mc90 \u001b[91mc91 \u001b[92mc92 \u001b[93mc93 \u001b[94mc94 \u001b[95mc95 \u001b[96mc96 \u001b[97mc97</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#777777\">c90 </span><span style=\"color:#cb7676\">c91 </span><span style=\"color:#4d9375\">c92 </span><span style=\"color:#e6cc77\">c93 </span><span style=\"color:#6394bf\">c94 </span><span style=\"color:#d9739f\">c95 </span><span style=\"color:#5eaab5\">c96 </span><span style=\"color:#ffffff\">c97</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "the 8 bright background colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[100mc100 \u001b[101mc101 \u001b[102mc102 \u001b[103mc103 \u001b[104mc104 \u001b[105mc105 \u001b[106mc106 \u001b[107mc107</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#dbd7caee;background-color:#777777\">c100 </span><span style=\"color:#dbd7caee;background-color:#cb7676\">c101 </span><span style=\"color:#dbd7caee;background-color:#4d9375\">c102 </span><span style=\"color:#dbd7caee;background-color:#e6cc77\">c103 </span><span style=\"color:#dbd7caee;background-color:#6394bf\">c104 </span><span style=\"color:#dbd7caee;background-color:#d9739f\">c105 </span><span style=\"color:#dbd7caee;background-color:#5eaab5\">c106 </span><span style=\"color:#dbd7caee;background-color:#ffffff\">c107</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "foreground and background together",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31;42mred on green\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#cb7676;background-color:#4d9375\">red on green</span><span style=\"color:#dbd7caee\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "256 colors, foreground",
+        "input": "<pre><code class=\"language-ansi\">\u001b[38;5;0mc0\u001b[38;5;9mc9\u001b[38;5;15mc15\u001b[38;5;16mc16\u001b[38;5;21mc21\u001b[38;5;100mc100\u001b[38;5;196mc196\u001b[38;5;231mc231\u001b[38;5;232mc232\u001b[38;5;244mc244\u001b[38;5;255mc255</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#393a34\">c0</span><span style=\"color:#cb7676\">c9</span><span style=\"color:#ffffff\">c15</span><span style=\"color:#000000\">c16</span><span style=\"color:#0000ff\">c21</span><span style=\"color:#878700\">c100</span><span style=\"color:#ff0000\">c196</span><span style=\"color:#ffffff\">c231</span><span style=\"color:#080808\">c232</span><span style=\"color:#808080\">c244</span><span style=\"color:#eeeeee\">c255</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "256 colors, background",
+        "input": "<pre><code class=\"language-ansi\">\u001b[48;5;0mc0\u001b[48;5;9mc9\u001b[48;5;16mc16\u001b[48;5;124mc124\u001b[48;5;231mc231\u001b[48;5;240mc240\u001b[48;5;255mc255</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#dbd7caee;background-color:#393a34\">c0</span><span style=\"color:#dbd7caee;background-color:#cb7676\">c9</span><span style=\"color:#dbd7caee;background-color:#000000\">c16</span><span style=\"color:#dbd7caee;background-color:#af0000\">c124</span><span style=\"color:#dbd7caee;background-color:#ffffff\">c231</span><span style=\"color:#dbd7caee;background-color:#585858\">c240</span><span style=\"color:#dbd7caee;background-color:#eeeeee\">c255</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "256 colors past the table and not a number",
+        "input": "<pre><code class=\"language-ansi\">\u001b[38;5;256mpast\u001b[38;5;xmword\u001b[38;5;0x10mhex\u001b[38;5; mspace</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span>past</span><span>word</span><span style=\"color:#000000\">hex</span><span style=\"color:#393a34\">space</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "RGB colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[38;2;255;128;0morange\u001b[48;2;10;20;30mon navy\u001b[0m \u001b[38;2;300;-5;7mclamped</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#ff8000\">orange</span><span style=\"color:#ff8000;background-color:#0a141e\">on navy</span><span style=\"color:#ff0007\"> clamped</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "an RGB color missing a channel",
+        "input": "<pre><code class=\"language-ansi\">\u001b[38;2;1;2mshort\u001b[38;2;1;x;3;31mnot a number</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#dbd7caee\">short</span><span style=\"color:#cb7676\">not a number</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "bold",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1mbold\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#dbd7caee;font-weight:bold\">bold</span><span style=\"color:#dbd7caee\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "dim",
+        "input": "<pre><code class=\"language-ansi\">\u001b[2mdim\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#dbd7ca77\">dim</span><span style=\"color:#dbd7caee\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "italic",
+        "input": "<pre><code class=\"language-ansi\">\u001b[3mitalic\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#dbd7caee;font-style:italic\">italic</span><span style=\"color:#dbd7caee\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "underline",
+        "input": "<pre><code class=\"language-ansi\">\u001b[4munderline\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#dbd7caee;text-decoration:underline\">underline</span><span style=\"color:#dbd7caee\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "strikethrough",
+        "input": "<pre><code class=\"language-ansi\">\u001b[9mstruck\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#dbd7caee;text-decoration:line-through\">struck</span><span style=\"color:#dbd7caee\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "reverse",
+        "input": "<pre><code class=\"language-ansi\">\u001b[7mreversed\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#121212;background-color:#dbd7caee\">reversed</span><span style=\"color:#dbd7caee\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "reverse with colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[7;31mred\u001b[42mred on green\u001b[39mon green</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#121212;background-color:#cb7676\">red</span><span style=\"color:#4d9375;background-color:#cb7676\">red on green</span><span style=\"color:#4d9375;background-color:#dbd7caee\">on green</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "every decoration at once",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1;3;4;9;31mall\u001b[0m</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#cb7676;font-style:italic;font-weight:bold;text-decoration:underline line-through\">all</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "dim colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[2;31mred\u001b[38;5;100mtable\u001b[38;2;1;2;3mrgb\u001b[91mbright</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#cb767680\">red</span><span style=\"color:#87870080\">table</span><span style=\"color:#01020380\">rgb</span><span style=\"color:#cb767680\">bright</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "hidden and overline make no style",
+        "input": "<pre><code class=\"language-ansi\">\u001b[8mhidden\u001b[28m \u001b[53mover\u001b[55mline</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#dbd7caee\">hidden</span><span style=\"color:#dbd7caee\"> over</span><span style=\"color:#dbd7caee\">line</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "resetting each decoration",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1;2;3;4;7;9;31;42mall\u001b[22mno bold\u001b[23mno italic\u001b[24mno underline\u001b[27mno reverse\u001b[29mno strike</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#4d937580;background-color:#cb7676;font-style:italic;font-weight:bold;text-decoration:underline line-through\">all</span><span style=\"color:#4d9375;background-color:#cb7676;font-style:italic;text-decoration:underline line-through\">no bold</span><span style=\"color:#4d9375;background-color:#cb7676;text-decoration:underline line-through\">no italic</span><span style=\"color:#4d9375;background-color:#cb7676;text-decoration:line-through\">no underline</span><span style=\"color:#cb7676;background-color:#4d9375;text-decoration:line-through\">no reverse</span><span style=\"color:#cb7676;background-color:#4d9375\">no strike</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "resetting colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31;42mboth\u001b[39mbackground\u001b[49mnone\u001b[31mred\u001b[0mnone</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#cb7676;background-color:#4d9375\">both</span><span style=\"color:#dbd7caee;background-color:#4d9375\">background</span><span style=\"color:#dbd7caee\">none</span><span style=\"color:#cb7676\">red</span><span style=\"color:#dbd7caee\">none</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "21 resets bold and an empty sequence nothing",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1;31mbold\u001b[21mred\u001b[mstill red</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#cb7676;font-weight:bold\">bold</span><span style=\"color:#cb7676\">red</span><span style=\"color:#cb7676\">still red</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a reset after a color in one sequence",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31;0mred\u001b[0;32mgreen\u001b[1;0mplain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#cb7676\">red</span><span style=\"color:#4d9375\">green</span><span style=\"color:#dbd7caee;font-weight:bold\">plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "styles carry over lines",
+        "input": "<pre><code class=\"language-ansi\">\u001b[32mgreen\nstill green\u001b[0m\nplain\r\n\u001b[1mbold\r\nbold</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#4d9375\">green</span></span>\n<span class=\"line\"><span style=\"color:#4d9375\">still green</span></span>\n<span class=\"line\"><span style=\"color:#dbd7caee\">plain</span></span>\n<span class=\"line\"><span style=\"color:#dbd7caee;font-weight:bold\">bold</span></span>\n<span class=\"line\"><span style=\"color:#dbd7caee;font-weight:bold\">bold</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "whitespace between colored words",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31mred\u001b[0m   \u001b[32mgreen\u001b[0m  </code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#cb7676\">red</span><span style=\"color:#4d9375\">   green</span><span style=\"color:#dbd7caee\">  </span></span></code></pre>"
+        }
+      },
+      {
+        "description": "whitespace before an underlined word",
+        "input": "<pre><code class=\"language-ansi\">  \u001b[4munderlined\u001b[0m \u001b[9m struck</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span>  </span><span style=\"color:#dbd7caee;text-decoration:underline\">underlined</span><span> </span><span style=\"color:#dbd7caee;text-decoration:line-through\"> struck</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a line of escapes alone",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31m\n\u001b[0m\u001b[1m\ntext</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"></span>\n<span class=\"line\"></span>\n<span class=\"line\"><span style=\"color:#dbd7caee;font-weight:bold\">text</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "an escape starting no sequence",
+        "input": "<pre><code class=\"language-ansi\">a\u001bb \u001b[31mc</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#dbd7caee\">a\u001bb \u001b[31mc</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a sequence never closed",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31mred \u001b[1;32 green</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#cb7676\">red \u001b[1;32 green</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "unknown codes",
+        "input": "<pre><code class=\"language-ansi\">\u001b[5;6;10;50;99;108;-1;foomblink</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#dbd7caee\">blink</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a test run's log",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1m\u001b[32m✓\u001b[39m\u001b[22m parses \u001b[2m(3 ms)\u001b[22m\n\u001b[1m\u001b[31m✗\u001b[39m\u001b[22m formats\n  \u001b[31mExpected:\u001b[39m \u001b[32m\"a\"\u001b[39m\n  \u001b[90mat \u001b[4mtest.ts:1:2\u001b[24m\u001b[39m</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#4d9375;font-weight:bold\">✓</span><span style=\"color:#dbd7caee\"> parses </span><span style=\"color:#dbd7ca77\">(3 ms)</span></span>\n<span class=\"line\"><span style=\"color:#cb7676;font-weight:bold\">✗</span><span style=\"color:#dbd7caee\"> formats</span></span>\n<span class=\"line\"><span style=\"color:#cb7676\">  Expected:</span><span style=\"color:#4d9375\"> \"a\"</span></span>\n<span class=\"line\"><span style=\"color:#777777\">  at </span><span style=\"color:#777777;text-decoration:underline\">test.ts:1:2</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "an empty block",
+        "input": "<pre><code class=\"language-ansi\"></code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki vitesse-dark\" style=\"background-color:#121212;color:#dbd7caee\" tabindex=\"0\"><code><span class=\"line\"></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "ansi under one theme without terminal colors",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/core/src/highlight/code-to-tokens-ansi.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.highlight",
+        {
+          "theme": "dark-plus"
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "plain text",
+        "input": "<pre><code class=\"language-ansi\">hello world\nsecond line</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#D4D4D4\">hello world</span></span>\n<span class=\"line\"><span style=\"color:#D4D4D4\">second line</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "the 8 foreground colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[30mc30 \u001b[31mc31 \u001b[32mc32 \u001b[33mc33 \u001b[34mc34 \u001b[35mc35 \u001b[36mc36 \u001b[37mc37</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#000000\">c30 </span><span style=\"color:#cd3131\">c31 </span><span style=\"color:#0DBC79\">c32 </span><span style=\"color:#E5E510\">c33 </span><span style=\"color:#2472C8\">c34 </span><span style=\"color:#BC3FBC\">c35 </span><span style=\"color:#11A8CD\">c36 </span><span style=\"color:#E5E5E5\">c37</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "the 8 background colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[40mc40 \u001b[41mc41 \u001b[42mc42 \u001b[43mc43 \u001b[44mc44 \u001b[45mc45 \u001b[46mc46 \u001b[47mc47</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#D4D4D4;background-color:#000000\">c40 </span><span style=\"color:#D4D4D4;background-color:#cd3131\">c41 </span><span style=\"color:#D4D4D4;background-color:#0DBC79\">c42 </span><span style=\"color:#D4D4D4;background-color:#E5E510\">c43 </span><span style=\"color:#D4D4D4;background-color:#2472C8\">c44 </span><span style=\"color:#D4D4D4;background-color:#BC3FBC\">c45 </span><span style=\"color:#D4D4D4;background-color:#11A8CD\">c46 </span><span style=\"color:#D4D4D4;background-color:#E5E5E5\">c47</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "the 8 bright foreground colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[90mc90 \u001b[91mc91 \u001b[92mc92 \u001b[93mc93 \u001b[94mc94 \u001b[95mc95 \u001b[96mc96 \u001b[97mc97</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#666666\">c90 </span><span style=\"color:#F14C4C\">c91 </span><span style=\"color:#23D18B\">c92 </span><span style=\"color:#F5F543\">c93 </span><span style=\"color:#3B8EEA\">c94 </span><span style=\"color:#D670D6\">c95 </span><span style=\"color:#29B8DB\">c96 </span><span style=\"color:#FFFFFF\">c97</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "the 8 bright background colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[100mc100 \u001b[101mc101 \u001b[102mc102 \u001b[103mc103 \u001b[104mc104 \u001b[105mc105 \u001b[106mc106 \u001b[107mc107</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#D4D4D4;background-color:#666666\">c100 </span><span style=\"color:#D4D4D4;background-color:#F14C4C\">c101 </span><span style=\"color:#D4D4D4;background-color:#23D18B\">c102 </span><span style=\"color:#D4D4D4;background-color:#F5F543\">c103 </span><span style=\"color:#D4D4D4;background-color:#3B8EEA\">c104 </span><span style=\"color:#D4D4D4;background-color:#D670D6\">c105 </span><span style=\"color:#D4D4D4;background-color:#29B8DB\">c106 </span><span style=\"color:#D4D4D4;background-color:#FFFFFF\">c107</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "foreground and background together",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31;42mred on green\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#cd3131;background-color:#0DBC79\">red on green</span><span style=\"color:#D4D4D4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "256 colors, foreground",
+        "input": "<pre><code class=\"language-ansi\">\u001b[38;5;0mc0\u001b[38;5;9mc9\u001b[38;5;15mc15\u001b[38;5;16mc16\u001b[38;5;21mc21\u001b[38;5;100mc100\u001b[38;5;196mc196\u001b[38;5;231mc231\u001b[38;5;232mc232\u001b[38;5;244mc244\u001b[38;5;255mc255</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#000000\">c0</span><span style=\"color:#F14C4C\">c9</span><span style=\"color:#FFFFFF\">c15</span><span style=\"color:#000000\">c16</span><span style=\"color:#0000ff\">c21</span><span style=\"color:#878700\">c100</span><span style=\"color:#ff0000\">c196</span><span style=\"color:#ffffff\">c231</span><span style=\"color:#080808\">c232</span><span style=\"color:#808080\">c244</span><span style=\"color:#eeeeee\">c255</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "256 colors, background",
+        "input": "<pre><code class=\"language-ansi\">\u001b[48;5;0mc0\u001b[48;5;9mc9\u001b[48;5;16mc16\u001b[48;5;124mc124\u001b[48;5;231mc231\u001b[48;5;240mc240\u001b[48;5;255mc255</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#D4D4D4;background-color:#000000\">c0</span><span style=\"color:#D4D4D4;background-color:#F14C4C\">c9</span><span style=\"color:#D4D4D4;background-color:#000000\">c16</span><span style=\"color:#D4D4D4;background-color:#af0000\">c124</span><span style=\"color:#D4D4D4;background-color:#ffffff\">c231</span><span style=\"color:#D4D4D4;background-color:#585858\">c240</span><span style=\"color:#D4D4D4;background-color:#eeeeee\">c255</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "256 colors past the table and not a number",
+        "input": "<pre><code class=\"language-ansi\">\u001b[38;5;256mpast\u001b[38;5;xmword\u001b[38;5;0x10mhex\u001b[38;5; mspace</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span>past</span><span>word</span><span style=\"color:#000000\">hex</span><span style=\"color:#000000\">space</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "RGB colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[38;2;255;128;0morange\u001b[48;2;10;20;30mon navy\u001b[0m \u001b[38;2;300;-5;7mclamped</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#ff8000\">orange</span><span style=\"color:#ff8000;background-color:#0a141e\">on navy</span><span style=\"color:#ff0007\"> clamped</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "an RGB color missing a channel",
+        "input": "<pre><code class=\"language-ansi\">\u001b[38;2;1;2mshort\u001b[38;2;1;x;3;31mnot a number</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#D4D4D4\">short</span><span style=\"color:#cd3131\">not a number</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "bold",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1mbold\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#D4D4D4;font-weight:bold\">bold</span><span style=\"color:#D4D4D4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "dim",
+        "input": "<pre><code class=\"language-ansi\">\u001b[2mdim\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#D4D4D480\">dim</span><span style=\"color:#D4D4D4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "italic",
+        "input": "<pre><code class=\"language-ansi\">\u001b[3mitalic\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#D4D4D4;font-style:italic\">italic</span><span style=\"color:#D4D4D4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "underline",
+        "input": "<pre><code class=\"language-ansi\">\u001b[4munderline\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#D4D4D4;text-decoration:underline\">underline</span><span style=\"color:#D4D4D4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "strikethrough",
+        "input": "<pre><code class=\"language-ansi\">\u001b[9mstruck\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#D4D4D4;text-decoration:line-through\">struck</span><span style=\"color:#D4D4D4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "reverse",
+        "input": "<pre><code class=\"language-ansi\">\u001b[7mreversed\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#1E1E1E;background-color:#D4D4D4\">reversed</span><span style=\"color:#D4D4D4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "reverse with colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[7;31mred\u001b[42mred on green\u001b[39mon green</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#1E1E1E;background-color:#cd3131\">red</span><span style=\"color:#0DBC79;background-color:#cd3131\">red on green</span><span style=\"color:#0DBC79;background-color:#D4D4D4\">on green</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "every decoration at once",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1;3;4;9;31mall\u001b[0m</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#cd3131;font-style:italic;font-weight:bold;text-decoration:underline line-through\">all</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "dim colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[2;31mred\u001b[38;5;100mtable\u001b[38;2;1;2;3mrgb\u001b[91mbright</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#cd313180\">red</span><span style=\"color:#87870080\">table</span><span style=\"color:#01020380\">rgb</span><span style=\"color:#F14C4C80\">bright</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "hidden and overline make no style",
+        "input": "<pre><code class=\"language-ansi\">\u001b[8mhidden\u001b[28m \u001b[53mover\u001b[55mline</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#D4D4D4\">hidden</span><span style=\"color:#D4D4D4\"> over</span><span style=\"color:#D4D4D4\">line</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "resetting each decoration",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1;2;3;4;7;9;31;42mall\u001b[22mno bold\u001b[23mno italic\u001b[24mno underline\u001b[27mno reverse\u001b[29mno strike</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#0DBC7980;background-color:#cd3131;font-style:italic;font-weight:bold;text-decoration:underline line-through\">all</span><span style=\"color:#0DBC79;background-color:#cd3131;font-style:italic;text-decoration:underline line-through\">no bold</span><span style=\"color:#0DBC79;background-color:#cd3131;text-decoration:underline line-through\">no italic</span><span style=\"color:#0DBC79;background-color:#cd3131;text-decoration:line-through\">no underline</span><span style=\"color:#cd3131;background-color:#0DBC79;text-decoration:line-through\">no reverse</span><span style=\"color:#cd3131;background-color:#0DBC79\">no strike</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "resetting colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31;42mboth\u001b[39mbackground\u001b[49mnone\u001b[31mred\u001b[0mnone</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#cd3131;background-color:#0DBC79\">both</span><span style=\"color:#D4D4D4;background-color:#0DBC79\">background</span><span style=\"color:#D4D4D4\">none</span><span style=\"color:#cd3131\">red</span><span style=\"color:#D4D4D4\">none</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "21 resets bold and an empty sequence nothing",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1;31mbold\u001b[21mred\u001b[mstill red</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#cd3131;font-weight:bold\">bold</span><span style=\"color:#cd3131\">red</span><span style=\"color:#cd3131\">still red</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a reset after a color in one sequence",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31;0mred\u001b[0;32mgreen\u001b[1;0mplain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#cd3131\">red</span><span style=\"color:#0DBC79\">green</span><span style=\"color:#D4D4D4;font-weight:bold\">plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "styles carry over lines",
+        "input": "<pre><code class=\"language-ansi\">\u001b[32mgreen\nstill green\u001b[0m\nplain\r\n\u001b[1mbold\r\nbold</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#0DBC79\">green</span></span>\n<span class=\"line\"><span style=\"color:#0DBC79\">still green</span></span>\n<span class=\"line\"><span style=\"color:#D4D4D4\">plain</span></span>\n<span class=\"line\"><span style=\"color:#D4D4D4;font-weight:bold\">bold</span></span>\n<span class=\"line\"><span style=\"color:#D4D4D4;font-weight:bold\">bold</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "whitespace between colored words",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31mred\u001b[0m   \u001b[32mgreen\u001b[0m  </code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#cd3131\">red</span><span style=\"color:#0DBC79\">   green</span><span style=\"color:#D4D4D4\">  </span></span></code></pre>"
+        }
+      },
+      {
+        "description": "whitespace before an underlined word",
+        "input": "<pre><code class=\"language-ansi\">  \u001b[4munderlined\u001b[0m \u001b[9m struck</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span>  </span><span style=\"color:#D4D4D4;text-decoration:underline\">underlined</span><span> </span><span style=\"color:#D4D4D4;text-decoration:line-through\"> struck</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a line of escapes alone",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31m\n\u001b[0m\u001b[1m\ntext</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"></span>\n<span class=\"line\"></span>\n<span class=\"line\"><span style=\"color:#D4D4D4;font-weight:bold\">text</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "an escape starting no sequence",
+        "input": "<pre><code class=\"language-ansi\">a\u001bb \u001b[31mc</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#D4D4D4\">a\u001bb \u001b[31mc</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a sequence never closed",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31mred \u001b[1;32 green</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#cd3131\">red \u001b[1;32 green</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "unknown codes",
+        "input": "<pre><code class=\"language-ansi\">\u001b[5;6;10;50;99;108;-1;foomblink</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#D4D4D4\">blink</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a test run's log",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1m\u001b[32m✓\u001b[39m\u001b[22m parses \u001b[2m(3 ms)\u001b[22m\n\u001b[1m\u001b[31m✗\u001b[39m\u001b[22m formats\n  \u001b[31mExpected:\u001b[39m \u001b[32m\"a\"\u001b[39m\n  \u001b[90mat \u001b[4mtest.ts:1:2\u001b[24m\u001b[39m</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#0DBC79;font-weight:bold\">✓</span><span style=\"color:#D4D4D4\"> parses </span><span style=\"color:#D4D4D480\">(3 ms)</span></span>\n<span class=\"line\"><span style=\"color:#cd3131;font-weight:bold\">✗</span><span style=\"color:#D4D4D4\"> formats</span></span>\n<span class=\"line\"><span style=\"color:#cd3131\">  Expected:</span><span style=\"color:#0DBC79\"> \"a\"</span></span>\n<span class=\"line\"><span style=\"color:#666666\">  at </span><span style=\"color:#666666;text-decoration:underline\">test.ts:1:2</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "an empty block",
+        "input": "<pre><code class=\"language-ansi\"></code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki dark-plus\" style=\"background-color:#1E1E1E;color:#D4D4D4\" tabindex=\"0\"><code><span class=\"line\"></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "ansi under colorReplacements",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/core/src/highlight/code-to-tokens-ansi.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "colorReplacements": {
+            "#d20f39": "#ff0000",
+            "#4c4f69": "#000000",
+            "catppuccin-mocha": {
+              "#a6e3a1": "#00ff00"
+            }
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "plain text",
+        "input": "<pre><code class=\"language-ansi\">hello world\nsecond line</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#000000;--shiki-dark:#cdd6f4\">hello world</span></span>\n<span class=\"line\"><span style=\"color:#000000;--shiki-dark:#cdd6f4\">second line</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "the 8 foreground colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[30mc30 \u001b[31mc31 \u001b[32mc32 \u001b[33mc33 \u001b[34mc34 \u001b[35mc35 \u001b[36mc36 \u001b[37mc37</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#5c5f77;--shiki-dark:#45475a\">c30 </span><span style=\"color:#ff0000;--shiki-dark:#f38ba8\">c31 </span><span style=\"color:#40a02b;--shiki-dark:#00ff00\">c32 </span><span style=\"color:#df8e1d;--shiki-dark:#f9e2af\">c33 </span><span style=\"color:#1e66f5;--shiki-dark:#89b4fa\">c34 </span><span style=\"color:#ea76cb;--shiki-dark:#f5c2e7\">c35 </span><span style=\"color:#179299;--shiki-dark:#94e2d5\">c36 </span><span style=\"color:#acb0be;--shiki-dark:#a6adc8\">c37</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "the 8 background colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[40mc40 \u001b[41mc41 \u001b[42mc42 \u001b[43mc43 \u001b[44mc44 \u001b[45mc45 \u001b[46mc46 \u001b[47mc47</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#000000;background-color:#5c5f77;--shiki-dark:#cdd6f4;--shiki-dark-bg:#45475a\">c40 </span><span style=\"color:#000000;background-color:#ff0000;--shiki-dark:#cdd6f4;--shiki-dark-bg:#f38ba8\">c41 </span><span style=\"color:#000000;background-color:#40a02b;--shiki-dark:#cdd6f4;--shiki-dark-bg:#00ff00\">c42 </span><span style=\"color:#000000;background-color:#df8e1d;--shiki-dark:#cdd6f4;--shiki-dark-bg:#f9e2af\">c43 </span><span style=\"color:#000000;background-color:#1e66f5;--shiki-dark:#cdd6f4;--shiki-dark-bg:#89b4fa\">c44 </span><span style=\"color:#000000;background-color:#ea76cb;--shiki-dark:#cdd6f4;--shiki-dark-bg:#f5c2e7\">c45 </span><span style=\"color:#000000;background-color:#179299;--shiki-dark:#cdd6f4;--shiki-dark-bg:#94e2d5\">c46 </span><span style=\"color:#000000;background-color:#acb0be;--shiki-dark:#cdd6f4;--shiki-dark-bg:#a6adc8\">c47</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "the 8 bright foreground colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[90mc90 \u001b[91mc91 \u001b[92mc92 \u001b[93mc93 \u001b[94mc94 \u001b[95mc95 \u001b[96mc96 \u001b[97mc97</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#6c6f85;--shiki-dark:#585b70\">c90 </span><span style=\"color:#de293e;--shiki-dark:#f37799\">c91 </span><span style=\"color:#49af3d;--shiki-dark:#89d88b\">c92 </span><span style=\"color:#eea02d;--shiki-dark:#ebd391\">c93 </span><span style=\"color:#456eff;--shiki-dark:#74a8fc\">c94 </span><span style=\"color:#fe85d8;--shiki-dark:#f2aede\">c95 </span><span style=\"color:#2d9fa8;--shiki-dark:#6bd7ca\">c96 </span><span style=\"color:#bcc0cc;--shiki-dark:#bac2de\">c97</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "the 8 bright background colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[100mc100 \u001b[101mc101 \u001b[102mc102 \u001b[103mc103 \u001b[104mc104 \u001b[105mc105 \u001b[106mc106 \u001b[107mc107</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#000000;background-color:#6c6f85;--shiki-dark:#cdd6f4;--shiki-dark-bg:#585b70\">c100 </span><span style=\"color:#000000;background-color:#de293e;--shiki-dark:#cdd6f4;--shiki-dark-bg:#f37799\">c101 </span><span style=\"color:#000000;background-color:#49af3d;--shiki-dark:#cdd6f4;--shiki-dark-bg:#89d88b\">c102 </span><span style=\"color:#000000;background-color:#eea02d;--shiki-dark:#cdd6f4;--shiki-dark-bg:#ebd391\">c103 </span><span style=\"color:#000000;background-color:#456eff;--shiki-dark:#cdd6f4;--shiki-dark-bg:#74a8fc\">c104 </span><span style=\"color:#000000;background-color:#fe85d8;--shiki-dark:#cdd6f4;--shiki-dark-bg:#f2aede\">c105 </span><span style=\"color:#000000;background-color:#2d9fa8;--shiki-dark:#cdd6f4;--shiki-dark-bg:#6bd7ca\">c106 </span><span style=\"color:#000000;background-color:#bcc0cc;--shiki-dark:#cdd6f4;--shiki-dark-bg:#bac2de\">c107</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "foreground and background together",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31;42mred on green\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#ff0000;background-color:#40a02b;--shiki-dark:#f38ba8;--shiki-dark-bg:#00ff00\">red on green</span><span style=\"color:#000000;--shiki-dark:#cdd6f4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "256 colors, foreground",
+        "input": "<pre><code class=\"language-ansi\">\u001b[38;5;0mc0\u001b[38;5;9mc9\u001b[38;5;15mc15\u001b[38;5;16mc16\u001b[38;5;21mc21\u001b[38;5;100mc100\u001b[38;5;196mc196\u001b[38;5;231mc231\u001b[38;5;232mc232\u001b[38;5;244mc244\u001b[38;5;255mc255</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#5c5f77;--shiki-dark:#45475a\">c0</span><span style=\"color:#de293e;--shiki-dark:#f37799\">c9</span><span style=\"color:#bcc0cc;--shiki-dark:#bac2de\">c15</span><span style=\"color:#000000;--shiki-dark:#000000\">c16</span><span style=\"color:#0000ff;--shiki-dark:#0000ff\">c21</span><span style=\"color:#878700;--shiki-dark:#878700\">c100</span><span style=\"color:#ff0000;--shiki-dark:#ff0000\">c196</span><span style=\"color:#ffffff;--shiki-dark:#ffffff\">c231</span><span style=\"color:#080808;--shiki-dark:#080808\">c232</span><span style=\"color:#808080;--shiki-dark:#808080\">c244</span><span style=\"color:#eeeeee;--shiki-dark:#eeeeee\">c255</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "256 colors, background",
+        "input": "<pre><code class=\"language-ansi\">\u001b[48;5;0mc0\u001b[48;5;9mc9\u001b[48;5;16mc16\u001b[48;5;124mc124\u001b[48;5;231mc231\u001b[48;5;240mc240\u001b[48;5;255mc255</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#000000;background-color:#5c5f77;--shiki-dark:#cdd6f4;--shiki-dark-bg:#45475a\">c0</span><span style=\"color:#000000;background-color:#de293e;--shiki-dark:#cdd6f4;--shiki-dark-bg:#f37799\">c9</span><span style=\"color:#000000;background-color:#000000;--shiki-dark:#cdd6f4;--shiki-dark-bg:#000000\">c16</span><span style=\"color:#000000;background-color:#af0000;--shiki-dark:#cdd6f4;--shiki-dark-bg:#af0000\">c124</span><span style=\"color:#000000;background-color:#ffffff;--shiki-dark:#cdd6f4;--shiki-dark-bg:#ffffff\">c231</span><span style=\"color:#000000;background-color:#585858;--shiki-dark:#cdd6f4;--shiki-dark-bg:#585858\">c240</span><span style=\"color:#000000;background-color:#eeeeee;--shiki-dark:#cdd6f4;--shiki-dark-bg:#eeeeee\">c255</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "256 colors past the table and not a number",
+        "input": "<pre><code class=\"language-ansi\">\u001b[38;5;256mpast\u001b[38;5;xmword\u001b[38;5;0x10mhex\u001b[38;5; mspace</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span>past</span><span>word</span><span style=\"color:#000000;--shiki-dark:#000000\">hex</span><span style=\"color:#5c5f77;--shiki-dark:#45475a\">space</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "RGB colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[38;2;255;128;0morange\u001b[48;2;10;20;30mon navy\u001b[0m \u001b[38;2;300;-5;7mclamped</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#ff8000;--shiki-dark:#ff8000\">orange</span><span style=\"color:#ff8000;background-color:#0a141e;--shiki-dark:#ff8000;--shiki-dark-bg:#0a141e\">on navy</span><span style=\"color:#ff0007;--shiki-dark:#ff0007\"> clamped</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "an RGB color missing a channel",
+        "input": "<pre><code class=\"language-ansi\">\u001b[38;2;1;2mshort\u001b[38;2;1;x;3;31mnot a number</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#000000;--shiki-dark:#cdd6f4\">short</span><span style=\"color:#ff0000;--shiki-dark:#f38ba8\">not a number</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "bold",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1mbold\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#000000;--shiki-light-font-weight:bold;--shiki-dark:#cdd6f4;--shiki-dark-font-weight:bold\">bold</span><span style=\"color:#000000;--shiki-dark:#cdd6f4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "dim",
+        "input": "<pre><code class=\"language-ansi\">\u001b[2mdim\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#00000080;--shiki-dark:#cdd6f480\">dim</span><span style=\"color:#000000;--shiki-dark:#cdd6f4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "italic",
+        "input": "<pre><code class=\"language-ansi\">\u001b[3mitalic\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#000000;--shiki-light-font-style:italic;--shiki-dark:#cdd6f4;--shiki-dark-font-style:italic\">italic</span><span style=\"color:#000000;--shiki-dark:#cdd6f4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "underline",
+        "input": "<pre><code class=\"language-ansi\">\u001b[4munderline\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#000000;--shiki-light-text-decoration:underline;--shiki-dark:#cdd6f4;--shiki-dark-text-decoration:underline\">underline</span><span style=\"color:#000000;--shiki-dark:#cdd6f4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "strikethrough",
+        "input": "<pre><code class=\"language-ansi\">\u001b[9mstruck\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#000000;--shiki-light-text-decoration:line-through;--shiki-dark:#cdd6f4;--shiki-dark-text-decoration:line-through\">struck</span><span style=\"color:#000000;--shiki-dark:#cdd6f4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "reverse",
+        "input": "<pre><code class=\"language-ansi\">\u001b[7mreversed\u001b[0m plain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#eff1f5;background-color:#000000;--shiki-dark:#1e1e2e;--shiki-dark-bg:#cdd6f4\">reversed</span><span style=\"color:#000000;--shiki-dark:#cdd6f4\"> plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "reverse with colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[7;31mred\u001b[42mred on green\u001b[39mon green</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#eff1f5;background-color:#ff0000;--shiki-dark:#1e1e2e;--shiki-dark-bg:#f38ba8\">red</span><span style=\"color:#40a02b;background-color:#ff0000;--shiki-dark:#00ff00;--shiki-dark-bg:#f38ba8\">red on green</span><span style=\"color:#40a02b;background-color:#000000;--shiki-dark:#00ff00;--shiki-dark-bg:#cdd6f4\">on green</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "every decoration at once",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1;3;4;9;31mall\u001b[0m</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#ff0000;--shiki-light-font-style:italic;--shiki-light-font-weight:bold;--shiki-light-text-decoration:underline line-through;--shiki-dark:#f38ba8;--shiki-dark-font-style:italic;--shiki-dark-font-weight:bold;--shiki-dark-text-decoration:underline line-through\">all</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "dim colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[2;31mred\u001b[38;5;100mtable\u001b[38;2;1;2;3mrgb\u001b[91mbright</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#ff000080;--shiki-dark:#f38ba880\">red</span><span style=\"color:#87870080;--shiki-dark:#87870080\">table</span><span style=\"color:#01020380;--shiki-dark:#01020380\">rgb</span><span style=\"color:#de293e80;--shiki-dark:#f3779980\">bright</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "hidden and overline make no style",
+        "input": "<pre><code class=\"language-ansi\">\u001b[8mhidden\u001b[28m \u001b[53mover\u001b[55mline</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#000000;--shiki-dark:#cdd6f4\">hidden</span><span style=\"color:#000000;--shiki-dark:#cdd6f4\"> over</span><span style=\"color:#000000;--shiki-dark:#cdd6f4\">line</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "resetting each decoration",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1;2;3;4;7;9;31;42mall\u001b[22mno bold\u001b[23mno italic\u001b[24mno underline\u001b[27mno reverse\u001b[29mno strike</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#40a02b80;background-color:#ff0000;--shiki-light-font-style:italic;--shiki-light-font-weight:bold;--shiki-light-text-decoration:underline line-through;--shiki-dark:#00ff0080;--shiki-dark-bg:#f38ba8;--shiki-dark-font-style:italic;--shiki-dark-font-weight:bold;--shiki-dark-text-decoration:underline line-through\">all</span><span style=\"color:#40a02b;background-color:#ff0000;--shiki-light-font-style:italic;--shiki-light-text-decoration:underline line-through;--shiki-dark:#00ff00;--shiki-dark-bg:#f38ba8;--shiki-dark-font-style:italic;--shiki-dark-text-decoration:underline line-through\">no bold</span><span style=\"color:#40a02b;background-color:#ff0000;--shiki-light-text-decoration:underline line-through;--shiki-dark:#00ff00;--shiki-dark-bg:#f38ba8;--shiki-dark-text-decoration:underline line-through\">no italic</span><span style=\"color:#40a02b;background-color:#ff0000;--shiki-light-text-decoration:line-through;--shiki-dark:#00ff00;--shiki-dark-bg:#f38ba8;--shiki-dark-text-decoration:line-through\">no underline</span><span style=\"color:#ff0000;background-color:#40a02b;--shiki-light-text-decoration:line-through;--shiki-dark:#f38ba8;--shiki-dark-bg:#00ff00;--shiki-dark-text-decoration:line-through\">no reverse</span><span style=\"color:#ff0000;background-color:#40a02b;--shiki-dark:#f38ba8;--shiki-dark-bg:#00ff00\">no strike</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "resetting colors",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31;42mboth\u001b[39mbackground\u001b[49mnone\u001b[31mred\u001b[0mnone</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#ff0000;background-color:#40a02b;--shiki-dark:#f38ba8;--shiki-dark-bg:#00ff00\">both</span><span style=\"color:#000000;background-color:#40a02b;--shiki-dark:#cdd6f4;--shiki-dark-bg:#00ff00\">background</span><span style=\"color:#000000;--shiki-dark:#cdd6f4\">none</span><span style=\"color:#ff0000;--shiki-dark:#f38ba8\">red</span><span style=\"color:#000000;--shiki-dark:#cdd6f4\">none</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "21 resets bold and an empty sequence nothing",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1;31mbold\u001b[21mred\u001b[mstill red</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#ff0000;--shiki-light-font-weight:bold;--shiki-dark:#f38ba8;--shiki-dark-font-weight:bold\">bold</span><span style=\"color:#ff0000;--shiki-dark:#f38ba8\">red</span><span style=\"color:#ff0000;--shiki-dark:#f38ba8\">still red</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a reset after a color in one sequence",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31;0mred\u001b[0;32mgreen\u001b[1;0mplain</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#ff0000;--shiki-dark:#f38ba8\">red</span><span style=\"color:#40a02b;--shiki-dark:#00ff00\">green</span><span style=\"color:#000000;--shiki-light-font-weight:bold;--shiki-dark:#cdd6f4;--shiki-dark-font-weight:bold\">plain</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "styles carry over lines",
+        "input": "<pre><code class=\"language-ansi\">\u001b[32mgreen\nstill green\u001b[0m\nplain\r\n\u001b[1mbold\r\nbold</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#40a02b;--shiki-dark:#00ff00\">green</span></span>\n<span class=\"line\"><span style=\"color:#40a02b;--shiki-dark:#00ff00\">still green</span></span>\n<span class=\"line\"><span style=\"color:#000000;--shiki-dark:#cdd6f4\">plain</span></span>\n<span class=\"line\"><span style=\"color:#000000;--shiki-light-font-weight:bold;--shiki-dark:#cdd6f4;--shiki-dark-font-weight:bold\">bold</span></span>\n<span class=\"line\"><span style=\"color:#000000;--shiki-light-font-weight:bold;--shiki-dark:#cdd6f4;--shiki-dark-font-weight:bold\">bold</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "whitespace between colored words",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31mred\u001b[0m   \u001b[32mgreen\u001b[0m  </code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#ff0000;--shiki-dark:#f38ba8\">red</span><span style=\"color:#40a02b;--shiki-dark:#00ff00\">   green</span><span style=\"color:#000000;--shiki-dark:#cdd6f4\">  </span></span></code></pre>"
+        }
+      },
+      {
+        "description": "whitespace before an underlined word",
+        "input": "<pre><code class=\"language-ansi\">  \u001b[4munderlined\u001b[0m \u001b[9m struck</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#000000;--shiki-light-text-decoration:underline;--shiki-dark:#cdd6f4;--shiki-dark-text-decoration:underline\">  underlined</span><span style=\"color:#000000;--shiki-light-text-decoration:line-through;--shiki-dark:#cdd6f4;--shiki-dark-text-decoration:line-through\">  struck</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a line of escapes alone",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31m\n\u001b[0m\u001b[1m\ntext</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"></span>\n<span class=\"line\"></span>\n<span class=\"line\"><span style=\"color:#000000;--shiki-light-font-weight:bold;--shiki-dark:#cdd6f4;--shiki-dark-font-weight:bold\">text</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "an escape starting no sequence",
+        "input": "<pre><code class=\"language-ansi\">a\u001bb \u001b[31mc</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#000000;--shiki-dark:#cdd6f4\">a\u001bb \u001b[31mc</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a sequence never closed",
+        "input": "<pre><code class=\"language-ansi\">\u001b[31mred \u001b[1;32 green</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#ff0000;--shiki-dark:#f38ba8\">red \u001b[1;32 green</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "unknown codes",
+        "input": "<pre><code class=\"language-ansi\">\u001b[5;6;10;50;99;108;-1;foomblink</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#000000;--shiki-dark:#cdd6f4\">blink</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a test run's log",
+        "input": "<pre><code class=\"language-ansi\">\u001b[1m\u001b[32m✓\u001b[39m\u001b[22m parses \u001b[2m(3 ms)\u001b[22m\n\u001b[1m\u001b[31m✗\u001b[39m\u001b[22m formats\n  \u001b[31mExpected:\u001b[39m \u001b[32m\"a\"\u001b[39m\n  \u001b[90mat \u001b[4mtest.ts:1:2\u001b[24m\u001b[39m</code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#40a02b;--shiki-light-font-weight:bold;--shiki-dark:#00ff00;--shiki-dark-font-weight:bold\">✓</span><span style=\"color:#000000;--shiki-dark:#cdd6f4\"> parses </span><span style=\"color:#00000080;--shiki-dark:#cdd6f480\">(3 ms)</span></span>\n<span class=\"line\"><span style=\"color:#ff0000;--shiki-light-font-weight:bold;--shiki-dark:#f38ba8;--shiki-dark-font-weight:bold\">✗</span><span style=\"color:#000000;--shiki-dark:#cdd6f4\"> formats</span></span>\n<span class=\"line\"><span style=\"color:#ff0000;--shiki-dark:#f38ba8\">  Expected:</span><span style=\"color:#40a02b;--shiki-dark:#00ff00\"> \"a\"</span></span>\n<span class=\"line\"><span style=\"color:#6c6f85;--shiki-dark:#585b70\">  at </span><span style=\"color:#6c6f85;--shiki-light-text-decoration:underline;--shiki-dark:#585b70;--shiki-dark-text-decoration:underline\">test.ts:1:2</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "an empty block",
+        "input": "<pre><code class=\"language-ansi\"></code></pre>",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#000000;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"></span></code></pre>"
+        }
+      }
+    ]
+  }
+]

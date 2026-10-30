@@ -108,7 +108,7 @@ export class Processor {
     const run = this.#native.startProcess(text, false)
     const file = new HostFile({ value: run.value() ?? text, path: readPath(document) })
     await finishRun({ run, hosts: this.#hosts, file, sync: false, call: "process" })
-    return withPath({ ...run.result(), data: file.data }, document)
+    return withPath(mergeData(run.result(), file.data), document)
   }
 
   /** Parse, run and compile a document; fails with `async-in-sync` on an asynchronous stage. */
@@ -118,7 +118,7 @@ export class Processor {
     const run = this.#native.startProcess(text, true)
     const file = new HostFile({ value: run.value() ?? text, path: readPath(document) })
     void finishRun({ run, hosts: this.#hosts, file, sync: true, call: "process" })
-    return withPath({ ...run.result(), data: file.data }, document)
+    return withPath(mergeData(run.result(), file.data), document)
   }
 
   // unified's addPlugin: the same attacher is one plugin, its object options merged
@@ -165,6 +165,11 @@ function readValue(file: Compatible | undefined) {
 
 function readPath(file: Compatible | undefined) {
   return typeof file === "string" ? undefined : file?.path
+}
+
+// Native stages' data first, then what JavaScript plugins stored over it
+function mergeData(result: VFile, data: Record<string, unknown>): VFile {
+  return { ...result, data: { ...result.data, ...data } }
 }
 
 function withPath(file: VFile, document: Compatible) {

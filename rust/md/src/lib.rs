@@ -202,12 +202,18 @@ mod plugins {
             pub(crate) mod children {
                 pub(crate) mod group;
             }
+            pub(crate) mod code {
+                pub(crate) mod convert;
+            }
             pub(crate) mod directive {
                 pub(crate) mod convert;
                 pub(crate) mod restore;
             }
             pub(crate) mod element {
                 pub(crate) mod create;
+            }
+            pub(crate) mod meta {
+                pub(crate) mod read;
             }
             pub(crate) mod node {
                 pub(crate) mod convert;
@@ -219,6 +225,14 @@ mod plugins {
         pub(crate) mod plugin;
     }
     pub(crate) mod definition_list {
+        pub(crate) mod plugin;
+    }
+    pub(crate) mod heading_id {
+        pub(crate) mod actions {
+            pub(crate) mod data {
+                pub(crate) mod copy;
+            }
+        }
         pub(crate) mod plugin;
     }
     pub(crate) mod directive {
@@ -256,6 +270,14 @@ mod plugins {
     pub(crate) mod stringify {
         pub(crate) mod plugin;
     }
+    pub(crate) mod strip {
+        pub(crate) mod actions {
+            pub(crate) mod list {
+                pub(crate) mod strip;
+            }
+        }
+        pub(crate) mod plugin;
+    }
     pub(crate) mod to_html {
         pub(crate) mod plugin;
     }
@@ -266,10 +288,10 @@ mod plugins {
 
 // models
 pub use models::options::{
-    AlertRule, AttributeRule, Component, DefinitionListSlot, Directive, DirectiveKind,
-    DirectiveRule, DirectiveSlot, Frontmatter, FrontmatterSlot, Gfm, GfmSlot, GroupRule,
-    Math, MathSlot, Matter, Mdx, MdxSlot, Names, Parse, Stringify, ToHtml,
-    ToNaturalLanguage, UnknownDirectives, UnsafePattern,
+    AlertRule, AttributeRule, CodeGroupRule, CodeRule, Component, DefinitionListSlot,
+    Directive, DirectiveKind, DirectiveRule, DirectiveSlot, Frontmatter, FrontmatterSlot,
+    Gfm, GfmSlot, GroupRule, Math, MathSlot, Matter, Mdx, MdxSlot, Names, Parse,
+    Stringify, Strip, ToHtml, ToNaturalLanguage, UnknownDirectives, UnsafePattern,
 };
 
 // actions
@@ -281,3 +303,4 @@ pub use actions::mdast::convert::convert_mdast;
 // plugins
 pub use plugins::definition_list::plugin::DefinitionList;
 pub use plugins::gemoji::plugin::Gemoji;
+pub use plugins::heading_id::plugin::HeadingId;

@@ -193,6 +193,16 @@ export function slug(options?: SlugOptions): Plugin<"html.slug", SlugOptions> {
   return { name: "html.slug", options }
 }
 
+/** The `html.unwrapImages` plugin. */
+export function unwrapImages(): Plugin<"html.unwrapImages"> {
+  return { name: "html.unwrapImages" }
+}
+
+/** The `html.extractToc` plugin. */
+export function extractToc(): Plugin<"html.extractToc"> {
+  return { name: "html.extractToc" }
+}
+
 /** The `html.highlight` plugin. */
 export function highlight(options?: HighlightOptions): Plugin<"html.highlight", HighlightOptions> {
   if (options === undefined) return { name: "html.highlight" }

@@ -22,6 +22,9 @@ __all__ = [
     "gemoji",
     "component",
     "ComponentOptions",
+    "heading_id",
+    "strip",
+    "StripOptions",
     "stringify",
     "StringifyOptions",
     "to_html",
@@ -195,6 +198,38 @@ class AlertRule(_AlertRuleRequired, total=False):
 UnknownDirectives = Union[Literal["keep"], Literal["source"]]
 
 
+class _CodeGroupRuleRequired(TypedDict):
+    # The wrapping component.
+    component: str
+
+
+# The component wrapping a run of adjacent code blocks one rule matched; the meta keys it
+# reads are taken out of each block's meta.
+class CodeGroupRule(_CodeGroupRuleRequired, total=False):
+    # The shortest run wrapped; 2 when left out.
+    min: Optional[int]
+    # The attribute that gets the run's values of the rule's `meta` key, as a JSON list.
+    collect: Optional[str]
+    # Meta keys the wrapper copies from the run's first block as attributes.
+    inherit: List[str]
+
+
+# How `md.component` turns matching code blocks into a component, or groups them.
+class CodeRule(TypedDict, total=False):
+    # The block's language, or several; any when left out.
+    lang: Optional[Names]
+    # A `key="value"` the block's meta must hold.
+    meta: Optional[str]
+    # The component the block becomes; left out, the block stays code and only groups.
+    component: Optional[str]
+    # The attribute that gets the code; left out, the code is the component's text.
+    valueAs: Optional[str]
+    # Meta `key="value"` pairs to keep as attributes, in order.
+    attributes: List[AttributeRule]
+    # Wrap runs of adjacent blocks this rule matched in another component.
+    group: Optional[CodeGroupRule]
+
+
 # `md.component`: directives, GitHub alerts and other nodes into MDX JSX elements, the
 # components an MDX runtime renders, by declarative rules.
 class ComponentOptions(TypedDict, total=False):
@@ -206,6 +241,17 @@ class ComponentOptions(TypedDict, total=False):
     nodes: Dict[str, str]
     # What becomes of a directive no rule converts.
     unknownDirectives: UnknownDirectives
+    # Rules for fenced code; the first that matches a block applies.
+    codes: List[CodeRule]
+
+
+# `md.strip`: mdast down to its text, as strip-markdown does: code, HTML, tables and
+# the like dropped, headings made paragraphs, formatting unwrapped.
+class StripOptions(TypedDict, total=False):
+    # Node types to leave as they are, such as `inlineCode`.
+    keep: List[str]
+    # Node types to drop, besides those strip-markdown drops.
+    remove: List[str]
 
 
 # A character to escape where it would otherwise start or end syntax.
@@ -345,6 +391,16 @@ def gemoji() -> Plugin:
 def component(options: Optional[ComponentOptions] = None) -> Plugin:
     """The `md.component` plugin."""
     return describe_plugin("md.component", options)
+
+
+def heading_id() -> Plugin:
+    """The `md.headingId` plugin."""
+    return describe_plugin("md.headingId")
+
+
+def strip(options: Optional[StripOptions] = None) -> Plugin:
+    """The `md.strip` plugin."""
+    return describe_plugin("md.strip", options)
 
 
 def stringify(options: Optional[StringifyOptions] = None) -> Plugin:

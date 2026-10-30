@@ -1,0 +1,203 @@
+[
+  {
+    "description": "headings as a table of contents in the file's data",
+    "source": {
+      "repository": "https://github.com/stefanprobst/rehype-extract-toc",
+      "version": "3.0.0",
+      "path": "src/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      ["html.slug"],
+      ["html.extractToc"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "nested headings",
+        "input": "<h1>A</h1><h2>B</h2><h3>C</h3><h2>D</h2>",
+        "expected": {
+          "fileData": {
+            "toc": [
+              {
+                "depth": 1,
+                "value": "A",
+                "id": "a",
+                "children": [
+                  {
+                    "depth": 2,
+                    "value": "B",
+                    "id": "b",
+                    "children": [
+                      {
+                        "depth": 3,
+                        "value": "C",
+                        "id": "c"
+                      }
+                    ]
+                  },
+                  {
+                    "depth": 2,
+                    "value": "D",
+                    "id": "d"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a level skipped",
+        "input": "<h1>A</h1><h3>B</h3><h2>C</h2>",
+        "expected": {
+          "fileData": {
+            "toc": [
+              {
+                "depth": 1,
+                "value": "A",
+                "id": "a",
+                "children": [
+                  {
+                    "depth": 3,
+                    "value": "B",
+                    "id": "b"
+                  },
+                  {
+                    "depth": 2,
+                    "value": "C",
+                    "id": "c"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "shallower after deeper",
+        "input": "<h3>A</h3><h1>B</h1><h2>C</h2>",
+        "expected": {
+          "fileData": {
+            "toc": [
+              {
+                "depth": 3,
+                "value": "A",
+                "id": "a"
+              },
+              {
+                "depth": 1,
+                "value": "B",
+                "id": "b",
+                "children": [
+                  {
+                    "depth": 2,
+                    "value": "C",
+                    "id": "c"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "siblings at one level",
+        "input": "<h2>A</h2><h2>B</h2><h2>C</h2>",
+        "expected": {
+          "fileData": {
+            "toc": [
+              {
+                "depth": 2,
+                "value": "A",
+                "id": "a"
+              },
+              {
+                "depth": 2,
+                "value": "B",
+                "id": "b"
+              },
+              {
+                "depth": 2,
+                "value": "C",
+                "id": "c"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "text inside elements",
+        "input": "<h2>An <em>emphasized</em> <code>code</code></h2>",
+        "expected": {
+          "fileData": {
+            "toc": [
+              {
+                "depth": 2,
+                "value": "An emphasized code",
+                "id": "an-emphasized-code"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "headings inside sections",
+        "input": "<section><h2>A</h2><div><h3>B</h3></div></section>",
+        "expected": {
+          "fileData": {
+            "toc": [
+              {
+                "depth": 2,
+                "value": "A",
+                "id": "a",
+                "children": [
+                  {
+                    "depth": 3,
+                    "value": "B",
+                    "id": "b"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "no headings",
+        "input": "<p>Text</p>",
+        "expected": {
+          "fileData": {
+            "toc": []
+          }
+        }
+      },
+      {
+        "description": "duplicate titles",
+        "input": "<h2>Same</h2><h2>Same</h2>",
+        "expected": {
+          "fileData": {
+            "toc": [
+              {
+                "depth": 2,
+                "value": "Same",
+                "id": "same"
+              },
+              {
+                "depth": 2,
+                "value": "Same",
+                "id": "same-1"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+]

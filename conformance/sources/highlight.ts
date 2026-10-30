@@ -470,6 +470,17 @@ const TRANSFORMER_GROUPS: {
     tests: [{ description: "from five", language: "ts", code: "a\nb" }],
   },
   {
+    description: "ansi code in a fence",
+    options: {},
+    tests: [
+      {
+        description: "colors and a decoration",
+        language: "ansi",
+        code: "\u001b[31mred\u001b[0m \u001b[1;32mbold green\u001b[0m",
+      },
+    ],
+  },
+  {
     description: "transformers run together, in order",
     options: {
       transformers: [
@@ -490,5 +501,180 @@ const TRANSFORMER_GROUPS: {
   },
 ]
 
+// Escape sequences Shiki colors `ansi` code from, as a terminal would show them
+const ESC = "\u001b["
+const ANSI_TESTS: { description: string; code: string }[] = [
+  { description: "plain text", code: "hello world\nsecond line" },
+  {
+    description: "the 8 foreground colors",
+    code: [30, 31, 32, 33, 34, 35, 36, 37].map(n => `${ESC}${n}mc${n}`).join(" "),
+  },
+  {
+    description: "the 8 background colors",
+    code: [40, 41, 42, 43, 44, 45, 46, 47].map(n => `${ESC}${n}mc${n}`).join(" "),
+  },
+  {
+    description: "the 8 bright foreground colors",
+    code: [90, 91, 92, 93, 94, 95, 96, 97].map(n => `${ESC}${n}mc${n}`).join(" "),
+  },
+  {
+    description: "the 8 bright background colors",
+    code: [100, 101, 102, 103, 104, 105, 106, 107].map(n => `${ESC}${n}mc${n}`).join(" "),
+  },
+  {
+    description: "foreground and background together",
+    code: `${ESC}31;42mred on green${ESC}0m plain`,
+  },
+  {
+    description: "256 colors, foreground",
+    code: [0, 9, 15, 16, 21, 100, 196, 231, 232, 244, 255]
+      .map(n => `${ESC}38;5;${n}mc${n}`)
+      .join(""),
+  },
+  {
+    description: "256 colors, background",
+    code: [0, 9, 16, 124, 231, 240, 255].map(n => `${ESC}48;5;${n}mc${n}`).join(""),
+  },
+  {
+    description: "256 colors past the table and not a number",
+    code: `${ESC}38;5;256mpast${ESC}38;5;xmword${ESC}38;5;0x10mhex${ESC}38;5; mspace`,
+  },
+  {
+    description: "RGB colors",
+    code: `${ESC}38;2;255;128;0morange${ESC}48;2;10;20;30mon navy${ESC}0m ${ESC}38;2;300;-5;7mclamped`,
+  },
+  {
+    description: "an RGB color missing a channel",
+    code: `${ESC}38;2;1;2mshort${ESC}38;2;1;x;3;31mnot a number`,
+  },
+  { description: "bold", code: `${ESC}1mbold${ESC}0m plain` },
+  { description: "dim", code: `${ESC}2mdim${ESC}0m plain` },
+  { description: "italic", code: `${ESC}3mitalic${ESC}0m plain` },
+  { description: "underline", code: `${ESC}4munderline${ESC}0m plain` },
+  { description: "strikethrough", code: `${ESC}9mstruck${ESC}0m plain` },
+  { description: "reverse", code: `${ESC}7mreversed${ESC}0m plain` },
+  {
+    description: "reverse with colors",
+    code: `${ESC}7;31mred${ESC}42mred on green${ESC}39mon green`,
+  },
+  {
+    description: "every decoration at once",
+    code: `${ESC}1;3;4;9;31mall${ESC}0m`,
+  },
+  {
+    description: "dim colors",
+    code: `${ESC}2;31mred${ESC}38;5;100mtable${ESC}38;2;1;2;3mrgb${ESC}91mbright`,
+  },
+  {
+    description: "hidden and overline make no style",
+    code: `${ESC}8mhidden${ESC}28m ${ESC}53mover${ESC}55mline`,
+  },
+  {
+    description: "resetting each decoration",
+    code: `${ESC}1;2;3;4;7;9;31;42mall${ESC}22mno bold${ESC}23mno italic${ESC}24mno underline${ESC}27mno reverse${ESC}29mno strike`,
+  },
+  {
+    description: "resetting colors",
+    code: `${ESC}31;42mboth${ESC}39mbackground${ESC}49mnone${ESC}31mred${ESC}0mnone`,
+  },
+  {
+    description: "21 resets bold and an empty sequence nothing",
+    code: `${ESC}1;31mbold${ESC}21mred${ESC}mstill red`,
+  },
+  {
+    description: "a reset after a color in one sequence",
+    code: `${ESC}31;0mred${ESC}0;32mgreen${ESC}1;0mplain`,
+  },
+  {
+    description: "styles carry over lines",
+    code: `${ESC}32mgreen\nstill green${ESC}0m\nplain\r\n${ESC}1mbold\r\nbold`,
+  },
+  {
+    description: "whitespace between colored words",
+    code: `${ESC}31mred${ESC}0m   ${ESC}32mgreen${ESC}0m  `,
+  },
+  {
+    description: "whitespace before an underlined word",
+    code: `  ${ESC}4munderlined${ESC}0m ${ESC}9m struck`,
+  },
+  {
+    description: "a line of escapes alone",
+    code: `${ESC}31m\n${ESC}0m${ESC}1m\ntext`,
+  },
+  { description: "an escape starting no sequence", code: `a\u001bb ${ESC}31mc` },
+  { description: "a sequence never closed", code: `${ESC}31mred ${ESC}1;32 green` },
+  { description: "unknown codes", code: `${ESC}5;6;10;50;99;108;-1;foomblink` },
+  {
+    description: "a test run's log",
+    code: [
+      `${ESC}1m${ESC}32m✓${ESC}39m${ESC}22m parses ${ESC}2m(3 ms)${ESC}22m`,
+      `${ESC}1m${ESC}31m✗${ESC}39m${ESC}22m formats`,
+      `  ${ESC}31mExpected:${ESC}39m ${ESC}32m"a"${ESC}39m`,
+      `  ${ESC}90mat ${ESC}4mtest.ts:1:2${ESC}24m${ESC}39m`,
+    ].join("\n"),
+  },
+  { description: "an empty block", code: "" },
+]
+
+async function importAnsi() {
+  const shiki = {
+    repository: SHIKI.url,
+    version: SHIKI.version,
+    path: "packages/core/src/highlight/code-to-tokens-ansi.ts",
+    license: "MIT",
+  }
+  const settings: { description: string; options: RehypeShikiOptions }[] = [
+    { description: `${THEMES.light} / ${THEMES.dark}`, options: { themes: THEMES } },
+    {
+      description: "github-light / github-dark",
+      options: { themes: { light: "github-light", dark: "github-dark" } },
+    },
+    {
+      description: "one theme with an alpha in its foreground",
+      options: { theme: "vitesse-dark" },
+    },
+    { description: "one theme without terminal colors", options: { theme: "dark-plus" } },
+    {
+      description: "colorReplacements",
+      options: {
+        themes: THEMES,
+        colorReplacements: {
+          "#d20f39": "#ff0000",
+          "#4c4f69": "#000000",
+          "catppuccin-mocha": { "#a6e3a1": "#00ff00" },
+        },
+      },
+    },
+  ]
+  const groups = []
+  for (const setting of settings) {
+    const tests = []
+    for (const test of ANSI_TESTS)
+      tests.push(
+        await createTest({
+          description: test.description,
+          html: codeBlock(test.code, "ansi"),
+          options: setting.options,
+        }),
+      )
+    groups.push({
+      description: `ansi under ${setting.description}`,
+      source: shiki,
+      pipeline: [
+        ["html.parse", { fragment: true }],
+        ["html.highlight", setting.options],
+        ["html.stringify"],
+      ],
+      tests,
+    })
+  }
+  writeGroups({
+    path: join(OUTPUT, "highlight-ansi.json"),
+    repository: SHIKI.url,
+    groups,
+  })
+}
+
 await importTransformers()
+await importAnsi()
 console.log(`highlight: ${written} cases`)

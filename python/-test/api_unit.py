@@ -60,6 +60,10 @@ def test_api(group, test):
     if output:
         assert processor().process(source)["value"] == expected[output]
         return
+    # What plugins stored in the file is the vfile's `data`
+    if "fileData" in expected:
+        assert processor().process_sync(source)["data"] == expected["fileData"]
+        return
     if "tree" in expected:
         tree = processor().run(processor().parse(source), source)
         # A tree read back from JSON keeps unist positions, which a bridge into nlcst cannot

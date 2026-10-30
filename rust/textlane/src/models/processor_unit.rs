@@ -1263,3 +1263,36 @@ fn groups_many_components_in_linear_time() -> Result<(), Error> {
     assert!(started.elapsed().as_secs() < LIMIT_SECS);
     Ok(())
 }
+
+#[test]
+fn strips_deep_block_quotes_without_recursing() -> Result<(), Error> {
+    let input = format!("{}a\n", "> ".repeat(10_000));
+    let processor = Processor::new()
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::Strip::default())
+        .with(textlane_md::Stringify::default())
+        .freeze()?;
+    assert_eq!(processor.process(&input)?.value, "a\n");
+    Ok(())
+}
+
+#[test]
+fn extracts_many_headings_in_linear_time() -> Result<(), Error> {
+    let input = "# a\n\n## b\n\n### c\n\n".repeat(20_000);
+    let processor = Processor::new()
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::HeadingId)
+        .with(textlane_md::ToHtml::default())
+        .with(textlane_html::UnwrapImages)
+        .with(textlane_html::ExtractToc)
+        .with(textlane_html::Stringify::default())
+        .freeze()?;
+    let started = std::time::Instant::now();
+    let output = processor.process(&input)?;
+    assert_eq!(
+        output.file.data["toc"].as_array().map(Vec::len),
+        Some(20_000)
+    );
+    assert!(started.elapsed().as_secs() < LIMIT_SECS);
+    Ok(())
+}

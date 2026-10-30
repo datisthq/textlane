@@ -1,11 +1,12 @@
 use giallo::{FontStyle, HighlightOptions, Style, ThemeVariant};
 use textlane_core::Error;
 
+use crate::actions::ansi::tokenize::tokenize_ansi;
 use crate::helpers::registry::load_registry;
-use crate::models::highlight::{CodeToken, Theme, Themes};
+use crate::models::highlight::{CodeToken, StyledLine, Theme, Themes, TokenStyle};
 
 /// Split code into lines of styled tokens as Shiki's `codeToTokens` and its whitespace
-/// merging do, for a language giallo or Shiki's plain text knows.
+/// merging do, for a language giallo or Shiki's plain text knows, or `ansi`.
 pub(crate) fn tokenize_code(
     code: &str,
     language: &str,
@@ -25,6 +26,13 @@ pub(crate) fn tokenize_code(
             })
             .collect());
     }
+    if language == "ansi" {
+        // Shiki keeps every escape's tokens apart, even where their styles agree
+        return Ok(tokenize_ansi(code, themes)?
+            .into_iter()
+            .map(|line| merge_whitespace(line, themes))
+            .collect());
+    }
     let mut lines = highlight_lines(code, language, themes)?;
     // giallo gives empty code no line, where Shiki gives it one empty line
     if lines.is_empty() {
@@ -32,14 +40,13 @@ pub(crate) fn tokenize_code(
     }
     Ok(lines
         .into_iter()
-        .map(|line| merge_whitespace(merge_styles(line), themes))
+        .map(|line| merge_whitespace(read_styles(merge_styles(line), themes), themes))
         .collect())
 }
 
 /// Whether Shiki takes a language as plain text, which it leaves uncolored.
 pub(crate) fn is_plain_language(language: &str) -> bool {
-    // Shiki colors `ansi` from its escapes, which giallo cannot
-    matches!(language, "plaintext" | "txt" | "text" | "plain" | "ansi")
+    matches!(language, "plaintext" | "txt" | "text" | "plain")
 }
 
 type Line = Vec<(String, Vec<Style>)>;
@@ -119,9 +126,38 @@ fn merge_styles(line: Line) -> Line {
     merged
 }
 
+// Each giallo style as Shiki's token would carry it: colors spelled as the theme spells
+// them, then replaced
+fn read_styles(line: Line, themes: &Themes) -> StyledLine {
+    (line.into_iter())
+        .map(|(text, styles)| {
+            let styles = (styles.iter().zip(&themes.list))
+                .map(|(style, theme)| read_style(style, theme))
+                .collect();
+            (text, styles)
+        })
+        .collect()
+}
+
+fn read_style(style: &Style, theme: &Theme) -> TokenStyle {
+    let color = style.foreground.as_hex();
+    let spelled = (theme.colors.spellings.iter())
+        .find(|(written, _)| *written == color)
+        .map_or(color.clone(), |(_, spelled)| (*spelled).to_owned());
+    let has = |flag| style.font_style.contains(flag);
+    TokenStyle {
+        color: Some(replace_color(spelled, theme)),
+        background: None,
+        italic: has(FontStyle::ITALIC),
+        bold: has(FontStyle::BOLD),
+        underline: has(FontStyle::UNDERLINE),
+        strikethrough: has(FontStyle::STRIKETHROUGH),
+    }
+}
+
 // Shiki's `mergeWhitespaceTokens`: whitespace joins the token after it, unless that one
 // is underlined or struck, which only a single theme's tokens still know
-fn merge_whitespace(line: Line, themes: &Themes) -> Vec<CodeToken> {
+fn merge_whitespace(line: StyledLine, themes: &Themes) -> Vec<CodeToken> {
     let mut tokens = Vec::with_capacity(line.len());
     let mut carry = String::new();
     let count = line.len();
@@ -161,9 +197,8 @@ fn merge_whitespace(line: Line, themes: &Themes) -> Vec<CodeToken> {
     tokens
 }
 
-fn is_decorated(style: &Style) -> bool {
-    style.font_style.contains(FontStyle::UNDERLINE)
-        || style.font_style.contains(FontStyle::STRIKETHROUGH)
+fn is_decorated(style: &TokenStyle) -> bool {
+    style.underline || style.strikethrough
 }
 
 // JavaScript's `/^\s+$/`
@@ -184,28 +219,29 @@ pub(crate) fn replace_color(color: String, theme: &Theme) -> String {
 
 // Shiki's `getTokenStyleObject` per theme, then `flatTokenVariants`: the default theme's
 // color is plain, everything else a `--shiki-<mode>…` variable, `inherit` where unset
-fn stringify_style(styles: &[Style], themes: &Themes) -> String {
-    let objects: Vec<Vec<(&str, String)>> = (styles.iter().zip(&themes.list))
-        .map(|(style, theme)| {
-            let color = style.foreground.as_hex();
-            let spelled = (theme.colors.spellings.iter())
-                .find(|(written, _)| *written == color)
-                .map_or(color.clone(), |(_, spelled)| (*spelled).to_owned());
-            let spelled = replace_color(spelled, theme);
-            let mut object = vec![("color", spelled)];
-            if style.font_style.contains(FontStyle::ITALIC) {
+fn stringify_style(styles: &[TokenStyle], themes: &Themes) -> String {
+    let objects: Vec<Vec<(&str, String)>> = (styles.iter())
+        .map(|style| {
+            let mut object = vec![];
+            object.extend(style.color.clone().map(|color| ("color", color)));
+            object.extend(
+                style
+                    .background
+                    .clone()
+                    .map(|color| ("background-color", color)),
+            );
+            if style.italic {
                 object.push(("font-style", "italic".to_owned()));
             }
-            if style.font_style.contains(FontStyle::BOLD) {
+            if style.bold {
                 object.push(("font-weight", "bold".to_owned()));
             }
             let decorations: Vec<&str> = [
-                (FontStyle::UNDERLINE, "underline"),
-                (FontStyle::STRIKETHROUGH, "line-through"),
+                (style.underline, "underline"),
+                (style.strikethrough, "line-through"),
             ]
             .into_iter()
-            .filter(|(flag, _)| style.font_style.contains(*flag))
-            .map(|(_, name)| name)
+            .filter_map(|(on, name)| on.then_some(name))
             .collect();
             if !decorations.is_empty() {
                 object.push(("text-decoration", decorations.join(" ")));
