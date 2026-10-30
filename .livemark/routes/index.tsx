@@ -1007,7 +1007,7 @@ function Benchmark() {
           </div>
         </Reveal>
         <Reveal>
-          <WindowCard label="benchmark · throughput on a 1 MB README">
+          <WindowCard label="benchmark · throughput on a 1 MB CommonMark README">
             <div className="p-5 sm:p-6">
               <ul className="space-y-3">
                 {measures.map(measure => (
