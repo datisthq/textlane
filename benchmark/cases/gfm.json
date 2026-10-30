@@ -6,8 +6,11 @@
   "tools": {
     "10MB": [
       "textlane-rust",
+      "textlane-rust-hast",
       "textlane-typescript",
+      "textlane-typescript-hast",
       "textlane-python",
+      "textlane-python-hast",
       "comrak",
       "pulldown-cmark",
       "cmark"
