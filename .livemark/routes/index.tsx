@@ -980,28 +980,30 @@ function ConformanceStripe() {
 interface Measure {
   tool: string
   mbps: number
+  /** Syntax trees built per document: events or a flat token stream count as none. */
+  trees: number
   isTextlane?: boolean
 }
 
 // The 1 MB `cmark` case of benchmark/, CommonMark to HTML, input MB/s at the median
 const measures: Measure[] = [
-  { tool: "pulldown-cmark", mbps: 286.7 },
-  { tool: "comrak", mbps: 119.8 },
-  { tool: "cmark (C, via cmarkgfm)", mbps: 104.1 },
-  { tool: "textlane (Rust, mdast)", mbps: 93.9, isTextlane: true },
-  { tool: "textlane (TypeScript, mdast)", mbps: 83.5, isTextlane: true },
-  { tool: "textlane (Python, mdast)", mbps: 82.8, isTextlane: true },
-  { tool: "textlane (Rust, mdast + hast)", mbps: 60.4, isTextlane: true },
-  { tool: "textlane (TypeScript, mdast + hast)", mbps: 60.1, isTextlane: true },
-  { tool: "textlane (Python, mdast + hast)", mbps: 56.0, isTextlane: true },
-  { tool: "marked", mbps: 17.0 },
-  { tool: "markdown-it", mbps: 14.3 },
-  { tool: "markdown-rs", mbps: 5.2 },
-  { tool: "mistune", mbps: 4.7 },
-  { tool: "markdown-it-py", mbps: 3.4 },
-  { tool: "Python-Markdown", mbps: 3.1 },
-  { tool: "micromark", mbps: 0.7 },
-  { tool: "unified (remark + rehype)", mbps: 0.7 },
+  { tool: "pulldown-cmark", mbps: 286.7, trees: 0 },
+  { tool: "comrak", mbps: 119.8, trees: 1 },
+  { tool: "cmark (C, via cmarkgfm)", mbps: 104.1, trees: 1 },
+  { tool: "textlane (Rust)", mbps: 93.9, trees: 1, isTextlane: true },
+  { tool: "textlane (TypeScript)", mbps: 83.5, trees: 1, isTextlane: true },
+  { tool: "textlane (Python)", mbps: 82.8, trees: 1, isTextlane: true },
+  { tool: "textlane (Rust)", mbps: 60.4, trees: 2, isTextlane: true },
+  { tool: "textlane (TypeScript)", mbps: 60.1, trees: 2, isTextlane: true },
+  { tool: "textlane (Python)", mbps: 56.0, trees: 2, isTextlane: true },
+  { tool: "marked", mbps: 17.0, trees: 1 },
+  { tool: "markdown-it", mbps: 14.3, trees: 0 },
+  { tool: "markdown-rs", mbps: 5.2, trees: 0 },
+  { tool: "mistune", mbps: 4.7, trees: 1 },
+  { tool: "markdown-it-py", mbps: 3.4, trees: 0 },
+  { tool: "Python-Markdown", mbps: 3.1, trees: 1 },
+  { tool: "micromark", mbps: 0.7, trees: 0 },
+  { tool: "unified (remark + rehype)", mbps: 0.7, trees: 2 },
 ]
 
 function Benchmark() {
@@ -1026,8 +1028,8 @@ function Benchmark() {
               <ul className="space-y-3">
                 {measures.map(measure => (
                   <li
-                    key={measure.tool}
-                    className="grid grid-cols-1 gap-1 sm:grid-cols-[17rem_minmax(0,1fr)_6rem] sm:items-center sm:gap-4"
+                    key={`${measure.tool}-${measure.trees}`}
+                    className="grid grid-cols-1 gap-1 sm:grid-cols-[14rem_4.5rem_minmax(0,1fr)_6rem] sm:items-center sm:gap-4"
                   >
                     <span
                       className={cn(
@@ -1038,6 +1040,9 @@ function Benchmark() {
                       )}
                     >
                       {measure.tool}
+                    </span>
+                    <span className="justify-self-start rounded-full border border-border px-1.5 py-px align-middle font-mono text-[0.65rem] font-normal whitespace-nowrap text-muted-foreground">
+                      {measure.trees} {measure.trees === 1 ? "AST" : "ASTs"}
                     </span>
                     <span className="h-3 rounded-full bg-muted">
                       <span
