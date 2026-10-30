@@ -22,10 +22,10 @@ Rust:
 use textlane::{Processor, html, md};
 
 let processor = Processor::new()
-    .with(md::parse(Default::default()))
-    .with(md::gfm(Default::default()))
-    .with(md::to_html(Default::default()))
-    .with(html::stringify(Default::default()))
+    .with(md::Parse::default())
+    .with(md::Gfm::default())
+    .with(md::ToHtml::default())
+    .with(html::Stringify::default())
     .freeze()?;
 assert_eq!(processor.process("# hi")?.value, "<h1>hi</h1>");
 ```

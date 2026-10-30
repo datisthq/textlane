@@ -11,7 +11,7 @@ pub(crate) fn stringify_table_cell(
     state.enter(Construct::TableCell);
     state.enter(Construct::Phrasing);
     // Upstream pads with a space only when `tableCellPadding` is passed as `true`, which
-    // `GfmOptions` cannot tell from its default
+    // `Gfm` cannot tell from its default
     let value = state.container_phrasing(
         cell,
         Info {

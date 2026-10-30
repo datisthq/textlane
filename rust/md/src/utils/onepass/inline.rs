@@ -15,7 +15,7 @@ use crate::helpers::decode::decode_string;
 use crate::helpers::identifier::normalize_identifier;
 use crate::helpers::literal::is_atext;
 use crate::helpers::math::create_inline_math_data;
-use crate::models::options::{GfmOptions, MathOptions};
+use crate::models::options::{Gfm, Math};
 use crate::utils::onepass::block::strip_line_prefixes;
 use crate::utils::onepass::directive::scan_head;
 use crate::utils::onepass::literal::{LiteralKind, LiteralMemo, scan_literal};
@@ -88,7 +88,7 @@ pub(crate) struct Inline<'a, 'd> {
     segments: &'d [(usize, usize)],
     identifiers: &'d HashSet<String>,
     longest_identifier: usize,
-    gfm: Option<&'d GfmOptions>,
+    gfm: Option<&'d Gfm>,
     footnotes: &'d HashSet<String>,
     in_table: bool,
     literal_memo: LiteralMemo,
@@ -98,7 +98,7 @@ pub(crate) struct Inline<'a, 'd> {
     leaf: &'static str,
     directive: bool,
     keep_trailing: bool,
-    math: Option<&'d MathOptions>,
+    math: Option<&'d Math>,
     items: Vec<Item<'a>>,
     brackets: Vec<Bracket>,
     delims: Vec<usize>,
@@ -108,8 +108,8 @@ pub(crate) struct Inline<'a, 'd> {
 pub(crate) struct InlineContext<'d> {
     pub(crate) identifiers: &'d HashSet<String>,
     pub(crate) longest_identifier: usize,
-    pub(crate) gfm: Option<&'d GfmOptions>,
-    pub(crate) math: Option<&'d MathOptions>,
+    pub(crate) gfm: Option<&'d Gfm>,
+    pub(crate) math: Option<&'d Math>,
     /// GFM footnote labels, normalized as micromark compares them.
     pub(crate) footnotes: &'d HashSet<String>,
     /// Whether a task list check may open the text: a list item's first content.

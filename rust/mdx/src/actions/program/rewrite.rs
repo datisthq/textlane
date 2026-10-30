@@ -5,13 +5,13 @@ use crate::helpers::identifier::is_identifier_name;
 use crate::helpers::walk::{Enter, Visit, walk};
 use crate::models::estree::{Id, Store, Value};
 use crate::models::name::{Key, Kind};
-use crate::models::options::CompileOptions;
+use crate::models::options::Compile;
 use crate::models::scope::Scopes;
 
 /// recma-jsx-rewrite of @mdx-js/mdx 3.1.1: in `_createMdxContent` (in every function with
 /// a provider), take lowercase tags from `_components` and components from
 /// `props.components` or the provider, checking each reference not in scope at runtime.
-pub(crate) fn rewrite_program(store: &mut Store, program: Id, options: &CompileOptions) {
+pub(crate) fn rewrite_program(store: &mut Store, program: Id, options: &Compile) {
     let provider = options
         .provider_import_source
         .as_deref()

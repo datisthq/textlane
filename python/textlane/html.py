@@ -26,7 +26,7 @@ __all__ = [
 ]
 
 
-# Options of `html.parse`, named as rehype-parse names them.
+# `html.parse`: HTML into hast; options named as rehype-parse names them.
 class ParseOptions(TypedDict, total=False):
     # Parse a fragment, as in a `template`, rather than a whole document.
     fragment: bool
@@ -36,7 +36,8 @@ class ParseOptions(TypedDict, total=False):
     verbose: bool
 
 
-# Options of `html.raw`, named as hast-util-raw names them.
+# `html.raw`: reparse raw HTML and fix nesting through the HTML parser; options named as
+# hast-util-raw names them.
 class RawOptions(TypedDict, total=False):
     # Node types, unknown to hast, to copy through as they are; their children are
     # reparsed on their own.
@@ -49,7 +50,8 @@ class RawOptions(TypedDict, total=False):
 Indent = Union[int, str]
 
 
-# Options of `html.format`, named as hast-util-format names them.
+# `html.format`: indent and collapse whitespace for readable HTML; options named as
+# hast-util-format names them.
 class FormatOptions(TypedDict, total=False):
     # Tag names of elements to put a blank line between, when both are one.
     blanks: List[str]
@@ -68,8 +70,8 @@ Primitive = Union[bool, float, str]
 AttributeDefinition = Union[str, List[Primitive]]
 
 
-# Options of `html.sanitize`: hast-util-sanitize's schema; a field left out keeps the
-# default schema's, which is GitHub's.
+# `html.sanitize`: keep only what a schema allows; options: hast-util-sanitize's schema,
+# where a field left out keeps the default schema's, which is GitHub's.
 class SanitizeOptions(TypedDict, total=False):
     # Keep comments.
     allowComments: Optional[bool]
@@ -94,13 +96,15 @@ class SanitizeOptions(TypedDict, total=False):
     tagNames: Optional[List[str]]
 
 
-# Options of `html.slug`, named as rehype-slug names them.
+# `html.slug`: ids on headings, from their text; options named as rehype-slug names
+# them.
 class SlugOptions(TypedDict, total=False):
     # Put before each id.
     prefix: str
 
 
-# Options of `html.highlight`, named as @shikijs/rehype names them.
+# `html.highlight`: code blocks colored as Shiki colors them, natively by giallo;
+# options named as @shikijs/rehype names them.
 class HighlightOptions(TypedDict, total=False):
     # The theme of each color mode, `light` first, as `{"light": …, "dark": …}`.
     themes: Optional[Dict[str, Any]]
@@ -112,7 +116,7 @@ class HighlightOptions(TypedDict, total=False):
     fallbackLanguage: Optional[str]
 
 
-# Options of `html.toMarkdown`, named as hast-util-to-mdast names them.
+# `html.toMarkdown`: hast into mdast; options named as hast-util-to-mdast names them.
 class ToMarkdownOptions(TypedDict, total=False):
     # Wrap all phrasing content of the root in paragraphs, as for a whole document.
     document: bool
@@ -127,7 +131,7 @@ class ToMarkdownOptions(TypedDict, total=False):
     quotes: Optional[List[str]]
 
 
-# Options of `html.stringify`, named as hast-util-to-html names them.
+# `html.stringify`: hast into HTML; options named as hast-util-to-html names them.
 class StringifyOptions(TypedDict, total=False):
     # Write raw nodes as they are instead of escaping them.
     allowDangerousHtml: bool

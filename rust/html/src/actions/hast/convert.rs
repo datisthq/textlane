@@ -5,7 +5,7 @@ use textlane_core::{Allocator, mdast};
 
 use crate::actions::hast::minify::minify_hast;
 use crate::helpers::value::read_value;
-use crate::models::options::ToMarkdownOptions;
+use crate::models::options::ToMarkdown;
 use crate::utils::converter::state::Converter;
 use crate::utils::converter::store::{Converted, Kind, Store};
 
@@ -13,7 +13,7 @@ use crate::utils::converter::store::{Converted, Kind, Store};
 /// rehype-minify-whitespace does; several nodes come back in a root.
 pub fn convert_hast<'a>(
     mut node: Node<'a>,
-    options: &ToMarkdownOptions,
+    options: &ToMarkdown,
     alloc: &'a Allocator,
 ) -> mdast::Node<'a> {
     minify_hast(&mut node, options.newlines, alloc);

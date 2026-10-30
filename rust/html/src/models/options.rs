@@ -2,11 +2,12 @@ use std::collections::{BTreeMap, HashMap};
 
 use serde::Deserialize;
 
-/// Options of `html.stringify`, named as hast-util-to-html names them.
+/// `html.stringify`: hast into HTML; options named as hast-util-to-html names them.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct StringifyOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "StringifyOptions"))]
+pub struct Stringify {
     /// Write raw nodes as they are instead of escaping them.
     pub allow_dangerous_html: bool,
     /// Leave characters that are only dangerous in some contexts, such as `` ` ``, as they are.
@@ -45,11 +46,12 @@ pub struct StringifyOptions {
     pub voids: Option<Vec<String>>,
 }
 
-/// Options of `html.parse`, named as rehype-parse names them.
+/// `html.parse`: HTML into hast; options named as rehype-parse names them.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct ParseOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "ParseOptions"))]
+pub struct Parse {
     /// Parse a fragment, as in a `template`, rather than a whole document.
     pub fragment: bool,
     /// Report parse errors as messages on the file.
@@ -58,12 +60,13 @@ pub struct ParseOptions {
     pub verbose: bool,
 }
 
-/// Options of `html.sanitize`: hast-util-sanitize's schema; a field left out keeps the
-/// default schema's, which is GitHub's.
+/// `html.sanitize`: keep only what a schema allows; options: hast-util-sanitize's schema,
+/// where a field left out keeps the default schema's, which is GitHub's.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct SanitizeOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "SanitizeOptions"))]
+pub struct Sanitize {
     /// Keep comments.
     pub allow_comments: Option<bool>,
     /// Keep doctypes.
@@ -106,11 +109,13 @@ pub enum Primitive {
     String(String),
 }
 
-/// Options of `html.highlight`, named as @shikijs/rehype names them.
+/// `html.highlight`: code blocks colored as Shiki colors them, natively by giallo;
+/// options named as @shikijs/rehype names them.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct HighlightOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "HighlightOptions"))]
+pub struct Highlight {
     /// The theme of each color mode, `light` first, as `{"light": …, "dark": …}`.
     pub themes: Option<serde_json::Map<String, serde_json::Value>>,
     /// The one theme, when `themes` is not given.
@@ -121,20 +126,23 @@ pub struct HighlightOptions {
     pub fallback_language: Option<String>,
 }
 
-/// Options of `html.slug`, named as rehype-slug names them.
+/// `html.slug`: ids on headings, from their text; options named as rehype-slug names
+/// them.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct SlugOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "SlugOptions"))]
+pub struct Slug {
     /// Put before each id.
     pub prefix: String,
 }
 
-/// Options of `html.toMarkdown`, named as hast-util-to-mdast names them.
+/// `html.toMarkdown`: hast into mdast; options named as hast-util-to-mdast names them.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct ToMarkdownOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "ToMarkdownOptions"))]
+pub struct ToMarkdown {
     /// Wrap all phrasing content of the root in paragraphs, as for a whole document.
     pub document: bool,
     /// Collapse whitespace holding a line ending to that line ending instead of a space.
@@ -148,11 +156,13 @@ pub struct ToMarkdownOptions {
     pub quotes: Option<Vec<String>>,
 }
 
-/// Options of `html.raw`, named as hast-util-raw names them.
+/// `html.raw`: reparse raw HTML and fix nesting through the HTML parser; options named as
+/// hast-util-raw names them.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct RawOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "RawOptions"))]
+pub struct Raw {
     /// Node types, unknown to hast, to copy through as they are; their children are
     /// reparsed on their own.
     pub pass_through: Vec<String>,
@@ -160,11 +170,13 @@ pub struct RawOptions {
     pub tagfilter: bool,
 }
 
-/// Options of `html.format`, named as hast-util-format names them.
+/// `html.format`: indent and collapse whitespace for readable HTML; options named as
+/// hast-util-format names them.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct FormatOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "FormatOptions"))]
+pub struct Format {
     /// Tag names of elements to put a blank line between, when both are one.
     pub blanks: Vec<String>,
     /// One level of indentation: a number of spaces or the text itself; two spaces when

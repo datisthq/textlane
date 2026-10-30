@@ -50,6 +50,11 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   `plugins/<name>/` for one `.use()` stage each (`plugin.rs` plus its own `actions/`), and
   `utils/<name>/` for a bounded internal system whose files are mutually recursive (`md`'s
   `onepass`, `serializer`, `converter`); only it is exempt from one action per file
+- A plugin is one struct named after it and holding its options as fields, declared in
+  `models/` and implementing `Plugin` in its `plugin.rs`; no constructor function beside
+  it. Callers write `md::Gfm::default()` or `md::Gfm { single_tilde: false,
+..Default::default() }`; a plugin without options is a unit struct (`md::Gemoji`),
+  declared in its `plugin.rs`
 - Trees live in one `bumpalo` arena per document (`textlane_core::Allocator`, `ArenaVec`);
   strings borrow the input or the arena. Input decides how deep a tree nests, so nothing
   walks one by recursion on the plain stack: `ArenaVec` never drops its items, conversion
@@ -195,7 +200,7 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   With `md.mdx` in the pipeline, `md.toHtml` runs remark-mark-and-unravel first (an
   `UnravelSlot` flag either plugin may attach first): a paragraph of only MDX text nodes
   and white space becomes its MDX as flow nodes, which hast cannot recover once wrapped
-- `md.gfm` only puts `GfmOptions` in the `GfmSlot` slot; `md.parse` and `md.stringify` read it
+- `md.gfm` only puts its options (the `md::Gfm` struct itself) in the `GfmSlot` slot; `md.parse` and `md.stringify` read it
   when their factories run at freeze, so GFM's constructs, handlers and unsafe patterns are
   on only with it. A GFM table is tried after each first byte's own flow constructs, as
   micromark tries constructs keyed on `null`, and a row's indent sits before the row token.

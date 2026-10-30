@@ -2,30 +2,19 @@ use textlane_core::{Allocator, Attach, Error, File, Plugin, Transform, Tree, Tre
 
 use crate::actions::message::place::place_messages;
 use crate::actions::readability::check::check_readability;
-use crate::models::options::ReadabilityOptions;
-
-/// `prose.readability`: warnings about sentences too hard to read, as retext-readability.
-#[derive(Clone, Debug, Default)]
-pub struct Readability {
-    pub options: ReadabilityOptions,
-}
-
-/// The `prose.readability` plugin.
-pub fn readability(options: ReadabilityOptions) -> Readability {
-    Readability { options }
-}
+use crate::models::options::Readability;
 
 impl Plugin for Readability {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
         context.add_transform(Box::new(ReadabilityCheck {
-            options: self.options.clone(),
+            options: self.clone(),
         }));
         Ok(())
     }
 }
 
 struct ReadabilityCheck {
-    options: ReadabilityOptions,
+    options: Readability,
 }
 
 impl Transform for ReadabilityCheck {

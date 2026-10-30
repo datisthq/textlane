@@ -7,11 +7,6 @@ use crate::actions::repeated_words::check::check_repeated_words;
 #[derive(Clone, Debug, Default)]
 pub struct RepeatedWords;
 
-/// The `prose.repeatedWords` plugin.
-pub fn repeated_words() -> RepeatedWords {
-    RepeatedWords
-}
-
 impl Plugin for RepeatedWords {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
         context.add_transform(Box::new(RepeatedWords));

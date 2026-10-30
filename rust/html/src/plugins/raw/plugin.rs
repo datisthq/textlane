@@ -1,18 +1,7 @@
 use textlane_core::{Allocator, Attach, Error, File, Plugin, Transform, Tree, TreeKind};
 
 use crate::actions::hast::raw::raw_hast;
-use crate::models::options::RawOptions;
-
-/// `html.raw`: reparse raw HTML and fix nesting through the HTML parser.
-#[derive(Clone, Debug, Default)]
-pub struct Raw {
-    pub options: RawOptions,
-}
-
-/// The `html.raw` plugin.
-pub fn raw(options: RawOptions) -> Raw {
-    Raw { options }
-}
+use crate::models::options::Raw;
 
 impl Plugin for Raw {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
@@ -37,7 +26,7 @@ impl Transform for Raw {
         alloc: &'a Allocator,
     ) -> Result<Tree<'a>, Error> {
         match tree {
-            Tree::Hast(node) => Ok(Tree::Hast(raw_hast(&node, &self.options, alloc)?)),
+            Tree::Hast(node) => Ok(Tree::Hast(raw_hast(&node, self, alloc)?)),
             _ => Err(Error::new("invalid-stage", "`html.raw` takes hast")),
         }
     }

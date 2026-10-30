@@ -4,30 +4,19 @@ use crate::actions::frontmatter::stringify::create_frontmatter_patterns;
 use crate::actions::markdown::stringify::serialize_tree;
 use crate::models::options::{
     DefinitionListSlot, DirectiveSlot, FrontmatterSlot, GfmSlot, MathSlot, MdxSlot,
-    StringifyOptions,
+    Stringify,
 };
 use crate::utils::serializer::settings::Settings;
 use crate::utils::serializer::unsafe_patterns::{
     Pattern, compile_patterns, create_def_list_pattern,
 };
 
-/// `md.stringify`: mdast into Markdown.
-#[derive(Clone, Debug, Default)]
-pub struct Stringify {
-    pub options: StringifyOptions,
-}
-
-/// The `md.stringify` plugin.
-pub fn stringify(options: StringifyOptions) -> Stringify {
-    Stringify { options }
-}
-
 impl Plugin for Stringify {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
-        let settings = Settings::from_options(&self.options)?;
+        let settings = Settings::from_options(self)?;
         // A bad pattern must fail at `use`, not later when the pipeline freezes
-        compile_patterns(false, None, false, false, &self.options.unsafe_patterns)?;
-        let unsafe_patterns = self.options.unsafe_patterns.clone();
+        compile_patterns(false, None, false, false, &self.unsafe_patterns)?;
+        let unsafe_patterns = self.unsafe_patterns.clone();
         context.set_compiler(move |slots| {
             let mut settings = settings;
             settings.gfm = slots.get::<GfmSlot>().and_then(|slot| slot.0.clone());

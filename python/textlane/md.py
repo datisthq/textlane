@@ -29,11 +29,13 @@ __all__ = [
 ]
 
 
-# Options of `md::parse`.
+# `md.parse`: Markdown into mdast.
 ParseOptions = Dict[str, Any]
 
 
-# Options of `md::directive`, named as mdast-util-directive's serializer names them.
+# `md.directive`: generic directives, `:a`, `::b` and `:::c`, read by `md.parse` and
+# written by `md.stringify`; options named as mdast-util-directive's serializer names
+# them.
 class DirectiveOptions(TypedDict, total=False):
     # Write an empty attribute as its name alone, `{a}`, rather than `{a=""}`.
     collapseEmptyAttributes: bool
@@ -41,13 +43,14 @@ class DirectiveOptions(TypedDict, total=False):
     preferShortcut: bool
     # Leave attribute values unquoted where they can be.
     preferUnquoted: bool
-    # The quote of attribute values: `"` or `'`; `md::stringify`'s `quote` when unset.
+    # The quote of attribute values: `"` or `'`; `md.stringify`'s `quote` when unset.
     quote: Optional[str]
     # Use the other quote when the preferred one occurs more often in a value.
     quoteSmart: bool
 
 
-# Options of `md::gfm`, named as remark-gfm names them.
+# `md.gfm`: GitHub Flavored Markdown's syntax, read by `md.parse` and written by
+# `md.stringify`; options named as remark-gfm names them.
 class GfmOptions(TypedDict, total=False):
     # Let one tilde, `~a~`, form strikethrough, as well as two.
     singleTilde: bool
@@ -59,13 +62,16 @@ class GfmOptions(TypedDict, total=False):
     firstLineBlank: bool
 
 
-# Options of `md::math`, named as remark-math names them.
+# `md.math`: math syntax, `$$` blocks and `$` text, read by `md.parse` and written by
+# `md.stringify`; options named as remark-math names them.
 class MathOptions(TypedDict, total=False):
     # Let one dollar, `$a$`, form math in text, as well as two.
     singleDollarTextMath: bool
 
 
-# Options of `md::mdx`, named as remark-mdx and mdast-util-mdx-jsx's serializer name them.
+# `md.mdx`: MDX syntax, JSX, expressions and ESM, read by `md.parse` and written by
+# `md.stringify`; it turns off indented code, autolinks and raw HTML; options named as
+# remark-mdx and mdast-util-mdx-jsx's serializer name them.
 class MdxOptions(TypedDict, total=False):
     # The quote of JSX attribute values: `"` (when unset) or `'`.
     quote: Optional[str]
@@ -132,7 +138,8 @@ class UnsafePattern(TypedDict, total=False):
     unicode: bool
 
 
-# Options of `md::stringify`, named as mdast-util-to-markdown names them.
+# `md.stringify`: mdast into Markdown; options named as mdast-util-to-markdown names
+# them.
 class StringifyOptions(TypedDict, total=False):
     # The marker of unordered list items: `*`, `+` or `-`.
     bullet: Optional[str]
@@ -172,7 +179,7 @@ class StringifyOptions(TypedDict, total=False):
     unsafe: List[UnsafePattern]
 
 
-# Options of `md::to_html`, named as remark-rehype names them.
+# `md.toHtml`: mdast into hast; options named as remark-rehype names them.
 class ToHtmlOptions(TypedDict, total=False):
     # Keep raw HTML in the tree instead of dropping it.
     allowDangerousHtml: bool
@@ -194,7 +201,8 @@ class ToHtmlOptions(TypedDict, total=False):
     passThrough: List[str]
 
 
-# Options of `md::to_prose`, named as remark-retext and mdast-util-to-nlcst name them.
+# `md.toProse`: mdast into nlcst, tokenized by the processor's prose parser; options
+# named as remark-retext and mdast-util-to-nlcst name them.
 class ToProseOptions(TypedDict, total=False):
     # Node types to leave out, besides `table`, `tableRow` and `tableCell`.
     ignore: List[str]

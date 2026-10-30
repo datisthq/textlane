@@ -4,18 +4,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use textlane_core::{Allocator, Attach, Error, File, Plugin, Transform, Tree, TreeKind};
 
 use crate::actions::mdast::convert::{convert_mdast, convert_mdast_with};
-use crate::models::options::{ToHtmlOptions, UnravelSlot};
-
-/// `md.toHtml`: mdast into hast.
-#[derive(Clone, Debug, Default)]
-pub struct ToHtml {
-    pub options: ToHtmlOptions,
-}
-
-/// The `md.toHtml` plugin.
-pub fn to_html(options: ToHtmlOptions) -> ToHtml {
-    ToHtml { options }
-}
+use crate::models::options::{ToHtml, UnravelSlot};
 
 impl Plugin for ToHtml {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
@@ -25,7 +14,7 @@ impl Plugin for ToHtml {
             .0
             .clone();
         context.add_transform(Box::new(Converting {
-            options: self.options.clone(),
+            options: self.clone(),
             unravel,
         }));
         Ok(())
@@ -48,18 +37,16 @@ impl Transform for ToHtml {
         alloc: &'a Allocator,
     ) -> Result<Tree<'a>, Error> {
         match tree {
-            Tree::Mdast(node) => {
-                Ok(Tree::Hast(convert_mdast(&node, alloc, &self.options)))
-            }
+            Tree::Mdast(node) => Ok(Tree::Hast(convert_mdast(&node, alloc, self))),
             _ => Err(Error::new("invalid-stage", "`md.toHtml` takes mdast")),
         }
     }
 }
 
-// The stage a pipeline runs: with `md::mdx` in it, @mdx-js/mdx's remark-mark-and-unravel
+// The stage a pipeline runs: with `md::Mdx` in it, @mdx-js/mdx's remark-mark-and-unravel
 // first lifts MDX out of paragraphs that hold nothing else
 struct Converting {
-    options: ToHtmlOptions,
+    options: ToHtml,
     unravel: Arc<AtomicBool>,
 }
 

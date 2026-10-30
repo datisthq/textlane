@@ -1,11 +1,13 @@
 use serde::Deserialize;
 use serde::de::{Deserializer, Error};
 
-/// Options of `prose.smartypants`, as retext-smartypants takes them.
+/// `prose.smartypants`: straight quotes, dashes, dots and backticks into typographic
+/// ones; options as retext-smartypants takes them.
 #[derive(Clone, Debug, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct SmartypantsOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "SmartypantsOptions"))]
+pub struct Smartypants {
     /// Turn double backticks and double straight single quotes into double quotes; `all`
     /// turns single ones into single quotes too, and needs `quotes: false`.
     pub backticks: Backticks,
@@ -60,7 +62,7 @@ pub enum Ellipses {
     Unspaced,
 }
 
-impl Default for SmartypantsOptions {
+impl Default for Smartypants {
     fn default() -> Self {
         Self {
             backticks: Backticks::On,

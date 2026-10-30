@@ -1,14 +1,14 @@
-use textlane_core::hast::{Node, Raw, Root, Unknown};
+use textlane_core::hast::{self, Node, Root, Unknown};
 use textlane_core::{Allocator, ArenaVec, Error};
 
 use super::raw_hast;
 use crate::actions::hast::stringify::stringify_hast;
-use crate::models::options::{RawOptions, StringifyOptions};
+use crate::models::options::{Raw, Stringify};
 
 fn create_root<'a>(alloc: &'a Allocator, values: &[&'a str]) -> Node<'a> {
     let mut children = ArenaVec::new_in(alloc);
     for value in values {
-        children.push(Node::Raw(Raw {
+        children.push(Node::Raw(hast::Raw {
             value,
             position: None,
             data: None,
@@ -22,15 +22,15 @@ fn create_root<'a>(alloc: &'a Allocator, values: &[&'a str]) -> Node<'a> {
     })
 }
 
-fn reparse(values: &[&str], options: &RawOptions) -> Result<String, Error> {
+fn reparse(values: &[&str], options: &Raw) -> Result<String, Error> {
     let alloc = Allocator::new();
     let tree = raw_hast(&create_root(&alloc, values), options, &alloc)?;
-    stringify_hast(&tree, &StringifyOptions::default())
+    stringify_hast(&tree, &Stringify::default())
 }
 
 #[test]
 fn escapes_disallowed_tags_with_tagfilter() -> Result<(), Error> {
-    let options = RawOptions {
+    let options = Raw {
         tagfilter: true,
         ..Default::default()
     };
@@ -44,7 +44,7 @@ fn escapes_disallowed_tags_with_tagfilter() -> Result<(), Error> {
 // What hast-util-raw 9.1.0 on parse5 7.3.0 does where a lookahead hits the end of a chunk
 #[test]
 fn drops_a_lookahead_cut_by_the_end_of_a_raw_node() -> Result<(), Error> {
-    let options = RawOptions::default();
+    let options = Raw::default();
     assert_eq!(reparse(&["<!-", "- x -->"], &options)?, "<!--- x ---->");
     assert_eq!(
         reparse(&["<title>a</ti", "tle>b"], &options)?,
@@ -64,7 +64,7 @@ fn fails_on_unknown_nodes_not_passed_through() {
         position: None,
         data: None,
     });
-    let error = raw_hast(&tree, &RawOptions::default(), &alloc).err();
+    let error = raw_hast(&tree, &Raw::default(), &alloc).err();
     assert!(error.is_some_and(|error| error.code == "unknown-node"));
 }
 
@@ -83,7 +83,7 @@ fn passes_deeply_nested_nodes_through_without_recursing() -> Result<(), Error> {
             data: None,
         });
     }
-    let options = RawOptions {
+    let options = Raw {
         pass_through: vec!["custom".to_string()],
         ..Default::default()
     };

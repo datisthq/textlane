@@ -8,7 +8,7 @@ use crate::helpers::property::find_property;
 use crate::helpers::schema::{
     BOOLEAN, COMMA_SEPARATED, HTML, Info, OVERLOADED_BOOLEAN, SVG,
 };
-use crate::models::options::StringifyOptions;
+use crate::models::options::Stringify;
 
 // html-void-elements
 pub(crate) const VOID_ELEMENTS: [&str; 20] = [
@@ -34,10 +34,7 @@ const DOUBLE: [[&str; 2]; 2] = [["\"&", "\"&'`"], ["\0\"&", "\0\"&'`"]];
 ///
 /// Walks with an explicit stack instead of recursing, so a deeply nested tree cannot
 /// overflow the call stack.
-pub fn stringify_hast(
-    node: &Node<'_>,
-    options: &StringifyOptions,
-) -> Result<String, Error> {
+pub fn stringify_hast(node: &Node<'_>, options: &Stringify) -> Result<String, Error> {
     let quote = match options.quote.as_deref() {
         None | Some("" | "\"") => '"',
         Some("'") => '\'',
@@ -87,7 +84,7 @@ pub fn stringify_hast(
 }
 
 struct State<'o> {
-    options: &'o StringifyOptions,
+    options: &'o Stringify,
     output: String,
     schema: &'static [Info],
     quote: char,

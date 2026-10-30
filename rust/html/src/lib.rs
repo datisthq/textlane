@@ -196,9 +196,8 @@ mod plugins {
 
 // models
 pub use models::options::{
-    AttributeDefinition, FormatOptions, HighlightOptions, Indent, ParseOptions,
-    Primitive, RawOptions, SanitizeOptions, SlugOptions, StringifyOptions,
-    ToMarkdownOptions,
+    AttributeDefinition, Format, Highlight, Indent, Parse, Primitive, Raw, Sanitize,
+    Slug, Stringify, ToMarkdown,
 };
 
 // actions
@@ -214,13 +213,5 @@ pub use actions::hast::stringify::stringify_hast;
 pub use actions::html::parse::parse_html;
 
 // plugins
-pub use plugins::format::plugin::{Format, format};
 #[cfg(feature = "highlight")]
-pub use plugins::highlight::plugin::{Highlight, highlight};
-pub use plugins::parse::plugin::{Parse, parse};
-pub use plugins::raw::plugin::{Raw, raw};
-pub use plugins::sanitize::plugin::{Sanitize, sanitize};
-pub use plugins::slug::plugin::{Slug, slug};
-pub use plugins::stringify::plugin::{Stringify, stringify};
-pub use plugins::to_markdown::plugin::{ToMarkdown, to_markdown};
-pub use plugins::to_prose::plugin::{ToProse, to_prose};
+pub use plugins::to_prose::plugin::ToProse;

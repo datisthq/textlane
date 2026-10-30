@@ -1,7 +1,7 @@
 use textlane_core::Allocator;
 use textlane_core::nlcst::Node;
 
-use crate::models::options::{Language, ParseOptions};
+use crate::models::options::{Language, Parse};
 use crate::utils::parser::document::{build_paragraph, build_root};
 use crate::utils::parser::store::Store;
 use crate::utils::parser::tokenize::tokenize_value;
@@ -9,7 +9,7 @@ use crate::utils::parser::tokenize::tokenize_value;
 /// Parse natural language into nlcst, as parse-latin's or parse-english's `parse`.
 pub fn parse_prose<'a>(
     input: &'a str,
-    options: &ParseOptions,
+    options: &Parse,
     alloc: &'a Allocator,
 ) -> Node<'a> {
     let mut store = Store::default();

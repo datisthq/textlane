@@ -8,7 +8,7 @@ use crate::actions::nlcst::visit::visit_nlcst;
 use crate::actions::syllable::count::count_syllables;
 use crate::helpers::place::join_positions;
 use crate::helpers::readability_table::{DALE_CHALL, SPACHE};
-use crate::models::options::ReadabilityOptions;
+use crate::models::options::Readability;
 use crate::models::report::Report;
 
 const SOURCE: &str = "retext-readability";
@@ -28,7 +28,7 @@ struct Counts {
 /// readability formulas find too hard for the audience's age.
 pub(crate) fn check_readability<'a>(
     tree: &Node<'a>,
-    options: &ReadabilityOptions,
+    options: &Readability,
     alloc: &'a Allocator,
 ) -> Vec<Report<'a>> {
     let age = options

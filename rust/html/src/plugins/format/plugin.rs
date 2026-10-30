@@ -1,18 +1,7 @@
 use textlane_core::{Allocator, Attach, Error, File, Plugin, Transform, Tree, TreeKind};
 
 use crate::actions::hast::format::format_hast;
-use crate::models::options::FormatOptions;
-
-/// `html.format`: indent and collapse whitespace for readable HTML.
-#[derive(Clone, Debug, Default)]
-pub struct Format {
-    pub options: FormatOptions,
-}
-
-/// The `html.format` plugin.
-pub fn format(options: FormatOptions) -> Format {
-    Format { options }
-}
+use crate::models::options::Format;
 
 impl Plugin for Format {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
@@ -37,7 +26,7 @@ impl Transform for Format {
         alloc: &'a Allocator,
     ) -> Result<Tree<'a>, Error> {
         match tree {
-            Tree::Hast(node) => Ok(Tree::Hast(format_hast(node, &self.options, alloc))),
+            Tree::Hast(node) => Ok(Tree::Hast(format_hast(node, self, alloc))),
             _ => Err(Error::new("invalid-stage", "`html.format` takes hast")),
         }
     }

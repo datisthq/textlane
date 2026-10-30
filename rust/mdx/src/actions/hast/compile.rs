@@ -5,7 +5,7 @@ use crate::actions::hast::convert::convert_hast;
 use crate::actions::program::build::build_program;
 use crate::actions::program::rewrite::rewrite_program;
 use crate::actions::program::wrap::wrap_program;
-use crate::models::options::CompileOptions;
+use crate::models::options::Compile;
 use crate::utils::printer::state::print_program;
 
 /// Compile hast into JavaScript as @mdx-js/mdx 3.1.1 does after remark-rehype:
@@ -14,7 +14,7 @@ use crate::utils::printer::state::print_program;
 pub fn compile_hast(
     tree: &Node<'_>,
     source: Option<&str>,
-    options: &CompileOptions,
+    options: &Compile,
 ) -> Result<String, Error> {
     let (state, program) = convert_hast(tree, source, options)?;
     let mut store = state.store;

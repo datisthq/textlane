@@ -126,7 +126,7 @@
       <h3>Compose</h3>
       <p>
         <code
-          >Processor::new().with(md::parse()).with(md::gfm()).with(md::to_html()).with(html::stringify())</code
+          >Processor::new().with(md::Parse::default()).with(md::Gfm::default()).with(md::ToHtml::default()).with(html::Stringify::default())</code
         >. Rust says <code>.with()</code>; the bindings keep unified's
         <code>.use()</code>.
       </p>
@@ -135,7 +135,7 @@
       <h3>Freeze, once</h3>
       <p>
         Each plugin's <code>attach</code> runs once and does all setup:
-        <code>md::parse</code> merges every registered syntax extension into one table of
+        <code>md::Parse</code> merges every registered syntax extension into one table of
         constructs by character code, and the stage sequence is checked. Setup may be
         async (loading grammars or a highlighter).
       </p>
@@ -157,9 +157,9 @@
     <p>
       <code>set_parser</code>, <code>add_transform</code>, <code>set_compiler</code>, and
       cross-plugin data in slots keyed by type in place of unified's string-keyed
-      <code>this.data()</code>: <code>md::gfm</code> pushes into
+      <code>this.data()</code>: <code>md::Gfm</code> pushes into
       <code>md::Syntax</code> and <code>md::Handlers</code>, which
-      <code>md::parse</code> and <code>md::stringify</code> read. Plugin order is free, as
+      <code>md::Parse</code> and <code>md::Stringify</code> read. Plugin order is free, as
       in unified.
     </p>
   </dd>

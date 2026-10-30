@@ -12,7 +12,7 @@ use crate::helpers::property::{find_property, react_property};
 use crate::helpers::style::parse_style;
 use crate::models::estree::{Id, Store, Value};
 use crate::models::name::{Key, Kind};
-use crate::models::options::CompileOptions;
+use crate::models::options::Compile;
 
 const STACK_RED_ZONE: usize = 64 * 1024;
 const STACK_GROWTH: usize = 1024 * 1024;
@@ -40,7 +40,7 @@ pub(crate) struct Convert<'o, 's> {
     pub(crate) comments: Vec<Id>,
     pub(crate) esm: Vec<Id>,
     pub(crate) snippets: Vec<Snippet>,
-    options: &'o CompileOptions,
+    options: &'o Compile,
     lines: Option<Lines<'s>>,
     svg: bool,
     next_base: usize,
@@ -51,7 +51,7 @@ pub(crate) struct Convert<'o, 's> {
 pub(crate) fn convert_hast<'o, 's>(
     tree: &Node<'_>,
     source: Option<&'s str>,
-    options: &'o CompileOptions,
+    options: &'o Compile,
 ) -> Result<(Convert<'o, 's>, Id), Error> {
     let mut state = Convert {
         store: Store::default(),

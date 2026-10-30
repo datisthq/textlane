@@ -5,7 +5,7 @@ use crate::helpers::place::stringify_place;
 use crate::helpers::walk::{Enter, Visit, walk};
 use crate::models::estree::{Id, Store, Value};
 use crate::models::name::{Key, Kind};
-use crate::models::options::CompileOptions;
+use crate::models::options::Compile;
 use crate::models::scope::Scopes;
 
 /// recma-document of @mdx-js/mdx 3.1.1: inject the JSX pragmas, take the layout from
@@ -14,7 +14,7 @@ use crate::models::scope::Scopes;
 pub(crate) fn wrap_program(
     store: &mut Store,
     program: Id,
-    options: &CompileOptions,
+    options: &Compile,
     snippets: &[Snippet],
 ) -> Result<(), Error> {
     let pragma = options.pragma.as_deref().unwrap_or("React.createElement");

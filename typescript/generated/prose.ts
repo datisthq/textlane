@@ -2,7 +2,7 @@
 
 import type { Plugin } from "../models/plugin.ts"
 
-/** Options of `prose.parse`. */
+/** `prose.parse`: natural language into nlcst. */
 export interface ParseOptions {
   /** The rules sentences and words are found by. */
   language?: Language
@@ -11,7 +11,7 @@ export interface ParseOptions {
 /** The language `prose.parse` reads: parse-latin's rules, or parse-english's on top of them. */
 export type Language = "latin" | "english"
 
-/** Options of `prose.equality`, retext-equality's. */
+/** `prose.equality`: warnings about insensitive, inconsiderate wording, as retext-equality; options are retext-equality's. */
 export interface EqualityOptions {
   /** Phrases not to warn about. */
   ignore?: string[] | null
@@ -19,13 +19,13 @@ export interface EqualityOptions {
   binary?: boolean | null
 }
 
-/** Options of `prose.passive`, retext-passive's. */
+/** `prose.passive`: warnings about the passive voice, as retext-passive; options are retext-passive's. */
 export interface PassiveOptions {
   /** Participles not to warn about. */
   ignore?: string[] | null
 }
 
-/** Options of `prose.readability`, retext-readability's. */
+/** `prose.readability`: warnings about sentences too hard to read, as retext-readability; options are retext-readability's. */
 export interface ReadabilityOptions {
   /** The age of the target audience: 16 by default. */
   age?: number | null
@@ -35,7 +35,7 @@ export interface ReadabilityOptions {
   minWords?: number | null
 }
 
-/** Options of `prose.sentenceSpacing`, retext-sentence-spacing's. */
+/** `prose.sentenceSpacing`: warnings about the spaces between sentences, as retext-sentence-spacing; options are retext-sentence-spacing's. */
 export interface SentenceSpacingOptions {
   /** The spacing expected between sentences: `1` or `"space"` (the default), `2` or `"double-space"`, `0` or `"newline"`. */
   preferred?: Spacing | null
@@ -44,7 +44,7 @@ export interface SentenceSpacingOptions {
 /** A spacing between sentences, as a count of spaces or by name. */
 export type Spacing = number | string
 
-/** Options of `prose.smartypants`, as retext-smartypants takes them. */
+/** `prose.smartypants`: straight quotes, dashes, dots and backticks into typographic ones; options as retext-smartypants takes them. */
 export interface SmartypantsOptions {
   /** Turn double backticks and double straight single quotes into double quotes; `all` turns single ones into single quotes too, and needs `quotes: false`. */
   backticks?: Backticks
@@ -72,7 +72,7 @@ export type Dashes = boolean | "oldschool" | "inverted"
 
 export type Ellipses = boolean | "spaced" | "unspaced"
 
-/** Options of `prose.quotes`, as retext-quotes takes them. */
+/** `prose.quotes`: check that quotes and apostrophes are straight or smart, as preferred, at each level of nesting; options as retext-quotes takes them. */
 export interface QuotesOptions {
   /** The style of quotes and apostrophes to prefer: `smart` by default. */
   preferred?: QuoteStyle | null
@@ -85,7 +85,7 @@ export interface QuotesOptions {
 /** A style of quotes: straight (`"`) or smart (`“”`). */
 export type QuoteStyle = "smart" | "straight"
 
-/** Options of `prose.contractions`, as retext-contractions takes them. */
+/** `prose.contractions`: check apostrophes in contractions, such as `don’t`; options as retext-contractions takes them. */
 export interface ContractionsOptions {
   /** Also check contractions written as literals, such as `“hasnt”`. @default false */
   allowLiterals?: boolean | null

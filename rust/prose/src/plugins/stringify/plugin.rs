@@ -6,11 +6,6 @@ use crate::actions::nlcst::stringify::stringify_nlcst;
 #[derive(Clone, Debug, Default)]
 pub struct Stringify;
 
-/// The `prose.stringify` plugin.
-pub fn stringify() -> Stringify {
-    Stringify
-}
-
 impl Plugin for Stringify {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
         context.set_compiler(|_| Ok(Box::new(Stringify)));

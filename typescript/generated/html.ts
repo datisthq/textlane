@@ -2,7 +2,7 @@
 
 import type { Plugin } from "../models/plugin.ts"
 
-/** Options of `html.parse`, named as rehype-parse names them. */
+/** `html.parse`: HTML into hast; options named as rehype-parse names them. */
 export interface ParseOptions {
   /** Parse a fragment, as in a `template`, rather than a whole document. @default false */
   fragment?: boolean
@@ -12,7 +12,7 @@ export interface ParseOptions {
   verbose?: boolean
 }
 
-/** Options of `html.raw`, named as hast-util-raw names them. */
+/** `html.raw`: reparse raw HTML and fix nesting through the HTML parser; options named as hast-util-raw names them. */
 export interface RawOptions {
   /** Node types, unknown to hast, to copy through as they are; their children are reparsed on their own. @default [] */
   passThrough?: string[]
@@ -20,7 +20,7 @@ export interface RawOptions {
   tagfilter?: boolean
 }
 
-/** Options of `html.format`, named as hast-util-format names them. */
+/** `html.format`: indent and collapse whitespace for readable HTML; options named as hast-util-format names them. */
 export interface FormatOptions {
   /** Tag names of elements to put a blank line between, when both are one. @default [] */
   blanks?: string[]
@@ -33,7 +33,7 @@ export interface FormatOptions {
 /** One level of indentation. */
 export type Indent = number | string
 
-/** Options of `html.sanitize`: hast-util-sanitize's schema; a field left out keeps the default schema's, which is GitHub's. */
+/** `html.sanitize`: keep only what a schema allows; options: hast-util-sanitize's schema, where a field left out keeps the default schema's, which is GitHub's. */
 export interface SanitizeOptions {
   /** Keep comments. */
   allowComments?: boolean | null
@@ -63,13 +63,13 @@ export type AttributeDefinition = string | Primitive[]
 /** A primitive property value. */
 export type Primitive = boolean | number | string
 
-/** Options of `html.slug`, named as rehype-slug names them. */
+/** `html.slug`: ids on headings, from their text; options named as rehype-slug names them. */
 export interface SlugOptions {
   /** Put before each id. @default "" */
   prefix?: string
 }
 
-/** Options of `html.highlight`, named as @shikijs/rehype names them. */
+/** `html.highlight`: code blocks colored as Shiki colors them, natively by giallo; options named as @shikijs/rehype names them. */
 export interface HighlightOptions {
   /** The theme of each color mode, `light` first, as `{"light": …, "dark": …}`. */
   themes?: Record<string, unknown> | null
@@ -81,7 +81,7 @@ export interface HighlightOptions {
   fallbackLanguage?: string | null
 }
 
-/** Options of `html.toMarkdown`, named as hast-util-to-mdast names them. */
+/** `html.toMarkdown`: hast into mdast; options named as hast-util-to-mdast names them. */
 export interface ToMarkdownOptions {
   /** Wrap all phrasing content of the root in paragraphs, as for a whole document. @default false */
   document?: boolean
@@ -95,7 +95,7 @@ export interface ToMarkdownOptions {
   quotes?: string[] | null
 }
 
-/** Options of `html.stringify`, named as hast-util-to-html names them. */
+/** `html.stringify`: hast into HTML; options named as hast-util-to-html names them. */
 export interface StringifyOptions {
   /** Write raw nodes as they are instead of escaping them. @default false */
   allowDangerousHtml?: boolean

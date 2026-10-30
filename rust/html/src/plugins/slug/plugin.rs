@@ -1,18 +1,7 @@
 use textlane_core::{Allocator, Attach, Error, File, Plugin, Transform, Tree, TreeKind};
 
 use crate::actions::hast::slug::slug_hast;
-use crate::models::options::SlugOptions;
-
-/// `html.slug`: ids on headings, from their text.
-#[derive(Clone, Debug, Default)]
-pub struct Slug {
-    pub options: SlugOptions,
-}
-
-/// The `html.slug` plugin.
-pub fn slug(options: SlugOptions) -> Slug {
-    Slug { options }
-}
+use crate::models::options::Slug;
 
 impl Plugin for Slug {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
@@ -38,7 +27,7 @@ impl Transform for Slug {
     ) -> Result<Tree<'a>, Error> {
         match tree {
             Tree::Hast(mut node) => {
-                slug_hast(&mut node, &self.options, alloc);
+                slug_hast(&mut node, self, alloc);
                 Ok(Tree::Hast(node))
             }
             _ => Err(Error::new("invalid-stage", "`html.slug` takes hast")),

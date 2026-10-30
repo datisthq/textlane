@@ -95,9 +95,9 @@ file and a tree are dicts.
 use textlane::{Processor, html, md};
 
 let processor = Processor::new()
-    .with(md::parse(Default::default()))
-    .with(md::to_html(Default::default()))
-    .with(html::stringify(Default::default()))
+    .with(md::Parse::default())
+    .with(md::ToHtml::default())
+    .with(html::Stringify::default())
     .freeze()?;
 let output = processor.process("# hi")?; // output.value, output.file.messages
 ```

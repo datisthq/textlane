@@ -2,7 +2,7 @@
 
 import type { Plugin } from "../models/plugin.ts"
 
-/** Options of `mdx.compile`, named as @mdx-js/mdx's `compile` names them. */
+/** `mdx.compile`: hast into a JavaScript module, as @mdx-js/mdx's `compile` makes it; options named as @mdx-js/mdx's `compile` names them. */
 export interface CompileOptions {
   /** Keep JSX in the output instead of compiling it to function calls. @default false */
   jsx?: boolean

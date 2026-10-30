@@ -2,10 +2,10 @@
 
 import type { Plugin } from "../models/plugin.ts"
 
-/** Options of `md::parse`. */
+/** `md.parse`: Markdown into mdast. */
 export type ParseOptions = Record<string, unknown>
 
-/** Options of `md::directive`, named as mdast-util-directive's serializer names them. */
+/** `md.directive`: generic directives, `:a`, `::b` and `:::c`, read by `md.parse` and written by `md.stringify`; options named as mdast-util-directive's serializer names them. */
 export interface DirectiveOptions {
   /** Write an empty attribute as its name alone, `{a}`, rather than `{a=""}`. @default true */
   collapseEmptyAttributes?: boolean
@@ -13,13 +13,13 @@ export interface DirectiveOptions {
   preferShortcut?: boolean
   /** Leave attribute values unquoted where they can be. @default false */
   preferUnquoted?: boolean
-  /** The quote of attribute values: `"` or `'`; `md::stringify`'s `quote` when unset. */
+  /** The quote of attribute values: `"` or `'`; `md.stringify`'s `quote` when unset. */
   quote?: string | null
   /** Use the other quote when the preferred one occurs more often in a value. @default false */
   quoteSmart?: boolean
 }
 
-/** Options of `md::gfm`, named as remark-gfm names them. */
+/** `md.gfm`: GitHub Flavored Markdown's syntax, read by `md.parse` and written by `md.stringify`; options named as remark-gfm names them. */
 export interface GfmOptions {
   /** Let one tilde, `~a~`, form strikethrough, as well as two. @default true */
   singleTilde?: boolean
@@ -31,13 +31,13 @@ export interface GfmOptions {
   firstLineBlank?: boolean
 }
 
-/** Options of `md::math`, named as remark-math names them. */
+/** `md.math`: math syntax, `$$` blocks and `$` text, read by `md.parse` and written by `md.stringify`; options named as remark-math names them. */
 export interface MathOptions {
   /** Let one dollar, `$a$`, form math in text, as well as two. @default true */
   singleDollarTextMath?: boolean
 }
 
-/** Options of `md::mdx`, named as remark-mdx and mdast-util-mdx-jsx's serializer name them. */
+/** `md.mdx`: MDX syntax, JSX, expressions and ESM, read by `md.parse` and written by `md.stringify`; it turns off indented code, autolinks and raw HTML; options named as remark-mdx and mdast-util-mdx-jsx's serializer name them. */
 export interface MdxOptions {
   /** The quote of JSX attribute values: `"` (when unset) or `'`. */
   quote?: string | null
@@ -69,7 +69,7 @@ export interface FencePair {
 /** A fence, or its opening and closing ones. */
 export type Fence = string | FencePair
 
-/** Options of `md::stringify`, named as mdast-util-to-markdown names them. */
+/** `md.stringify`: mdast into Markdown; options named as mdast-util-to-markdown names them. */
 export interface StringifyOptions {
   /** The marker of unordered list items: `*`, `+` or `-`. */
   bullet?: string | null
@@ -134,7 +134,7 @@ export interface UnsafePattern {
 /** One name or several. */
 export type Names = string | string[]
 
-/** Options of `md::to_html`, named as remark-rehype names them. */
+/** `md.toHtml`: mdast into hast; options named as remark-rehype names them. */
 export interface ToHtmlOptions {
   /** Keep raw HTML in the tree instead of dropping it. @default false */
   allowDangerousHtml?: boolean
@@ -152,7 +152,7 @@ export interface ToHtmlOptions {
   passThrough?: string[]
 }
 
-/** Options of `md::to_prose`, named as remark-retext and mdast-util-to-nlcst name them. */
+/** `md.toProse`: mdast into nlcst, tokenized by the processor's prose parser; options named as remark-retext and mdast-util-to-nlcst name them. */
 export interface ToProseOptions {
   /** Node types to leave out, besides `table`, `tableRow` and `tableCell`. @default [] */
   ignore?: string[]

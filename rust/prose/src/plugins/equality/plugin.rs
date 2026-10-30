@@ -3,23 +3,12 @@ use textlane_core::{Allocator, Attach, Error, File, Plugin, Transform, Tree, Tre
 use crate::actions::equality::check::check_equality;
 use crate::actions::message::place::place_messages;
 use crate::models::equality::EqualityRules;
-use crate::models::options::EqualityOptions;
-
-/// `prose.equality`: warnings about insensitive, inconsiderate wording, as retext-equality.
-#[derive(Clone, Debug, Default)]
-pub struct Equality {
-    pub options: EqualityOptions,
-}
-
-/// The `prose.equality` plugin.
-pub fn equality(options: EqualityOptions) -> Equality {
-    Equality { options }
-}
+use crate::models::options::Equality;
 
 impl Plugin for Equality {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
         context.add_transform(Box::new(EqualityCheck {
-            rules: EqualityRules::new(&self.options),
+            rules: EqualityRules::new(self),
         }));
         Ok(())
     }

@@ -32,13 +32,13 @@ use crate::actions::table_cell::convert::convert_table_cell;
 use crate::actions::table_row::convert::convert_table_row;
 use crate::actions::text::convert::convert_text;
 use crate::actions::thematic_break::convert::convert_thematic_break;
-use crate::models::options::ToHtmlOptions;
+use crate::models::options::ToHtml;
 use crate::utils::converter::unknown::{apply_data, convert_unknown};
 
 /// Turns mdast into hast, as mdast-util-to-hast does.
 pub(crate) struct Converter<'a, 'o> {
     pub(crate) alloc: &'a Allocator,
-    pub(crate) options: &'o ToHtmlOptions,
+    pub(crate) options: &'o ToHtml,
     /// Whether paragraphs of only MDX JSX, expressions and white space unravel.
     pub(crate) unravel: bool,
     /// Whether each list being converted is loose, worked out once per list for its items.

@@ -14,20 +14,20 @@ pub(crate) struct PluginEntry {
 }
 
 macro_rules! plugin {
-    ($name:literal, $build:path, $options:ty) => {
+    ($name:literal, $plugin:path, unit) => {
         PluginEntry {
             name: $name,
-            build: |_, options| Ok(Box::new($build(read_options::<$options>(options)?))),
-            #[cfg(feature = "schema")]
-            options: Some(|generator| generator.subschema_for::<$options>()),
-        }
-    };
-    ($name:literal, $build:path) => {
-        PluginEntry {
-            name: $name,
-            build: |_, _| Ok(Box::new($build())),
+            build: |_, _| Ok(Box::new($plugin)),
             #[cfg(feature = "schema")]
             options: None,
+        }
+    };
+    ($name:literal, $plugin:ty) => {
+        PluginEntry {
+            name: $name,
+            build: |_, options| Ok(Box::new(read_options::<$plugin>(options)?)),
+            #[cfg(feature = "schema")]
+            options: Some(|generator| generator.subschema_for::<$plugin>()),
         }
     };
 }
@@ -35,151 +35,72 @@ macro_rules! plugin {
 /// Every public plugin, in the order the bindings list them.
 pub(crate) const PLUGINS: &[PluginEntry] = &[
     #[cfg(feature = "md")]
-    plugin!("md.parse", textlane_md::parse, textlane_md::ParseOptions),
+    plugin!("md.parse", textlane_md::Parse),
     #[cfg(feature = "md")]
-    plugin!(
-        "md.directive",
-        textlane_md::directive,
-        textlane_md::DirectiveOptions
-    ),
+    plugin!("md.directive", textlane_md::Directive),
     #[cfg(feature = "md")]
-    plugin!("md.gfm", textlane_md::gfm, textlane_md::GfmOptions),
+    plugin!("md.gfm", textlane_md::Gfm),
     #[cfg(feature = "md")]
-    plugin!("md.definitionList", textlane_md::definition_list),
+    plugin!("md.definitionList", textlane_md::DefinitionList, unit),
     #[cfg(feature = "md")]
-    plugin!("md.math", textlane_md::math, textlane_md::MathOptions),
+    plugin!("md.math", textlane_md::Math),
     #[cfg(feature = "md")]
-    plugin!("md.mdx", textlane_md::mdx, textlane_md::MdxOptions),
+    plugin!("md.mdx", textlane_md::Mdx),
     #[cfg(feature = "md")]
-    plugin!(
-        "md.frontmatter",
-        textlane_md::frontmatter,
-        textlane_md::FrontmatterOptions
-    ),
+    plugin!("md.frontmatter", textlane_md::Frontmatter),
     #[cfg(feature = "md")]
-    plugin!("md.gemoji", textlane_md::gemoji),
+    plugin!("md.gemoji", textlane_md::Gemoji, unit),
     #[cfg(feature = "md")]
-    plugin!(
-        "md.stringify",
-        textlane_md::stringify,
-        textlane_md::StringifyOptions
-    ),
+    plugin!("md.stringify", textlane_md::Stringify),
     #[cfg(feature = "md")]
-    plugin!(
-        "md.toHtml",
-        textlane_md::to_html,
-        textlane_md::ToHtmlOptions
-    ),
+    plugin!("md.toHtml", textlane_md::ToHtml),
     #[cfg(feature = "md")]
-    plugin!(
-        "md.toProse",
-        textlane_md::to_prose,
-        textlane_md::ToProseOptions
-    ),
+    plugin!("md.toProse", textlane_md::ToProse),
     #[cfg(feature = "html")]
-    plugin!(
-        "html.parse",
-        textlane_html::parse,
-        textlane_html::ParseOptions
-    ),
+    plugin!("html.parse", textlane_html::Parse),
     #[cfg(feature = "html")]
-    plugin!("html.raw", textlane_html::raw, textlane_html::RawOptions),
+    plugin!("html.raw", textlane_html::Raw),
     #[cfg(feature = "html")]
-    plugin!(
-        "html.format",
-        textlane_html::format,
-        textlane_html::FormatOptions
-    ),
+    plugin!("html.format", textlane_html::Format),
     #[cfg(feature = "html")]
-    plugin!(
-        "html.sanitize",
-        textlane_html::sanitize,
-        textlane_html::SanitizeOptions
-    ),
+    plugin!("html.sanitize", textlane_html::Sanitize),
     #[cfg(feature = "html")]
-    plugin!("html.slug", textlane_html::slug, textlane_html::SlugOptions),
+    plugin!("html.slug", textlane_html::Slug),
     #[cfg(feature = "highlight")]
-    plugin!(
-        "html.highlight",
-        textlane_html::highlight,
-        textlane_html::HighlightOptions
-    ),
+    plugin!("html.highlight", textlane_html::Highlight),
     #[cfg(feature = "html")]
-    plugin!(
-        "html.toMarkdown",
-        textlane_html::to_markdown,
-        textlane_html::ToMarkdownOptions
-    ),
+    plugin!("html.toMarkdown", textlane_html::ToMarkdown),
     #[cfg(feature = "html")]
-    plugin!("html.toProse", textlane_html::to_prose),
+    plugin!("html.toProse", textlane_html::ToProse, unit),
     #[cfg(feature = "html")]
-    plugin!(
-        "html.stringify",
-        textlane_html::stringify,
-        textlane_html::StringifyOptions
-    ),
+    plugin!("html.stringify", textlane_html::Stringify),
     #[cfg(feature = "mdx")]
-    plugin!(
-        "mdx.compile",
-        textlane_mdx::compile,
-        textlane_mdx::CompileOptions
-    ),
+    plugin!("mdx.compile", textlane_mdx::Compile),
     #[cfg(feature = "prose")]
-    plugin!(
-        "prose.parse",
-        textlane_prose::parse,
-        textlane_prose::ParseOptions
-    ),
+    plugin!("prose.parse", textlane_prose::Parse),
     #[cfg(feature = "prose")]
-    plugin!(
-        "prose.equality",
-        textlane_prose::equality,
-        textlane_prose::EqualityOptions
-    ),
+    plugin!("prose.equality", textlane_prose::Equality),
     #[cfg(feature = "prose")]
-    plugin!(
-        "prose.passive",
-        textlane_prose::passive,
-        textlane_prose::PassiveOptions
-    ),
+    plugin!("prose.passive", textlane_prose::Passive),
     #[cfg(feature = "prose")]
-    plugin!(
-        "prose.readability",
-        textlane_prose::readability,
-        textlane_prose::ReadabilityOptions
-    ),
+    plugin!("prose.readability", textlane_prose::Readability),
     #[cfg(feature = "prose")]
-    plugin!("prose.repeatedWords", textlane_prose::repeated_words),
+    plugin!("prose.repeatedWords", textlane_prose::RepeatedWords, unit),
     #[cfg(feature = "prose")]
-    plugin!(
-        "prose.sentenceSpacing",
-        textlane_prose::sentence_spacing,
-        textlane_prose::SentenceSpacingOptions
-    ),
+    plugin!("prose.sentenceSpacing", textlane_prose::SentenceSpacing),
     #[cfg(feature = "prose")]
-    plugin!("prose.stringify", textlane_prose::stringify),
+    plugin!("prose.stringify", textlane_prose::Stringify, unit),
     #[cfg(feature = "prose")]
-    plugin!(
-        "prose.smartypants",
-        textlane_prose::smartypants,
-        textlane_prose::SmartypantsOptions
-    ),
+    plugin!("prose.smartypants", textlane_prose::Smartypants),
     #[cfg(feature = "prose")]
-    plugin!(
-        "prose.quotes",
-        textlane_prose::quotes,
-        textlane_prose::QuotesOptions
-    ),
+    plugin!("prose.quotes", textlane_prose::Quotes),
     #[cfg(feature = "prose")]
-    plugin!(
-        "prose.contractions",
-        textlane_prose::contractions,
-        textlane_prose::ContractionsOptions
-    ),
+    plugin!("prose.contractions", textlane_prose::Contractions),
     #[cfg(feature = "prose")]
     plugin!(
         "prose.indefiniteArticle",
-        textlane_prose::indefinite_article
+        textlane_prose::IndefiniteArticle,
+        unit
     ),
 ];
 

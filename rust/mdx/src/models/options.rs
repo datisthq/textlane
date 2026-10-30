@@ -1,10 +1,12 @@
 use serde::Deserialize;
 
-/// Options of `mdx.compile`, named as @mdx-js/mdx's `compile` names them.
+/// `mdx.compile`: hast into a JavaScript module, as @mdx-js/mdx's `compile` makes it;
+/// options named as @mdx-js/mdx's `compile` names them.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct CompileOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "CompileOptions"))]
+pub struct Compile {
     /// Keep JSX in the output instead of compiling it to function calls.
     pub jsx: bool,
     /// The JSX runtime: `automatic` (default) or `classic`.

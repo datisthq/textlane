@@ -1,18 +1,7 @@
 use textlane_core::{Allocator, Attach, Error, File, Plugin, Transform, Tree, TreeKind};
 
 use crate::actions::hast::sanitize::sanitize_hast;
-use crate::models::options::SanitizeOptions;
-
-/// `html.sanitize`: keep only what a schema allows.
-#[derive(Clone, Debug, Default)]
-pub struct Sanitize {
-    pub options: SanitizeOptions,
-}
-
-/// The `html.sanitize` plugin.
-pub fn sanitize(options: SanitizeOptions) -> Sanitize {
-    Sanitize { options }
-}
+use crate::models::options::Sanitize;
 
 impl Plugin for Sanitize {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
@@ -37,9 +26,7 @@ impl Transform for Sanitize {
         alloc: &'a Allocator,
     ) -> Result<Tree<'a>, Error> {
         match tree {
-            Tree::Hast(node) => {
-                Ok(Tree::Hast(sanitize_hast(&node, &self.options, alloc)))
-            }
+            Tree::Hast(node) => Ok(Tree::Hast(sanitize_hast(&node, self, alloc))),
             _ => Err(Error::new("invalid-stage", "`html.sanitize` takes hast")),
         }
     }

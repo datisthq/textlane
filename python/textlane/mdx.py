@@ -11,7 +11,8 @@ __all__ = [
 ]
 
 
-# Options of `mdx.compile`, named as @mdx-js/mdx's `compile` names them.
+# `mdx.compile`: hast into a JavaScript module, as @mdx-js/mdx's `compile` makes it;
+# options named as @mdx-js/mdx's `compile` names them.
 class CompileOptions(TypedDict, total=False):
     # Keep JSX in the output instead of compiling it to function calls.
     jsx: bool

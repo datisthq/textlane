@@ -1,10 +1,11 @@
 use serde::Deserialize;
 
-/// Options of `prose.parse`.
+/// `prose.parse`: natural language into nlcst.
 #[derive(Clone, Copy, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct ParseOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "ParseOptions"))]
+pub struct Parse {
     /// The rules sentences and words are found by.
     pub language: Language,
 }
@@ -19,22 +20,26 @@ pub enum Language {
     English,
 }
 
-/// Options of `prose.equality`, retext-equality's.
+/// `prose.equality`: warnings about insensitive, inconsiderate wording, as
+/// retext-equality; options are retext-equality's.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct EqualityOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "EqualityOptions"))]
+pub struct Equality {
     /// Phrases not to warn about.
     pub ignore: Option<Vec<String>>,
     /// Whether a phrase used next to its counterpart (`he or she`) is fine.
     pub binary: Option<bool>,
 }
 
-/// Options of `prose.readability`, retext-readability's.
+/// `prose.readability`: warnings about sentences too hard to read, as retext-readability;
+/// options are retext-readability's.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct ReadabilityOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "ReadabilityOptions"))]
+pub struct Readability {
     /// The age of the target audience: 16 by default.
     pub age: Option<f64>,
     /// The share of algorithms that must find a sentence too hard: 4/7 by default.
@@ -43,20 +48,24 @@ pub struct ReadabilityOptions {
     pub min_words: Option<f64>,
 }
 
-/// Options of `prose.passive`, retext-passive's.
+/// `prose.passive`: warnings about the passive voice, as retext-passive; options are
+/// retext-passive's.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct PassiveOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "PassiveOptions"))]
+pub struct Passive {
     /// Participles not to warn about.
     pub ignore: Option<Vec<String>>,
 }
 
-/// Options of `prose.sentenceSpacing`, retext-sentence-spacing's.
+/// `prose.sentenceSpacing`: warnings about the spaces between sentences, as
+/// retext-sentence-spacing; options are retext-sentence-spacing's.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct SentenceSpacingOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "SentenceSpacingOptions"))]
+pub struct SentenceSpacing {
     /// The spacing expected between sentences: `1` or `"space"` (the default), `2` or
     /// `"double-space"`, `0` or `"newline"`.
     pub preferred: Option<Spacing>,

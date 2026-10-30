@@ -1,18 +1,7 @@
 use textlane_core::{Allocator, Attach, Error, File, Parser, Plugin, Tree, TreeKind};
 
 use crate::actions::html::parse::parse_html;
-use crate::models::options::ParseOptions;
-
-/// `html.parse`: HTML into hast.
-#[derive(Clone, Debug, Default)]
-pub struct Parse {
-    pub options: ParseOptions,
-}
-
-/// The `html.parse` plugin.
-pub fn parse(options: ParseOptions) -> Parse {
-    Parse { options }
-}
+use crate::models::options::Parse;
 
 impl Plugin for Parse {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
@@ -33,6 +22,6 @@ impl Parser for Parse {
         file: &mut File,
         alloc: &'a Allocator,
     ) -> Result<Tree<'a>, Error> {
-        Ok(Tree::Hast(parse_html(input, &self.options, file, alloc)))
+        Ok(Tree::Hast(parse_html(input, self, file, alloc)))
     }
 }

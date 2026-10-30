@@ -1,18 +1,7 @@
 use textlane_core::{Allocator, Attach, Error, File, Plugin, Transform, Tree, TreeKind};
 
 use crate::actions::hast::highlight::highlight_hast;
-use crate::models::options::HighlightOptions;
-
-/// `html.highlight`: code blocks colored as Shiki colors them, natively by giallo.
-#[derive(Clone, Debug, Default)]
-pub struct Highlight {
-    pub options: HighlightOptions,
-}
-
-/// The `html.highlight` plugin.
-pub fn highlight(options: HighlightOptions) -> Highlight {
-    Highlight { options }
-}
+use crate::models::options::Highlight;
 
 impl Plugin for Highlight {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
@@ -38,7 +27,7 @@ impl Transform for Highlight {
     ) -> Result<Tree<'a>, Error> {
         match tree {
             Tree::Hast(mut node) => {
-                highlight_hast(&mut node, &self.options, alloc)?;
+                highlight_hast(&mut node, self, alloc)?;
                 Ok(Tree::Hast(node))
             }
             _ => Err(Error::new("invalid-stage", "`html.highlight` takes hast")),

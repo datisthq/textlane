@@ -11,11 +11,6 @@ use crate::actions::hast::bridge::bridge_hast;
 #[derive(Clone, Copy, Debug, Default)]
 pub struct ToProse;
 
-/// The `html.toProse` plugin.
-pub fn to_prose() -> ToProse {
-    ToProse
-}
-
 struct Bridge {
     parser: Arc<dyn ProseParser>,
 }

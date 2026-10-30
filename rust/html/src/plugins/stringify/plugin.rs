@@ -1,18 +1,7 @@
 use textlane_core::{Attach, Compiler, Error, File, Plugin, Tree, TreeKind};
 
 use crate::actions::hast::stringify::stringify_hast;
-use crate::models::options::StringifyOptions;
-
-/// `html.stringify`: hast into HTML.
-#[derive(Clone, Debug, Default)]
-pub struct Stringify {
-    pub options: StringifyOptions,
-}
-
-/// The `html.stringify` plugin.
-pub fn stringify(options: StringifyOptions) -> Stringify {
-    Stringify { options }
-}
+use crate::models::options::Stringify;
 
 impl Plugin for Stringify {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
@@ -33,7 +22,7 @@ impl Compiler for Stringify {
 
     fn compile(&self, tree: &Tree<'_>, _file: &mut File) -> Result<String, Error> {
         match tree {
-            Tree::Hast(node) => stringify_hast(node, &self.options),
+            Tree::Hast(node) => stringify_hast(node, self),
             _ => Err(Error::new("invalid-stage", "`html.stringify` takes hast")),
         }
     }

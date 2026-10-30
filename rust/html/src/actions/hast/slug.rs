@@ -2,14 +2,14 @@ use textlane_core::hast::{Node, Property, PropertyValue};
 use textlane_core::{Allocator, ArenaVec};
 
 use crate::helpers::slug::Slugger;
-use crate::models::options::SlugOptions;
+use crate::models::options::Slug;
 
 // Headings nested in each other share text, and slugging each one's whole text is
 // quadratic; past this much more text than the headings hold, later ones are cut short
 const SLACK: usize = 64 * 1024;
 
 /// Give headings without an `id` one made from their text, as rehype-slug does.
-pub fn slug_hast<'a>(node: &mut Node<'a>, options: &SlugOptions, alloc: &'a Allocator) {
+pub fn slug_hast<'a>(node: &mut Node<'a>, options: &Slug, alloc: &'a Allocator) {
     let (text, ranges) = collect_heading_text(node);
     let mut budget = text.len() + SLACK;
     let mut ranges = ranges.into_iter();

@@ -5,7 +5,7 @@ use crate::helpers::identifier::is_identifier_name;
 use crate::helpers::walk::{Enter, Visit, walk};
 use crate::models::estree::{Id, Store, Value};
 use crate::models::name::{Key, Kind};
-use crate::models::options::CompileOptions;
+use crate::models::options::Compile;
 
 /// estree-util-build-jsx 3.0.1 as recma-build-jsx runs it: JSX into calls of the runtime
 /// the program's `@jsx…` pragma comments pick, `_jsx`/`_jsxs` imported for the automatic
@@ -14,7 +14,7 @@ use crate::models::options::CompileOptions;
 pub(crate) fn build_program(
     store: &mut Store,
     program: Id,
-    options: &CompileOptions,
+    options: &Compile,
 ) -> Result<(), Error> {
     let mut build = Build {
         automatic: false,

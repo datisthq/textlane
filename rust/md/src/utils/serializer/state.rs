@@ -83,7 +83,7 @@ pub(crate) struct AttentionKind {
     pub(crate) sequences: Vec<String>,
 }
 
-/// The state of one `md::stringify` run, as mdast-util-to-markdown's `state`.
+/// The state of one `md::Stringify` run, as mdast-util-to-markdown's `state`.
 pub(crate) struct Serializer<'c> {
     pub(crate) settings: &'c Settings,
     pub(crate) patterns: &'c [Pattern],

@@ -1,10 +1,8 @@
 use textlane_core::Error;
 
-use crate::models::options::{
-    DirectiveOptions, GfmOptions, MathOptions, Matter, MdxOptions, StringifyOptions,
-};
+use crate::models::options::{Directive, Gfm, Math, Matter, Mdx, Stringify};
 
-/// `md::stringify`'s options, checked once, with their defaults filled in.
+/// `md::Stringify`'s options, checked once, with their defaults filled in.
 #[derive(Clone, Debug)]
 pub(crate) struct Settings {
     pub(crate) bullet: char,
@@ -24,18 +22,18 @@ pub(crate) struct Settings {
     pub(crate) setext: bool,
     pub(crate) strong: char,
     pub(crate) tight_definitions: bool,
-    /// GFM's options, when `md::gfm` is used: its handlers, unsafe patterns and joins.
-    pub(crate) gfm: Option<GfmOptions>,
-    /// Whether `md::definition_list` is used: its handlers, unsafe pattern and join.
+    /// GFM's options, when `md::Gfm` is used: its handlers, unsafe patterns and joins.
+    pub(crate) gfm: Option<Gfm>,
+    /// Whether `md::DefinitionList` is used: its handlers, unsafe pattern and join.
     pub(crate) definition_list: bool,
-    /// Math's options, when `md::math` is used: its handlers and unsafe patterns.
-    pub(crate) math: Option<MathOptions>,
-    /// Directives' options, when `md::directive` is used: their handlers and unsafe
+    /// Math's options, when `md::Math` is used: its handlers and unsafe patterns.
+    pub(crate) math: Option<Math>,
+    /// Directives' options, when `md::Directive` is used: their handlers and unsafe
     /// patterns.
-    pub(crate) directive: Option<DirectiveOptions>,
-    /// MDX's options, when `md::mdx` is used: its handlers and unsafe patterns, fenced code
+    pub(crate) directive: Option<Directive>,
+    /// MDX's options, when `md::Mdx` is used: its handlers and unsafe patterns, fenced code
     /// and resource links.
-    pub(crate) mdx: Option<MdxOptions>,
+    pub(crate) mdx: Option<Mdx>,
     /// `md.frontmatter`'s matters, whose nodes it writes.
     pub(crate) frontmatter: Vec<Matter>,
 }
@@ -49,7 +47,7 @@ pub(crate) enum ListItemIndent {
 
 impl Settings {
     /// Check `options` with mdast-util-to-markdown's messages.
-    pub(crate) fn from_options(options: &StringifyOptions) -> Result<Settings, Error> {
+    pub(crate) fn from_options(options: &Stringify) -> Result<Settings, Error> {
         let bullet = read_marker(options.bullet.as_deref(), '*', "*+-", |marker| {
             format!(
                 "Cannot serialize items with `{marker}` for `options.bullet`, expected `*`, `+`, or `-`"

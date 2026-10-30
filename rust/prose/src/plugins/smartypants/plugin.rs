@@ -1,22 +1,11 @@
 use textlane_core::{Allocator, Attach, Error, File, Plugin, Transform, Tree, TreeKind};
 
 use crate::actions::punctuation::smarten::{Smarten, smarten_punctuation};
-use crate::models::smartypants::{Backticks, SmartypantsOptions};
-
-/// `prose.smartypants`: straight quotes, dashes, dots and backticks into typographic ones.
-#[derive(Clone, Debug, Default)]
-pub struct Smartypants {
-    pub options: SmartypantsOptions,
-}
-
-/// The `prose.smartypants` plugin.
-pub fn smartypants(options: SmartypantsOptions) -> Smartypants {
-    Smartypants { options }
-}
+use crate::models::smartypants::{Backticks, Smartypants};
 
 impl Plugin for Smartypants {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
-        if self.options.backticks == Backticks::All && self.options.quotes {
+        if self.backticks == Backticks::All && self.quotes {
             return Err(Error::new(
                 "invalid-options",
                 "Cannot accept `backticks: 'all'` with `quotes: true`",
@@ -48,7 +37,7 @@ impl Transform for Smartypants {
                 "`prose.smartypants` takes nlcst",
             ));
         };
-        let options = &self.options;
+        let options = self;
         let quotes = |given: &Option<_>, default: [&'static str; 2]| match given {
             Some(crate::models::smartypants::QuoteCharacters { double, single }) => {
                 [&*alloc.alloc_str(double), &*alloc.alloc_str(single)]

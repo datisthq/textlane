@@ -7,11 +7,6 @@ use crate::plugins::gemoji::actions::text::replace::replace_shortcodes;
 #[derive(Clone, Debug, Default)]
 pub struct Gemoji;
 
-/// The `md.gemoji` plugin.
-pub fn gemoji() -> Gemoji {
-    Gemoji
-}
-
 impl Plugin for Gemoji {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
         context.add_transform(Box::new(Gemoji));

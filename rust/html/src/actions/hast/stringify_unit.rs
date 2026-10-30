@@ -2,7 +2,7 @@ use textlane_core::hast::{Element, Node, Raw};
 use textlane_core::{Allocator, ArenaVec, Error};
 
 use super::stringify_hast;
-use crate::models::options::StringifyOptions;
+use crate::models::options::Stringify;
 
 #[test]
 fn escapes_raw_in_script_unless_dangerous_html_is_allowed() -> Result<(), Error> {
@@ -22,10 +22,10 @@ fn escapes_raw_in_script_unless_dangerous_html_is_allowed() -> Result<(), Error>
         data: None,
     });
     assert_eq!(
-        stringify_hast(&script, &StringifyOptions::default())?,
+        stringify_hast(&script, &Stringify::default())?,
         "<script>&#x3C;/script>&#x3C;img onerror=x></script>"
     );
-    let options = StringifyOptions {
+    let options = Stringify {
         allow_dangerous_html: true,
         ..Default::default()
     };

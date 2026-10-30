@@ -4,14 +4,14 @@ use crate::actions::nlcst::stringify::stringify_nlcst;
 use crate::helpers::contraction_table::CONTRACTIONS;
 use crate::helpers::literal::is_literal;
 use crate::helpers::words::visit_words;
-use crate::models::contractions::ContractionsOptions;
+use crate::models::contractions::Contractions;
 use crate::models::report::Report;
 
 /// Report contractions missing their apostrophe or using the other kind, as
 /// retext-contractions does.
 pub(crate) fn check_contractions<'a>(
     tree: &Node<'a>,
-    options: &ContractionsOptions,
+    options: &Contractions,
     reports: &mut Vec<Report<'a>>,
 ) {
     visit_words(tree, |node, place| {

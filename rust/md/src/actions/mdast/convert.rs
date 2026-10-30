@@ -4,7 +4,7 @@ use textlane_core::Allocator;
 use textlane_core::hast;
 use textlane_core::mdast;
 
-use crate::models::options::ToHtmlOptions;
+use crate::models::options::ToHtml;
 use crate::utils::converter::footnote::{append_footer, create_footer};
 use crate::utils::converter::state::Converter;
 
@@ -12,7 +12,7 @@ use crate::utils::converter::state::Converter;
 pub fn convert_mdast<'a>(
     node: &mdast::Node<'a>,
     alloc: &'a Allocator,
-    options: &ToHtmlOptions,
+    options: &ToHtml,
 ) -> hast::Node<'a> {
     convert_mdast_with(node, alloc, options, false)
 }
@@ -22,7 +22,7 @@ pub fn convert_mdast<'a>(
 pub(crate) fn convert_mdast_with<'a>(
     node: &mdast::Node<'a>,
     alloc: &'a Allocator,
-    options: &ToHtmlOptions,
+    options: &ToHtml,
     unravel: bool,
 ) -> hast::Node<'a> {
     let (definitions, footnotes) = find_definitions(node);

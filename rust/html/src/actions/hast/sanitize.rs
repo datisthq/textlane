@@ -5,12 +5,12 @@ use textlane_core::hast::{
 };
 use textlane_core::{Allocator, ArenaVec};
 
-use crate::models::options::{AttributeDefinition, Primitive, SanitizeOptions};
+use crate::models::options::{AttributeDefinition, Primitive, Sanitize};
 
 /// Keep only what a schema allows of a hast tree, as hast-util-sanitize does.
 pub fn sanitize_hast<'a>(
     node: &Node<'a>,
-    options: &SanitizeOptions,
+    options: &Sanitize,
     alloc: &'a Allocator,
 ) -> Node<'a> {
     let schema = Schema::from_options(options);
@@ -79,7 +79,7 @@ struct Schema {
 }
 
 impl Schema {
-    fn from_options(options: &SanitizeOptions) -> Schema {
+    fn from_options(options: &Sanitize) -> Schema {
         let owned = |list: &[&str]| list.iter().map(|item| item.to_string()).collect();
         let attributes = match &options.attributes {
             Some(attributes) => attributes

@@ -1,10 +1,12 @@
 use serde::Deserialize;
 
-/// Options of `prose.contractions`, as retext-contractions takes them.
+/// `prose.contractions`: check apostrophes in contractions, such as `don’t`; options as
+/// retext-contractions takes them.
 #[derive(Clone, Copy, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct ContractionsOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "ContractionsOptions"))]
+pub struct Contractions {
     /// Also check contractions written as literals, such as `“hasnt”`.
     #[serde(deserialize_with = "read_flag")]
     #[cfg_attr(feature = "schema", schemars(with = "Option<bool>"))]

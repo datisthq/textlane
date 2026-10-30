@@ -2,7 +2,7 @@ use textlane_core::Allocator;
 use textlane_core::nlcst::Node;
 
 use super::parse_prose;
-use crate::models::options::{Language, ParseOptions};
+use crate::models::options::{Language, Parse};
 
 fn count_sentences(root: &Node<'_>) -> usize {
     let mut count = 0;
@@ -20,10 +20,10 @@ fn count_sentences(root: &Node<'_>) -> usize {
 fn keeps_abbreviations_in_their_sentence() {
     let alloc = Allocator::new();
     let input = "Ask Mr. Smith. He knows.";
-    let latin = parse_prose(input, &ParseOptions::default(), &alloc);
+    let latin = parse_prose(input, &Parse::default(), &alloc);
     let english = parse_prose(
         input,
-        &ParseOptions {
+        &Parse {
             language: Language::English,
         },
         &alloc,
@@ -35,7 +35,7 @@ fn keeps_abbreviations_in_their_sentence() {
 #[test]
 fn reads_astral_characters_as_one_symbol() {
     let alloc = Allocator::new();
-    let root = parse_prose("a 😀😀", &ParseOptions::default(), &alloc);
+    let root = parse_prose("a 😀😀", &Parse::default(), &alloc);
     let symbols: Vec<_> = {
         let mut found = Vec::new();
         let mut stack = vec![&root];

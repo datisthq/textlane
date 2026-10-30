@@ -2,22 +2,11 @@ use textlane_core::{Allocator, Attach, Error, File, Plugin, Transform, Tree, Tre
 
 use crate::actions::contractions::check::check_contractions;
 use crate::actions::message::place::place_messages;
-use crate::models::contractions::ContractionsOptions;
-
-/// `prose.contractions`: check apostrophes in contractions, such as `don’t`.
-#[derive(Clone, Debug, Default)]
-pub struct Contractions {
-    pub options: ContractionsOptions,
-}
-
-/// The `prose.contractions` plugin.
-pub fn contractions(options: ContractionsOptions) -> Contractions {
-    Contractions { options }
-}
+use crate::models::contractions::Contractions;
 
 impl Plugin for Contractions {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
-        context.add_transform(Box::new(self.clone()));
+        context.add_transform(Box::new(*self));
         Ok(())
     }
 }
@@ -44,7 +33,7 @@ impl Transform for Contractions {
             ));
         };
         let mut reports = Vec::new();
-        check_contractions(&node, &self.options, &mut reports);
+        check_contractions(&node, self, &mut reports);
         place_messages(file, reports);
         Ok(Tree::Nlcst(node))
     }

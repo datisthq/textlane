@@ -6,21 +6,10 @@ use textlane_core::{
 };
 
 use crate::actions::mdast::bridge::bridge_mdast;
-use crate::models::options::ToProseOptions;
-
-/// `md.toProse`: mdast into nlcst, tokenized by the processor's prose parser.
-#[derive(Clone, Debug, Default)]
-pub struct ToProse {
-    pub options: ToProseOptions,
-}
-
-/// The `md.toProse` plugin.
-pub fn to_prose(options: ToProseOptions) -> ToProse {
-    ToProse { options }
-}
+use crate::models::options::ToProse;
 
 struct Bridge {
-    options: ToProseOptions,
+    options: ToProse,
     parser: Arc<dyn ProseParser>,
 }
 
@@ -37,7 +26,7 @@ impl Plugin for ToProse {
                 )
             })?;
         context.add_transform(Box::new(Bridge {
-            options: self.options.clone(),
+            options: self.clone(),
             parser,
         }));
         Ok(())

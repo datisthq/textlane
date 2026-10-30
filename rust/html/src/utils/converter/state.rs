@@ -37,7 +37,7 @@ use crate::actions::unknown::convert::convert_unknown;
 use crate::actions::wbr::convert::convert_wbr;
 use crate::helpers::selected::OptionValues;
 use crate::helpers::value::{find_string, find_value, is_truthy, read_value};
-use crate::models::options::ToMarkdownOptions;
+use crate::models::options::ToMarkdown;
 use crate::utils::converter::store::{Converted, Id, Kind, Store};
 
 // Handlers recurse once per level of the tree; past the red zone the stack grows on the heap
@@ -47,7 +47,7 @@ const STACK_GROWTH: usize = 1024 * 1024;
 /// Turns hast into mdast, as hast-util-to-mdast's state does.
 pub(crate) struct Converter<'a, 'n, 'o> {
     pub(crate) alloc: &'a Allocator,
-    pub(crate) options: &'o ToMarkdownOptions,
+    pub(crate) options: &'o ToMarkdown,
     pub(crate) store: Store<'a>,
     /// The first element with each `id`, for an `input`'s `list`.
     pub(crate) element_by_id: HashMap<String, &'n Element<'a>>,

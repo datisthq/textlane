@@ -242,10 +242,9 @@ mod plugins {
 
 // models
 pub use models::options::{
-    DefinitionListSlot, DirectiveOptions, DirectiveSlot, FrontmatterOptions,
-    FrontmatterSlot, GfmOptions, GfmSlot, MathOptions, MathSlot, Matter, MdxOptions,
-    MdxSlot, Names, ParseOptions, StringifyOptions, ToHtmlOptions, ToProseOptions,
-    UnsafePattern,
+    DefinitionListSlot, Directive, DirectiveSlot, Frontmatter, FrontmatterSlot, Gfm,
+    GfmSlot, Math, MathSlot, Matter, Mdx, MdxSlot, Names, Parse, Stringify, ToHtml,
+    ToProse, UnsafePattern,
 };
 
 // actions
@@ -255,14 +254,5 @@ pub use actions::mdast::bridge::bridge_mdast;
 pub use actions::mdast::convert::convert_mdast;
 
 // plugins
-pub use plugins::definition_list::plugin::{DefinitionList, definition_list};
-pub use plugins::directive::plugin::{Directive, directive};
-pub use plugins::frontmatter::plugin::{Frontmatter, frontmatter};
-pub use plugins::gemoji::plugin::{Gemoji, gemoji};
-pub use plugins::gfm::plugin::{Gfm, gfm};
-pub use plugins::math::plugin::{Math, math};
-pub use plugins::mdx::plugin::{Mdx, mdx};
-pub use plugins::parse::plugin::{Parse, parse};
-pub use plugins::stringify::plugin::{Stringify, stringify};
-pub use plugins::to_html::plugin::{ToHtml, to_html};
-pub use plugins::to_prose::plugin::{ToProse, to_prose};
+pub use plugins::definition_list::plugin::DefinitionList;
+pub use plugins::gemoji::plugin::Gemoji;

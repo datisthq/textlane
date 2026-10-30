@@ -1,5 +1,5 @@
 use crate::helpers::equality_table::PATTERNS;
-use crate::models::options::EqualityOptions;
+use crate::models::options::Equality;
 use crate::models::phrases::Phrases;
 
 /// A phrase `prose.equality` searches: its pattern, its text and its category.
@@ -19,7 +19,7 @@ pub(crate) struct EqualityRules {
 }
 
 impl EqualityRules {
-    pub(crate) fn new(options: &EqualityOptions) -> Self {
+    pub(crate) fn new(options: &Equality) -> Self {
         let ignore = options.ignore.as_deref().unwrap_or_default();
         let mut normal = Vec::new();
         let mut apostrophe = Vec::new();

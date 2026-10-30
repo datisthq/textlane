@@ -1,7 +1,7 @@
 use textlane_core::Error;
 use textlane_core::mdast::{MdxJsxAttribute, MdxJsxAttributeValue, MdxJsxElement, Node};
 
-use crate::models::options::MdxOptions;
+use crate::models::options::Mdx;
 use crate::utils::serializer::construct::Construct;
 use crate::utils::serializer::sink::Layer;
 use crate::utils::serializer::state::{Info, Parent, Serializer};
@@ -115,7 +115,7 @@ fn serialize_attributes(
     element: &MdxJsxElement<Node>,
     quote: char,
     alternative: char,
-    options: &MdxOptions,
+    options: &Mdx,
 ) -> Result<Vec<String>, Error> {
     if !element.attributes.is_empty() && element.name.is_none_or(str::is_empty) {
         return Err(Error::new(
@@ -249,7 +249,7 @@ pub(crate) fn serialize_mdx_jsx_tags(
     Ok((open, format!("</{name}>")))
 }
 
-fn read_quotes(options: &MdxOptions) -> (char, char) {
+fn read_quotes(options: &Mdx) -> (char, char) {
     match options.quote.as_deref() {
         Some("'") => ('\'', '"'),
         _ => ('"', '\''),

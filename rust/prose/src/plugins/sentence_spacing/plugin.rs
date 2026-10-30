@@ -2,24 +2,12 @@ use textlane_core::{Allocator, Attach, Error, File, Plugin, Transform, Tree, Tre
 
 use crate::actions::message::place::place_messages;
 use crate::actions::sentence_spacing::check::check_sentence_spacing;
-use crate::models::options::{SentenceSpacingOptions, Spacing};
-
-/// `prose.sentenceSpacing`: warnings about the spaces between sentences, as
-/// retext-sentence-spacing.
-#[derive(Clone, Debug, Default)]
-pub struct SentenceSpacing {
-    pub options: SentenceSpacingOptions,
-}
-
-/// The `prose.sentenceSpacing` plugin.
-pub fn sentence_spacing(options: SentenceSpacingOptions) -> SentenceSpacing {
-    SentenceSpacing { options }
-}
+use crate::models::options::{SentenceSpacing, Spacing};
 
 impl Plugin for SentenceSpacing {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
         context.add_transform(Box::new(SentenceSpacingCheck {
-            expected: read_expected(&self.options),
+            expected: read_expected(self),
         }));
         Ok(())
     }
@@ -59,7 +47,7 @@ impl Transform for SentenceSpacingCheck {
 }
 
 // retext-sentence-spacing's `preferred`: anything but two spaces or a line ending is one space
-fn read_expected(options: &SentenceSpacingOptions) -> usize {
+fn read_expected(options: &SentenceSpacing) -> usize {
     match &options.preferred {
         Some(Spacing::Count(count)) if *count == 2.0 => 2,
         Some(Spacing::Name(name)) if name == "double-space" => 2,

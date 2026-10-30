@@ -5,21 +5,10 @@ use textlane_core::{
 use crate::actions::markdown::parse::ParseSettings;
 use crate::models::mdx::MdxScript;
 use crate::models::options::{
-    DefinitionListSlot, DirectiveSlot, FrontmatterSlot, GfmOptions, GfmSlot, MathOptions,
-    MathSlot, Matter, MdxSlot, ParseOptions,
+    DefinitionListSlot, DirectiveSlot, FrontmatterSlot, Gfm, GfmSlot, Math, MathSlot,
+    Matter, MdxSlot, Parse,
 };
 use crate::utils::onepass::build::parse_onepass_source;
-
-/// `md.parse`: Markdown into mdast.
-#[derive(Clone, Debug, Default)]
-pub struct Parse {
-    pub options: ParseOptions,
-}
-
-/// The `md.parse` plugin.
-pub fn parse(options: ParseOptions) -> Parse {
-    Parse { options }
-}
 
 impl Plugin for Parse {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
@@ -59,8 +48,8 @@ impl Plugin for Parse {
 }
 
 struct MarkdownParser {
-    gfm: Option<GfmOptions>,
-    math: Option<MathOptions>,
+    gfm: Option<Gfm>,
+    math: Option<Math>,
     directive: bool,
     frontmatter: Vec<Matter>,
     definition_list: bool,

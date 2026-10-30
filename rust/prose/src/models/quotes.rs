@@ -1,10 +1,12 @@
 use serde::Deserialize;
 
-/// Options of `prose.quotes`, as retext-quotes takes them.
+/// `prose.quotes`: check that quotes and apostrophes are straight or smart, as preferred,
+/// at each level of nesting; options as retext-quotes takes them.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct QuotesOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "QuotesOptions"))]
+pub struct Quotes {
     /// The style of quotes and apostrophes to prefer: `smart` by default.
     pub preferred: Option<QuoteStyle>,
     /// Smart quotes by nesting level, each one character or an opening and closing pair:

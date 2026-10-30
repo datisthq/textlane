@@ -3,7 +3,7 @@ use textlane_core::{Allocator, ArenaVec};
 
 use crate::actions::hast::minify::minify_hast;
 use crate::helpers::phrasing::{is_embedded, is_phrasing};
-use crate::models::options::{FormatOptions, Indent};
+use crate::models::options::{Format, Indent};
 
 // Indentation grows with depth on every line, so a deep tree would format into output
 // quadratic in its size; deeper levels indent as this one, unlike hast-util-format
@@ -13,7 +13,7 @@ const MAX_INDENT_LEVEL: usize = 100;
 /// then put each block on its own line, indented by how deep it nests.
 pub fn format_hast<'a>(
     tree: Node<'a>,
-    options: &FormatOptions,
+    options: &Format,
     alloc: &'a Allocator,
 ) -> Node<'a> {
     let indent = match &options.indent {

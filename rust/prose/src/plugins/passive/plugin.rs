@@ -3,24 +3,13 @@ use textlane_core::{Allocator, Attach, Error, File, Plugin, Transform, Tree, Tre
 use crate::actions::message::place::place_messages;
 use crate::actions::passive::check::check_passive;
 use crate::helpers::passive_table::PARTICIPLES;
-use crate::models::options::PassiveOptions;
+use crate::models::options::Passive;
 use crate::models::phrases::Phrases;
-
-/// `prose.passive`: warnings about the passive voice, as retext-passive.
-#[derive(Clone, Debug, Default)]
-pub struct Passive {
-    pub options: PassiveOptions,
-}
-
-/// The `prose.passive` plugin.
-pub fn passive(options: PassiveOptions) -> Passive {
-    Passive { options }
-}
 
 impl Plugin for Passive {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
         context.add_transform(Box::new(PassiveCheck {
-            participles: index_participles(&self.options),
+            participles: index_participles(self),
         }));
         Ok(())
     }
@@ -58,7 +47,7 @@ impl Transform for PassiveCheck {
 }
 
 // retext-passive's participles without the ignored ones, indexed for the search
-fn index_participles(options: &PassiveOptions) -> (Vec<&'static str>, Phrases) {
+fn index_participles(options: &Passive) -> (Vec<&'static str>, Phrases) {
     let ignore = options.ignore.as_deref().unwrap_or_default();
     let participles: Vec<&'static str> = PARTICIPLES
         .iter()

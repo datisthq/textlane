@@ -2,17 +2,14 @@ use textlane_core::Error;
 use textlane_core::mdast::Node;
 
 use crate::actions::root::stringify::stringify_root;
-use crate::models::options::StringifyOptions;
+use crate::models::options::Stringify;
 use crate::utils::serializer::format::is_phrasing;
 use crate::utils::serializer::settings::Settings;
 use crate::utils::serializer::state::{Info, Parent, Serializer};
 use crate::utils::serializer::unsafe_patterns::{Pattern, compile_patterns};
 
 /// Serialize mdast as Markdown, as mdast-util-to-markdown does.
-pub fn stringify_markdown(
-    tree: &Node,
-    options: &StringifyOptions,
-) -> Result<String, Error> {
+pub fn stringify_markdown(tree: &Node, options: &Stringify) -> Result<String, Error> {
     let settings = Settings::from_options(options)?;
     let patterns = compile_patterns(false, None, false, false, &options.unsafe_patterns)?;
     serialize_tree(tree, &settings, &patterns)

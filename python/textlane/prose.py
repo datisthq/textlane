@@ -32,13 +32,14 @@ __all__ = [
 Language = Literal["latin", "english"]
 
 
-# Options of `prose.parse`.
+# `prose.parse`: natural language into nlcst.
 class ParseOptions(TypedDict, total=False):
     # The rules sentences and words are found by.
     language: Language
 
 
-# Options of `prose.equality`, retext-equality's.
+# `prose.equality`: warnings about insensitive, inconsiderate wording, as
+# retext-equality; options are retext-equality's.
 class EqualityOptions(TypedDict, total=False):
     # Phrases not to warn about.
     ignore: Optional[List[str]]
@@ -46,13 +47,15 @@ class EqualityOptions(TypedDict, total=False):
     binary: Optional[bool]
 
 
-# Options of `prose.passive`, retext-passive's.
+# `prose.passive`: warnings about the passive voice, as retext-passive; options are
+# retext-passive's.
 class PassiveOptions(TypedDict, total=False):
     # Participles not to warn about.
     ignore: Optional[List[str]]
 
 
-# Options of `prose.readability`, retext-readability's.
+# `prose.readability`: warnings about sentences too hard to read, as retext-readability;
+# options are retext-readability's.
 class ReadabilityOptions(TypedDict, total=False):
     # The age of the target audience: 16 by default.
     age: Optional[float]
@@ -66,7 +69,8 @@ class ReadabilityOptions(TypedDict, total=False):
 Spacing = Union[float, str]
 
 
-# Options of `prose.sentenceSpacing`, retext-sentence-spacing's.
+# `prose.sentenceSpacing`: warnings about the spaces between sentences, as
+# retext-sentence-spacing; options are retext-sentence-spacing's.
 class SentenceSpacingOptions(TypedDict, total=False):
     # The spacing expected between sentences: `1` or `"space"` (the default), `2` or
     # `"double-space"`, `0` or `"newline"`.
@@ -92,7 +96,8 @@ Dashes = Union[bool, Literal["oldschool", "inverted"]]
 Ellipses = Union[bool, Literal["spaced", "unspaced"]]
 
 
-# Options of `prose.smartypants`, as retext-smartypants takes them.
+# `prose.smartypants`: straight quotes, dashes, dots and backticks into typographic
+# ones; options as retext-smartypants takes them.
 class SmartypantsOptions(TypedDict, total=False):
     # Turn double backticks and double straight single quotes into double quotes; `all`
     # turns single ones into single quotes too, and needs `quotes: false`.
@@ -113,7 +118,8 @@ class SmartypantsOptions(TypedDict, total=False):
 QuoteStyle = Literal["smart", "straight"]
 
 
-# Options of `prose.quotes`, as retext-quotes takes them.
+# `prose.quotes`: check that quotes and apostrophes are straight or smart, as preferred,
+# at each level of nesting; options as retext-quotes takes them.
 class QuotesOptions(TypedDict, total=False):
     # The style of quotes and apostrophes to prefer: `smart` by default.
     preferred: Optional[QuoteStyle]
@@ -124,7 +130,8 @@ class QuotesOptions(TypedDict, total=False):
     straight: Optional[List[str]]
 
 
-# Options of `prose.contractions`, as retext-contractions takes them.
+# `prose.contractions`: check apostrophes in contractions, such as `don’t`; options as
+# retext-contractions takes them.
 class ContractionsOptions(TypedDict, total=False):
     # Also check contractions written as literals, such as `“hasnt”`.
     allowLiterals: Optional[bool]

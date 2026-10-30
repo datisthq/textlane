@@ -7,11 +7,6 @@ use crate::actions::message::place::place_messages;
 #[derive(Clone, Debug, Default)]
 pub struct IndefiniteArticle;
 
-/// The `prose.indefiniteArticle` plugin.
-pub fn indefinite_article() -> IndefiniteArticle {
-    IndefiniteArticle
-}
-
 impl Plugin for IndefiniteArticle {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
         context.add_transform(Box::new(IndefiniteArticle));

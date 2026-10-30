@@ -2,19 +2,7 @@ use textlane_core::{Allocator, Attach, Error, File, Plugin, Transform, Tree, Tre
 
 use crate::actions::message::place::place_messages;
 use crate::actions::quotes::check::{QuoteMarkers, check_quotes};
-use crate::models::quotes::QuotesOptions;
-
-/// `prose.quotes`: check that quotes and apostrophes are straight or smart, as preferred,
-/// at each level of nesting.
-#[derive(Clone, Debug, Default)]
-pub struct Quotes {
-    pub options: QuotesOptions,
-}
-
-/// The `prose.quotes` plugin.
-pub fn quotes(options: QuotesOptions) -> Quotes {
-    Quotes { options }
-}
+use crate::models::quotes::Quotes;
 
 impl Plugin for Quotes {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
@@ -54,9 +42,9 @@ impl Transform for Quotes {
             }
         };
         let markers = QuoteMarkers {
-            preferred: self.options.preferred.unwrap_or_default(),
-            smart: read(&self.options.smart, &["“”", "‘’"]),
-            straight: read(&self.options.straight, &["\"", "'"]),
+            preferred: self.preferred.unwrap_or_default(),
+            smart: read(&self.smart, &["“”", "‘’"]),
+            straight: read(&self.straight, &["\"", "'"]),
         };
         let mut reports = Vec::new();
         check_quotes(&node, &markers, &mut reports);

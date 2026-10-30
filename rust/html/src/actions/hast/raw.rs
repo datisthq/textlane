@@ -5,7 +5,7 @@ use std::mem::discriminant;
 use textlane_core::hast::{Element, MdxJsxElement, Node, Root, Unknown};
 use textlane_core::{Allocator, ArenaVec, Error};
 
-use crate::models::options::RawOptions;
+use crate::models::options::Raw;
 use crate::utils::builder::convert::convert_dom;
 use crate::utils::builder::dom::{Dom, NodeId};
 use crate::utils::builder::parser::Parser;
@@ -23,7 +23,7 @@ const MDX_TYPES: [&str; 5] = [
 /// nodes and nesting is fixed.
 pub fn raw_hast<'a>(
     tree: &Node<'a>,
-    options: &RawOptions,
+    options: &Raw,
     alloc: &'a Allocator,
 ) -> Result<Node<'a>, Error> {
     let head = match tree {
@@ -88,7 +88,7 @@ pub fn raw_hast<'a>(
 }
 
 struct Reparse<'n, 'o, 'a> {
-    options: &'o RawOptions,
+    options: &'o Raw,
     alloc: &'a Allocator,
     jobs: Vec<(&'n [Node<'a>], bool)>,
     // Each passed-through node, and the job parsing its children

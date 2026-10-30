@@ -4,19 +4,19 @@ use textlane_core::{Allocator, Error, File};
 use super::highlight_hast;
 use crate::actions::hast::stringify::stringify_hast;
 use crate::actions::html::parse::parse_html;
-use crate::models::options::{HighlightOptions, ParseOptions, StringifyOptions};
+use crate::models::options::{Highlight, Parse, Stringify};
 
 fn highlight(input: &str, options: serde_json::Value) -> Result<String, Error> {
     let alloc = Allocator::new();
-    let options: HighlightOptions = serde_json::from_value(options)
+    let options: Highlight = serde_json::from_value(options)
         .map_err(|error| Error::new("invalid-options", error.to_string()))?;
-    let parse = ParseOptions {
+    let parse = Parse {
         fragment: true,
         ..Default::default()
     };
     let mut node = parse_html(input, &parse, &mut File::new(), &alloc);
     highlight_hast(&mut node, &options, &alloc)?;
-    stringify_hast(&node, &StringifyOptions::default())
+    stringify_hast(&node, &Stringify::default())
 }
 
 #[test]

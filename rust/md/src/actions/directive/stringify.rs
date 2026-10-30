@@ -2,7 +2,7 @@ use textlane_core::Error;
 use textlane_core::mdast::Node;
 
 use crate::helpers::character::CharacterKind;
-use crate::models::options::DirectiveOptions;
+use crate::models::options::Directive;
 use crate::utils::serializer::construct::Construct;
 use crate::utils::serializer::state::{Info, Parent, Serializer, classify_unit};
 
@@ -135,7 +135,7 @@ fn serialize_attributes(
     node: &Node,
     attributes: &[(&str, &str)],
 ) -> String {
-    let defaults = DirectiveOptions::default();
+    let defaults = Directive::default();
     let options = state.settings.directive.as_ref().unwrap_or(&defaults);
     let mut values = Vec::new();
     let mut id = None;
@@ -245,7 +245,7 @@ fn is_unquoted(value: &str) -> bool {
 
 fn quote_attribute(
     state: &Serializer,
-    options: &DirectiveOptions,
+    options: &Directive,
     node: &Node,
     key: &str,
     value: &str,

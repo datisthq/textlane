@@ -61,11 +61,10 @@ mod plugins {
 }
 
 // models
-pub use models::options::CompileOptions;
+pub use models::options::Compile;
 pub use models::script::OxcScriptParser;
 
 // actions
 pub use actions::hast::compile::compile_hast;
 
 // plugins
-pub use plugins::compile::plugin::{Compile, compile};

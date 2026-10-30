@@ -4,7 +4,7 @@ use textlane_core::hast::Node;
 use textlane_core::{Allocator, File, Lines, Message, Point, Position};
 
 use crate::helpers::reason::find_reason;
-use crate::models::options::ParseOptions;
+use crate::models::options::Parse;
 use crate::utils::builder::convert::convert_dom;
 use crate::utils::builder::parser::Parser;
 
@@ -12,7 +12,7 @@ use crate::utils::builder::parser::Parser;
 /// `file` when `emit_parse_errors` is set.
 pub fn parse_html<'a>(
     input: &str,
-    options: &ParseOptions,
+    options: &Parse,
     file: &mut File,
     alloc: &'a Allocator,
 ) -> Node<'a> {

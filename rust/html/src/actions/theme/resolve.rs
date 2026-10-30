@@ -4,13 +4,13 @@ use textlane_core::Error;
 use crate::helpers::registry::load_registry;
 use crate::helpers::theme_table::THEMES;
 use crate::models::highlight::{Theme, Themes};
-use crate::models::options::HighlightOptions;
+use crate::models::options::Highlight;
 
 // Shiki's `defaultColor`, which takes plain `color` while the others take CSS variables
 const DEFAULT_MODE: &str = "light";
 
 /// The themes `html.highlight` colors with, failing as Shiki does on ones it lacks.
-pub(crate) fn resolve_themes(options: &HighlightOptions) -> Result<Themes, Error> {
+pub(crate) fn resolve_themes(options: &Highlight) -> Result<Themes, Error> {
     let Some(themes) = &options.themes else {
         let Some(name) = &options.theme else {
             return Err(invalid("either `theme` or `themes` must be provided"));

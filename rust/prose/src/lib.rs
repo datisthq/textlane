@@ -121,24 +121,15 @@ mod plugins {
 
 pub use actions::nlcst::stringify::stringify_nlcst;
 pub use actions::prose::parse::parse_prose;
-pub use models::contractions::ContractionsOptions;
+pub use models::contractions::Contractions;
 pub use models::options::{
-    EqualityOptions, Language, ParseOptions, PassiveOptions, ReadabilityOptions,
-    SentenceSpacingOptions, Spacing,
+    Equality, Language, Parse, Passive, Readability, SentenceSpacing, Spacing,
 };
 pub use models::parser::LanguageParser;
-pub use models::quotes::{QuoteStyle, QuotesOptions};
+pub use models::quotes::{QuoteStyle, Quotes};
 pub use models::smartypants::{
-    Backticks, Dashes, Ellipses, QuoteCharacters, SmartypantsOptions,
+    Backticks, Dashes, Ellipses, QuoteCharacters, Smartypants,
 };
-pub use plugins::contractions::plugin::{Contractions, contractions};
-pub use plugins::equality::plugin::{Equality, equality};
-pub use plugins::indefinite_article::plugin::{IndefiniteArticle, indefinite_article};
-pub use plugins::parse::plugin::{Parse, parse};
-pub use plugins::passive::plugin::{Passive, passive};
-pub use plugins::quotes::plugin::{Quotes, quotes};
-pub use plugins::readability::plugin::{Readability, readability};
-pub use plugins::repeated_words::plugin::{RepeatedWords, repeated_words};
-pub use plugins::sentence_spacing::plugin::{SentenceSpacing, sentence_spacing};
-pub use plugins::smartypants::plugin::{Smartypants, smartypants};
-pub use plugins::stringify::plugin::{Stringify, stringify};
+pub use plugins::indefinite_article::plugin::IndefiniteArticle;
+pub use plugins::repeated_words::plugin::RepeatedWords;
+pub use plugins::stringify::plugin::Stringify;

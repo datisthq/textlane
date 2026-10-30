@@ -22,8 +22,11 @@ One workspace, three registries, one version. Nothing here may change what the c
   `schemars::JsonSchema`, derived only under each crate's `schema` feature, so no release build
   pays for schemars. A plugin added to the table or an option changed in Rust is one
   `pnpm generate:bindings` away; `.scripts/-test/bindings.unit.ts` fails until it runs.
-  A custom `Deserialize` needs a hand-written `JsonSchema` beside it (`FrontmatterOptions`,
+  A custom `Deserialize` needs a hand-written `JsonSchema` beside it (`md::Frontmatter`,
   smartypants' modes), and a `deserialize_with` field a `schemars(with = …)`.
+  A plugin struct is its own options (`md::Gfm`), so schemars would name the binding type
+  `Gfm`: each carries `schemars(rename = "GfmOptions")`, and a hand-written `schema_name`
+  returns the `…Options` name too, or the generated types silently lose their suffix.
 - `resolveAddon` takes `TEXTLANE_ADDON` first (a cargo build, an unsupported platform), else
   resolves `@textlane/<platform>-<arch>/textlane.node` from the installed packages.
 - `PLATFORMS` in `typescript/settings.ts` is the single list. `scripts/pack.ts` reads it to lay

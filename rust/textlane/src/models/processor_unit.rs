@@ -7,9 +7,9 @@ const LIMIT_SECS: u64 = if cfg!(debug_assertions) { 20 } else { 5 };
 
 fn render(input: &str) -> Result<String, Error> {
     let processor = Processor::new()
-        .with(textlane_md::parse(Default::default()))
-        .with(textlane_md::to_html(Default::default()))
-        .with(textlane_html::stringify(Default::default()))
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::ToHtml::default())
+        .with(textlane_html::Stringify::default())
         .freeze()?;
     Ok(processor.process(input)?.value)
 }
@@ -133,19 +133,19 @@ fn resolves_hostile_links_in_linear_time() -> Result<(), Error> {
 
 fn render_gfm(input: &str) -> Result<String, Error> {
     let processor = Processor::new()
-        .with(textlane_md::parse(Default::default()))
-        .with(textlane_md::gfm(Default::default()))
-        .with(textlane_md::to_html(Default::default()))
-        .with(textlane_html::stringify(Default::default()))
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::Gfm::default())
+        .with(textlane_md::ToHtml::default())
+        .with(textlane_html::Stringify::default())
         .freeze()?;
     Ok(processor.process(input)?.value)
 }
 
 fn format_gfm(input: &str) -> Result<String, Error> {
     let processor = Processor::new()
-        .with(textlane_md::parse(Default::default()))
-        .with(textlane_md::gfm(Default::default()))
-        .with(textlane_md::stringify(Default::default()))
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::Gfm::default())
+        .with(textlane_md::Stringify::default())
         .freeze()?;
     Ok(processor.process(input)?.value)
 }
@@ -184,20 +184,20 @@ fn resolves_hostile_footnotes_in_linear_time() -> Result<(), Error> {
 
 fn render_def_list(input: &str) -> Result<String, Error> {
     let processor = Processor::new()
-        .with(textlane_md::parse(Default::default()))
-        .with(textlane_md::gfm(Default::default()))
-        .with(textlane_md::definition_list())
-        .with(textlane_md::to_html(Default::default()))
-        .with(textlane_html::stringify(Default::default()))
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::Gfm::default())
+        .with(textlane_md::DefinitionList)
+        .with(textlane_md::ToHtml::default())
+        .with(textlane_html::Stringify::default())
         .freeze()?;
     Ok(processor.process(input)?.value)
 }
 
 fn format_def_list(input: &str) -> Result<String, Error> {
     let processor = Processor::new()
-        .with(textlane_md::parse(Default::default()))
-        .with(textlane_md::definition_list())
-        .with(textlane_md::stringify(Default::default()))
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::DefinitionList)
+        .with(textlane_md::Stringify::default())
         .freeze()?;
     Ok(processor.process(input)?.value)
 }
@@ -263,8 +263,8 @@ fn rejects_hostile_html_in_linear_time() -> Result<(), Error> {
 
 fn format_markdown(input: &str) -> Result<String, Error> {
     let processor = Processor::new()
-        .with(textlane_md::parse(Default::default()))
-        .with(textlane_md::stringify(Default::default()))
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::Stringify::default())
         .freeze()?;
     Ok(processor.process(input)?.value)
 }
@@ -323,8 +323,8 @@ fn formats_hostile_phrasing_in_linear_time() -> Result<(), Error> {
 
 fn reformat_html(input: &str) -> Result<String, Error> {
     let processor = Processor::new()
-        .with(textlane_html::parse(Default::default()))
-        .with(textlane_html::stringify(Default::default()))
+        .with(textlane_html::Parse::default())
+        .with(textlane_html::Stringify::default())
         .freeze()?;
     Ok(processor.process(input)?.value)
 }
@@ -376,10 +376,10 @@ fn parses_hostile_html_in_linear_time() -> Result<(), Error> {
 #[test]
 fn sanitizes_and_slugs_hostile_html_in_linear_time() -> Result<(), Error> {
     let processor = Processor::new()
-        .with(textlane_html::parse(Default::default()))
-        .with(textlane_html::sanitize(Default::default()))
-        .with(textlane_html::slug(Default::default()))
-        .with(textlane_html::stringify(Default::default()))
+        .with(textlane_html::Parse::default())
+        .with(textlane_html::Sanitize::default())
+        .with(textlane_html::Slug::default())
+        .with(textlane_html::Stringify::default())
         .freeze()?;
     for input in [
         "<div>".repeat(100_000),
@@ -405,8 +405,8 @@ fn sanitizes_and_slugs_hostile_html_in_linear_time() -> Result<(), Error> {
 #[test]
 fn converts_hostile_html_to_markdown_in_linear_time() -> Result<(), Error> {
     let processor = Processor::new()
-        .with(textlane_html::parse(Default::default()))
-        .with(textlane_html::to_markdown(Default::default()))
+        .with(textlane_html::Parse::default())
+        .with(textlane_html::ToMarkdown::default())
         .freeze()?;
     let datalist =
         "<datalist id=d>".to_string() + &"<option>x".repeat(20_000) + "</datalist>";
@@ -460,17 +460,17 @@ fn converts_hostile_html_to_markdown_in_linear_time() -> Result<(), Error> {
 
 #[test]
 fn handles_hostile_gfm_tables_in_linear_time() -> Result<(), Error> {
-    let gfm = || textlane_md::gfm(Default::default());
+    let gfm = || textlane_md::Gfm::default();
     let to_html = Processor::new()
-        .with(textlane_md::parse(Default::default()))
+        .with(textlane_md::Parse::default())
         .with(gfm())
-        .with(textlane_md::to_html(Default::default()))
-        .with(textlane_html::stringify(Default::default()))
+        .with(textlane_md::ToHtml::default())
+        .with(textlane_html::Stringify::default())
         .freeze()?;
     let to_markdown = Processor::new()
-        .with(textlane_md::parse(Default::default()))
+        .with(textlane_md::Parse::default())
         .with(gfm())
-        .with(textlane_md::stringify(Default::default()))
+        .with(textlane_md::Stringify::default())
         .freeze()?;
     let head = "|a".repeat(10_000) + "|\n" + &"|-".repeat(10_000) + "|\n";
     for input in [
@@ -502,15 +502,15 @@ fn handles_hostile_gfm_tables_in_linear_time() -> Result<(), Error> {
 #[test]
 fn handles_hostile_gfm_in_linear_time() -> Result<(), Error> {
     let render = Processor::new()
-        .with(textlane_md::parse(Default::default()))
-        .with(textlane_md::gfm(Default::default()))
-        .with(textlane_md::to_html(Default::default()))
-        .with(textlane_html::stringify(Default::default()))
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::Gfm::default())
+        .with(textlane_md::ToHtml::default())
+        .with(textlane_html::Stringify::default())
         .freeze()?;
     let format = Processor::new()
-        .with(textlane_md::parse(Default::default()))
-        .with(textlane_md::gfm(Default::default()))
-        .with(textlane_md::stringify(Default::default()))
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::Gfm::default())
+        .with(textlane_md::Stringify::default())
         .freeze()?;
     for input in [
         "x_www.a_".repeat(20_000),
@@ -552,17 +552,17 @@ fn handles_hostile_gfm_in_linear_time() -> Result<(), Error> {
 
 #[test]
 fn handles_hostile_math_in_linear_time() -> Result<(), Error> {
-    let math = || textlane_md::math(Default::default());
+    let math = || textlane_md::Math::default();
     let render = Processor::new()
-        .with(textlane_md::parse(Default::default()))
+        .with(textlane_md::Parse::default())
         .with(math())
-        .with(textlane_md::to_html(Default::default()))
-        .with(textlane_html::stringify(Default::default()))
+        .with(textlane_md::ToHtml::default())
+        .with(textlane_html::Stringify::default())
         .freeze()?;
     let format = Processor::new()
-        .with(textlane_md::parse(Default::default()))
+        .with(textlane_md::Parse::default())
         .with(math())
-        .with(textlane_md::stringify(Default::default()))
+        .with(textlane_md::Stringify::default())
         .freeze()?;
     for input in [
         (1..=1_000).map(|size| "$".repeat(size) + "a").collect(),
@@ -588,16 +588,16 @@ fn handles_hostile_math_in_linear_time() -> Result<(), Error> {
 
 #[test]
 fn handles_hostile_mdx_in_linear_time() -> Result<(), Error> {
-    let mdx = || textlane_md::mdx(Default::default());
+    let mdx = || textlane_md::Mdx::default();
     let render = Processor::new()
-        .with(textlane_md::parse(Default::default()))
+        .with(textlane_md::Parse::default())
         .with(mdx())
-        .with(textlane_md::to_html(Default::default()))
+        .with(textlane_md::ToHtml::default())
         .freeze()?;
     let format = Processor::new()
-        .with(textlane_md::parse(Default::default()))
+        .with(textlane_md::Parse::default())
         .with(mdx())
-        .with(textlane_md::stringify(Default::default()))
+        .with(textlane_md::Stringify::default())
         .freeze()?;
     let inputs: Vec<(String, bool)> = vec![
         // Indenting nested flow elements grows the output with depth squared, by nature
@@ -669,13 +669,13 @@ fn checks_setext_underlines_in_linear_time() -> Result<(), Error> {
 #[test]
 fn reparses_hostile_raw_html_in_linear_time() -> Result<(), Error> {
     let markdown = Processor::new()
-        .with(textlane_md::parse(Default::default()))
-        .with(textlane_md::to_html(textlane_md::ToHtmlOptions {
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::ToHtml {
             allow_dangerous_html: true,
             ..Default::default()
-        }))
-        .with(textlane_html::raw(Default::default()))
-        .with(textlane_html::stringify(Default::default()))
+        })
+        .with(textlane_html::Raw::default())
+        .with(textlane_html::Stringify::default())
         .freeze()?;
     for input in [
         "<div>\n\n".repeat(50_000),
@@ -697,9 +697,9 @@ fn reparses_hostile_raw_html_in_linear_time() -> Result<(), Error> {
         );
     }
     let html = Processor::new()
-        .with(textlane_html::parse(Default::default()))
-        .with(textlane_html::raw(Default::default()))
-        .with(textlane_html::stringify(Default::default()))
+        .with(textlane_html::Parse::default())
+        .with(textlane_html::Raw::default())
+        .with(textlane_html::Stringify::default())
         .freeze()?;
     for input in [
         "<div>".repeat(100_000),
@@ -722,9 +722,9 @@ fn reparses_hostile_raw_html_in_linear_time() -> Result<(), Error> {
 #[test]
 fn formats_hostile_html_in_linear_time() -> Result<(), Error> {
     let indented = Processor::new()
-        .with(textlane_html::parse(Default::default()))
-        .with(textlane_html::format(Default::default()))
-        .with(textlane_html::stringify(Default::default()))
+        .with(textlane_html::Parse::default())
+        .with(textlane_html::Format::default())
+        .with(textlane_html::Stringify::default())
         .freeze()?;
     for input in [
         "<p>a</p>\n".repeat(100_000),
@@ -753,10 +753,8 @@ fn reparse_prose(
     language: textlane_prose::Language,
 ) -> Result<String, Error> {
     let processor = Processor::new()
-        .with(textlane_prose::parse(textlane_prose::ParseOptions {
-            language,
-        }))
-        .with(textlane_prose::stringify())
+        .with(textlane_prose::Parse { language })
+        .with(textlane_prose::Stringify)
         .freeze()?;
     Ok(processor.process(input)?.value)
 }
@@ -842,7 +840,7 @@ impl textlane_core::Parser for ProseBridgeParser {
 fn hands_the_prose_parser_to_plugins() -> Result<(), Error> {
     let processor = Processor::new()
         .with(ProseBridge)
-        .with(textlane_prose::stringify())
+        .with(textlane_prose::Stringify)
         .freeze()?;
     let alloc = textlane_core::Allocator::new();
     let mut file = textlane_core::File::new();
@@ -857,17 +855,17 @@ fn hands_the_prose_parser_to_plugins() -> Result<(), Error> {
 #[test]
 fn checks_hostile_prose_in_linear_time() -> Result<(), Error> {
     let processor = Processor::new()
-        .with(textlane_prose::parse(Default::default()))
-        .with(textlane_prose::equality(Default::default()))
-        .with(textlane_prose::equality(textlane_prose::EqualityOptions {
+        .with(textlane_prose::Parse::default())
+        .with(textlane_prose::Equality::default())
+        .with(textlane_prose::Equality {
             binary: Some(true),
             ..Default::default()
-        }))
-        .with(textlane_prose::readability(Default::default()))
-        .with(textlane_prose::passive(Default::default()))
-        .with(textlane_prose::repeated_words())
-        .with(textlane_prose::sentence_spacing(Default::default()))
-        .with(textlane_prose::stringify())
+        })
+        .with(textlane_prose::Readability::default())
+        .with(textlane_prose::Passive::default())
+        .with(textlane_prose::RepeatedWords)
+        .with(textlane_prose::SentenceSpacing::default())
+        .with(textlane_prose::Stringify)
         .freeze()?;
     for input in [
         "he or she and his/her ".repeat(10_000),
@@ -935,9 +933,9 @@ fn checks_hostile_prose_typography_in_linear_time() -> Result<(), Error> {
             let build = crate::actions::plugin::find::find_plugin(name)
                 .ok_or_else(|| Error::new("unknown-plugin", *name))?;
             let processor = Processor::new()
-                .with(textlane_prose::parse(Default::default()))
+                .with(textlane_prose::Parse::default())
                 .with_boxed(build(name, options.clone())?)
-                .with(textlane_prose::stringify())
+                .with(textlane_prose::Stringify)
                 .freeze()?;
             let started = std::time::Instant::now();
             processor.process(input)?;
@@ -955,10 +953,10 @@ fn checks_hostile_prose_typography_in_linear_time() -> Result<(), Error> {
 #[test]
 fn places_many_messages_on_non_ascii_prose_in_linear_time() -> Result<(), Error> {
     let processor = Processor::new()
-        .with(textlane_prose::parse(Default::default()))
-        .with(textlane_prose::equality(Default::default()))
-        .with(textlane_prose::repeated_words())
-        .with(textlane_prose::stringify())
+        .with(textlane_prose::Parse::default())
+        .with(textlane_prose::Equality::default())
+        .with(textlane_prose::RepeatedWords)
+        .with(textlane_prose::Stringify)
         .freeze()?;
     for input in ["é he ".repeat(50_000), "é he he ".repeat(25_000)] {
         let started = std::time::Instant::now();
@@ -976,18 +974,18 @@ fn places_many_messages_on_non_ascii_prose_in_linear_time() -> Result<(), Error>
 
 fn markdown_to_prose(input: &str) -> Result<String, Error> {
     let processor = Processor::new()
-        .with(textlane_md::parse(Default::default()))
-        .with(textlane_md::to_prose(Default::default()))
-        .with(textlane_prose::stringify())
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::ToProse::default())
+        .with(textlane_prose::Stringify)
         .freeze()?;
     Ok(processor.process(input)?.value)
 }
 
 fn html_to_prose(input: &str) -> Result<String, Error> {
     let processor = Processor::new()
-        .with(textlane_html::parse(Default::default()))
-        .with(textlane_html::to_prose())
-        .with(textlane_prose::stringify())
+        .with(textlane_html::Parse::default())
+        .with(textlane_html::ToProse)
+        .with(textlane_prose::Stringify)
         .freeze()?;
     Ok(processor.process(input)?.value)
 }
@@ -1052,22 +1050,19 @@ fn bridges_hostile_html_into_prose_in_linear_time() -> Result<(), Error> {
     Ok(())
 }
 
-fn compile_mdx(
-    input: &str,
-    options: textlane_mdx::CompileOptions,
-) -> Result<String, Error> {
+fn compile_mdx(input: &str, options: textlane_mdx::Compile) -> Result<String, Error> {
     let processor = Processor::new()
-        .with(textlane_md::parse(Default::default()))
-        .with(textlane_md::mdx(Default::default()))
-        .with(textlane_md::to_html(Default::default()))
-        .with(textlane_mdx::compile(options))
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::Mdx::default())
+        .with(textlane_md::ToHtml::default())
+        .with(options)
         .freeze()?;
     Ok(processor.process(input)?.value)
 }
 
 #[test]
 fn compiles_deeply_nested_markdown_into_javascript() -> Result<(), Error> {
-    let jsx = textlane_mdx::CompileOptions {
+    let jsx = textlane_mdx::Compile {
         jsx: true,
         ..Default::default()
     };
@@ -1104,7 +1099,7 @@ fn compiles_deeply_nested_jsx_into_javascript() -> Result<(), Error> {
     let depth = 10_000;
     let input = format!("{}b{}", "<a>".repeat(depth), "</a>".repeat(depth));
     let started = std::time::Instant::now();
-    let jsx = textlane_mdx::CompileOptions {
+    let jsx = textlane_mdx::Compile {
         jsx: true,
         ..Default::default()
     };
@@ -1133,7 +1128,7 @@ fn compiles_many_components_and_exports_in_linear_time() -> Result<(), Error> {
     let started = std::time::Instant::now();
     let output = compile_mdx(&input, Default::default())?;
     assert!(output.contains("if (!X9999) _missingMdxReference(\"X9999\", true);"));
-    let body = textlane_mdx::CompileOptions {
+    let body = textlane_mdx::Compile {
         output_format: Some("function-body".to_string()),
         ..Default::default()
     };
@@ -1150,10 +1145,10 @@ fn compiles_many_components_and_exports_in_linear_time() -> Result<(), Error> {
 #[test]
 fn parses_deeply_recursive_mdx_scripts_without_overflow() -> Result<(), Error> {
     let compile = Processor::new()
-        .with(textlane_md::parse(Default::default()))
-        .with(textlane_md::mdx(Default::default()))
-        .with(textlane_md::to_html(Default::default()))
-        .with(textlane_mdx::compile(Default::default()))
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::Mdx::default())
+        .with(textlane_md::ToHtml::default())
+        .with(textlane_mdx::Compile::default())
         .freeze()?;
     let depth = 5_000;
     for input in [
@@ -1186,9 +1181,9 @@ fn parses_deeply_recursive_mdx_scripts_without_overflow() -> Result<(), Error> {
 #[test]
 fn gives_up_on_mdx_scripts_that_keep_failing_in_linear_time() -> Result<(), Error> {
     let render = Processor::new()
-        .with(textlane_md::parse(Default::default()))
-        .with(textlane_md::mdx(Default::default()))
-        .with(textlane_md::to_html(Default::default()))
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::Mdx::default())
+        .with(textlane_md::ToHtml::default())
         .freeze()?;
     for input in [
         "{'".to_string() + &"}".repeat(100_000),

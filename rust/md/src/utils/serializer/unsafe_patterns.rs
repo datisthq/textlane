@@ -1,7 +1,7 @@
 use regex::bytes::{Regex, RegexBuilder};
 use textlane_core::Error;
 
-use crate::models::options::{MathOptions, Names, UnsafePattern};
+use crate::models::options::{Math, Names, UnsafePattern};
 use crate::utils::serializer::construct::Construct;
 
 /// An unsafe pattern, compiled as mdast-util-to-markdown's `compilePattern` does.
@@ -45,7 +45,7 @@ const CODE_FENCED_INFO: &[&str] = &[
 /// `directive` is, then `extra`, in the order upstream checks them.
 pub(crate) fn compile_patterns(
     gfm: bool,
-    math: Option<&MathOptions>,
+    math: Option<&Math>,
     directive: bool,
     mdx: bool,
     extra: &[UnsafePattern],
@@ -108,7 +108,7 @@ fn create_gfm_patterns() -> Vec<UnsafePattern> {
 
 // As mdast-util-math: a single dollar is escaped in phrasing unless single dollars do not
 // form math
-fn create_math_patterns(options: &MathOptions) -> Vec<UnsafePattern> {
+fn create_math_patterns(options: &Math) -> Vec<UnsafePattern> {
     let meta = Some(&["mathFlowMeta"][..]);
     let after = if options.single_dollar_text_math {
         None

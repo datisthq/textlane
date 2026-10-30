@@ -2,17 +2,19 @@ use serde::Deserialize;
 use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
 
-/// Options of `md::parse`.
+/// `md.parse`: Markdown into mdast.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct ParseOptions {}
+#[cfg_attr(feature = "schema", schemars(rename = "ParseOptions"))]
+pub struct Parse {}
 
-/// Options of `md::to_html`, named as remark-rehype names them.
+/// `md.toHtml`: mdast into hast; options named as remark-rehype names them.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct ToHtmlOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "ToHtmlOptions"))]
+pub struct ToHtml {
     /// Keep raw HTML in the tree instead of dropping it.
     pub allow_dangerous_html: bool,
     /// What footnote `id`s start with, so they cannot clobber the page's; `user-content-`
@@ -33,22 +35,26 @@ pub struct ToHtmlOptions {
     pub pass_through: Vec<String>,
 }
 
-/// Options of `md::to_prose`, named as remark-retext and mdast-util-to-nlcst name them.
+/// `md.toProse`: mdast into nlcst, tokenized by the processor's prose parser; options
+/// named as remark-retext and mdast-util-to-nlcst name them.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
-pub struct ToProseOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "ToProseOptions"))]
+pub struct ToProse {
     /// Node types to leave out, besides `table`, `tableRow` and `tableCell`.
     pub ignore: Vec<String>,
     /// Node types to keep as one `SourceNode` of their source text, besides `inlineCode`.
     pub source: Vec<String>,
 }
 
-/// Options of `md::stringify`, named as mdast-util-to-markdown names them.
+/// `md.stringify`: mdast into Markdown; options named as mdast-util-to-markdown names
+/// them.
 #[derive(Clone, Debug, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct StringifyOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "StringifyOptions"))]
+pub struct Stringify {
     /// The marker of unordered list items: `*`, `+` or `-`.
     pub bullet: Option<String>,
     /// The marker of ordered list items: `.` or `)`.
@@ -88,9 +94,9 @@ pub struct StringifyOptions {
     pub unsafe_patterns: Vec<UnsafePattern>,
 }
 
-impl Default for StringifyOptions {
+impl Default for Stringify {
     fn default() -> Self {
-        StringifyOptions {
+        Stringify {
             bullet: None,
             bullet_ordered: None,
             bullet_other: None,
@@ -157,11 +163,13 @@ impl Names {
     }
 }
 
-/// Options of `md::gfm`, named as remark-gfm names them.
+/// `md.gfm`: GitHub Flavored Markdown's syntax, read by `md.parse` and written by
+/// `md.stringify`; options named as remark-gfm names them.
 #[derive(Clone, Debug, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct GfmOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "GfmOptions"))]
+pub struct Gfm {
     /// Let one tilde, `~a~`, form strikethrough, as well as two.
     pub single_tilde: bool,
     /// Pad table cells with a space on each side when writing Markdown.
@@ -172,9 +180,9 @@ pub struct GfmOptions {
     pub first_line_blank: bool,
 }
 
-impl Default for GfmOptions {
+impl Default for Gfm {
     fn default() -> Self {
-        GfmOptions {
+        Gfm {
             single_tilde: true,
             table_cell_padding: true,
             table_pipe_align: true,
@@ -183,50 +191,55 @@ impl Default for GfmOptions {
     }
 }
 
-/// What `md::gfm` shares with the parser and serializer: `Some` once GFM is used.
+/// What `md::Gfm` shares with the parser and serializer: `Some` once GFM is used.
 #[derive(Clone, Debug, Default)]
-pub struct GfmSlot(pub Option<GfmOptions>);
+pub struct GfmSlot(pub Option<Gfm>);
 
-/// What `md::definition_list` shares with the parser and serializer: `true` once it is used.
+/// What `md::DefinitionList` shares with the parser and serializer: `true` once it is used.
 #[derive(Clone, Debug, Default)]
 pub struct DefinitionListSlot(pub bool);
-/// Options of `md::math`, named as remark-math names them.
+/// `md.math`: math syntax, `$$` blocks and `$` text, read by `md.parse` and written by
+/// `md.stringify`; options named as remark-math names them.
 #[derive(Clone, Debug, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct MathOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "MathOptions"))]
+pub struct Math {
     /// Let one dollar, `$a$`, form math in text, as well as two.
     pub single_dollar_text_math: bool,
 }
 
-impl Default for MathOptions {
+impl Default for Math {
     fn default() -> Self {
-        MathOptions {
+        Math {
             single_dollar_text_math: true,
         }
     }
 }
 
-/// Options of `md::directive`, named as mdast-util-directive's serializer names them.
+/// `md.directive`: generic directives, `:a`, `::b` and `:::c`, read by `md.parse` and
+/// written by `md.stringify`; options named as mdast-util-directive's serializer names
+/// them.
 #[derive(Clone, Debug, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct DirectiveOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "DirectiveOptions"))]
+pub struct Directive {
     /// Write an empty attribute as its name alone, `{a}`, rather than `{a=""}`.
     pub collapse_empty_attributes: bool,
     /// Write `id` and `class` as `#a` and `.b` where they can be.
     pub prefer_shortcut: bool,
     /// Leave attribute values unquoted where they can be.
     pub prefer_unquoted: bool,
-    /// The quote of attribute values: `"` or `'`; `md::stringify`'s `quote` when unset.
+    /// The quote of attribute values: `"` or `'`; `md.stringify`'s `quote` when unset.
     pub quote: Option<String>,
     /// Use the other quote when the preferred one occurs more often in a value.
     pub quote_smart: bool,
 }
 
-impl Default for DirectiveOptions {
+impl Default for Directive {
     fn default() -> Self {
-        DirectiveOptions {
+        Directive {
             collapse_empty_attributes: true,
             prefer_shortcut: true,
             prefer_unquoted: false,
@@ -236,15 +249,18 @@ impl Default for DirectiveOptions {
     }
 }
 
-/// What `md::math` shares with the parser and serializer: `Some` once math is used.
+/// What `md::Math` shares with the parser and serializer: `Some` once math is used.
 #[derive(Clone, Debug, Default)]
-pub struct MathSlot(pub Option<MathOptions>);
+pub struct MathSlot(pub Option<Math>);
 
-/// Options of `md::mdx`, named as remark-mdx and mdast-util-mdx-jsx's serializer name them.
+/// `md.mdx`: MDX syntax, JSX, expressions and ESM, read by `md.parse` and written by
+/// `md.stringify`; it turns off indented code, autolinks and raw HTML; options named as
+/// remark-mdx and mdast-util-mdx-jsx's serializer name them.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]
-pub struct MdxOptions {
+#[cfg_attr(feature = "schema", schemars(rename = "MdxOptions"))]
+pub struct Mdx {
     /// The quote of JSX attribute values: `"` (when unset) or `'`.
     pub quote: Option<String>,
     /// Use the other quote when the preferred one occurs more often in a value.
@@ -255,30 +271,32 @@ pub struct MdxOptions {
     pub print_width: Option<f64>,
 }
 
-/// Whether `md::mdx` is in the pipeline, for `md::to_html`, which may attach before it.
+/// Whether `md::Mdx` is in the pipeline, for `md::ToHtml`, which may attach before it.
 #[derive(Clone, Debug, Default)]
 pub(crate) struct UnravelSlot(pub(crate) Arc<AtomicBool>);
 
-/// What `md::mdx` shares with the parser and serializer: `Some` once MDX is used.
+/// What `md::Mdx` shares with the parser and serializer: `Some` once MDX is used.
 #[derive(Clone, Debug, Default)]
-pub struct MdxSlot(pub Option<MdxOptions>);
+pub struct MdxSlot(pub Option<Mdx>);
 
-/// What `md::directive` shares with the parser and serializer: `Some` once directives are
+/// What `md::Directive` shares with the parser and serializer: `Some` once directives are
 /// used.
 #[derive(Clone, Debug, Default)]
-pub struct DirectiveSlot(pub Option<DirectiveOptions>);
+pub struct DirectiveSlot(pub Option<Directive>);
 
-/// Options of `md::frontmatter`: the kinds of matter to recognize, `yaml` when unset.
+/// `md.frontmatter`: YAML, TOML or custom matter at the start of a document, read by
+/// `md.parse` and written by `md.stringify`; options: the kinds of matter to recognize,
+/// `yaml` when unset.
 ///
 /// From JSON they read as remark-frontmatter's: a preset (`"yaml"`, `"toml"`), a matter
 /// (`{type, marker | fence, anywhere?}`, where `marker` is repeated three times and either
 /// may be `{open, close}`), or a list of them.
 #[derive(Clone, Debug)]
-pub struct FrontmatterOptions(pub Vec<Matter>);
+pub struct Frontmatter(pub Vec<Matter>);
 
-impl Default for FrontmatterOptions {
+impl Default for Frontmatter {
     fn default() -> Self {
-        FrontmatterOptions(vec![Matter::yaml()])
+        Frontmatter(vec![Matter::yaml()])
     }
 }
 
@@ -314,13 +332,13 @@ impl Matter {
     }
 }
 
-impl<'de> Deserialize<'de> for FrontmatterOptions {
+impl<'de> Deserialize<'de> for Frontmatter {
     fn deserialize<D: serde::Deserializer<'de>>(
         deserializer: D,
     ) -> Result<Self, D::Error> {
         let value = serde_json::Value::deserialize(deserializer)?;
         read_matters(&value)
-            .map(FrontmatterOptions)
+            .map(Frontmatter)
             .map_err(serde::de::Error::custom)
     }
 }
@@ -399,7 +417,7 @@ fn is_truthy(value: &serde_json::Value) -> bool {
 }
 
 #[cfg(feature = "schema")]
-impl schemars::JsonSchema for FrontmatterOptions {
+impl schemars::JsonSchema for Frontmatter {
     fn schema_name() -> std::borrow::Cow<'static, str> {
         "FrontmatterOptions".into()
     }
@@ -459,6 +477,6 @@ impl schemars::JsonSchema for Matter {
     }
 }
 
-/// What `md::frontmatter` shares with the parser and serializer: its matters, in order.
+/// What `md::Frontmatter` shares with the parser and serializer: its matters, in order.
 #[derive(Clone, Debug, Default)]
 pub struct FrontmatterSlot(pub Vec<Matter>);

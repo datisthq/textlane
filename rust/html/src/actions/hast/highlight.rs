@@ -6,13 +6,13 @@ use crate::actions::code::tokenize::is_plain_language;
 use crate::actions::theme::resolve::resolve_themes;
 use crate::helpers::registry::{INJECTION_TARGETS, load_registry};
 use crate::models::highlight::Themes;
-use crate::models::options::HighlightOptions;
+use crate::models::options::Highlight;
 
 /// Color each `<pre>` whose first child is a `<code class="language-…">` as
 /// @shikijs/rehype does, replacing the block with Shiki's.
 pub fn highlight_hast<'a>(
     node: &mut Node<'a>,
-    options: &HighlightOptions,
+    options: &Highlight,
     alloc: &'a Allocator,
 ) -> Result<(), Error> {
     // Resolved at the first block, as Shiki only fails on themes when it highlights
@@ -43,7 +43,7 @@ pub fn highlight_hast<'a>(
 }
 
 // A block's code, without one final line ending, and the language to color it in
-fn read_block(pre: &Element, options: &HighlightOptions) -> Option<(String, String)> {
+fn read_block(pre: &Element, options: &Highlight) -> Option<(String, String)> {
     if pre.tag_name != "pre" {
         return None;
     }
