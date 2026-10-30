@@ -73,7 +73,7 @@ function Hero() {
             Open source · MIT License
           </p>
           <h1 className="mt-5 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-5xl">
-            Fast Markdown pipeline for{" "}
+            Markdown pipeline for{" "}
             <span className="box-decoration-clone bg-linear-to-r from-primary/20 to-primary/20 bg-size-[100%_0.3em] bg-position-[0_88%] bg-no-repeat">
               Python, TypeScript, and Rust
             </span>
@@ -626,12 +626,10 @@ function Pipeline() {
       <div className="mx-auto max-w-6xl px-6 pt-16 md:pt-24">
         <Reveal>
           <div className="text-center max-w-2xl mx-auto mb-10 md:mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-              The same pipeline, stage for stage
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Languages</h2>
             <p className="mt-4 text-muted-foreground text-lg">
-              Every stage is a native port of the unified plugin of the same name: same
-              options, same trees in, same trees out.
+              One pipeline in Python, TypeScript and Rust; each stage ports the unified
+              plugin of the same name.
             </p>
           </div>
         </Reveal>
@@ -722,9 +720,7 @@ function Plugins() {
       <div className="mx-auto max-w-6xl px-6 py-16 md:py-24">
         <Reveal>
           <div className="text-center max-w-2xl mx-auto mb-10 md:mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-              Thirty plugins, natively
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Plugins</h2>
             <p className="mt-4 text-muted-foreground text-lg">
               Markdown, HTML and prose, each a crate of its own, bridged by the same
               converters unified uses.
@@ -774,7 +770,7 @@ interface Feature {
 const features: Feature[] = [
   {
     icon: Zap,
-    title: "Native all the way",
+    title: "Native execution",
     description:
       "Parsing, transforms and serialization run in Rust over trees held in a per-document arena, not a heap of objects.",
   },
@@ -788,7 +784,7 @@ const features: Feature[] = [
     icon: Workflow,
     title: "unified's semantics",
     description:
-      "use, data and freeze; parse, run and stringify; presets, reconfiguring a plugin, sync and async. Nothing new to learn.",
+      "use, data and freeze; parse, run and stringify; presets, reconfiguring a plugin, sync and async.",
   },
   {
     icon: Braces,
@@ -804,7 +800,7 @@ const features: Feature[] = [
   },
   {
     icon: Bot,
-    title: "Ready for agents",
+    title: "Agent skill",
     description:
       "The npm and PyPI packages ship a skill that teaches coding agents to install and call textlane; this site publishes it too.",
   },
@@ -817,10 +813,10 @@ function Features() {
         <Reveal>
           <div className="text-center max-w-2xl mx-auto mb-10 md:mb-16">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-              Compatible by construction
+              Compatibility
             </h2>
             <p className="mt-4 text-muted-foreground text-lg">
-              Not a lookalike: a port, checked case by case against the upstream suites.
+              Each port is checked case by case against its upstream test suite.
             </p>
           </div>
         </Reveal>
@@ -909,7 +905,7 @@ function ConformanceStripe() {
             Conformance suite
           </p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-            One test suite, every language
+            Shared across languages
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
             Python, TypeScript and Rust run the same language-neutral cases, ported from
@@ -992,12 +988,10 @@ function Benchmark() {
       <div className="mx-auto max-w-6xl px-6 py-16 md:py-24">
         <Reveal>
           <div className="text-center max-w-2xl mx-auto mb-10 md:mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-              190× faster than remark + rehype
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Performance</h2>
             <p className="mt-4 text-muted-foreground text-lg">
-              The same Markdown-to-HTML pipeline at about 42 MB/s, nearly the same from
-              Rust, Node.js and Python.
+              Markdown-to-HTML throughput from Rust, Node.js and Python, against other
+              libraries.
             </p>
           </div>
         </Reveal>
@@ -1076,10 +1070,7 @@ function FinalCta() {
     <section className="relative overflow-hidden">
       <div className="relative mx-auto max-w-3xl px-6 py-16 md:py-24 text-center">
         <Reveal>
-          <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight">
-            <span className="inline-block">Keep your pipeline.</span>{" "}
-            <span className="inline-block text-primary">Lose the wait.</span>
-          </h2>
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Get started</h2>
           <p className="mt-6 text-lg text-muted-foreground">
             Textlane is in technical preview: the crate and its plugins are here, the
             Node.js and Python pipeline API is on its way.
