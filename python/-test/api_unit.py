@@ -31,7 +31,9 @@ def collect_cases():
             group_id = f"{file_id}#{group['description']}"
             for test in group["tests"]:
                 test_id = f"{group_id}#{test['description']}"
-                if "input" in test and "operations" not in test:
+                # host plugins need the runner's stand-ins: conformance_unit.py runs them publicly
+                hosted = any(str(entry[0]).startswith("host:") for entry in group["pipeline"])
+                if "input" in test and "operations" not in test and not hosted:
                     if not is_pending(file_id, group_id, test_id):
                         sample.append(pytest.param(group, test, id=test_id))
         yield from sample[:SAMPLE_PER_FILE]

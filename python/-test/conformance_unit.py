@@ -1,8 +1,10 @@
+import asyncio
 import json
 from pathlib import Path
 
 import pytest
 import textlane
+from hosts import create_hosts
 
 SUITE = Path(__file__).resolve().parents[2] / "conformance"
 TESTS = SUITE / "tests"
@@ -42,11 +44,7 @@ def collect_cases():
 
 @pytest.mark.parametrize("group,test,entry", list(collect_cases()))
 def test_conformance(group, test, entry):
-    case = {"pipeline": group["pipeline"]}
-    for key in ("input", "tree", "operations"):
-        if key in test:
-            case[key] = test[key]
-    actual = json.loads(textlane.run_case(json.dumps(case)))
+    actual = run_hosted(group, test) if is_hosted(group) else run_native(group, test)
     if group.get("positions") is False:
         actual = strip_positions(actual)
     if not entry:
@@ -56,6 +54,37 @@ def test_conformance(group, test, entry):
         assert_outcome(actual, test["expected"])
     except AssertionError:
         failing_entries.add(entry)
+
+
+def run_native(group, test):
+    case = {"pipeline": group["pipeline"]}
+    for key in ("input", "tree", "operations"):
+        if key in test:
+            case[key] = test[key]
+    return json.loads(textlane.run_case(json.dumps(case)))
+
+
+# `host:` plugins stand for Python ones, so their groups go through the public API with this
+# runner's stand-ins, processing asynchronously as the Rust runner does
+def is_hosted(group):
+    return any(str(entry[0]).startswith("host:") for entry in group["pipeline"])
+
+
+def run_hosted(group, test):
+    processor = textlane.textlane()
+    host_for = create_hosts()
+    for name, *options in group["pipeline"]:
+        processor.use(host_for(name) if name.startswith("host:") else name, *options)
+    try:
+        file = asyncio.run(processor.process(test.get("input", "")))
+    except Exception as error:
+        return {"error": {"code": getattr(error, "code", "unknown"), "message": str(error)}}
+    messages = [
+        {"ruleId": message["ruleId"], "source": message["source"], "place": message["place"]}
+        for message in file["messages"]
+    ]
+    outputs = {key: file["value"] for key in ("html", "md", "js", "txt")}
+    return {**outputs, "data": processor.data(), "messages": messages}
 
 
 # A group with `positions: false` compares trees without them

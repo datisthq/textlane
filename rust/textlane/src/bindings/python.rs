@@ -245,6 +245,16 @@ mod native {
             }
         }
 
+        /// Every message the run reported so far, native stages' and host plugins', in order.
+        fn messages(&self) -> String {
+            match &self.progress {
+                Some(Progress::Paused(pause)) => {
+                    crate::write_messages(&pause.file().messages).to_string()
+                }
+                _ => "[]".to_string(),
+            }
+        }
+
         /// Continue with the tree the host plugins returned and the messages they reported.
         fn resume(&mut self, py: Python<'_>, tree: &str, messages: &str) -> PyResult<()> {
             let Some(Progress::Paused(mut pause)) = self.progress.take() else {

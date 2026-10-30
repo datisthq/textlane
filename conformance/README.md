@@ -57,6 +57,14 @@ back), `test.recordOptions` (records its options in `data.recorded`), `test.setD
 `test.trace:<label>` (appends its label to the trace; one plugin per label, since a plugin used
 twice is one plugin reconfigured). Transformers take `mode: "sync" | "async"`.
 
+`host:<behaviour>[:<label>]` entries stand for a binding's own plugin (`core/host.json`): each
+runner implements them in its language, the Rust one through `start_process` and `resume`, the
+Node and Python ones as JavaScript and Python functions through the public API, processing
+asynchronously. `appendNode` (`node`, `mode`), `replaceTree` (`tree`), `message` (`reason`,
+`ruleId`, `source`, `place`), `countMessages` and `readValue` (a paragraph of the message count
+or the document), `fail` and `returnError` (an error coded `plugin-failed`) and
+`recordOptions` (its attacher appends its options to the data's `recorded`).
+
 ## Runners
 
 | implementation | runner                                 | run with                       |

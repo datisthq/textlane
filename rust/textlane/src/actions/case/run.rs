@@ -2,6 +2,8 @@ use serde_json::{Value, json};
 use textlane_core::{Allocator, Error, File, Lines};
 
 use crate::models::pipeline::{Api, Pipeline, read_tree, write_tree};
+use crate::models::run::{Outcome, Progress};
+use crate::utils::testing::hosts::{read_behaviour, run_host};
 use crate::utils::testing::plugins::take_trace;
 
 /// Run one conformance case, `{pipeline, input | tree | operations}`, through the crate.
@@ -12,10 +14,13 @@ pub fn run_case(case: &Value) -> Value {
     take_trace();
     let mut file = File::new();
     let result = match read_case(case) {
-        Ok((pipeline, Some(operations))) => {
+        Ok((pipeline, _, Some(operations))) => {
             run_operations(pipeline, operations, &mut file)
         }
-        Ok((pipeline, None)) => run_document(case, pipeline, &mut file),
+        Ok((pipeline, hosts, None)) if !hosts.is_empty() => {
+            run_hosted(case, pipeline, &hosts, &mut file)
+        }
+        Ok((pipeline, _, None)) => run_document(case, pipeline, &mut file),
         Err(error) => Err(error),
     };
     match result {
@@ -30,17 +35,95 @@ pub fn run_case(case: &Value) -> Value {
     }
 }
 
-fn read_case(case: &Value) -> Result<(Pipeline, Option<&Vec<Value>>), Error> {
+type Case<'a> = (Pipeline, Vec<String>, Option<&'a Vec<Value>>);
+
+// A `host:<behaviour>` entry stands for a binding's plugin: the same name is one plugin, its
+// id the index of its name in the list handed back
+fn read_case(case: &Value) -> Result<Case<'_>, Error> {
     let entries = case
         .get("pipeline")
         .and_then(Value::as_array)
         .ok_or_else(|| Error::new("invalid-case", "a case needs a `pipeline` array"))?;
     let mut pipeline = Pipeline::new();
+    let mut hosts: Vec<String> = Vec::new();
     for entry in entries {
         let name = entry.get(0).cloned().unwrap_or(Value::Null);
-        pipeline.use_value(&name, entry.get(1).cloned())?;
+        let value = match name.as_str() {
+            Some(host) if host.starts_with("host:") => {
+                let id = match hosts.iter().position(|known| known == host) {
+                    Some(id) => id,
+                    None => {
+                        hosts.push(host.to_string());
+                        hosts.len() - 1
+                    }
+                };
+                json!({ "host": id })
+            }
+            _ => name,
+        };
+        pipeline.use_value(&value, entry.get(1).cloned())?;
     }
-    Ok((pipeline, case.get("operations").and_then(Value::as_array)))
+    Ok((
+        pipeline,
+        hosts,
+        case.get("operations").and_then(Value::as_array),
+    ))
+}
+
+// A case with host plugins processes its input asynchronously, as a binding's runner does,
+// running each host stand-in where the run pauses
+fn run_hosted(
+    case: &Value,
+    mut pipeline: Pipeline,
+    hosts: &[String],
+    file: &mut File,
+) -> Result<Value, Error> {
+    let options = |id: u32| pipeline.host_options(id).unwrap_or(Value::Null);
+    let mut recorded = Vec::new();
+    for id in pipeline.hosts() {
+        let name = hosts
+            .get(id as usize)
+            .map(String::as_str)
+            .unwrap_or_default();
+        if read_behaviour(name) == "recordOptions" {
+            recorded.push(options(id));
+        }
+    }
+    let host_options: Vec<Value> = (0..hosts.len() as u32).map(options).collect();
+    if !recorded.is_empty() {
+        pipeline.set_data("recorded", Value::Array(recorded))?;
+    }
+    let input = case
+        .get("input")
+        .and_then(Value::as_str)
+        .unwrap_or_default();
+    let mut progress = pipeline.start_process(input, File::new(), Api::Async)?;
+    loop {
+        match progress {
+            Progress::Paused(mut pause) => {
+                let mut tree = pause.tree().clone();
+                for id in pause.hosts().to_vec() {
+                    let name = hosts
+                        .get(id as usize)
+                        .map(String::as_str)
+                        .unwrap_or_default();
+                    let options = host_options.get(id as usize).unwrap_or(&Value::Null);
+                    tree = run_host(name, options, tree, pause.file_mut())?;
+                }
+                progress = pause.resume(&tree)?;
+            }
+            Progress::Finished(finished) => {
+                *file = finished.file;
+                let value = match finished.output {
+                    Outcome::Text(text) => text,
+                    Outcome::Tree(tree) => tree.to_string(),
+                };
+                let mut result = json!({ extension_of(&mut pipeline)?: value });
+                result["data"] = pipeline.data(None);
+                return Ok(result);
+            }
+        }
+    }
 }
 
 // A pipeline case parses its input when there is a parser, or reads its tree, then compiles

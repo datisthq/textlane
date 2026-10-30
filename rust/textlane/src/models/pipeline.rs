@@ -108,6 +108,13 @@ impl Pipeline {
         enabled.collect()
     }
 
+    /// The latest options a host plugin was used with, merged as a named plugin's are.
+    #[cfg(feature = "testing")]
+    pub(crate) fn host_options(&self, id: u32) -> Option<Value> {
+        let entry = self.entries.iter().find(|(key, _)| key == &Key::Host(id));
+        entry.and_then(|(_, options)| options.clone())
+    }
+
     /// Attach every enabled plugin once; later calls return the same processor.
     pub fn freeze(&mut self) -> Result<&FrozenProcessor, Error> {
         self.freeze_shared().map(|_| ())?;

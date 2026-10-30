@@ -57,10 +57,10 @@ class Processor:
         self._native.freeze()
         return self
 
-    def parse(self, text: str) -> Dict[str, Any]:
-        """Parse text into a tree."""
+    def parse(self, document: Compatible) -> Dict[str, Any]:
+        """Parse a document into a tree."""
         self._attach()
-        return json.loads(self._native.parse(text))
+        return json.loads(self._native.parse(_read_value(document) or ""))
 
     async def run(self, tree: Dict[str, Any], file: Compatible = None) -> Dict[str, Any]:
         """Run the transforms, finishing asynchronous stages.

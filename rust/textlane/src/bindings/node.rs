@@ -92,17 +92,13 @@ impl Pipeline {
     }
 
     #[napi]
-    pub fn run(&mut self, tree: Value) -> Result<Value> {
-        self.inner
-            .run(&tree, &mut File::new(), Api::Async)
-            .map_err(throw)
+    pub fn run(&mut self, tree: Value, value: Option<String>) -> Result<Value> {
+        self.run_with(&tree, value, Api::Async)
     }
 
     #[napi]
-    pub fn run_sync(&mut self, tree: Value) -> Result<Value> {
-        self.inner
-            .run(&tree, &mut File::new(), Api::Sync)
-            .map_err(throw)
+    pub fn run_sync(&mut self, tree: Value, value: Option<String>) -> Result<Value> {
+        self.run_with(&tree, value, Api::Sync)
     }
 
     #[napi]
@@ -205,6 +201,17 @@ impl Run {
         match &self.progress {
             Some(Progress::Paused(pause)) => pause.file().value.clone(),
             _ => None,
+        }
+    }
+
+    /// Every message the run reported so far, native stages' and host plugins', in order.
+    #[napi]
+    pub fn messages(&self) -> Value {
+        match &self.progress {
+            Some(Progress::Paused(pause)) => {
+                crate::write_messages(&pause.file().messages)
+            }
+            _ => Value::Array(Vec::new()),
         }
     }
 

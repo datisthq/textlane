@@ -66,10 +66,10 @@ export class Processor {
     return this
   }
 
-  /** Parse text into a tree. */
-  parse(text: string) {
+  /** Parse a document into a tree. */
+  parse(document: Compatible) {
     this.#attach()
-    return this.#native.parse(text)
+    return this.#native.parse(readValue(document) ?? "")
   }
 
   /**

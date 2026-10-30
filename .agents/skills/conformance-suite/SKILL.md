@@ -42,6 +42,12 @@ otherwise.
   input is read as the kind the first stage takes. The `test.*` plugins live in
   `utils/testing/plugins.rs`, compiled only under `testing`; `mode: "async"` makes a stage
   hand back a job, as a JavaScript plugin returning a promise would.
+- `host:<behaviour>[:<label>]` entries are a binding's own plugins, implemented three times:
+  `utils/testing/hosts.rs` (`run_case`'s `run_hosted` drives `start_process`/`resume`),
+  `typescript/-test/hosts.ts` and `python/-test/hosts.py`. The Node and Python runners send
+  those groups through the public `textlane()` instead of `runCase`, and the API samplers skip
+  them. A new behaviour lands in all three files and the README's list at once, or two
+  runners fail the case.
 - A case with `operations` calls the pipeline once per entry (`use`, `data`, `freeze`,
   `parse`, `run`, `stringify`, `process`); the last call's output is the case's, beside
   `data`, `messages` and the labels `test.trace:<label>` recorded (`trace`).

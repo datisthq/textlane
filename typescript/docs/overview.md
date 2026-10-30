@@ -59,8 +59,8 @@ through `next`, and the run goes on natively. `processSync` fails with `async-in
 transformer that finishes later, and one returning an `Error` fails the run. The file is
 vfile's shape: `message`, `info` and `fail` make vfile-messages that land in the result's
 `messages`, `file.data` becomes its `data`, and `process({ value, path })` gives plugins
-`path`, `dirname`, `stem` and `extname` and puts `path` on the result. Messages from native
-stages reach only the result, not `file.messages`.
+`path`, `dirname`, `stem` and `extname` and puts `path` on the result. `file.messages` holds
+what native stages reported before the plugin, then what plugins reported.
 
 ```js
 const strong = () => tree => {

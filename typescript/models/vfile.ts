@@ -120,6 +120,19 @@ export class HostMessage extends Error {
     this.name = writePlace(this.place)
   }
 
+  /** A message a native stage reported, as the file's other messages are. */
+  static fromMessage(message: Message, path: string | undefined) {
+    const options = {
+      place: message.place ?? undefined,
+      ruleId: message.ruleId ?? undefined,
+      source: message.source ?? undefined,
+    }
+    const created = new HostMessage(message.reason, options)
+    created.file = path ?? ""
+    created.fatal = false
+    return created
+  }
+
   /** The message as it crosses into the crate. */
   toJSON(): Message {
     return {

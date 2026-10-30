@@ -23,6 +23,7 @@ export interface NativeRun<Result> {
   hosts(): number[]
   tree(): Node
   value(): string | null
+  messages(): Message[]
   resume(tree: Node, messages: Message[]): void
   result(): Result
 }

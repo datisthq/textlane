@@ -271,3 +271,23 @@ def test_reports_python_messages_as_vfile_does():
 
 def point(line, column):
     return {"line": line, "column": column, "offset": None}
+
+
+def test_shows_python_plugins_what_native_stages_reported():
+    counts = []
+
+    def count(processor):
+        def transformer(tree, file):
+            counts.append(len(file.messages))
+            file.message("from py")
+
+        return transformer
+
+    processor = textlane.textlane().use([md.parse(), ["test.message", {"reason": "native"}], count, md.stringify()])
+    file = processor.process_sync("a")
+    assert counts == [1]
+    assert [message["reason"] for message in file["messages"]] == ["native", "from py"]
+
+
+def test_parses_a_document():
+    assert textlane.textlane().use(md.parse()).parse({"value": "a"})["type"] == "root"

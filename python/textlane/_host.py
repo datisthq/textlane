@@ -139,8 +139,8 @@ class Host:
 def finish_sync(run: Any, hosts: Dict[int, Host], file: HostFile, call: str) -> None:
     """Run the host plugins a native run pauses at until it finishes; one returning an
     awaitable fails with `async-in-sync`, as an asynchronous native stage does."""
-    sent = len(file.messages)
     while run.hosts():
+        sent = _mirror_messages(run, file)
         tree = json.loads(run.tree())
         for id in run.hosts():
             host = hosts.get(id)
@@ -155,13 +155,12 @@ def finish_sync(run: Any, hosts: Dict[int, Host], file: HostFile, call: str) -> 
             tree = _read_tree(result, tree)
         messages = [message.to_json() for message in file.messages[sent:]]
         run.resume(json.dumps(tree), json.dumps(messages))
-        sent = len(file.messages)
 
 
 async def finish(run: Any, hosts: Dict[int, Host], file: HostFile) -> None:
     """Run the host plugins a native run pauses at until it finishes, awaiting each."""
-    sent = len(file.messages)
     while run.hosts():
+        sent = _mirror_messages(run, file)
         tree = json.loads(run.tree())
         for id in run.hosts():
             host = hosts.get(id)
@@ -173,7 +172,17 @@ async def finish(run: Any, hosts: Dict[int, Host], file: HostFile) -> None:
             tree = _read_tree(result, tree)
         messages = [message.to_json() for message in file.messages[sent:]]
         run.resume(json.dumps(tree), json.dumps(messages))
-        sent = len(file.messages)
+
+
+# file.messages follows the run's: what native stages reported since, then the plugins'
+def _mirror_messages(run: Any, file: HostFile) -> int:
+    for message in json.loads(run.messages())[len(file.messages) :]:
+        place = message["place"]
+        created = HostMessage(message["reason"], place, message["ruleId"], message["source"])
+        created.file = file.path or ""
+        created.fatal = False
+        file.messages.append(created)
+    return len(file.messages)
 
 
 def merge_options(target: Any, source: Any) -> Any:

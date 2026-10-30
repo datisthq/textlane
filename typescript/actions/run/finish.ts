@@ -1,6 +1,6 @@
 import type { NativeRun } from "../../models/addon.ts"
 import type { Node } from "../../models/file.ts"
-import type { HostFile } from "../../models/vfile.ts"
+import { type HostFile, HostMessage } from "../../models/vfile.ts"
 import type { Host } from "../../models/host.ts"
 import { callHost, isThenable } from "../host/call.ts"
 
@@ -15,6 +15,7 @@ export function finishRun(props: {
 }): void | Promise<void> {
   let sent = props.file.messages.length
   while (props.run.hosts().length > 0) {
+    mirrorMessages()
     const tree = runHosts(props, props.run.hosts(), props.run.tree())
     if (isThenable(tree)) {
       if (props.sync) throw asyncError(props.call)
@@ -24,6 +25,15 @@ export function finishRun(props: {
       })
     }
     resume(tree)
+  }
+
+  // file.messages follows the run's: what native stages reported since, then the plugins'
+  function mirrorMessages() {
+    const reported = props.run.messages().slice(props.file.messages.length)
+    for (const message of reported) {
+      props.file.messages.push(HostMessage.fromMessage(message, props.file.path))
+    }
+    sent = props.file.messages.length
   }
 
   function resume(tree: Node) {

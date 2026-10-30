@@ -6,6 +6,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vite-plus/test"
 import { resolveAddon } from "../actions/addon/resolve.ts"
 import { ADDON_ENV } from "../settings.ts"
 import { buildAddon } from "./addon.ts"
+import { createHosts } from "./hosts.ts"
 
 const ROOT = resolve(import.meta.dirname, "..", "..")
 const TESTS = join(ROOT, "conformance", "tests")
@@ -33,9 +34,11 @@ type Group = {
 }
 
 let runCase: (json: string) => string
+let entry: typeof import("../index.ts")
 let addonDir = ""
+const OUTPUTS = ["html", "md", "js", "txt"]
 
-beforeAll(() => {
+beforeAll(async () => {
   addonDir = mkdtempSync(join(tmpdir(), "textlane-addon-"))
   const addonPath = buildAddon(addonDir)
   const require = createRequire(import.meta.url)
@@ -48,6 +51,8 @@ beforeAll(() => {
     }),
   )
   runCase = addon.runCase
+  process.env[ADDON_ENV] = addonPath
+  entry = await import("../index.ts")
 }, 600_000)
 
 afterAll(() => {
@@ -72,17 +77,10 @@ describe("conformance", () => {
             matchesEntry(key, id, groupId, testId),
           )
           if (entry) matchedEntries.add(entry)
-          it(test.description, () => {
-            const parsed: Expected = JSON.parse(
-              runCase(
-                JSON.stringify({
-                  pipeline: group.pipeline,
-                  input: test.input,
-                  tree: test.tree,
-                  operations: test.operations,
-                }),
-              ),
-            )
+          it(test.description, async () => {
+            const parsed = isHosted(group)
+              ? await runHosted(group, test)
+              : runNative(group, test)
             const actual = group.positions === false ? stripPositions(parsed) : parsed
             if (!entry) return expectOutcome(actual, test.expected)
             try {
@@ -102,6 +100,53 @@ describe("conformance", () => {
     expect(stale).toEqual([])
   })
 })
+
+function runNative(group: Group, test: Test): Expected {
+  return JSON.parse(
+    runCase(
+      JSON.stringify({
+        pipeline: group.pipeline,
+        input: test.input,
+        tree: test.tree,
+        operations: test.operations,
+      }),
+    ),
+  )
+}
+
+// `host:` plugins stand for JavaScript ones, so their groups go through the public API with
+// this runner's stand-ins, processing asynchronously as the Rust runner does
+function isHosted(group: Group) {
+  return group.pipeline.some(
+    entry => Array.isArray(entry) && String(entry[0]).startsWith("host:"),
+  )
+}
+
+async function runHosted(group: Group, test: Test): Promise<Expected> {
+  const processor = entry.textlane()
+  const hostFor = createHosts()
+  for (const item of group.pipeline) {
+    const [name, ...options]: unknown[] = Array.isArray(item) ? item : [item]
+    const plugin = String(name)
+    if (plugin.startsWith("host:")) processor.use(hostFor(plugin), ...options)
+    else processor.use(plugin, ...options)
+  }
+  try {
+    const file = await processor.process(test.input ?? "")
+    const messages = file.messages.map(message => ({
+      ruleId: message.ruleId,
+      source: message.source,
+      place: message.place,
+    }))
+    const outputs = Object.fromEntries(OUTPUTS.map(key => [key, file.value]))
+    return { ...outputs, data: processor.data(), messages }
+  } catch (error) {
+    const code =
+      error instanceof Error && "code" in error ? String(error.code) : "unknown"
+    const message = error instanceof Error ? error.message : String(error)
+    return { error: { code, message } }
+  }
+}
 
 // A group with `positions: false` compares trees without them
 function stripPositions<T>(value: T): T {

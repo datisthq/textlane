@@ -68,7 +68,11 @@ describe("conformance through the public API", () => {
         const pending = Object.keys(PENDING).some(key =>
           key.endsWith("*") ? id.startsWith(key.slice(0, -1)) : ids.includes(key),
         )
-        return test.input !== undefined && !test.operations && !pending
+        // host plugins need the runner's stand-ins: conformance.unit.ts runs them publicly
+        const hosted = group.pipeline.some(
+          entry => Array.isArray(entry) && String(entry[0]).startsWith("host:"),
+        )
+        return test.input !== undefined && !test.operations && !pending && !hosted
       })
       .slice(0, SAMPLE_PER_FILE)
     for (const { group, test } of sample) {

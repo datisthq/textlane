@@ -149,6 +149,16 @@ describe("Processor", () => {
     expect(described.toSorted()).toEqual(entry.pluginNames().toSorted())
   })
 
+  it("hands the file's text to a run, as a bridge into nlcst needs", () => {
+    const processor = () => entry.textlane().use(md.parse()).use(md.toNaturalLanguage())
+    const tree = processor().parse({ value: "a b" })
+    const withText = processor().runSync(tree, "a b")
+    expect(withText.position).toEqual(
+      processor().runSync(tree, { value: "a b" }).position,
+    )
+    expect(withText).not.toEqual(processor().runSync(tree))
+  })
+
   it("reports the version", () => {
     expect(entry.version()).toMatch(/^\d+\.\d+\.\d+/)
   })
@@ -318,6 +328,20 @@ describe("Processor", () => {
       })
       expect(reported[1]).toMatchObject({ reason: "b", fatal: null, name: "1:1" })
       expect(reported[1]?.cause).toBeInstanceOf(Error)
+    })
+
+    it("shows plugins what native stages reported", () => {
+      const counts: number[] = []
+      const count = () => (_tree: Node, file: HostFile) => {
+        counts.push(file.messages.length)
+        file.message("from js")
+      }
+      const processor = entry
+        .textlane()
+        .use([md.parse(), ["test.message", { reason: "native" }], count, md.stringify()])
+      const file = processor.processSync("a")
+      expect(counts).toEqual([1])
+      expect(file.messages.map(message => message.reason)).toEqual(["native", "from js"])
     })
 
     it("runs a tree through native and JavaScript stages", async () => {

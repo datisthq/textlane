@@ -24,6 +24,7 @@ mod actions {
     }
     pub(crate) mod message {
         pub(crate) mod read;
+        pub(crate) mod write;
     }
     pub(crate) mod package {
         pub(crate) mod version;
@@ -38,6 +39,7 @@ mod actions {
 #[cfg(feature = "testing")]
 mod utils {
     pub(crate) mod testing {
+        pub(crate) mod hosts;
         pub(crate) mod plugins;
     }
 }
@@ -59,6 +61,7 @@ pub use actions::file::write::write_file;
 pub use actions::memory::read::read_retained_memory;
 pub use actions::memory::set::set_retained_memory;
 pub use actions::message::read::read_messages;
+pub use actions::message::write::write_messages;
 pub use actions::package::version::read_version;
 #[cfg(feature = "schema")]
 pub use actions::plugin::describe::describe_plugins;

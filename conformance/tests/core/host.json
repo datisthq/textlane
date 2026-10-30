@@ -1,0 +1,412 @@
+[
+  {
+    "description": "a host plugin runs between native stages",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "host:appendNode",
+        {
+          "node": {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "b"
+              }
+            ]
+          }
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "appends a paragraph",
+        "input": "a",
+        "expected": {
+          "md": "a\n\nb\n"
+        }
+      }
+    ],
+    "comment": "`host:<behaviour>[:<label>]` entries stand for a binding's own plugin; each runner implements the behaviour in its language"
+  },
+  {
+    "description": "host and native stages run in pipeline order",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "test.appendNode",
+        {
+          "node": {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "b"
+              }
+            ]
+          }
+        }
+      ],
+      [
+        "host:appendNode",
+        {
+          "node": {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "c"
+              }
+            ]
+          }
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "the native stage first",
+        "input": "a",
+        "expected": {
+          "md": "a\n\nb\n\nc\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "consecutive host plugins run in order",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "host:appendNode:first",
+        {
+          "node": {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "b"
+              }
+            ]
+          }
+        }
+      ],
+      [
+        "host:appendNode:second",
+        {
+          "node": {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "c"
+              }
+            ]
+          }
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "two appends",
+        "input": "a",
+        "expected": {
+          "md": "a\n\nb\n\nc\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "an asynchronous host plugin finishes before the run goes on",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "host:appendNode",
+        {
+          "node": {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "b"
+              }
+            ]
+          },
+          "mode": "async"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "appends later",
+        "input": "a",
+        "expected": {
+          "md": "a\n\nb\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "a host plugin replaces the tree",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "host:replaceTree",
+        {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "z"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a new root",
+        "input": "a",
+        "expected": {
+          "md": "z\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "a host plugin after md.toHtml gets hast",
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "host:appendNode",
+        {
+          "node": {
+            "type": "element",
+            "tagName": "hr",
+            "properties": {},
+            "children": []
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "appends an element",
+        "input": "a",
+        "expected": {
+          "html": "<p>a</p><hr>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "a host plugin reports a message",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "host:message",
+        {
+          "reason": "look",
+          "ruleId": "rule",
+          "source": "host",
+          "place": {
+            "line": 1,
+            "column": 1
+          }
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "one message",
+        "input": "a",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "rule",
+              "source": "host",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": null
+                },
+                "end": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": null
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "description": "a host plugin sees what native stages reported",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "test.message",
+        {
+          "reason": "native",
+          "ruleId": "native"
+        }
+      ],
+      ["host:countMessages"],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "counts one message",
+        "input": "a",
+        "expected": {
+          "md": "a\n\n1\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "a host plugin reads the document",
+    "pipeline": [["md.parse"], ["host:readValue"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "appends the input",
+        "input": "a",
+        "expected": {
+          "md": "a\n\na\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "a host plugin that throws fails the run",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "host:fail",
+        {
+          "message": "boom"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "the plugin's error",
+        "input": "a",
+        "expected": {
+          "error": {
+            "code": "plugin-failed",
+            "message": "boom"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a host plugin that returns an error fails the run",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "host:returnError",
+        {
+          "message": "boom"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "the returned error",
+        "input": "a",
+        "expected": {
+          "error": {
+            "code": "plugin-failed",
+            "message": "boom"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a host plugin used twice is reconfigured, its options merged",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "host:recordOptions",
+        {
+          "a": {
+            "b": 1
+          }
+        }
+      ],
+      [
+        "host:recordOptions",
+        {
+          "a": {
+            "c": 2
+          }
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "one attach with merged options",
+        "input": "a",
+        "expected": {
+          "data": {
+            "recorded": [
+              {
+                "a": {
+                  "b": 1,
+                  "c": 2
+                }
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "comment": "`host:recordOptions` appends the options its attacher gets to the processor's `recorded` data"
+  },
+  {
+    "description": "a host plugin turned off does not run",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "host:fail",
+        {
+          "message": "ran"
+        }
+      ],
+      ["host:fail", false],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "skipped",
+        "input": "a",
+        "expected": {
+          "md": "a\n"
+        }
+      }
+    ]
+  }
+]
