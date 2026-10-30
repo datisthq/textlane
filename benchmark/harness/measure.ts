@@ -35,10 +35,24 @@ export type Result = {
 /** Converted per run at least, so a 10KB document is timed over hundreds of conversions. */
 export const MIN_RUN_BYTES = 8 * 1024 * 1024
 
-/** Runs one tool on one dataset `warmup + runs` times; the first failed run ends the series. */
-export async function measureTool(props: {
-  caseName: string
+// One tool's runs so far; the first failed run ends it
+type Series = {
   tool: Tool
+  timings: number[]
+  memories: number[]
+  outputBytes?: number
+  outcome: Outcome
+  exit?: string
+  stderr?: string
+}
+
+/**
+ * Runs every tool on one dataset `warmup + runs` times, one run of each tool per round, so
+ * load that comes and goes while they run lands on all of them alike.
+ */
+export async function measureTools(props: {
+  caseName: string
+  tools: Tool[]
   dataset: Dataset
   flavor: Flavor
   runs: number
@@ -47,59 +61,64 @@ export async function measureTool(props: {
   memoryMax?: string
 }) {
   const repeat = Math.max(1, Math.ceil(MIN_RUN_BYTES / props.dataset.bytes))
-  const timings: number[] = []
-  const memories: number[] = []
-  let outputBytes: number | undefined
-  let outcome: Outcome = "ok"
-  let exit: string | undefined
-  let stderr: string | undefined
+  const series: Series[] = props.tools.map(tool => ({
+    tool,
+    timings: [],
+    memories: [],
+    outcome: "ok",
+  }))
 
   for (let index = 0; index < props.warmup + props.runs; index++) {
-    const command = await props.tool.createCommand(props.dataset, repeat, props.flavor)
-    const run = await runCommand(command, {
-      cwd: dirname(props.dataset.path),
-      timeoutMs: props.timeoutMs,
-      memoryMax: props.memoryMax,
-    })
-    const output = run.outcome === "ok" ? readAdapterOutput(run.stdout) : undefined
-    if (run.outcome === "ok" && !output) run.outcome = "crash"
-    if (run.outcome !== "ok" || !output) {
-      outcome = run.outcome
-      exit = run.exit
-      stderr = run.stderr.slice(-2000)
-      break
+    for (const item of series) {
+      if (item.outcome !== "ok") continue
+      const command = await item.tool.createCommand(props.dataset, repeat, props.flavor)
+      const run = await runCommand(command, {
+        cwd: dirname(props.dataset.path),
+        timeoutMs: props.timeoutMs,
+        memoryMax: props.memoryMax,
+      })
+      const output = run.outcome === "ok" ? readAdapterOutput(run.stdout) : undefined
+      if (run.outcome !== "ok" || !output) {
+        item.outcome = run.outcome === "ok" ? "crash" : run.outcome
+        item.exit = run.exit
+        item.stderr = run.stderr.slice(-2000)
+        continue
+      }
+      if (index < props.warmup) continue
+      item.timings.push(output.elapsedMs / repeat)
+      if (run.peakMemoryMb !== undefined) item.memories.push(run.peakMemoryMb)
+      item.outputBytes = output.outputBytes
     }
-    if (index < props.warmup) continue
-    timings.push(output.elapsedMs / repeat)
-    if (run.peakMemoryMb !== undefined) memories.push(run.peakMemoryMb)
-    outputBytes = output.outputBytes
   }
 
-  const documentMs = timings.length ? summarize(timings) : undefined
-  const result: Result = {
-    case: props.caseName,
-    tool: props.tool.name,
-    title: props.tool.title,
-    language: props.tool.language,
-    isTextlane: props.tool.isTextlane,
-    version: await props.tool.getVersion().catch(() => "unknown"),
-    profile: props.dataset.profile,
-    size: props.dataset.size,
-    bytes: props.dataset.bytes,
-    repeat,
-    runs: timings.length,
-    documentMs,
-    throughputMbs: documentMs
-      ? props.dataset.bytes / 1024 / 1024 / (documentMs.median / 1000)
-      : undefined,
-    peakMemoryMb: memories.length ? Math.max(...memories) : undefined,
-    outcome,
-    exit,
-    outputBytes,
-    caveats: props.tool.caveats,
-    stderr,
+  const results: Result[] = []
+  for (const item of series) {
+    const documentMs = item.timings.length ? summarize(item.timings) : undefined
+    results.push({
+      case: props.caseName,
+      tool: item.tool.name,
+      title: item.tool.title,
+      language: item.tool.language,
+      isTextlane: item.tool.isTextlane,
+      version: await item.tool.getVersion().catch(() => "unknown"),
+      profile: props.dataset.profile,
+      size: props.dataset.size,
+      bytes: props.dataset.bytes,
+      repeat,
+      runs: item.timings.length,
+      documentMs,
+      throughputMbs: documentMs
+        ? props.dataset.bytes / 1024 / 1024 / (documentMs.median / 1000)
+        : undefined,
+      peakMemoryMb: item.memories.length ? Math.max(...item.memories) : undefined,
+      outcome: item.outcome,
+      exit: item.exit,
+      outputBytes: item.outputBytes,
+      caveats: item.tool.caveats,
+      stderr: item.stderr,
+    })
   }
-  return result
+  return results
 }
 
 /** Reads the `{"elapsedMs", "outputBytes"}` line every adapter prints last. */

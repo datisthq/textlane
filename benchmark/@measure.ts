@@ -5,7 +5,7 @@ import { parseArgs } from "node:util"
 import { describeDataset, generateDataset } from "./generate/generate.ts"
 import { formatBytes } from "./generate/size.ts"
 import { loadCases } from "./harness/case.ts"
-import { type Result, measureTool } from "./harness/measure.ts"
+import { type Result, measureTools } from "./harness/measure.ts"
 import { getProfile } from "./profiles/index.ts"
 import { selectTools } from "./tools/index.ts"
 
@@ -51,24 +51,22 @@ for (const benchmarkCase of await loadCases(values.case)) {
     const tools = selectTools(values.tool).filter(
       tool => !limit || limit.includes(tool.name),
     )
-    for (const tool of tools) {
-      const result = await measureTool({
-        caseName: benchmarkCase.name,
-        flavor: benchmarkCase.flavor ?? "commonmark",
-        tool,
-        dataset,
-        runs: Number(values.runs),
-        warmup: Number(values.warmup),
-        timeoutMs: Number(values.timeout) * 1000,
-        memoryMax: values["memory-max"],
-      })
-      results.push(result)
-      await writeFile(
-        resultsPath,
-        `${JSON.stringify({ startedAt, machine, results }, null, 2)}\n`,
-      )
-      console.log(formatResult(result))
-    }
+    const measured = await measureTools({
+      caseName: benchmarkCase.name,
+      flavor: benchmarkCase.flavor ?? "commonmark",
+      tools,
+      dataset,
+      runs: Number(values.runs),
+      warmup: Number(values.warmup),
+      timeoutMs: Number(values.timeout) * 1000,
+      memoryMax: values["memory-max"],
+    })
+    results.push(...measured)
+    await writeFile(
+      resultsPath,
+      `${JSON.stringify({ startedAt, machine, results }, null, 2)}\n`,
+    )
+    for (const result of measured) console.log(formatResult(result))
   }
 }
 

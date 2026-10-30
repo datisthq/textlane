@@ -71,5 +71,8 @@ must sit near the others', or it renders a different document. Pin it: npm by ex
 - `conformance` snippets that leave a fence or raw HTML block open, or define a reference, would
   change every later snippet: `readSnippets` drops them, and a thematic break at column 0
   closes any list, quote or indented code between snippets
+- Runs go round-robin, one run of every tool per round: a series per tool let another
+  session's build land on some tools and not others, and once showed textlane level with
+  comrak when it was 1.6× behind. Still compare only on an idle machine (`uptime`)
 - Memory is sampled every 50ms, so a run shorter than that shows none; it includes the runtime,
   so Node.js starts tens of megabytes above Rust

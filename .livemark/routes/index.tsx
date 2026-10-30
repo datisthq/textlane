@@ -975,20 +975,20 @@ interface Measure {
 
 // The 1 MB `cmark` case of benchmark/, CommonMark to HTML, input MB/s at the median
 const measures: Measure[] = [
-  { tool: "pulldown-cmark", mbps: 178.9 },
-  { tool: "textlane (Rust)", mbps: 58.4, isTextlane: true },
-  { tool: "comrak", mbps: 57.6 },
-  { tool: "cmark (C, via cmarkgfm)", mbps: 56.8 },
-  { tool: "textlane (Node.js)", mbps: 48.5, isTextlane: true },
-  { tool: "textlane (Python)", mbps: 39.8, isTextlane: true },
-  { tool: "marked", mbps: 16.2 },
-  { tool: "markdown-it", mbps: 12.1 },
-  { tool: "markdown-rs", mbps: 4.3 },
-  { tool: "mistune", mbps: 3.6 },
-  { tool: "markdown-it-py", mbps: 3.1 },
-  { tool: "Python-Markdown", mbps: 1.9 },
+  { tool: "pulldown-cmark", mbps: 194.7 },
+  { tool: "cmark (C, via cmarkgfm)", mbps: 68.6 },
+  { tool: "comrak", mbps: 66.8 },
+  { tool: "textlane (Rust)", mbps: 52.5, isTextlane: true },
+  { tool: "textlane (Node.js)", mbps: 47.0, isTextlane: true },
+  { tool: "textlane (Python)", mbps: 46.5, isTextlane: true },
+  { tool: "marked", mbps: 14.6 },
+  { tool: "markdown-it", mbps: 13.2 },
+  { tool: "markdown-rs", mbps: 4.2 },
+  { tool: "mistune", mbps: 3.7 },
+  { tool: "Python-Markdown", mbps: 2.6 },
+  { tool: "markdown-it-py", mbps: 2.5 },
   { tool: "micromark", mbps: 0.6 },
-  { tool: "unified (remark + rehype)", mbps: 0.6 },
+  { tool: "unified (remark + rehype)", mbps: 0.5 },
 ]
 
 function Benchmark() {
