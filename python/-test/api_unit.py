@@ -62,7 +62,7 @@ def test_api(group, test):
         return
     # What plugins stored in the file is the vfile's `data`
     if "fileData" in expected:
-        assert processor().process_sync(source)["data"] == expected["fileData"]
+        assert processor().process(source)["data"] == expected["fileData"]
         return
     if "tree" in expected:
         tree = processor().run(processor().parse(source), source)

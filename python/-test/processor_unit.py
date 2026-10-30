@@ -303,6 +303,6 @@ def test_merges_the_data_native_stages_and_python_plugins_store():
     file = (
         textlane.textlane()
         .use([md.parse(), md.to_html(), html.extract_toc(), mark, html.stringify()])
-        .process_sync("# A")
+        .process("# A")
     )
     assert file["data"] == {"toc": [{"depth": 1, "value": "A"}], "seen": True}
