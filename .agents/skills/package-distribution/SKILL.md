@@ -115,5 +115,8 @@ a trusted publisher; PyPI accepts a pending trusted publisher for a new project.
 carries no token: each package is `npm trust github <pkg> --file release.yaml --repo
 datisthq/textlane --env release --allow-publish` and `npm access set mfa=publish <pkg>`, which
 forbids tokens, so a package missing either fails CI. A crates.io token made for the first
-publish may lack `publish-update`. Unscoped npm names can trip npm's spam check, hence the
+publish may lack `publish-update`. Publish the crates with a fresh `CARGO_TARGET_DIR`: a local
+`cargo publish` treats each `0.0.0` it packaged before as immutable and verifies against that
+stale build. crates.io rate-limits a burst of new crates with a 429 naming when to retry, so the last one
+may need a rerun with `-p textlane` once the 429's time passes. Unscoped npm names can trip npm's spam check, hence the
 `@textlane` scope.
