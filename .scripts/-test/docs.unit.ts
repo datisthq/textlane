@@ -197,7 +197,7 @@ function looksLikeRepoPath(span: string) {
   if (span.startsWith("@")) return false
   if (!WORKSPACE.has(span.split("/")[0] ?? "")) return false
   // Build output is gitignored, so a fresh checkout or CI would fail on it.
-  const generated = ["build", "target", "compile"]
+  const generated = ["build", "target", "compile", ".cache"]
   if (span.split("/").some(part => generated.includes(part))) return false
   return (
     /\.(ts|json|md|css|js|html|yaml|yml|svg|png|rs|toml)$/.test(span) ||
