@@ -290,8 +290,8 @@ mod plugins {
 pub use models::options::{
     AlertRule, AttributeRule, CodeGroupRule, CodeRule, Component, DefinitionListSlot,
     Directive, DirectiveKind, DirectiveRule, DirectiveSlot, Frontmatter, FrontmatterSlot,
-    Gfm, GfmSlot, GroupRule, Math, MathSlot, Matter, Mdx, MdxSlot, Names, Parse,
-    Stringify, Strip, ToHtml, ToNaturalLanguage, UnknownDirectives, UnsafePattern,
+    Gfm, GfmSlot, GroupRule, HeadingId, Math, MathSlot, Matter, Mdx, MdxSlot, Names,
+    Parse, Stringify, Strip, ToHtml, ToNaturalLanguage, UnknownDirectives, UnsafePattern,
 };
 
 // actions
@@ -303,4 +303,3 @@ pub use actions::mdast::convert::convert_mdast;
 // plugins
 pub use plugins::definition_list::plugin::DefinitionList;
 pub use plugins::gemoji::plugin::Gemoji;
-pub use plugins::heading_id::plugin::HeadingId;

@@ -88,5 +88,85 @@
         }
       }
     ]
+  },
+  {
+    "description": "attribute lists, with attributes: true",
+    "comment": "textlane's own: `{#id .class key=value}` read as md.directive reads attributes; no upstream",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.headingId",
+        {
+          "attributes": true
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "an id",
+        "input": "# Install {#setup}",
+        "expected": {
+          "html": "<h1 id=\"setup\">Install</h1>"
+        }
+      },
+      {
+        "description": "an id, classes and values",
+        "input": "## API {#api .wide .dark data-step=2 title=\"The API\"}",
+        "expected": {
+          "html": "<h2 id=\"api\" class=\"wide dark\" data-step=\"2\" title=\"The API\">API</h2>"
+        }
+      },
+      {
+        "description": "classes only",
+        "input": "# A {.note}",
+        "expected": {
+          "html": "<h1 class=\"note\">A</h1>"
+        }
+      },
+      {
+        "description": "a list that does not end the text",
+        "input": "# A {.x} b",
+        "expected": {
+          "html": "<h1>A {.x} b</h1>"
+        }
+      },
+      {
+        "description": "the last braces win",
+        "input": "# A {.x} {#y}",
+        "expected": {
+          "html": "<h1 id=\"y\">A {.x}</h1>"
+        }
+      },
+      {
+        "description": "invalid attributes stay text",
+        "input": "# A {=x}",
+        "expected": {
+          "html": "<h1>A {=x}</h1>"
+        }
+      },
+      {
+        "description": "no space before the braces",
+        "input": "# A{#x}",
+        "expected": {
+          "html": "<h1>A{#x}</h1>"
+        }
+      },
+      {
+        "description": "trailing spaces",
+        "input": "# A {#x}   ",
+        "expected": {
+          "html": "<h1 id=\"x\">A</h1>"
+        }
+      },
+      {
+        "description": "a heading without attributes",
+        "input": "# Plain",
+        "expected": {
+          "html": "<h1>Plain</h1>"
+        }
+      }
+    ]
   }
 ]

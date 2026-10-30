@@ -408,7 +408,7 @@ The component wrapping a run of adjacent code blocks one rule matched; the meta 
 
 ## md.headingId
 
-Reads `{#id}` at the end of a heading, after a space, as its id, as remark-heading-id does; `md.toHtml` puts it on the heading. remark-heading-id's `defaults` is not ported: `html.slug` gives the other headings ids.
+Reads `{#id}` at the end of a heading, after a space, as its id, as remark-heading-id does; `md.toHtml` puts it on the heading. remark-heading-id's `defaults` is not ported: `html.slug` gives the other headings ids. With `{"attributes": True}` it reads a whole attribute list instead, as `md.directive` reads one: `## API {#api .wide data-step=2}` gives the heading an id, classes and a `data-step`. Only the last braces are read, event handlers (`on…`) and invalid names are dropped, and on untrusted input the result still belongs behind `html.sanitize`.
 
 ```python
 from textlane import html, md, textlane
@@ -419,7 +419,7 @@ file = (
     .use(md.heading_id())
     .use(md.to_html())
     .use(html.stringify())
-    .process_sync("# Install {#setup}")
+    .process("# Install {#setup}")
 )
 file["value"]
 # <h1 id="setup">Install</h1>
@@ -429,7 +429,9 @@ file["value"]
 
 Follows [remark-heading-id](https://www.npmjs.com/package/remark-heading-id).
 
-No options.
+| Option       | Type   | Default | Description                                                                                                                                        |
+| ------------ | ------ | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `attributes` | `bool` | `False` | Read a whole attribute list, `{#id .class key=value key="v w"}`, as directives write theirs: classes become `className` and other keys properties. |
 
 <!-- /generated -->
 
@@ -445,7 +447,7 @@ file = (
     .use(md.parse())
     .use(md.strip())
     .use(md.stringify())
-    .process_sync("# Hello *world*\n\nSee [the docs](/docs).")
+    .process("# Hello *world*\n\nSee [the docs](/docs).")
 )
 file["value"]
 # Hello world

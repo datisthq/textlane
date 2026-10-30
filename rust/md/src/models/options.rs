@@ -224,6 +224,18 @@ impl Default for Math {
     }
 }
 
+/// `md.headingId`: `{#id}` at the end of a heading, after a space, as its id, as
+/// remark-heading-id reads it; headings without one keep none.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", schemars(rename = "HeadingIdOptions"))]
+pub struct HeadingId {
+    /// Read a whole attribute list, `{#id .class key=value key="v w"}`, as directives
+    /// write theirs: classes become `className` and other keys properties.
+    pub attributes: bool,
+}
+
 /// `md.strip`: mdast down to its text, as strip-markdown does: code, HTML, tables and
 /// the like dropped, headings made paragraphs, formatting unwrapped.
 #[derive(Clone, Debug, Default, Deserialize)]

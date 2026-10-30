@@ -69,6 +69,25 @@ export interface SlugOptions {
   prefix?: string
 }
 
+/** `html.externalLinks`: `rel`, `target` and more on links to other sites, as rehype-external-links adds them; options named as it names them, JSON values only. */
+export interface ExternalLinksOptions {
+  /** The `target` of each external link, such as `_blank`. */
+  target?: string | null
+  /** The `rel` of each external link: a list, or tokens separated by white space; `nofollow` when left out or empty, none for an empty list. */
+  rel?: Tokens | null
+  /** The protocols of absolute URLs that count as external; `http` and `https` when left out. A protocol-relative `//…` URL always counts. */
+  protocols?: string[] | null
+  /** More properties for each external link, as hast names them. */
+  properties?: Record<string, unknown> | null
+  /** hast content appended to each external link in a `<span>`: one node or a list. */
+  content?: unknown
+  /** The properties of that `<span>`. */
+  contentProperties?: Record<string, unknown> | null
+}
+
+/** Tokens: a list, or one string of them separated by white space. */
+export type Tokens = string | string[]
+
 /** `html.highlight`: code blocks colored as Shiki colors them, natively by giallo; options named as @shikijs/rehype names them. */
 export interface HighlightOptions {
   /** The theme of each color mode, `light` first, as `{"light": …, "dark": …}`. */
@@ -228,6 +247,12 @@ export function sanitize(options?: SanitizeOptions): Plugin<"html.sanitize", San
 export function slug(options?: SlugOptions): Plugin<"html.slug", SlugOptions> {
   if (options === undefined) return { name: "html.slug" }
   return { name: "html.slug", options }
+}
+
+/** The `html.externalLinks` plugin. */
+export function externalLinks(options?: ExternalLinksOptions): Plugin<"html.externalLinks", ExternalLinksOptions> {
+  if (options === undefined) return { name: "html.externalLinks" }
+  return { name: "html.externalLinks", options }
 }
 
 /** The `html.unwrapImages` plugin. */

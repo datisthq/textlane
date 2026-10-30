@@ -79,6 +79,7 @@ mod actions {
     pub(crate) mod hast {
         pub(crate) mod bridge;
         pub(crate) mod convert;
+        pub(crate) mod external;
         pub(crate) mod format;
         #[cfg(feature = "highlight")]
         pub(crate) mod highlight;
@@ -188,6 +189,9 @@ mod helpers {
     pub(crate) mod value;
 }
 mod plugins {
+    pub(crate) mod external_links {
+        pub(crate) mod plugin;
+    }
     pub(crate) mod extract_toc {
         pub(crate) mod plugin;
     }
@@ -230,15 +234,16 @@ mod plugins {
 
 // models
 pub use models::options::{
-    AttributeDefinition, Classes, ColorReplacement, ConfiguredTransformer, Format,
-    Highlight, HighlightTransformer, Indent, InlineCode, Katex, KatexOutput, KatexStrict,
-    KatexStrictMode, Parse, Primitive, Raw, Sanitize, Slug, Stringify, ToMarkdown,
-    TransformerName,
+    AttributeDefinition, Classes, ColorReplacement, ConfiguredTransformer, ExternalLinks,
+    Format, Highlight, HighlightTransformer, Indent, InlineCode, Katex, KatexOutput,
+    KatexStrict, KatexStrictMode, Parse, Primitive, Raw, Sanitize, Slug, Stringify,
+    ToMarkdown, Tokens, TransformerName,
 };
 
 // actions
 pub use actions::hast::bridge::bridge_hast;
 pub use actions::hast::convert::convert_hast;
+pub use actions::hast::external::mark_external_links;
 pub use actions::hast::format::format_hast;
 #[cfg(feature = "highlight")]
 pub use actions::hast::highlight::highlight_hast;

@@ -1,5 +1,6 @@
 import { join, resolve } from "node:path"
 import rehypeExtractToc from "@stefanprobst/rehype-extract-toc"
+import rehypeExternalLinks from "rehype-external-links"
 import rehypeParse from "rehype-parse"
 import rehypeSlug from "rehype-slug"
 import rehypeStringify from "rehype-stringify"
@@ -23,6 +24,7 @@ await importHeadingId()
 await importStrip()
 await importUnwrapImages()
 await importExtractToc()
+await importExternalLinks()
 console.log(`site plugins: ${written} cases`)
 
 async function importHeadingId() {
@@ -224,5 +226,104 @@ async function importExtractToc() {
         tests,
       },
     ],
+  })
+}
+
+async function importExternalLinks() {
+  const repository = "https://github.com/rehypejs/rehype-external-links"
+  const source = { repository, version: "3.0.0", path: "lib/index.js", license: "MIT" }
+  const links = [
+    '<a href="https://example.com">a</a>',
+    '<a href="http://example.com">b</a>',
+    '<a href="//cdn.example.com/x">c</a>',
+    '<a href="mailto:a@example.com">d</a>',
+    '<a href="/docs">e</a>',
+    '<a href="#top">f</a>',
+    '<a href="ftp://example.com">g</a>',
+    '<a href="HTTP://example.com">h</a>',
+    '<a href="C:\\path">i</a>',
+    "<a>j</a>",
+  ].join(" ")
+  const groups: { description: string; options?: object; inputs: [string, string][] }[] =
+    [
+      { description: "defaults", inputs: [["each kind of URL", links]] },
+      {
+        description: "target and rel as a string",
+        options: { target: "_blank", rel: "noopener noreferrer" },
+        inputs: [["each kind of URL", links]],
+      },
+      {
+        description: "an empty rel list",
+        options: { rel: [] },
+        inputs: [["a link", links]],
+      },
+      {
+        description: "an empty rel string",
+        options: { rel: "" },
+        inputs: [["a link", links]],
+      },
+      {
+        description: "other protocols",
+        options: { protocols: ["mailto", "ftp"] },
+        inputs: [["each kind of URL", links]],
+      },
+      {
+        description: "more properties",
+        options: { properties: { className: ["external"], title: "Leaves the site" } },
+        inputs: [["a link", '<a href="https://example.com" title="old">a</a>']],
+      },
+      {
+        description: "content with its properties",
+        options: {
+          content: { type: "text", value: " (opens in a new tab)" },
+          contentProperties: { className: ["sr-only"] },
+        },
+        inputs: [["a link", '<a href="https://example.com">a</a>']],
+      },
+      {
+        description: "a list of content nodes",
+        options: {
+          content: [
+            { type: "text", value: " " },
+            {
+              type: "element",
+              tagName: "b",
+              properties: {},
+              children: [{ type: "text", value: "↗" }],
+            },
+          ],
+        },
+        inputs: [["a link", '<a href="https://example.com">a</a>']],
+      },
+    ]
+  const writtenGroups = []
+  for (const group of groups) {
+    const tests = []
+    for (const [description, input] of group.inputs) {
+      const html = String(
+        await unified()
+          .use(rehypeParse, { fragment: true })
+          .use(rehypeExternalLinks, group.options as never)
+          .use(rehypeStringify)
+          .process(input),
+      )
+      tests.push({ description, input, expected: { html } })
+      written += 1
+    }
+    writtenGroups.push({
+      description: group.description,
+      source,
+      pipeline: [
+        ["html.parse", { fragment: true }],
+        group.options ? ["html.externalLinks", group.options] : ["html.externalLinks"],
+        ["html.stringify"],
+      ],
+      tests,
+    })
+  }
+  writeGroups({
+    path: join(TESTS, "html", "external-links.json"),
+    repository,
+    groups: writtenGroups,
   })
 }

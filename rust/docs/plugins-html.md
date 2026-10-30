@@ -186,6 +186,50 @@ Follows [rehype-slug](https://www.npmjs.com/package/rehype-slug).
 
 <!-- /generated -->
 
+## html.externalLinks
+
+Marks links to other sites as rehype-external-links does: `rel` (`nofollow` by default), `target`, more `properties`, and `content` appended in a `<span>`. A link counts as external when its URL is absolute in one of `protocols` (`http` and `https` by default) or protocol-relative.
+
+```rust
+use textlane::{Processor, html, md};
+
+let links = html::ExternalLinks {
+    target: Some("_blank".into()),
+    rel: Some(html::Tokens::Many(vec!["noopener".into()])),
+    ..Default::default()
+};
+let output = Processor::new()
+    .with(md::Parse::default())
+    .with(md::ToHtml::default())
+    .with(links)
+    .with(html::Stringify::default())
+    .freeze()?
+    .process("See [npm](https://www.npmjs.com) or the [guide](/guide).")?;
+output.value
+// <p>See <a href="https://www.npmjs.com" rel="noopener" target="_blank">npm</a> or the <a href="/guide">guide</a>.</p>
+```
+
+<!-- generated:options html.externalLinks -->
+
+Follows [rehype-external-links](https://www.npmjs.com/package/rehype-external-links).
+
+| Option              | Type                              | Default | Description                                                                                                                             |
+| ------------------- | --------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `target`            | `string \| null`                  | `null`  | The `target` of each external link, such as `_blank`.                                                                                   |
+| `rel`               | `Tokens \| null`                  |         | The `rel` of each external link: a list, or tokens separated by white space; `nofollow` when left out or empty, none for an empty list. |
+| `protocols`         | `string[] \| null`                | `null`  | The protocols of absolute URLs that count as external; `http` and `https` when left out. A protocol-relative `//…` URL always counts.   |
+| `properties`        | `Record<string, unknown> \| null` | `null`  | More properties for each external link, as hast names them.                                                                             |
+| `content`           | `unknown`                         | `null`  | hast content appended to each external link in a `<span>`: one node or a list.                                                          |
+| `contentProperties` | `Record<string, unknown> \| null` | `null`  | The properties of that `<span>`.                                                                                                        |
+
+**`Tokens`**
+
+Tokens: a list, or one string of them separated by white space.
+
+Takes `string | string[]`.
+
+<!-- /generated -->
+
 ## html.unwrapImages
 
 Replaces each paragraph that holds only images, links around them and white space with its content, as rehype-unwrap-images does, so images are not wrapped in `<p>`.

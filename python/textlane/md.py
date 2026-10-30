@@ -23,6 +23,7 @@ __all__ = [
     "component",
     "ComponentOptions",
     "heading_id",
+    "HeadingIdOptions",
     "strip",
     "StripOptions",
     "stringify",
@@ -245,6 +246,14 @@ class ComponentOptions(TypedDict, total=False):
     codes: List[CodeRule]
 
 
+# `md.headingId`: `{#id}` at the end of a heading, after a space, as its id, as
+# remark-heading-id reads it; headings without one keep none.
+class HeadingIdOptions(TypedDict, total=False):
+    # Read a whole attribute list, `{#id .class key=value key="v w"}`, as directives
+    # write theirs: classes become `className` and other keys properties.
+    attributes: bool
+
+
 # `md.strip`: mdast down to its text, as strip-markdown does: code, HTML, tables and
 # the like dropped, headings made paragraphs, formatting unwrapped.
 class StripOptions(TypedDict, total=False):
@@ -393,9 +402,9 @@ def component(options: Optional[ComponentOptions] = None) -> Plugin:
     return describe_plugin("md.component", options)
 
 
-def heading_id() -> Plugin:
+def heading_id(options: Optional[HeadingIdOptions] = None) -> Plugin:
     """The `md.headingId` plugin."""
-    return describe_plugin("md.headingId")
+    return describe_plugin("md.headingId", options)
 
 
 def strip(options: Optional[StripOptions] = None) -> Plugin:

@@ -1281,7 +1281,7 @@ fn extracts_many_headings_in_linear_time() -> Result<(), Error> {
     let input = "# a\n\n## b\n\n### c\n\n".repeat(20_000);
     let processor = Processor::new()
         .with(textlane_md::Parse::default())
-        .with(textlane_md::HeadingId)
+        .with(textlane_md::HeadingId::default())
         .with(textlane_md::ToHtml::default())
         .with(textlane_html::UnwrapImages)
         .with(textlane_html::ExtractToc)
@@ -1294,5 +1294,62 @@ fn extracts_many_headings_in_linear_time() -> Result<(), Error> {
         Some(20_000)
     );
     assert!(started.elapsed().as_secs() < LIMIT_SECS);
+    Ok(())
+}
+
+#[test]
+fn marks_external_links_and_reads_heading_attributes() -> Result<(), Error> {
+    let links = textlane_html::ExternalLinks {
+        target: Some("_blank".into()),
+        rel: Some(textlane_html::Tokens::Many(vec!["noopener".into()])),
+        ..Default::default()
+    };
+    let processor = Processor::new()
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::HeadingId { attributes: true })
+        .with(textlane_md::ToHtml::default())
+        .with(links)
+        .with(textlane_html::Stringify::default())
+        .freeze()?;
+    let output =
+        processor.process("## API {#api .wide}\n\n[a](https://a.example) [b](/b)")?;
+    assert_eq!(
+        output.value,
+        "<h2 id=\"api\" class=\"wide\">API</h2>\n<p><a href=\"https://a.example\" \
+         rel=\"noopener\" target=\"_blank\">a</a> <a href=\"/b\">b</a></p>"
+    );
+    Ok(())
+}
+
+#[test]
+fn marks_many_external_links_in_linear_time() -> Result<(), Error> {
+    let processor = Processor::new()
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::ToHtml::default())
+        .with(textlane_html::ExternalLinks::default())
+        .with(textlane_html::Stringify::default())
+        .freeze()?;
+    let input = "[a](https://a.example) ".repeat(50_000);
+    let started = std::time::Instant::now();
+    let output = processor.process(&input)?;
+    assert_eq!(output.value.matches("nofollow").count(), 50_000);
+    assert!(started.elapsed().as_secs() < LIMIT_SECS);
+    Ok(())
+}
+
+#[test]
+fn reads_heading_attributes_in_linear_time_without_handlers() -> Result<(), Error> {
+    let processor = Processor::new()
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::HeadingId { attributes: true })
+        .with(textlane_md::ToHtml::default())
+        .with(textlane_html::Stringify::default())
+        .freeze()?;
+    let hostile = format!("# a{}\n", " {x=\"".repeat(50_000));
+    let started = std::time::Instant::now();
+    processor.process(&hostile)?;
+    assert!(started.elapsed().as_secs() < LIMIT_SECS);
+    let output = processor.process("# A {#a onclick=\"x()\" ONLOAD=y data-x=1}")?;
+    assert_eq!(output.value, "<h1 id=\"a\" data-x=\"1\">A</h1>");
     Ok(())
 }

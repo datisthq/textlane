@@ -167,6 +167,12 @@ export interface CodeGroupRule {
   inherit?: string[]
 }
 
+/** `md.headingId`: `{#id}` at the end of a heading, after a space, as its id, as remark-heading-id reads it; headings without one keep none. */
+export interface HeadingIdOptions {
+  /** Read a whole attribute list, `{#id .class key=value key="v w"}`, as directives write theirs: classes become `className` and other keys properties. @default false */
+  attributes?: boolean
+}
+
 /** `md.strip`: mdast down to its text, as strip-markdown does: code, HTML, tables and the like dropped, headings made paragraphs, formatting unwrapped. */
 export interface StripOptions {
   /** Node types to leave as they are, such as `inlineCode`. @default [] */
@@ -316,8 +322,9 @@ export function component(options?: ComponentOptions): Plugin<"md.component", Co
 }
 
 /** The `md.headingId` plugin. */
-export function headingId(): Plugin<"md.headingId"> {
-  return { name: "md.headingId" }
+export function headingId(options?: HeadingIdOptions): Plugin<"md.headingId", HeadingIdOptions> {
+  if (options === undefined) return { name: "md.headingId" }
+  return { name: "md.headingId", options }
 }
 
 /** The `md.strip` plugin. */

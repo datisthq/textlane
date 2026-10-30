@@ -188,6 +188,46 @@ Follows [rehype-slug](https://www.npmjs.com/package/rehype-slug).
 
 <!-- /generated -->
 
+## html.externalLinks
+
+Marks links to other sites as rehype-external-links does: `rel` (`nofollow` by default), `target`, more `properties`, and `content` appended in a `<span>`. A link counts as external when its URL is absolute in one of `protocols` (`http` and `https` by default) or protocol-relative.
+
+```python
+from textlane import html, md, textlane
+
+file = (
+    textlane()
+    .use(md.parse())
+    .use(md.to_html())
+    .use(html.external_links({"target": "_blank", "rel": ["noopener"]}))
+    .use(html.stringify())
+    .process("See [npm](https://www.npmjs.com) or the [guide](/guide).")
+)
+file["value"]
+# <p>See <a href="https://www.npmjs.com" rel="noopener" target="_blank">npm</a> or the <a href="/guide">guide</a>.</p>
+```
+
+<!-- generated:options html.externalLinks -->
+
+Follows [rehype-external-links](https://www.npmjs.com/package/rehype-external-links).
+
+| Option              | Type                       | Default | Description                                                                                                                             |
+| ------------------- | -------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `target`            | `Optional[str]`            | `None`  | The `target` of each external link, such as `_blank`.                                                                                   |
+| `rel`               | `Optional[Tokens]`         |         | The `rel` of each external link: a list, or tokens separated by white space; `nofollow` when left out or empty, none for an empty list. |
+| `protocols`         | `Optional[List[str]]`      | `None`  | The protocols of absolute URLs that count as external; `http` and `https` when left out. A protocol-relative `//…` URL always counts.   |
+| `properties`        | `Optional[Dict[str, Any]]` | `None`  | More properties for each external link, as hast names them.                                                                             |
+| `content`           | `Any`                      | `None`  | hast content appended to each external link in a `<span>`: one node or a list.                                                          |
+| `contentProperties` | `Optional[Dict[str, Any]]` | `None`  | The properties of that `<span>`.                                                                                                        |
+
+**`Tokens`**
+
+Tokens: a list, or one string of them separated by white space.
+
+Takes `Union[str, List[str]]`.
+
+<!-- /generated -->
+
 ## html.unwrapImages
 
 Replaces each paragraph that holds only images, links around them and white space with its content, as rehype-unwrap-images does, so images are not wrapped in `<p>`.
@@ -200,7 +240,7 @@ file = (
     .use(html.parse({"fragment": True}))
     .use(html.unwrap_images())
     .use(html.stringify())
-    .process_sync('<p><img src="a.png"></p>')
+    .process('<p><img src="a.png"></p>')
 )
 file["value"]
 # <img src="a.png">
@@ -228,7 +268,7 @@ file = (
     .use(html.slug())
     .use(html.extract_toc())
     .use(html.stringify())
-    .process_sync("# Guide\n\n## Install")
+    .process("# Guide\n\n## Install")
 )
 file["data"]["toc"]
 # [{ depth: 1, value: "Guide", id: "guide", children: [{ depth: 2, value: "Install", id: "install" }] }]

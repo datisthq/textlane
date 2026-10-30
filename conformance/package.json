@@ -59,6 +59,7 @@
     "nlcst-to-string": "4.0.0",
     "parse-english": "7.0.0",
     "parse-latin": "7.0.0",
+    "rehype-external-links": "3.0.0",
     "rehype-format": "5.0.1",
     "rehype-katex": "7.0.1",
     "rehype-parse": "9.0.1",

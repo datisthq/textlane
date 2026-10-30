@@ -68,12 +68,7 @@ pub(crate) const PLUGINS: &[PluginEntry] = &[
     #[cfg(feature = "md")]
     plugin!("md.component", textlane_md::Component, ""),
     #[cfg(feature = "md")]
-    plugin!(
-        "md.headingId",
-        textlane_md::HeadingId,
-        "remark-heading-id",
-        unit
-    ),
+    plugin!("md.headingId", textlane_md::HeadingId, "remark-heading-id"),
     #[cfg(feature = "md")]
     plugin!("md.strip", textlane_md::Strip, "strip-markdown"),
     #[cfg(feature = "md")]
@@ -96,6 +91,12 @@ pub(crate) const PLUGINS: &[PluginEntry] = &[
     plugin!("html.sanitize", textlane_html::Sanitize, "rehype-sanitize"),
     #[cfg(feature = "html")]
     plugin!("html.slug", textlane_html::Slug, "rehype-slug"),
+    #[cfg(feature = "html")]
+    plugin!(
+        "html.externalLinks",
+        textlane_html::ExternalLinks,
+        "rehype-external-links"
+    ),
     #[cfg(feature = "html")]
     plugin!(
         "html.unwrapImages",

@@ -19,7 +19,7 @@ katex = ["dep:katex-rs"]
 schema = ["dep:schemars"]
 
 [dependencies]
-textlane-core.workspace = true
+textlane-core = { workspace = true, features = ["json"] }
 giallo = { workspace = true, optional = true }
 katex-rs = { workspace = true, optional = true }
 regex = { workspace = true, optional = true }

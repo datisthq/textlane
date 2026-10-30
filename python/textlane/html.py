@@ -16,6 +16,8 @@ __all__ = [
     "SanitizeOptions",
     "slug",
     "SlugOptions",
+    "external_links",
+    "ExternalLinksOptions",
     "unwrap_images",
     "extract_toc",
     "highlight",
@@ -105,6 +107,29 @@ class SanitizeOptions(TypedDict, total=False):
 class SlugOptions(TypedDict, total=False):
     # Put before each id.
     prefix: str
+
+
+# Tokens: a list, or one string of them separated by white space.
+Tokens = Union[str, List[str]]
+
+
+# `html.externalLinks`: `rel`, `target` and more on links to other sites, as
+# rehype-external-links adds them; options named as it names them, JSON values only.
+class ExternalLinksOptions(TypedDict, total=False):
+    # The `target` of each external link, such as `_blank`.
+    target: Optional[str]
+    # The `rel` of each external link: a list, or tokens separated by white space;
+    # `nofollow` when left out or empty, none for an empty list.
+    rel: Optional[Tokens]
+    # The protocols of absolute URLs that count as external; `http` and `https` when left
+    # out. A protocol-relative `//…` URL always counts.
+    protocols: Optional[List[str]]
+    # More properties for each external link, as hast names them.
+    properties: Optional[Dict[str, Any]]
+    # hast content appended to each external link in a `<span>`: one node or a list.
+    content: Any
+    # The properties of that `<span>`.
+    contentProperties: Optional[Dict[str, Any]]
 
 
 # A replacement color, or a theme's own replacements.
@@ -336,6 +361,11 @@ def sanitize(options: Optional[SanitizeOptions] = None) -> Plugin:
 def slug(options: Optional[SlugOptions] = None) -> Plugin:
     """The `html.slug` plugin."""
     return describe_plugin("html.slug", options)
+
+
+def external_links(options: Optional[ExternalLinksOptions] = None) -> Plugin:
+    """The `html.externalLinks` plugin."""
+    return describe_plugin("html.externalLinks", options)
 
 
 def unwrap_images() -> Plugin:

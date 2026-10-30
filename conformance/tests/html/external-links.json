@@ -1,0 +1,287 @@
+[
+  {
+    "description": "defaults",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-external-links",
+      "version": "3.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      ["html.externalLinks"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "each kind of URL",
+        "input": "<a href=\"https://example.com\">a</a> <a href=\"http://example.com\">b</a> <a href=\"//cdn.example.com/x\">c</a> <a href=\"mailto:a@example.com\">d</a> <a href=\"/docs\">e</a> <a href=\"#top\">f</a> <a href=\"ftp://example.com\">g</a> <a href=\"HTTP://example.com\">h</a> <a href=\"C:\\path\">i</a> <a>j</a>",
+        "expected": {
+          "html": "<a href=\"https://example.com\" rel=\"nofollow\">a</a> <a href=\"http://example.com\" rel=\"nofollow\">b</a> <a href=\"//cdn.example.com/x\" rel=\"nofollow\">c</a> <a href=\"mailto:a@example.com\">d</a> <a href=\"/docs\">e</a> <a href=\"#top\">f</a> <a href=\"ftp://example.com\">g</a> <a href=\"HTTP://example.com\">h</a> <a href=\"C:\\path\">i</a> <a>j</a>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "target and rel as a string",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-external-links",
+      "version": "3.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.externalLinks",
+        {
+          "target": "_blank",
+          "rel": "noopener noreferrer"
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "each kind of URL",
+        "input": "<a href=\"https://example.com\">a</a> <a href=\"http://example.com\">b</a> <a href=\"//cdn.example.com/x\">c</a> <a href=\"mailto:a@example.com\">d</a> <a href=\"/docs\">e</a> <a href=\"#top\">f</a> <a href=\"ftp://example.com\">g</a> <a href=\"HTTP://example.com\">h</a> <a href=\"C:\\path\">i</a> <a>j</a>",
+        "expected": {
+          "html": "<a href=\"https://example.com\" rel=\"noopener noreferrer\" target=\"_blank\">a</a> <a href=\"http://example.com\" rel=\"noopener noreferrer\" target=\"_blank\">b</a> <a href=\"//cdn.example.com/x\" rel=\"noopener noreferrer\" target=\"_blank\">c</a> <a href=\"mailto:a@example.com\">d</a> <a href=\"/docs\">e</a> <a href=\"#top\">f</a> <a href=\"ftp://example.com\">g</a> <a href=\"HTTP://example.com\">h</a> <a href=\"C:\\path\">i</a> <a>j</a>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "an empty rel list",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-external-links",
+      "version": "3.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.externalLinks",
+        {
+          "rel": []
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a link",
+        "input": "<a href=\"https://example.com\">a</a> <a href=\"http://example.com\">b</a> <a href=\"//cdn.example.com/x\">c</a> <a href=\"mailto:a@example.com\">d</a> <a href=\"/docs\">e</a> <a href=\"#top\">f</a> <a href=\"ftp://example.com\">g</a> <a href=\"HTTP://example.com\">h</a> <a href=\"C:\\path\">i</a> <a>j</a>",
+        "expected": {
+          "html": "<a href=\"https://example.com\">a</a> <a href=\"http://example.com\">b</a> <a href=\"//cdn.example.com/x\">c</a> <a href=\"mailto:a@example.com\">d</a> <a href=\"/docs\">e</a> <a href=\"#top\">f</a> <a href=\"ftp://example.com\">g</a> <a href=\"HTTP://example.com\">h</a> <a href=\"C:\\path\">i</a> <a>j</a>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "an empty rel string",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-external-links",
+      "version": "3.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.externalLinks",
+        {
+          "rel": ""
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a link",
+        "input": "<a href=\"https://example.com\">a</a> <a href=\"http://example.com\">b</a> <a href=\"//cdn.example.com/x\">c</a> <a href=\"mailto:a@example.com\">d</a> <a href=\"/docs\">e</a> <a href=\"#top\">f</a> <a href=\"ftp://example.com\">g</a> <a href=\"HTTP://example.com\">h</a> <a href=\"C:\\path\">i</a> <a>j</a>",
+        "expected": {
+          "html": "<a href=\"https://example.com\" rel=\"nofollow\">a</a> <a href=\"http://example.com\" rel=\"nofollow\">b</a> <a href=\"//cdn.example.com/x\" rel=\"nofollow\">c</a> <a href=\"mailto:a@example.com\">d</a> <a href=\"/docs\">e</a> <a href=\"#top\">f</a> <a href=\"ftp://example.com\">g</a> <a href=\"HTTP://example.com\">h</a> <a href=\"C:\\path\">i</a> <a>j</a>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "other protocols",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-external-links",
+      "version": "3.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.externalLinks",
+        {
+          "protocols": ["mailto", "ftp"]
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "each kind of URL",
+        "input": "<a href=\"https://example.com\">a</a> <a href=\"http://example.com\">b</a> <a href=\"//cdn.example.com/x\">c</a> <a href=\"mailto:a@example.com\">d</a> <a href=\"/docs\">e</a> <a href=\"#top\">f</a> <a href=\"ftp://example.com\">g</a> <a href=\"HTTP://example.com\">h</a> <a href=\"C:\\path\">i</a> <a>j</a>",
+        "expected": {
+          "html": "<a href=\"https://example.com\">a</a> <a href=\"http://example.com\">b</a> <a href=\"//cdn.example.com/x\" rel=\"nofollow\">c</a> <a href=\"mailto:a@example.com\" rel=\"nofollow\">d</a> <a href=\"/docs\">e</a> <a href=\"#top\">f</a> <a href=\"ftp://example.com\" rel=\"nofollow\">g</a> <a href=\"HTTP://example.com\">h</a> <a href=\"C:\\path\">i</a> <a>j</a>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "more properties",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-external-links",
+      "version": "3.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.externalLinks",
+        {
+          "properties": {
+            "className": ["external"],
+            "title": "Leaves the site"
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a link",
+        "input": "<a href=\"https://example.com\" title=\"old\">a</a>",
+        "expected": {
+          "html": "<a href=\"https://example.com\" title=\"Leaves the site\" class=\"external\" rel=\"nofollow\">a</a>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "content with its properties",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-external-links",
+      "version": "3.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.externalLinks",
+        {
+          "content": {
+            "type": "text",
+            "value": " (opens in a new tab)"
+          },
+          "contentProperties": {
+            "className": ["sr-only"]
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a link",
+        "input": "<a href=\"https://example.com\">a</a>",
+        "expected": {
+          "html": "<a href=\"https://example.com\" rel=\"nofollow\">a<span class=\"sr-only\"> (opens in a new tab)</span></a>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "a list of content nodes",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-external-links",
+      "version": "3.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.externalLinks",
+        {
+          "content": [
+            {
+              "type": "text",
+              "value": " "
+            },
+            {
+              "type": "element",
+              "tagName": "b",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "↗"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a link",
+        "input": "<a href=\"https://example.com\">a</a>",
+        "expected": {
+          "html": "<a href=\"https://example.com\" rel=\"nofollow\">a<span> <b>↗</b></span></a>"
+        }
+      }
+    ]
+  }
+]

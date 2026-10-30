@@ -248,11 +248,14 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   fields as `Data` and its children, so `md.toHtml`'s `passThrough` can copy it into hast
 - `File::data` is vfile's `data`, a JSON map native plugins store results in
   (`html.extractToc` puts `toc`); `write_file` hands it back, and the loaders lay what their
-  host plugins stored over it. `md.headingId`, `md.strip`, `html.unwrapImages` and
-  `html.extractToc` port remark-heading-id, strip-markdown, rehype-unwrap-images and
-  @stefanprobst/rehype-extract-toc with explicit stacks (`import:site-plugins` renders their
+  host plugins stored over it. `md.headingId`, `md.strip`, `html.unwrapImages`,
+  `html.extractToc` and `html.externalLinks` port remark-heading-id, strip-markdown, rehype-unwrap-images,
+  @stefanprobst/rehype-extract-toc and rehype-external-links (JSON options only; `content` read
+  as hast JSON, so html depends on core's `json`) with explicit stacks (`import:site-plugins` renders their
   cases); `md.strip` handles each sibling list once, a handler's children going back on that
-  list's pending stack, never recursion
+  list's pending stack, never recursion. `md.headingId`'s `attributes` reuses
+  `md.directive`'s `scan_attributes`, trying ` {` from the right so a hostile run of braces
+  fails fast
 - `md.component` is textlane's own plugin, with no upstream: `conformance/tests/md/component.json`
   is its specification. It walks with a stack of sibling lists, converting each list's items
   before pushing their children, so a list groups (`actions/children/group.rs`) once its own

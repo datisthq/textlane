@@ -236,6 +236,38 @@ pub enum Classes {
     Many(Vec<String>),
 }
 
+/// `html.externalLinks`: `rel`, `target` and more on links to other sites, as
+/// rehype-external-links adds them; options named as it names them, JSON values only.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", schemars(rename = "ExternalLinksOptions"))]
+pub struct ExternalLinks {
+    /// The `target` of each external link, such as `_blank`.
+    pub target: Option<String>,
+    /// The `rel` of each external link: a list, or tokens separated by white space;
+    /// `nofollow` when left out or empty, none for an empty list.
+    pub rel: Option<Tokens>,
+    /// The protocols of absolute URLs that count as external; `http` and `https` when left
+    /// out. A protocol-relative `//…` URL always counts.
+    pub protocols: Option<Vec<String>>,
+    /// More properties for each external link, as hast names them.
+    pub properties: Option<serde_json::Map<String, serde_json::Value>>,
+    /// hast content appended to each external link in a `<span>`: one node or a list.
+    pub content: Option<serde_json::Value>,
+    /// The properties of that `<span>`.
+    pub content_properties: Option<serde_json::Map<String, serde_json::Value>>,
+}
+
+/// Tokens: a list, or one string of them separated by white space.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(untagged)]
+pub enum Tokens {
+    One(String),
+    Many(Vec<String>),
+}
+
 /// `html.katex`: math rendered as rehype-katex renders it, natively by katex-rs; options
 /// named as KaTeX names them.
 #[derive(Clone, Debug, Default, Deserialize)]

@@ -131,6 +131,7 @@ the case: `unknown-plugin`, `invalid-options`, `missing-parser`, `missing-compil
   directives, `> [!NOTE]` alerts, definition lists or fenced code into MDX JSX elements is a
   rule of `md.component` instead. remark-heading-id, strip-markdown, rehype-unwrap-images and
   @stefanprobst/rehype-extract-toc are `md.headingId`, `md.strip`, `html.unwrapImages` and
-  `html.extractToc`; the table of contents lands in the result's `data.toc`.
+  `html.extractToc`; the table of contents lands in the result's `data.toc`. rehype-external-links is `html.externalLinks` (JSON options, no functions), and
+  `md.headingId({ attributes: true })` reads `{#id .class key=value}`.
 - remark-stringify reads `settings` from processor data; textlane's `md.stringify` takes its
   options directly.
