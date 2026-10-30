@@ -103,7 +103,12 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   instructions a cycle against the direct writer's 2.5, so trimming instructions
   (`apply_data` inlined, `parse_inline`'s items pre-sized) saved 1% of instructions and no
   cycles. Its lever is node size (112 bytes, moved about three times). Under load, A/B with
-  `perf stat -e instructions:u,cycles:u`, which load does not skew as wall time does
+  `perf stat -e instructions:u,cycles:u`, which load does not skew as wall time does. Keep
+  short-lived working lists on the heap: moving `parse_inline`'s into the arena saved 5% of
+  instructions but cost 16% of cycles and 55% more cache misses, as the heap hands back the
+  block just freed, still hot, and the arena only ever hands out cold memory. Converting
+  hast children straight into their parents' vectors saved 2% of instructions and no
+  cycles, as the misses come from the tree's size, not that copy
 - Container ends follow micromark, not markdown-rs: a list item ends at the first line
   ending of its trailing blank lines (`prepareList`), stepping over the exits of lists
   inside but not of block quotes; a list does the same without stepping over block quote
