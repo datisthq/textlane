@@ -22,7 +22,7 @@ file = (
     .use(md.parse())
     .use(md.to_html())
     .use(html.stringify())
-    .process_sync("# Hello *world*")
+    .process("# Hello *world*")
 )
 file["value"]
 # <h1>Hello <em>world</em></h1>
@@ -48,7 +48,7 @@ file = (
     .use(md.parse())
     .use(md.directive())
     .use(md.stringify())
-    .process_sync(":::note{.info}\nRead *this*.\n:::")
+    .process(":::note{.info}\nRead *this*.\n:::")
 )
 file["value"]
 # :::note{.info}
@@ -83,7 +83,7 @@ file = (
     .use(md.gfm())
     .use(md.to_html())
     .use(html.stringify())
-    .process_sync("~~old~~ www.example.com")
+    .process("~~old~~ www.example.com")
 )
 file["value"]
 # <p><del>old</del> <a href="http://www.example.com">www.example.com</a></p>
@@ -115,7 +115,7 @@ file = (
     .use(md.definition_list())
     .use(md.to_html())
     .use(html.stringify())
-    .process_sync("Apple\n: A fruit.")
+    .process("Apple\n: A fruit.")
 )
 file["value"]
 # <dl>
@@ -146,7 +146,7 @@ file = (
     .use(md.math())
     .use(md.to_html())
     .use(html.stringify())
-    .process_sync("Euler: $e^{i\\pi} = -1$")
+    .process("Euler: $e^{i\\pi} = -1$")
 )
 file["value"]
 # <p>Euler: <code class="language-math math-inline">e^{i\pi} = -1</code></p>
@@ -174,7 +174,7 @@ file = (
     .use(md.parse())
     .use(md.mdx())
     .use(md.stringify())
-    .process_sync("import {Chart} from './chart.js'\n\n# Sales {year}\n\n<Chart  data={rows}/>")
+    .process("import {Chart} from './chart.js'\n\n# Sales {year}\n\n<Chart  data={rows}/>")
 )
 file["value"]
 # import {Chart} from './chart.js'
@@ -209,7 +209,7 @@ file = (
     .use(md.parse())
     .use(md.frontmatter(["yaml", "toml"]))
     .use(md.stringify())
-    .process_sync("+++\ntitle = \"Hi\"\n+++\n\n# Hi")
+    .process("+++\ntitle = \"Hi\"\n+++\n\n# Hi")
 )
 file["value"]
 # +++
@@ -267,7 +267,7 @@ file = (
     .use(md.parse())
     .use(md.gemoji())
     .use(md.stringify())
-    .process_sync("Shipped :tada:")
+    .process("Shipped :tada:")
 )
 file["value"]
 # Shipped 🎉
@@ -301,7 +301,7 @@ file = (
     .use(md.mdx())
     .use(md.component({"directives": [rule]}))
     .use(md.stringify())
-    .process_sync(":::note[Heads up]\nRead *this*.\n:::")
+    .process(":::note[Heads up]\nRead *this*.\n:::")
 )
 file["value"]
 # <Callout type="note" title="Heads up">
@@ -392,7 +392,7 @@ file = (
     textlane()
     .use(md.parse())
     .use(md.stringify({"bullet": "-", "emphasis": "_"}))
-    .process_sync("* *one*\n* two")
+    .process("* *one*\n* two")
 )
 file["value"]
 # - _one_
@@ -460,7 +460,7 @@ file = (
     .use(md.parse())
     .use(md.to_html({"allowDangerousHtml": True}))
     .use(html.stringify({"allowDangerousHtml": True}))
-    .process_sync("Hi <kbd>Ctrl</kbd>")
+    .process("Hi <kbd>Ctrl</kbd>")
 )
 file["value"]
 # <p>Hi <kbd>Ctrl</kbd></p>
@@ -495,7 +495,7 @@ file = (
     .use(md.to_natural_language())
     .use(nl.repeated_words())
     .use(nl.stringify())
-    .process_sync("It is *the the* best.")
+    .process("It is *the the* best.")
 )
 file["messages"][0]["reason"]
 # Unexpected repeated `the`, remove one occurrence

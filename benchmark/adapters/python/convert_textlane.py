@@ -16,4 +16,4 @@ def create_processor():
 
 if __name__ == "__main__":
     processor = create_processor()
-    run_adapter(lambda markdown: processor.process_sync(markdown)["value"])
+    run_adapter(lambda markdown: processor.process(markdown)["value"])

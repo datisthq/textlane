@@ -23,7 +23,7 @@ file = (
     .use(html.slug())
     .use(html.highlight({"theme": "github-dark"}))
     .use(html.stringify())
-    .process_sync("## Install\n\n```sh\nnpm install textlane\n```")
+    .process("## Install\n\n```sh\nnpm install textlane\n```")
 )
 file["value"]
 # <h2 id="install">Install</h2>
@@ -46,7 +46,7 @@ file = (
     .use(html.raw())
     .use(html.sanitize())
     .use(html.stringify())
-    .process_sync("Hi <img src=x onerror=alert(1)>")
+    .process("Hi <img src=x onerror=alert(1)>")
 )
 file["value"]
 # <p>Hi <img src="x"></p>
@@ -63,7 +63,7 @@ file = (
     .use(html.to_markdown())
     .use(md.gfm())
     .use(md.stringify())
-    .process_sync("<h1>Notes</h1><ul><li><s>old</s></li><li>new</li></ul>")
+    .process("<h1>Notes</h1><ul><li><s>old</s></li><li>new</li></ul>")
 )
 file["value"]
 # # Notes
@@ -83,7 +83,7 @@ file = (
     textlane()
     .use(md.parse())
     .use(md.stringify({"bullet": "-", "emphasis": "_", "strong": "*"}))
-    .process_sync("* *a*\n* __b__")
+    .process("* *a*\n* __b__")
 )
 file["value"]
 # - _a_
@@ -101,7 +101,7 @@ file = (
     .use(md.mdx())
     .use(md.to_html())
     .use(mdx.compile())
-    .process_sync("# Hi {props.name}")
+    .process("# Hi {props.name}")
 )
 file["value"]
 # import {jsx as _jsx} from "react/jsx-runtime";
@@ -123,7 +123,7 @@ file = (
     .use(nl.passive())
     .use(nl.indefinite_article())
     .use(nl.stringify())
-    .process_sync("# Notes\n\nThe build was broken by a update.")
+    .process("# Notes\n\nThe build was broken by a update.")
 )
 report = "\n".join(
     f"{m['place']['start']['line']}:{m['place']['start']['column']} {m['reason']}"

@@ -79,14 +79,15 @@ file = (
     .use(md.gfm())
     .use(md.to_html({"allowDangerousHtml": True}))
     .use(html.stringify())
-    .process_sync("# hi")
+    .process("# hi")
 )
 file["value"]  # "<h1>hi</h1>"
 ```
 
 Functions are snake_case (`md.to_html`, `nl.indefinite_article`); their options stay the
-camelCase keys the plugin takes, typed as `TypedDict`s. `await processor.process(text)` and
-`await processor.run(tree)` are coroutines; `process_sync` and `run_sync` return directly. A
+camelCase keys the plugin takes, typed as `TypedDict`s. `process(text)` and `run(tree)`
+return directly; `await processor.aprocess(text)` and `await processor.arun(tree)` are their
+coroutines. A
 file and a tree are dicts.
 
 ## Rust

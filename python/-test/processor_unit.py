@@ -10,12 +10,12 @@ def to_html():
 
 
 def test_processes_markdown_to_html():
-    file = asyncio.run(to_html().process("# hi"))
+    file = asyncio.run(to_html().aprocess("# hi"))
     assert file == {"value": "<h1>hi</h1>", "messages": [], "data": {}}
 
 
 def test_processes_synchronously():
-    assert to_html().process_sync("~a~")["value"] == "<p><del>a</del></p>"
+    assert to_html().process("~a~")["value"] == "<p><del>a</del></p>"
 
 
 def test_takes_a_list_tuples_and_names():
@@ -24,14 +24,14 @@ def test_takes_a_list_tuples_and_names():
         .use([md.parse(), [md.to_html(), {"allowDangerousHtml": True}], "html.stringify"])
         .use(html.stringify({"allowDangerousHtml": True}))
     )
-    assert processor.process_sync("<b>a</b>")["value"] == "<p><b>a</b></p>"
+    assert processor.process("<b>a</b>")["value"] == "<p><b>a</b></p>"
 
 
 def test_takes_a_preset_its_settings_becoming_data():
     processor = textlane.textlane().use(
         {"plugins": [md.parse(), md.stringify()], "settings": {"bullet": "+"}}
     )
-    assert processor.process_sync("- a")["value"] == "* a\n"
+    assert processor.process("- a")["value"] == "* a\n"
     assert processor.data("settings") == {"bullet": "+"}
 
 
@@ -42,7 +42,7 @@ def test_reconfigures_a_plugin_used_again():
         .use(md.stringify({"bullet": "+", "emphasis": "_"}))
         .use(md.stringify({"bullet": "*"}))
     )
-    assert processor.process_sync("- *a*")["value"] == "* _a_\n"
+    assert processor.process("- *a*")["value"] == "* _a_\n"
 
 
 def test_ignores_none():
@@ -72,14 +72,14 @@ def test_parses_runs_and_stringifies():
     processor = textlane.textlane().use(md.parse()).use(md.stringify())
     tree = processor.parse("*a*")
     assert tree["type"] == "root"
-    assert processor.run_sync(tree) == tree
-    assert asyncio.run(processor.run(tree, "*a*")) == tree
+    assert processor.run(tree) == tree
+    assert asyncio.run(processor.arun(tree, "*a*")) == tree
     assert processor.stringify(tree) == "*a*\n"
 
 
 def test_reports_messages():
     processor = textlane.textlane().use(nl.parse()).use(nl.repeated_words()).use(nl.stringify())
-    assert processor.process_sync("the the")["messages"] == [
+    assert processor.process("the the")["messages"] == [
         {
             "reason": "Unexpected repeated `the`, remove one occurrence",
             "ruleId": "the",
@@ -97,7 +97,7 @@ def test_raises_errors_carrying_the_crates_code():
         textlane.textlane().use("md.missing")
     assert error.value.code == "unknown-plugin"
     with pytest.raises(TextlaneError) as error:
-        asyncio.run(textlane.textlane().process("a"))
+        asyncio.run(textlane.textlane().aprocess("a"))
     assert error.value.code == "missing-parser"
     assert str(error.value) == "Cannot `process` without `parser`"
     with pytest.raises(TextlaneError) as error:
@@ -111,9 +111,9 @@ def test_finishes_asynchronous_stages_only_in_the_async_api():
 
     tree = {"type": "root", "children": [{"type": "text", "value": "a"}]}
     with pytest.raises(TextlaneError) as error:
-        processor().run_sync(tree)
+        processor().run(tree)
     assert error.value.code == "async-in-sync"
-    assert asyncio.run(processor().run(tree)) == tree
+    assert asyncio.run(processor().arun(tree)) == tree
 
 
 def test_domain_modules_describe_plugins():
@@ -164,7 +164,7 @@ def visit(tree, visitor):
 
 def test_runs_a_python_plugin_between_native_stages():
     processor = textlane.textlane().use(md.parse()).use(strong_emphasis).use(md.to_html()).use(html.stringify())
-    assert processor.process_sync("*a*")["value"] == "<p><strong>a</strong></p>"
+    assert processor.process("*a*")["value"] == "<p><strong>a</strong></p>"
 
 
 def test_calls_the_attacher_with_the_processor_and_merged_options():
@@ -181,7 +181,7 @@ def test_calls_the_attacher_with_the_processor_and_merged_options():
         .use([[record, {"a": {"c": 2}}]])
         .use(md.stringify())
     )
-    processor.process_sync("a")
+    processor.process("a")
     assert seen == [{"a": {"b": 1, "c": 2}}, "value"]
 
 
@@ -194,9 +194,9 @@ def test_awaits_an_async_transformer():
         return transformer
 
     processor = textlane.textlane().use([md.parse(), replace, md.stringify()])
-    assert asyncio.run(processor.process("a"))["value"] == "b\n"
+    assert asyncio.run(processor.aprocess("a"))["value"] == "b\n"
     with pytest.raises(TextlaneError) as raised:
-        processor.process_sync("a")
+        processor.process("a")
     assert raised.value.code == "async-in-sync"
 
 
@@ -208,7 +208,7 @@ def test_keeps_the_messages_and_data_a_python_plugin_reports():
 
         return transformer
 
-    file = textlane.textlane().use([md.parse(), warn, md.stringify()]).process_sync("a")
+    file = textlane.textlane().use([md.parse(), warn, md.stringify()]).process("a")
     assert file["data"] == {"seen": True}
     point = {"line": 1, "column": 1, "offset": None}
     place = {"start": point, "end": point}
@@ -223,7 +223,7 @@ def test_skips_a_python_plugin_turned_off():
         return transformer
 
     processor = textlane.textlane().use([md.parse(), fail, md.stringify()]).use(fail, False)
-    assert processor.process_sync("a")["value"] == "a\n"
+    assert processor.process("a")["value"] == "a\n"
 
 
 def test_fails_the_run_on_an_exception_a_transformer_returns():
@@ -231,7 +231,7 @@ def test_fails_the_run_on_an_exception_a_transformer_returns():
         return lambda tree, file: ValueError("returned")
 
     with pytest.raises(ValueError, match="returned"):
-        textlane.textlane().use([md.parse(), fail, md.stringify()]).process_sync("a")
+        textlane.textlane().use([md.parse(), fail, md.stringify()]).process("a")
 
 
 def test_gives_python_plugins_the_files_path_and_keeps_it_in_the_result():
@@ -244,7 +244,7 @@ def test_gives_python_plugins_the_files_path_and_keeps_it_in_the_result():
         return transformer
 
     processor = textlane.textlane().use([md.parse(), record, md.stringify()])
-    file = processor.process_sync({"value": "a", "path": "docs/intro.md"})
+    file = processor.process({"value": "a", "path": "docs/intro.md"})
     assert seen == ["docs/intro.md", "docs", "intro", ".md", "a"]
     assert file["path"] == "docs/intro.md"
 
@@ -262,7 +262,7 @@ def test_reports_python_messages_as_vfile_does():
 
     processor = textlane.textlane().use([md.parse(), report, md.stringify()])
     with pytest.raises(textlane.HostMessage) as raised:
-        processor.process_sync({"value": "abc", "path": "a.md"})
+        processor.process({"value": "abc", "path": "a.md"})
     assert (raised.value.fatal, raised.value.name, raised.value.file) == (True, "1:1-1:3", "a.md")
     assert (reported[0].fatal, reported[0].line, reported[0].column) == (False, 1, 2)
     assert (reported[1].fatal, reported[1].name, reported[1].reason) == (None, "1:1", "b")
@@ -284,7 +284,7 @@ def test_shows_python_plugins_what_native_stages_reported():
         return transformer
 
     processor = textlane.textlane().use([md.parse(), ["test.message", {"reason": "native"}], count, md.stringify()])
-    file = processor.process_sync("a")
+    file = processor.process("a")
     assert counts == [1]
     assert [message["reason"] for message in file["messages"]] == ["native", "from py"]
 

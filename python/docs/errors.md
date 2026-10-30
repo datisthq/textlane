@@ -32,7 +32,7 @@ code
 | `missing-parser`        | `parse` or `process` runs with no parser in the pipeline               |
 | `missing-compiler`      | `stringify` or `process` runs with no compiler in the pipeline         |
 | `invalid-stage`         | a stage gets a tree it does not take, such as hast before `md.to_html` |
-| `async-in-sync`         | `process_sync` or `run_sync` meets a stage with asynchronous work      |
+| `async-in-sync`         | `process` or `run` meets a stage with asynchronous work                |
 | `invalid-tree`          | a tree given to `run` or `stringify` is not valid unist                |
 | `unsupported-node`      | a tree given to `run` or `stringify` holds a node with no `type`       |
 | `unknown-node`          | a compiler meets a node type it cannot write                           |

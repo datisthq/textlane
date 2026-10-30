@@ -76,7 +76,7 @@ def run_hosted(group, test):
     for name, *options in group["pipeline"]:
         processor.use(host_for(name) if name.startswith("host:") else name, *options)
     try:
-        file = asyncio.run(processor.process(test.get("input", "")))
+        file = asyncio.run(processor.aprocess(test.get("input", "")))
     except Exception as error:
         return {"error": {"code": getattr(error, "code", "unknown"), "message": str(error)}}
     messages = [

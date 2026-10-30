@@ -23,7 +23,7 @@ file = (
     .use(md.mdx())
     .use(md.to_html())
     .use(mdx.compile())
-    .process_sync("# Hi {name}")
+    .process("# Hi {name}")
 )
 file["value"]
 # import {jsx as _jsx, jsxs as _jsxs} from "react/jsx-runtime";

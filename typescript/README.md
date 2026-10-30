@@ -60,13 +60,14 @@ file = (
     .use(md.gfm())
     .use(md.to_html({"allowDangerousHtml": True}))
     .use(html.stringify())
-    .process_sync("# hi")
+    .process("# hi")
 )
 file["value"]  # "<h1>hi</h1>"
 ```
 
 Node.js and Python also offer `parse`, `run`, `stringify`, `data` and `freeze`, with
-`process`/`run` returning a Promise or coroutine and `processSync`/`process_sync` the result.
+Node.js's `process`/`run` returning a Promise beside `processSync`/`runSync`, and Python's
+returning the result beside the coroutines `aprocess`/`arun`.
 Errors carry the crate's `code`, such as `unknown-plugin`. A JavaScript or Python function
 joins a pipeline as a unified attacher returning a transformer; it cannot add syntax, a parser
 or a compiler.

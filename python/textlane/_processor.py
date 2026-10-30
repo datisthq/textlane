@@ -62,7 +62,7 @@ class Processor:
         self._attach()
         return json.loads(self._native.parse(_read_value(document) or ""))
 
-    async def run(self, tree: Dict[str, Any], file: Compatible = None) -> Dict[str, Any]:
+    async def arun(self, tree: Dict[str, Any], file: Compatible = None) -> Dict[str, Any]:
         """Run the transforms, finishing asynchronous stages.
 
         `file`, the text `tree` was parsed from, lets bridges read it and keeps positions in
@@ -75,7 +75,7 @@ class Processor:
         await finish(run, self._hosts, HostFile(value, _read_path(file)))
         return json.loads(run.result())
 
-    def run_sync(self, tree: Dict[str, Any], file: Compatible = None) -> Dict[str, Any]:
+    def run(self, tree: Dict[str, Any], file: Compatible = None) -> Dict[str, Any]:
         """Run the transforms; fails with `async-in-sync` on an asynchronous stage."""
         value = _read_value(file)
         if not self._attach():
@@ -89,7 +89,7 @@ class Processor:
         self._attach()
         return self._native.stringify(json.dumps(tree))
 
-    async def process(self, document: Compatible) -> VFile:
+    async def aprocess(self, document: Compatible) -> VFile:
         """Parse, run and compile a document, finishing asynchronous stages."""
         text = _read_value(document) or ""
         if not self._attach():
@@ -99,7 +99,7 @@ class Processor:
         await finish(run, self._hosts, file)
         return _with_path({**json.loads(run.result()), "data": file.data}, document)
 
-    def process_sync(self, document: Compatible) -> VFile:
+    def process(self, document: Compatible) -> VFile:
         """Parse, run and compile a document; fails with `async-in-sync` on an asynchronous
         stage."""
         text = _read_value(document) or ""

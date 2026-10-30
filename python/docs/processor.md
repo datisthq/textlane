@@ -34,7 +34,7 @@ file = (
             [html.stringify(), {"allowDangerousHtml": True}],
         ]
     )
-    .process_sync("Hi <kbd>Ctrl</kbd>")
+    .process("Hi <kbd>Ctrl</kbd>")
 )
 file["value"]
 # <p>Hi <kbd>Ctrl</kbd></p>
@@ -47,7 +47,7 @@ bundles plugins, `{"plugins": [...]}`, for reuse:
 from textlane import html, md, textlane
 
 markdown_to_html = {"plugins": [md.parse(), md.gfm(), md.to_html(), html.stringify()]}
-file = textlane().use(markdown_to_html).process_sync("**bold**")
+file = textlane().use(markdown_to_html).process("**bold**")
 file["value"]
 # <p><strong>bold</strong></p>
 ```
@@ -79,11 +79,11 @@ processor.data("site")
 `process` runs all three stages; each also runs on its own:
 
 - `parse(text)` returns the tree the parser reads, as a dict
-- `await run(tree, file=None)` runs the transforms over a tree and returns the new tree;
-  `run_sync` is its blocking form. Pass the text the tree came from as `file` to keep
+- `run(tree, file=None)` runs the transforms over a tree and returns the new tree;
+  `await arun(tree, file=None)` is its coroutine. Pass the text the tree came from as `file` to keep
   positions
 - `stringify(tree)` serializes a tree with no transform
-- `await process(text)` returns the file; `process_sync(text)` is its blocking form
+- `process(text)` returns the file; `await aprocess(text)` is its coroutine
 
 ```python
 from textlane import md, textlane
@@ -105,13 +105,13 @@ import asyncio
 from textlane import html, md, textlane
 
 processor = textlane().use(md.parse()).use(md.to_html()).use(html.stringify())
-file = asyncio.run(processor.process("*hi*"))
+file = asyncio.run(processor.aprocess("*hi*"))
 file["value"]
 # <p><em>hi</em></p>
 ```
 
-The blocking forms fail with `async-in-sync` when a stage has asynchronous work to finish; use
-`process` and `run` then.
+`process` and `run` fail with `async-in-sync` when a stage has asynchronous work to finish;
+use `aprocess` and `arun` then.
 
 ## The file
 

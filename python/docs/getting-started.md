@@ -31,14 +31,14 @@ file = (
     .use(md.parse())
     .use(md.to_html())
     .use(html.stringify())
-    .process_sync("# Hello *world*")
+    .process("# Hello *world*")
 )
 file["value"]
 # <h1>Hello <em>world</em></h1>
 ```
 
 `md.parse` reads Markdown into mdast, `md.to_html` turns it into hast and `html.stringify`
-writes HTML. `process_sync` returns the file; `await processor.process(text)` is its
+writes HTML. `process` returns the file; `await processor.aprocess(text)` is its
 coroutine form.
 
 ## Adding syntax
@@ -56,7 +56,7 @@ file = (
     .use(md.frontmatter())
     .use(md.to_html())
     .use(html.stringify())
-    .process_sync("---\ntitle: Notes\n---\n\n~~draft~~ done")
+    .process("---\ntitle: Notes\n---\n\n~~draft~~ done")
 )
 file["value"]
 # <p><del>draft</del> done</p>
@@ -77,7 +77,7 @@ file = (
     .use(md.to_natural_language())
     .use(nl.repeated_words())
     .use(nl.stringify())
-    .process_sync("It is the the best.")
+    .process("It is the the best.")
 )
 file["messages"][0]["reason"]
 # Unexpected repeated `the`, remove one occurrence

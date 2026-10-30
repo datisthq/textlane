@@ -21,7 +21,7 @@ file = (
     textlane()
     .use(html.parse({"fragment": True}))
     .use(html.stringify())
-    .process_sync("<p>One<p>Two")
+    .process("<p>One<p>Two")
 )
 file["value"]
 # <p>One</p><p>Two</p>
@@ -52,7 +52,7 @@ file = (
     .use(md.to_html({"allowDangerousHtml": True}))
     .use(html.raw())
     .use(html.stringify())
-    .process_sync("<details><summary>More</summary>\n\n*Hidden*\n\n</details>")
+    .process("<details><summary>More</summary>\n\n*Hidden*\n\n</details>")
 )
 file["value"]
 # <details><summary>More</summary>
@@ -83,7 +83,7 @@ file = (
     .use(html.parse({"fragment": True}))
     .use(html.format())
     .use(html.stringify())
-    .process_sync("<ul><li>One</li><li>Two</li></ul>")
+    .process("<ul><li>One</li><li>Two</li></ul>")
 )
 file["value"]
 # <ul>
@@ -122,7 +122,7 @@ file = (
     .use(html.parse({"fragment": True}))
     .use(html.sanitize())
     .use(html.stringify())
-    .process_sync("<a href=\"javascript:alert(1)\" onclick=\"x()\">Hi</a><script>x()</script>")
+    .process("<a href=\"javascript:alert(1)\" onclick=\"x()\">Hi</a><script>x()</script>")
 )
 file["value"]
 # <a>Hi</a>
@@ -172,7 +172,7 @@ file = (
     .use(md.to_html())
     .use(html.slug())
     .use(html.stringify())
-    .process_sync("## Getting started")
+    .process("## Getting started")
 )
 file["value"]
 # <h2 id="getting-started">Getting started</h2>
@@ -201,7 +201,7 @@ file = (
     .use(md.to_html())
     .use(html.highlight({"theme": "github-light"}))
     .use(html.stringify())
-    .process_sync("```js\nlet a = 1\n```")
+    .process("```js\nlet a = 1\n```")
 )
 file["value"]
 # <pre class="shiki github-light" style="background-color:#fff;color:#24292e"  …
@@ -288,7 +288,7 @@ file = (
     .use(html.parse({"fragment": True}))
     .use(html.to_markdown())
     .use(md.stringify())
-    .process_sync("<h2>Title</h2><p>Some <strong>bold</strong> text.</p>")
+    .process("<h2>Title</h2><p>Some <strong>bold</strong> text.</p>")
 )
 file["value"]
 # ## Title
@@ -323,7 +323,7 @@ file = (
     .use(html.to_natural_language())
     .use(nl.repeated_words())
     .use(nl.stringify())
-    .process_sync("<p>It is the the best.</p>")
+    .process("<p>It is the the best.</p>")
 )
 file["messages"][0]["reason"]
 # Unexpected repeated `the`, remove one occurrence
@@ -348,7 +348,7 @@ file = (
     textlane()
     .use(html.parse({"fragment": True}))
     .use(html.stringify({"quote": "'"}))
-    .process_sync("<img alt=\"Logo\" src=\"logo.svg\">")
+    .process("<img alt=\"Logo\" src=\"logo.svg\">")
 )
 file["value"]
 # <img alt='Logo' src='logo.svg'>

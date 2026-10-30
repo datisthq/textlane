@@ -52,16 +52,16 @@ def test_api(group, test):
     if "error" in expected:
         with pytest.raises(textlane.TextlaneError) as error:
             if output:
-                processor().process_sync(source)
+                processor().process(source)
             else:
-                processor().run_sync(processor().parse(source), source)
+                processor().run(processor().parse(source), source)
         assert error.value.code == expected["error"]["code"]
         return
     if output:
-        assert processor().process_sync(source)["value"] == expected[output]
+        assert processor().process(source)["value"] == expected[output]
         return
     if "tree" in expected:
-        tree = processor().run_sync(processor().parse(source), source)
+        tree = processor().run(processor().parse(source), source)
         # A tree read back from JSON keeps unist positions, which a bridge into nlcst cannot
         # place its nodes by: only `process` keeps them in that case
         bridged = any(entry[0].endswith(".toNaturalLanguage") for entry in group["pipeline"])
@@ -75,7 +75,7 @@ def test_api(group, test):
         return
     messages = [
         {key: message[key] for key in ("ruleId", "source", "place")}
-        for message in processor().process_sync(source)["messages"]
+        for message in processor().process(source)["messages"]
     ]
     assert messages == expected["messages"]
 

@@ -22,7 +22,7 @@ file = (
     .use(nl.parse())
     .use(nl.smartypants())
     .use(nl.stringify())
-    .process_sync("\"Hi\" -- she said...")
+    .process("\"Hi\" -- she said...")
 )
 file["value"]
 # “Hi” — she said…
@@ -56,7 +56,7 @@ file = (
     .use(nl.parse())
     .use(nl.equality())
     .use(nl.stringify())
-    .process_sync("Hey guys, the chairman is here.")
+    .process("Hey guys, the chairman is here.")
 )
 file["messages"][0]["reason"]
 # Unexpected potentially insensitive use of `guys`, in somes cases `people`, ` …
@@ -85,7 +85,7 @@ file = (
     .use(nl.parse())
     .use(nl.passive())
     .use(nl.stringify())
-    .process_sync("The cake was eaten.")
+    .process("The cake was eaten.")
 )
 file["messages"][0]["reason"]
 # Unexpected use of the passive voice
@@ -113,7 +113,7 @@ file = (
     .use(nl.parse())
     .use(nl.readability({"age": 12}))
     .use(nl.stringify())
-    .process_sync("The constitutionally mandated intergovernmental reconciliation procedures necessitate comprehensive multilateral deliberation.")
+    .process("The constitutionally mandated intergovernmental reconciliation procedures necessitate comprehensive multilateral deliberation.")
 )
 file["messages"][0]["reason"]
 # Unexpected hard to read sentence, according to 6 out of 7 algorithms
@@ -143,7 +143,7 @@ file = (
     .use(nl.parse())
     .use(nl.repeated_words())
     .use(nl.stringify())
-    .process_sync("It is the the best.")
+    .process("It is the the best.")
 )
 file["messages"][0]["reason"]
 # Unexpected repeated `the`, remove one occurrence
@@ -169,7 +169,7 @@ file = (
     .use(nl.parse())
     .use(nl.sentence_spacing())
     .use(nl.stringify())
-    .process_sync("One.  Two.")
+    .process("One.  Two.")
 )
 file["messages"][0]["reason"]
 # Unexpected 2 spaces between sentence, expected 1 space
@@ -202,7 +202,7 @@ file = (
     textlane()
     .use(nl.parse())
     .use(nl.stringify())
-    .process_sync("Same text out.")
+    .process("Same text out.")
 )
 file["value"]
 # Same text out.
@@ -228,7 +228,7 @@ file = (
     .use(nl.parse())
     .use(nl.smartypants())
     .use(nl.stringify())
-    .process_sync("\"It's\" -- fine...")
+    .process("\"It's\" -- fine...")
 )
 file["value"]
 # “It’s” — fine…
@@ -282,7 +282,7 @@ file = (
     .use(nl.parse())
     .use(nl.quotes())
     .use(nl.stringify())
-    .process_sync("He said \"hi\".")
+    .process("He said \"hi\".")
 )
 file["messages"][0]["reason"]
 # Unexpected straight quote `"`, expected `“`
@@ -318,7 +318,7 @@ file = (
     .use(nl.parse())
     .use(nl.contractions())
     .use(nl.stringify())
-    .process_sync("Dont do that.")
+    .process("Dont do that.")
 )
 file["messages"][0]["reason"]
 # Unexpected missing apostrophe in `Dont`, expected `Don’t`
@@ -347,7 +347,7 @@ file = (
     .use(nl.parse())
     .use(nl.indefinite_article())
     .use(nl.stringify())
-    .process_sync("It is a apple.")
+    .process("It is a apple.")
 )
 file["messages"][0]["reason"]
 # Unexpected article `a` before `apple`, expected `an`
