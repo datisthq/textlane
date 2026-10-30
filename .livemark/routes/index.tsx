@@ -575,11 +575,11 @@ const file = await textlane()
     source: `use textlane::{Processor, html, md};
 
 let processor = Processor::new()
-    .with(md::parse(Default::default()))
-    .with(md::gfm(Default::default()))
-    .with(md::to_html(Default::default()))
-    .with(html::slug(Default::default()))
-    .with(html::stringify(Default::default()))
+    .with(md::Parse::default())
+    .with(md::Gfm::default())
+    .with(md::ToHtml::default())
+    .with(html::Slug::default())
+    .with(html::Stringify::default())
     .freeze()?;
 
 let output = processor.process(markdown)?;`,
