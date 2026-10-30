@@ -970,9 +970,9 @@ const measures: Measure[] = [
   { tool: "pulldown-cmark", mbps: 176.4 },
   { tool: "cmark (C, via cmarkgfm)", mbps: 63.1 },
   { tool: "comrak", mbps: 51.7 },
-  { tool: "textlane (Rust)", mbps: 41.9, isTextlane: true },
-  { tool: "textlane (Node.js)", mbps: 41.7, isTextlane: true },
-  { tool: "textlane (Python)", mbps: 37.7, isTextlane: true },
+  { tool: "textlane (Rust)", mbps: 46.7, isTextlane: true },
+  { tool: "textlane (Node.js)", mbps: 46.5, isTextlane: true },
+  { tool: "textlane (Python)", mbps: 42.2, isTextlane: true },
   { tool: "marked", mbps: 18.1 },
   { tool: "markdown-it", mbps: 16.1 },
   { tool: "mistune", mbps: 4.3 },
@@ -993,7 +993,8 @@ function Benchmark() {
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Performance</h2>
             <p className="mt-4 text-muted-foreground text-lg">
               Markdown-to-HTML throughput from Rust, Node.js and Python, against other
-              libraries.
+              libraries. textlane builds two trees, mdast and hast, for plugins to
+              transform; comrak and cmark build one, pulldown-cmark none.
             </p>
           </div>
         </Reveal>
@@ -1035,8 +1036,7 @@ function Benchmark() {
                 <Gauge className="mt-0.5 size-3.5 shrink-0" />
                 <span>
                   Input megabytes per second at the median, on an AMD Ryzen 5 PRO 7545U.
-                  pulldown-cmark streams events without a syntax tree; comrak and cmark
-                  build one but render HTML from it directly. Reproduce with{" "}
+                  Reproduce with{" "}
                   <code className="font-mono text-foreground">
                     pnpm -C benchmark measure
                   </code>
