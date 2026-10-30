@@ -676,6 +676,8 @@ const domains: Domain[] = [
       ["md.directive", "remark-directive"],
       ["md.gemoji", "remark-gemoji"],
       ["md.definitionList", "remark-definition-list"],
+      ["md.mdx", "remark-mdx"],
+      ["mdx.compile", "@mdx-js/mdx"],
     ],
   },
   {
