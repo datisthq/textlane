@@ -5,7 +5,7 @@ import { getProfile } from "./profiles/index.ts"
 
 const { values } = parseArgs({
   options: {
-    profile: { type: "string", default: "prose" },
+    profile: { type: "string", default: "readme" },
     size: { type: "string", default: "1MB" },
     seed: { type: "string", default: "1" },
   },

@@ -56,7 +56,7 @@
 <htmlpress-grid cols="4">
   <htmlpress-card>
     <h3>~42 MB/s</h3>
-    <p>textlane on 4 MB of prose, nearly the same from Rust, Node.js and Python</p>
+    <p>textlane on the 4 MB README, nearly the same from Rust, Node.js and Python</p>
   </htmlpress-card>
   <htmlpress-card>
     <h3>190× unified</h3>
@@ -64,15 +64,15 @@
   </htmlpress-card>
   <htmlpress-card>
     <h3>2.3× marked</h3>
-    <p>and markdown-it on prose, 20× markdown-rs</p>
+    <p>and markdown-it on the README, 20× markdown-rs</p>
   </htmlpress-card>
   <htmlpress-card>
     <h3>1.2× behind comrak</h3>
-    <p>on 4 MB of prose, 4× behind pulldown-cmark, which builds no tree</p>
+    <p>on the 4 MB README, 4× behind pulldown-cmark, which builds no tree</p>
   </htmlpress-card>
 </htmlpress-grid>
 
-<h2>Throughput on 4 MB of prose</h2>
+<h2>Throughput on the 4 MB README</h2>
 <figure class="diagram">
   <svg
     viewBox="0 0 760 400"
@@ -156,7 +156,7 @@
   <dt>Against its own family</dt>
   <dd>
     unified, micromark and markdown-rs build the same trees through micromark's event
-    engine; textlane is 20× markdown-rs and over 190× unified on 4 MB of prose, and
+    engine; textlane is 20× markdown-rs and over 190× unified on the 4 MB README, and
     unified and micromark time out on 1 MB of edge cases.
   </dd>
   <dt>Against the fastest</dt>
@@ -173,7 +173,7 @@
   </dd>
 </dl>
 
-<h2>Prose</h2>
+<h2>README</h2>
 <p>A README-like document: headings, rich paragraphs, lists, quotes and fenced code.</p>
 
 <h3>10 KB</h3>
@@ -521,7 +521,7 @@
   </table>
 </htmlpress-table>
 
-<h2>Spec edge cases</h2>
+<h2>Conformance</h2>
 <p>
   The plain CommonMark inputs of the conformance suite, back to back: thousands of tiny
   blocks, each an edge case.

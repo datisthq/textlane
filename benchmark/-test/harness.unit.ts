@@ -40,12 +40,12 @@ describe("renderReport", () => {
       machine: { cpu: "<cpu>", cpus: 8, memory: "16GB", os: "linux" },
       results: [
         {
-          case: "prose",
+          case: "readme",
           tool: "comrak",
           title: "comrak",
           language: "rust",
           version: "1.0.0",
-          profile: "prose",
+          profile: "readme",
           size: "10KB",
           bytes: 10240,
           repeat: 820,

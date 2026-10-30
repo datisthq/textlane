@@ -10,9 +10,9 @@ const WORDS = (
 
 const LANGUAGES = ["js", "rust", "python", "sh", "json", ""]
 
-/** A README-like document: headings, prose with inline markup, lists, quotes and code. */
-export const proseProfile: Profile = {
-  name: "prose",
+/** A README-like document: headings, paragraphs with inline markup, lists, quotes and code. */
+export const readmeProfile: Profile = {
+  name: "readme",
   description: "README-like CommonMark: headings, rich paragraphs, lists, quotes, code",
   version: 1,
   createBlock: (random, index) => {

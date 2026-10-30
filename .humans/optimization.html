@@ -11,7 +11,7 @@
   How much faster textlane can turn Markdown into HTML while staying a unified
   replacement. Stage times are from 2026-10-29 at commit <code>9bf4f98</code>, timing
   <code>parse</code>, <code>run</code> and <code>stringify</code> separately on 1 MB of
-  the benchmark's <code>prose</code> document; library numbers are from
+  the benchmark's <code>readme</code> document; library numbers are from
   <a href="./benchmark.html">the benchmark</a>. The floors below are estimates, not
   measurements.
 </p>
@@ -77,7 +77,7 @@
 <p>
   The parser's cost is per block and per line, not per byte: one long paragraph runs near
   13 MB/s, while a document of tiny paragraphs pays about 2.7 µs each. That is why the
-  benchmark's <code>spec</code> case, thousands of tiny edge cases, runs at 2 MB/s.
+  benchmark's <code>conformance</code> case, thousands of tiny edge cases, runs at 2 MB/s.
 </p>
 
 <h2>Why comrak is 5× faster with a tree too</h2>

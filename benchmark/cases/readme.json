@@ -1,5 +1,5 @@
 {
   "description": "Convert a README-like CommonMark document to HTML",
-  "profile": "prose",
+  "profile": "readme",
   "sizes": ["10KB", "1MB", "4MB"]
 }

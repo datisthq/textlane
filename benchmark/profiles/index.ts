@@ -1,8 +1,8 @@
-import { proseProfile } from "./prose.ts"
-import { specProfile } from "./spec.ts"
+import { readmeProfile } from "./readme.ts"
+import { conformanceProfile } from "./conformance.ts"
 import type { Profile } from "./types.ts"
 
-export const PROFILES: Profile[] = [proseProfile, specProfile]
+export const PROFILES: Profile[] = [readmeProfile, conformanceProfile]
 
 export function getProfile(name: string) {
   const profile = PROFILES.find(item => item.name === name)

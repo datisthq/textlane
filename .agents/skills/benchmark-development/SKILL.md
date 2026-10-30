@@ -64,7 +64,7 @@ must sit near the others', or it renders a different document. Pin it: npm by ex
   `RUSTUP_TOOLCHAIN=stable` or the default toolchain builds it
 - The Rust adapters are their own cargo workspace, so comrak and friends never enter
   `rust/Cargo.lock`; they build with release, LTO and one codegen unit, as `rust/` does
-- `spec` snippets that leave a fence or raw HTML block open, or define a reference, would
+- `conformance` snippets that leave a fence or raw HTML block open, or define a reference, would
   change every later snippet: `readSnippets` drops them, and a thematic break at column 0
   closes any list, quote or indented code between snippets
 - Memory is sampled every 50ms, so a run shorter than that shows none; it includes the runtime,

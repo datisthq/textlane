@@ -155,7 +155,7 @@ function renderMethod() {
   <h2>Method</h2>
   <ul>
     <li>Documents are synthetic and seeded, so every library reads the same bytes. The
-    <code>prose</code> profile reads like a README; <code>spec</code> strings together the
+    <code>readme</code> profile reads like a README; <code>conformance</code> strings together the
     CommonMark edge cases of textlane's conformance suite.</li>
     <li>Each library runs as its own process and converts the document repeatedly, at least
     8 MB of input per run, so a small document is timed over many conversions. Time is clocked

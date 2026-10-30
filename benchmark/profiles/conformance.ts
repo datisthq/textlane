@@ -18,8 +18,8 @@ const UNCLOSED = [
 let snippets: string[] | undefined
 
 /** The conformance suite's plain CommonMark inputs, one after another: the edge cases. */
-export const specProfile: Profile = {
-  name: "spec",
+export const conformanceProfile: Profile = {
+  name: "conformance",
   description: "The CommonMark edge cases of the conformance suite, back to back",
   version: 1,
   createBlock: (_random, index) => {

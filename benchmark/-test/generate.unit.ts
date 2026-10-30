@@ -4,8 +4,8 @@ import { join } from "node:path"
 import { afterEach, describe, expect, it } from "vite-plus/test"
 import { createDocument, generateDataset } from "../generate/generate.ts"
 import { formatBytes, parseSize } from "../generate/size.ts"
-import { proseProfile } from "../profiles/prose.ts"
-import { readSnippets, specProfile } from "../profiles/spec.ts"
+import { readmeProfile } from "../profiles/readme.ts"
+import { readSnippets, conformanceProfile } from "../profiles/conformance.ts"
 
 let directory = ""
 afterEach(async () => {
@@ -16,18 +16,20 @@ describe("generateDataset", () => {
   it("writes the same bytes for the same seed, and at least the size asked", async () => {
     directory = await mkdtemp(join(tmpdir(), "textlane-benchmark-test-"))
     const dataset = await generateDataset({
-      profile: proseProfile,
+      profile: readmeProfile,
       size: "4KB",
       directory,
     })
     const text = await readFile(dataset.path, "utf8")
     expect(dataset.bytes).toBeGreaterThanOrEqual(4096)
-    expect(createDocument({ profile: proseProfile, bytes: 4096, seed: 1 })).toBe(text)
-    expect(createDocument({ profile: proseProfile, bytes: 4096, seed: 2 })).not.toBe(text)
+    expect(createDocument({ profile: readmeProfile, bytes: 4096, seed: 1 })).toBe(text)
+    expect(createDocument({ profile: readmeProfile, bytes: 4096, seed: 2 })).not.toBe(
+      text,
+    )
   })
 
-  it("separates spec snippets with a thematic break at column 0", () => {
-    const text = createDocument({ profile: specProfile, bytes: 2048, seed: 1 })
+  it("separates edge-case snippets with a thematic break at column 0", () => {
+    const text = createDocument({ profile: conformanceProfile, bytes: 2048, seed: 1 })
     expect(text).toMatch(/\n\n---\n\n$/)
   })
 })

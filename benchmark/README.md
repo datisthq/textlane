@@ -34,7 +34,7 @@ its clock, converts the document `repeat` times (at least 8MB of input per run) 
 
 ```bash
 pnpm -C benchmark setup:tools                    # uv sync, the addon and wheel, the Rust adapters
-pnpm -C benchmark measure --case prose --size 1MB
+pnpm -C benchmark measure --case readme --size 1MB
 pnpm -C benchmark show:report                    # .cache/report.html
 ```
 
@@ -49,7 +49,7 @@ size and tool, and `--out` writes the page elsewhere.
 `generate:data` writes a document without measuring anything:
 
 ```bash
-pnpm -C benchmark generate:data --profile spec --size 4MB
+pnpm -C benchmark generate:data --profile conformance --size 4MB
 ```
 
 ## Data
@@ -58,9 +58,9 @@ Every document is generated from a seed, so each tool reads identical bytes, and
 `.cache/data/` until its profile, version, size or seed changes. A size is a byte target such
 as `10KB`. A profile in `profiles/` writes one block of Markdown at a time:
 
-- `prose` — README-like CommonMark: headings, paragraphs with emphasis, code spans and links,
+- `readme` — README-like CommonMark: headings, paragraphs with emphasis, code spans and links,
   lists, block quotes, fenced code
-- `spec` — the plain CommonMark inputs of `conformance/tests/md/`, back to back and split by
+- `conformance` — the plain CommonMark inputs of `conformance/tests/md/`, back to back and split by
   thematic breaks; snippets that would swallow the rest (an unclosed fence or raw HTML block, a
   reference definition) are left out
 
