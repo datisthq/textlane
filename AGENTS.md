@@ -10,7 +10,7 @@ Textlane is a Rust-native text processing pipeline: a replacement for unified wh
 - **pipeline** — a processor built with `.use()`: parse, transform and serialize stages run in order over a syntax tree
 - **plugin** — one pipeline stage, native Rust or a host-language (JavaScript, Python) function called through a binding
 - **conformance suite** — language-neutral JSON cases, each a pipeline, an input and the expected output, in the style of the JSON-Schema test suite; every implementation runs the same cases
-- **docs site** — this repo's livemark project: `livemark.config.ts`, `.livemark/` and the Python, TypeScript and Rust sections, each from its `docs/` pages, `README.md` and `CONTRIBUTING.md` symlink, plus the root `CHANGELOG.md` as the header's Changelog section, built by `pnpm build:docs` and deployed to textlane.dev
+- **docs site** — this repo's livemark project: `livemark.config.ts`, `.livemark/` and the Python, TypeScript and Rust sections, each from its `docs/` pages and `CONTRIBUTING.md` symlink, plus the root `CHANGELOG.md` as the header's Changelog section, built by `pnpm build:docs` and deployed to textlane.dev
 
 ## Rules
 
@@ -105,7 +105,7 @@ Dot-directories hold non-package code: `.agents/` repo skills, `.humans/` design
 - `package.json` script names are `verb[:object]` (`check:lint`, `build:docs`), never noun-first
 - Specs: Vitest via `vite-plus/test`, `<module>.unit.ts`, no "Arrange / Act / Assert" comments
 - Rust: edition 2024, rustfmt (90 columns), clippy with `-D warnings`; snake_case **verb_noun** functions; no `unwrap` / `expect` / `unsafe` outside tests (**`rust-development`**)
-- Docs pages in `python/docs/`, `typescript/docs/` and `rust/docs/` are Markdown with livemark frontmatter (`title`, `description`, `path` under the language's prefix, `icon`, `order`); each package's `README.md` becomes its section's Introduction and its `CONTRIBUTING.md` symlink its Contributing page, and the root `CHANGELOG.md` is a `changelog` section in the header, split per version with the latest beside its tab, all through `patches` and `sections` in `livemark.config.ts`
+- Docs pages in `python/docs/`, `typescript/docs/` and `rust/docs/` are Markdown with livemark frontmatter (`title`, `description`, `path` under the language's prefix, `icon`, `order`); each section opens on its Overview page, the packages' `README.md`s stay registry pages only, and each `CONTRIBUTING.md` symlink becomes its Contributing page, and the root `CHANGELOG.md` is a `changelog` section in the header, split per version with the latest beside its tab, all through `patches` and `sections` in `livemark.config.ts`
 - Commits: Conventional Commits, typed by what an installer gets (below)
 
 ## Releases

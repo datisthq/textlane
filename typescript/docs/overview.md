@@ -3,7 +3,7 @@ title: Overview
 description: What textlane is for and how the TypeScript package is built.
 path: /typescript/overview/
 icon: book-open
-order: 2
+order: 1
 ---
 
 # Overview
@@ -12,6 +12,14 @@ Textlane is a Rust-native replacement for [unified](https://unifiedjs.com): a pi
 parses text into a syntax tree, runs plugins over it and serializes the result. The pipeline
 and its most expensive plugins run in Rust; existing JavaScript plugins can still take part,
 called only at the stage where they run.
+
+## Installation
+
+```bash
+npm install textlane
+```
+
+It needs Node.js 20 or later; a prebuilt addon for Linux, macOS and Windows, x64 and arm64, comes along as an optional dependency, so no Rust toolchain is needed.
 
 ## The TypeScript package
 
@@ -65,3 +73,12 @@ await textlane().use(md.parse()).use(strong).use(md.toHtml()).use(html.stringify
 Each pause serializes the tree, so a plugin costs one round trip per batch, not per node. A
 JavaScript plugin only transforms: syntax extensions such as remark-gfm need the native
 plugin.
+
+## Next steps
+
+- [Getting started](/typescript/getting-started/) — a first pipeline, syntax extensions and the result
+- [Processor](/typescript/processor/) — every method of the pipeline
+- [Recipes](/typescript/recipes/) — pipelines for common jobs
+- [Markdown plugins](/typescript/markdown-plugins/), [HTML plugins](/typescript/html-plugins/),
+  [MDX plugins](/typescript/mdx-plugins/) and
+  [natural language plugins](/typescript/natural-language-plugins/) — each plugin and its options

@@ -7,11 +7,8 @@ export default defineConfig({
   logo: "/logo.svg",
   favicon: "/logo.png",
   include: [
-    "python/README.md",
     "python/docs/**/*.md",
-    "typescript/README.md",
     "typescript/docs/**/*.md",
-    "rust/textlane/README.md",
     "rust/docs/**/*.md",
     "python/CONTRIBUTING.md",
     "typescript/CONTRIBUTING.md",
@@ -38,36 +35,6 @@ export default defineConfig({
     },
   ],
   patches: [
-    {
-      file: "python/README.md",
-      article: {
-        title: "Introduction",
-        description: "Install textlane for Python.",
-        icon: "rocket",
-        order: 1,
-        path: "/python/introduction/",
-      },
-    },
-    {
-      file: "typescript/README.md",
-      article: {
-        title: "Introduction",
-        description: "Install textlane for Node.js.",
-        icon: "rocket",
-        order: 1,
-        path: "/typescript/introduction/",
-      },
-    },
-    {
-      file: "rust/textlane/README.md",
-      article: {
-        title: "Introduction",
-        description: "Install textlane for Rust.",
-        icon: "rocket",
-        order: 1,
-        path: "/rust/introduction/",
-      },
-    },
     {
       file: "python/CONTRIBUTING.md",
       article: {

@@ -3,7 +3,7 @@ title: Overview
 description: What textlane is for and how the Python package is built.
 path: /python/overview/
 icon: book-open
-order: 2
+order: 1
 ---
 
 # Overview
@@ -12,6 +12,14 @@ Textlane is a Rust-native replacement for [unified](https://unifiedjs.com): a pi
 parses text into a syntax tree, runs plugins over it and serializes the result. The pipeline
 and its most expensive plugins run in Rust; existing JavaScript plugins can still take part,
 called only at the stage where they run.
+
+## Installation
+
+```bash
+pip install textlane
+```
+
+It needs Python 3.9 or later; the wheel carries a prebuilt extension for your platform, so no Rust toolchain is needed.
 
 ## The Python package
 
@@ -62,3 +70,12 @@ textlane().use(md.parse()).use(strong).use(md.to_html()).use(html.stringify()).p
 ```
 
 A Python plugin only transforms: syntax, parsers and compilers need native plugins.
+
+## Next steps
+
+- [Getting started](/python/getting-started/) — a first pipeline, syntax extensions and the result
+- [Processor](/python/processor/) — every method of the pipeline
+- [Recipes](/python/recipes/) — pipelines for common jobs
+- [Markdown plugins](/python/markdown-plugins/), [HTML plugins](/python/html-plugins/),
+  [MDX plugins](/python/mdx-plugins/) and
+  [natural language plugins](/python/natural-language-plugins/) — each plugin and its options

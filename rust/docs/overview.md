@@ -3,7 +3,7 @@ title: Overview
 description: What textlane is for and how the Rust crate is built.
 path: /rust/overview/
 icon: book-open
-order: 2
+order: 1
 ---
 
 # Overview
@@ -12,6 +12,14 @@ Textlane is a Rust-native replacement for [unified](https://unifiedjs.com): a pi
 parses text into a syntax tree, runs plugins over it and serializes the result. The pipeline
 and its most expensive plugins run in Rust; existing JavaScript plugins can still take part,
 called only at the stage where they run.
+
+## Installation
+
+```bash
+cargo add textlane
+```
+
+It needs Rust 1.88 or later; each domain is a cargo feature, all on by default.
 
 ## The Rust crate
 
@@ -33,3 +41,12 @@ the Node.js and Python packages drive `textlane::Pipeline`, which takes plugins 
 JSON options and follows unified's `use`, `data` and `freeze`. A binding adds its own
 functions as `{host: id}` descriptors: `start_process` and `start_run` pause before them with
 the tree as JSON, and `Pause::resume` goes on with the tree they returned.
+
+## Next steps
+
+- [Getting started](/rust/getting-started/) — a first pipeline, syntax extensions and the result
+- [Processor](/rust/processor/) — every method of the pipeline
+- [Recipes](/rust/recipes/) — pipelines for common jobs
+- [Markdown plugins](/rust/markdown-plugins/), [HTML plugins](/rust/html-plugins/),
+  [MDX plugins](/rust/mdx-plugins/) and
+  [natural language plugins](/rust/natural-language-plugins/) — each plugin and its options

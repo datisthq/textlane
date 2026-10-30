@@ -99,7 +99,7 @@ function HeroActions() {
       <div className="mt-10 flex flex-wrap gap-3">
         <Link
           to="/$"
-          params={{ _splat: "python/introduction" }}
+          params={{ _splat: "python/overview" }}
           className={cn(
             buttonVariants({ variant: "default", size: "lg" }),
             "flex-1 px-3 no-underline sm:flex-none sm:px-5",
@@ -1089,7 +1089,7 @@ function FinalCta() {
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               to="/$"
-              params={{ _splat: "python/introduction" }}
+              params={{ _splat: "python/overview" }}
               className={cn(
                 buttonVariants({ variant: "default", size: "lg" }),
                 "px-5 no-underline",
