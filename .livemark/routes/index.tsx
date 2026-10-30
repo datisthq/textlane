@@ -354,10 +354,10 @@ function PortsCard(props: { slides: Slide[]; active: number }) {
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold tracking-[0.12em] text-primary uppercase">
-            Ported from unified
+            unified-compatible
           </p>
           <p className="mt-0.5 text-base font-semibold text-foreground">
-            AI-driven port of unified
+            Built by AI, in Rust
           </p>
         </div>
         <p className="shrink-0 text-right leading-none">
