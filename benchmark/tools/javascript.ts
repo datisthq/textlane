@@ -54,9 +54,14 @@ export function createJavascriptTool(props: {
       const manifest: { version: string } = JSON.parse(await readFile(path, "utf8"))
       return manifest.version
     },
-    createCommand: async (dataset, repeat) => ({
+    createCommand: async (dataset, repeat, flavor) => ({
       file: process.execPath,
-      args: [join(ADAPTERS, props.adapter), basename(dataset.path), String(repeat)],
+      args: [
+        join(ADAPTERS, props.adapter),
+        basename(dataset.path),
+        String(repeat),
+        flavor,
+      ],
     }),
   }
 }

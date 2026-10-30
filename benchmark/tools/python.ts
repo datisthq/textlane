@@ -57,12 +57,13 @@ export function createPythonTool(props: {
       ])
       return stdout.trim()
     },
-    createCommand: async (dataset, repeat) => ({
+    createCommand: async (dataset, repeat, flavor) => ({
       file: PYTHON,
       args: [
         join(PYTHON_ADAPTERS, props.adapter),
         basename(dataset.path),
         String(repeat),
+        flavor,
       ],
     }),
   }

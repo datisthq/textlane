@@ -1,20 +1,19 @@
 from textlane import html, md, textlane
 
-from common import run_adapter
-
-PROCESSOR = (
-    textlane()
-    .use(md.parse())
-    .use(md.gfm())
-    .use(md.to_html({"allowDangerousHtml": True}))
-    .use(html.stringify({"allowDangerousHtml": True}))
-    .freeze()
-)
+from common import is_gfm, run_adapter
 
 
-def convert(markdown: str) -> str:
-    return PROCESSOR.process_sync(markdown)["value"]
+def create_processor():
+    processor = textlane().use(md.parse())
+    if is_gfm():
+        processor = processor.use(md.gfm())
+    return (
+        processor.use(md.to_html({"allowDangerousHtml": True}))
+        .use(html.stringify({"allowDangerousHtml": True}))
+        .freeze()
+    )
 
 
 if __name__ == "__main__":
-    run_adapter(convert)
+    processor = create_processor()
+    run_adapter(lambda markdown: processor.process_sync(markdown)["value"])

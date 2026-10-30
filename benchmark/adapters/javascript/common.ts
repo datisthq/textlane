@@ -1,5 +1,8 @@
 import { readFileSync } from "node:fs"
 
+/** Whether the third argument, the case's flavor, asks for GFM. */
+export const isGfm = process.argv[4] === "gfm"
+
 /** Converts `<input> <repeat>` times and prints `{elapsedMs, outputBytes}`; imports are untimed. */
 export function runAdapter(convert: (markdown: string) => string) {
   const [path = "", repeat = "1"] = process.argv.slice(2)

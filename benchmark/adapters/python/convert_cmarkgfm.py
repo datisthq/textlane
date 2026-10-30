@@ -1,10 +1,12 @@
 import cmarkgfm
 from cmarkgfm.cmark import Options
-from common import run_adapter
-
-OPTIONS = Options.CMARK_OPT_UNSAFE | Options.CMARK_OPT_FOOTNOTES
+from common import is_gfm, run_adapter
 
 if __name__ == "__main__":
-    run_adapter(
-        lambda text: cmarkgfm.github_flavored_markdown_to_html(text, options=OPTIONS)
-    )
+    if is_gfm():
+        options = Options.CMARK_OPT_UNSAFE | Options.CMARK_OPT_FOOTNOTES
+        convert = cmarkgfm.github_flavored_markdown_to_html
+    else:
+        options = Options.CMARK_OPT_UNSAFE
+        convert = cmarkgfm.markdown_to_html
+    run_adapter(lambda text: convert(text, options=options))

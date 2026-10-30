@@ -38,9 +38,9 @@ export const textlaneTypescriptTool: Tool = {
   isTextlane: true,
   getVersion: readTextlaneVersion,
   // cargo is a no-op when the addon is fresh, and runs before the clock starts
-  createCommand: async (dataset, repeat) => {
+  createCommand: async (dataset, repeat, flavor) => {
     await buildAddon()
-    const command = await typescriptAdapter.createCommand(dataset, repeat)
+    const command = await typescriptAdapter.createCommand(dataset, repeat, flavor)
     return { ...command, env: { TEXTLANE_ADDON: ADDON_PATH } }
   },
 }

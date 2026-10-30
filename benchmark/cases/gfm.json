@@ -1,6 +1,7 @@
 {
-  "description": "Convert a README-like GFM document to HTML",
-  "profile": "readme",
+  "description": "Convert a README-like GFM document to HTML, with every library's GFM extensions on",
+  "profile": "readme-gfm",
+  "flavor": "gfm",
   "sizes": ["10KB", "1MB", "10MB"],
   "tools": {
     "10MB": [

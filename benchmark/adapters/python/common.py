@@ -4,9 +4,14 @@ import time
 from collections.abc import Callable
 
 
+def is_gfm() -> bool:
+    """Whether the third argument, the case's flavor, asks for GFM."""
+    return sys.argv[3:4] == ["gfm"]
+
+
 def run_adapter(convert: Callable[[str], str]) -> None:
     """Convert `<input> <repeat>` times and print `{elapsedMs, outputBytes}`; imports are untimed."""
-    _, path, repeat = sys.argv
+    path, repeat = sys.argv[1:3]
     with open(path, encoding="utf-8") as file:
         markdown = file.read()
     html = ""

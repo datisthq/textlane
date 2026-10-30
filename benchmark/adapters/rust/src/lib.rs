@@ -2,6 +2,11 @@ use std::error::Error;
 use std::time::Instant;
 use std::{env, fs};
 
+/// Whether the third argument, the case's flavor, asks for GFM.
+pub fn is_gfm() -> bool {
+    env::args().nth(3).as_deref() == Some("gfm")
+}
+
 /// Converts `<input> <repeat>` times and prints `{elapsedMs, outputBytes}`; setup is untimed.
 pub fn run_adapter(
     mut convert: impl FnMut(&str) -> Result<String, Box<dyn Error>>,

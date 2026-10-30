@@ -31,7 +31,7 @@ this skill is how to change it without making the numbers lie.
   `show:report`, so pass the run's own file (`show:report <path>`) when the page is regenerated
 - A full run takes about half an hour; unified and micromark dominate it and grow faster than
   their input, so keep the all-tool sizes at 1MB and the timeout at 180s. A larger size runs
-  only the fastest tools, listed under the case's `tools` (`realistic`'s 10MB, for memory)
+  only the fastest tools, listed under the case's `tools` (`cmark`'s and `gfm`'s 10MB, for memory)
 
 ## Layout
 
@@ -42,13 +42,13 @@ generated lives in its `.cache/` (gitignored repo-wide).
 
 ## The adapter contract
 
-An adapter takes `<document> <repeat>`, imports its library and reads the document untimed,
+An adapter takes `<document> <repeat> <flavor>`, imports its library and reads the document untimed,
 then converts `repeat` times and prints `{"elapsedMs", "outputBytes"}` last. The harness picks
-`repeat` so a run converts at least 8MB, and divides. Every library gets the same job:
-GFM, as most READMEs are written (tables, task lists, strikethrough, autolink literals,
-footnotes, through a plugin where the library has none built in), raw HTML passed through
-(`allowDangerousHtml`, `unsafe`, `html: true`). A GFM piece a library cannot do goes in its
-`caveats`. The `conformance` case's CommonMark edge cases run under the same GFM setup
+`repeat` so a run converts at least 8MB, and divides. Every library gets the same job, raw HTML
+passed through (`allowDangerousHtml`, `unsafe`, `html: true`), in the case's `flavor`:
+`commonmark` with no extension, or `gfm` (the `gfm` case), with tables, task lists,
+strikethrough, autolink literals and footnotes, through a plugin where the library has none
+built in. A GFM piece a library cannot do goes in its `caveats`
 
 ## Adding a library
 

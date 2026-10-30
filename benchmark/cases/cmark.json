@@ -1,0 +1,15 @@
+{
+  "description": "Convert a README-like CommonMark document to HTML",
+  "profile": "readme",
+  "sizes": ["10KB", "1MB", "10MB"],
+  "tools": {
+    "10MB": [
+      "textlane-rust",
+      "textlane-typescript",
+      "textlane-python",
+      "comrak",
+      "pulldown-cmark",
+      "cmark"
+    ]
+  }
+}

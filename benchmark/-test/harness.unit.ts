@@ -40,7 +40,7 @@ describe("renderReport", () => {
       machine: { cpu: "<cpu>", cpus: 8, memory: "16GB", os: "linux" },
       results: [
         {
-          case: "realistic",
+          case: "cmark",
           tool: "comrak",
           title: "comrak",
           language: "rust",

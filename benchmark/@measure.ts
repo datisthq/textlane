@@ -54,6 +54,7 @@ for (const benchmarkCase of await loadCases(values.case)) {
     for (const tool of tools) {
       const result = await measureTool({
         caseName: benchmarkCase.name,
+        flavor: benchmarkCase.flavor ?? "commonmark",
         tool,
         dataset,
         runs: Number(values.runs),

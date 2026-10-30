@@ -1,6 +1,7 @@
 import { dirname } from "node:path"
 import type { Dataset } from "../generate/generate.ts"
 import type { Language, Tool } from "../tools/types.ts"
+import type { Flavor } from "./case.ts"
 import { type Outcome, runCommand } from "./run.ts"
 
 export type Result = {
@@ -39,6 +40,7 @@ export async function measureTool(props: {
   caseName: string
   tool: Tool
   dataset: Dataset
+  flavor: Flavor
   runs: number
   warmup: number
   timeoutMs: number
@@ -53,7 +55,7 @@ export async function measureTool(props: {
   let stderr: string | undefined
 
   for (let index = 0; index < props.warmup + props.runs; index++) {
-    const command = await props.tool.createCommand(props.dataset, repeat)
+    const command = await props.tool.createCommand(props.dataset, repeat, props.flavor)
     const run = await runCommand(command, {
       cwd: dirname(props.dataset.path),
       timeoutMs: props.timeoutMs,

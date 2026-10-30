@@ -51,14 +51,14 @@ export function createRustTool(props: {
       return pattern.exec(lock)?.[1] ?? "unknown"
     },
     // cargo is a no-op when the build is fresh, and runs before the clock starts
-    createCommand: async (dataset, repeat) => {
+    createCommand: async (dataset, repeat, flavor) => {
       await promisify(execFile)("cargo", ["build", "--release", "--bin", props.binary], {
         cwd: RUST_ADAPTERS,
         maxBuffer: 64 * 1024 * 1024,
       })
       return {
         file: join(RUST_ADAPTERS, "target", "release", props.binary),
-        args: [basename(dataset.path), String(repeat)],
+        args: [basename(dataset.path), String(repeat), flavor],
       }
     },
   }

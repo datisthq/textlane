@@ -45,7 +45,7 @@ export function renderReport(report: Report) {
   <p class="eyebrow">Textlane benchmark</p>
   <h1>How fast does Markdown become HTML?</h1>
   <p class="lede">Textlane from Rust, Node.js and Python against ${rivals} other Markdown
-  libraries, each converting the same generated GFM document to HTML. Measured
+  libraries, each converting the same generated documents to HTML. Measured
   ${escapeHtml(report.measuredAt.slice(0, 10))} on ${escapeHtml(describeMachine(report.machine))}.</p>
 </header>
 ${groups.map(renderGroup).join("\n")}
@@ -136,7 +136,8 @@ function renderTools(results: Result[]) {
   const tools = new Map(results.map(result => [result.tool, result]))
   return `<section>
   <h2>What each library does</h2>
-  <p class="caption">Every library converts GFM to HTML with raw HTML passed through.
+  <p class="caption">Every library converts CommonMark, or GFM in the <code>gfm</code> case, to HTML with
+  raw HTML passed through.
   Differences from textlane, which builds an mdast tree, converts it to hast and serializes that:</p>
   <div class="table-wrap"><table>
     <thead><tr><th>Library</th><th>Version</th><th>Caveats</th></tr></thead>
@@ -155,8 +156,9 @@ function renderMethod() {
   <h2>Method</h2>
   <ul>
     <li>Documents are synthetic and seeded, so every library reads the same bytes. The
-    <code>realistic</code> case reads like a GFM README; <code>conformance</code> strings
-    together the CommonMark edge cases of textlane's conformance suite.</li>
+    <code>cmark</code> case reads like a README in CommonMark, <code>gfm</code> like one in
+    GFM with GFM on in every library; <code>cmark-full</code> strings together the
+    CommonMark edge cases of textlane's conformance suite.</li>
     <li>Each library runs as its own process and converts the document repeatedly, at least
     8 MB of input per run, so a small document is timed over many conversions. Time is clocked
     inside the process after imports and reading the file, and divided by the repeat count.</li>

@@ -2,8 +2,8 @@
 
 How fast, and in how much memory, textlane turns Markdown into HTML: its Rust crate, Node.js
 addon and Python extension side by side with other Markdown libraries, all converting the same
-generated GFM document, with tables, task lists, strikethrough, autolink literals and
-footnotes switched on in each:
+generated document, as CommonMark or, in the `gfm` case, as GFM with tables, task lists,
+strikethrough, autolink literals and footnotes switched on in each. Under GFM:
 
 | tool                      | how it runs                                                                            |
 | ------------------------- | -------------------------------------------------------------------------------------- |
@@ -27,6 +27,10 @@ The adapters live in `adapters/`: `javascript/` beside this package's pinned npm
 rival reaches the published packages. Linux only: memory is the peak
 anonymous memory of the process, sampled from `/proc`, and the cap comes from `systemd-run`.
 
+Under CommonMark each runs with no extension: textlane and unified without `md.gfm` and
+`remark-gfm`, markdown-it and markdown-it-py with the `commonmark` preset, marked with GFM off,
+cmark through `markdown_to_html`, the rest with their default options.
+
 Time leaves out start-up: every adapter imports its library and reads the document, then starts
 its clock, converts the document `repeat` times (at least 8MB of input per run) and prints
 `{"elapsedMs", "outputBytes"}`. The report shows the time per document.
@@ -35,7 +39,7 @@ its clock, converts the document `repeat` times (at least 8MB of input per run) 
 
 ```bash
 pnpm -C benchmark setup:tools                    # uv sync, the addon and wheel, the Rust adapters
-pnpm -C benchmark measure --case realistic --size 1MB
+pnpm -C benchmark measure --case gfm --size 1MB
 pnpm -C benchmark show:report                    # .cache/report.html
 ```
 
@@ -59,18 +63,27 @@ Every document is generated from a seed, so each tool reads identical bytes, and
 `.cache/data/` until its profile, version, size or seed changes. A size is a byte target such
 as `10KB`. A profile in `profiles/` writes one block of Markdown at a time:
 
-- `readme` — a README in GFM: headings, paragraphs with emphasis, code spans, links,
-  strikethrough, autolink literals and footnotes, lists, task lists, tables, block quotes, fenced code
+- `readme` — a README in CommonMark: headings, paragraphs with emphasis, code spans and links,
+  lists, block quotes, fenced code
+- `readme-gfm` — the same README in GFM, adding strikethrough, autolink literals, footnotes,
+  task lists and tables
 - `conformance` — the plain CommonMark inputs of `conformance/tests/md/`, back to back and split by
   thematic breaks; snippets that would swallow the rest (an unclosed fence or raw HTML block, a
   reference definition) are left out
 
-A case in `cases/` picks a profile and its sizes, and `tools` can narrow a size to a few tools:
-`realistic` (the `readme` profile) runs 10MB only for the six fastest, to show their memory on
-a large document.
+A case in `cases/` picks a profile, its sizes and its `flavor` (`commonmark` unless it says
+`gfm`), which the harness hands each adapter as its third argument; `tools` can narrow a size to
+a few tools:
+
+- `cmark` — the `readme` profile as CommonMark
+- `gfm` — the `readme-gfm` profile as GFM
+- `cmark-full` — the `conformance` profile as CommonMark: every edge case of the spec
+
+`cmark` and `gfm` run 10MB only for the six fastest, to show their memory on a large
+document.
 
 ## Correctness
 
-There is no gate yet. Every library renders GFM slightly differently (textlane matches
+There is no gate yet. Every library renders Markdown slightly differently (textlane matches
 unified byte for byte), so the report shows each one's HTML size: one far from the others
 renders the document differently, and its time is not like for like.
