@@ -1,4 +1,5 @@
 title: Textlane
+logo: /logo.svg
 description:
   en: Design notes, decisions and research for people
 links:
@@ -9,3 +10,4 @@ sections:
   - title: Notes
     prefix: /
     icon: notebook-pen
+    siteTitle: Textlane/Internal
