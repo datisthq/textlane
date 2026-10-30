@@ -3,7 +3,7 @@ import { defineConfig } from "livemark"
 export default defineConfig({
   site: "https://textlane.dev",
   title: "Textlane",
-  description: "Fast Markdown pipeline",
+  description: "Fast text pipeline",
   logo: "/logo.svg",
   favicon: "/logo.png",
   include: [
