@@ -365,7 +365,7 @@ function PortsCard(props: { slides: Slide[]; active: number }) {
             100×
           </span>
           <span className="mt-1 block text-[0.625rem] tracking-wide text-muted-foreground uppercase">
-            faster
+            faster with Rust core
           </span>
         </p>
       </div>
