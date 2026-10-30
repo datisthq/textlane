@@ -10,6 +10,22 @@ pub fn version() -> &'static str {
     crate::read_version()
 }
 
+/// The most memory, in bytes, each thread keeps after a document to reuse for the next.
+#[napi]
+pub fn retained_memory() -> i64 {
+    i64::try_from(crate::read_retained_memory()).unwrap_or(i64::MAX)
+}
+
+/// Cap the memory, in bytes, each thread keeps after a document; `0` keeps none.
+#[napi]
+pub fn set_retained_memory(bytes: i64) -> napi::Result<()> {
+    let bytes = usize::try_from(bytes).map_err(|_| {
+        napi::Error::new(napi::Status::InvalidArg, "bytes must not be negative")
+    })?;
+    crate::set_retained_memory(bytes);
+    Ok(())
+}
+
 /// The name of every public plugin, as a pipeline names it.
 #[napi]
 pub fn plugin_names() -> Vec<String> {

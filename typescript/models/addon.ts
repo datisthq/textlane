@@ -19,5 +19,7 @@ export interface NativePipeline {
 export interface Addon {
   version(): string
   pluginNames(): string[]
+  retainedMemory(): number
+  setRetainedMemory(bytes: number): void
   Pipeline: new () => NativePipeline
 }

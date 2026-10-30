@@ -138,3 +138,12 @@ def test_domain_modules_list_every_plugin():
 
 def test_reports_the_version():
     assert textlane.version().count(".") == 2
+
+
+def test_reads_back_the_retained_memory():
+    assert textlane.retained_memory() == 256 * 1024**2
+    textlane.set_retained_memory(0)
+    assert textlane.retained_memory() == 0
+    textlane.set_retained_memory(256 * 1024**2)
+    with pytest.raises(OverflowError):
+        textlane.set_retained_memory(-1)

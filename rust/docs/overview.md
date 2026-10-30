@@ -32,3 +32,15 @@ Textlane is pre-release. In Rust, `Processor::new().with(plugin)` builds a typed
 the Node.js and Python packages drive `textlane::Pipeline`, which takes plugins by name with
 JSON options and follows unified's `use`, `data` and `freeze`. JavaScript and Python plugins
 cannot join a pipeline yet.
+
+## Memory
+
+Each thread keeps the working memory a document's trees were built in, emptied, for the next
+document, up to 256 MB; a document that needs more has its memory freed once it finishes.
+Documents of several megabytes need more than that, so raise the cap for them, or lower it
+when idle memory matters more than speed. It applies to every processor in the process, and
+`textlane::read_retained_memory()` reads it back.
+
+```rust
+textlane::set_retained_memory(512 << 20);
+```

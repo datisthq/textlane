@@ -20,6 +20,18 @@ mod native {
         crate::read_version()
     }
 
+    /// The most memory, in bytes, each thread keeps after a document to reuse for the next.
+    #[pyfunction]
+    fn retained_memory() -> usize {
+        crate::read_retained_memory()
+    }
+
+    /// Cap the memory, in bytes, each thread keeps after a document; `0` keeps none.
+    #[pyfunction]
+    fn set_retained_memory(bytes: usize) {
+        crate::set_retained_memory(bytes);
+    }
+
     /// The name of every public plugin, as a pipeline names it.
     #[pyfunction]
     fn plugin_names() -> Vec<&'static str> {

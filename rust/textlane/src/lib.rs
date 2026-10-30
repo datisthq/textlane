@@ -16,6 +16,10 @@ mod actions {
     pub(crate) mod file {
         pub(crate) mod write;
     }
+    pub(crate) mod memory {
+        pub(crate) mod read;
+        pub(crate) mod set;
+    }
     pub(crate) mod package {
         pub(crate) mod version;
     }
@@ -47,6 +51,8 @@ mod bindings {
 #[cfg(feature = "testing")]
 pub use actions::case::run::run_case;
 pub use actions::file::write::write_file;
+pub use actions::memory::read::read_retained_memory;
+pub use actions::memory::set::set_retained_memory;
 pub use actions::package::version::read_version;
 #[cfg(feature = "schema")]
 pub use actions::plugin::describe::describe_plugins;

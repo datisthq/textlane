@@ -78,10 +78,12 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   token. Time
   growth in release mode, best of several runs: single debug timings are noisy.
 - `process` takes the thread's last arena, reset, from `with_allocator`
-  (`textlane/src/actions/allocator/reuse.rs`, up to 64 MB kept), as glibc hands large freed
-  buffers back and faults them in again. An arena never frees a vector it outgrew, so trees
+  (`textlane/src/actions/allocator/reuse.rs`), as glibc hands large freed buffers back and
+  faults them in again. It keeps what `reset` leaves (the largest chunk) up to
+  `set_retained_memory`, 256 MB by default; trees take 15–75 bytes per input byte, so a
+  64 MB cap dropped the arena of a 4 MB document every time and cost it 22–45%. An arena never frees a vector it outgrew, so trees
   are built at their exact size where it is known, and `md.toHtml` gives wrapped parents
-  room for their line endings up front (`wrap` works in place); an arena past 64 MB is
+  room for their line endings up front (`wrap` works in place); an arena past the cap is
   dropped and faulted in again per document. Scan bytes with `memchr`, never
   `slice.contains` per byte. Count faults with `/usr/bin/time -f %R` beside the timing;
   the pprof harness must not blocklist `libc`, or malloc, free and memcpy vanish from it.

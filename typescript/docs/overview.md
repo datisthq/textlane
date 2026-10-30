@@ -40,3 +40,17 @@ import * as md from "textlane/md"
 const file = await textlane().use(md.parse()).use(md.toHtml()).use(html.stringify()).process("# hi")
 file.value // "<h1>hi</h1>"
 ```
+
+## Memory
+
+Each thread keeps the working memory a document's trees were built in, emptied, for the next
+document, up to 256 MB; a document that needs more has its memory freed once it finishes.
+Documents of several megabytes need more than that, so raise the cap for them, or lower it
+when idle memory matters more than speed. It applies to every processor in the process, and
+`retainedMemory()` reads it back.
+
+```js
+import { setRetainedMemory } from "textlane"
+
+setRetainedMemory(512 * 1024 ** 2)
+```

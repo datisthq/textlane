@@ -28,3 +28,12 @@ export const version = addon.version
 
 /** The name of every native plugin, as a pipeline names it. */
 export const pluginNames = addon.pluginNames
+
+/** The most memory, in bytes, each thread keeps after a document to reuse for the next. */
+export const retainedMemory = addon.retainedMemory
+
+/**
+ * Cap the memory, in bytes, each thread keeps after a document; `0` keeps none. The
+ * default is 256 MB.
+ */
+export const setRetainedMemory = addon.setRetainedMemory

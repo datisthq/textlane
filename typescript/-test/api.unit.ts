@@ -44,6 +44,16 @@ afterAll(() => {
   if (addonDir) rmSync(addonDir, { recursive: true, force: true })
 })
 
+describe("retained memory", () => {
+  it("reads back what was set, 256 MB by default", () => {
+    expect(entry.retainedMemory()).toBe(256 * 1024 ** 2)
+    entry.setRetainedMemory(0)
+    expect(entry.retainedMemory()).toBe(0)
+    entry.setRetainedMemory(256 * 1024 ** 2)
+    expect(() => entry.setRetainedMemory(-1)).toThrow()
+  })
+})
+
 describe("conformance through the public API", () => {
   for (const file of listFiles(TESTS)) {
     const id = relative(TESTS, file)

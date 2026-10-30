@@ -39,3 +39,17 @@ from textlane import html, md, textlane
 file = textlane().use(md.parse()).use(md.to_html()).use(html.stringify()).process_sync("# hi")
 file["value"]  # "<h1>hi</h1>"
 ```
+
+## Memory
+
+Each thread keeps the working memory a document's trees were built in, emptied, for the next
+document, up to 256 MB; a document that needs more has its memory freed once it finishes.
+Documents of several megabytes need more than that, so raise the cap for them, or lower it
+when idle memory matters more than speed. It applies to every processor in the process, and
+`textlane.retained_memory()` reads it back.
+
+```python
+import textlane
+
+textlane.set_retained_memory(512 * 1024**2)
+```

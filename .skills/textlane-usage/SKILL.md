@@ -102,6 +102,17 @@ let processor = Processor::new()
 let output = processor.process("# hi")?; // output.value, output.file.messages
 ```
 
+## Memory
+
+A document's trees are built in working memory that each thread keeps afterwards, emptied, so
+the next document reuses it instead of asking the system again. At most 256 MB is kept per
+thread; a larger document's memory is freed once it finishes. Change the cap, in bytes, with
+`setRetainedMemory(bytes)` (Node.js), `textlane.set_retained_memory(bytes)` (Python) or
+`textlane::set_retained_memory(bytes)` (Rust), and read it back with `retainedMemory()`,
+`textlane.retained_memory()` or `textlane::read_retained_memory()`. It applies to every
+processor in the process. Raise it for documents of several megabytes, which need more
+than 256 MB of working memory; lower it, or set `0`, when idle memory matters more than speed.
+
 ## Errors
 
 Failures raise an `Error` (Node.js) or `textlane.TextlaneError` (Python) whose `code` names

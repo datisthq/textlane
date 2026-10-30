@@ -2,7 +2,13 @@
 
 from . import html, md, mdx, nl
 from ._models import Message, Place, Plugin, Point, VFile
-from ._native import TextlaneError, plugin_names, version
+from ._native import (
+    TextlaneError,
+    plugin_names,
+    retained_memory,
+    set_retained_memory,
+    version,
+)
 from ._processor import Processor, textlane
 
 __all__ = [
@@ -18,6 +24,8 @@ __all__ = [
     "mdx",
     "plugin_names",
     "nl",
+    "retained_memory",
+    "set_retained_memory",
     "textlane",
     "version",
 ]
