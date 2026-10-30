@@ -357,7 +357,7 @@ function PortsCard(props: { slides: Slide[]; active: number }) {
             unified-compatible
           </p>
           <p className="mt-0.5 text-base font-semibold text-foreground">
-            Built by AI, in Rust
+            Built with AI, in Rust
           </p>
         </div>
         <p className="shrink-0 text-right leading-none">
