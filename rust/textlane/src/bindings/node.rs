@@ -143,12 +143,20 @@ impl Pipeline {
     }
 
     #[napi]
-    pub fn process(&mut self, text: String, path: Option<String>) -> Result<Value> {
+    pub fn process(
+        &mut self,
+        text: String,
+        path: Option<String>,
+    ) -> Result<ProcessedFile> {
         self.process_with(&text, path, Api::Async)
     }
 
     #[napi]
-    pub fn process_sync(&mut self, text: String, path: Option<String>) -> Result<Value> {
+    pub fn process_sync(
+        &mut self,
+        text: String,
+        path: Option<String>,
+    ) -> Result<ProcessedFile> {
         self.process_with(&text, path, Api::Sync)
     }
 
@@ -170,14 +178,27 @@ impl Pipeline {
         text: &str,
         path: Option<String>,
         api: Api,
-    ) -> Result<Value> {
+    ) -> Result<ProcessedFile> {
         let mut file = File {
             path,
             ..File::new()
         };
         let value = self.inner.process(text, &mut file, api).map_err(throw)?;
-        Ok(crate::write_file(&file, &value))
+        Ok(ProcessedFile {
+            value,
+            messages: crate::write_messages(&file.messages),
+            data: Value::Object(file.data),
+        })
     }
+}
+
+/// A processed document: its text, messages and data. A typed object rather than a JSON
+/// value, so the text is not copied once more on its way to JavaScript.
+#[napi(object)]
+pub struct ProcessedFile {
+    pub value: String,
+    pub messages: Value,
+    pub data: Value,
 }
 
 /// The crate's `Progress`: a run paused before host plugins until `resume`, then finished.
