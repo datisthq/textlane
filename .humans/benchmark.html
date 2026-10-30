@@ -46,33 +46,33 @@
 <h1>Benchmark</h1>
 <p>
   Markdown to HTML, measured 2026-10-30 on an AMD Ryzen 5 PRO 7545U, 12 threads, 30 GB
-  RAM, Linux 7.0, textlane at commit <code>4b8f1ae</code>. Three cases:
+  RAM, Linux 7.0, textlane at commit <code>0581318</code>. Three cases:
   <code>cmark</code>, a README in CommonMark; <code>gfm</code>, a README in GFM with every
   library's GFM extensions on; <code>cmark-full</code>, the CommonMark edge cases of the
   conformance suite. Raw HTML passes through; median of five runs after one warmup, the
-  tools taking turns run by run. Other jobs kept the machine busy (load average 5–6),
-  which narrows the gaps between the fastest: on an idle machine comrak led textlane by
-  1.66× and cmark by 1.37× on the 1 MB README. Source:
+  tools taking turns run by run, on an idle machine. marked, markdown-it, micromark and
+  unified ran just after the others, with other jobs loading the machine (load average
+  3–4), so their figures are if anything low. Source:
   <code>pnpm -C benchmark measure</code>; the method is in
   <code>benchmark/README.md</code>.
 </p>
 
 <htmlpress-grid cols="4">
   <htmlpress-card>
-    <h3>~50 MB/s</h3>
-    <p>textlane on the 1 MB README, within 15% from Rust, Node.js and Python</p>
+    <h3>~70 MB/s</h3>
+    <p>textlane on the 1 MB README, within 16% from Rust, Node.js and Python</p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>Over 90× unified</h3>
+    <h3>Over 100× unified</h3>
     <p>and micromark, the JavaScript pipeline textlane replaces</p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>3.6× marked</h3>
-    <p>4× markdown-it and 13× markdown-rs on the README</p>
+    <h3>4.4× marked</h3>
+    <p>5× markdown-it and 14× markdown-rs on the README</p>
   </htmlpress-card>
   <htmlpress-card>
-    <h3>1.3× behind comrak</h3>
-    <p>and cmark on the README (1.4–1.7× idle), 3.7× behind pulldown-cmark</p>
+    <h3>1.6× behind comrak</h3>
+    <p>1.4× behind cmark on the README, 3.8× behind pulldown-cmark</p>
   </htmlpress-card>
 </htmlpress-grid>
 
@@ -81,64 +81,64 @@
   <svg
     viewBox="0 0 760 400"
     role="img"
-    aria-label="Megabytes of CommonMark converted per second on a 1 MB README-like document; pulldown-cmark 194.7, cmark (C, via cmarkgfm) 68.6, comrak 66.8, textlane (Rust) 52.5, textlane (Node.js) 47.0, textlane (Python) 46.5, marked 14.6, markdown-it 13.2, markdown-rs 4.2, mistune 3.7, Python-Markdown 2.6, markdown-it-py 2.5, micromark 0.6, unified (remark + rehype) 0.5"
+    aria-label="Megabytes of CommonMark converted per second on a 1 MB README-like document; pulldown-cmark 286.7, comrak 119.8, cmark (C, via cmarkgfm) 104.1, textlane (Rust) 75.0, textlane (Node.js) 66.9, textlane (Python) 63.1, marked 17.0, markdown-it 14.3, markdown-rs 5.2, mistune 4.7, markdown-it-py 3.4, Python-Markdown 3.1, micromark 0.7, unified (remark + rehype) 0.7"
   >
     <text class="name" x="188" y="23" text-anchor="end">pulldown-cmark</text>
     <rect class="track" x="200" y="8" width="480" height="20" rx="4" />
     <rect class="bar rival" x="200" y="8" width="480" height="20" rx="4" />
-    <text class="value" x="686" y="23">194.7 MB/s</text>
-    <text class="name" x="188" y="51" text-anchor="end">cmark (C, via cmarkgfm)</text>
+    <text class="value" x="686" y="23">286.7 MB/s</text>
+    <text class="name" x="188" y="51" text-anchor="end">comrak</text>
     <rect class="track" x="200" y="36" width="480" height="20" rx="4" />
-    <rect class="bar rival" x="200" y="36" width="169" height="20" rx="4" />
-    <text class="value" x="375" y="51">68.6 MB/s</text>
-    <text class="name" x="188" y="79" text-anchor="end">comrak</text>
+    <rect class="bar rival" x="200" y="36" width="201" height="20" rx="4" />
+    <text class="value" x="407" y="51">119.8 MB/s</text>
+    <text class="name" x="188" y="79" text-anchor="end">cmark (C, via cmarkgfm)</text>
     <rect class="track" x="200" y="64" width="480" height="20" rx="4" />
-    <rect class="bar rival" x="200" y="64" width="165" height="20" rx="4" />
-    <text class="value" x="371" y="79">66.8 MB/s</text>
+    <rect class="bar rival" x="200" y="64" width="174" height="20" rx="4" />
+    <text class="value" x="380" y="79">104.1 MB/s</text>
     <text class="name" x="188" y="107" text-anchor="end">textlane (Rust)</text>
     <rect class="track" x="200" y="92" width="480" height="20" rx="4" />
-    <rect class="bar" x="200" y="92" width="130" height="20" rx="4" />
-    <text class="value" x="336" y="107">52.5 MB/s</text>
+    <rect class="bar" x="200" y="92" width="126" height="20" rx="4" />
+    <text class="value" x="332" y="107">75.0 MB/s</text>
     <text class="name" x="188" y="135" text-anchor="end">textlane (Node.js)</text>
     <rect class="track" x="200" y="120" width="480" height="20" rx="4" />
-    <rect class="bar" x="200" y="120" width="116" height="20" rx="4" />
-    <text class="value" x="322" y="135">47.0 MB/s</text>
+    <rect class="bar" x="200" y="120" width="112" height="20" rx="4" />
+    <text class="value" x="318" y="135">66.9 MB/s</text>
     <text class="name" x="188" y="163" text-anchor="end">textlane (Python)</text>
     <rect class="track" x="200" y="148" width="480" height="20" rx="4" />
-    <rect class="bar" x="200" y="148" width="115" height="20" rx="4" />
-    <text class="value" x="321" y="163">46.5 MB/s</text>
+    <rect class="bar" x="200" y="148" width="106" height="20" rx="4" />
+    <text class="value" x="312" y="163">63.1 MB/s</text>
     <text class="name" x="188" y="191" text-anchor="end">marked</text>
     <rect class="track" x="200" y="176" width="480" height="20" rx="4" />
-    <rect class="bar rival" x="200" y="176" width="36" height="20" rx="4" />
-    <text class="value" x="242" y="191">14.6 MB/s</text>
+    <rect class="bar rival" x="200" y="176" width="28" height="20" rx="4" />
+    <text class="value" x="234" y="191">17.0 MB/s</text>
     <text class="name" x="188" y="219" text-anchor="end">markdown-it</text>
     <rect class="track" x="200" y="204" width="480" height="20" rx="4" />
-    <rect class="bar rival" x="200" y="204" width="33" height="20" rx="4" />
-    <text class="value" x="239" y="219">13.2 MB/s</text>
+    <rect class="bar rival" x="200" y="204" width="24" height="20" rx="4" />
+    <text class="value" x="230" y="219">14.3 MB/s</text>
     <text class="name" x="188" y="247" text-anchor="end">markdown-rs</text>
     <rect class="track" x="200" y="232" width="480" height="20" rx="4" />
-    <rect class="bar rival" x="200" y="232" width="10" height="20" rx="4" />
-    <text class="value" x="216" y="247">4.2 MB/s</text>
+    <rect class="bar rival" x="200" y="232" width="9" height="20" rx="4" />
+    <text class="value" x="215" y="247">5.2 MB/s</text>
     <text class="name" x="188" y="275" text-anchor="end">mistune</text>
     <rect class="track" x="200" y="260" width="480" height="20" rx="4" />
-    <rect class="bar rival" x="200" y="260" width="9" height="20" rx="4" />
-    <text class="value" x="215" y="275">3.7 MB/s</text>
-    <text class="name" x="188" y="303" text-anchor="end">Python-Markdown</text>
+    <rect class="bar rival" x="200" y="260" width="8" height="20" rx="4" />
+    <text class="value" x="214" y="275">4.7 MB/s</text>
+    <text class="name" x="188" y="303" text-anchor="end">markdown-it-py</text>
     <rect class="track" x="200" y="288" width="480" height="20" rx="4" />
-    <rect class="bar rival" x="200" y="288" width="7" height="20" rx="4" />
-    <text class="value" x="213" y="303">2.6 MB/s</text>
-    <text class="name" x="188" y="331" text-anchor="end">markdown-it-py</text>
+    <rect class="bar rival" x="200" y="288" width="6" height="20" rx="4" />
+    <text class="value" x="212" y="303">3.4 MB/s</text>
+    <text class="name" x="188" y="331" text-anchor="end">Python-Markdown</text>
     <rect class="track" x="200" y="316" width="480" height="20" rx="4" />
-    <rect class="bar rival" x="200" y="316" width="6" height="20" rx="4" />
-    <text class="value" x="212" y="331">2.5 MB/s</text>
+    <rect class="bar rival" x="200" y="316" width="5" height="20" rx="4" />
+    <text class="value" x="211" y="331">3.1 MB/s</text>
     <text class="name" x="188" y="359" text-anchor="end">micromark</text>
     <rect class="track" x="200" y="344" width="480" height="20" rx="4" />
     <rect class="bar rival" x="200" y="344" width="2" height="20" rx="4" />
-    <text class="value" x="208" y="359">0.6 MB/s</text>
+    <text class="value" x="208" y="359">0.7 MB/s</text>
     <text class="name" x="188" y="387" text-anchor="end">unified (remark + rehype)</text>
     <rect class="track" x="200" y="372" width="480" height="20" rx="4" />
     <rect class="bar rival" x="200" y="372" width="2" height="20" rx="4" />
-    <text class="value" x="208" y="387">0.5 MB/s</text>
+    <text class="value" x="208" y="387">0.7 MB/s</text>
   </svg>
   <figcaption>
     Input megabytes per second at the median; textlane in the accent colour.
@@ -160,7 +160,7 @@
   <dt>Against its own family</dt>
   <dd>
     unified, micromark and markdown-rs build the same trees through micromark's event
-    engine; textlane is 13× markdown-rs and over 90× unified on the 1 MB README, and
+    engine; textlane is 14× markdown-rs and over 100× unified on the 1 MB README, and
     unified and micromark time out on 1 MB of edge cases.
   </dd>
   <dt>Against the fastest</dt>
@@ -168,17 +168,17 @@
     comrak and cmark build a tree too, but render HTML from it directly; pulldown-cmark
     streams events and builds none. The gap is the same on CommonMark and GFM: building
     and walking hast is about half of textlane's time, and the time follows node size. On
-    1 MB of edge cases textlane is level with comrak and cmark.
+    1 MB of edge cases textlane is level with comrak and cmark, slightly ahead.
   </dd>
   <dt>GFM</dt>
   <dd>
-    With GFM on, textlane stays level with cmark and 1.5× behind comrak; tables slow
+    With GFM on, textlane stays level with cmark and 1.7× behind comrak; tables slow
     comrak as much as textlane, so no GFM construct stands out.
   </dd>
   <dt>Memory at 10 MB</dt>
   <dd>
-    The six fastest run a 10 MB README too: textlane peaks at 170–210 MB on CommonMark and
-    290–330 MB on GFM, against 114 and 154 MB for comrak, 148 and 225 MB for cmark and
+    The six fastest run a 10 MB README too: textlane peaks at 170–220 MB on CommonMark and
+    290–320 MB on GFM, against 114 and 154 MB for comrak, 139 and 223 MB for cmark and
     under 50 MB for pulldown-cmark.
   </dd>
   <dt>Same output as unified</dt>
@@ -210,100 +210,100 @@
       <tr>
         <td>pulldown-cmark</td>
         <td>Rust</td>
-        <td>38 µs</td>
-        <td>264.2 MB/s</td>
+        <td>27 µs</td>
+        <td>378.6 MB/s</td>
         <td>–</td>
-      </tr>
-      <tr>
-        <td><strong>textlane (Rust)</strong></td>
-        <td>Rust</td>
-        <td>74 µs</td>
-        <td>136.6 MB/s</td>
-        <td>1 MB</td>
       </tr>
       <tr>
         <td>comrak</td>
         <td>Rust</td>
-        <td>80 µs</td>
-        <td>125.8 MB/s</td>
+        <td>59 µs</td>
+        <td>172.0 MB/s</td>
         <td>1 MB</td>
       </tr>
       <tr>
-        <td>cmark (C, via cmarkgfm)</td>
-        <td>Python</td>
-        <td>96 µs</td>
-        <td>105.1 MB/s</td>
-        <td>16 MB</td>
-      </tr>
-      <tr>
-        <td><strong>textlane (Python)</strong></td>
-        <td>Python</td>
-        <td>100 µs</td>
-        <td>101.2 MB/s</td>
-        <td>7 MB</td>
+        <td><strong>textlane (Rust)</strong></td>
+        <td>Rust</td>
+        <td>62 µs</td>
+        <td>163.7 MB/s</td>
+        <td>1 MB</td>
       </tr>
       <tr>
         <td><strong>textlane (Node.js)</strong></td>
         <td>Node.js</td>
-        <td>108 µs</td>
-        <td>93.0 MB/s</td>
-        <td>38 MB</td>
+        <td>74 µs</td>
+        <td>136.3 MB/s</td>
+        <td>41 MB</td>
       </tr>
       <tr>
-        <td>markdown-it</td>
-        <td>Node.js</td>
-        <td>662 µs</td>
-        <td>15.2 MB/s</td>
-        <td>49 MB</td>
+        <td>cmark (C, via cmarkgfm)</td>
+        <td>Python</td>
+        <td>77 µs</td>
+        <td>130.2 MB/s</td>
+        <td>11 MB</td>
+      </tr>
+      <tr>
+        <td><strong>textlane (Python)</strong></td>
+        <td>Python</td>
+        <td>83 µs</td>
+        <td>121.7 MB/s</td>
+        <td>8 MB</td>
       </tr>
       <tr>
         <td>marked</td>
         <td>Node.js</td>
-        <td>862 µs</td>
-        <td>11.7 MB/s</td>
+        <td>455 µs</td>
+        <td>22.1 MB/s</td>
         <td>48 MB</td>
+      </tr>
+      <tr>
+        <td>markdown-it</td>
+        <td>Node.js</td>
+        <td>616 µs</td>
+        <td>16.4 MB/s</td>
+        <td>50 MB</td>
       </tr>
       <tr>
         <td>markdown-rs</td>
         <td>Rust</td>
-        <td>1.68 ms</td>
-        <td>6.0 MB/s</td>
+        <td>1.10 ms</td>
+        <td>9.2 MB/s</td>
         <td>1 MB</td>
       </tr>
       <tr>
         <td>mistune</td>
         <td>Python</td>
-        <td>2.77 ms</td>
-        <td>3.6 MB/s</td>
+        <td>2.11 ms</td>
+        <td>4.8 MB/s</td>
         <td>8 MB</td>
-      </tr>
-      <tr>
-        <td>micromark</td>
-        <td>Node.js</td>
-        <td>3.92 ms</td>
-        <td>2.6 MB/s</td>
-        <td>201 MB</td>
-      </tr>
-      <tr>
-        <td>Python-Markdown</td>
-        <td>Python</td>
-        <td>4.10 ms</td>
-        <td>2.5 MB/s</td>
-        <td>7 MB</td>
-      </tr>
-      <tr>
-        <td>unified (remark + rehype)</td>
-        <td>Node.js</td>
-        <td>4.29 ms</td>
-        <td>2.3 MB/s</td>
-        <td>206 MB</td>
       </tr>
       <tr>
         <td>markdown-it-py</td>
         <td>Python</td>
-        <td>4.35 ms</td>
-        <td>2.3 MB/s</td>
+        <td>2.79 ms</td>
+        <td>3.6 MB/s</td>
         <td>10 MB</td>
+      </tr>
+      <tr>
+        <td>Python-Markdown</td>
+        <td>Python</td>
+        <td>3.37 ms</td>
+        <td>3.0 MB/s</td>
+        <td>7 MB</td>
+      </tr>
+      <tr>
+        <td>micromark</td>
+        <td>Node.js</td>
+        <td>4.33 ms</td>
+        <td>2.3 MB/s</td>
+        <td>201 MB</td>
+      </tr>
+      <tr>
+        <td>unified (remark + rehype)</td>
+        <td>Node.js</td>
+        <td>5.07 ms</td>
+        <td>2.0 MB/s</td>
+        <td>207 MB</td>
       </tr>
     </tbody>
   </table>
@@ -325,100 +325,100 @@
       <tr>
         <td>pulldown-cmark</td>
         <td>Rust</td>
-        <td>5.14 ms</td>
-        <td>194.7 MB/s</td>
+        <td>3.49 ms</td>
+        <td>286.7 MB/s</td>
         <td>–</td>
-      </tr>
-      <tr>
-        <td>cmark (C, via cmarkgfm)</td>
-        <td>Python</td>
-        <td>14.6 ms</td>
-        <td>68.6 MB/s</td>
-        <td>30 MB</td>
       </tr>
       <tr>
         <td>comrak</td>
         <td>Rust</td>
-        <td>15.0 ms</td>
-        <td>66.8 MB/s</td>
-        <td>18 MB</td>
+        <td>8.35 ms</td>
+        <td>119.8 MB/s</td>
+        <td>16 MB</td>
+      </tr>
+      <tr>
+        <td>cmark (C, via cmarkgfm)</td>
+        <td>Python</td>
+        <td>9.60 ms</td>
+        <td>104.1 MB/s</td>
+        <td>23 MB</td>
       </tr>
       <tr>
         <td><strong>textlane (Rust)</strong></td>
         <td>Rust</td>
-        <td>19.0 ms</td>
-        <td>52.5 MB/s</td>
+        <td>13.3 ms</td>
+        <td>75.0 MB/s</td>
         <td>22 MB</td>
       </tr>
       <tr>
         <td><strong>textlane (Node.js)</strong></td>
         <td>Node.js</td>
-        <td>21.3 ms</td>
-        <td>47.0 MB/s</td>
-        <td>60 MB</td>
+        <td>14.9 ms</td>
+        <td>66.9 MB/s</td>
+        <td>62 MB</td>
       </tr>
       <tr>
         <td><strong>textlane (Python)</strong></td>
         <td>Python</td>
-        <td>21.5 ms</td>
-        <td>46.5 MB/s</td>
+        <td>15.8 ms</td>
+        <td>63.1 MB/s</td>
         <td>31 MB</td>
       </tr>
       <tr>
         <td>marked</td>
         <td>Node.js</td>
-        <td>68.4 ms</td>
-        <td>14.6 MB/s</td>
-        <td>182 MB</td>
+        <td>58.8 ms</td>
+        <td>17.0 MB/s</td>
+        <td>178 MB</td>
       </tr>
       <tr>
         <td>markdown-it</td>
         <td>Node.js</td>
-        <td>75.6 ms</td>
-        <td>13.2 MB/s</td>
+        <td>69.9 ms</td>
+        <td>14.3 MB/s</td>
         <td>239 MB</td>
       </tr>
       <tr>
         <td>markdown-rs</td>
         <td>Rust</td>
-        <td>240 ms</td>
-        <td>4.2 MB/s</td>
+        <td>191 ms</td>
+        <td>5.2 MB/s</td>
         <td>71 MB</td>
       </tr>
       <tr>
         <td>mistune</td>
         <td>Python</td>
-        <td>269 ms</td>
-        <td>3.7 MB/s</td>
-        <td>25 MB</td>
-      </tr>
-      <tr>
-        <td>Python-Markdown</td>
-        <td>Python</td>
-        <td>378 ms</td>
-        <td>2.6 MB/s</td>
+        <td>211 ms</td>
+        <td>4.7 MB/s</td>
         <td>25 MB</td>
       </tr>
       <tr>
         <td>markdown-it-py</td>
         <td>Python</td>
-        <td>396 ms</td>
-        <td>2.5 MB/s</td>
+        <td>294 ms</td>
+        <td>3.4 MB/s</td>
         <td>39 MB</td>
+      </tr>
+      <tr>
+        <td>Python-Markdown</td>
+        <td>Python</td>
+        <td>322 ms</td>
+        <td>3.1 MB/s</td>
+        <td>25 MB</td>
       </tr>
       <tr>
         <td>micromark</td>
         <td>Node.js</td>
-        <td>1.74 s</td>
-        <td>0.6 MB/s</td>
-        <td>669 MB</td>
+        <td>1.39 s</td>
+        <td>0.7 MB/s</td>
+        <td>653 MB</td>
       </tr>
       <tr>
         <td>unified (remark + rehype)</td>
         <td>Node.js</td>
-        <td>1.84 s</td>
-        <td>0.5 MB/s</td>
-        <td>736 MB</td>
+        <td>1.48 s</td>
+        <td>0.7 MB/s</td>
+        <td>741 MB</td>
       </tr>
     </tbody>
   </table>
@@ -440,44 +440,44 @@
       <tr>
         <td>pulldown-cmark</td>
         <td>Rust</td>
-        <td>66.7 ms</td>
-        <td>150.0 MB/s</td>
-        <td>44 MB</td>
+        <td>47.2 ms</td>
+        <td>211.8 MB/s</td>
+        <td>46 MB</td>
       </tr>
       <tr>
         <td>comrak</td>
         <td>Rust</td>
-        <td>270 ms</td>
-        <td>37.0 MB/s</td>
+        <td>172 ms</td>
+        <td>58.0 MB/s</td>
         <td>114 MB</td>
-      </tr>
-      <tr>
-        <td><strong>textlane (Rust)</strong></td>
-        <td>Rust</td>
-        <td>293 ms</td>
-        <td>34.2 MB/s</td>
-        <td>168 MB</td>
       </tr>
       <tr>
         <td>cmark (C, via cmarkgfm)</td>
         <td>Python</td>
-        <td>299 ms</td>
-        <td>33.4 MB/s</td>
-        <td>148 MB</td>
+        <td>195 ms</td>
+        <td>51.4 MB/s</td>
+        <td>139 MB</td>
+      </tr>
+      <tr>
+        <td><strong>textlane (Rust)</strong></td>
+        <td>Rust</td>
+        <td>238 ms</td>
+        <td>42.1 MB/s</td>
+        <td>171 MB</td>
       </tr>
       <tr>
         <td><strong>textlane (Node.js)</strong></td>
         <td>Node.js</td>
-        <td>332 ms</td>
-        <td>30.1 MB/s</td>
-        <td>213 MB</td>
+        <td>247 ms</td>
+        <td>40.4 MB/s</td>
+        <td>217 MB</td>
       </tr>
       <tr>
         <td><strong>textlane (Python)</strong></td>
         <td>Python</td>
-        <td>385 ms</td>
-        <td>26.0 MB/s</td>
-        <td>184 MB</td>
+        <td>258 ms</td>
+        <td>38.7 MB/s</td>
+        <td>187 MB</td>
       </tr>
     </tbody>
   </table>
@@ -505,100 +505,100 @@
       <tr>
         <td>pulldown-cmark</td>
         <td>Rust</td>
-        <td>44 µs</td>
-        <td>233.1 MB/s</td>
-        <td>0 MB</td>
+        <td>35 µs</td>
+        <td>289.9 MB/s</td>
+        <td>–</td>
       </tr>
       <tr>
         <td>comrak</td>
         <td>Rust</td>
-        <td>130 µs</td>
-        <td>79.3 MB/s</td>
+        <td>88 µs</td>
+        <td>116.2 MB/s</td>
         <td>1 MB</td>
       </tr>
       <tr>
         <td><strong>textlane (Rust)</strong></td>
         <td>Rust</td>
-        <td>164 µs</td>
-        <td>62.5 MB/s</td>
+        <td>111 µs</td>
+        <td>92.2 MB/s</td>
         <td>1 MB</td>
       </tr>
       <tr>
         <td><strong>textlane (Node.js)</strong></td>
         <td>Node.js</td>
-        <td>200 µs</td>
-        <td>51.4 MB/s</td>
-        <td>38 MB</td>
+        <td>146 µs</td>
+        <td>70.2 MB/s</td>
+        <td>41 MB</td>
       </tr>
       <tr>
         <td><strong>textlane (Python)</strong></td>
         <td>Python</td>
-        <td>247 µs</td>
-        <td>41.6 MB/s</td>
-        <td>7 MB</td>
+        <td>164 µs</td>
+        <td>62.7 MB/s</td>
+        <td>8 MB</td>
       </tr>
       <tr>
         <td>cmark (C, via cmarkgfm)</td>
         <td>Python</td>
-        <td>283 µs</td>
-        <td>36.3 MB/s</td>
-        <td>122 MB</td>
+        <td>187 µs</td>
+        <td>55.1 MB/s</td>
+        <td>121 MB</td>
       </tr>
       <tr>
         <td>marked</td>
         <td>Node.js</td>
-        <td>899 µs</td>
-        <td>11.4 MB/s</td>
-        <td>53 MB</td>
+        <td>562 µs</td>
+        <td>18.3 MB/s</td>
+        <td>54 MB</td>
       </tr>
       <tr>
         <td>markdown-it</td>
         <td>Node.js</td>
-        <td>958 µs</td>
-        <td>10.7 MB/s</td>
-        <td>57 MB</td>
+        <td>670 µs</td>
+        <td>15.3 MB/s</td>
+        <td>59 MB</td>
       </tr>
       <tr>
         <td>markdown-rs</td>
         <td>Rust</td>
-        <td>1.80 ms</td>
-        <td>5.7 MB/s</td>
+        <td>1.39 ms</td>
+        <td>7.4 MB/s</td>
         <td>2 MB</td>
       </tr>
       <tr>
         <td>mistune</td>
         <td>Python</td>
-        <td>4.04 ms</td>
-        <td>2.5 MB/s</td>
+        <td>2.75 ms</td>
+        <td>3.7 MB/s</td>
         <td>8 MB</td>
       </tr>
       <tr>
         <td>micromark</td>
         <td>Node.js</td>
-        <td>7.34 ms</td>
-        <td>1.4 MB/s</td>
-        <td>279 MB</td>
-      </tr>
-      <tr>
-        <td>markdown-it-py</td>
-        <td>Python</td>
-        <td>7.83 ms</td>
-        <td>1.3 MB/s</td>
-        <td>10 MB</td>
+        <td>5.50 ms</td>
+        <td>1.9 MB/s</td>
+        <td>284 MB</td>
       </tr>
       <tr>
         <td>Python-Markdown</td>
         <td>Python</td>
-        <td>8.52 ms</td>
-        <td>1.2 MB/s</td>
+        <td>6.05 ms</td>
+        <td>1.7 MB/s</td>
         <td>14 MB</td>
+      </tr>
+      <tr>
+        <td>markdown-it-py</td>
+        <td>Python</td>
+        <td>6.06 ms</td>
+        <td>1.7 MB/s</td>
+        <td>11 MB</td>
       </tr>
       <tr>
         <td>unified (remark + rehype)</td>
         <td>Node.js</td>
-        <td>10.5 ms</td>
-        <td>1.0 MB/s</td>
-        <td>296 MB</td>
+        <td>6.76 ms</td>
+        <td>1.5 MB/s</td>
+        <td>300 MB</td>
       </tr>
     </tbody>
   </table>
@@ -620,100 +620,100 @@
       <tr>
         <td>pulldown-cmark</td>
         <td>Rust</td>
-        <td>4.90 ms</td>
-        <td>203.9 MB/s</td>
+        <td>4.68 ms</td>
+        <td>213.7 MB/s</td>
         <td>9 MB</td>
       </tr>
       <tr>
         <td>comrak</td>
         <td>Rust</td>
-        <td>21.4 ms</td>
-        <td>46.7 MB/s</td>
+        <td>18.8 ms</td>
+        <td>53.1 MB/s</td>
         <td>22 MB</td>
-      </tr>
-      <tr>
-        <td><strong>textlane (Rust)</strong></td>
-        <td>Rust</td>
-        <td>32.5 ms</td>
-        <td>30.7 MB/s</td>
-        <td>32 MB</td>
       </tr>
       <tr>
         <td>cmark (C, via cmarkgfm)</td>
         <td>Python</td>
-        <td>33.0 ms</td>
-        <td>30.4 MB/s</td>
-        <td>143 MB</td>
+        <td>30.5 ms</td>
+        <td>32.8 MB/s</td>
+        <td>136 MB</td>
+      </tr>
+      <tr>
+        <td><strong>textlane (Rust)</strong></td>
+        <td>Rust</td>
+        <td>31.5 ms</td>
+        <td>31.7 MB/s</td>
+        <td>33 MB</td>
       </tr>
       <tr>
         <td><strong>textlane (Node.js)</strong></td>
         <td>Node.js</td>
-        <td>35.7 ms</td>
-        <td>28.0 MB/s</td>
-        <td>90 MB</td>
+        <td>33.1 ms</td>
+        <td>30.2 MB/s</td>
+        <td>92 MB</td>
       </tr>
       <tr>
         <td><strong>textlane (Python)</strong></td>
         <td>Python</td>
-        <td>39.1 ms</td>
-        <td>25.6 MB/s</td>
-        <td>50 MB</td>
+        <td>35.1 ms</td>
+        <td>28.5 MB/s</td>
+        <td>51 MB</td>
       </tr>
       <tr>
         <td>marked</td>
         <td>Node.js</td>
-        <td>114 ms</td>
-        <td>8.8 MB/s</td>
-        <td>256 MB</td>
+        <td>97.5 ms</td>
+        <td>10.3 MB/s</td>
+        <td>252 MB</td>
       </tr>
       <tr>
         <td>mistune</td>
         <td>Python</td>
-        <td>342 ms</td>
-        <td>2.9 MB/s</td>
-        <td>35 MB</td>
+        <td>300 ms</td>
+        <td>3.3 MB/s</td>
+        <td>34 MB</td>
       </tr>
       <tr>
         <td>markdown-it</td>
         <td>Node.js</td>
-        <td>376 ms</td>
-        <td>2.7 MB/s</td>
-        <td>360 MB</td>
-      </tr>
-      <tr>
-        <td>Python-Markdown</td>
-        <td>Python</td>
-        <td>673 ms</td>
-        <td>1.5 MB/s</td>
-        <td>44 MB</td>
+        <td>355 ms</td>
+        <td>2.8 MB/s</td>
+        <td>356 MB</td>
       </tr>
       <tr>
         <td>markdown-rs</td>
         <td>Rust</td>
-        <td>687 ms</td>
-        <td>1.5 MB/s</td>
+        <td>624 ms</td>
+        <td>1.6 MB/s</td>
         <td>135 MB</td>
+      </tr>
+      <tr>
+        <td>Python-Markdown</td>
+        <td>Python</td>
+        <td>659 ms</td>
+        <td>1.5 MB/s</td>
+        <td>44 MB</td>
       </tr>
       <tr>
         <td>markdown-it-py</td>
         <td>Python</td>
-        <td>840 ms</td>
-        <td>1.2 MB/s</td>
-        <td>59 MB</td>
+        <td>763 ms</td>
+        <td>1.3 MB/s</td>
+        <td>61 MB</td>
       </tr>
       <tr>
         <td>micromark</td>
         <td>Node.js</td>
-        <td>1.77 s</td>
+        <td>1.59 s</td>
         <td>0.6 MB/s</td>
-        <td>993 MB</td>
+        <td>996 MB</td>
       </tr>
       <tr>
         <td>unified (remark + rehype)</td>
         <td>Node.js</td>
-        <td>2.01 s</td>
-        <td>0.5 MB/s</td>
-        <td>983 MB</td>
+        <td>1.79 s</td>
+        <td>0.6 MB/s</td>
+        <td>950 MB</td>
       </tr>
     </tbody>
   </table>
@@ -735,44 +735,44 @@
       <tr>
         <td>pulldown-cmark</td>
         <td>Rust</td>
-        <td>69.3 ms</td>
-        <td>144.4 MB/s</td>
+        <td>65.1 ms</td>
+        <td>153.7 MB/s</td>
         <td>49 MB</td>
       </tr>
       <tr>
         <td>comrak</td>
         <td>Rust</td>
-        <td>374 ms</td>
-        <td>26.8 MB/s</td>
+        <td>324 ms</td>
+        <td>30.9 MB/s</td>
         <td>154 MB</td>
       </tr>
       <tr>
         <td><strong>textlane (Rust)</strong></td>
         <td>Rust</td>
-        <td>461 ms</td>
-        <td>21.7 MB/s</td>
-        <td>286 MB</td>
+        <td>400 ms</td>
+        <td>25.0 MB/s</td>
+        <td>288 MB</td>
       </tr>
       <tr>
         <td>cmark (C, via cmarkgfm)</td>
         <td>Python</td>
-        <td>464 ms</td>
-        <td>21.5 MB/s</td>
-        <td>225 MB</td>
+        <td>414 ms</td>
+        <td>24.1 MB/s</td>
+        <td>223 MB</td>
       </tr>
       <tr>
         <td><strong>textlane (Node.js)</strong></td>
         <td>Node.js</td>
-        <td>482 ms</td>
-        <td>20.7 MB/s</td>
-        <td>329 MB</td>
+        <td>427 ms</td>
+        <td>23.4 MB/s</td>
+        <td>317 MB</td>
       </tr>
       <tr>
         <td><strong>textlane (Python)</strong></td>
         <td>Python</td>
-        <td>522 ms</td>
-        <td>19.2 MB/s</td>
-        <td>304 MB</td>
+        <td>489 ms</td>
+        <td>20.5 MB/s</td>
+        <td>303 MB</td>
       </tr>
     </tbody>
   </table>
@@ -800,100 +800,100 @@
       <tr>
         <td>pulldown-cmark</td>
         <td>Rust</td>
-        <td>1.23 ms</td>
-        <td>79.5 MB/s</td>
+        <td>1.20 ms</td>
+        <td>81.2 MB/s</td>
         <td>3 MB</td>
       </tr>
       <tr>
         <td>comrak</td>
         <td>Rust</td>
-        <td>3.18 ms</td>
-        <td>30.7 MB/s</td>
+        <td>3.14 ms</td>
+        <td>31.1 MB/s</td>
         <td>6 MB</td>
       </tr>
       <tr>
         <td><strong>textlane (Rust)</strong></td>
         <td>Rust</td>
-        <td>3.43 ms</td>
-        <td>28.5 MB/s</td>
+        <td>3.18 ms</td>
+        <td>30.7 MB/s</td>
         <td>10 MB</td>
       </tr>
       <tr>
         <td>cmark (C, via cmarkgfm)</td>
         <td>Python</td>
-        <td>3.88 ms</td>
-        <td>25.2 MB/s</td>
-        <td>29 MB</td>
+        <td>3.83 ms</td>
+        <td>25.5 MB/s</td>
+        <td>28 MB</td>
       </tr>
       <tr>
         <td><strong>textlane (Node.js)</strong></td>
         <td>Node.js</td>
-        <td>4.05 ms</td>
-        <td>24.1 MB/s</td>
-        <td>49 MB</td>
+        <td>3.91 ms</td>
+        <td>25.0 MB/s</td>
+        <td>59 MB</td>
       </tr>
       <tr>
         <td><strong>textlane (Python)</strong></td>
         <td>Python</td>
-        <td>4.30 ms</td>
-        <td>22.7 MB/s</td>
+        <td>4.08 ms</td>
+        <td>24.0 MB/s</td>
         <td>18 MB</td>
       </tr>
       <tr>
         <td>marked</td>
         <td>Node.js</td>
-        <td>19.1 ms</td>
-        <td>5.1 MB/s</td>
-        <td>280 MB</td>
+        <td>17.8 ms</td>
+        <td>5.5 MB/s</td>
+        <td>287 MB</td>
       </tr>
       <tr>
         <td>markdown-it</td>
         <td>Node.js</td>
-        <td>23.3 ms</td>
-        <td>4.2 MB/s</td>
-        <td>288 MB</td>
+        <td>22.2 ms</td>
+        <td>4.4 MB/s</td>
+        <td>292 MB</td>
       </tr>
       <tr>
         <td>markdown-it-py</td>
         <td>Python</td>
-        <td>116 ms</td>
-        <td>0.8 MB/s</td>
-        <td>26 MB</td>
+        <td>112 ms</td>
+        <td>0.9 MB/s</td>
+        <td>24 MB</td>
       </tr>
       <tr>
         <td>mistune</td>
         <td>Python</td>
-        <td>124 ms</td>
+        <td>115 ms</td>
         <td>0.8 MB/s</td>
         <td>17 MB</td>
       </tr>
       <tr>
         <td>markdown-rs</td>
         <td>Rust</td>
-        <td>124 ms</td>
+        <td>122 ms</td>
         <td>0.8 MB/s</td>
         <td>48 MB</td>
       </tr>
       <tr>
         <td>Python-Markdown</td>
         <td>Python</td>
-        <td>154 ms</td>
-        <td>0.6 MB/s</td>
+        <td>146 ms</td>
+        <td>0.7 MB/s</td>
         <td>19 MB</td>
       </tr>
       <tr>
         <td>micromark</td>
         <td>Node.js</td>
-        <td>529 ms</td>
+        <td>518 ms</td>
         <td>0.2 MB/s</td>
-        <td>593 MB</td>
+        <td>628 MB</td>
       </tr>
       <tr>
         <td>unified (remark + rehype)</td>
         <td>Node.js</td>
-        <td>568 ms</td>
+        <td>549 ms</td>
         <td>0.2 MB/s</td>
-        <td>585 MB</td>
+        <td>588 MB</td>
       </tr>
     </tbody>
   </table>
@@ -915,84 +915,84 @@
       <tr>
         <td>pulldown-cmark</td>
         <td>Rust</td>
-        <td>22.1 ms</td>
-        <td>45.3 MB/s</td>
+        <td>19.1 ms</td>
+        <td>52.3 MB/s</td>
         <td>34 MB</td>
-      </tr>
-      <tr>
-        <td>cmark (C, via cmarkgfm)</td>
-        <td>Python</td>
-        <td>64.4 ms</td>
-        <td>15.5 MB/s</td>
-        <td>85 MB</td>
-      </tr>
-      <tr>
-        <td>comrak</td>
-        <td>Rust</td>
-        <td>65.0 ms</td>
-        <td>15.4 MB/s</td>
-        <td>48 MB</td>
       </tr>
       <tr>
         <td><strong>textlane (Rust)</strong></td>
         <td>Rust</td>
-        <td>66.4 ms</td>
-        <td>15.1 MB/s</td>
+        <td>58.5 ms</td>
+        <td>17.1 MB/s</td>
         <td>101 MB</td>
+      </tr>
+      <tr>
+        <td>comrak</td>
+        <td>Rust</td>
+        <td>60.6 ms</td>
+        <td>16.5 MB/s</td>
+        <td>48 MB</td>
+      </tr>
+      <tr>
+        <td>cmark (C, via cmarkgfm)</td>
+        <td>Python</td>
+        <td>61.2 ms</td>
+        <td>16.3 MB/s</td>
+        <td>87 MB</td>
       </tr>
       <tr>
         <td><strong>textlane (Node.js)</strong></td>
         <td>Node.js</td>
-        <td>73.4 ms</td>
-        <td>13.6 MB/s</td>
-        <td>153 MB</td>
+        <td>66.1 ms</td>
+        <td>15.1 MB/s</td>
+        <td>156 MB</td>
       </tr>
       <tr>
         <td><strong>textlane (Python)</strong></td>
         <td>Python</td>
-        <td>76.1 ms</td>
-        <td>13.1 MB/s</td>
-        <td>128 MB</td>
+        <td>68.4 ms</td>
+        <td>14.6 MB/s</td>
+        <td>129 MB</td>
       </tr>
       <tr>
         <td>marked</td>
         <td>Node.js</td>
-        <td>242 ms</td>
-        <td>4.1 MB/s</td>
-        <td>454 MB</td>
+        <td>237 ms</td>
+        <td>4.2 MB/s</td>
+        <td>450 MB</td>
       </tr>
       <tr>
         <td>markdown-it</td>
         <td>Node.js</td>
-        <td>325 ms</td>
-        <td>3.1 MB/s</td>
-        <td>585 MB</td>
+        <td>303 ms</td>
+        <td>3.3 MB/s</td>
+        <td>586 MB</td>
       </tr>
       <tr>
         <td>markdown-it-py</td>
         <td>Python</td>
-        <td>2.03 s</td>
-        <td>0.5 MB/s</td>
-        <td>179 MB</td>
+        <td>1.77 s</td>
+        <td>0.6 MB/s</td>
+        <td>173 MB</td>
       </tr>
       <tr>
         <td>Python-Markdown</td>
         <td>Python</td>
-        <td>3.11 s</td>
-        <td>0.3 MB/s</td>
+        <td>2.75 s</td>
+        <td>0.4 MB/s</td>
         <td>126 MB</td>
       </tr>
       <tr>
         <td>mistune</td>
         <td>Python</td>
-        <td>3.41 s</td>
+        <td>3.06 s</td>
         <td>0.3 MB/s</td>
-        <td>100 MB</td>
+        <td>101 MB</td>
       </tr>
       <tr>
         <td>markdown-rs</td>
         <td>Rust</td>
-        <td>10.38 s</td>
+        <td>8.61 s</td>
         <td>0.1 MB/s</td>
         <td>345 MB</td>
       </tr>

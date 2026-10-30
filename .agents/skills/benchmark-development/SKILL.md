@@ -61,6 +61,9 @@ must sit near the others', or it renders a different document. Pin it: npm by ex
 
 ## Traps
 
+- After merging `main` into a worktree, run `pnpm install` before `measure`: a stale
+  `node_modules` makes every JavaScript adapter exit with code 1, which `measure` reports
+  as `CRASH` and keeps running, so a full run silently loses four libraries
 - The Node.js and Python adapters build and `freeze()` their processor once, outside the
   clock, then `processSync` / Python's `process` per document, as every rival reuses its parser.
   The Node.js adapter imports `typescript/index.ts` from source, the addon found through
