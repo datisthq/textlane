@@ -1035,7 +1035,7 @@ function Benchmark() {
                       />
                     </span>
                     <span className="font-mono text-xs whitespace-nowrap text-muted-foreground sm:text-right">
-                      {measure.mbps} MB/s
+                      {measure.mbps.toFixed(1)} MB/s
                     </span>
                   </li>
                 ))}
