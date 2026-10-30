@@ -996,6 +996,14 @@ const measures: Measure[] = [
   { tool: "textlane (Rust)", mbps: 47.6, trees: 2, isTextlane: true },
   { tool: "textlane (Python)", mbps: 46.9, trees: 2, isTextlane: true },
   { tool: "textlane (TypeScript)", mbps: 44.1, trees: 2, isTextlane: true },
+  { tool: "marked", mbps: 20.2, trees: 1 },
+  { tool: "markdown-it", mbps: 17.7, trees: 0 },
+  { tool: "mistune", mbps: 3.9, trees: 1 },
+  { tool: "markdown-it-py", mbps: 2.7, trees: 0 },
+  { tool: "Python-Markdown", mbps: 2.6, trees: 1 },
+  { tool: "markdown-rs", mbps: 1.1, trees: 0 },
+  { tool: "unified (remark + rehype)", mbps: 0.1, trees: 2 },
+  { tool: "micromark", mbps: 0.1, trees: 0 },
 ]
 
 function Benchmark() {
