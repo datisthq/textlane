@@ -35,8 +35,10 @@ this skill is how to change it without making the numbers lie.
   tools that crashed there may have a rerun file of their own) with textlane's new rows,
   titled by their tool names now: a result file keeps the titles it was measured with
 - A full run takes about half an hour; unified and micromark dominate it and grow faster than
-  their input, so keep the all-tool sizes at 1MB and the timeout at 180s. A larger size runs
-  only the fastest tools, listed under the case's `tools` (`cmark`'s and `gfm`'s 10MB, for memory)
+  their input, so keep the timeout at 180s. The `cmark` README runs every tool at 10MB too, for
+  the landing chart: unified and micromark take 100s a document there and add about 20
+  minutes. Other large sizes run only the fastest tools, listed under the case's `tools`
+  (`gfm`'s 10MB, for memory)
 
 ## Layout
 
