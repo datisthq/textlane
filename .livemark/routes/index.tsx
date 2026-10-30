@@ -963,45 +963,52 @@ function ConformanceStripe() {
 
 interface Measure {
   tool: string
-  ms: number
-  mb: number
+  mbps: number
   isTextlane?: boolean
 }
 
-// The 100KB `spec` case of benchmark/, Markdown to HTML, median time per document
+// The 4 MB `readme` case of benchmark/, Markdown to HTML, input MB/s at the median
 const measures: Measure[] = [
-  { tool: "textlane (Rust)", ms: 4.5, mb: 10, isTextlane: true },
-  { tool: "textlane (Node.js)", ms: 4.5, mb: 46, isTextlane: true },
-  { tool: "textlane (Python)", ms: 5.5, mb: 17, isTextlane: true },
-  { tool: "markdown-rs", ms: 127, mb: 48 },
-  { tool: "micromark", ms: 538, mb: 600 },
-  { tool: "unified (remark + rehype)", ms: 554, mb: 580 },
+  { tool: "pulldown-cmark", mbps: 176.4 },
+  { tool: "cmark (C, via cmarkgfm)", mbps: 63.1 },
+  { tool: "comrak", mbps: 51.7 },
+  { tool: "textlane (Rust)", mbps: 41.9, isTextlane: true },
+  { tool: "textlane (Node.js)", mbps: 41.7, isTextlane: true },
+  { tool: "textlane (Python)", mbps: 37.7, isTextlane: true },
+  { tool: "marked", mbps: 18.1 },
+  { tool: "markdown-it", mbps: 16.1 },
+  { tool: "mistune", mbps: 4.3 },
+  { tool: "Python-Markdown", mbps: 2.8 },
+  { tool: "markdown-it-py", mbps: 2.6 },
+  { tool: "markdown-rs", mbps: 2.1 },
+  { tool: "micromark", mbps: 0.2 },
+  { tool: "unified (remark + rehype)", mbps: 0.2 },
 ]
 
 function Benchmark() {
-  const slowest = Math.max(...measures.map(measure => measure.ms))
+  const fastest = Math.max(...measures.map(measure => measure.mbps))
   return (
     <section className="border-b border-border">
       <div className="mx-auto max-w-6xl px-6 py-16 md:py-24">
         <Reveal>
           <div className="text-center max-w-2xl mx-auto mb-10 md:mb-16">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-              120× faster than remark + rehype
+              190× faster than remark + rehype
             </h2>
             <p className="mt-4 text-muted-foreground text-lg">
-              The same Markdown-to-HTML pipeline in under a tenth of the memory, from
-              every language.
+              The same Markdown-to-HTML pipeline at about 42 MB/s, nearly the same from
+              Rust, Node.js and Python.
             </p>
           </div>
         </Reveal>
         <Reveal>
-          <WindowCard label="benchmark · 100KB CommonMark document">
+          <WindowCard label="benchmark · throughput on a 4 MB README">
             <div className="p-5 sm:p-6">
               <ul className="space-y-3">
                 {measures.map(measure => (
                   <li
                     key={measure.tool}
-                    className="grid grid-cols-1 gap-1 sm:grid-cols-[13rem_minmax(0,1fr)_8rem] sm:items-center sm:gap-4"
+                    className="grid grid-cols-1 gap-1 sm:grid-cols-[13rem_minmax(0,1fr)_6rem] sm:items-center sm:gap-4"
                   >
                     <span
                       className={cn(
@@ -1016,14 +1023,14 @@ function Benchmark() {
                     <span className="h-3 rounded-full bg-muted">
                       <span
                         className={cn(
-                          "block h-full rounded-full",
+                          "block h-full min-w-1 rounded-full",
                           measure.isTextlane ? "bg-primary" : "bg-muted-foreground/40",
                         )}
-                        style={{ width: `${(measure.ms / slowest) * 100}%` }}
+                        style={{ width: `${(measure.mbps / fastest) * 100}%` }}
                       />
                     </span>
                     <span className="font-mono text-xs whitespace-nowrap text-muted-foreground sm:text-right">
-                      {measure.ms} ms · {measure.mb} MB
+                      {measure.mbps} MB/s
                     </span>
                   </li>
                 ))}
@@ -1031,9 +1038,9 @@ function Benchmark() {
               <p className="mt-6 flex items-start gap-2 text-xs leading-relaxed text-muted-foreground">
                 <Gauge className="mt-0.5 size-3.5 shrink-0" />
                 <span>
-                  Median time per document and peak memory, on an AMD Ryzen 5 PRO 7545U.
-                  pulldown-cmark, which streams events without a syntax tree, is faster
-                  still; comrak, which builds one, is about level. Reproduce with{" "}
+                  Input megabytes per second at the median, on an AMD Ryzen 5 PRO 7545U.
+                  pulldown-cmark streams events without a syntax tree; comrak and cmark
+                  build one but render HTML from it directly. Reproduce with{" "}
                   <code className="font-mono text-foreground">
                     pnpm -C benchmark measure
                   </code>
