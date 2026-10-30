@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.1](https://github.com/datisthq/textlane/compare/v0.2.0...v0.2.1) (2026-10-30)
+
+
+### Bug Fixes
+
+* **md:** keep a directory URL's trailing slash in md.pathRewrite ([8e82727](https://github.com/datisthq/textlane/commit/8e827275ac57c81996e57a164732309f4bc8658f))
+
+
+### Performance Improvements
+
+* **python:** hand process's HTML to Python as a string of its own, not inside JSON ([bd2005a](https://github.com/datisthq/textlane/commit/bd2005ad2797381edec994eca333ee8fc76dd6f9))
+
 ## [0.2.0](https://github.com/datisthq/textlane/compare/v0.1.0...v0.2.0) (2026-10-30)
 
 
