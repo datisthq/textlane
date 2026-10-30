@@ -901,7 +901,7 @@ function highlightJson(code: string) {
 function ConformanceStripe() {
   return (
     <section className="border-b border-border bg-primary/5">
-      <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-16 md:grid-cols-2 md:gap-12 md:py-20">
+      <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-16 *:min-w-0 md:grid-cols-2 md:gap-12 md:py-20">
         <Reveal>
           <p className="text-xs font-semibold tracking-[0.12em] text-primary uppercase">
             Conformance suite
