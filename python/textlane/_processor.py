@@ -2,7 +2,7 @@
 Python plugins run here when a run pauses before them."""
 
 import json
-from typing import Any, Callable, Dict, List, Optional, Union, overload
+from typing import Any, Callable, Dict, List, Optional, Union, cast, overload
 
 from . import _native
 from ._host import Host, HostFile, finish, finish_sync, merge_options
@@ -93,7 +93,7 @@ class Processor:
         """Parse, run and compile a document, finishing asynchronous stages."""
         text = _read_value(document) or ""
         if not self._attach():
-            return _with_path(json.loads(self._native.process(text, _read_path(document))), document)
+            return _with_path(_read_file(*self._native.process(text, _read_path(document))), document)
         run = self._native.start_process(text, False, _read_path(document))
         file = HostFile(run.value() or text, _read_path(document))
         await finish(run, self._hosts, file)
@@ -104,7 +104,7 @@ class Processor:
         stage."""
         text = _read_value(document) or ""
         if not self._attach():
-            return _with_path(json.loads(self._native.process_sync(text, _read_path(document))), document)
+            return _with_path(_read_file(*self._native.process_sync(text, _read_path(document))), document)
         run = self._native.start_process(text, True, _read_path(document))
         file = HostFile(run.value() or text, _read_path(document))
         finish_sync(run, self._hosts, file, "process")
@@ -185,6 +185,11 @@ def _read_path(file: Compatible) -> Optional[str]:
 # Native stages' data first, then what Python plugins stored over it
 def _merge_data(result: VFile, data: Dict[str, Any]) -> VFile:
     return {**result, "data": {**result["data"], **data}}
+
+
+# The extension hands back the text apart from the file's messages and data
+def _read_file(value: str, rest: str) -> VFile:
+    return cast(VFile, {"value": value, **json.loads(rest)})
 
 
 def _with_path(file: VFile, document: Compatible) -> VFile:

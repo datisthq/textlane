@@ -139,7 +139,7 @@ mod native {
             py: Python<'_>,
             text: &str,
             path: Option<String>,
-        ) -> PyResult<String> {
+        ) -> PyResult<(String, String)> {
             self.process_with(py, text, path, Api::Async)
         }
 
@@ -187,7 +187,7 @@ mod native {
             py: Python<'_>,
             text: &str,
             path: Option<String>,
-        ) -> PyResult<String> {
+        ) -> PyResult<(String, String)> {
             self.process_with(py, text, path, Api::Sync)
         }
     }
@@ -209,20 +209,26 @@ mod native {
             Ok(tree.map_err(|error| throw(py, error))?.to_string())
         }
 
+        // The text crosses as a string of its own: inside the file's JSON, every quote of
+        // the HTML would be escaped here and parsed again in Python
         fn process_with(
             &mut self,
             py: Python<'_>,
             text: &str,
             path: Option<String>,
             api: Api,
-        ) -> PyResult<String> {
+        ) -> PyResult<(String, String)> {
             let mut file = File {
                 path,
                 ..File::new()
             };
             let value = self.inner.process(text, &mut file, api);
             let value = value.map_err(|error| throw(py, error))?;
-            Ok(crate::write_file(&file, &value).to_string())
+            let rest = serde_json::json!({
+                "messages": crate::write_messages(&file.messages),
+                "data": file.data,
+            });
+            Ok((value, rest.to_string()))
         }
     }
 

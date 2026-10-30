@@ -60,7 +60,9 @@ mixed layout with `bindings = "pyo3"`, `features = ["python"]`,
 `module-name = "textlane._native"` (the PyO3 module is `#[pymodule(name = "_native")]`) and
 `manifest-path = "../rust/textlane/Cargo.toml"`. `textlane/__init__.py` re-exports the
 extension's `version`, `plugin_names` and `TextlaneError`, and `run_case` when a `testing`
-build has it; `_processor.py` is the processor, crossing the boundary as JSON text;
+build has it; `_processor.py` is the processor, crossing the boundary as JSON text, except that
+`process` gets the HTML back as a `str` of its own beside the file's messages and data:
+inside the JSON, encoding and parsing it cost Python 28% of a 1 MB README;
 `_native.pyi` and `py.typed` type it. `scripts/test.sh` runs every `-test/*_unit.py` against
 the installed wheel, never the source folder, which lacks the extension.
 `dynamic = ["version"]` gives the wheel the crate's version. PyO3's `abi3-py39` makes one
