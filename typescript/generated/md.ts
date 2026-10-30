@@ -49,8 +49,8 @@ export interface MdxOptions {
   printWidth?: number | null
 }
 
-/** The kinds of matter to recognize, as remark-frontmatter takes them: a preset, a matter, or a list of them; `yaml` when unset. */
-export type FrontmatterOptions = "yaml" | "toml" | Matter | ("yaml" | "toml" | Matter)[]
+/** The kinds of matter to recognize, as remark-frontmatter takes them (a preset, a matter, or a list of them; `yaml` when unset), or textlane's options object. */
+export type FrontmatterOptions = "yaml" | "toml" | Matter | ("yaml" | "toml" | Matter)[] | FrontmatterSettings
 
 /** One kind of frontmatter: the node `type` it becomes and its fences, a `marker` repeated three times or a whole `fence`. */
 export interface Matter {
@@ -68,6 +68,16 @@ export interface FencePair {
 
 /** A fence, or its opening and closing ones. */
 export type Fence = string | FencePair
+
+/** textlane's options: the matters, and what to do with YAML frontmatter. */
+export interface FrontmatterSettings {
+  /** The kinds of matter to recognize, as remark-frontmatter takes them; `yaml` when unset. */
+  matters?: "yaml" | "toml" | Matter | ("yaml" | "toml" | Matter)[]
+  /** Parse the YAML frontmatter a document starts with into `file.data.matter`, `{}` when there is none, as vfile-matter does. */
+  data?: boolean
+  /** Remove the YAML frontmatter a document starts with from the tree. */
+  strip?: boolean
+}
 
 /** `md.component`: directives, GitHub alerts and other nodes into MDX JSX elements, the components an MDX runtime renders, by declarative rules. */
 export interface ComponentOptions {
@@ -167,6 +177,33 @@ export interface CodeGroupRule {
   inherit?: string[]
 }
 
+/** `md.packageCommand`: a fenced block of package-manager commands, its language naming the ecosystem (`npm`, `pip`, `cargo`), into one component with the commands converted for each manager, as `@docusaurus/remark-plugin-npm2yarn` does for npm. */
+export interface PackageCommandOptions {
+  /** The component a block becomes; one string attribute per manager. @default "PackageTabs" */
+  component?: string
+  /** Each ecosystem's managers, in attribute order; an empty list leaves its blocks code. */
+  ecosystems?: Ecosystems
+}
+
+/** The managers `md.packageCommand` converts each ecosystem's commands for. */
+export interface Ecosystems {
+  /** Managers for `npm` blocks, converted as npm-to-yarn converts; npm, pnpm, yarn and bun by default. */
+  npm?: NpmManager[]
+  /** Managers for `pip` blocks; pip, uv, poetry and pdm by default. */
+  pip?: PipManager[]
+  /** Managers for `cargo` blocks; cargo and cargo-binstall by default. */
+  cargo?: CargoManager[]
+}
+
+/** A JavaScript package manager an `npm` command converts to. */
+export type NpmManager = "npm" | "pnpm" | "yarn" | "bun" | "deno" | "nub"
+
+/** A Python package manager a `pip` command converts to. */
+export type PipManager = "pip" | "uv" | "poetry" | "pdm"
+
+/** A Rust installer a `cargo` command converts to. */
+export type CargoManager = "cargo" | "cargo-binstall"
+
 /** `md.headingId`: `{#id}` at the end of a heading, after a space, as its id, as remark-heading-id reads it; headings without one keep none. */
 export interface HeadingIdOptions {
   /** Read a whole attribute list, `{#id .class key=value key="v w"}`, as directives write theirs: classes become `className` and other keys properties. @default false */
@@ -180,6 +217,32 @@ export interface StripOptions {
   /** Node types to drop, besides those strip-markdown drops. @default [] */
   remove?: string[]
 }
+
+/** `md.toc`: a table of contents under the first heading matching `heading`, replacing what sat between it and the next heading as deep or shallower, as remark-toc makes it. */
+export interface TocOptions {
+  /** The heading to put the table under, as JavaScript regular expression source matched against its whole text, case-insensitively; `(table[ -]of[ -])?contents?|toc` when unset. */
+  heading?: string | null
+  /** The deepest heading rank to list, 1 to 6. */
+  maxDepth?: number | null
+  /** The shallowest heading rank to list, 1 to 6. */
+  minDepth?: number | null
+  /** Headings to leave out, as JavaScript regular expression source matched against their whole text, case-insensitively. */
+  skip?: string | null
+  /** Keep the list compact, without blank lines between items; `true` when unset. */
+  tight?: boolean | null
+  /** Number the list instead of bulleting it. */
+  ordered?: boolean | null
+  /** What each link's fragment starts with, such as `user-content-`. */
+  prefix?: string | null
+  /** The parents whose headings are listed, as a unist-util-is test: a node type, an object of fields a parent must equal, or a list of these; only the root when unset. */
+  parents?: ParentTest | null
+}
+
+/** A unist-util-is test of a node, written as JSON: one check, or a list any of which passes. */
+export type ParentTest = ParentCheck | ParentCheck[]
+
+/** One unist-util-is check: a node type, or fields a node must equal. */
+export type ParentCheck = string | Record<string, unknown>
 
 /** `md.stringify`: mdast into Markdown; options named as mdast-util-to-markdown names them. */
 export interface StringifyOptions {
@@ -321,6 +384,12 @@ export function component(options?: ComponentOptions): Plugin<"md.component", Co
   return { name: "md.component", options }
 }
 
+/** The `md.packageCommand` plugin. */
+export function packageCommand(options?: PackageCommandOptions): Plugin<"md.packageCommand", PackageCommandOptions> {
+  if (options === undefined) return { name: "md.packageCommand" }
+  return { name: "md.packageCommand", options }
+}
+
 /** The `md.headingId` plugin. */
 export function headingId(options?: HeadingIdOptions): Plugin<"md.headingId", HeadingIdOptions> {
   if (options === undefined) return { name: "md.headingId" }
@@ -331,6 +400,12 @@ export function headingId(options?: HeadingIdOptions): Plugin<"md.headingId", He
 export function strip(options?: StripOptions): Plugin<"md.strip", StripOptions> {
   if (options === undefined) return { name: "md.strip" }
   return { name: "md.strip", options }
+}
+
+/** The `md.toc` plugin. */
+export function toc(options?: TocOptions): Plugin<"md.toc", TocOptions> {
+  if (options === undefined) return { name: "md.toc" }
+  return { name: "md.toc", options }
 }
 
 /** The `md.stringify` plugin. */

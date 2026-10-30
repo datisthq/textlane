@@ -68,9 +68,17 @@ pub(crate) const PLUGINS: &[PluginEntry] = &[
     #[cfg(feature = "md")]
     plugin!("md.component", textlane_md::Component, ""),
     #[cfg(feature = "md")]
+    plugin!(
+        "md.packageCommand",
+        textlane_md::PackageCommand,
+        "npm-to-yarn"
+    ),
+    #[cfg(feature = "md")]
     plugin!("md.headingId", textlane_md::HeadingId, "remark-heading-id"),
     #[cfg(feature = "md")]
     plugin!("md.strip", textlane_md::Strip, "strip-markdown"),
+    #[cfg(feature = "md")]
+    plugin!("md.toc", textlane_md::Toc, "remark-toc"),
     #[cfg(feature = "md")]
     plugin!("md.stringify", textlane_md::Stringify, "remark-stringify"),
     #[cfg(feature = "md")]

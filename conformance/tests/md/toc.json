@@ -1,0 +1,2219 @@
+[
+  {
+    "description": "fixture contents",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "contents",
+        "input": "# Alpha\n\n## Contents\n\n# Bravo\n",
+        "expected": {
+          "md": "# Alpha\n\n## Contents\n\n* [Bravo](#bravo)\n\n# Bravo\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture custom-heading",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "heading": "fo+"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "custom-heading",
+        "input": "# Normal\n\n## Fooooo\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Normal\n\n## Fooooo\n\n* [Something if](#something-if)\n  * [Something else](#something-else)\n  * [Something elsefi](#something-elsefi)\n* [Something iffi](#something-iffi)\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture empty-headings",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "empty-headings",
+        "input": "# Empty headings\n\n## Table of Contents\n\n## \n\n## ![](an-image.svg)\n",
+        "expected": {
+          "md": "# Empty headings\n\n## Table of Contents\n\n* [](#)\n* [![](an-image.svg)](#-1)\n\n##\n\n## ![](an-image.svg)\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture image-in-link-in-heading",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "image-in-link-in-heading",
+        "input": "# Image in link in heading\n\n## [![](./some-table.png \"Table of Contents\")](some-link.com) \n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Image in link in heading\n\n## [![](./some-table.png \"Table of Contents\")](some-link.com)\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture loose",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "tight": false
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "loose",
+        "input": "# Normal\n\n## Table of Contents\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n### Yet Another Thing\n\n### And another thing\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Normal\n\n## Table of Contents\n\n* [Something if](#something-if)\n\n  * [Something else](#something-else)\n\n  * [Something elsefi](#something-elsefi)\n\n    * [Yet Another Thing](#yet-another-thing)\n    * [And another thing](#and-another-thing)\n\n* [Something iffi](#something-iffi)\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n### Yet Another Thing\n\n### And another thing\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture maximum-depth-1",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "maxDepth": 1
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "maximum-depth-1",
+        "input": "# Normal\n\n# Table of Contents\n\n# Alpha\n\n## Bravo\n\n### Charlie\n\n#### Delta\n\n##### Echo\n\n###### Foxtrot\n",
+        "expected": {
+          "md": "# Normal\n\n# Table of Contents\n\n* [Alpha](#alpha)\n\n# Alpha\n\n## Bravo\n\n### Charlie\n\n#### Delta\n\n##### Echo\n\n###### Foxtrot\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture maximum-depth-3",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "maxDepth": 3
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "maximum-depth-3",
+        "input": "# Normal\n\n# Table of Contents\n\n# Alpha\n\n## Bravo\n\n### Charlie\n\n#### Delta\n\n##### Echo\n\n###### Foxtrot\n",
+        "expected": {
+          "md": "# Normal\n\n# Table of Contents\n\n* [Alpha](#alpha)\n  * [Bravo](#bravo)\n    * [Charlie](#charlie)\n\n# Alpha\n\n## Bravo\n\n### Charlie\n\n#### Delta\n\n##### Echo\n\n###### Foxtrot\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture maximum-depth-6",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "maxDepth": 6
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "maximum-depth-6",
+        "input": "# Normal\n\n# Table of Contents\n\n# Alpha\n\n## Bravo\n\n### Charlie\n\n#### Delta\n\n##### Echo\n\n###### Foxtrot\n",
+        "expected": {
+          "md": "# Normal\n\n# Table of Contents\n\n* [Alpha](#alpha)\n  * [Bravo](#bravo)\n    * [Charlie](#charlie)\n      * [Delta](#delta)\n        * [Echo](#echo)\n          * [Foxtrot](#foxtrot)\n\n# Alpha\n\n## Bravo\n\n### Charlie\n\n#### Delta\n\n##### Echo\n\n###### Foxtrot\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture missing-content",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "missing-content",
+        "input": "# Missing content\n\n## Table of Contents\n\n---\n",
+        "expected": {
+          "md": "# Missing content\n\n## Table of Contents\n\n***\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture missing-heading",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "missing-heading",
+        "input": "# Missing heading\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Missing heading\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture normal",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "normal",
+        "input": "# Normal\n\n## Table of Contents\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Normal\n\n## Table of Contents\n\n* [Something if](#something-if)\n  * [Something else](#something-else)\n  * [Something elsefi](#something-elsefi)\n* [Something iffi](#something-iffi)\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture normal-content",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "normal-content",
+        "input": "# Normal\n\n## Table of Contents\n\nHere’s some content.\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Normal\n\n## Table of Contents\n\n* [Something if](#something-if)\n  * [Something else](#something-else)\n  * [Something elsefi](#something-elsefi)\n* [Something iffi](#something-iffi)\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture normal-dashes",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "normal-dashes",
+        "input": "# Normal Dashes\n\n## Table-of-contents\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Normal Dashes\n\n## Table-of-contents\n\n* [Something if](#something-if)\n  * [Something else](#something-else)\n  * [Something elsefi](#something-elsefi)\n* [Something iffi](#something-iffi)\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture normal-literal-dashes",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "normal-literal-dashes",
+        "input": "# Normal Dashes\n\n## Table-of-contents\n\n## Rules\n\n### Foo-bar-baz\n\n## Alpha-bravo-charlie\n",
+        "expected": {
+          "md": "# Normal Dashes\n\n## Table-of-contents\n\n* [Rules](#rules)\n  * [Foo-bar-baz](#foo-bar-baz)\n* [Alpha-bravo-charlie](#alpha-bravo-charlie)\n\n## Rules\n\n### Foo-bar-baz\n\n## Alpha-bravo-charlie\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture normal-more-content",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "normal-more-content",
+        "input": "# Normal\n\n## Table of Contents\n\nHere’s some content.\n\nHere’s some more content.\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Normal\n\n## Table of Contents\n\n* [Something if](#something-if)\n  * [Something else](#something-else)\n  * [Something elsefi](#something-elsefi)\n* [Something iffi](#something-iffi)\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture normal-nesting-inverted",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "normal-nesting-inverted",
+        "input": "# Normal with inverted nesting\n\n## Table of Contents\n\n## Something if\n\n# Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Normal with inverted nesting\n\n## Table of Contents\n\n* * [Something if](#something-if)\n* [Something else](#something-else)\n  * [Something elsefi](#something-elsefi)\n* [Something iffi](#something-iffi)\n\n## Something if\n\n# Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture normal-singular",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "normal-singular",
+        "input": "# Normal with TOC\n\n## Table of Content\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Normal with TOC\n\n## Table of Content\n\n* [Something if](#something-if)\n  * [Something else](#something-else)\n  * [Something elsefi](#something-elsefi)\n* [Something iffi](#something-iffi)\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture normal-toc",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "normal-toc",
+        "input": "# Normal with TOC\n\n## TOC\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Normal with TOC\n\n## TOC\n\n* [Something if](#something-if)\n  * [Something else](#something-else)\n  * [Something elsefi](#something-elsefi)\n* [Something iffi](#something-iffi)\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture skip",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "skip": "example|notes?"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "skip",
+        "input": "# Normal\n\n## Table of Contents\n\n## Alpha\n\n## Bravo\n\n### Example\n\n### Note\n\n## Charlie\n\n### Note\n\n## Delta\n\n### Examples\n\n## Echo\n\n### Notes\n\n## Foxtrot\n\n## Example\n",
+        "expected": {
+          "md": "# Normal\n\n## Table of Contents\n\n* [Alpha](#alpha)\n* [Bravo](#bravo)\n* [Charlie](#charlie)\n* [Delta](#delta)\n  * [Examples](#examples)\n* [Echo](#echo)\n* [Foxtrot](#foxtrot)\n\n## Alpha\n\n## Bravo\n\n### Example\n\n### Note\n\n## Charlie\n\n### Note\n\n## Delta\n\n### Examples\n\n## Echo\n\n### Notes\n\n## Foxtrot\n\n## Example\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture slug-for-images-and-links",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "slug-for-images-and-links",
+        "input": "# Slugs for images and links\n\n## Table of Contents\n\n# [Something if](http://a-link.com)\n\n## ![Something else](an-image.svg)\n\nText.\n\n## ![](an-alt.jpeg \"Something elsefi\")\n\n# [![Something iffi](a-link.png \"a title\")](http://a-link.com \"another title\")\n",
+        "expected": {
+          "md": "# Slugs for images and links\n\n## Table of Contents\n\n* [Something if](#something-if)\n  * [![Something else](an-image.svg)](#)\n  * [![](an-alt.jpeg \"Something elsefi\")](#-1)\n* [![Something iffi](a-link.png \"a title\")](#-2)\n\n# [Something if](http://a-link.com)\n\n## ![Something else](an-image.svg)\n\nText.\n\n## ![](an-alt.jpeg \"Something elsefi\")\n\n# [![Something iffi](a-link.png \"a title\")](http://a-link.com \"another title\")\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture tight",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "tight": true
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "tight",
+        "input": "# Normal\n\n## Table of Contents\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n### Yet Another Thing\n\n### And another thing\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Normal\n\n## Table of Contents\n\n* [Something if](#something-if)\n  * [Something else](#something-else)\n  * [Something elsefi](#something-elsefi)\n    * [Yet Another Thing](#yet-another-thing)\n    * [And another thing](#and-another-thing)\n* [Something iffi](#something-iffi)\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n### Yet Another Thing\n\n### And another thing\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture unicode",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "commit": "9d0e2764ce3b5a8276e3cdee36c56ff6eecf7477",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "unicode",
+        "input": "# Normal\n\n## Table of Contents\n\n# I ♥ unicode.\n",
+        "expected": {
+          "md": "# Normal\n\n## Table of Contents\n\n* [I ♥ unicode.](#i--unicode)\n\n# I ♥ unicode.\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "headings at every depth",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "headings at every depth",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A\n\n### B\n\n#### C\n\n##### D\n\n###### E\n\n## F",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [A](#a)\n  * [B](#b)\n    * [C](#c)\n      * [D](#d)\n        * [E](#e)\n* [F](#f)\n\n## A\n\n### B\n\n#### C\n\n##### D\n\n###### E\n\n## F\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "duplicate headings",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "duplicate headings",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## Same\n\n## Same\n\n### Same\n\n## Same-1",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [Same](#same)\n* [Same](#same-1)\n  * [Same](#same-2)\n* [Same-1](#same-1-1)\n\n## Same\n\n## Same\n\n### Same\n\n## Same-1\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "a heading named Table of Contents",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "a heading named Table of Contents",
+        "input": "# Doc\n\n## Table of Contents\n\n## One\n\n## Two",
+        "expected": {
+          "md": "# Doc\n\n## Table of Contents\n\n* [One](#one)\n* [Two](#two)\n\n## One\n\n## Two\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "toc in capitals",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "toc in capitals",
+        "input": "## TOC\n\n## One",
+        "expected": {
+          "md": "## TOC\n\n* [One](#one)\n\n## One\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "no matching heading",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "no matching heading",
+        "input": "# Doc\n\n## One\n\n## Two",
+        "expected": {
+          "md": "# Doc\n\n## One\n\n## Two\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "a matching heading with no headings after",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "a matching heading with no headings after",
+        "input": "# Doc\n\n## Contents\n\ntext",
+        "expected": {
+          "md": "# Doc\n\n## Contents\n\ntext\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "only deeper headings before the end",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "only deeper headings before the end",
+        "input": "# Doc\n\n## Contents\n\n### Deeper\n\ntext",
+        "expected": {
+          "md": "# Doc\n\n## Contents\n\n### Deeper\n\ntext\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "closing heading shallower than the opening",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "closing heading shallower than the opening",
+        "input": "## Contents\n\n### A\n\n# B\n\n## C",
+        "expected": {
+          "md": "## Contents\n\n* [B](#b)\n  * [C](#c)\n\n# B\n\n## C\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "inline formatting",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "inline formatting",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## *Emphasis* and **strong**\n\n## `code` here\n\n## A [link](https://example.com) inside\n\n## An ![image](a.png) too",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [*Emphasis* and **strong**](#emphasis-and-strong)\n* [`code` here](#code-here)\n* [A link inside](#a-link-inside)\n* [An ![image](a.png) too](#an--too)\n\n## *Emphasis* and **strong**\n\n## `code` here\n\n## A [link](https://example.com) inside\n\n## An ![image](a.png) too\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "a link reference",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "a link reference",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## See [ref]\n\n[ref]: https://example.com",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [See ref](#see-ref)\n\n## See [ref]\n\n[ref]: https://example.com\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "html in a heading",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "html in a heading",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A <b>b</b> c",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [A <b>b</b> c](#a-bbb-c)\n\n## A <b>b</b> c\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "punctuation and unicode",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "punctuation and unicode",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## Hello, World!\n\n## Ünïcödé — test\n\n## 日本語\n\n## emoji 🎉 here",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [Hello, World!](#hello-world)\n* [Ünïcödé — test](#ünïcödé--test)\n* [日本語](#日本語)\n* [emoji 🎉 here](#emoji--here)\n\n## Hello, World!\n\n## Ünïcödé — test\n\n## 日本語\n\n## emoji 🎉 here\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "empty headings",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "empty headings",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n##\n\n## A\n\n##",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [](#)\n* [A](#a)\n* [](#-1)\n\n##\n\n## A\n\n##\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "setext headings",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "setext headings",
+        "input": "Contents\n--------\n\nA\n===\n\nB\n-",
+        "expected": {
+          "md": "## Contents\n\n* [A](#a)\n  * [B](#b)\n\n# A\n\n## B\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "a heading inside a block quote",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "a heading inside a block quote",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A\n\n> ## Quoted\n\n## B",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [A](#a)\n* [B](#b)\n\n## A\n\n> ## Quoted\n\n## B\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "headings inside a list",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "headings inside a list",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A\n\n- ## Listed\n\n## B",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [A](#a)\n* [B](#b)\n\n## A\n\n* ## Listed\n\n## B\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "a custom heading",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "heading": "overview|summary"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a custom heading",
+        "input": "# Doc\n\n## Overview\n\n## One\n\n## Two",
+        "expected": {
+          "md": "# Doc\n\n## Overview\n\n* [One](#one)\n* [Two](#two)\n\n## One\n\n## Two\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "a custom heading closing a group",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "heading": "fo+"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a custom heading closing a group",
+        "input": "# Doc\n\n## Foo\n\n## One",
+        "expected": {
+          "md": "# Doc\n\n## Foo\n\n* [One](#one)\n\n## One\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "an empty heading option takes the default",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "heading": ""
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "an empty heading option takes the default",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [A](#a)\n\n## A\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "skip",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "skip": "example|notes?"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "skip",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## Example\n\n## Notes\n\n## Real\n\n### Example two",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [Real](#real)\n  * [Example two](#example-two)\n\n## Example\n\n## Notes\n\n## Real\n\n### Example two\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "skip with classes",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "skip": "step \\d+"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "skip with classes",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## Step 1\n\n## Step 22\n\n## Other",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [Other](#other)\n\n## Step 1\n\n## Step 22\n\n## Other\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "minDepth",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "minDepth": 3
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "minDepth",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A\n\n### B\n\n#### C",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [B](#b)\n  * [C](#c)\n\n## A\n\n### B\n\n#### C\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "maxDepth",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "maxDepth": 3
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "maxDepth",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A\n\n### B\n\n#### C",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [A](#a)\n  * [B](#b)\n\n## A\n\n### B\n\n#### C\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "minDepth and maxDepth",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "minDepth": 3,
+          "maxDepth": 4
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "minDepth and maxDepth",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A\n\n### B\n\n#### C\n\n##### D",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [B](#b)\n  * [C](#c)\n\n## A\n\n### B\n\n#### C\n\n##### D\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "minDepth zero is no limit",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "minDepth": 0
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "minDepth zero is no limit",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A\n\n### B",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [A](#a)\n  * [B](#b)\n\n## A\n\n### B\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "tight false",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "tight": false
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "tight false",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A\n\n### B\n\n## C",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [A](#a)\n\n  * [B](#b)\n\n* [C](#c)\n\n## A\n\n### B\n\n## C\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "tight false and flat",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "tight": false
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "tight false and flat",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A\n\n## B",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [A](#a)\n* [B](#b)\n\n## A\n\n## B\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "ordered",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "ordered": true
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "ordered",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A\n\n### B\n\n## C",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n1. [A](#a)\n   1. [B](#b)\n2. [C](#c)\n\n## A\n\n### B\n\n## C\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "ordered and loose",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "ordered": true,
+          "tight": false
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "ordered and loose",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A\n\n### B\n\n## C",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n1. [A](#a)\n\n   1. [B](#b)\n\n2. [C](#c)\n\n## A\n\n### B\n\n## C\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "prefix",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "prefix": "user-content-"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "prefix",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A\n\n### B",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [A](#user-content-a)\n  * [B](#user-content-b)\n\n## A\n\n### B\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "a level skipped",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "a level skipped",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A\n\n#### B\n\n### C",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [A](#a)\n  * * [B](#b)\n  * [C](#c)\n\n## A\n\n#### B\n\n### C\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "shallower after deeper",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "shallower after deeper",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n#### A\n\n## B\n\n### C",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [B](#b)\n  * [C](#c)\n\n## B\n\n### C\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "parents as a type list",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "parents": ["root", "blockquote"]
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "parents as a type list",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A\n\n> ## Quoted\n\n## B",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [A](#a)\n* [Quoted](#quoted)\n* [B](#b)\n\n## A\n\n> ## Quoted\n\n## B\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "parents as an object",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "parents": {
+            "type": "blockquote"
+          }
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "parents as an object",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A\n\n> ## Quoted\n\n## B",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\nOld text\n\n## A\n\n> ## Quoted\n\n## B\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "parents excluding the root",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "parents": "blockquote"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "parents excluding the root",
+        "input": "## Contents\n\n> ## Quoted\n> ## Also",
+        "expected": {
+          "md": "## Contents\n\n> ## Quoted\n>\n> ## Also\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "an opening heading in a block quote",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "parents": ["root", "blockquote"]
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "an opening heading in a block quote",
+        "input": "a\n\nb\n\n> ## Contents\n> ## A\n\n## B",
+        "expected": {
+          "md": "a\n\n* [A](#a)\n* [B](#b)\n\nb\n\n> ## Contents\n>\n> ## A\n\n## B\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "a closing heading before the opening's index repeats children",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "parents": ["root", "blockquote"]
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a closing heading before the opening's index repeats children",
+        "input": "> x\n>\n> y\n>\n> ## Contents\n\n## A\n\ntext",
+        "expected": {
+          "md": "> x\n>\n> y\n>\n> ## Contents\n\n## A\n\ntext\n\n* [A](#a)\n\n## A\n\ntext\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "parents as an empty list lists nothing",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "parents": []
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "parents as an empty list lists nothing",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\nOld text\n\n## A\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "parents matching on a field",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "parents": [
+            {
+              "type": "list",
+              "ordered": true
+            },
+            "listItem",
+            "root"
+          ]
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "parents matching on a field",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A\n\n- ## Listed\n\n1. ## Ordered",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [A](#a)\n* [Listed](#listed)\n* [Ordered](#ordered)\n\n## A\n\n* ## Listed\n\n1. ## Ordered\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "a footnote call is dropped",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "a footnote call is dropped",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## Note[^1]\n\n[^1]: text",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [Note](#note)\n\n## Note[^1]\n\n[^1]: text\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "strikethrough",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "strikethrough",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## ~~old~~ new",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [~~old~~ new](#old-new)\n\n## ~~old~~ new\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "nested headings to HTML",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "nested headings",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A\n\n### B\n\n## C",
+        "expected": {
+          "html": "<h1>Title</h1>\n<h2>Contents</h2>\n<ul>\n<li><a href=\"#a\">A</a>\n<ul>\n<li><a href=\"#b\">B</a></li>\n</ul>\n</li>\n<li><a href=\"#c\">C</a></li>\n</ul>\n<h2>A</h2>\n<h3>B</h3>\n<h2>C</h2>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "loose to HTML",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "tight": false
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "loose",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A\n\n### B\n\n## C",
+        "expected": {
+          "html": "<h1>Title</h1>\n<h2>Contents</h2>\n<ul>\n<li>\n<p><a href=\"#a\">A</a></p>\n<ul>\n<li><a href=\"#b\">B</a></li>\n</ul>\n</li>\n<li>\n<p><a href=\"#c\">C</a></p>\n</li>\n</ul>\n<h2>A</h2>\n<h3>B</h3>\n<h2>C</h2>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "ordered with a prefix to HTML",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.toc",
+        {
+          "ordered": true,
+          "prefix": "user-content-"
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "ordered with a prefix",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A\n\n### B",
+        "expected": {
+          "html": "<h1>Title</h1>\n<h2>Contents</h2>\n<ol>\n<li><a href=\"#user-content-a\">A</a>\n<ol>\n<li><a href=\"#user-content-b\">B</a></li>\n</ol>\n</li>\n</ol>\n<h2>A</h2>\n<h3>B</h3>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "inline formatting to HTML",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.toc"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "inline formatting",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## *A* `b` [c](d)",
+        "expected": {
+          "html": "<h1>Title</h1>\n<h2>Contents</h2>\n<ul>\n<li><a href=\"#a-b-c\"><em>A</em> <code>b</code> c</a></li>\n</ul>\n<h2><em>A</em> <code>b</code> <a href=\"d\">c</a></h2>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "ids from md.headingId",
+    "source": {
+      "repository": "https://github.com/remarkjs/remark-toc",
+      "version": "9.0.0",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.headingId"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "stored ids are linked",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A {#first}\n\n## B",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [A](#first)\n* [B](#b)\n\n## A\n\n## B\n"
+        }
+      },
+      {
+        "description": "a stored id repeating a slug",
+        "input": "# Title\n\n## Contents\n\nOld text\n\n## A {#b}\n\n## B",
+        "expected": {
+          "md": "# Title\n\n## Contents\n\n* [A](#b)\n* [B](#b-1)\n\n## A\n\n## B\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture custom-heading through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toc",
+        {
+          "heading": "fo+"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "custom-heading",
+        "input": "# Normal\n\n## Fooooo\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n## Normal\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Normal\n\n## Fooooo\n\n* [Something if](#something-if)\n  * [Something else](#something-else)\n  * [Something elsefi](#something-elsefi)\n  * [Normal](#normal-1)\n* [Something iffi](#something-iffi)\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n## Normal\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture deep-headings through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "deep-headings",
+        "input": "# Something if\n\n## Something else\n\nText.\n\n> ## heading in a blockquote\n\n* ## heading in a list\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Something if\n\n## Something else\n\nText.\n\n> ## heading in a blockquote\n\n* ## heading in a list\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture deep-headings-with-config through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toc",
+        {
+          "parents": ["root", "blockquote"]
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "deep-headings-with-config",
+        "input": "# Something if\n\n## Something else\n\nText.\n\n> ## heading in a blockquote\n\n* ## heading in a list\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Something if\n\n## Something else\n\nText.\n\n> ## heading in a blockquote\n\n* ## heading in a list\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture empty-headings through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "empty-headings",
+        "input": "## \n\n## ![](an-image.svg)\n",
+        "expected": {
+          "md": "##\n\n## ![](an-image.svg)\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture heading-no-contents through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toc",
+        {
+          "heading": "fo+"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "heading-no-contents",
+        "input": "Some content.\n\n# Foo\n",
+        "expected": {
+          "md": "Some content.\n\n# Foo\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture headings-ordered through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toc",
+        {
+          "ordered": true
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "headings-ordered",
+        "input": "# Something if\n\n## Something else\n\nText.\n\n# Something else if\n\n## Something else else",
+        "expected": {
+          "md": "# Something if\n\n## Something else\n\nText.\n\n# Something else if\n\n## Something else else\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture image-in-link-in-heading through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "image-in-link-in-heading",
+        "input": "# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture maximum-depth-1 through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toc",
+        {
+          "maxDepth": 1
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "maximum-depth-1",
+        "input": "# Alpha\n\n## Bravo\n\n### Charlie\n\n#### Delta\n\n##### Echo\n\n###### Foxtrot\n",
+        "expected": {
+          "md": "# Alpha\n\n## Bravo\n\n### Charlie\n\n#### Delta\n\n##### Echo\n\n###### Foxtrot\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture maximum-depth-3 through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toc",
+        {
+          "maxDepth": 3
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "maximum-depth-3",
+        "input": "# Alpha\n\n## Bravo\n\n### Charlie\n\n#### Delta\n\n##### Echo\n\n###### Foxtrot\n",
+        "expected": {
+          "md": "# Alpha\n\n## Bravo\n\n### Charlie\n\n#### Delta\n\n##### Echo\n\n###### Foxtrot\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture maximum-depth-6 through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toc",
+        {
+          "maxDepth": 6
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "maximum-depth-6",
+        "input": "# Alpha\n\n## Bravo\n\n### Charlie\n\n#### Delta\n\n##### Echo\n\n###### Foxtrot\n",
+        "expected": {
+          "md": "# Alpha\n\n## Bravo\n\n### Charlie\n\n#### Delta\n\n##### Echo\n\n###### Foxtrot\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture minimum-depth-1 through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toc",
+        {
+          "minDepth": 1
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "minimum-depth-1",
+        "input": "# Alpha\n\n## Bravo\n\n### Charlie\n\n#### Delta\n\n##### Echo\n\n###### Foxtrot\n",
+        "expected": {
+          "md": "# Alpha\n\n## Bravo\n\n### Charlie\n\n#### Delta\n\n##### Echo\n\n###### Foxtrot\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture minimum-depth-4 through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toc",
+        {
+          "minDepth": 4
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "minimum-depth-4",
+        "input": "# Alpha\n\n## Bravo\n\n### Charlie\n\n#### Delta\n\n##### Echo\n\n###### Foxtrot\n",
+        "expected": {
+          "md": "# Alpha\n\n## Bravo\n\n### Charlie\n\n#### Delta\n\n##### Echo\n\n###### Foxtrot\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture minimum-depth-6 through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toc",
+        {
+          "minDepth": 6
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "minimum-depth-6",
+        "input": "# Alpha\n\n## Bravo\n\n### Charlie\n\n#### Delta\n\n##### Echo\n\n###### Foxtrot\n",
+        "expected": {
+          "md": "# Alpha\n\n## Bravo\n\n### Charlie\n\n#### Delta\n\n##### Echo\n\n###### Foxtrot\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture missing-content through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "missing-content",
+        "input": "---\n",
+        "expected": {
+          "md": "***\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture missing-heading through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toc",
+        {
+          "heading": "fo+"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "missing-heading",
+        "input": "# Missing heading\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Missing heading\n\n# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture normal through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "normal",
+        "input": "# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture normal-literal-dashes through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "normal-literal-dashes",
+        "input": "## Rules\n\n### Foo-bar-baz\n\n## Alpha-bravo-charlie\n",
+        "expected": {
+          "md": "## Rules\n\n### Foo-bar-baz\n\n## Alpha-bravo-charlie\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture normal-nesting-inverted through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "normal-nesting-inverted",
+        "input": "## Something if\n\n# Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n",
+        "expected": {
+          "md": "## Something if\n\n# Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture normal-singular through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "normal-singular",
+        "input": "# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture normal-toc through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "normal-toc",
+        "input": "# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture phrasing-content through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "phrasing-content",
+        "input": "# Text\n\n# *Emphasis*\n\n# **Importance**\n\n# ~~Strikethrough~~\n\n# <i>HTML<i>\n\n# `inline.code()`\n\n# footnote reference [^1]\n\n# ![image](image.png)\n\n# ![image reference][image]\n\n# [link](example.com)\n\n# ![link reference][link]\n\n[^1]: footnote reference\n\n[image]: image.png\n\n[link]: example.com\n",
+        "expected": {
+          "md": "# Text\n\n# *Emphasis*\n\n# **Importance**\n\n# ~~Strikethrough~~\n\n# <i>HTML<i>\n\n# `inline.code()`\n\n# footnote reference [^1]\n\n# ![image](image.png)\n\n# ![image reference][image]\n\n# [link](example.com)\n\n# ![link reference][link]\n\n[^1]: footnote reference\n\n[image]: image.png\n\n[link]: example.com\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture prefix through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toc",
+        {
+          "prefix": "user-content-"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "prefix",
+        "input": "# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture skip through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toc",
+        {
+          "skip": "example|notes?"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "skip",
+        "input": "# Alpha\n\n## Bravo\n\n### Example\n\n### Note\n\n## Charlie\n\n### Note\n\n## Delta\n\n### Examples\n\n## Echo\n\n### Notes\n\n## Foxtrot\n\n## Example\n",
+        "expected": {
+          "md": "# Alpha\n\n## Bravo\n\n### Example\n\n### Note\n\n## Charlie\n\n### Note\n\n## Delta\n\n### Examples\n\n## Echo\n\n### Notes\n\n## Foxtrot\n\n## Example\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture slug-for-images-and-links through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "slug-for-images-and-links",
+        "input": "# [Something if](http://a-link.com)\n\n## ![Something else](an-image.svg)\n\nText.\n\n## ![](an-alt.jpeg \"Something elsefi\")\n\n# [![Something iffi](a-link.png \"a title\")](http://a-link.com \"another title\")\n",
+        "expected": {
+          "md": "# [Something if](http://a-link.com)\n\n## ![Something else](an-image.svg)\n\nText.\n\n## ![](an-alt.jpeg \"Something elsefi\")\n\n# [![Something iffi](a-link.png \"a title\")](http://a-link.com \"another title\")\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture tight through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.toc",
+        {
+          "tight": true
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "tight",
+        "input": "# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n### Yet Another Thing\n\n### And another thing\n\n# Something iffi\n",
+        "expected": {
+          "md": "# Something if\n\n## Something else\n\nText.\n\n## Something elsefi\n\n### Yet Another Thing\n\n### And another thing\n\n# Something iffi\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "fixture unicode through remark-toc",
+    "source": {
+      "repository": "https://github.com/syntax-tree/mdast-util-toc",
+      "commit": "9fd2abaafa62e3152123e3d4b069fd601844e4a7",
+      "path": "test/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.toc"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "unicode",
+        "input": "# I ♥ unicode.\n",
+        "expected": {
+          "md": "# I ♥ unicode.\n"
+        }
+      }
+    ]
+  }
+]

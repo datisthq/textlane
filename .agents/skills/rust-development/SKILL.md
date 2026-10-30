@@ -138,8 +138,10 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   hast-util-to-html 9.0.5 whole, omission rules in `helpers/omission.rs`; serde_json keeps
   `preserve_order`, since hast writes properties in the order a tree lists them
   `html.sanitize` and `html.slug` port hast-util-sanitize and rehype-slug; the sanitizer
-  walks with its own stack and counts open ancestors instead of searching them, and
-  `helpers/slug_table.rs` is github-slugger's removal regex as generated code-point ranges
+  walks with its own stack and counts open ancestors instead of searching them. The slugger
+  is github-slugger in core (`textlane_core::Slugger`, `core/src/helpers/slug.rs`), shared by
+  `html.slug` and `md.toc`, since md cannot depend on html; `helpers/slug_table.rs` beside it
+  is github-slugger's removal regex as code-point ranges, hand-ported with no generator
   `html.highlight` follows @shikijs/rehype 4.5.0 on giallo 0.5.2 (Shiki's TextMate grammars
   and themes on Oniguruma, `onig-regset`): giallo's tokens unmerged, then textlane joins
   neighbours every theme styles alike, merges whitespace forward and writes Shiki's hast and
@@ -246,6 +248,14 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   linear. Custom types are `Literal` nodes, as is any unknown JSON node with only a string
   `value`; any other unknown type is an `Unknown` node (mdast and hast alike) keeping its
   fields as `Data` and its children, so `md.toHtml`'s `passThrough` can copy it into hast
+  With `data` or `strip` it also adds a transform over the first root child when it is a
+  `yaml` node (vfile-matter's regex reads the file, so `--- ` with trailing spaces differs):
+  `utils/yaml/` composes yaml-rust2's pull events into a flat node store with an explicit
+  stack (yaml-rust2's own `load` recurses), then ports the `yaml` package's `toJS`: core
+  schema scalars, numbers through JavaScript's `String(number)` so JSON reads them back as
+  `JSON.stringify` wrote them, array-index keys first, `maxAliasCount` 100 with
+  `getAliasCount`, duplicate keys by resolved value. Depth stops at 512 (Python 3.9's `json`
+  fails near 1000); every failure is `invalid-frontmatter`
 - `File::data` is vfile's `data`, a JSON map native plugins store results in
   (`html.extractToc` puts `toc`); `write_file` hands it back, and the loaders lay what their
   host plugins stored over it. `md.headingId`, `md.strip`, `html.unwrapImages`,
@@ -256,6 +266,16 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   list's pending stack, never recursion. `md.headingId`'s `attributes` reuses
   `md.directive`'s `scan_attributes`, trying ` {` from the right so a hostile run of braces
   fails fast
+- `md.toc` ports remark-toc 9.0.0 over mdast-util-toc 7.1.0 (`import:toc`, which also runs
+  their fixtures): every heading is slugged in document order, ids `md.headingId` stored in
+  `data.hProperties.id` win over the text, and the list is built in a flat store of lists
+  and items, `spread` set bottom-up along each insert's path. `heading` and `skip` are
+  JavaScript regex source: `actions/expression/compile.rs` translates them for `regex`
+  (ASCII `\d`/`\w`/`\b`, JavaScript's `\s` and `.`, Annex B escapes, `[]`/`[^]`, a lone
+  `{`) and refuses lookaround and back references; case folding stays Unicode's, and `.`
+  takes a code point, not a UTF-16 unit. `parents` is unist-util-is as JSON (`ParentTest`),
+  fields compared as `===`; a closing heading before the opening's index repeats the
+  children between, as upstream's slices do, by `copy_nodes` (`CopyMode::Whole`)
 - `md.component` is textlane's own plugin, with no upstream: `conformance/tests/md/component.json`
   is its specification. It walks with a stack of sibling lists, converting each list's items
   before pushing their children, so a list groups (`actions/children/group.rs`) once its own
@@ -265,6 +285,14 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   `labelAs` unless listed, then the list, the order livemark's components were written against.
   Its code rules (`codes`) mark matched blocks with `Mark::Code`; a code group's wrapper reads
   and strips meta pairs (`actions/meta/read.rs`), its blocks staying code
+- `md.packageCommand` ports npm-to-yarn 3.2.0's `convert` per line of an `npm` block
+  (`plugins/package_command/actions/<manager>/convert.rs`, tables in
+  `helpers/command_table.rs`), quirks included: `npm` matches inside `pnpm`, a bare `npm`
+  becomes `npm undefined`, bun replaces the first `=`. Only npm itself deviates: a line no
+  executor leads stays, since upstream reads it as yarn's. Prototype names (`npm toString`)
+  are not ported. `pip` and `cargo` are textlane's own tables (`PipEntry`, one column per
+  manager, `None` keeping the line); `import:package-command` renders npm cases through the
+  pinned package and spells the others out
 - `md.math`, `md.directive` and `md.definitionList` use slots the same way, and each adds a
   flag to `tokenize_input` and `parse_markdown_with`, in that order after `frontmatter`.
   Every mdast node carries unist `data` (`None` unless a tree from JSON or a plugin set it);

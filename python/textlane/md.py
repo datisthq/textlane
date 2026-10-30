@@ -22,10 +22,14 @@ __all__ = [
     "gemoji",
     "component",
     "ComponentOptions",
+    "package_command",
+    "PackageCommandOptions",
     "heading_id",
     "HeadingIdOptions",
     "strip",
     "StripOptions",
+    "toc",
+    "TocOptions",
     "stringify",
     "StringifyOptions",
     "to_html",
@@ -114,8 +118,18 @@ class Matter(_MatterRequired, total=False):
     anywhere: bool
 
 
-# The kinds of matter to recognize, as remark-frontmatter takes them: a preset, a matter, or a list of them; `yaml` when unset.
-FrontmatterOptions = Union[Literal["yaml", "toml"], Matter, List[Union[Literal["yaml", "toml"], Matter]]]
+# textlane's options: the matters, and what to do with YAML frontmatter.
+class FrontmatterSettings(TypedDict, total=False):
+    # The kinds of matter to recognize, as remark-frontmatter takes them; `yaml` when unset.
+    matters: Union[Literal["yaml", "toml"], Matter, List[Union[Literal["yaml", "toml"], Matter]]]
+    # Parse the YAML frontmatter a document starts with into `file.data.matter`, `{}` when there is none, as vfile-matter does.
+    data: bool
+    # Remove the YAML frontmatter a document starts with from the tree.
+    strip: bool
+
+
+# The kinds of matter to recognize, as remark-frontmatter takes them (a preset, a matter, or a list of them; `yaml` when unset), or textlane's options object.
+FrontmatterOptions = Union[Literal["yaml", "toml"], Matter, List[Union[Literal["yaml", "toml"], Matter]], FrontmatterSettings]
 
 
 # One name or several.
@@ -246,6 +260,39 @@ class ComponentOptions(TypedDict, total=False):
     codes: List[CodeRule]
 
 
+# A JavaScript package manager an `npm` command converts to.
+NpmManager = Literal["npm", "pnpm", "yarn", "bun", "deno", "nub"]
+
+
+# A Python package manager a `pip` command converts to.
+PipManager = Literal["pip", "uv", "poetry", "pdm"]
+
+
+# A Rust installer a `cargo` command converts to.
+CargoManager = Literal["cargo", "cargo-binstall"]
+
+
+# The managers `md.packageCommand` converts each ecosystem's commands for.
+class Ecosystems(TypedDict, total=False):
+    # Managers for `npm` blocks, converted as npm-to-yarn converts; npm, pnpm, yarn and
+    # bun by default.
+    npm: List[NpmManager]
+    # Managers for `pip` blocks; pip, uv, poetry and pdm by default.
+    pip: List[PipManager]
+    # Managers for `cargo` blocks; cargo and cargo-binstall by default.
+    cargo: List[CargoManager]
+
+
+# `md.packageCommand`: a fenced block of package-manager commands, its language naming
+# the ecosystem (`npm`, `pip`, `cargo`), into one component with the commands converted
+# for each manager, as `@docusaurus/remark-plugin-npm2yarn` does for npm.
+class PackageCommandOptions(TypedDict, total=False):
+    # The component a block becomes; one string attribute per manager.
+    component: str
+    # Each ecosystem's managers, in attribute order; an empty list leaves its blocks code.
+    ecosystems: Ecosystems
+
+
 # `md.headingId`: `{#id}` at the end of a heading, after a space, as its id, as
 # remark-heading-id reads it; headings without one keep none.
 class HeadingIdOptions(TypedDict, total=False):
@@ -261,6 +308,40 @@ class StripOptions(TypedDict, total=False):
     keep: List[str]
     # Node types to drop, besides those strip-markdown drops.
     remove: List[str]
+
+
+# One unist-util-is check: a node type, or fields a node must equal.
+ParentCheck = Union[str, Dict[str, Any]]
+
+
+# A unist-util-is test of a node, written as JSON: one check, or a list any of which
+# passes.
+ParentTest = Union[ParentCheck, List[ParentCheck]]
+
+
+# `md.toc`: a table of contents under the first heading matching `heading`, replacing
+# what sat between it and the next heading as deep or shallower, as remark-toc makes it.
+class TocOptions(TypedDict, total=False):
+    # The heading to put the table under, as JavaScript regular expression source matched
+    # against its whole text, case-insensitively; `(table[ -]of[ -])?contents?|toc` when
+    # unset.
+    heading: Optional[str]
+    # The deepest heading rank to list, 1 to 6.
+    maxDepth: Optional[int]
+    # The shallowest heading rank to list, 1 to 6.
+    minDepth: Optional[int]
+    # Headings to leave out, as JavaScript regular expression source matched against
+    # their whole text, case-insensitively.
+    skip: Optional[str]
+    # Keep the list compact, without blank lines between items; `true` when unset.
+    tight: Optional[bool]
+    # Number the list instead of bulleting it.
+    ordered: Optional[bool]
+    # What each link's fragment starts with, such as `user-content-`.
+    prefix: Optional[str]
+    # The parents whose headings are listed, as a unist-util-is test: a node type, an
+    # object of fields a parent must equal, or a list of these; only the root when unset.
+    parents: Optional[ParentTest]
 
 
 # A character to escape where it would otherwise start or end syntax.
@@ -402,6 +483,11 @@ def component(options: Optional[ComponentOptions] = None) -> Plugin:
     return describe_plugin("md.component", options)
 
 
+def package_command(options: Optional[PackageCommandOptions] = None) -> Plugin:
+    """The `md.packageCommand` plugin."""
+    return describe_plugin("md.packageCommand", options)
+
+
 def heading_id(options: Optional[HeadingIdOptions] = None) -> Plugin:
     """The `md.headingId` plugin."""
     return describe_plugin("md.headingId", options)
@@ -410,6 +496,11 @@ def heading_id(options: Optional[HeadingIdOptions] = None) -> Plugin:
 def strip(options: Optional[StripOptions] = None) -> Plugin:
     """The `md.strip` plugin."""
     return describe_plugin("md.strip", options)
+
+
+def toc(options: Optional[TocOptions] = None) -> Plugin:
+    """The `md.toc` plugin."""
+    return describe_plugin("md.toc", options)
 
 
 def stringify(options: Optional[StringifyOptions] = None) -> Plugin:

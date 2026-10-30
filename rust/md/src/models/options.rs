@@ -249,6 +249,59 @@ pub struct Strip {
     pub remove: Vec<String>,
 }
 
+/// `md.toc`: a table of contents under the first heading matching `heading`, replacing
+/// what sat between it and the next heading as deep or shallower, as remark-toc makes it.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", schemars(rename = "TocOptions"))]
+pub struct Toc {
+    /// The heading to put the table under, as JavaScript regular expression source matched
+    /// against its whole text, case-insensitively; `(table[ -]of[ -])?contents?|toc` when
+    /// unset.
+    pub heading: Option<String>,
+    /// The deepest heading rank to list, 1 to 6.
+    pub max_depth: Option<u8>,
+    /// The shallowest heading rank to list, 1 to 6.
+    pub min_depth: Option<u8>,
+    /// Headings to leave out, as JavaScript regular expression source matched against
+    /// their whole text, case-insensitively.
+    pub skip: Option<String>,
+    /// Keep the list compact, without blank lines between items; `true` when unset.
+    pub tight: Option<bool>,
+    /// Number the list instead of bulleting it.
+    pub ordered: Option<bool>,
+    /// What each link's fragment starts with, such as `user-content-`.
+    pub prefix: Option<String>,
+    /// The parents whose headings are listed, as a unist-util-is test: a node type, an
+    /// object of fields a parent must equal, or a list of these; only the root when unset.
+    pub parents: Option<ParentTest>,
+}
+
+/// A unist-util-is test of a node, written as JSON: one check, or a list any of which
+/// passes.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(untagged)]
+pub enum ParentTest {
+    /// One check.
+    One(ParentCheck),
+    /// A node passing any of these checks.
+    Any(Vec<ParentCheck>),
+}
+
+/// One unist-util-is check: a node type, or fields a node must equal.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(untagged)]
+pub enum ParentCheck {
+    /// A node of this type.
+    Kind(String),
+    /// A node whose fields equal these values; only strings, numbers, booleans and `null`
+    /// can ever be equal.
+    Fields(serde_json::Map<String, serde_json::Value>),
+}
+
 /// `md.component`: directives, GitHub alerts and other nodes into MDX JSX elements, the
 /// components an MDX runtime renders, by declarative rules.
 #[derive(Clone, Debug, Default, Deserialize)]
@@ -409,6 +462,132 @@ pub enum UnknownDirectives {
     Source,
 }
 
+/// `md.packageCommand`: a fenced block of package-manager commands, its language naming
+/// the ecosystem (`npm`, `pip`, `cargo`), into one component with the commands converted
+/// for each manager, as `@docusaurus/remark-plugin-npm2yarn` does for npm.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", schemars(rename = "PackageCommandOptions"))]
+pub struct PackageCommand {
+    /// The component a block becomes; one string attribute per manager.
+    pub component: String,
+    /// Each ecosystem's managers, in attribute order; an empty list leaves its blocks code.
+    pub ecosystems: Ecosystems,
+}
+
+impl Default for PackageCommand {
+    fn default() -> Self {
+        PackageCommand {
+            component: "PackageTabs".to_owned(),
+            ecosystems: Ecosystems::default(),
+        }
+    }
+}
+
+/// The managers `md.packageCommand` converts each ecosystem's commands for.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+pub struct Ecosystems {
+    /// Managers for `npm` blocks, converted as npm-to-yarn converts; npm, pnpm, yarn and
+    /// bun by default.
+    pub npm: Vec<NpmManager>,
+    /// Managers for `pip` blocks; pip, uv, poetry and pdm by default.
+    pub pip: Vec<PipManager>,
+    /// Managers for `cargo` blocks; cargo and cargo-binstall by default.
+    pub cargo: Vec<CargoManager>,
+}
+
+impl Default for Ecosystems {
+    fn default() -> Self {
+        Ecosystems {
+            npm: vec![
+                NpmManager::Npm,
+                NpmManager::Pnpm,
+                NpmManager::Yarn,
+                NpmManager::Bun,
+            ],
+            pip: vec![
+                PipManager::Pip,
+                PipManager::Uv,
+                PipManager::Poetry,
+                PipManager::Pdm,
+            ],
+            cargo: vec![CargoManager::Cargo, CargoManager::CargoBinstall],
+        }
+    }
+}
+
+/// A JavaScript package manager an `npm` command converts to.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "kebab-case")]
+pub enum NpmManager {
+    Npm,
+    Pnpm,
+    Yarn,
+    Bun,
+    Deno,
+    Nub,
+}
+
+/// A Python package manager a `pip` command converts to.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "kebab-case")]
+pub enum PipManager {
+    Pip,
+    Uv,
+    Poetry,
+    Pdm,
+}
+
+/// A Rust installer a `cargo` command converts to.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "kebab-case")]
+pub enum CargoManager {
+    Cargo,
+    CargoBinstall,
+}
+
+impl NpmManager {
+    /// The manager's name, as options spell it and as its attribute is named.
+    pub fn name(self) -> &'static str {
+        match self {
+            NpmManager::Npm => "npm",
+            NpmManager::Pnpm => "pnpm",
+            NpmManager::Yarn => "yarn",
+            NpmManager::Bun => "bun",
+            NpmManager::Deno => "deno",
+            NpmManager::Nub => "nub",
+        }
+    }
+}
+
+impl PipManager {
+    /// The manager's name, as options spell it and as its attribute is named.
+    pub fn name(self) -> &'static str {
+        match self {
+            PipManager::Pip => "pip",
+            PipManager::Uv => "uv",
+            PipManager::Poetry => "poetry",
+            PipManager::Pdm => "pdm",
+        }
+    }
+}
+
+impl CargoManager {
+    /// The manager's name, as options spell it and as its attribute is named.
+    pub fn name(self) -> &'static str {
+        match self {
+            CargoManager::Cargo => "cargo",
+            CargoManager::CargoBinstall => "cargo-binstall",
+        }
+    }
+}
+
 /// `md.directive`: generic directives, `:a`, `::b` and `:::c`, read by `md.parse` and
 /// written by `md.stringify`; options named as mdast-util-directive's serializer names
 /// them.
@@ -477,18 +656,30 @@ pub struct MdxSlot(pub Option<Mdx>);
 pub struct DirectiveSlot(pub Option<Directive>);
 
 /// `md.frontmatter`: YAML, TOML or custom matter at the start of a document, read by
-/// `md.parse` and written by `md.stringify`; options: the kinds of matter to recognize,
-/// `yaml` when unset.
+/// `md.parse` and written by `md.stringify`; with `data`, the YAML a document starts with is
+/// parsed into `file.data.matter`, as vfile-matter does.
 ///
-/// From JSON they read as remark-frontmatter's: a preset (`"yaml"`, `"toml"`), a matter
-/// (`{type, marker | fence, anywhere?}`, where `marker` is repeated three times and either
-/// may be `{open, close}`), or a list of them.
+/// From JSON they read as remark-frontmatter's (a preset, `"yaml"` or `"toml"`; a matter,
+/// `{type, marker | fence, anywhere?}`, where `marker` is repeated three times and either
+/// may be `{open, close}`; or a list of them), or as `{matters?, data?, strip?}`.
 #[derive(Clone, Debug)]
-pub struct Frontmatter(pub Vec<Matter>);
+pub struct Frontmatter {
+    /// The kinds of matter to recognize, `yaml` when unset.
+    pub matters: Vec<Matter>,
+    /// Parse the YAML frontmatter a document starts with into `file.data.matter`, `{}`
+    /// when there is none.
+    pub data: bool,
+    /// Remove the YAML frontmatter a document starts with from the tree.
+    pub strip: bool,
+}
 
 impl Default for Frontmatter {
     fn default() -> Self {
-        Frontmatter(vec![Matter::yaml()])
+        Frontmatter {
+            matters: vec![Matter::yaml()],
+            data: false,
+            strip: false,
+        }
     }
 }
 
@@ -529,10 +720,36 @@ impl<'de> Deserialize<'de> for Frontmatter {
         deserializer: D,
     ) -> Result<Self, D::Error> {
         let value = serde_json::Value::deserialize(deserializer)?;
-        read_matters(&value)
-            .map(Frontmatter)
-            .map_err(serde::de::Error::custom)
+        read_frontmatter(&value).map_err(serde::de::Error::custom)
     }
+}
+
+// An object with none of a matter's keys but one of textlane's own is the options object
+fn read_frontmatter(value: &serde_json::Value) -> Result<Frontmatter, String> {
+    let own = value.as_object().filter(|object| {
+        !["type", "marker", "fence"]
+            .iter()
+            .any(|key| object.contains_key(*key))
+            && ["matters", "data", "strip"]
+                .iter()
+                .any(|key| object.contains_key(*key))
+    });
+    let Some(object) = own else {
+        return Ok(Frontmatter {
+            matters: read_matters(value)?,
+            ..Frontmatter::default()
+        });
+    };
+    let flag = |key: &str| match object.get(key) {
+        None | Some(serde_json::Value::Null) => Ok(false),
+        Some(serde_json::Value::Bool(flag)) => Ok(*flag),
+        Some(other) => Err(format!("Expected `{key}` to be a boolean, not `{other}`")),
+    };
+    Ok(Frontmatter {
+        matters: read_matters(object.get("matters").unwrap_or(&serde_json::Value::Null))?,
+        data: flag("data")?,
+        strip: flag("strip")?,
+    })
 }
 
 // As micromark-extension-frontmatter's `toMatters`, with its messages
@@ -617,9 +834,40 @@ impl schemars::JsonSchema for Frontmatter {
     fn json_schema(generator: &mut schemars::SchemaGenerator) -> schemars::Schema {
         let matter = generator.subschema_for::<Matter>();
         let preset = serde_json::json!({ "enum": ["yaml", "toml"] });
-        schemars::json_schema!({
-            "description": "The kinds of matter to recognize, as remark-frontmatter takes them: a preset, a matter, or a list of them; `yaml` when unset.",
+        let matters = serde_json::json!({
             "anyOf": [preset, matter, { "type": "array", "items": { "anyOf": [preset, matter] } }],
+        });
+        let path = generator
+            .settings()
+            .definitions_path
+            .trim_start_matches('/')
+            .to_string();
+        let settings = serde_json::json!({
+            "description": "textlane's options: the matters, and what to do with YAML frontmatter.",
+            "type": "object",
+            "properties": {
+                "matters": {
+                    "description": "The kinds of matter to recognize, as remark-frontmatter takes them; `yaml` when unset.",
+                    "anyOf": matters["anyOf"],
+                },
+                "data": {
+                    "description": "Parse the YAML frontmatter a document starts with into `file.data.matter`, `{}` when there is none, as vfile-matter does.",
+                    "type": "boolean",
+                },
+                "strip": {
+                    "description": "Remove the YAML frontmatter a document starts with from the tree.",
+                    "type": "boolean",
+                },
+            },
+        });
+        generator
+            .definitions_mut()
+            .insert("FrontmatterSettings".into(), settings);
+        let object =
+            serde_json::json!({ "$ref": format!("#/{path}/FrontmatterSettings") });
+        schemars::json_schema!({
+            "description": "The kinds of matter to recognize, as remark-frontmatter takes them (a preset, a matter, or a list of them; `yaml` when unset), or textlane's options object.",
+            "anyOf": [preset, matter, { "type": "array", "items": { "anyOf": [preset, matter] } }, object],
         })
     }
 }

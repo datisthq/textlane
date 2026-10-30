@@ -3444,5 +3444,589 @@
         }
       }
     ]
+  },
+  {
+    "description": "vfile-matter: data",
+    "comment": "textlane's own extension: md.frontmatter's `data` reads the first yaml node as vfile-matter reads the file, on the pinned yaml package",
+    "source": {
+      "repository": "https://github.com/vfile/vfile-matter",
+      "version": "5.0.1",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        {
+          "data": true
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a mapping",
+        "input": "---\ntitle: Hello\nauthor: Ada\n---\n\n# Hello",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "title": "Hello",
+              "author": "Ada"
+            }
+          }
+        }
+      },
+      {
+        "description": "nested mappings",
+        "input": "---\na:\n  b:\n    c: d\n  e: f\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "a": {
+                "b": {
+                  "c": "d"
+                },
+                "e": "f"
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "block and flow sequences",
+        "input": "---\ntags:\n  - a\n  - b\nflow: [1, two, {three: 3}]\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "tags": ["a", "b"],
+              "flow": [
+                1,
+                "two",
+                {
+                  "three": 3
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "description": "integers",
+        "input": "---\na: 1\nb: -2\nc: +3\nd: 0o17\ne: 0x1F\nf: 007\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "a": 1,
+              "b": -2,
+              "c": 3,
+              "d": 15,
+              "e": 31,
+              "f": 7
+            }
+          }
+        }
+      },
+      {
+        "description": "floats",
+        "input": "---\na: 1.5\nb: -.5\nc: 1e3\nd: 2.\ne: 1.0\nf: 6.02E+23\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "a": 1.5,
+              "b": -0.5,
+              "c": 1000,
+              "d": 2,
+              "e": 1,
+              "f": 6.02e23
+            }
+          }
+        }
+      },
+      {
+        "description": "large integers lose precision as numbers",
+        "input": "---\na: 12345678901234567890\nb: 9007199254740993\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "a": 12345678901234567000,
+              "b": 9007199254740992
+            }
+          }
+        }
+      },
+      {
+        "description": "infinities and not-a-number become null",
+        "input": "---\na: .inf\nb: -.Inf\nc: .NaN\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "a": null,
+              "b": null,
+              "c": null
+            }
+          }
+        }
+      },
+      {
+        "description": "booleans",
+        "input": "---\na: true\nb: False\nc: TRUE\nd: yes\ne: on\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "a": true,
+              "b": false,
+              "c": true,
+              "d": "yes",
+              "e": "on"
+            }
+          }
+        }
+      },
+      {
+        "description": "nulls",
+        "input": "---\na: null\nb: ~\nc:\nd: NULL\ne: Null\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "a": null,
+              "b": null,
+              "c": null,
+              "d": null,
+              "e": null
+            }
+          }
+        }
+      },
+      {
+        "description": "quoted strings stay strings",
+        "input": "---\na: \"1\"\nb: 'true'\nc: \"null\"\nd: \"a\\tb\\u00e9\"\ne: 'it''s'\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "a": "1",
+              "b": "true",
+              "c": "null",
+              "d": "a\tbé",
+              "e": "it's"
+            }
+          }
+        }
+      },
+      {
+        "description": "dates stay strings",
+        "input": "---\ndate: 2024-01-02\ntime: 2001-12-14t21:59:43.10-05:00\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "date": "2024-01-02",
+              "time": "2001-12-14t21:59:43.10-05:00"
+            }
+          }
+        }
+      },
+      {
+        "description": "literal and folded block scalars",
+        "input": "---\nliteral: |\n  a\n  b\nfolded: >\n  a\n  b\nkeep: |+\n  c\n\nstrip: >-\n  d\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "literal": "a\nb\n",
+              "folded": "a b\n",
+              "keep": "c\n\n",
+              "strip": "d"
+            }
+          }
+        }
+      },
+      {
+        "description": "multi-line plain and quoted scalars",
+        "input": "---\nplain: a\n  b\n\n  c\nquoted: \"x\n  y\"\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "plain": "a b\nc",
+              "quoted": "x y"
+            }
+          }
+        }
+      },
+      {
+        "description": "anchors and aliases",
+        "input": "---\nbase: &base\n  a: 1\n  b: [2, 3]\ncopy: *base\nlist:\n  - &x hi\n  - *x\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "base": {
+                "a": 1,
+                "b": [2, 3]
+              },
+              "copy": {
+                "a": 1,
+                "b": [2, 3]
+              },
+              "list": ["hi", "hi"]
+            }
+          }
+        }
+      },
+      {
+        "description": "a redefined anchor resolves to the latest",
+        "input": "---\na: &x 1\nb: *x\nc: &x 2\nd: *x\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "a": 1,
+              "b": 1,
+              "c": 2,
+              "d": 2
+            }
+          }
+        }
+      },
+      {
+        "description": "merge keys are plain keys in YAML 1.2",
+        "input": "---\nbase: &b {a: 1}\nmerged:\n  <<: *b\n  c: 2\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "base": {
+                "a": 1
+              },
+              "merged": {
+                "<<": {
+                  "a": 1
+                },
+                "c": 2
+              }
+            }
+          }
+        }
+      },
+      {
+        "description": "keys of other types become strings",
+        "input": "---\n1: a\n1.5: b\ntrue: c\n~: d\n0x10: e\n.inf: f\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "1": "a",
+              "16": "e",
+              "1.5": "b",
+              "true": "c",
+              "": "d",
+              "Infinity": "f"
+            }
+          }
+        }
+      },
+      {
+        "description": "integer keys come first",
+        "input": "---\nb: 1\n2: x\na: 2\n1: y\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "1": "y",
+              "2": "x",
+              "b": 1,
+              "a": 2
+            }
+          }
+        }
+      },
+      {
+        "description": "a string and a number key alike",
+        "input": "---\n\"1\": a\n1: b\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "1": "b"
+            }
+          }
+        }
+      },
+      {
+        "description": "explicit tags",
+        "input": "---\na: !!str 123\nb: !!int \"42\"\nc: !!float 1\nd: !custom value\ne: !!int abc\nf: ! 12\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "a": "123",
+              "b": 42,
+              "c": "1",
+              "d": "value",
+              "e": "abc",
+              "f": "12"
+            }
+          }
+        }
+      },
+      {
+        "description": "comments",
+        "input": "---\n# a comment\na: 1 # trailing\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "a": 1
+            }
+          }
+        }
+      },
+      {
+        "description": "a top-level sequence",
+        "input": "---\n- a\n- b\n---",
+        "expected": {
+          "fileData": {
+            "matter": ["a", "b"]
+          }
+        }
+      },
+      {
+        "description": "a top-level string",
+        "input": "---\nhello\n---",
+        "expected": {
+          "fileData": {
+            "matter": "hello"
+          }
+        }
+      },
+      {
+        "description": "a top-level number",
+        "input": "---\n42\n---",
+        "expected": {
+          "fileData": {
+            "matter": 42
+          }
+        }
+      },
+      {
+        "description": "a falsy top-level value becomes an empty object",
+        "input": "---\nfalse\n---",
+        "expected": {
+          "fileData": {
+            "matter": {}
+          }
+        }
+      },
+      {
+        "description": "a zero top-level value becomes an empty object",
+        "input": "---\n0\n---",
+        "expected": {
+          "fileData": {
+            "matter": {}
+          }
+        }
+      },
+      {
+        "description": "an empty block",
+        "input": "---\n---\n\ntext",
+        "expected": {
+          "fileData": {
+            "matter": {}
+          }
+        }
+      },
+      {
+        "description": "a block of only comments",
+        "input": "---\n# nothing\n---",
+        "expected": {
+          "fileData": {
+            "matter": {}
+          }
+        }
+      },
+      {
+        "description": "no frontmatter",
+        "input": "# Hello\n\nworld",
+        "expected": {
+          "fileData": {
+            "matter": {}
+          }
+        }
+      },
+      {
+        "description": "an empty document",
+        "input": "",
+        "expected": {
+          "fileData": {
+            "matter": {}
+          }
+        }
+      },
+      {
+        "description": "a thematic break is not frontmatter",
+        "input": "---\n\ntext",
+        "expected": {
+          "fileData": {
+            "matter": {}
+          }
+        }
+      },
+      {
+        "description": "CRLF line endings",
+        "input": "---\r\na: 1\r\nb: 2\r\n---\r\n\r\ntext",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "a": 1,
+              "b": 2
+            }
+          }
+        }
+      },
+      {
+        "description": "unicode",
+        "input": "---\nтитул: Привет\nemoji: 😀\n---",
+        "expected": {
+          "fileData": {
+            "matter": {
+              "титул": "Привет",
+              "emoji": "😀"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "vfile-matter: invalid YAML",
+    "comment": "textlane's own extension: md.frontmatter's `data` reads the first yaml node as vfile-matter reads the file, on the pinned yaml package; every failure is `invalid-frontmatter`, with yaml's message where textlane words it the same",
+    "source": {
+      "repository": "https://github.com/vfile/vfile-matter",
+      "version": "5.0.1",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        {
+          "data": true
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a duplicate key",
+        "input": "---\na: 1\na: 2\n---",
+        "expected": {
+          "error": {
+            "code": "invalid-frontmatter",
+            "message": "Map keys must be unique"
+          }
+        }
+      },
+      {
+        "description": "a duplicate key spelled differently",
+        "input": "---\n1: a\n1.0: b\n---",
+        "expected": {
+          "error": {
+            "code": "invalid-frontmatter",
+            "message": "Map keys must be unique"
+          }
+        }
+      },
+      {
+        "description": "an unclosed flow sequence",
+        "input": "---\na: [1, 2\n---",
+        "expected": {
+          "error": {
+            "code": "invalid-frontmatter"
+          }
+        }
+      },
+      {
+        "description": "a bad indentation",
+        "input": "---\na:\n  b: 1\n c: 2\n---",
+        "expected": {
+          "error": {
+            "code": "invalid-frontmatter"
+          }
+        }
+      },
+      {
+        "description": "an undefined alias",
+        "input": "---\na: *nope\n---",
+        "expected": {
+          "error": {
+            "code": "invalid-frontmatter"
+          }
+        }
+      },
+      {
+        "description": "a tab as indentation",
+        "input": "---\na:\n\tb: 1\n---",
+        "expected": {
+          "error": {
+            "code": "invalid-frontmatter"
+          }
+        }
+      },
+      {
+        "description": "exponential aliases",
+        "input": "---\na: &a [x, x, x, x, x, x, x, x, x, x]\nb: &b [*a, *a, *a, *a, *a, *a, *a, *a, *a, *a]\nc: &c [*b, *b, *b, *b, *b, *b, *b, *b, *b, *b]\nd: [*c, *c, *c, *c, *c, *c, *c, *c, *c, *c]\n---",
+        "expected": {
+          "error": {
+            "code": "invalid-frontmatter",
+            "message": "Excessive alias count indicates a resource exhaustion attack"
+          }
+        }
+      },
+      {
+        "description": "many aliases of one scalar",
+        "input": "---\na: &a x\nb: [*a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a, *a]\n---",
+        "expected": {
+          "error": {
+            "code": "invalid-frontmatter",
+            "message": "Excessive alias count indicates a resource exhaustion attack"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "vfile-matter: strip",
+    "comment": "textlane's own extension: md.frontmatter's `data` reads the first yaml node as vfile-matter reads the file, on the pinned yaml package; `strip` drops the yaml node, where vfile-matter drops the text before parsing",
+    "source": {
+      "repository": "https://github.com/vfile/vfile-matter",
+      "version": "5.0.1",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.frontmatter",
+        {
+          "data": true,
+          "strip": true
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "frontmatter before a heading",
+        "input": "---\ntitle: Hello\n---\n\n# Hello",
+        "expected": {
+          "md": "# Hello\n"
+        }
+      },
+      {
+        "description": "frontmatter alone",
+        "input": "---\na: 1\n---",
+        "expected": {
+          "md": ""
+        }
+      },
+      {
+        "description": "no frontmatter",
+        "input": "# Hello",
+        "expected": {
+          "md": "# Hello\n"
+        }
+      }
+    ]
   }
 ]

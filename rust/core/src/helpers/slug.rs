@@ -4,13 +4,13 @@ use crate::helpers::slug_table::REMOVED;
 
 /// github-slugger's `BananaSlug`: slugs, made unique by counting repeats.
 #[derive(Debug, Default)]
-pub(crate) struct Slugger {
+pub struct Slugger {
     occurrences: HashMap<String, usize>,
 }
 
 impl Slugger {
     /// A unique slug for `value`: `a`, then `a-1`, `a-2`.
-    pub(crate) fn slug(&mut self, value: &str) -> String {
+    pub fn slug(&mut self, value: &str) -> String {
         let original = create_slug(value);
         let mut result = original.clone();
         while self.occurrences.contains_key(&result) {
@@ -24,7 +24,7 @@ impl Slugger {
 }
 
 /// Lowercase, drop punctuation and symbols, turn spaces into dashes.
-pub(crate) fn create_slug(value: &str) -> String {
+pub fn create_slug(value: &str) -> String {
     value
         .to_lowercase()
         .chars()

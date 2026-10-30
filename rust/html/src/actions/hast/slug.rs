@@ -1,7 +1,6 @@
 use textlane_core::hast::{Node, Property, PropertyValue};
-use textlane_core::{Allocator, ArenaVec};
+use textlane_core::{Allocator, ArenaVec, Slugger};
 
-use crate::helpers::slug::Slugger;
 use crate::models::options::Slug;
 
 // Headings nested in each other share text, and slugging each one's whole text is

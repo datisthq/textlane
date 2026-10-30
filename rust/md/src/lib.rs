@@ -32,6 +32,14 @@ mod utils {
         pub(crate) mod mdx;
         pub(crate) mod scan;
     }
+    pub(crate) mod yaml {
+        pub(crate) mod compose;
+        pub(crate) mod convert;
+        pub(crate) mod document;
+        pub(crate) mod number;
+        pub(crate) mod parse;
+        pub(crate) mod scalar;
+    }
 }
 mod actions {
     pub(crate) mod blockquote {
@@ -180,6 +188,8 @@ mod actions {
 mod helpers {
     pub(crate) mod attribute;
     pub(crate) mod character;
+    pub(crate) mod command;
+    pub(crate) mod command_table;
     pub(crate) mod decode;
     pub(crate) mod entities;
     pub(crate) mod html;
@@ -239,6 +249,11 @@ mod plugins {
         pub(crate) mod plugin;
     }
     pub(crate) mod frontmatter {
+        pub(crate) mod actions {
+            pub(crate) mod matter {
+                pub(crate) mod read;
+            }
+        }
         pub(crate) mod plugin;
     }
     pub(crate) mod gemoji {
@@ -264,6 +279,41 @@ mod plugins {
     pub(crate) mod mdx {
         pub(crate) mod plugin;
     }
+    pub(crate) mod package_command {
+        pub(crate) mod actions {
+            pub(crate) mod args {
+                pub(crate) mod parse;
+            }
+            pub(crate) mod bun {
+                pub(crate) mod convert;
+            }
+            pub(crate) mod cargo {
+                pub(crate) mod convert;
+            }
+            pub(crate) mod code {
+                pub(crate) mod convert;
+            }
+            pub(crate) mod deno {
+                pub(crate) mod convert;
+            }
+            pub(crate) mod npm {
+                pub(crate) mod convert;
+            }
+            pub(crate) mod nub {
+                pub(crate) mod convert;
+            }
+            pub(crate) mod pip {
+                pub(crate) mod convert;
+            }
+            pub(crate) mod pnpm {
+                pub(crate) mod convert;
+            }
+            pub(crate) mod yarn {
+                pub(crate) mod convert;
+            }
+        }
+        pub(crate) mod plugin;
+    }
     pub(crate) mod parse {
         pub(crate) mod plugin;
     }
@@ -278,6 +328,29 @@ mod plugins {
         }
         pub(crate) mod plugin;
     }
+    pub(crate) mod toc {
+        pub(crate) mod actions {
+            pub(crate) mod contents {
+                pub(crate) mod build;
+            }
+            pub(crate) mod expression {
+                pub(crate) mod compile;
+            }
+            pub(crate) mod heading {
+                pub(crate) mod search;
+            }
+            pub(crate) mod node {
+                pub(crate) mod copy;
+            }
+            pub(crate) mod parent {
+                pub(crate) mod check;
+            }
+            pub(crate) mod text {
+                pub(crate) mod collect;
+            }
+        }
+        pub(crate) mod plugin;
+    }
     pub(crate) mod to_html {
         pub(crate) mod plugin;
     }
@@ -288,10 +361,12 @@ mod plugins {
 
 // models
 pub use models::options::{
-    AlertRule, AttributeRule, CodeGroupRule, CodeRule, Component, DefinitionListSlot,
-    Directive, DirectiveKind, DirectiveRule, DirectiveSlot, Frontmatter, FrontmatterSlot,
-    Gfm, GfmSlot, GroupRule, HeadingId, Math, MathSlot, Matter, Mdx, MdxSlot, Names,
-    Parse, Stringify, Strip, ToHtml, ToNaturalLanguage, UnknownDirectives, UnsafePattern,
+    AlertRule, AttributeRule, CargoManager, CodeGroupRule, CodeRule, Component,
+    DefinitionListSlot, Directive, DirectiveKind, DirectiveRule, DirectiveSlot,
+    Ecosystems, Frontmatter, FrontmatterSlot, Gfm, GfmSlot, GroupRule, HeadingId, Math,
+    MathSlot, Matter, Mdx, MdxSlot, Names, NpmManager, PackageCommand, ParentCheck,
+    ParentTest, Parse, PipManager, Stringify, Strip, ToHtml, ToNaturalLanguage, Toc,
+    UnknownDirectives, UnsafePattern,
 };
 
 // actions

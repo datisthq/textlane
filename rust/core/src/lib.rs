@@ -3,6 +3,10 @@
 //! shares.
 
 mod plugin;
+mod helpers {
+    pub(crate) mod slug;
+    pub(crate) mod slug_table;
+}
 mod models {
     pub(crate) mod arena;
     pub(crate) mod data;
@@ -69,6 +73,9 @@ pub mod nlcst {
     pub use crate::actions::nlcst::serialize::serialize_nlcst;
     pub use crate::models::nlcst::*;
 }
+
+// helpers
+pub use helpers::slug::{Slugger, create_slug};
 
 // models
 pub use models::arena::ArenaVec;

@@ -196,14 +196,17 @@ Follows [remark-mdx](https://www.npmjs.com/package/remark-mdx).
 
 ## md.frontmatter
 
-Reads frontmatter — YAML by default, TOML or your own fences by option — into a node of its own. In Rust it holds the matters themselves: `md::Matter::yaml()`, `md::Matter::toml()` or one of your own.
+Reads frontmatter — YAML by default, TOML or your own fences by option — into a node of its own. In Rust its `matters` are the matters themselves: `md::Matter::yaml()`, `md::Matter::toml()` or one of your own.
 
 ```rust
 use textlane::{Processor, md};
 
 let output = Processor::new()
     .with(md::Parse::default())
-    .with(md::Frontmatter(vec![md::Matter::yaml(), md::Matter::toml()]))
+    .with(md::Frontmatter {
+        matters: vec![md::Matter::yaml(), md::Matter::toml()],
+        ..Default::default()
+    })
     .with(md::Stringify::default())
     .freeze()?
     .process("+++\ntitle = \"Hi\"\n+++\n\n# Hi")?;
@@ -215,13 +218,26 @@ output.value
 // # Hi
 ```
 
+With `data: true` it also parses the YAML a document starts with into the file's `data.matter`, as vfile-matter does (`{}` when there is none; YAML 1.2's core schema, as the `yaml` package reads it), and `strip: true` drops that node from the tree. Invalid YAML fails with `invalid-frontmatter`. To combine them with other matters, pass `{ matters, data, strip }`.
+
+```rust
+let output = Processor::new()
+    .with(md::Parse::default())
+    .with(md::Frontmatter { data: true, ..Default::default() })
+    .with(md::Stringify::default())
+    .freeze()?
+    .process("---\ntitle: Hello\ntags: [a, b]\n---\n\n# Hello")?;
+output.file.data["matter"]
+// {"title": "Hello", "tags": ["a", "b"]}
+```
+
 <!-- generated:options md.frontmatter -->
 
 Follows [remark-frontmatter](https://www.npmjs.com/package/remark-frontmatter).
 
-The kinds of matter to recognize, as remark-frontmatter takes them: a preset, a matter, or a list of them; `yaml` when unset.
+The kinds of matter to recognize, as remark-frontmatter takes them (a preset, a matter, or a list of them; `yaml` when unset), or textlane's options object.
 
-Takes `"yaml" | "toml" | Matter | ("yaml" | "toml" | Matter)[]`.
+Takes `"yaml" | "toml" | Matter | ("yaml" | "toml" | Matter)[] | FrontmatterSettings`.
 
 **`Matter`**
 
@@ -233,6 +249,16 @@ One kind of frontmatter: the node `type` it becomes and its fences, a `marker` r
 | `marker`   | `Fence`   |         |             |
 | `fence`    | `Fence`   |         |             |
 | `anywhere` | `boolean` |         |             |
+
+**`FrontmatterSettings`**
+
+textlane's options: the matters, and what to do with YAML frontmatter.
+
+| Option    | Type                                                           | Default | Description                                                                                                               |
+| --------- | -------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `matters` | `"yaml" \| "toml" \| Matter \| ("yaml" \| "toml" \| Matter)[]` |         | The kinds of matter to recognize, as remark-frontmatter takes them; `yaml` when unset.                                    |
+| `data`    | `boolean`                                                      |         | Parse the YAML frontmatter a document starts with into `file.data.matter`, `{}` when there is none, as vfile-matter does. |
+| `strip`   | `boolean`                                                      |         | Remove the YAML frontmatter a document starts with from the tree.                                                         |
 
 **`Fence`**
 
@@ -406,6 +432,69 @@ The component wrapping a run of adjacent code blocks one rule matched; the meta 
 
 <!-- /generated -->
 
+## md.packageCommand
+
+Turns a fenced block of package-manager commands into one MDX JSX element with the commands
+converted for each manager, as `@docusaurus/remark-plugin-npm2yarn` does, so a site's install
+tabs need no JavaScript plugin. The block's language names the ecosystem: `npm` converts as
+the npm-to-yarn package does, for pnpm, yarn, bun, deno and nub; `pip` for uv, poetry and pdm;
+`cargo` for cargo-binstall. Each manager becomes a string attribute named after it, in the
+order `ecosystems` lists them, and each line converts on its own; a line a manager has no
+equivalent for stays as written. Run it before `md::ToHtml` and `mdx::Compile`.
+
+````rust
+use textlane::{Processor, md};
+
+let output = Processor::new()
+    .with(md::Parse::default())
+    .with(md::Mdx::default())
+    .with(md::PackageCommand::default())
+    .with(md::Stringify::default())
+    .freeze()?
+    .process("```npm\nnpm install textlane\n```")?;
+output.value
+// <PackageTabs npm="npm install textlane" pnpm="pnpm add textlane" yarn="yarn add textlane" bun="bun add textlane" />
+````
+
+<!-- generated:options md.packageCommand -->
+
+Follows [npm-to-yarn](https://www.npmjs.com/package/npm-to-yarn).
+
+| Option       | Type         | Default         | Description                                                                          |
+| ------------ | ------------ | --------------- | ------------------------------------------------------------------------------------ |
+| `component`  | `string`     | `"PackageTabs"` | The component a block becomes; one string attribute per manager.                     |
+| `ecosystems` | `Ecosystems` |                 | Each ecosystem's managers, in attribute order; an empty list leaves its blocks code. |
+
+**`Ecosystems`**
+
+The managers `md.packageCommand` converts each ecosystem's commands for.
+
+| Option  | Type             | Default | Description                                                                                       |
+| ------- | ---------------- | ------- | ------------------------------------------------------------------------------------------------- |
+| `npm`   | `NpmManager[]`   |         | Managers for `npm` blocks, converted as npm-to-yarn converts; npm, pnpm, yarn and bun by default. |
+| `pip`   | `PipManager[]`   |         | Managers for `pip` blocks; pip, uv, poetry and pdm by default.                                    |
+| `cargo` | `CargoManager[]` |         | Managers for `cargo` blocks; cargo and cargo-binstall by default.                                 |
+
+**`NpmManager`**
+
+A JavaScript package manager an `npm` command converts to.
+
+Takes `"npm" | "pnpm" | "yarn" | "bun" | "deno" | "nub"`.
+
+**`PipManager`**
+
+A Python package manager a `pip` command converts to.
+
+Takes `"pip" | "uv" | "poetry" | "pdm"`.
+
+**`CargoManager`**
+
+A Rust installer a `cargo` command converts to.
+
+Takes `"cargo" | "cargo-binstall"`.
+
+<!-- /generated -->
+
 ## md.headingId
 
 Reads `{#id}` at the end of a heading, after a space, as its id, as remark-heading-id does; `md.toHtml` puts it on the heading. remark-heading-id's `defaults` is not ported: `html.slug` gives the other headings ids. With `attributes: true` it reads a whole attribute list instead, as `md.directive` reads one: `## API {#api .wide data-step=2}` gives the heading an id, classes and a `data-step`. Only the last braces are read, event handlers (`on…`) and invalid names are dropped, and on untrusted input the result still belongs behind `html.sanitize`.
@@ -461,6 +550,64 @@ Follows [strip-markdown](https://www.npmjs.com/package/strip-markdown).
 | -------- | ---------- | ------- | ------------------------------------------------------- |
 | `keep`   | `string[]` | `[]`    | Node types to leave as they are, such as `inlineCode`.  |
 | `remove` | `string[]` | `[]`    | Node types to drop, besides those strip-markdown drops. |
+
+<!-- /generated -->
+
+## md.toc
+
+Generates a table of contents, as remark-toc does: under the first heading matching `heading` (`Contents`, `Table of contents` or `TOC` by default), it replaces whatever sat before the next heading as deep or shallower with a list linking to every heading after, by the ids github-slugger makes from their text, or the ids `md.headingId` stored. `heading` and `skip` are JavaScript regular expression sources matched against a heading's whole text, case-insensitively, run by Rust's `regex`: lookaround and back references are refused, and case folding is Unicode's rather than JavaScript's. `parents` takes unist-util-is tests written as JSON (a type, an object of fields, a list), not functions.
+
+```rust
+use textlane::{Processor, md};
+
+let output = Processor::new()
+    .with(md::Parse::default())
+    .with(md::Toc::default())
+    .with(md::Stringify::default())
+    .freeze()?
+    .process("# Guide\n\n## Contents\n\n## Install\n\n### From npm\n\n## Use")?;
+output.value
+// # Guide
+//
+// ## Contents
+//
+// * [Install](#install)
+//   * [From npm](#from-npm)
+// * [Use](#use)
+//
+// ## Install
+//
+// ### From npm
+//
+// ## Use
+```
+
+<!-- generated:options md.toc -->
+
+Follows [remark-toc](https://www.npmjs.com/package/remark-toc).
+
+| Option     | Type                 | Default | Description                                                                                                                                                                    |
+| ---------- | -------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `heading`  | `string \| null`     | `null`  | The heading to put the table under, as JavaScript regular expression source matched against its whole text, case-insensitively; `(table[ -]of[ -])?contents?\|toc` when unset. |
+| `maxDepth` | `number \| null`     | `null`  | The deepest heading rank to list, 1 to 6.                                                                                                                                      |
+| `minDepth` | `number \| null`     | `null`  | The shallowest heading rank to list, 1 to 6.                                                                                                                                   |
+| `skip`     | `string \| null`     | `null`  | Headings to leave out, as JavaScript regular expression source matched against their whole text, case-insensitively.                                                           |
+| `tight`    | `boolean \| null`    | `null`  | Keep the list compact, without blank lines between items; `true` when unset.                                                                                                   |
+| `ordered`  | `boolean \| null`    | `null`  | Number the list instead of bulleting it.                                                                                                                                       |
+| `prefix`   | `string \| null`     | `null`  | What each link's fragment starts with, such as `user-content-`.                                                                                                                |
+| `parents`  | `ParentTest \| null` |         | The parents whose headings are listed, as a unist-util-is test: a node type, an object of fields a parent must equal, or a list of these; only the root when unset.            |
+
+**`ParentTest`**
+
+A unist-util-is test of a node, written as JSON: one check, or a list any of which passes.
+
+Takes `ParentCheck | ParentCheck[]`.
+
+**`ParentCheck`**
+
+One unist-util-is check: a node type, or fields a node must equal.
+
+Takes `string | Record<string, unknown>`.
 
 <!-- /generated -->
 

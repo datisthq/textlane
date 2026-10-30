@@ -180,8 +180,6 @@ mod helpers {
     pub(crate) mod registry;
     pub(crate) mod schema;
     pub(crate) mod selected;
-    pub(crate) mod slug;
-    pub(crate) mod slug_table;
     pub(crate) mod tag;
     pub(crate) mod text;
     #[cfg(feature = "highlight")]

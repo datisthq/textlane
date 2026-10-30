@@ -132,6 +132,15 @@ the case: `unknown-plugin`, `invalid-options`, `missing-parser`, `missing-compil
   rule of `md.component` instead. remark-heading-id, strip-markdown, rehype-unwrap-images and
   @stefanprobst/rehype-extract-toc are `md.headingId`, `md.strip`, `html.unwrapImages` and
   `html.extractToc`; the table of contents lands in the result's `data.toc`. rehype-external-links is `html.externalLinks` (JSON options, no functions), and
-  `md.headingId({ attributes: true })` reads `{#id .class key=value}`.
+  `md.headingId({ attributes: true })` reads `{#id .class key=value}`. vfile-matter is
+  `md.frontmatter({ data: true })` (add `strip: true` to drop the node, `matters` for TOML too):
+  the YAML lands in the result's `data.matter`, `{}` without one; bad YAML fails with
+  `invalid-frontmatter`. An npm2yarn-style remark plugin (`@docusaurus/remark-plugin-npm2yarn`,
+  npm-to-yarn tabs) is `md.packageCommand`: a fenced `npm`, `pip` or `cargo` block becomes one
+  `PackageTabs` element with an attribute per manager (pnpm, yarn, bun; uv, poetry, pdm;
+  cargo-binstall). remark-toc is
+  `md.toc`: `heading` and `skip` are regex source strings, `parents` a JSON unist-util-is
+  test, never a function; JavaScript lookaround and back references fail with
+  `invalid-options`.
 - remark-stringify reads `settings` from processor data; textlane's `md.stringify` takes its
   options directly.
