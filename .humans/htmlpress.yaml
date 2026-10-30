@@ -9,7 +9,3 @@ sections:
   - title: Notes
     prefix: /
     icon: notebook-pen
-  - title: Docs
-    type: custom
-    url: https://textlane.dev
-    icon: book-open
