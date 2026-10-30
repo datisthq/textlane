@@ -141,7 +141,7 @@ InlineCode = Literal["tailing-curly-colon"]
 
 
 # The transformers `html.highlight` runs natively.
-TransformerName = Literal["notationDiff", "notationFocus", "notationHighlight", "notationErrorLevel", "metaHighlight", "renderLineNumber"]
+TransformerName = Literal["notationDiff", "notationFocus", "notationHighlight", "notationErrorLevel", "metaHighlight", "metaWordHighlight", "renderLineNumber"]
 
 
 # Class names: a list, or one string of them separated by white space.
@@ -199,16 +199,24 @@ class ConfiguredTransformer4(_ConfiguredTransformer4Required, total=False):
 
 
 class _ConfiguredTransformer5Required(TypedDict):
-    name: Literal["renderLineNumber"]
+    name: Literal["metaWordHighlight"]
 
 
 class ConfiguredTransformer5(_ConfiguredTransformer5Required, total=False):
+    className: Optional[Classes]
+
+
+class _ConfiguredTransformer6Required(TypedDict):
+    name: Literal["renderLineNumber"]
+
+
+class ConfiguredTransformer6(_ConfiguredTransformer6Required, total=False):
     classLineNumber: Optional[Classes]
     start: Optional[int]
 
 
 # A transformer with its options, as @shikijs/transformers names them.
-ConfiguredTransformer = Union[ConfiguredTransformer0, ConfiguredTransformer1, ConfiguredTransformer2, ConfiguredTransformer3, ConfiguredTransformer4, ConfiguredTransformer5]
+ConfiguredTransformer = Union[ConfiguredTransformer0, ConfiguredTransformer1, ConfiguredTransformer2, ConfiguredTransformer3, ConfiguredTransformer4, ConfiguredTransformer5, ConfiguredTransformer6]
 
 
 # A transformer of @shikijs/transformers: its name alone, or its name and options.

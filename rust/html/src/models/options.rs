@@ -175,6 +175,7 @@ pub enum TransformerName {
     NotationHighlight,
     NotationErrorLevel,
     MetaHighlight,
+    MetaWordHighlight,
     RenderLineNumber,
 }
 
@@ -219,6 +220,9 @@ pub enum ConfiguredTransformer {
         #[serde(default)]
         zero_indexed: bool,
     },
+    /// `/word/` in the meta marks every occurrence of the word.
+    #[serde(rename_all = "camelCase")]
+    MetaWordHighlight { class_name: Option<Classes> },
     /// A number at the start of each line.
     #[serde(rename_all = "camelCase")]
     RenderLineNumber {

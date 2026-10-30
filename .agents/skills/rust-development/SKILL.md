@@ -160,7 +160,10 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   over hast: line hooks (`metaHighlight`, `renderLineNumber`) per line, then the notation
   `code` hooks sharing one `parseComments` (`utils/notation/`, matching `v3`). A notation
   marks tokens `None` and lines `removed` instead of splicing, so the indexes parsed comments
-  hold stay valid; Shiki's line ending after a removed line goes with it. Cases come from the
+  hold stay valid; Shiki's line ending after a removed line goes with it. `metaWordHighlight`
+  ports Shiki's decorations engine (`actions/code/decorate.rs`): tokens split at UTF-16
+  offsets before the hooks, decorations applied to the finished hast last, as Shiki's own
+  transformer runs after every caller's. Cases come from the
   pinned packages through `import:highlight` (`highlight-transformers.json`, `highlight-ansi.json`)
   `html.katex` follows rehype-katex 7.0.1 on katex-rs 0.3.0 (KaTeX 0.18.5): KaTeX's markup
   goes back through the HTML parser, as `fromHtmlIsomorphic` does. katex-rs keeps attributes

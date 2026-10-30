@@ -1,6 +1,7 @@
 use textlane_core::hast::{Element, Node, Property, PropertyItem, PropertyValue, Text};
 use textlane_core::{Allocator, ArenaVec, Error};
 
+use crate::actions::code::decorate::{apply_decorations, read_decorations, split_tokens};
 use crate::actions::code::tokenize::{replace_color, tokenize_code};
 use crate::actions::code::transform::transform_code;
 use crate::models::highlight::{CodeBlock, CodeLine, Themes, add_classes};
@@ -31,6 +32,10 @@ pub(crate) fn highlight_code<'a>(
         pre_classes: Vec::new(),
         code_classes: Vec::new(),
     };
+    let mut decorations = read_decorations(code, meta, &options.transformers)?;
+    if !decorations.is_empty() {
+        split_tokens(&mut block, code, &decorations);
+    }
     transform_code(&mut block, &options.transformers);
     if options.add_language_class {
         add_classes(&mut block.code_classes, &[format!("language-{language}")]);
@@ -67,8 +72,12 @@ pub(crate) fn highlight_code<'a>(
     if !block.code_classes.is_empty() {
         code_properties.push(create_class(&block.code_classes, alloc));
     }
-    let mut code = ArenaVec::with_capacity_in(1, alloc);
-    code.push(create_element("code", code_properties, children));
+    // Shiki's own decorations transformer runs after every one a caller adds
+    if !decorations.is_empty() {
+        apply_decorations(&mut children, code, &mut decorations, alloc)?;
+    }
+    let mut code_element = ArenaVec::with_capacity_in(1, alloc);
+    code_element.push(create_element("code", code_properties, children));
     let mut properties = ArenaVec::with_capacity_in(4, alloc);
     let names = themes.list.iter().map(|theme| theme.colors.name.to_owned());
     let mut class: Vec<String> = match themes.single {
@@ -96,7 +105,7 @@ pub(crate) fn highlight_code<'a>(
     {
         properties.push(create_property(alloc.alloc_str(name), meta, alloc));
     }
-    Ok(create_element("pre", properties, code))
+    Ok(create_element("pre", properties, code_element))
 }
 
 // Shiki's `mapThemeColors` for the background, then the text

@@ -4,6 +4,7 @@ import rehypeShiki from "@shikijs/rehype"
 import type { RehypeShikiOptions } from "@shikijs/rehype"
 import {
   transformerMetaHighlight,
+  transformerMetaWordHighlight,
   transformerNotationDiff,
   transformerNotationErrorLevel,
   transformerNotationFocus,
@@ -224,6 +225,7 @@ const TRANSFORMERS: Record<string, (options: never) => ShikiTransformer> = {
   notationHighlight: transformerNotationHighlight,
   notationErrorLevel: transformerNotationErrorLevel,
   metaHighlight: transformerMetaHighlight,
+  metaWordHighlight: transformerMetaWordHighlight,
   renderLineNumber: transformerRenderLineNumber,
 }
 
@@ -463,6 +465,86 @@ const TRANSFORMER_GROUPS: {
       transformers: [{ name: "metaHighlight", zeroIndexed: true, className: "hi" }],
     },
     tests: [{ description: "the first line", language: "ts", code: "a\nb", meta: "{0}" }],
+  },
+  {
+    description: "transformerMetaWordHighlight",
+    options: { transformers: ["metaWordHighlight"] },
+    tests: [
+      {
+        description: "every occurrence",
+        language: "ts",
+        code: "const config = 1\nuse(config, config)",
+        meta: "/config/",
+      },
+      {
+        description: "a word across tokens",
+        language: "ts",
+        code: "let a = b.c(d)",
+        meta: "/= b.c/",
+      },
+      {
+        description: "a word that is a whole token",
+        language: "ts",
+        code: "let a = 1",
+        meta: "/let/",
+      },
+      {
+        description: "a word that is a whole line",
+        language: "text",
+        code: "abc\nabc",
+        meta: "/abc/",
+      },
+      {
+        description: "inside one token",
+        language: "text",
+        code: "hello world",
+        meta: "/lo wo/",
+      },
+      {
+        description: "two words",
+        language: "ts",
+        code: "let a = b + c",
+        meta: "/a/ /c/",
+      },
+      {
+        description: "an escaped slash",
+        language: "text",
+        code: "a/b and a/b",
+        meta: "/a\\/b/",
+      },
+      {
+        description: "nested words",
+        language: "text",
+        code: "foobar",
+        meta: "/foobar/ /foo/",
+      },
+      {
+        description: "a word that is not there",
+        language: "ts",
+        code: "let a",
+        meta: "/zzz/",
+      },
+      { description: "no meta", language: "ts", code: "let a" },
+    ],
+  },
+  {
+    description: "transformerMetaWordHighlight with its class",
+    options: { transformers: [{ name: "metaWordHighlight", className: "word" }] },
+    tests: [
+      { description: "a word", language: "ts", code: "let config", meta: "/config/" },
+    ],
+  },
+  {
+    description: "transformerMetaWordHighlight with notations",
+    options: { transformers: ["metaWordHighlight", "notationHighlight"] },
+    tests: [
+      {
+        description: "a word on a highlighted line",
+        language: "ts",
+        code: "let config = 1 // [!code hl]\nlet b",
+        meta: "/config/",
+      },
+    ],
   },
   {
     description: "transformerRenderLineNumber",

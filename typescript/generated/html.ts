@@ -120,10 +120,10 @@ export type InlineCode = "tailing-curly-colon"
 export type HighlightTransformer = TransformerName | ConfiguredTransformer
 
 /** The transformers `html.highlight` runs natively. */
-export type TransformerName = "notationDiff" | "notationFocus" | "notationHighlight" | "notationErrorLevel" | "metaHighlight" | "renderLineNumber"
+export type TransformerName = "notationDiff" | "notationFocus" | "notationHighlight" | "notationErrorLevel" | "metaHighlight" | "metaWordHighlight" | "renderLineNumber"
 
 /** A transformer with its options, as @shikijs/transformers names them. */
-export type ConfiguredTransformer = { name: "notationDiff"; classLineAdd?: Classes | null; classLineRemove?: Classes | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "notationFocus"; classActiveLine?: Classes | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "notationHighlight"; classActiveLine?: Classes | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "notationErrorLevel"; classMap?: Record<string, Classes> | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "metaHighlight"; className?: Classes | null; zeroIndexed?: boolean } | { name: "renderLineNumber"; classLineNumber?: Classes | null; start?: number | null }
+export type ConfiguredTransformer = { name: "notationDiff"; classLineAdd?: Classes | null; classLineRemove?: Classes | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "notationFocus"; classActiveLine?: Classes | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "notationHighlight"; classActiveLine?: Classes | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "notationErrorLevel"; classMap?: Record<string, Classes> | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "metaHighlight"; className?: Classes | null; zeroIndexed?: boolean } | { name: "metaWordHighlight"; className?: Classes | null } | { name: "renderLineNumber"; classLineNumber?: Classes | null; start?: number | null }
 
 /** Class names: a list, or one string of them separated by white space. */
 export type Classes = string | string[]

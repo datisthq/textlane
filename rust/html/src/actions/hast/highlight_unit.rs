@@ -191,3 +191,26 @@ fn colors_long_ansi_code_in_linear_time() -> Result<(), Error> {
     );
     Ok(())
 }
+
+#[test]
+fn fails_on_meta_words_that_cross() {
+    let options =
+        json!({ "theme": "github-light", "transformers": ["metaWordHighlight"] });
+    let error = highlight_meta("abc", "/ab/ /bc/", options).err();
+    assert_eq!(
+        error.map(|error| error.code).as_deref(),
+        Some("highlight-failed")
+    );
+}
+
+#[test]
+fn highlights_meta_words_on_many_lines_in_linear_time() -> Result<(), Error> {
+    let options =
+        json!({ "theme": "github-light", "transformers": ["metaWordHighlight"] });
+    let code = "let config = config\n".repeat(20_000);
+    let started = std::time::Instant::now();
+    let html = highlight_meta(code.trim_end(), "/config/", options)?;
+    assert_eq!(html.matches("highlighted-word").count(), 40_000);
+    assert!(started.elapsed().as_secs() < 20);
+    Ok(())
+}

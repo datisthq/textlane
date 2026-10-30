@@ -534,6 +534,173 @@
     ]
   },
   {
+    "description": "transformerMetaWordHighlight",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "transformers": ["metaWordHighlight"]
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "every occurrence",
+        "input": "```ts /config/\nconst config = 1\nuse(config, config)\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">const</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> </span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\" class=\"highlighted-word\">config</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 1</span></span>\n<span class=\"line\"><span style=\"color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic\">use</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\">(</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\" class=\"highlighted-word\">config</span><span style=\"color:#7C7F93;--shiki-dark:#9399B2\">,</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> </span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\" class=\"highlighted-word\">config</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\">)</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a word across tokens",
+        "input": "```ts /= b.c/\nlet a = b.c(d)\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> a </span><span class=\"highlighted-word\"><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> b</span><span style=\"color:#179299;--shiki-dark:#94E2D5\">.</span><span style=\"color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic\">c</span></span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\">(d)</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a word that is a whole token",
+        "input": "```ts /let/\nlet a = 1\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\" class=\"highlighted-word\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> a </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 1</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a word that is a whole line",
+        "input": "```text /abc/\nabc\nabc\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line highlighted-word\"><span>abc</span></span>\n<span class=\"line highlighted-word\"><span>abc</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "inside one token",
+        "input": "```text /lo wo/\nhello world\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span>hel</span><span class=\"highlighted-word\">lo wo</span><span>rld</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "two words",
+        "input": "```ts /a/ /c/\nlet a = b + c\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> </span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\" class=\"highlighted-word\">a</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> b </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">+</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> </span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\" class=\"highlighted-word\">c</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "an escaped slash",
+        "input": "```text /a\\/b/\na/b and a/b\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span class=\"highlighted-word\">a</span><span>/b </span><span class=\"highlighted-word\">a</span><span>nd </span><span class=\"highlighted-word\">a</span><span>/b</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "nested words",
+        "input": "```text /foobar/ /foo/\nfoobar\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line highlighted-word\"><span class=\"highlighted-word\">foo</span><span>bar</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "a word that is not there",
+        "input": "```ts /zzz/\nlet a\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> a</span></span></code></pre>"
+        }
+      },
+      {
+        "description": "no meta",
+        "input": "```ts\nlet a\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> a</span></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "transformerMetaWordHighlight with its class",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "transformers": [
+            {
+              "name": "metaWordHighlight",
+              "className": "word"
+            }
+          ]
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a word",
+        "input": "```ts /config/\nlet config\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> </span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\" class=\"word\">config</span></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "transformerMetaWordHighlight with notations",
+    "source": {
+      "repository": "https://github.com/shikijs/shiki",
+      "version": "4.5.0",
+      "path": "packages/transformers",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.toHtml"],
+      [
+        "html.highlight",
+        {
+          "themes": {
+            "light": "catppuccin-latte",
+            "dark": "catppuccin-mocha"
+          },
+          "transformers": ["metaWordHighlight", "notationHighlight"]
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a word on a highlighted line",
+        "input": "```ts /config/\nlet config = 1 // [!code hl]\nlet b\n```",
+        "expected": {
+          "html": "<pre class=\"shiki shiki-themes catppuccin-latte catppuccin-mocha has-highlighted\" style=\"background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4\" tabindex=\"0\"><code><span class=\"line highlighted\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> </span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\" class=\"highlighted-word\">config</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> </span><span style=\"color:#179299;--shiki-dark:#94E2D5\">=</span><span style=\"color:#FE640B;--shiki-dark:#FAB387\"> 1</span></span>\n<span class=\"line\"><span style=\"color:#8839EF;--shiki-dark:#CBA6F7\">let</span><span style=\"color:#4C4F69;--shiki-dark:#CDD6F4\"> b</span></span></code></pre>"
+        }
+      }
+    ]
+  },
+  {
     "description": "transformerRenderLineNumber",
     "source": {
       "repository": "https://github.com/shikijs/shiki",

@@ -303,11 +303,10 @@ file["value"]
 
 `transformers` runs @shikijs/transformers natively, by name or with their options:
 `notationDiff`, `notationFocus`, `notationHighlight` and `notationErrorLevel` read
-`// [!code ++]`-style comments, `metaHighlight` reads `{1,3-5}` after the fence's language
+`// [!code ++]`-style comments, `metaHighlight` reads `{1,3-5}` after the fence's language, `metaWordHighlight` marks every `/word/` it names
 and `renderLineNumber` numbers lines, each marking lines with Shiki's classes. `"inline":
 "tailing-curly-colon"` colors inline code written `` `a(){:js}` ``, `colorReplacements` and
 `addLanguageClass` are Shiki's own, and `metaProperty` puts a fence's meta on its `<pre>`.
-`transformerMetaWordHighlight` (`/word/`) is not native yet.
 
 ```python
 html.highlight({
@@ -354,13 +353,13 @@ Takes `Union[TransformerName, ConfiguredTransformer]`.
 
 The transformers `html.highlight` runs natively.
 
-Takes `Literal["notationDiff", "notationFocus", "notationHighlight", "notationErrorLevel", "metaHighlight", "renderLineNumber"]`.
+Takes `Literal["notationDiff", "notationFocus", "notationHighlight", "notationErrorLevel", "metaHighlight", "metaWordHighlight", "renderLineNumber"]`.
 
 **`ConfiguredTransformer`**
 
 A transformer with its options, as @shikijs/transformers names them.
 
-Takes `Union[Inline0, Inline1, Inline2, Inline3, Inline4, Inline5]`.
+Takes `Union[Inline0, Inline1, Inline2, Inline3, Inline4, Inline5, Inline6]`.
 
 **`Classes`**
 

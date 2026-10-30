@@ -58,6 +58,8 @@ mod actions {
     pub(crate) mod code {
         pub(crate) mod convert;
         #[cfg(feature = "highlight")]
+        pub(crate) mod decorate;
+        #[cfg(feature = "highlight")]
         pub(crate) mod highlight;
         #[cfg(feature = "highlight")]
         pub(crate) mod tokenize;

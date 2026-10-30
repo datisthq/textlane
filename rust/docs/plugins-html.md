@@ -302,12 +302,11 @@ output.value
 
 `transformers` runs @shikijs/transformers natively, by name or with their options:
 `NotationDiff`, `NotationFocus`, `NotationHighlight` and `NotationErrorLevel` read
-`// [!code ++]`-style comments, `MetaHighlight` reads `{1,3-5}` after the fence's language
+`// [!code ++]`-style comments, `MetaHighlight` reads `{1,3-5}` after the fence's language, `MetaWordHighlight` marks every `/word/` it names
 and `RenderLineNumber` numbers lines, each marking lines with Shiki's classes.
 `inline: Some(html::InlineCode::TailingCurlyColon)` colors inline code written
 `` `a(){:js}` ``, `color_replacements` and `add_language_class` are Shiki's own, and
-`meta_property` puts a fence's meta on its `<pre>`. `transformerMetaWordHighlight` (`/word/`)
-is not native yet.
+`meta_property` puts a fence's meta on its `<pre>`.
 
 ```rust
 use textlane::html::{Highlight, HighlightTransformer, TransformerName};
@@ -357,13 +356,13 @@ Takes `TransformerName | ConfiguredTransformer`.
 
 The transformers `html.highlight` runs natively.
 
-Takes `"notationDiff" | "notationFocus" | "notationHighlight" | "notationErrorLevel" | "metaHighlight" | "renderLineNumber"`.
+Takes `"notationDiff" | "notationFocus" | "notationHighlight" | "notationErrorLevel" | "metaHighlight" | "metaWordHighlight" | "renderLineNumber"`.
 
 **`ConfiguredTransformer`**
 
 A transformer with its options, as @shikijs/transformers names them.
 
-Takes `{ name: "notationDiff"; classLineAdd?: Classes | null; classLineRemove?: Classes | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "notationFocus"; classActiveLine?: Classes | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "notationHighlight"; classActiveLine?: Classes | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "notationErrorLevel"; classMap?: Record<string, Classes> | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "metaHighlight"; className?: Classes | null; zeroIndexed?: boolean } | { name: "renderLineNumber"; classLineNumber?: Classes | null; start?: number | null }`.
+Takes `{ name: "notationDiff"; classLineAdd?: Classes | null; classLineRemove?: Classes | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "notationFocus"; classActiveLine?: Classes | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "notationHighlight"; classActiveLine?: Classes | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "notationErrorLevel"; classMap?: Record<string, Classes> | null; classActivePre?: Classes | null; classActiveCode?: Classes | null } | { name: "metaHighlight"; className?: Classes | null; zeroIndexed?: boolean } | { name: "metaWordHighlight"; className?: Classes | null } | { name: "renderLineNumber"; classLineNumber?: Classes | null; start?: number | null }`.
 
 **`Classes`**
 

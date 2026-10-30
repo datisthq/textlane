@@ -69,7 +69,9 @@ pub(crate) fn transform_code(
 }
 
 // A transformer named alone takes the options @shikijs/transformers defaults to
-fn configure_transformer(transformer: &HighlightTransformer) -> ConfiguredTransformer {
+pub(crate) fn configure_transformer(
+    transformer: &HighlightTransformer,
+) -> ConfiguredTransformer {
     let name = match transformer {
         HighlightTransformer::Configured(configured) => return configured.clone(),
         HighlightTransformer::Name(name) => name,
@@ -102,6 +104,9 @@ fn configure_transformer(transformer: &HighlightTransformer) -> ConfiguredTransf
             class_name: None,
             zero_indexed: false,
         },
+        TransformerName::MetaWordHighlight => {
+            ConfiguredTransformer::MetaWordHighlight { class_name: None }
+        }
         TransformerName::RenderLineNumber => ConfiguredTransformer::RenderLineNumber {
             class_line_number: None,
             start: None,
@@ -168,7 +173,7 @@ fn read_notation(transformer: &ConfiguredTransformer) -> Option<Notation> {
     })
 }
 
-fn read_classes(classes: &Option<Classes>, default: &str) -> Vec<String> {
+pub(crate) fn read_classes(classes: &Option<Classes>, default: &str) -> Vec<String> {
     match classes {
         Some(classes) => split_classes(classes),
         None => split_classes(&Classes::One(default.into())),
