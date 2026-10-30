@@ -662,7 +662,7 @@ interface Domain {
 
 const domains: Domain[] = [
   {
-    name: "md",
+    name: "md/mdx",
     title: "Markdown",
     description: "A port of micromark and the mdast utilities.",
     plugins: [
