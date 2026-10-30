@@ -684,6 +684,9 @@ const domains: Domain[] = [
       ["md.directive", "remark-directive"],
       ["md.gemoji", "remark-gemoji"],
       ["md.definitionList", "remark-definition-list"],
+      ["md.headingId", "remark-heading-id"],
+      ["md.strip", "strip-markdown"],
+      ["md.component", "textlane"],
       ["md.mdx", "remark-mdx"],
       ["mdx.compile", "@mdx-js/mdx"],
     ],
@@ -700,6 +703,8 @@ const domains: Domain[] = [
       ["html.raw", "rehype-raw"],
       ["html.sanitize", "rehype-sanitize"],
       ["html.slug", "rehype-slug"],
+      ["html.extractToc", "rehype-extract-toc"],
+      ["html.unwrapImages", "rehype-unwrap-images"],
       ["html.format", "rehype-format"],
       ["html.highlight", "@shikijs/rehype"],
     ],
@@ -794,7 +799,7 @@ const features: Feature[] = [
     icon: Workflow,
     title: "unified's semantics",
     description:
-      "use, data and freeze; parse, run and stringify; presets, reconfiguring a plugin, sync and async.",
+      "use, data and freeze; parse, run and stringify; presets, sync and async; and JavaScript or Python plugins joining a pipeline as transformers.",
   },
   {
     icon: Braces,
@@ -860,7 +865,7 @@ const SUITE = "https://github.com/datisthq/textlane/tree/main/conformance"
 
 const conformanceStats = [
   { value: "10k+", label: "tests" },
-  { value: "30", label: "plugins" },
+  { value: "30+", label: "plugins" },
   { value: "3", label: "languages" },
 ]
 
