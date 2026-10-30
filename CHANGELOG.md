@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.2.0](https://github.com/datisthq/textlane/compare/v0.1.0...v0.2.0) (2026-10-30)
+
+
+### Features
+
+* add heading markers to md.headingId and a skip list to html.extractToc ([58f9233](https://github.com/datisthq/textlane/commit/58f92334ca856807467f97961aba86e895398199))
+* **html:** run transformerMetaWordHighlight natively in html.highlight, on a port of Shiki's decorations ([903cf4e](https://github.com/datisthq/textlane/commit/903cf4e1968fbdbba9e392ade022f3e3d5287dfc))
+* **md:** add md.pathRewrite, resolving asset and page URLs from the document's path, and list the new plugins on the landing ([c2f2383](https://github.com/datisthq/textlane/commit/c2f23835cabdb490c641ab156b55608683dff2d5))
+* **md:** give task-list checkboxes an aria-label with md.toHtml's taskListLabels ([a459be5](https://github.com/datisthq/textlane/commit/a459be587badbf03defb65680a98af042ba05ac0))
+* **md:** read a container directive's lists as a file tree with md.component's treeAs ([e954fc1](https://github.com/datisthq/textlane/commit/e954fc1d01c9f78430575d622cafcb68072cc772))
+
+
+### Bug Fixes
+
+* **html:** apply meta-word decorations from running lengths, at most 1,000 per line ([b291cbd](https://github.com/datisthq/textlane/commit/b291cbd41a441fb56a3521ea7b42967dd31b0028))
+* **html:** leave lines of 2,000 characters or more plain in html.highlight, with Shiki's tokenizeMaxLineLength ([9570ce3](https://github.com/datisthq/textlane/commit/9570ce3efaef88fa783122094619b0d0f72d1b07))
+
+
+### Performance Improvements
+
+* write HTML straight from mdast when md.toHtml and html.stringify end a pipeline ([a357233](https://github.com/datisthq/textlane/commit/a357233f028d7f051bfd80e15e6cba1919071b29))
+
 ## 0.1.0 (2026-10-30)
 
 
