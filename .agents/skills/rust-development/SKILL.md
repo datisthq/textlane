@@ -99,6 +99,11 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   write: `textlane/tests/html_writer.rs` compares both over every Markdown input of the
   conformance suite and fails on any byte. A stage timing must reuse one reset arena, as
   `process` does: a fresh one per run measures page faults, which tripled `md.toHtml`
+- The hast path is memory-bound, not instruction-bound: on a 1 MB README it runs about 1.7
+  instructions a cycle against the direct writer's 2.5, so trimming instructions
+  (`apply_data` inlined, `parse_inline`'s items pre-sized) saved 1% of instructions and no
+  cycles. Its lever is node size (112 bytes, moved about three times). Under load, A/B with
+  `perf stat -e instructions:u,cycles:u`, which load does not skew as wall time does
 - Container ends follow micromark, not markdown-rs: a list item ends at the first line
   ending of its trailing blank lines (`prepareList`), stepping over the exits of lists
   inside but not of block quotes; a list does the same without stepping over block quote
