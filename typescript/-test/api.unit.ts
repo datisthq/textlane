@@ -89,7 +89,7 @@ function runTest(group: Group, test: Test) {
     const tree: Node = processor().runSync(processor().parse(input), input)
     // A tree read back from JSON keeps unist positions, which a bridge into nlcst cannot
     // place its nodes by: only `process` keeps them in that case
-    const bridged = group.pipeline.some(([name]) => name.endsWith(".toProse"))
+    const bridged = group.pipeline.some(([name]) => name.endsWith(".toNaturalLanguage"))
     if (group.positions === false || bridged) {
       return expect(stripPositions(tree)).toEqual(stripPositions(test.expected.tree))
     }

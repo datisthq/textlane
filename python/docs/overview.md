@@ -29,7 +29,7 @@ retext and MDX test suites. Every implementation, Python included, runs the same
 ## Status
 
 Textlane is pre-release. `textlane()` builds a processor over the native pipeline, and
-`textlane.md`, `textlane.html`, `textlane.mdx` and `textlane.prose` hold one function per
+`textlane.md`, `textlane.html`, `textlane.mdx` and `textlane.nl` hold one function per
 plugin, its options typed as a `TypedDict` generated from the crate's option structs. Python
 plugins cannot join a pipeline yet.
 

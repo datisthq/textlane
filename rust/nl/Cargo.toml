@@ -1,0 +1,25 @@
+[package]
+name = "textlane-nl"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "Textlane's natural-language plugins: natural-language parsing, serializing and writing checks"
+keywords = ["nl", "ast", "textlane"]
+categories = ["text-processing", "parser-implementations"]
+
+[features]
+# The options' JSON Schema, which the bindings' types are generated from
+schema = ["dep:schemars"]
+
+[dependencies]
+textlane-core.workspace = true
+serde.workspace = true
+regex.workspace = true
+schemars = { workspace = true, optional = true }
+
+[lints]
+workspace = true

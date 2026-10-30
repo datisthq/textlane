@@ -2,7 +2,7 @@ import asyncio
 
 import pytest
 import textlane
-from textlane import TextlaneError, html, md, mdx, prose
+from textlane import TextlaneError, html, md, mdx, nl
 
 
 def to_html():
@@ -78,7 +78,7 @@ def test_parses_runs_and_stringifies():
 
 
 def test_reports_messages():
-    processor = textlane.textlane().use(prose.parse()).use(prose.repeated_words()).use(prose.stringify())
+    processor = textlane.textlane().use(nl.parse()).use(nl.repeated_words()).use(nl.stringify())
     assert processor.process_sync("the the")["messages"] == [
         {
             "reason": "Unexpected repeated `the`, remove one occurrence",
@@ -123,13 +123,13 @@ def test_domain_modules_describe_plugins():
         "options": {"allowDangerousHtml": True},
     }
     assert md.gemoji() == {"name": "md.gemoji"}
-    assert prose.indefinite_article() == {"name": "prose.indefiniteArticle"}
+    assert nl.indefinite_article() == {"name": "nl.indefiniteArticle"}
 
 
 def test_domain_modules_list_every_plugin():
     described = [
         getattr(module, name)()["name"]
-        for module in (md, html, mdx, prose)
+        for module in (md, html, mdx, nl)
         for name in module.__all__
         if name[0].islower()
     ]

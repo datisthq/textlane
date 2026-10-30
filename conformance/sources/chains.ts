@@ -35,13 +35,13 @@ const PLUGINS: Record<
   rehypeParse: { stage: "html.parse", plugin: rehypeParse },
   rehypeRemark: { stage: "html.toMarkdown", plugin: rehypeRemark },
   rehypeStringify: { stage: "html.stringify", plugin: rehypeStringify },
-  retextLatin: { stage: "prose.parse", plugin: retextLatin },
+  retextLatin: { stage: "nl.parse", plugin: retextLatin },
   retextEnglish: {
-    stage: "prose.parse",
+    stage: "nl.parse",
     plugin: retextEnglish,
     options: { language: "english" },
   },
-  retextStringify: { stage: "prose.stringify", plugin: retextStringify },
+  retextStringify: { stage: "nl.stringify", plugin: retextStringify },
 }
 // Factories that start a chain with plugins already used, as their packages do
 const FACTORIES: Record<string, string[]> = {
@@ -62,7 +62,7 @@ const SOURCES = [
     url: "https://github.com/retextjs/retext",
     commit: "04580e54d857f86405c1b109f5205be58f1285f8",
     path: "test.js",
-    output: "prose/retext.json",
+    output: "nl/retext.json",
     name: "retext",
   },
   {

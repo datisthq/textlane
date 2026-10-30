@@ -189,7 +189,7 @@ mod plugins {
     pub(crate) mod to_markdown {
         pub(crate) mod plugin;
     }
-    pub(crate) mod to_prose {
+    pub(crate) mod to_natural_language {
         pub(crate) mod plugin;
     }
 }
@@ -214,4 +214,4 @@ pub use actions::html::parse::parse_html;
 
 // plugins
 #[cfg(feature = "highlight")]
-pub use plugins::to_prose::plugin::ToProse;
+pub use plugins::to_natural_language::plugin::ToNaturalLanguage;

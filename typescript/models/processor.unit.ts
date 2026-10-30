@@ -5,7 +5,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vite-plus/test"
 import { buildAddon } from "../-test/addon.ts"
 import * as html from "../generated/html.ts"
 import * as md from "../generated/md.ts"
-import * as prose from "../generated/prose.ts"
+import * as nl from "../generated/nl.ts"
 import { ADDON_ENV } from "../settings.ts"
 
 let entry: typeof import("../index.ts")
@@ -95,9 +95,9 @@ describe("Processor", () => {
   it("reports messages", () => {
     const processor = entry
       .textlane()
-      .use(prose.parse())
-      .use(prose.repeatedWords())
-      .use(prose.stringify())
+      .use(nl.parse())
+      .use(nl.repeatedWords())
+      .use(nl.stringify())
     expect(processor.processSync("the the").messages).toEqual([
       {
         reason: "Unexpected repeated `the`, remove one occurrence",
@@ -136,7 +136,7 @@ describe("Processor", () => {
 
   it("lists the plugins the domain modules describe", async () => {
     const domains = await Promise.all(
-      ["md", "html", "mdx", "prose"].map(name => import(`../generated/${name}.ts`)),
+      ["md", "html", "mdx", "nl"].map(name => import(`../generated/${name}.ts`)),
     )
     const described = domains.flatMap(domain =>
       Object.values(domain).map(describe =>

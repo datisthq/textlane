@@ -177,9 +177,9 @@ export function toMarkdown(options?: ToMarkdownOptions): Plugin<"html.toMarkdown
   return { name: "html.toMarkdown", options }
 }
 
-/** The `html.toProse` plugin. */
-export function toProse(): Plugin<"html.toProse"> {
-  return { name: "html.toProse" }
+/** The `html.toNaturalLanguage` plugin. */
+export function toNaturalLanguage(): Plugin<"html.toNaturalLanguage"> {
+  return { name: "html.toNaturalLanguage" }
 }
 
 /** The `html.stringify` plugin. */

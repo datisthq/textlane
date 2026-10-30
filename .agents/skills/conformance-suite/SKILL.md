@@ -123,7 +123,7 @@ of failure, never per message.
 ## Adding cases
 
 1. Put the group in `conformance/tests/<area>/<construct>.json`; `<area>` is `core`, `md`,
-   `html`, `mdx` or `prose`, and a file holds one construct with a group per source (micromark's
+   `html`, `mdx` or `nl`, and a file holds one construct with a group per source (micromark's
    test-file names decide construct names in `md`). Group descriptions are unique within a file.
 2. Anything ported from upstream carries `source` (repository, commit, path, test, licence).
 3. Run the schema guard, then the Rust runner; the Node and Python runners read the same files.

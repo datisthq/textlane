@@ -1,0 +1,153 @@
+[
+  {
+    "description": "retext-repeated-words",
+    "source": {
+      "repository": "https://github.com/retextjs/retext-repeated-words",
+      "commit": "d6d53fb61144ccabda6ca2fe1420014c0c070b7e",
+      "path": "test.js",
+      "license": "MIT"
+    },
+    "pipeline": [["nl.parse"], ["nl.repeatedWords"], ["nl.stringify"]],
+    "tests": [
+      {
+        "description": "should emit a message w/ metadata",
+        "input": "Well, it it doesn’t have to be.",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "it",
+              "source": "retext-repeated-words",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 7,
+                  "offset": 6
+                },
+                "end": {
+                  "line": 1,
+                  "column": 12,
+                  "offset": 11
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "should catch repeated words",
+        "input": "Well, it it doesn’t have to to be. Like a fish in the\nthe sea.",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "it",
+              "source": "retext-repeated-words",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 7,
+                  "offset": 6
+                },
+                "end": {
+                  "line": 1,
+                  "column": 12,
+                  "offset": 11
+                }
+              }
+            },
+            {
+              "ruleId": "to",
+              "source": "retext-repeated-words",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 26,
+                  "offset": 25
+                },
+                "end": {
+                  "line": 1,
+                  "column": 31,
+                  "offset": 30
+                }
+              }
+            },
+            {
+              "ruleId": "the",
+              "source": "retext-repeated-words",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 51,
+                  "offset": 50
+                },
+                "end": {
+                  "line": 2,
+                  "column": 4,
+                  "offset": 57
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "should catch repeated words when uppercase",
+        "input": "LIKE A FISH IN THE\nTHE SEA.",
+        "expected": {
+          "messages": [
+            {
+              "ruleId": "the",
+              "source": "retext-repeated-words",
+              "place": {
+                "start": {
+                  "line": 1,
+                  "column": 16,
+                  "offset": 15
+                },
+                "end": {
+                  "line": 2,
+                  "column": 4,
+                  "offset": 22
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "should ignore sentence cased words",
+        "input": "Duran Duran is awesome.",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "should ignore initialisms",
+        "input": "D. D. will pop up with.",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "should ignore differently cases words",
+        "input": "DURAN Duran",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "should ignore some valid repetitions",
+        "input": "the most heartening exhibition they had had since",
+        "expected": {
+          "messages": []
+        }
+      },
+      {
+        "description": "should ignore some valid repetitions (mau)",
+        "input": "The Mau Mau Uprising, also known as the Mau Mau Rebellion, Mau Mau Revolt, or Kenya Emergency, was a military conflict that took place in British Kenya",
+        "expected": {
+          "messages": []
+        }
+      }
+    ]
+  }
+]

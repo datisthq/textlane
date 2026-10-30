@@ -1,7 +1,7 @@
 use textlane_core::hast::{Element, Node, PropertyValue};
 use textlane_core::nlcst::{self, Literal, Parent};
 use textlane_core::{
-    Allocator, ArenaString, ArenaVec, Location, Point, Position, ProseParser,
+    Allocator, ArenaString, ArenaVec, Location, NaturalLanguageParser, Point, Position,
 };
 
 use crate::helpers::phrasing::{is_embedded, is_phrasing};
@@ -13,7 +13,7 @@ use crate::helpers::value::find_value;
 pub fn bridge_hast<'a>(
     tree: &Node<'a>,
     source: &str,
-    parser: &dyn ProseParser,
+    parser: &dyn NaturalLanguageParser,
     alloc: &'a Allocator,
 ) -> nlcst::Node<'a> {
     let state = State {
@@ -45,7 +45,7 @@ pub fn bridge_hast<'a>(
 
 struct State<'s, 'a> {
     location: Location<'s>,
-    parser: &'s dyn ProseParser,
+    parser: &'s dyn NaturalLanguageParser,
     alloc: &'a Allocator,
 }
 

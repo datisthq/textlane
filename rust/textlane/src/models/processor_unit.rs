@@ -748,19 +748,19 @@ fn formats_hostile_html_in_linear_time() -> Result<(), Error> {
     Ok(())
 }
 
-fn reparse_prose(
+fn reparse_natural_language(
     input: &str,
-    language: textlane_prose::Language,
+    language: textlane_nl::Language,
 ) -> Result<String, Error> {
     let processor = Processor::new()
-        .with(textlane_prose::Parse { language })
-        .with(textlane_prose::Stringify)
+        .with(textlane_nl::Parse { language })
+        .with(textlane_nl::Stringify)
         .freeze()?;
     Ok(processor.process(input)?.value)
 }
 
 #[test]
-fn parses_hostile_prose_in_linear_time() -> Result<(), Error> {
+fn parses_hostile_natural_language_in_linear_time() -> Result<(), Error> {
     let inputs = [
         ".".repeat(1_000_000),
         "!?".repeat(200_000),
@@ -782,12 +782,9 @@ fn parses_hostile_prose_in_linear_time() -> Result<(), Error> {
         "😀a".repeat(100_000),
     ];
     for input in inputs {
-        for language in [
-            textlane_prose::Language::Latin,
-            textlane_prose::Language::English,
-        ] {
+        for language in [textlane_nl::Language::Latin, textlane_nl::Language::English] {
             let started = std::time::Instant::now();
-            assert_eq!(reparse_prose(&input, language)?, input);
+            assert_eq!(reparse_natural_language(&input, language)?, input);
             assert!(
                 started.elapsed().as_secs() < LIMIT_SECS,
                 "{:?}… took {:?}",
@@ -800,24 +797,28 @@ fn parses_hostile_prose_in_linear_time() -> Result<(), Error> {
 }
 
 // What a bridge into nlcst does with the parser it reads from the slots
-struct ProseBridge;
+struct NaturalLanguageBridge;
 
-struct ProseBridgeParser(std::sync::Arc<dyn textlane_core::ProseParser>);
+struct NaturalLanguageBridgeParser(
+    std::sync::Arc<dyn textlane_core::NaturalLanguageParser>,
+);
 
-impl textlane_core::Plugin for ProseBridge {
+impl textlane_core::Plugin for NaturalLanguageBridge {
     fn attach(&self, context: &mut textlane_core::Attach) -> Result<(), Error> {
         context.set_parser(|slots| {
             let parser = slots
-                .get::<textlane_core::ProseParserSlot>()
+                .get::<textlane_core::NaturalLanguageParserSlot>()
                 .and_then(|slot| slot.parser.clone())
-                .ok_or_else(|| Error::new("missing-parser", "no prose parser"))?;
-            Ok(Box::new(ProseBridgeParser(parser)))
+                .ok_or_else(|| {
+                    Error::new("missing-parser", "no natural-language parser")
+                })?;
+            Ok(Box::new(NaturalLanguageBridgeParser(parser)))
         });
         Ok(())
     }
 }
 
-impl textlane_core::Parser for ProseBridgeParser {
+impl textlane_core::Parser for NaturalLanguageBridgeParser {
     fn output(&self) -> textlane_core::TreeKind {
         textlane_core::TreeKind::Nlcst
     }
@@ -837,35 +838,36 @@ impl textlane_core::Parser for ProseBridgeParser {
 }
 
 #[test]
-fn hands_the_prose_parser_to_plugins() -> Result<(), Error> {
+fn hands_the_natural_language_parser_to_plugins() -> Result<(), Error> {
     let processor = Processor::new()
-        .with(ProseBridge)
-        .with(textlane_prose::Stringify)
+        .with(NaturalLanguageBridge)
+        .with(textlane_nl::Stringify)
         .freeze()?;
     let alloc = textlane_core::Allocator::new();
     let mut file = textlane_core::File::new();
     let input = "Mr. Smith left. He said: e.g. this.\n\nNext one.";
     let tree = processor.parse(input, &mut file, &alloc)?;
-    let expected = textlane_prose::parse_prose(input, &Default::default(), &alloc);
+    let expected =
+        textlane_nl::parse_natural_language(input, &Default::default(), &alloc);
     assert_eq!(tree, textlane_core::Tree::Nlcst(expected));
     assert_eq!(processor.stringify(&tree, &mut file)?, input);
     Ok(())
 }
 
 #[test]
-fn checks_hostile_prose_in_linear_time() -> Result<(), Error> {
+fn checks_hostile_natural_language_in_linear_time() -> Result<(), Error> {
     let processor = Processor::new()
-        .with(textlane_prose::Parse::default())
-        .with(textlane_prose::Equality::default())
-        .with(textlane_prose::Equality {
+        .with(textlane_nl::Parse::default())
+        .with(textlane_nl::Equality::default())
+        .with(textlane_nl::Equality {
             binary: Some(true),
             ..Default::default()
         })
-        .with(textlane_prose::Readability::default())
-        .with(textlane_prose::Passive::default())
-        .with(textlane_prose::RepeatedWords)
-        .with(textlane_prose::SentenceSpacing::default())
-        .with(textlane_prose::Stringify)
+        .with(textlane_nl::Readability::default())
+        .with(textlane_nl::Passive::default())
+        .with(textlane_nl::RepeatedWords)
+        .with(textlane_nl::SentenceSpacing::default())
+        .with(textlane_nl::Stringify)
         .freeze()?;
     for input in [
         "he or she and his/her ".repeat(10_000),
@@ -891,24 +893,21 @@ fn checks_hostile_prose_in_linear_time() -> Result<(), Error> {
 }
 
 #[test]
-fn checks_hostile_prose_typography_in_linear_time() -> Result<(), Error> {
+fn checks_hostile_natural_language_typography_in_linear_time() -> Result<(), Error> {
     let plugins = [
-        ("prose.smartypants", serde_json::json!(null)),
+        ("nl.smartypants", serde_json::json!(null)),
         (
-            "prose.smartypants",
+            "nl.smartypants",
             serde_json::json!({ "ellipses": "spaced", "dashes": "inverted" }),
         ),
         (
-            "prose.smartypants",
+            "nl.smartypants",
             serde_json::json!({ "quotes": false, "backticks": "all", "dashes": "oldschool" }),
         ),
-        ("prose.quotes", serde_json::json!(null)),
-        (
-            "prose.quotes",
-            serde_json::json!({ "preferred": "straight" }),
-        ),
-        ("prose.contractions", serde_json::json!(null)),
-        ("prose.indefiniteArticle", serde_json::json!(null)),
+        ("nl.quotes", serde_json::json!(null)),
+        ("nl.quotes", serde_json::json!({ "preferred": "straight" })),
+        ("nl.contractions", serde_json::json!(null)),
+        ("nl.indefiniteArticle", serde_json::json!(null)),
     ];
     let inputs = [
         "\"".repeat(125_000),
@@ -933,9 +932,9 @@ fn checks_hostile_prose_typography_in_linear_time() -> Result<(), Error> {
             let build = crate::actions::plugin::find::find_plugin(name)
                 .ok_or_else(|| Error::new("unknown-plugin", *name))?;
             let processor = Processor::new()
-                .with(textlane_prose::Parse::default())
+                .with(textlane_nl::Parse::default())
                 .with_boxed(build(name, options.clone())?)
-                .with(textlane_prose::Stringify)
+                .with(textlane_nl::Stringify)
                 .freeze()?;
             let started = std::time::Instant::now();
             processor.process(input)?;
@@ -951,12 +950,13 @@ fn checks_hostile_prose_typography_in_linear_time() -> Result<(), Error> {
 }
 
 #[test]
-fn places_many_messages_on_non_ascii_prose_in_linear_time() -> Result<(), Error> {
+fn places_many_messages_on_non_ascii_natural_language_in_linear_time() -> Result<(), Error>
+{
     let processor = Processor::new()
-        .with(textlane_prose::Parse::default())
-        .with(textlane_prose::Equality::default())
-        .with(textlane_prose::RepeatedWords)
-        .with(textlane_prose::Stringify)
+        .with(textlane_nl::Parse::default())
+        .with(textlane_nl::Equality::default())
+        .with(textlane_nl::RepeatedWords)
+        .with(textlane_nl::Stringify)
         .freeze()?;
     for input in ["é he ".repeat(50_000), "é he he ".repeat(25_000)] {
         let started = std::time::Instant::now();
@@ -972,36 +972,39 @@ fn places_many_messages_on_non_ascii_prose_in_linear_time() -> Result<(), Error>
     Ok(())
 }
 
-fn markdown_to_prose(input: &str) -> Result<String, Error> {
+fn markdown_to_natural_language(input: &str) -> Result<String, Error> {
     let processor = Processor::new()
         .with(textlane_md::Parse::default())
-        .with(textlane_md::ToProse::default())
-        .with(textlane_prose::Stringify)
+        .with(textlane_md::ToNaturalLanguage::default())
+        .with(textlane_nl::Stringify)
         .freeze()?;
     Ok(processor.process(input)?.value)
 }
 
-fn html_to_prose(input: &str) -> Result<String, Error> {
+fn html_to_natural_language(input: &str) -> Result<String, Error> {
     let processor = Processor::new()
         .with(textlane_html::Parse::default())
-        .with(textlane_html::ToProse)
-        .with(textlane_prose::Stringify)
+        .with(textlane_html::ToNaturalLanguage)
+        .with(textlane_nl::Stringify)
         .freeze()?;
     Ok(processor.process(input)?.value)
 }
 
 #[test]
-fn bridges_markdown_and_html_into_prose() -> Result<(), Error> {
-    assert_eq!(markdown_to_prose("# A *b*.\n\nC `d`.\n")?, "A b.\n\nC `d`.");
+fn bridges_markdown_and_html_into_natural_language() -> Result<(), Error> {
     assert_eq!(
-        html_to_prose("<p>A <b>b</b>.</p><div>C<br>d <code>e</code></div>")?,
+        markdown_to_natural_language("# A *b*.\n\nC `d`.\n")?,
+        "A b.\n\nC `d`."
+    );
+    assert_eq!(
+        html_to_natural_language("<p>A <b>b</b>.</p><div>C<br>d <code>e</code></div>")?,
         "A b.C\nd e"
     );
     Ok(())
 }
 
 #[test]
-fn bridges_hostile_markdown_into_prose_in_linear_time() -> Result<(), Error> {
+fn bridges_hostile_markdown_into_natural_language_in_linear_time() -> Result<(), Error> {
     for input in [
         "> ".repeat(20_000) + "a\n",
         "- ".repeat(20_000) + "a\n",
@@ -1014,7 +1017,7 @@ fn bridges_hostile_markdown_into_prose_in_linear_time() -> Result<(), Error> {
         "> é😀 b\n".repeat(50_000),
     ] {
         let started = std::time::Instant::now();
-        markdown_to_prose(&input)?;
+        markdown_to_natural_language(&input)?;
         let took = started.elapsed();
         assert!(
             took.as_secs() < LIMIT_SECS,
@@ -1026,7 +1029,7 @@ fn bridges_hostile_markdown_into_prose_in_linear_time() -> Result<(), Error> {
 }
 
 #[test]
-fn bridges_hostile_html_into_prose_in_linear_time() -> Result<(), Error> {
+fn bridges_hostile_html_into_natural_language_in_linear_time() -> Result<(), Error> {
     for input in [
         "<div>".repeat(100_000) + "a",
         "<p>".to_string() + &"<span>".repeat(100_000) + "a",
@@ -1039,7 +1042,7 @@ fn bridges_hostile_html_into_prose_in_linear_time() -> Result<(), Error> {
         "<p>".to_string() + &"&amp;é😀 ".repeat(50_000),
     ] {
         let started = std::time::Instant::now();
-        html_to_prose(&input)?;
+        html_to_natural_language(&input)?;
         let took = started.elapsed();
         assert!(
             took.as_secs() < LIMIT_SECS,

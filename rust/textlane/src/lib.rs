@@ -60,5 +60,5 @@ pub use textlane_html as html;
 pub use textlane_md as md;
 #[cfg(feature = "mdx")]
 pub use textlane_mdx as mdx;
-#[cfg(feature = "prose")]
-pub use textlane_prose as prose;
+#[cfg(feature = "nl")]
+pub use textlane_nl as nl;

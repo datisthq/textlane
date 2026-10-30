@@ -110,12 +110,12 @@
   <dt>
     <htmlpress-badge type="success">decided</htmlpress-badge> Crate names
     <code>core</code>, <code>md</code>, <code>html</code>, <code>mdx</code>,
-    <code>prose</code>
+    <code>nl</code>
   </dt>
   <dd>
     <p>
       <strong>Why.</strong> Domains are named by their format, short like file extensions
-      (<code>md</code>, <code>html</code>, <code>mdx</code>), with <code>prose</code> for
+      (<code>md</code>, <code>html</code>, <code>mdx</code>), with <code>nl</code> for
       natural language; <code>core</code> also holds the plugin contract every domain
       implements.
     </p>
@@ -144,7 +144,7 @@
   <dt>
     <htmlpress-badge type="success">decided</htmlpress-badge> Domains are named short;
     functions spell formats out in full: <code>md.toHtml</code>,
-    <code>html.toMarkdown</code>, <code>md.toProse</code>
+    <code>html.toMarkdown</code>, <code>md.toNaturalLanguage</code>
   </dt>
   <dd>
     <p>
@@ -454,11 +454,11 @@
     <p>
       <strong>Why.</strong> A case reads self-describing, and the key names what the
       string is, not which domain made it: <code>mdx.compile</code> yields
-      <code>js</code>, <code>prose.stringify</code> yields <code>txt</code>.
+      <code>js</code>, <code>nl.stringify</code> yields <code>txt</code>.
     </p>
     <p>
       <strong>Rejected.</strong> One generic <code>text</code> key;
-      <code>.markdown</code>; <code>.prose</code>.
+      <code>.markdown</code>; <code>.nl</code>.
     </p>
   </dd>
   <dt>
@@ -864,9 +864,9 @@
   </dd>
   <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge>
-    <code>prose.parse</code> takes <code>language</code> (<code>latin</code> by default,
-    <code>english</code>); prose plugins keep the retext packages' option names; messages
-    are compared in place order
+    <code>nl.parse</code> takes <code>language</code> (<code>latin</code> by default,
+    <code>english</code>); natural-language plugins keep the retext packages' option
+    names; messages are compared in place order
   </dt>
   <dd>
     <p>
@@ -875,28 +875,28 @@
       of the contract.
     </p>
     <p>
-      <strong>Rejected.</strong> <code>prose.parseLatin</code> /
-      <code>prose.parseEnglish</code>.
+      <strong>Rejected.</strong> <code>nl.parseLatin</code> /
+      <code>nl.parseEnglish</code>.
     </p>
   </dd>
   <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge> Core defines a
-    <code>ProseParser</code> trait and a <code>ProseParserSlot</code>; the textlane
-    processor seeds the slot with <code>prose.parse</code>'s Latin parser before plugins
-    attach
+    <code>NaturalLanguageParser</code> trait and a <code>NaturalLanguageParserSlot</code>;
+    the textlane processor seeds the slot with <code>nl.parse</code>'s Latin parser before
+    plugins attach
   </dt>
   <dd>
     <p>
-      <strong>Why.</strong> <code>md.toProse</code> and <code>html.toProse</code> live in
-      md and html, which depend on core only, yet mdast-util-to-nlcst and
-      hast-util-to-nlcst need a parse-latin instance: <code>tokenize</code>, the sentence
-      and paragraph plugins, the root plugins. The trait carries exactly those three
-      steps, so a bridge reads the parser from the slots at freeze without a
-      domain-to-domain dependency.
+      <strong>Why.</strong> <code>md.toNaturalLanguage</code> and
+      <code>html.toNaturalLanguage</code> live in md and html, which depend on core only,
+      yet mdast-util-to-nlcst and hast-util-to-nlcst need a parse-latin instance:
+      <code>tokenize</code>, the sentence and paragraph plugins, the root plugins. The
+      trait carries exactly those three steps, so a bridge reads the parser from the slots
+      at freeze without a domain-to-domain dependency.
     </p>
     <p>
       <strong>Rejected.</strong> The parser in core (a domain's behaviour in the shared
-      crate); the bridges in textlane-prose (prose would depend on md and html).
+      crate); the bridges in textlane-nl (nl would depend on md and html).
     </p>
   </dd>
   <dt>
@@ -998,16 +998,16 @@
     <p><strong>Rejected.</strong> Unbounded indentation; a total output budget.</p>
   </dd>
   <dt>
-    <htmlpress-badge type="warning">my call</htmlpress-badge> Prose plugins reject what
-    upstream mishandles: <code>prose.smartypants</code> fails on an unknown mode string
-    and <code>prose.quotes</code> falls back to its defaults for an empty list
+    <htmlpress-badge type="warning">my call</htmlpress-badge> Natural-language plugins
+    reject what upstream mishandles: <code>nl.smartypants</code> fails on an unknown mode
+    string and <code>nl.quotes</code> falls back to its defaults for an empty list
   </dt>
   <dd>
     <p>
       <strong>Why.</strong> retext-smartypants silently treats an unknown mode as
       <code>true</code>, hiding a typo, and retext-quotes crashes on an empty list;
       neither is behaviour a pipeline relies on. Out-of-range numbers in
-      <code>prose.indefiniteArticle</code> still fail the run, as upstream throws.
+      <code>nl.indefiniteArticle</code> still fail the run, as upstream throws.
     </p>
     <p><strong>Rejected.</strong> Copying upstream's silent fallback and crash.</p>
   </dd>
@@ -1070,8 +1070,9 @@
   </dd>
   <dt>
     <htmlpress-badge type="danger">open</htmlpress-badge> A tree read back from JSON keeps
-    unist positions, so <code>md.toProse</code> and <code>html.toProse</code> leave nlcst
-    unplaced after a separate <code>parse</code> and <code>run</code>
+    unist positions, so <code>md.toNaturalLanguage</code> and
+    <code>html.toNaturalLanguage</code> leave nlcst unplaced after a separate
+    <code>parse</code> and <code>run</code>
   </dt>
   <dd>
     <p>

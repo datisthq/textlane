@@ -192,15 +192,15 @@ impl FrozenProcessor {
     }
 }
 
-// Bridges into nlcst live in md and html, which cannot depend on prose, so the parser they
+// Bridges into nlcst live in md and html, which cannot depend on nl, so the parser they
 // share reaches them through a slot
 fn seed_slots(context: &mut Attach) {
-    #[cfg(feature = "prose")]
+    #[cfg(feature = "nl")]
     {
-        let parser = textlane_prose::LanguageParser::new(textlane_prose::Language::Latin);
+        let parser = textlane_nl::LanguageParser::new(textlane_nl::Language::Latin);
         context
             .slots_mut()
-            .get_or_default::<textlane_core::ProseParserSlot>()
+            .get_or_default::<textlane_core::NaturalLanguageParserSlot>()
             .parser = Some(std::sync::Arc::new(parser));
     }
     #[cfg(feature = "mdx")]
@@ -210,7 +210,7 @@ fn seed_slots(context: &mut Attach) {
             .get_or_default::<textlane_core::ScriptParserSlot>()
             .parser = Some(std::sync::Arc::new(textlane_mdx::OxcScriptParser));
     }
-    #[cfg(not(any(feature = "prose", feature = "mdx")))]
+    #[cfg(not(any(feature = "nl", feature = "mdx")))]
     let _ = context;
 }
 

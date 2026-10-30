@@ -235,7 +235,7 @@ mod plugins {
     pub(crate) mod to_html {
         pub(crate) mod plugin;
     }
-    pub(crate) mod to_prose {
+    pub(crate) mod to_natural_language {
         pub(crate) mod plugin;
     }
 }
@@ -244,7 +244,7 @@ mod plugins {
 pub use models::options::{
     DefinitionListSlot, Directive, DirectiveSlot, Frontmatter, FrontmatterSlot, Gfm,
     GfmSlot, Math, MathSlot, Matter, Mdx, MdxSlot, Names, Parse, Stringify, ToHtml,
-    ToProse, UnsafePattern,
+    ToNaturalLanguage, UnsafePattern,
 };
 
 // actions

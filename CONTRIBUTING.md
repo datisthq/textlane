@@ -60,11 +60,11 @@ textlane/
 │   │   ├── examples/    #   schema.rs: the option schemas `pnpm generate:bindings` reads
 │   │   └── build.rs     #   napi setup under the `node` feature
 │   ├── core/            #   textlane-core: trees, the file, the plugin contract
-│   ├── md/ html/ mdx/ prose/  # one textlane-<domain> crate each
+│   ├── md/ html/ mdx/ nl/  # one textlane-<domain> crate each
 │   └── docs/            #   the docs site's Markdown pages, built with livemark
 ├── typescript/          # the npm package `textlane`: loads the native addon
 │   ├── actions/         #   resolveAddon — find the platform package's addon
-│   ├── generated/       #   textlane/md, /html, /mdx, /prose, from `pnpm generate:bindings`
+│   ├── generated/       #   textlane/md, /html, /mdx, /nl, from `pnpm generate:bindings`
 │   ├── models/          #   the processor over the addon's pipeline, and its types
 │   ├── index.ts         #   the package entry: `textlane()`
 │   ├── scripts/         #   pack and publish the per-platform packages

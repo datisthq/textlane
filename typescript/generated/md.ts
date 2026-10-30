@@ -152,8 +152,8 @@ export interface ToHtmlOptions {
   passThrough?: string[]
 }
 
-/** `md.toProse`: mdast into nlcst, tokenized by the processor's prose parser; options named as remark-retext and mdast-util-to-nlcst name them. */
-export interface ToProseOptions {
+/** `md.toNaturalLanguage`: mdast into nlcst, tokenized by the processor's natural-language parser; options named as remark-retext and mdast-util-to-nlcst name them. */
+export interface ToNaturalLanguageOptions {
   /** Node types to leave out, besides `table`, `tableRow` and `tableCell`. @default [] */
   ignore?: string[]
   /** Node types to keep as one `SourceNode` of their source text, besides `inlineCode`. @default [] */
@@ -218,8 +218,8 @@ export function toHtml(options?: ToHtmlOptions): Plugin<"md.toHtml", ToHtmlOptio
   return { name: "md.toHtml", options }
 }
 
-/** The `md.toProse` plugin. */
-export function toProse(options?: ToProseOptions): Plugin<"md.toProse", ToProseOptions> {
-  if (options === undefined) return { name: "md.toProse" }
-  return { name: "md.toProse", options }
+/** The `md.toNaturalLanguage` plugin. */
+export function toNaturalLanguage(options?: ToNaturalLanguageOptions): Plugin<"md.toNaturalLanguage", ToNaturalLanguageOptions> {
+  if (options === undefined) return { name: "md.toNaturalLanguage" }
+  return { name: "md.toNaturalLanguage", options }
 }

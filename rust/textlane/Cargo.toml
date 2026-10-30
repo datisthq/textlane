@@ -17,23 +17,23 @@ include = ["src/**/*", "build.rs", "README.md", "LICENSE.md"]
 crate-type = ["lib", "cdylib"]
 
 [features]
-default = ["md", "html", "highlight", "mdx", "prose"]
+default = ["md", "html", "highlight", "mdx", "nl"]
 md = ["dep:textlane-md"]
 html = ["dep:textlane-html"]
 highlight = ["html", "textlane-html/highlight"]
 mdx = ["dep:textlane-mdx"]
-prose = ["dep:textlane-prose"]
+nl = ["dep:textlane-nl"]
 node = [
   "md",
   "html",
   "highlight",
   "mdx",
-  "prose",
+  "nl",
   "dep:napi",
   "dep:napi-derive",
   "dep:napi-build",
 ]
-python = ["md", "html", "highlight", "mdx", "prose", "dep:pyo3"]
+python = ["md", "html", "highlight", "mdx", "nl", "dep:pyo3"]
 testing = []
 # The plugins' option schemas, read by `pnpm generate:bindings`; never in a release build
 schema = [
@@ -41,7 +41,7 @@ schema = [
   "textlane-md?/schema",
   "textlane-html?/schema",
   "textlane-mdx?/schema",
-  "textlane-prose?/schema",
+  "textlane-nl?/schema",
 ]
 
 [dependencies]
@@ -49,7 +49,7 @@ textlane-core = { workspace = true, features = ["json"] }
 textlane-md = { workspace = true, optional = true }
 textlane-html = { workspace = true, optional = true }
 textlane-mdx = { workspace = true, optional = true }
-textlane-prose = { workspace = true, optional = true }
+textlane-nl = { workspace = true, optional = true }
 napi = { version = "3.14.2", default-features = false, features = [
   "napi4",
   "serde-json",

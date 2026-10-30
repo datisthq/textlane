@@ -55,7 +55,7 @@ pub(crate) const PLUGINS: &[PluginEntry] = &[
     #[cfg(feature = "md")]
     plugin!("md.toHtml", textlane_md::ToHtml),
     #[cfg(feature = "md")]
-    plugin!("md.toProse", textlane_md::ToProse),
+    plugin!("md.toNaturalLanguage", textlane_md::ToNaturalLanguage),
     #[cfg(feature = "html")]
     plugin!("html.parse", textlane_html::Parse),
     #[cfg(feature = "html")]
@@ -71,37 +71,37 @@ pub(crate) const PLUGINS: &[PluginEntry] = &[
     #[cfg(feature = "html")]
     plugin!("html.toMarkdown", textlane_html::ToMarkdown),
     #[cfg(feature = "html")]
-    plugin!("html.toProse", textlane_html::ToProse, unit),
+    plugin!(
+        "html.toNaturalLanguage",
+        textlane_html::ToNaturalLanguage,
+        unit
+    ),
     #[cfg(feature = "html")]
     plugin!("html.stringify", textlane_html::Stringify),
     #[cfg(feature = "mdx")]
     plugin!("mdx.compile", textlane_mdx::Compile),
-    #[cfg(feature = "prose")]
-    plugin!("prose.parse", textlane_prose::Parse),
-    #[cfg(feature = "prose")]
-    plugin!("prose.equality", textlane_prose::Equality),
-    #[cfg(feature = "prose")]
-    plugin!("prose.passive", textlane_prose::Passive),
-    #[cfg(feature = "prose")]
-    plugin!("prose.readability", textlane_prose::Readability),
-    #[cfg(feature = "prose")]
-    plugin!("prose.repeatedWords", textlane_prose::RepeatedWords, unit),
-    #[cfg(feature = "prose")]
-    plugin!("prose.sentenceSpacing", textlane_prose::SentenceSpacing),
-    #[cfg(feature = "prose")]
-    plugin!("prose.stringify", textlane_prose::Stringify, unit),
-    #[cfg(feature = "prose")]
-    plugin!("prose.smartypants", textlane_prose::Smartypants),
-    #[cfg(feature = "prose")]
-    plugin!("prose.quotes", textlane_prose::Quotes),
-    #[cfg(feature = "prose")]
-    plugin!("prose.contractions", textlane_prose::Contractions),
-    #[cfg(feature = "prose")]
-    plugin!(
-        "prose.indefiniteArticle",
-        textlane_prose::IndefiniteArticle,
-        unit
-    ),
+    #[cfg(feature = "nl")]
+    plugin!("nl.parse", textlane_nl::Parse),
+    #[cfg(feature = "nl")]
+    plugin!("nl.equality", textlane_nl::Equality),
+    #[cfg(feature = "nl")]
+    plugin!("nl.passive", textlane_nl::Passive),
+    #[cfg(feature = "nl")]
+    plugin!("nl.readability", textlane_nl::Readability),
+    #[cfg(feature = "nl")]
+    plugin!("nl.repeatedWords", textlane_nl::RepeatedWords, unit),
+    #[cfg(feature = "nl")]
+    plugin!("nl.sentenceSpacing", textlane_nl::SentenceSpacing),
+    #[cfg(feature = "nl")]
+    plugin!("nl.stringify", textlane_nl::Stringify, unit),
+    #[cfg(feature = "nl")]
+    plugin!("nl.smartypants", textlane_nl::Smartypants),
+    #[cfg(feature = "nl")]
+    plugin!("nl.quotes", textlane_nl::Quotes),
+    #[cfg(feature = "nl")]
+    plugin!("nl.contractions", textlane_nl::Contractions),
+    #[cfg(feature = "nl")]
+    plugin!("nl.indefiniteArticle", textlane_nl::IndefiniteArticle, unit),
 ];
 
 /// The builder of the plugin a pipeline names, when the crate has one by that name.

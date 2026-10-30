@@ -1,6 +1,6 @@
 """Textlane: a Rust-native text processing pipeline, a unified replacement."""
 
-from . import html, md, mdx, prose
+from . import html, md, mdx, nl
 from ._models import Message, Place, Plugin, Point, VFile
 from ._native import TextlaneError, plugin_names, version
 from ._processor import Processor, textlane
@@ -17,7 +17,7 @@ __all__ = [
     "md",
     "mdx",
     "plugin_names",
-    "prose",
+    "nl",
     "textlane",
     "version",
 ]

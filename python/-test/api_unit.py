@@ -62,7 +62,7 @@ def test_api(group, test):
         tree = processor().run_sync(processor().parse(source), source)
         # A tree read back from JSON keeps unist positions, which a bridge into nlcst cannot
         # place its nodes by: only `process` keeps them in that case
-        bridged = any(entry[0].endswith(".toProse") for entry in group["pipeline"])
+        bridged = any(entry[0].endswith(".toNaturalLanguage") for entry in group["pipeline"])
         if group.get("positions") is False or bridged:
             assert strip_positions(tree) == strip_positions(expected["tree"])
         else:

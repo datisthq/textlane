@@ -13,7 +13,7 @@ natively, with Node.js and Python bindings over the same crate. It is pre-releas
 Invoke when the user asks to:
 
 - Install textlane in a Rust, Node.js or Python project.
-- Turn Markdown into HTML (or HTML into Markdown, MDX into JavaScript, prose into checks) with
+- Turn Markdown into HTML (or HTML into Markdown, MDX into JavaScript, natural language into checks) with
   textlane, or port a unified, remark, rehype or retext pipeline to it.
 - Check which textlane version is installed.
 
@@ -32,16 +32,16 @@ current platform as an optional dependency; never install with `--omit=optional`
 
 Plugins are grouped by domain and named `<domain>.<name>`, the name unified's ecosystem uses
 spelled out: `md.parse`, `md.gfm`, `md.toHtml`, `html.stringify`, `html.toMarkdown`,
-`mdx.compile`, `prose.parse`, `prose.equality`. Options take the upstream plugin's camelCase
+`mdx.compile`, `nl.parse`, `nl.equality`. Options take the upstream plugin's camelCase
 names (`allowDangerousHtml`, as remark-rehype). A pipeline has one parser and one compiler, and
 bridges such as `md.toHtml` (remark-rehype) change the tree between them.
 
-| Domain  | Node.js          | Python           | Rust              |
-| ------- | ---------------- | ---------------- | ----------------- |
-| `md`    | `textlane/md`    | `textlane.md`    | `textlane::md`    |
-| `html`  | `textlane/html`  | `textlane.html`  | `textlane::html`  |
-| `mdx`   | `textlane/mdx`   | `textlane.mdx`   | `textlane::mdx`   |
-| `prose` | `textlane/prose` | `textlane.prose` | `textlane::prose` |
+| Domain | Node.js         | Python          | Rust             |
+| ------ | --------------- | --------------- | ---------------- |
+| `md`   | `textlane/md`   | `textlane.md`   | `textlane::md`   |
+| `html` | `textlane/html` | `textlane.html` | `textlane::html` |
+| `mdx`  | `textlane/mdx`  | `textlane.mdx`  | `textlane::mdx`  |
+| `nl`   | `textlane/nl`   | `textlane.nl`   | `textlane::nl`   |
 
 `pluginNames()` (Node.js) and `textlane.plugin_names()` (Python) list every plugin.
 
@@ -84,7 +84,7 @@ file = (
 file["value"]  # "<h1>hi</h1>"
 ```
 
-Functions are snake_case (`md.to_html`, `prose.indefinite_article`); their options stay the
+Functions are snake_case (`md.to_html`, `nl.indefinite_article`); their options stay the
 camelCase keys the plugin takes, typed as `TypedDict`s. `await processor.process(text)` and
 `await processor.run(tree)` are coroutines; `process_sync` and `run_sync` return directly. A
 file and a tree are dicts.

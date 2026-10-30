@@ -198,7 +198,7 @@ const slides: Slide[] = [
   {
     id: "smartypants",
     title: "Typography",
-    stages: ["prose.parse", "prose.smartypants", "prose.stringify"],
+    stages: ["nl.parse", "nl.smartypants", "nl.stringify"],
     ports: ["retext-english", "retext-smartypants", "retext-stringify"],
     input: { label: "input.txt", text: "Alfred \"bertrand\" 'cees'." },
     output: { label: "output.txt", text: "Alfred “bertrand” ‘cees’." },
@@ -206,7 +206,7 @@ const slides: Slide[] = [
   {
     id: "lint",
     title: "Lint",
-    stages: ["prose.parse", "prose.repeatedWords", "prose.stringify"],
+    stages: ["nl.parse", "nl.repeatedWords", "nl.stringify"],
     ports: ["retext-english", "retext-repeated-words", "retext-stringify"],
     input: { label: "input.txt", text: "Well, it it doesn’t have to be." },
     output: {
@@ -669,7 +669,7 @@ const domains: Domain[] = [
       ["md.parse", "remark-parse"],
       ["md.stringify", "remark-stringify"],
       ["md.toHtml", "remark-rehype"],
-      ["md.toProse", "remark-retext"],
+      ["md.toNaturalLanguage", "remark-retext"],
       ["md.gfm", "remark-gfm"],
       ["md.frontmatter", "remark-frontmatter"],
       ["md.math", "remark-math"],
@@ -681,6 +681,24 @@ const domains: Domain[] = [
     ],
   },
   {
+    name: "nl",
+    title: "Natural Language",
+    description: "A port of parse-english and the retext plugins.",
+    plugins: [
+      ["nl.parse", "retext-english"],
+      ["nl.stringify", "retext-stringify"],
+      ["nl.smartypants", "retext-smartypants"],
+      ["nl.quotes", "retext-quotes"],
+      ["nl.contractions", "retext-contractions"],
+      ["nl.repeatedWords", "retext-repeated-words"],
+      ["nl.indefiniteArticle", "retext-indefinite-article"],
+      ["nl.passive", "retext-passive"],
+      ["nl.readability", "retext-readability"],
+      ["nl.equality", "retext-equality"],
+      ["nl.sentenceSpacing", "retext-sentence-spacing"],
+    ],
+  },
+  {
     name: "html",
     title: "HTML",
     description: "A port of parse5 and the hast utilities.",
@@ -688,30 +706,12 @@ const domains: Domain[] = [
       ["html.parse", "rehype-parse"],
       ["html.stringify", "rehype-stringify"],
       ["html.toMarkdown", "rehype-remark"],
-      ["html.toProse", "rehype-retext"],
+      ["html.toNaturalLanguage", "rehype-retext"],
       ["html.raw", "rehype-raw"],
       ["html.sanitize", "rehype-sanitize"],
       ["html.slug", "rehype-slug"],
       ["html.format", "rehype-format"],
       ["html.highlight", "@shikijs/rehype"],
-    ],
-  },
-  {
-    name: "prose",
-    title: "Prose",
-    description: "A port of parse-english and the retext plugins.",
-    plugins: [
-      ["prose.parse", "retext-english"],
-      ["prose.stringify", "retext-stringify"],
-      ["prose.smartypants", "retext-smartypants"],
-      ["prose.quotes", "retext-quotes"],
-      ["prose.contractions", "retext-contractions"],
-      ["prose.repeatedWords", "retext-repeated-words"],
-      ["prose.indefiniteArticle", "retext-indefinite-article"],
-      ["prose.passive", "retext-passive"],
-      ["prose.readability", "retext-readability"],
-      ["prose.equality", "retext-equality"],
-      ["prose.sentenceSpacing", "retext-sentence-spacing"],
     ],
   },
 ]
@@ -724,8 +724,8 @@ function Plugins() {
           <div className="text-center max-w-2xl mx-auto mb-10 md:mb-16">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Plugins</h2>
             <p className="mt-4 text-muted-foreground text-lg">
-              Markdown, HTML and prose, each a crate of its own, bridged by the same
-              converters unified uses.
+              Markdown, HTML and natural language, each a crate of its own, bridged by the
+              same converters unified uses.
             </p>
           </div>
         </Reveal>

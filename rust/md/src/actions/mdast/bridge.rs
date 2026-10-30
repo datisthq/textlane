@@ -1,8 +1,10 @@
 use textlane_core::mdast::Node;
 use textlane_core::nlcst::{self, Literal, Parent};
-use textlane_core::{Allocator, ArenaVec, Location, Position, ProseParser, UnistPoint};
+use textlane_core::{
+    Allocator, ArenaVec, Location, NaturalLanguageParser, Position, UnistPoint,
+};
 
-use crate::models::options::ToProse;
+use crate::models::options::ToNaturalLanguage;
 use crate::utils::serializer::state::read_node_type;
 
 const DEFAULT_IGNORE: [&str; 3] = ["table", "tableRow", "tableCell"];
@@ -14,8 +16,8 @@ const DEFAULT_SOURCE: [&str; 1] = ["inlineCode"];
 pub fn bridge_mdast<'a>(
     tree: &Node<'a>,
     source: &str,
-    parser: &dyn ProseParser,
-    options: &ToProse,
+    parser: &dyn NaturalLanguageParser,
+    options: &ToNaturalLanguage,
     alloc: &'a Allocator,
 ) -> nlcst::Node<'a> {
     let state = State {
@@ -58,8 +60,8 @@ pub fn bridge_mdast<'a>(
 
 struct State<'s, 'a> {
     location: Location<'s>,
-    parser: &'s dyn ProseParser,
-    options: &'s ToProse,
+    parser: &'s dyn NaturalLanguageParser,
+    options: &'s ToNaturalLanguage,
     alloc: &'a Allocator,
 }
 

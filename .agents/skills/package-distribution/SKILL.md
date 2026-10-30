@@ -14,7 +14,7 @@ One workspace, three registries, one version. Nothing here may change what the c
   (`typescript/models/processor.ts`) over the addon's `Pipeline` class: chaining, Promises
   and `data`'s overloads only; values cross napi as JSON (`serde-json`), so a JavaScript
   function in `use` fails in napi rather than vanishing.
-- The subpaths `textlane/md`, `textlane/html`, `textlane/mdx` and `textlane/prose` are
+- The subpaths `textlane/md`, `textlane/html`, `textlane/mdx` and `textlane/nl` are
   `exports` entries pointing at `build/generated/<domain>.js`. Their sources,
   `typescript/generated/<domain>.ts`, and Python's `python/textlane/<domain>.py` are written by
   `pnpm generate:bindings` from `cargo run --example schema --features schema`: the plugin

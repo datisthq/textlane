@@ -35,13 +35,13 @@ pub struct ToHtml {
     pub pass_through: Vec<String>,
 }
 
-/// `md.toProse`: mdast into nlcst, tokenized by the processor's prose parser; options
+/// `md.toNaturalLanguage`: mdast into nlcst, tokenized by the processor's natural-language parser; options
 /// named as remark-retext and mdast-util-to-nlcst name them.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
-#[cfg_attr(feature = "schema", schemars(rename = "ToProseOptions"))]
-pub struct ToProse {
+#[cfg_attr(feature = "schema", schemars(rename = "ToNaturalLanguageOptions"))]
+pub struct ToNaturalLanguage {
     /// Node types to leave out, besides `table`, `tableRow` and `tableCell`.
     pub ignore: Vec<String>,
     /// Node types to keep as one `SourceNode` of their source text, besides `inlineCode`.

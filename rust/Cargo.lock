@@ -1389,7 +1389,7 @@ dependencies = [
  "textlane-html",
  "textlane-md",
  "textlane-mdx",
- "textlane-prose",
+ "textlane-nl",
 ]
 
 [[package]]
@@ -1448,7 +1448,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "textlane-prose"
+name = "textlane-nl"
 version = "0.0.0"
 dependencies = [
  "regex",

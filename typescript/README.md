@@ -17,7 +17,7 @@ through a platform-specific optional dependency; no Rust toolchain is needed.
 
 A processor chains plugins with `use`, as unified does, then parses, transforms and serializes
 text with `process`. Each language reaches the same crate; plugins are grouped by domain (`md`,
-`html`, `mdx`, `prose`) and named as the pipeline names them.
+`html`, `mdx`, `nl`) and named as the pipeline names them.
 
 Rust:
 

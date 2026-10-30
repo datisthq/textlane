@@ -71,7 +71,7 @@ pub trait Compiler: Send + Sync {
 
 /// A natural-language parser, as parse-latin's instance is to mdast-util-to-nlcst and
 /// hast-util-to-nlcst: bridges into nlcst tokenize text with it and run its plugins.
-pub trait ProseParser: Send + Sync {
+pub trait NaturalLanguageParser: Send + Sync {
     /// Split `value` into sentence content: words, white space, punctuation and symbols, each
     /// spanning its bytes from `offset` on.
     fn tokenize<'a>(
@@ -101,11 +101,11 @@ pub trait ProseParser: Send + Sync {
     ) -> Node<'a>;
 }
 
-/// The slot holding the prose parser bridges into nlcst read when their stage is built; the
-/// textlane processor seeds it with `prose.parse`'s Latin parser before plugins attach.
+/// The slot holding the natural-language parser bridges into nlcst read when their stage is built; the
+/// textlane processor seeds it with `nl.parse`'s Latin parser before plugins attach.
 #[derive(Clone, Default)]
-pub struct ProseParserSlot {
-    pub parser: Option<Arc<dyn ProseParser>>,
+pub struct NaturalLanguageParserSlot {
+    pub parser: Option<Arc<dyn NaturalLanguageParser>>,
 }
 
 /// A JavaScript parser, as acorn is to micromark's MDX extensions: `md.mdx` asks it where

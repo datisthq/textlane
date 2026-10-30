@@ -80,9 +80,9 @@ pub use models::location::Location;
 pub use models::position::{Point, Position, UnistPoint, UnistPosition};
 pub use models::tree::{Tree, TreeKind};
 pub use plugin::{
-    Attach, Compiler, Job, Parser, Plugin, ProseParser, ProseParserSlot, ScriptError,
-    ScriptExpression, ScriptParser, ScriptParserSlot, ScriptStatement, Slots, Step,
-    Transform,
+    Attach, Compiler, Job, NaturalLanguageParser, NaturalLanguageParserSlot, Parser,
+    Plugin, ScriptError, ScriptExpression, ScriptParser, ScriptParserSlot,
+    ScriptStatement, Slots, Step, Transform,
 };
 
 /// The arena every node of one document is allocated in.

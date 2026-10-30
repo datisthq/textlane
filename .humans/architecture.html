@@ -121,7 +121,7 @@
   <svg
     viewBox="0 0 760 302"
     role="img"
-    aria-label="textlane depends on four domain crates, md, html, prose and mdx, which each depend only on textlane-core; mdx also depends on oxc; textlane re-exports core"
+    aria-label="textlane depends on four domain crates, md, html, nl and mdx, which each depend only on textlane-core; mdx also depends on oxc; textlane re-exports core"
   >
     <defs>
       <marker
@@ -185,8 +185,8 @@
     </g>
     <g class="node">
       <rect x="410" y="124" width="140" height="48" rx="8" />
-      <text class="title" x="480" y="145" text-anchor="middle">textlane-prose</text>
-      <text class="sub" x="480" y="160" text-anchor="middle">prose/</text>
+      <text class="title" x="480" y="145" text-anchor="middle">textlane-nl</text>
+      <text class="sub" x="480" y="160" text-anchor="middle">nl/</text>
     </g>
     <g class="node">
       <rect x="570" y="124" width="140" height="48" rx="8" />
@@ -227,9 +227,8 @@
     built-in <code>core</code>.
   </li>
   <li>
-    Features <code>md</code>, <code>html</code>, <code>mdx</code> and
-    <code>prose</code> are all default; <code>node</code> and <code>python</code> enable
-    every domain.
+    Features <code>md</code>, <code>html</code>, <code>mdx</code> and <code>nl</code> are
+    all default; <code>node</code> and <code>python</code> enable every domain.
   </li>
 </ul>
 
@@ -254,13 +253,13 @@
     <code>parse</code>, <code>stringify</code>, <code>gfm</code>,
     <code>frontmatter</code>, <code>directive</code>, <code>math</code>,
     <code>definitionList</code>, <code>gemoji</code>, <code>toc</code>,
-    <code>mdx</code> (syntax only), <code>toHtml</code>, <code>toProse</code>.
+    <code>mdx</code> (syntax only), <code>toHtml</code>, <code>toNaturalLanguage</code>.
   </dd>
   <dt><code>textlane-html</code></dt>
   <dd>
     <code>parse</code> (HTML5), <code>stringify</code>, <code>raw</code>,
     <code>sanitize</code>, <code>slug</code>, <code>format</code>,
-    <code>toMarkdown</code>, <code>toProse</code>; later <code>katex</code> and
+    <code>toMarkdown</code>, <code>toNaturalLanguage</code>; later <code>katex</code> and
     <code>highlight</code>.
   </dd>
   <dt><code>textlane-mdx</code></dt>
@@ -269,7 +268,7 @@
     the MDX transforms (document, JSX rewrite, build JSX) and code generation as astring
     prints it.
   </dd>
-  <dt><code>textlane-prose</code></dt>
+  <dt><code>textlane-nl</code></dt>
   <dd>
     <code>parse</code> (English, Latin), <code>stringify</code>, then
     <code>smartypants</code>, <code>readability</code>, <code>spell</code>,
@@ -315,9 +314,9 @@
       <td><code>textlane.mdx</code></td>
     </tr>
     <tr>
-      <td><code>textlane::prose</code></td>
-      <td><code>textlane/prose</code></td>
-      <td><code>textlane.prose</code></td>
+      <td><code>textlane::nl</code></td>
+      <td><code>textlane/nl</code></td>
+      <td><code>textlane.nl</code></td>
     </tr>
   </tbody>
 </table>
@@ -336,8 +335,8 @@ const processor = textlane()
 <p>
   Domains are named short, like file extensions; their functions spell formats out in
   full:
-  <code>md.toHtml</code>, <code>html.toMarkdown</code>, <code>md.toProse</code>. Names
-  derive mechanically from Rust: <code>to_markdown</code> is
+  <code>md.toHtml</code>, <code>html.toMarkdown</code>, <code>md.toNaturalLanguage</code>.
+  Names derive mechanically from Rust: <code>to_markdown</code> is
   <code>toMarkdown</code> through napi's default conversion and
   <code>to_markdown</code> in Python. Plugin names, their options and node shapes are
   public API.

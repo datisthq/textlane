@@ -17,7 +17,7 @@ called only at the stage where they run.
 
 `cargo add textlane` adds the crate that holds all of textlane's behaviour. It re-exports one
 crate per domain as a module of its name: `textlane::md`, `textlane::html`,
-`textlane::mdx` and `textlane::prose`. The npm package loads the same crate as a prebuilt native addon and the PyPI
+`textlane::mdx` and `textlane::nl`. The npm package loads the same crate as a prebuilt native addon and the PyPI
 package as a prebuilt extension, so each language gets the same pipeline at the same version.
 
 ## Conformance

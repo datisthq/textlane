@@ -24,8 +24,8 @@ __all__ = [
     "StringifyOptions",
     "to_html",
     "ToHtmlOptions",
-    "to_prose",
-    "ToProseOptions",
+    "to_natural_language",
+    "ToNaturalLanguageOptions",
 ]
 
 
@@ -201,9 +201,9 @@ class ToHtmlOptions(TypedDict, total=False):
     passThrough: List[str]
 
 
-# `md.toProse`: mdast into nlcst, tokenized by the processor's prose parser; options
+# `md.toNaturalLanguage`: mdast into nlcst, tokenized by the processor's natural-language parser; options
 # named as remark-retext and mdast-util-to-nlcst name them.
-class ToProseOptions(TypedDict, total=False):
+class ToNaturalLanguageOptions(TypedDict, total=False):
     # Node types to leave out, besides `table`, `tableRow` and `tableCell`.
     ignore: List[str]
     # Node types to keep as one `SourceNode` of their source text, besides `inlineCode`.
@@ -260,6 +260,6 @@ def to_html(options: Optional[ToHtmlOptions] = None) -> Plugin:
     return describe_plugin("md.toHtml", options)
 
 
-def to_prose(options: Optional[ToProseOptions] = None) -> Plugin:
-    """The `md.toProse` plugin."""
-    return describe_plugin("md.toProse", options)
+def to_natural_language(options: Optional[ToNaturalLanguageOptions] = None) -> Plugin:
+    """The `md.toNaturalLanguage` plugin."""
+    return describe_plugin("md.toNaturalLanguage", options)

@@ -166,7 +166,7 @@
   <dt>Stages</dt>
   <dd>
     <p>
-      <code>enum Tree&lt;'a&gt; { Mdast, Hast, Prose }</code>. Every plugin declares the
+      <code>enum Tree&lt;'a&gt; { Mdast, Hast, Nlcst }</code>. Every plugin declares the
       kind it takes and returns, and <code>freeze()</code> rejects a mismatch. Plugin
       lists stay dynamic, as livemark's config and the bindings need; the check costs one
       <code>match</code> per stage, not per node.

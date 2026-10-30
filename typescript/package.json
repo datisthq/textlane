@@ -29,7 +29,7 @@
     "./md": "./build/generated/md.js",
     "./html": "./build/generated/html.js",
     "./mdx": "./build/generated/mdx.js",
-    "./prose": "./build/generated/prose.js"
+    "./nl": "./build/generated/nl.js"
   },
   "scripts": {
     "build": "tsgo --project tsconfig.build.json",

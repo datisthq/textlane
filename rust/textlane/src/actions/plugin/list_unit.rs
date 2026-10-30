@@ -5,7 +5,7 @@ use crate::actions::plugin::find::find_plugin;
 fn lists_every_public_plugin_once() {
     let names = list_plugins();
     assert!(names.contains(&"md.toHtml"));
-    assert!(names.contains(&"prose.indefiniteArticle"));
+    assert!(names.contains(&"nl.indefiniteArticle"));
     let mut unique = names.clone();
     unique.sort_unstable();
     unique.dedup();

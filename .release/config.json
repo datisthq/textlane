@@ -29,7 +29,7 @@
         {
           "type": "toml",
           "path": "rust/Cargo.toml",
-          "jsonpath": "$.workspace.dependencies['textlane-prose'].version"
+          "jsonpath": "$.workspace.dependencies['textlane-nl'].version"
         },
         {
           "type": "toml",
@@ -64,7 +64,7 @@
         {
           "type": "toml",
           "path": "rust/Cargo.lock",
-          "jsonpath": "$.package[?(@.name.value=='textlane-prose')].version"
+          "jsonpath": "$.package[?(@.name.value=='textlane-nl')].version"
         },
         {
           "type": "toml",

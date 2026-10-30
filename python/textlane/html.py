@@ -20,7 +20,7 @@ __all__ = [
     "HighlightOptions",
     "to_markdown",
     "ToMarkdownOptions",
-    "to_prose",
+    "to_natural_language",
     "stringify",
     "StringifyOptions",
 ]
@@ -206,9 +206,9 @@ def to_markdown(options: Optional[ToMarkdownOptions] = None) -> Plugin:
     return describe_plugin("html.toMarkdown", options)
 
 
-def to_prose() -> Plugin:
-    """The `html.toProse` plugin."""
-    return describe_plugin("html.toProse")
+def to_natural_language() -> Plugin:
+    """The `html.toNaturalLanguage` plugin."""
+    return describe_plugin("html.toNaturalLanguage")
 
 
 def stringify(options: Optional[StringifyOptions] = None) -> Plugin:

@@ -29,7 +29,7 @@ retext and MDX test suites. Every implementation, TypeScript included, runs the 
 ## Status
 
 Textlane is pre-release. `textlane()` builds a processor over the native pipeline, and
-`textlane/md`, `textlane/html`, `textlane/mdx` and `textlane/prose` export one function per
+`textlane/md`, `textlane/html`, `textlane/mdx` and `textlane/nl` export one function per
 plugin, typed from the crate's option structs. JavaScript plugins cannot join a pipeline yet.
 
 ```js
