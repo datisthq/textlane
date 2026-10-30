@@ -29,7 +29,11 @@ this skill is how to change it without making the numbers lie.
 - `pnpm -C benchmark show:report` — merges `.cache/results/`, latest per case, size and tool
 - Publish a full run in `.humans/benchmark.html`: its tables, chart and cards, with the date,
   commit and machine. A stale result file from before a textlane change still merges into
-  `show:report`, so pass the run's own file (`show:report <path>`) when the page is regenerated
+  `show:report`, so pass the run's own file (`show:report <path>`) when the page is regenerated. After a
+  textlane-only rerun, build the page from one file merging the rivals' rows of the last
+  full run (it may sit in another worktree's `benchmark/.cache/results/`, and JavaScript
+  tools that crashed there may have a rerun file of their own) with textlane's new rows,
+  titled by their tool names now: a result file keeps the titles it was measured with
 - A full run takes about half an hour; unified and micromark dominate it and grow faster than
   their input, so keep the all-tool sizes at 1MB and the timeout at 180s. A larger size runs
   only the fastest tools, listed under the case's `tools` (`cmark`'s and `gfm`'s 10MB, for memory)
