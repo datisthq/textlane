@@ -10,4 +10,4 @@ sections:
   - title: Notes
     prefix: /
     icon: notebook-pen
-    siteTitle: Textlane/Internal
+    siteDescription: Internal
