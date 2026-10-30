@@ -21,7 +21,8 @@ this skill is how to change it without making the numbers lie.
   Rust adapters. Rerun it after a crate change: the wheel is not rebuilt per run
 - `pnpm -C benchmark measure` — narrowed with `--case`, `--size`, `--tool`; `--runs 1 --warmup 0`
   for a smoke run. **By default a rerun measures only textlane:**
-  `--tool textlane-rust --tool textlane-typescript --tool textlane-python`. The rivals'
+  the six textlane tools (`textlane-rust`, `textlane-typescript`, `textlane-python`, each
+  also with `-hast`). The rivals'
   results carry over, as `show:report` merges the latest per tool, and re-measuring them
   costs half an hour for numbers that did not change. Measure every tool only when asked
   for a full run, or when a rival's version or the machine changed
@@ -58,6 +59,15 @@ must sit near the others', or it renders a different document. Pin it: npm by ex
 (the workspace's seven-day quarantine applies), Python in `pyproject.toml` under
 `exclude-newer`, Rust in `adapters/rust/Cargo.lock`. Whatever it does differently from textlane
 (no tree, not CommonMark, a GFM piece missing) goes in its `caveats`, which the report prints.
+
+## The two textlane paths
+
+`process` writes HTML straight from mdast when `md.toHtml` and `html.stringify` end the
+pipeline, and builds hast as soon as anything sits between them. Each build is measured both
+ways: `textlane-<language>-hast` sets `TEXTLANE_HAST`, and its adapter passes `html.stringify`
+`quote: '"'`, a non-default option writing the same bytes, so the hast row costs the tree
+alone. A real HTML plugin would add its own work, and a JavaScript or Python no-op plugin its
+binding's JSON crossing, so neither is the fair stand-in
 
 ## Traps
 

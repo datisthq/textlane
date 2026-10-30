@@ -57,6 +57,27 @@ export const textlanePythonTool: Tool = {
   getVersion: readTextlaneVersion,
 }
 
+export const textlaneRustHastTool = createHastTool(textlaneRustTool)
+export const textlaneTypescriptHastTool = createHastTool(textlaneTypescriptTool)
+export const textlanePythonHastTool = createHastTool(textlanePythonTool)
+
+// The same build with an HTML plugin between `md.toHtml` and `html.stringify`, which keeps
+// hast; a no-op stands in for it, so only the tree's cost shows
+function createHastTool(tool: Tool): Tool {
+  return {
+    ...tool,
+    name: `${tool.name}-hast`,
+    title: `${tool.title} + HTML plugins`,
+    caveats: [
+      "builds hast as any HTML plugin makes it, with a no-op in the plugin's place",
+    ],
+    createCommand: async (dataset, repeat, flavor) => {
+      const command = await tool.createCommand(dataset, repeat, flavor)
+      return { ...command, env: { ...command.env, TEXTLANE_HAST: "1" } }
+    },
+  }
+}
+
 const LIBRARY_NAMES: Record<string, string> = {
   darwin: "libtextlane.dylib",
   linux: "libtextlane.so",

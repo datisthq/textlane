@@ -10,6 +10,7 @@ strikethrough, autolink literals and footnotes switched on in each. Under GFM:
 | textlane (Rust)           | `md.parse` → `md.gfm` → `md.toHtml` → `html.stringify` through `Pipeline`, release+LTO |
 | textlane (Node.js)        | the same pipeline through the addon's processor, frozen once, `processSync`            |
 | textlane (Python)         | the same pipeline through the wheel's processor, frozen once, `process`                |
+| … + HTML plugins          | each of the three with hast kept, as any `html.*` plugin before `stringify` keeps it   |
 | comrak                    | `markdown_to_html`, `unsafe` on, the five GFM extensions                               |
 | pulldown-cmark            | `html::push_html` over `Parser::new_ext` with its GFM options (no autolink literals)   |
 | markdown-rs               | `to_html_with_options` with `Options::gfm()`, dangerous HTML allowed                   |

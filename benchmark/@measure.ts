@@ -80,5 +80,5 @@ function formatResult(result: Result) {
   const memory = result.peakMemoryMb ? `${Math.round(result.peakMemoryMb)}MB` : "-"
   const output = result.outputBytes ? formatBytes(result.outputBytes) : "-"
   const failure = result.outcome === "ok" ? "" : `  (${result.exit})`
-  return `  ${result.title.padEnd(28)} ${time.padStart(11)} ${throughput.padStart(11)} ${memory.padStart(8)} ${output.padStart(9)}${failure}`
+  return `  ${result.title.padEnd(34)} ${time.padStart(11)} ${throughput.padStart(11)} ${memory.padStart(8)} ${output.padStart(9)}${failure}`
 }

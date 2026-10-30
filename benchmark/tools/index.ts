@@ -2,16 +2,22 @@ import { markdownItTool, markedTool, micromarkTool, unifiedTool } from "./javasc
 import { cmarkTool, markdownItPyTool, mistuneTool, pythonMarkdownTool } from "./python.ts"
 import { comrakTool, markdownRsTool, pulldownCmarkTool } from "./rust.ts"
 import {
+  textlanePythonHastTool,
   textlanePythonTool,
+  textlaneRustHastTool,
   textlaneRustTool,
+  textlaneTypescriptHastTool,
   textlaneTypescriptTool,
 } from "./textlane.ts"
 import type { Tool } from "./types.ts"
 
 export const TOOLS: Tool[] = [
   textlaneRustTool,
+  textlaneRustHastTool,
   textlaneTypescriptTool,
+  textlaneTypescriptHastTool,
   textlanePythonTool,
+  textlanePythonHastTool,
   comrakTool,
   pulldownCmarkTool,
   markdownRsTool,

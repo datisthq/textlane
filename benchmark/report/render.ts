@@ -138,7 +138,7 @@ function renderTools(results: Result[]) {
   <h2>What each library does</h2>
   <p class="caption">Every library converts CommonMark, or GFM in the <code>gfm</code> case, to HTML with
   raw HTML passed through.
-  Differences from textlane, which builds an mdast tree, converts it to hast and serializes that:</p>
+  Differences from textlane, which builds an mdast tree and writes HTML from it, or converts it to hast and serializes that once an HTML plugin needs the tree:</p>
   <div class="table-wrap"><table>
     <thead><tr><th>Library</th><th>Version</th><th>Caveats</th></tr></thead>
     <tbody>${[...tools.values()]
