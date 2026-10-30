@@ -80,7 +80,7 @@ Shipped skills live in `.skills/` and teach coding agents to **use** textlane; t
 
 The root is a private pnpm workspace (`package.json`, `pnpm-workspace.yaml`): format, lint, the docs site, the repo guards and the scripts that chain each section with `pnpm -C <section>` — never `pnpm -r`.
 
-- `rust/` — the cargo workspace, a virtual `Cargo.toml` over one sibling directory per crate, on the toolchain `rust/rust-toolchain.toml` pins (**`rust-development`**)
+- `rust/` — the cargo workspace, a virtual `Cargo.toml` over one sibling directory per crate, on the toolchain `rust/rust-toolchain.toml` pins, with `vendor/` holding patched copies of dependencies (**`rust-development`**)
   - `textlane/` — the crates.io package `textlane`: `src/actions/<entity>/<verb>.rs` (`package/version`, `case/run`, `plugin/find`, the one table of public plugins); `src/models/processor.rs` the processor (`.with()`, `freeze()`, `process()`); `src/models/pipeline.rs` the name-based `Pipeline` the bindings drive, with unified's `use`, `data` and `freeze`; `src/bindings/` — `node.rs` (napi, the `node` feature) and `python.rs` (PyO3, the `python` feature), each only mapping `Pipeline` to its language; `examples/schema.rs` prints every plugin's option schema (the `schema` feature); `build.rs` runs napi's setup under `node`; `src/lib.rs` the façade, re-exporting each domain crate as a module of its name
   - `core/` — `textlane-core`: the unist, mdast, hast and nlcst trees in a per-document arena, positions, the file and the plugin contract (its `json` feature reads and writes unified's JSON) every other crate shares
   - `md/`, `html/`, `mdx/`, `nl/` — `textlane-<domain>`, each domain's plugins, depending on `textlane-core` only

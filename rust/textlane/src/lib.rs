@@ -66,7 +66,7 @@ pub use actions::package::version::read_version;
 #[cfg(feature = "schema")]
 pub use actions::plugin::describe::describe_plugins;
 pub use actions::plugin::list::list_plugins;
-pub use models::pipeline::{Api, Pipeline};
+pub use models::pipeline::{Api, Pipeline, ProcessJob};
 pub use models::processor::{FrozenProcessor, Output, Processor};
 pub use models::run::{Finished, Outcome, Pause, Progress};
 pub use textlane_core::*;

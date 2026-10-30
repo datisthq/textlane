@@ -11,11 +11,17 @@ export interface NativePipeline {
   run(tree: Node, value?: string): Node
   runSync(tree: Node, value?: string): Node
   stringify(tree: Node): string
-  process(text: string, path?: string): VFile
+  process(text: string, path?: string): Promise<ProcessOutcome>
   processSync(text: string, path?: string): VFile
   hosts(): number[]
   startRun(tree: Node, value: string | undefined, sync: boolean): NativeRun<Node>
   startProcess(text: string, sync: boolean, path?: string): NativeRun<VFile>
+}
+
+/** What an async `process` settles with: the file, or the error the crate raised. */
+export interface ProcessOutcome {
+  file?: VFile
+  error?: { code: string; message: string }
 }
 
 /** A run paused before host plugins until `resume`, then finished with `result`. */

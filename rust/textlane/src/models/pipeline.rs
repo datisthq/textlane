@@ -35,6 +35,31 @@ enum Key {
     Host(u32),
 }
 
+/// A frozen pipeline's `process`, independent of the `Pipeline` it came from.
+pub struct ProcessJob {
+    processor: Arc<FrozenProcessor>,
+    api: Api,
+}
+
+impl ProcessJob {
+    /// Parse, run and compile a document.
+    pub fn process(&self, input: &str, file: &mut File) -> Result<String, Error> {
+        let (processor, api) = (&self.processor, self.api);
+        with_allocator(|alloc| {
+            let tree = processor.parse(input, file, alloc)?;
+            match processor
+                .finish(tree, file, alloc, 0, api)
+                .map_err(|error| rename_async(error, api, "process"))?
+            {
+                Finish::Text(text) => Ok(text),
+                Finish::Host { hosts, .. } => {
+                    Err(missing_host(hosts.first().copied().unwrap_or_default()))
+                }
+            }
+        })
+    }
+}
+
 /// The data plugins set while they attach, shared through the attach slots.
 #[derive(Default)]
 pub(crate) struct PipelineData(pub(crate) Map<String, Value>);
@@ -207,25 +232,26 @@ impl Pipeline {
         file: &mut File,
         api: Api,
     ) -> Result<String, Error> {
-        let processor = self.freeze()?;
+        self.freeze_shared()?;
+        self.prepare_process(api)?.process(input, file)
+    }
+
+    /// Check a frozen pipeline for `process`, into a job that owns what it needs, so a
+    /// binding can run documents on other threads; `freeze` first.
+    pub fn prepare_process(&self, api: Api) -> Result<ProcessJob, Error> {
+        let Some(processor) = self.frozen.clone() else {
+            return Err(Error::new(
+                "unfrozen-processor",
+                "Cannot prepare `process` before `freeze`",
+            ));
+        };
         let call = match api {
             Api::Sync => "processSync",
             Api::Async => "process",
         };
-        check_parser(processor, call)?;
-        check_compiler(processor, call)?;
-        with_allocator(|alloc| {
-            let tree = processor.parse(input, file, alloc)?;
-            match processor
-                .finish(tree, file, alloc, 0, api)
-                .map_err(|error| rename_async(error, api, "process"))?
-            {
-                Finish::Text(text) => Ok(text),
-                Finish::Host { hosts, .. } => {
-                    Err(missing_host(hosts.first().copied().unwrap_or_default()))
-                }
-            }
-        })
+        check_parser(&processor, call)?;
+        check_compiler(&processor, call)?;
+        Ok(ProcessJob { processor, api })
     }
 
     /// Run the transforms over a tree given as JSON, as `run` does, pausing before the

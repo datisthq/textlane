@@ -775,8 +775,6 @@ checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
 [[package]]
 name = "onig-regset"
 version = "6.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "080c4eeac92e475efa2893e52522ee3de48086cdad5fb5f36631a7fcb5293c81"
 dependencies = [
  "bitflags",
  "libc",

@@ -81,7 +81,9 @@ processor.data("site")
 - `run(tree, file?)` runs the transforms over a tree and resolves to the new tree;
   `runSync` returns it. Pass the text the tree came from as `file` to keep positions
 - `stringify(tree)` serializes a tree with no transform
-- `process(text)` resolves to the file; `processSync(text)` returns it
+- `process(text)` resolves to the file; `processSync(text)` returns it. Unless the
+  pipeline holds a JavaScript plugin, `process` runs on a libuv worker thread, so
+  `Promise.all` over many documents uses several cores and the event loop stays free
 
 ```js
 import { textlane } from "textlane"

@@ -18,6 +18,7 @@ export class Processor {
   #ids = new Map<Attacher, number>()
   #hosts = new Map<number, Host>()
   #attached = false
+  #frozen = false
 
   constructor(native: NativePipeline) {
     this.#native = native
@@ -62,7 +63,7 @@ export class Processor {
   /** Attach every plugin; later `use` and `data` setters fail. */
   freeze() {
     this.#attach()
-    this.#native.freeze()
+    this.#freezeNative()
     return this
   }
 
@@ -104,8 +105,15 @@ export class Processor {
   /** Parse, run and compile a document, finishing asynchronous stages. */
   async process(document: Compatible): Promise<VFile> {
     const text = readValue(document) ?? ""
-    if (!this.#attach())
-      return withPath(this.#native.process(text, readPath(document)), document)
+    if (!this.#attach()) {
+      this.#freezeNative()
+      const outcome = await this.#native.process(text, readPath(document))
+      if (outcome.error)
+        throw Object.assign(new Error(outcome.error.message), outcome.error)
+      if (!outcome.file)
+        throw new Error("process settled with neither a file nor an error")
+      return withPath(outcome.file, document)
+    }
     const run = this.#native.startProcess(text, false, readPath(document))
     const file = new HostFile({ value: run.value() ?? text, path: readPath(document) })
     await finishRun({ run, hosts: this.#hosts, file, sync: false, call: "process" })
@@ -121,6 +129,14 @@ export class Processor {
     const file = new HostFile({ value: run.value() ?? text, path: readPath(document) })
     void finishRun({ run, hosts: this.#hosts, file, sync: true, call: "process" })
     return withPath(mergeData(run.result(), file.data), document)
+  }
+
+  // Once only: `freeze` borrows the native pipeline mutably, which napi refuses while an
+  // async `process` still holds it
+  #freezeNative() {
+    if (this.#frozen) return
+    this.#frozen = true
+    this.#native.freeze()
   }
 
   // unified's addPlugin: the same attacher is one plugin, its object options merged

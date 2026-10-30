@@ -66,7 +66,8 @@ A domain function returns a descriptor, `{ name: "md.toHtml", options }`, typed 
 crate. The processor follows unified: `use(plugin | [plugin, options] | preset | list)`,
 `data(key?, value?)`, `freeze()`, `parse(text)`, `run(tree, file?)` (Promise),
 `runSync(tree, file?)`, `stringify(tree)`, `process(text)` (Promise) and `processSync(text)`.
-Trees are plain unist JSON objects.
+Trees are plain unist JSON objects. Without JavaScript plugins, `process` runs off the main
+thread: process many documents with `Promise.all` over one frozen processor, not one by one.
 
 ## Python
 

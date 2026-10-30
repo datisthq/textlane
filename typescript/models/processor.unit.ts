@@ -114,6 +114,29 @@ describe("Processor", () => {
     ])
   })
 
+  it("processes documents concurrently, each as processSync does", async () => {
+    const processor = toHtml()
+    const documents = Array.from({ length: 50 }, (_, index) => `# ${index}\n\n~a~ *b*`)
+    const files = await Promise.all(
+      documents.map(document => processor.process(document)),
+    )
+    expect(files.map(file => file.value)).toEqual(
+      documents.map(document => processor.processSync(document).value),
+    )
+  })
+
+  it("rejects with the crate's code when a document fails off the main thread", async () => {
+    const processor = entry
+      .textlane()
+      .use(md.parse())
+      .use(md.mdx())
+      .use(md.toHtml())
+      .use(html.stringify())
+    await expect(processor.process("<a")).rejects.toMatchObject({
+      code: "micromark-extension-mdx-jsx:unexpected-eof",
+    })
+  })
+
   it("throws errors carrying the crate's code", async () => {
     expect(() => entry.textlane().use("md.missing")).toThrow(
       expect.objectContaining({ code: "unknown-plugin" }),

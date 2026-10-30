@@ -44,6 +44,13 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   in `rust/Cargo.toml` (`[workspace.package]`, `[workspace.dependencies]`, `[workspace.lints]`); a
   member inherits each with `.workspace = true`. A new member joins `[workspace.dependencies]`
   and the release-please `extra-files` (**`package-distribution`**)
+- `rust/vendor/` holds dependencies textlane patches, wired in through `[patch.crates-io]`
+  and excluded from the workspace so its lints and rustfmt leave them alone; only the npm
+  and PyPI addons build with them, a crates.io build takes the published crate. Mark each
+  change `// textlane:` and drop the copy once upstream ships it. `onig-regset` (giallo's
+  Oniguruma binding) takes its global lock for the first `onig_new` only, which initializes
+  the encoding: with the lock on every compile, cold highlighting on several threads ran
+  slower than on one, and the Node `process` (a napi `AsyncTask`) gained nothing
 - In each crate, `src/actions/<entity>/<verb>.rs` exports `verb_noun`
   (`actions/package/version.rs` exports `read_version`); the module tree is declared inline in `lib.rs`, so there is no `mod.rs`
 - Beside `actions/`, as in fairspec: `models/` for types, `helpers/` for small free functions,

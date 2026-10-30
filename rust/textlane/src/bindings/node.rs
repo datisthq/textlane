@@ -1,3 +1,5 @@
+use napi::bindgen_prelude::AsyncTask;
+use napi::{Env, Task};
 use napi_derive::napi;
 use serde_json::Value;
 use textlane_core::File;
@@ -142,13 +144,17 @@ impl Pipeline {
         progress.map(Run::new).map_err(throw)
     }
 
-    #[napi]
+    /// Process on a libuv worker thread, so documents run in parallel and the event loop
+    /// stays free; resolves to the file or the error the crate raised. Takes `&self`, as
+    /// napi holds a `&mut` borrow until the task settles: `freeze` first.
+    #[napi(ts_return_type = "Promise<ProcessOutcome>")]
     pub fn process(
-        &mut self,
+        &self,
         text: String,
         path: Option<String>,
-    ) -> Result<ProcessedFile> {
-        self.process_with(&text, path, Api::Async)
+    ) -> Result<AsyncTask<ProcessTask>> {
+        let job = self.inner.prepare_process(Api::Async).map_err(throw)?;
+        Ok(AsyncTask::new(ProcessTask { job, text, path }))
     }
 
     #[napi]
@@ -184,12 +190,68 @@ impl Pipeline {
             ..File::new()
         };
         let value = self.inner.process(text, &mut file, api).map_err(throw)?;
-        Ok(ProcessedFile {
-            value,
-            messages: crate::write_messages(&file.messages),
-            data: Value::Object(file.data),
+        Ok(write_processed(value, file))
+    }
+}
+
+fn write_processed(value: String, file: File) -> ProcessedFile {
+    ProcessedFile {
+        value,
+        messages: crate::write_messages(&file.messages),
+        data: Value::Object(file.data),
+    }
+}
+
+/// One document's `process` on a libuv worker thread.
+pub struct ProcessTask {
+    job: crate::ProcessJob,
+    text: String,
+    path: Option<String>,
+}
+
+impl Task for ProcessTask {
+    type Output = std::result::Result<ProcessedFile, crate::Error>;
+    type JsValue = ProcessOutcome;
+
+    fn compute(&mut self) -> napi::Result<Self::Output> {
+        let mut file = File {
+            path: self.path.take(),
+            ..File::new()
+        };
+        let value = self.job.process(&self.text, &mut file);
+        Ok(value.map(|value| write_processed(value, file)))
+    }
+
+    fn resolve(&mut self, _: Env, output: Self::Output) -> napi::Result<ProcessOutcome> {
+        Ok(match output {
+            Ok(file) => ProcessOutcome {
+                file: Some(file),
+                error: None,
+            },
+            Err(error) => ProcessOutcome {
+                file: None,
+                error: Some(ProcessError {
+                    code: error.code,
+                    message: error.message,
+                }),
+            },
         })
     }
+}
+
+/// What an async `process` settles with: the file, or the crate's error, whose `code` a
+/// task's rejection could not carry.
+#[napi(object)]
+pub struct ProcessOutcome {
+    pub file: Option<ProcessedFile>,
+    pub error: Option<ProcessError>,
+}
+
+/// An error the crate raised, as a thrown one carries it.
+#[napi(object)]
+pub struct ProcessError {
+    pub code: String,
+    pub message: String,
 }
 
 /// A processed document: its text, messages and data. A typed object rather than a JSON
