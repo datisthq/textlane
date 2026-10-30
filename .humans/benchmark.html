@@ -54,7 +54,8 @@
   <code>a357233</code>, with other jobs loading the machine (load average 2–8), so its
   figures are if anything low. Each textlane build runs twice: with one tree, mdast,
   written straight to HTML, and with two, as any HTML plugin between
-  <code>md.toHtml</code> and <code>html.stringify</code> makes it keep hast. Source:
+  <code>md.toHtml</code> and <code>html.stringify</code> makes it keep hast. The 100 KB
+  README ran last, every library in one quiet run. Source:
   <code>pnpm -C benchmark measure</code>; the method is in
   <code>benchmark/README.md</code>.
 </p>
@@ -67,7 +68,8 @@
   <htmlpress-card>
     <h3>1.4× comrak</h3>
     <p>
-      and cmark on 1 MB of CommonMark edge cases; ahead of both at 10 KB and 10 MB too
+      and cmark on 1 MB of CommonMark edge cases; ahead of both on the 10 KB, 100 KB and
+      10 MB READMEs too
     </p>
   </htmlpress-card>
   <htmlpress-card>
@@ -189,10 +191,10 @@
   </dd>
   <dt>Against the fastest</dt>
   <dd>
-    With one tree textlane is ahead of comrak and cmark on the 10 KB and 10 MB READMEs and
-    1.4× ahead on 1 MB of edge cases, and 1.3× behind comrak on the 1 MB README;
-    pulldown-cmark, which builds no tree, stays 2–3× ahead. Parsing is about 80% of
-    textlane's time, writing HTML the rest.
+    With one tree textlane is ahead of comrak and cmark on the 10 KB, 100 KB and 10 MB
+    READMEs (1.2× comrak and 1.4× cmark at 100 KB) and 1.4× ahead on 1 MB of edge cases,
+    and 1.3× behind comrak on the 1 MB README; pulldown-cmark, which builds no tree, stays
+    2–3× ahead. Parsing is about 80% of textlane's time, writing HTML the rest.
   </dd>
   <dt>The second tree</dt>
   <dd>
@@ -221,7 +223,7 @@
 <h2>cmark</h2>
 <p>
   A README in CommonMark: headings, rich paragraphs, lists, quotes and fenced code. 10 MB
-  runs only the six fastest, for their memory.
+  runs only the fastest, for their memory.
 </p>
 
 <h3>10 KB</h3>
@@ -355,6 +357,142 @@
         <td>5.07 ms</td>
         <td>2.0 MB/s</td>
         <td>207 MB</td>
+      </tr>
+    </tbody>
+  </table>
+</htmlpress-table>
+
+<h3>100 KB</h3>
+<htmlpress-table>
+  <table>
+    <thead>
+      <tr>
+        <th>Library</th>
+        <th>Language</th>
+        <th>Per document</th>
+        <th>Throughput</th>
+        <th>Peak memory</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>pulldown-cmark</td>
+        <td>Rust</td>
+        <td>292 µs</td>
+        <td>334.3 MB/s</td>
+        <td>–</td>
+      </tr>
+      <tr>
+        <td><strong>textlane (Rust, mdast)</strong></td>
+        <td>Rust</td>
+        <td>576 µs</td>
+        <td>169.4 MB/s</td>
+        <td>2 MB</td>
+      </tr>
+      <tr>
+        <td><strong>textlane (Node.js, mdast)</strong></td>
+        <td>Node.js</td>
+        <td>673 µs</td>
+        <td>145.2 MB/s</td>
+        <td>41 MB</td>
+      </tr>
+      <tr>
+        <td>comrak</td>
+        <td>Rust</td>
+        <td>676 µs</td>
+        <td>144.5 MB/s</td>
+        <td>3 MB</td>
+      </tr>
+      <tr>
+        <td><strong>textlane (Rust, mdast + hast)</strong></td>
+        <td>Rust</td>
+        <td>750 µs</td>
+        <td>130.3 MB/s</td>
+        <td>3 MB</td>
+      </tr>
+      <tr>
+        <td><strong>textlane (Python, mdast)</strong></td>
+        <td>Python</td>
+        <td>763 µs</td>
+        <td>128.0 MB/s</td>
+        <td>9 MB</td>
+      </tr>
+      <tr>
+        <td>cmark (C, via cmarkgfm)</td>
+        <td>Python</td>
+        <td>797 µs</td>
+        <td>122.6 MB/s</td>
+        <td>13 MB</td>
+      </tr>
+      <tr>
+        <td><strong>textlane (Node.js, mdast + hast)</strong></td>
+        <td>Node.js</td>
+        <td>835 µs</td>
+        <td>116.9 MB/s</td>
+        <td>42 MB</td>
+      </tr>
+      <tr>
+        <td><strong>textlane (Python, mdast + hast)</strong></td>
+        <td>Python</td>
+        <td>985 µs</td>
+        <td>99.1 MB/s</td>
+        <td>10 MB</td>
+      </tr>
+      <tr>
+        <td>marked</td>
+        <td>Node.js</td>
+        <td>4.06 ms</td>
+        <td>24.1 MB/s</td>
+        <td>76 MB</td>
+      </tr>
+      <tr>
+        <td>markdown-it</td>
+        <td>Node.js</td>
+        <td>4.13 ms</td>
+        <td>23.6 MB/s</td>
+        <td>67 MB</td>
+      </tr>
+      <tr>
+        <td>markdown-rs</td>
+        <td>Rust</td>
+        <td>10.3 ms</td>
+        <td>9.5 MB/s</td>
+        <td>7 MB</td>
+      </tr>
+      <tr>
+        <td>mistune</td>
+        <td>Python</td>
+        <td>20.3 ms</td>
+        <td>4.8 MB/s</td>
+        <td>10 MB</td>
+      </tr>
+      <tr>
+        <td>markdown-it-py</td>
+        <td>Python</td>
+        <td>25.8 ms</td>
+        <td>3.8 MB/s</td>
+        <td>13 MB</td>
+      </tr>
+      <tr>
+        <td>Python-Markdown</td>
+        <td>Python</td>
+        <td>31.1 ms</td>
+        <td>3.1 MB/s</td>
+        <td>9 MB</td>
+      </tr>
+      <tr>
+        <td>micromark</td>
+        <td>Node.js</td>
+        <td>42.8 ms</td>
+        <td>2.3 MB/s</td>
+        <td>329 MB</td>
+      </tr>
+      <tr>
+        <td>unified (remark + rehype)</td>
+        <td>Node.js</td>
+        <td>50.9 ms</td>
+        <td>1.9 MB/s</td>
+        <td>331 MB</td>
       </tr>
     </tbody>
   </table>

@@ -985,25 +985,25 @@ interface Measure {
   isTextlane?: boolean
 }
 
-// The 1 MB `cmark` case of benchmark/, CommonMark to HTML, input MB/s at the median
+// The 100 KB `cmark` case of benchmark/, CommonMark to HTML, input MB/s at the median
 const measures: Measure[] = [
-  { tool: "pulldown-cmark", mbps: 286.7, trees: 0 },
-  { tool: "comrak", mbps: 119.8, trees: 1 },
-  { tool: "cmark (C, via cmarkgfm)", mbps: 104.1, trees: 1 },
-  { tool: "textlane (Rust)", mbps: 93.9, trees: 1, isTextlane: true },
-  { tool: "textlane (TypeScript)", mbps: 83.5, trees: 1, isTextlane: true },
-  { tool: "textlane (Python)", mbps: 82.8, trees: 1, isTextlane: true },
-  { tool: "textlane (Rust)", mbps: 60.4, trees: 2, isTextlane: true },
-  { tool: "textlane (TypeScript)", mbps: 60.1, trees: 2, isTextlane: true },
-  { tool: "textlane (Python)", mbps: 56.0, trees: 2, isTextlane: true },
-  { tool: "marked", mbps: 17.0, trees: 1 },
-  { tool: "markdown-it", mbps: 14.3, trees: 0 },
-  { tool: "markdown-rs", mbps: 5.2, trees: 0 },
-  { tool: "mistune", mbps: 4.7, trees: 1 },
-  { tool: "markdown-it-py", mbps: 3.4, trees: 0 },
+  { tool: "pulldown-cmark", mbps: 334.3, trees: 0 },
+  { tool: "textlane (Rust)", mbps: 169.4, trees: 1, isTextlane: true },
+  { tool: "textlane (TypeScript)", mbps: 145.2, trees: 1, isTextlane: true },
+  { tool: "comrak", mbps: 144.5, trees: 1 },
+  { tool: "textlane (Rust)", mbps: 130.3, trees: 2, isTextlane: true },
+  { tool: "textlane (Python)", mbps: 128.0, trees: 1, isTextlane: true },
+  { tool: "cmark (C, via cmarkgfm)", mbps: 122.6, trees: 1 },
+  { tool: "textlane (TypeScript)", mbps: 116.9, trees: 2, isTextlane: true },
+  { tool: "textlane (Python)", mbps: 99.1, trees: 2, isTextlane: true },
+  { tool: "marked", mbps: 24.1, trees: 1 },
+  { tool: "markdown-it", mbps: 23.6, trees: 0 },
+  { tool: "markdown-rs", mbps: 9.5, trees: 0 },
+  { tool: "mistune", mbps: 4.8, trees: 1 },
+  { tool: "markdown-it-py", mbps: 3.8, trees: 0 },
   { tool: "Python-Markdown", mbps: 3.1, trees: 1 },
-  { tool: "micromark", mbps: 0.7, trees: 0 },
-  { tool: "unified (remark + rehype)", mbps: 0.7, trees: 2 },
+  { tool: "micromark", mbps: 2.3, trees: 0 },
+  { tool: "unified (remark + rehype)", mbps: 1.9, trees: 2 },
 ]
 
 function Benchmark() {
@@ -1023,7 +1023,7 @@ function Benchmark() {
           </div>
         </Reveal>
         <Reveal>
-          <WindowCard label="benchmark · throughput on a 1 MB CommonMark README">
+          <WindowCard label="benchmark · throughput on a 100 KB CommonMark README">
             <div className="p-5 sm:p-6">
               <ul className="space-y-3">
                 {measures.map(measure => (
