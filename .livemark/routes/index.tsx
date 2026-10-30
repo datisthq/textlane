@@ -73,7 +73,7 @@ function Hero() {
             Open source · MIT License
           </p>
           <h1 className="mt-5 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-5xl">
-            Fast pluggable text processing for{" "}
+            Fast text processing for{" "}
             <span className="box-decoration-clone bg-linear-to-r from-primary/20 to-primary/20 bg-size-[100%_0.3em] bg-position-[0_88%] bg-no-repeat">
               Python, TypeScript, and Rust
             </span>
