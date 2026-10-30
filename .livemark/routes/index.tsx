@@ -348,11 +348,11 @@ function Pane(props: { label: string; text: string }) {
 function PortsCard(props: { slides: Slide[]; active: number }) {
   return (
     <figure className="rounded-card border border-primary/25 bg-card p-4 shadow-lg">
-      <div className="flex items-center gap-3">
+      <div className="flex items-start gap-3">
         <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
           <Workflow className="size-5" />
         </span>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold tracking-[0.12em] text-primary uppercase">
             Ported from unified
           </p>
@@ -360,6 +360,14 @@ function PortsCard(props: { slides: Slide[]; active: number }) {
             AI-driven port of unified
           </p>
         </div>
+        <p className="shrink-0 text-right leading-none">
+          <span className="bg-gradient-to-br from-primary to-primary/60 bg-clip-text font-mono text-3xl font-bold tracking-tight text-transparent tabular-nums">
+            100×
+          </span>
+          <span className="mt-1 block text-[0.625rem] tracking-wide text-muted-foreground uppercase">
+            faster
+          </span>
+        </p>
       </div>
       <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
         All credit goes to the{" "}
