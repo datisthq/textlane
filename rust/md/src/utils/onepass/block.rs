@@ -242,10 +242,8 @@ pub(crate) fn parse_blocks<'s>(
         .push(Block::new(Kind::Document, NONE, Point::new(0, 0), 0));
     let mut start = 0;
     while start < bytes.len() {
-        let mut end = start;
-        while end < bytes.len() && bytes[end] != b'\n' && bytes[end] != b'\r' {
-            end += 1;
-        }
+        let end = memchr::memchr2(b'\n', b'\r', &bytes[start..])
+            .map_or(bytes.len(), |found| start + found);
         let next = match bytes.get(end) {
             Some(b'\r') if bytes.get(end + 1) == Some(&b'\n') => end + 2,
             Some(_) => end + 1,

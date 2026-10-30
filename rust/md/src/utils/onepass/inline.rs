@@ -130,6 +130,18 @@ pub(crate) struct InlineOutput<'a> {
     pub(crate) checked: Option<bool>,
 }
 
+// Every byte `scan` has an arm for; the rest are plain text it can skip in one run
+const INLINE_SPECIAL: [bool; 256] = {
+    let mut table = [false; 256];
+    let bytes = b"\\&`$<{[:~!]*_\n\r";
+    let mut index = 0;
+    while index < bytes.len() {
+        table[bytes[index] as usize] = true;
+        index += 1;
+    }
+    table
+};
+
 pub(crate) fn parse_inline<'a>(
     alloc: &'a Allocator,
     text: &'a str,
@@ -548,6 +560,12 @@ impl<'a> Inline<'a, '_> {
                         pos += 1;
                     }
                     text_start = pos;
+                }
+                _ if self.gfm.is_none() => {
+                    pos += 1;
+                    while pos < len && !INLINE_SPECIAL[bytes[pos] as usize] {
+                        pos += 1;
+                    }
                 }
                 _ => pos += 1,
             }

@@ -100,7 +100,9 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
 - `md.parse` is `utils/onepass/`, a cmark-style parser that builds mdast with no event
   list: `block.rs` takes each line through a stack of open blocks, leaves keeping their
   lines, with `FlowText` reading ahead through container prefixes for MDX's multi-line
-  constructs; `inline.rs` runs once per leaf: items, then pairing runs, then the tree;
+  constructs; `inline.rs` runs once per leaf: items, then pairing runs, then the tree
+  (without GFM, `scan` jumps over plain text through `INLINE_SPECIAL`, so a byte given
+  an arm in `scan` must join that table, or its construct is skipped over);
   `build.rs` turns blocks into nodes, groups definition lists and assembles JSX elements.
   It reproduces micromark's and from-markdown's trees and positions, quirks included:
   `interrupt` is decided once a line, before any container opens on it; unclosed fences
