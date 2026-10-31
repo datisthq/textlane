@@ -9,6 +9,7 @@ use textlane_core::{
 use crate::actions::mdast::convert::{convert_mdast, convert_mdast_with};
 use crate::actions::mdast::write::write_html;
 use crate::models::options::{ToHtml, UnravelSlot};
+use crate::plugins::to_html::actions::text::split::split_text;
 
 impl Plugin for ToHtml {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
@@ -17,6 +18,10 @@ impl Plugin for ToHtml {
             .get_or_default::<UnravelSlot>()
             .0
             .clone();
+        // Its own mdast stage, so the direct HTML writer sees the breaks it makes too
+        if self.breaks {
+            context.add_transform(Box::new(Breaking));
+        }
         context.add_transform(Box::new(Converting {
             options: self.clone(),
             unravel,
@@ -42,6 +47,34 @@ impl Transform for ToHtml {
     ) -> Result<Tree<'a>, Error> {
         match tree {
             Tree::Mdast(node) => Ok(Tree::Hast(convert_mdast(&node, alloc, self))),
+            _ => Err(Error::new("invalid-stage", "`md.toHtml` takes mdast")),
+        }
+    }
+}
+
+// remark-breaks, run before the conversion
+struct Breaking;
+
+impl Transform for Breaking {
+    fn input(&self) -> TreeKind {
+        TreeKind::Mdast
+    }
+
+    fn output(&self) -> TreeKind {
+        TreeKind::Mdast
+    }
+
+    fn run<'a>(
+        &self,
+        tree: Tree<'a>,
+        _file: &mut File,
+        alloc: &'a Allocator,
+    ) -> Result<Tree<'a>, Error> {
+        match tree {
+            Tree::Mdast(mut node) => {
+                split_text(&mut node, alloc);
+                Ok(Tree::Mdast(node))
+            }
             _ => Err(Error::new("invalid-stage", "`md.toHtml` takes mdast")),
         }
     }

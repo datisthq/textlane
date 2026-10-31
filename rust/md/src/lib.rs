@@ -372,6 +372,11 @@ mod plugins {
         pub(crate) mod plugin;
     }
     pub(crate) mod to_html {
+        pub(crate) mod actions {
+            pub(crate) mod text {
+                pub(crate) mod split;
+            }
+        }
         pub(crate) mod plugin;
     }
     pub(crate) mod to_natural_language {

@@ -787,6 +787,8 @@ output.value
 
 `task_list_labels` gives each GFM task-list checkbox an `aria-label`, so screen readers name it; remark-rehype writes none, so it is off by default.
 
+`breaks: true` turns each line ending in text into a `<br>`, as remark-breaks does, so a single newline breaks the line as in GitHub comments.
+
 <!-- generated:options md.toHtml -->
 
 Follows [remark-rehype](https://www.npmjs.com/package/remark-rehype).
@@ -794,6 +796,7 @@ Follows [remark-rehype](https://www.npmjs.com/package/remark-rehype).
 | Option                 | Type                     | Default | Description                                                                                                               |
 | ---------------------- | ------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------- |
 | `allowDangerousHtml`   | `boolean`                | `false` | Keep raw HTML in the tree instead of dropping it.                                                                         |
+| `breaks`               | `boolean`                | `false` | Turn each line ending in text into a `<br>`, as remark-breaks does.                                                       |
 | `clobberPrefix`        | `string \| null`         | `null`  | What footnote `id`s start with, so they cannot clobber the page's; `user-content-` when unset.                            |
 | `footnoteBackContent`  | `string \| null`         | `null`  | The text of each footnote's back reference; `↩`, numbered from the second, when unset.                                    |
 | `footnoteBackLabel`    | `string \| null`         | `null`  | The `aria-label` of each footnote's back reference; `Back to reference 1` and so on when unset.                           |

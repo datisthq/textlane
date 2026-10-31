@@ -97,6 +97,9 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   the pprof harness must not blocklist `libc`, or malloc, free and memcpy vanish from it.
   Measure a change A/B against the previous build, interleaved, best of many runs: a
   loaded machine drifts by more than most wins
+- `md.toHtml`'s `breaks` is remark-breaks as its own mdast stage ahead of the conversion
+  (`plugins/to_html/actions/text/split.rs`), real `break` nodes, so the direct writer and
+  mdast-util-to-hast's trimming after a break see them as upstream's tree has them
 - `process` skips hast when the last stage is `md.toHtml` and the compiler `html.stringify`
   with no option but `allowDangerousHtml` set: core's `Transform::html_writer` and
   `Compiler::html_target` let `FrozenProcessor::finish` hand the mdast to `md`'s

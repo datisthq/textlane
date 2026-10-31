@@ -473,6 +473,8 @@ class TaskListLabels(_TaskListLabelsRequired, total=False):
 class ToHtmlOptions(TypedDict, total=False):
     # Keep raw HTML in the tree instead of dropping it.
     allowDangerousHtml: bool
+    # Turn each line ending in text into a `<br>`, as remark-breaks does.
+    breaks: bool
     # What footnote `id`s start with, so they cannot clobber the page's; `user-content-`
     # when unset.
     clobberPrefix: Optional[str]

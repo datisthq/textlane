@@ -18,6 +18,8 @@ pub struct Parse {}
 pub struct ToHtml {
     /// Keep raw HTML in the tree instead of dropping it.
     pub allow_dangerous_html: bool,
+    /// Turn each line ending in text into a `<br>`, as remark-breaks does.
+    pub breaks: bool,
     /// What footnote `id`s start with, so they cannot clobber the page's; `user-content-`
     /// when unset.
     pub clobber_prefix: Option<String>,
