@@ -10,14 +10,19 @@ pub struct ResolvedUrl<'u> {
 }
 
 /// Resolve `url`, written in the file at `path`, to the file it names inside `root`; `None`
-/// for a URL with a scheme, protocol-relative or a fragment alone, or a relative one without
-/// a file to resolve it against or resolving outside `root`.
+/// for a URL with a scheme, protocol-relative, holding a backslash or a fragment alone, or
+/// a relative one without a file to resolve it against or resolving outside `root`.
 pub fn resolve_url<'u>(
     url: &'u str,
     path: Option<&str>,
     root: Option<&str>,
 ) -> Option<ResolvedUrl<'u>> {
-    if url.is_empty() || url.starts_with('#') || url.starts_with("//") || has_scheme(url)
+    // Browsers read `\` as `/`, so `\\evil.dev` and `/\evil.dev` name another host
+    if url.is_empty()
+        || url.starts_with('#')
+        || url.starts_with("//")
+        || url.contains('\\')
+        || has_scheme(url)
     {
         return None;
     }
@@ -118,3 +123,7 @@ fn relative_to(path: &str, root: Option<&str>) -> Option<String> {
         None => None,
     }
 }
+
+#[cfg(test)]
+#[path = "url_unit.rs"]
+mod unit;
