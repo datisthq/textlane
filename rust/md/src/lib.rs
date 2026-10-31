@@ -271,6 +271,7 @@ mod plugins {
                 pub(crate) mod replace;
             }
         }
+        pub(crate) mod emoticons;
         pub(crate) mod names;
         pub(crate) mod plugin;
     }
@@ -399,11 +400,11 @@ mod plugins {
 pub use models::options::{
     AlertRule, Alerts, AlertsOptions, AttributeRule, CargoManager, CodeGroupRule,
     CodeRule, Component, DefinitionListSlot, Directive, DirectiveKind, DirectiveRule,
-    DirectiveSlot, Ecosystems, Frontmatter, FrontmatterSlot, Gfm, GfmSlot, GroupRule,
-    HeadingId, MarkdownLinks, MarkerValue, Math, MathSlot, Matter, Mdx, MdxSlot, Names,
-    NpmManager, PackageCommand, ParentCheck, ParentTest, Parse, PathRewrite, PipManager,
-    ShiftHeading, Smartypants, Stringify, Strip, TaskListLabels, ToHtml,
-    ToNaturalLanguage, Toc, UnknownDirectives, UnsafePattern, UrlNode,
+    DirectiveSlot, Ecosystems, Frontmatter, FrontmatterSlot, Gemoji, Gfm, GfmSlot,
+    GroupRule, HeadingId, MarkdownLinks, MarkerValue, Math, MathSlot, Matter, Mdx,
+    MdxSlot, Names, NpmManager, PackageCommand, ParentCheck, ParentTest, Parse,
+    PathRewrite, PipManager, ShiftHeading, Smartypants, Stringify, Strip, TaskListLabels,
+    ToHtml, ToNaturalLanguage, Toc, UnknownDirectives, UnsafePattern, UrlNode,
 };
 
 // actions
@@ -415,4 +416,3 @@ pub use actions::mdast::write::write_html;
 
 // plugins
 pub use plugins::definition_list::plugin::DefinitionList;
-pub use plugins::gemoji::plugin::Gemoji;

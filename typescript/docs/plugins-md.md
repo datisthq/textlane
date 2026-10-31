@@ -310,11 +310,70 @@ file.value
 // Shipped 🎉
 ```
 
+`emoticon: true` also turns emoticons such as `:)` and `:-(` into emoji, `accessible: true` wraps an emoji in `<span role="img" aria-label="…">` and `padSpaceAfter: true` puts a space after each, as remark-emoji's options do. Shortcodes stay gemoji's names, where remark-emoji reads node-emoji's, which name a few emoji differently.
+
 <!-- generated:options md.gemoji -->
 
 Follows [remark-gemoji](https://www.npmjs.com/package/remark-gemoji).
 
-No options.
+| Option          | Type      | Default | Description                                                                    |
+| --------------- | --------- | ------- | ------------------------------------------------------------------------------ |
+| `emoticon`      | `boolean` | `false` | Also turn emoticons such as `:)` and `:-(` into emoji, as remark-emoji does.   |
+| `accessible`    | `boolean` | `false` | Wrap each emoji in `<span role="img" aria-label="…">`, labelled with its name. |
+| `padSpaceAfter` | `boolean` | `false` | Put a space after each emoji.                                                  |
+
+<!-- /generated -->
+
+## md.smartypants
+
+Turns straight quotes, dashes, dots and backticks in Markdown text into their typographic forms, pairing quotes across links and emphasis, as remark-smartypants does. Code is left alone.
+
+```js
+import { textlane } from "textlane"
+import * as md from "textlane/md"
+
+const file = textlane()
+  .use(md.parse())
+  .use(md.smartypants())
+  .use(md.stringify())
+  .processSync(`"Hello" -- it's *done*...`)
+file.value
+// “Hello” — it’s *done*…
+```
+
+<!-- generated:options md.smartypants -->
+
+Follows [remark-smartypants](https://www.npmjs.com/package/remark-smartypants).
+
+| Option          | Type                      | Default | Description                                                                                                                 |
+| --------------- | ------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `backticks`     | `Backticks`               |         | Turn double backticks and double straight single quotes into double quotes; `all` turns single ones into single quotes too. |
+| `closingQuotes` | `QuoteCharacters \| null` |         | The closing quotes to use: `”` and `’` by default.                                                                          |
+| `dashes`        | `Dashes`                  |         | Turn two dashes into an em dash; `oldschool` and `inverted` treat three too.                                                |
+| `ellipses`      | `Ellipses`                |         | Turn three dots into an ellipsis, with spaces between them or without.                                                      |
+| `openingQuotes` | `QuoteCharacters \| null` |         | The opening quotes to use: `“` and `‘` by default.                                                                          |
+| `quotes`        | `boolean \| null`         | `true`  | Turn straight quotes into smart ones.                                                                                       |
+
+**`Backticks`**
+
+Takes `boolean | "all"`.
+
+**`QuoteCharacters`**
+
+The quote characters to use for double and single quotes.
+
+| Option   | Type     | Default | Description |
+| -------- | -------- | ------- | ----------- |
+| `double` | `string` |         |             |
+| `single` | `string` |         |             |
+
+**`Dashes`**
+
+Takes `boolean | "oldschool" | "inverted"`.
+
+**`Ellipses`**
+
+Takes `boolean | "spaced" | "unspaced"`.
 
 <!-- /generated -->
 

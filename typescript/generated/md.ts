@@ -95,6 +95,16 @@ export interface FrontmatterSettings {
   strip?: boolean
 }
 
+/** `md.gemoji`: gemoji shortcodes, `:smile:`, into emoji, as remark-gemoji does; its options are remark-emoji's. */
+export interface GemojiOptions {
+  /** Also turn emoticons such as `:)` and `:-(` into emoji, as remark-emoji does. @default false */
+  emoticon?: boolean
+  /** Wrap each emoji in `<span role="img" aria-label="…">`, labelled with its name. @default false */
+  accessible?: boolean
+  /** Put a space after each emoji. @default false */
+  padSpaceAfter?: boolean
+}
+
 /** `md.smartypants`: straight quotes, dashes, dots and backticks in Markdown text into typographic ones, as remark-smartypants does; options as retext-smartypants takes them. */
 export interface SmartypantsOptions {
   /** Turn double backticks and double straight single quotes into double quotes; `all` turns single ones into single quotes too. */
@@ -465,8 +475,15 @@ export function frontmatter(options?: FrontmatterOptions): Plugin<"md.frontmatte
 }
 
 /** The `md.gemoji` plugin. */
-export function gemoji(): Plugin<"md.gemoji"> {
-  return { name: "md.gemoji" }
+export function gemoji(options?: GemojiOptions): Plugin<"md.gemoji", GemojiOptions> {
+  if (options === undefined) return { name: "md.gemoji" }
+  return { name: "md.gemoji", options }
+}
+
+/** The `md.smartypants` plugin. */
+export function smartypants(options?: SmartypantsOptions): Plugin<"md.smartypants", SmartypantsOptions> {
+  if (options === undefined) return { name: "md.smartypants" }
+  return { name: "md.smartypants", options }
 }
 
 /** The `md.smartypants` plugin. */

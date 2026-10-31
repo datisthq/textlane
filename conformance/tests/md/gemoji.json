@@ -13428,5 +13428,643 @@
         }
       }
     ]
+  },
+  {
+    "description": "remark-emoji md {}",
+    "comment": "md.gemoji keeps gemoji's names where remark-emoji reads node-emoji's; cases whose shortcodes the two name differently are left out",
+    "source": {
+      "repository": "https://github.com/rhysd/remark-emoji",
+      "commit": "2373e26b06f5d446435f64e42760454a7b662d22",
+      "path": "test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gemoji", {}], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "compiler",
+        "input": "This is :dog:",
+        "expected": {
+          "md": "This is 🐶\n"
+        }
+      },
+      {
+        "description": "compiler",
+        "input": ":dog: is not :cat:",
+        "expected": {
+          "md": "🐶 is not 🐱\n"
+        }
+      },
+      {
+        "description": "compiler",
+        "input": "Please vote with :+1: or :-1:",
+        "expected": {
+          "md": "Please vote with 👍 or 👎\n"
+        }
+      },
+      {
+        "description": "compiler",
+        "input": ":triumph:",
+        "expected": {
+          "md": "😤\n"
+        }
+      },
+      {
+        "description": "compiler",
+        "input": ":stuck_out_tongue_winking_eye:",
+        "expected": {
+          "md": "😜\n"
+        }
+      },
+      {
+        "description": "compiler",
+        "input": "This text does not include emoji.",
+        "expected": {
+          "md": "This text does not include emoji.\n"
+        }
+      },
+      {
+        "description": "compiler",
+        "input": ":++: or :foo: or :cat",
+        "expected": {
+          "md": ":++: or :foo: or :cat\n"
+        }
+      },
+      {
+        "description": "compiler",
+        "input": "::",
+        "expected": {
+          "md": "::\n"
+        }
+      },
+      {
+        "description": "compiler",
+        "input": "In inline code, `:dog: and :-) is not replaced`",
+        "expected": {
+          "md": "In inline code, `:dog: and :-) is not replaced`\n"
+        }
+      },
+      {
+        "description": "compiler",
+        "input": "In code, \n```\n:dog: and :-) is not replaced\n```",
+        "expected": {
+          "md": "In code,\n\n```\n:dog: and :-) is not replaced\n```\n"
+        }
+      },
+      {
+        "description": "compiler",
+        "input": "[here :dog: and :cat: and :-) pictures!](https://example.com)",
+        "expected": {
+          "md": "[here 🐶 and 🐱 and :-) pictures!](https://example.com)\n"
+        }
+      },
+      {
+        "description": "compiler",
+        "input": ":heavy_check_mark:",
+        "expected": {
+          "md": "✔️\n"
+        }
+      },
+      {
+        "description": "compiler",
+        "input": "T-Rex emoji is :t-rex:",
+        "expected": {
+          "md": "T-Rex emoji is 🦖\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-emoji md {\"padSpaceAfter\":true}",
+    "comment": "md.gemoji keeps gemoji's names where remark-emoji reads node-emoji's; cases whose shortcodes the two name differently are left out",
+    "source": {
+      "repository": "https://github.com/rhysd/remark-emoji",
+      "commit": "2373e26b06f5d446435f64e42760454a7b662d22",
+      "path": "test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gemoji",
+        {
+          "padSpaceAfter": true
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "padded",
+        "input": ":dog: is dog",
+        "expected": {
+          "md": "🐶  is dog\n"
+        }
+      },
+      {
+        "description": "padded",
+        "input": "dog is :dog:",
+        "expected": {
+          "md": "dog is 🐶&#x20;\n"
+        }
+      },
+      {
+        "description": "padded",
+        "input": ":dog: is not :cat:",
+        "expected": {
+          "md": "🐶  is not 🐱&#x20;\n"
+        }
+      },
+      {
+        "description": "padded",
+        "input": ":triumph:",
+        "expected": {
+          "md": "😤&#x20;\n"
+        }
+      },
+      {
+        "description": "padded",
+        "input": ":-)",
+        "expected": {
+          "md": ":-)\n"
+        }
+      },
+      {
+        "description": "padded",
+        "input": "Smile :-), not >:(!",
+        "expected": {
+          "md": "Smile :-), not >:(!\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-emoji md {\"emoticon\":true}",
+    "comment": "md.gemoji keeps gemoji's names where remark-emoji reads node-emoji's; cases whose shortcodes the two name differently are left out",
+    "source": {
+      "repository": "https://github.com/rhysd/remark-emoji",
+      "commit": "2373e26b06f5d446435f64e42760454a7b662d22",
+      "path": "test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gemoji",
+        {
+          "emoticon": true
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "emoticon",
+        "input": "This is :dog:",
+        "expected": {
+          "md": "This is 🐶\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": ":dog: is not :cat:",
+        "expected": {
+          "md": "🐶 is not 🐱\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": "Please vote with :+1: or :-1:",
+        "expected": {
+          "md": "Please vote with 👍 or 👎\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": ":triumph:",
+        "expected": {
+          "md": "😤\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": "This text does not include emoji.",
+        "expected": {
+          "md": "This text does not include emoji.\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": ":++: or :foo: or :cat",
+        "expected": {
+          "md": ":++: or :foo: or :cat\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": "::",
+        "expected": {
+          "md": "::\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": "In inline code, `:dog: and :-) is not replaced`",
+        "expected": {
+          "md": "In inline code, `:dog: and :-) is not replaced`\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": "In code, \n```\n:dog: and :-) is not replaced\n```",
+        "expected": {
+          "md": "In code,\n\n```\n:dog: and :-) is not replaced\n```\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": "[here :dog: and :cat: and :-) pictures!](https://example.com)",
+        "expected": {
+          "md": "[here 🐶 and 🐱 and 😃 pictures!](https://example.com)\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": ":heavy_check_mark:",
+        "expected": {
+          "md": "✔️\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": "T-Rex emoji is :t-rex:",
+        "expected": {
+          "md": "T-Rex emoji is 🦖\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": "with space :o, and comma",
+        "expected": {
+          "md": "with space 😮, and comma\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": "WARN:Danger",
+        "expected": {
+          "md": "WARN:Danger\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": "https://github.com",
+        "expected": {
+          "md": "https://github.com\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": ":p",
+        "expected": {
+          "md": "😛\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": ":-)",
+        "expected": {
+          "md": "😃\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": "With-in some text :-p, also with some  :o spaces :-)!",
+        "expected": {
+          "md": "With-in some text 😛, also with some  😮 spaces 😃!\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": "Four char code ]:-)",
+        "expected": {
+          "md": "Four char code 😈\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": "No problem with :dog: - :d",
+        "expected": {
+          "md": "No problem with 🐶 - 😛\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": "With double quotes :\"D",
+        "expected": {
+          "md": "With double quotes 😊\n"
+        }
+      },
+      {
+        "description": "emoticon",
+        "input": "::: danger Title\n\nbla bla bla\n\n:::\n",
+        "expected": {
+          "md": "::: danger Title\n\nbla bla bla\n\n:::\n"
+        }
+      },
+      {
+        "description": "\":dog::) and :cat: :-(\"",
+        "input": ":dog::) and :cat: :-(",
+        "expected": {
+          "md": "🐶:) and 🐱 😦\n"
+        }
+      },
+      {
+        "description": "\"a　:) b ;) c\"",
+        "input": "a　:) b ;) c",
+        "expected": {
+          "md": "a　😃 b 😉 c\n"
+        }
+      },
+      {
+        "description": "\":):) x :-)) (:\"",
+        "input": ":):) x :-)) (:",
+        "expected": {
+          "md": ":):) x 😃) (:\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-emoji md {\"padSpaceAfter\":true,\"emoticon\":true}",
+    "comment": "md.gemoji keeps gemoji's names where remark-emoji reads node-emoji's; cases whose shortcodes the two name differently are left out",
+    "source": {
+      "repository": "https://github.com/rhysd/remark-emoji",
+      "commit": "2373e26b06f5d446435f64e42760454a7b662d22",
+      "path": "test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gemoji",
+        {
+          "padSpaceAfter": true,
+          "emoticon": true
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "padAndEmoticon",
+        "input": ":dog: is dog",
+        "expected": {
+          "md": "🐶  is dog\n"
+        }
+      },
+      {
+        "description": "padAndEmoticon",
+        "input": "dog is :dog:",
+        "expected": {
+          "md": "dog is 🐶&#x20;\n"
+        }
+      },
+      {
+        "description": "padAndEmoticon",
+        "input": ":dog: is not :cat:",
+        "expected": {
+          "md": "🐶  is not 🐱&#x20;\n"
+        }
+      },
+      {
+        "description": "padAndEmoticon",
+        "input": ":triumph:",
+        "expected": {
+          "md": "😤&#x20;\n"
+        }
+      },
+      {
+        "description": "padAndEmoticon",
+        "input": ":-)",
+        "expected": {
+          "md": "😃&#x20;\n"
+        }
+      },
+      {
+        "description": "padAndEmoticon",
+        "input": "Smile :-), not >:(!",
+        "expected": {
+          "md": "Smile 😃 , not 😠 !\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-emoji html {\"emoticon\":true,\"accessible\":true}",
+    "comment": "md.gemoji keeps gemoji's names where remark-emoji reads node-emoji's; cases whose shortcodes the two name differently are left out",
+    "source": {
+      "repository": "https://github.com/rhysd/remark-emoji",
+      "commit": "2373e26b06f5d446435f64e42760454a7b662d22",
+      "path": "test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gemoji",
+        {
+          "emoticon": true,
+          "accessible": true
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "ariaHtml",
+        "input": ":dog:",
+        "expected": {
+          "html": "<p><span role=\"img\" aria-label=\"dog emoji\">🐶</span></p>"
+        }
+      },
+      {
+        "description": "ariaHtml",
+        "input": ":dog: :cat:",
+        "expected": {
+          "html": "<p><span role=\"img\" aria-label=\"dog emoji\">🐶</span></p>"
+        }
+      },
+      {
+        "description": "ariaHtml",
+        "input": ":-)",
+        "expected": {
+          "html": "<p><span role=\"img\" aria-label=\"smiley emoticon\">😃</span></p>"
+        }
+      },
+      {
+        "description": "ariaHtml",
+        "input": ":+1:",
+        "expected": {
+          "html": "<p><span role=\"img\" aria-label=\"+1 emoji\">👍</span></p>"
+        }
+      },
+      {
+        "description": "ariaHtml",
+        "input": ":-1:",
+        "expected": {
+          "html": "<p><span role=\"img\" aria-label=\"-1 emoji\">👎</span></p>"
+        }
+      },
+      {
+        "description": "ariaHtml",
+        "input": ":stuck_out_tongue_winking_eye:",
+        "expected": {
+          "html": "<p><span role=\"img\" aria-label=\"stuck out tongue winking eye emoji\">😜</span></p>"
+        }
+      },
+      {
+        "description": "\"**bold :) text** and [link :D](#)\"",
+        "input": "**bold :) text** and [link :D](#)",
+        "expected": {
+          "html": "<p><strong>bold 😃 text</strong> and <a href=\"#\">link 😄</a></p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-emoji html {\"emoticon\":true}",
+    "comment": "md.gemoji keeps gemoji's names where remark-emoji reads node-emoji's; cases whose shortcodes the two name differently are left out",
+    "source": {
+      "repository": "https://github.com/rhysd/remark-emoji",
+      "commit": "2373e26b06f5d446435f64e42760454a7b662d22",
+      "path": "test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gemoji",
+        {
+          "emoticon": true
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\":dog::) and :cat: :-(\"",
+        "input": ":dog::) and :cat: :-(",
+        "expected": {
+          "html": "<p>🐶:) and 🐱 😦</p>"
+        }
+      },
+      {
+        "description": "\"a　:) b ;) c\"",
+        "input": "a　:) b ;) c",
+        "expected": {
+          "html": "<p>a　😃 b 😉 c</p>"
+        }
+      },
+      {
+        "description": "\":):) x :-)) (:\"",
+        "input": ":):) x :-)) (:",
+        "expected": {
+          "html": "<p>:):) x 😃) (:</p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-emoji md {\"emoticon\":true,\"accessible\":true}",
+    "comment": "md.gemoji keeps gemoji's names where remark-emoji reads node-emoji's; cases whose shortcodes the two name differently are left out",
+    "source": {
+      "repository": "https://github.com/rhysd/remark-emoji",
+      "commit": "2373e26b06f5d446435f64e42760454a7b662d22",
+      "path": "test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gemoji",
+        {
+          "emoticon": true,
+          "accessible": true
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\"**bold :) text** and [link :D](#)\"",
+        "input": "**bold :) text** and [link :D](#)",
+        "expected": {
+          "md": "**bold 😃 text** and [link 😄](#)\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-emoji md {\"accessible\":true,\"padSpaceAfter\":true}",
+    "comment": "md.gemoji keeps gemoji's names where remark-emoji reads node-emoji's; cases whose shortcodes the two name differently are left out",
+    "source": {
+      "repository": "https://github.com/rhysd/remark-emoji",
+      "commit": "2373e26b06f5d446435f64e42760454a7b662d22",
+      "path": "test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gemoji",
+        {
+          "accessible": true,
+          "padSpaceAfter": true
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\":+1: :heavy_check_mark: :t-rex:\"",
+        "input": ":+1: :heavy_check_mark: :t-rex:",
+        "expected": {
+          "md": "👍  ✔️  🦖&#x20;\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-emoji html {\"accessible\":true,\"padSpaceAfter\":true}",
+    "comment": "md.gemoji keeps gemoji's names where remark-emoji reads node-emoji's; cases whose shortcodes the two name differently are left out",
+    "source": {
+      "repository": "https://github.com/rhysd/remark-emoji",
+      "commit": "2373e26b06f5d446435f64e42760454a7b662d22",
+      "path": "test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gemoji",
+        {
+          "accessible": true,
+          "padSpaceAfter": true
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\":+1: :heavy_check_mark: :t-rex:\"",
+        "input": ":+1: :heavy_check_mark: :t-rex:",
+        "expected": {
+          "html": "<p><span role=\"img\" aria-label=\"+1 emoji\">👍 </span></p>"
+        }
+      }
+    ]
   }
 ]

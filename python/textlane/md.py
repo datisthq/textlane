@@ -22,6 +22,7 @@ __all__ = [
     "frontmatter",
     "FrontmatterOptions",
     "gemoji",
+    "GemojiOptions",
     "smartypants",
     "SmartypantsOptions",
     "component",
@@ -155,6 +156,17 @@ class FrontmatterSettings(TypedDict, total=False):
 
 # The kinds of matter to recognize, as remark-frontmatter takes them (a preset, a matter, or a list of them; `yaml` when unset), or textlane's options object.
 FrontmatterOptions = Union[Literal["yaml", "toml"], Matter, List[Union[Literal["yaml", "toml"], Matter]], FrontmatterSettings]
+
+
+# `md.gemoji`: gemoji shortcodes, `:smile:`, into emoji, as remark-gemoji does; its options
+# are remark-emoji's.
+class GemojiOptions(TypedDict, total=False):
+    # Also turn emoticons such as `:)` and `:-(` into emoji, as remark-emoji does.
+    emoticon: bool
+    # Wrap each emoji in `<span role="img" aria-label="…">`, labelled with its name.
+    accessible: bool
+    # Put a space after each emoji.
+    padSpaceAfter: bool
 
 
 Backticks = Union[bool, Literal["all"]]
@@ -607,9 +619,14 @@ def frontmatter(options: Optional[FrontmatterOptions] = None) -> Plugin:
     return describe_plugin("md.frontmatter", options)
 
 
-def gemoji() -> Plugin:
+def gemoji(options: Optional[GemojiOptions] = None) -> Plugin:
     """The `md.gemoji` plugin."""
-    return describe_plugin("md.gemoji")
+    return describe_plugin("md.gemoji", options)
+
+
+def smartypants(options: Optional[SmartypantsOptions] = None) -> Plugin:
+    """The `md.smartypants` plugin."""
+    return describe_plugin("md.smartypants", options)
 
 
 def smartypants(options: Optional[SmartypantsOptions] = None) -> Plugin:

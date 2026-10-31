@@ -1085,3 +1085,18 @@ impl Default for Smartypants {
         }
     }
 }
+
+/// `md.gemoji`: gemoji shortcodes, `:smile:`, into emoji, as remark-gemoji does; its options
+/// are remark-emoji's.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", schemars(rename = "GemojiOptions"))]
+pub struct Gemoji {
+    /// Also turn emoticons such as `:)` and `:-(` into emoji, as remark-emoji does.
+    pub emoticon: bool,
+    /// Wrap each emoji in `<span role="img" aria-label="…">`, labelled with its name.
+    pub accessible: bool,
+    /// Put a space after each emoji.
+    pub pad_space_after: bool,
+}
