@@ -1,4 +1,4 @@
-use napi::bindgen_prelude::AsyncTask;
+use napi::bindgen_prelude::{AsyncTask, Either, Latin1String};
 use napi::{Env, Task};
 use napi_derive::napi;
 use serde_json::Value;
@@ -195,6 +195,12 @@ impl Pipeline {
 }
 
 fn write_processed(value: String, file: File) -> ProcessedFile {
+    // ASCII, as HTML nearly always is, reads the same as Latin-1, which V8 copies as it is
+    // instead of decoding UTF-8
+    let value = match value.is_ascii() {
+        true => Either::B(Latin1String::from(value)),
+        false => Either::A(value),
+    };
     ProcessedFile {
         value,
         messages: crate::write_messages(&file.messages),
@@ -258,7 +264,7 @@ pub struct ProcessError {
 /// value, so the text is not copied once more on its way to JavaScript.
 #[napi(object)]
 pub struct ProcessedFile {
-    pub value: String,
+    pub value: Either<String, Latin1String>,
     pub messages: Value,
     pub data: Value,
 }

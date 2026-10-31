@@ -14,7 +14,8 @@ One workspace, three registries, one version. Nothing here may change what the c
   (`typescript/models/processor.ts`) over the addon's `Pipeline` class: chaining, Promises
   and `data`'s overloads only; values cross napi as JSON (`serde-json`), so a JavaScript
   function in `use` fails in napi rather than vanishing. `process` returns a `#[napi(object)]`
-  `ProcessedFile` rather than a `Value`, which would copy the HTML once more; taking
+  `ProcessedFile` rather than a `Value`, which would copy the HTML once more, its ASCII
+  `value` as a `Latin1String`, which V8 copies without decoding UTF-8 (1–2%); taking
   `Uint8Array` input instead of a string measured no faster, the string copy being cheap.
 - The subpaths `textlane/md`, `textlane/html`, `textlane/mdx` and `textlane/nl` are
   `exports` entries pointing at `build/generated/<domain>.js`. Their sources,
