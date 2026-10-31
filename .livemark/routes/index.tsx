@@ -235,10 +235,18 @@ function HeroCarousel(props: { slides: Slide[] }) {
                       : "text-muted-foreground hover:text-foreground",
                   )}
                 >
-                  <Icon
-                    aria-hidden
-                    className={cn("size-4 shrink-0", index === active && "text-primary")}
-                  />
+                  <span
+                    className={cn(
+                      "font-mono text-xs",
+                      index === active ? "text-primary" : "hidden sm:inline",
+                    )}
+                  >
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  {/* Collapsed on phones, an inactive tab shows its icon in place of the number */}
+                  {index === active ? null : (
+                    <Icon aria-hidden className="size-4 shrink-0 sm:hidden" />
+                  )}
                   <span
                     className={index === active ? undefined : "sr-only sm:not-sr-only"}
                   >
