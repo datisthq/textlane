@@ -72,12 +72,6 @@ pub(crate) const PLUGINS: &[PluginEntry] = &[
         "remark-smartypants"
     ),
     #[cfg(feature = "md")]
-    plugin!(
-        "md.smartypants",
-        textlane_md::Smartypants,
-        "remark-smartypants"
-    ),
-    #[cfg(feature = "md")]
     plugin!("md.component", textlane_md::Component, ""),
     #[cfg(feature = "md")]
     plugin!(

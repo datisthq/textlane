@@ -486,12 +486,6 @@ export function smartypants(options?: SmartypantsOptions): Plugin<"md.smartypant
   return { name: "md.smartypants", options }
 }
 
-/** The `md.smartypants` plugin. */
-export function smartypants(options?: SmartypantsOptions): Plugin<"md.smartypants", SmartypantsOptions> {
-  if (options === undefined) return { name: "md.smartypants" }
-  return { name: "md.smartypants", options }
-}
-
 /** The `md.component` plugin. */
 export function component(options?: ComponentOptions): Plugin<"md.component", ComponentOptions> {
   if (options === undefined) return { name: "md.component" }

@@ -629,11 +629,6 @@ def smartypants(options: Optional[SmartypantsOptions] = None) -> Plugin:
     return describe_plugin("md.smartypants", options)
 
 
-def smartypants(options: Optional[SmartypantsOptions] = None) -> Plugin:
-    """The `md.smartypants` plugin."""
-    return describe_plugin("md.smartypants", options)
-
-
 def component(options: Optional[ComponentOptions] = None) -> Plugin:
     """The `md.component` plugin."""
     return describe_plugin("md.component", options)
