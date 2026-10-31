@@ -1016,9 +1016,8 @@ function Benchmark() {
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Performance</h2>
             <p className="mt-4 text-muted-foreground text-lg">
               Markdown-to-HTML throughput from Rust, Node.js and Python, against other
-              libraries. textlane builds one tree (AST) for plugins to transform and
-              writes HTML from it, or two trees once an HTML plugin needs them; comrak and
-              cmark build one tree, pulldown-cmark none.
+              libraries. textlane exposes one pluggable tree (AST), or two once an HTML
+              plugin needs them; comrak and cmark expose one, pulldown-cmark none.
             </p>
           </div>
         </Reveal>
