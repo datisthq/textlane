@@ -5,9 +5,9 @@ use textlane_core::{Allocator, ArenaVec};
 use crate::helpers::prose::{create_text, replace_prose};
 use crate::models::options::Linkify;
 
-/// Turn bare URLs and email addresses in text into links: one with `://` as written, a
-/// `www.` one under `https://`, an email under `mailto:`; a bare domain stays text, as it
-/// may name a file.
+/// Turn bare URLs and email addresses in text into links: an `http`, `https` or `ftp` one
+/// as written, a `www.` one under `https://`, an email under `mailto:`; any other scheme,
+/// and a bare domain, which may name a file, stay text.
 pub fn link_urls<'a>(node: &mut Node<'a>, options: &Linkify, alloc: &'a Allocator) {
     let mut finder = LinkFinder::new();
     finder.url_must_have_scheme(false);
@@ -23,7 +23,7 @@ pub fn link_urls<'a>(node: &mut Node<'a>, options: &Linkify, alloc: &'a Allocato
                 let url = link.as_str();
                 let href = match link.kind() {
                     LinkKind::Email => format!("mailto:{url}"),
-                    _ if url.contains("://") => url.to_owned(),
+                    _ if has_safe_scheme(url) => url.to_owned(),
                     _ if url.starts_with("www.") => format!("https://{url}"),
                     _ => continue,
                 };
@@ -40,6 +40,15 @@ pub fn link_urls<'a>(node: &mut Node<'a>, options: &Linkify, alloc: &'a Allocato
             changed
         },
     );
+}
+
+// Any other scheme stays text: `javascript://%0aalert(1)` in prose must not become a link
+fn has_safe_scheme(url: &str) -> bool {
+    url.split_once("://").is_some_and(|(scheme, _)| {
+        ["http", "https", "ftp"]
+            .iter()
+            .any(|safe| scheme.eq_ignore_ascii_case(safe))
+    })
 }
 
 fn create_link<'a>(href: &str, text: &str, alloc: &'a Allocator) -> Node<'a> {

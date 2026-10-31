@@ -34,3 +34,10 @@ fn leaves_bare_domains_links_and_code_alone() -> Result<(), Error> {
     assert_eq!(link(input)?, input);
     Ok(())
 }
+
+#[test]
+fn leaves_other_schemes_as_text() -> Result<(), Error> {
+    let input = "<p>javascript://%0aalert(1) data://x vbscript://y</p>";
+    assert_eq!(link(input)?, input);
+    Ok(())
+}

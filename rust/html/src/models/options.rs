@@ -600,8 +600,8 @@ impl Default for Math {
 }
 
 /// `html.linkify`: bare URLs and email addresses in text into links, as GitHub's literal
-/// autolinks do: a URL with `://` as it is, a `www.` one under `https://`, an email under
-/// `mailto:`.
+/// autolinks do: an `http`, `https` or `ftp` URL as it is, a `www.` one under `https://`,
+/// an email under `mailto:`; any other scheme stays text.
 #[derive(Clone, Debug, Default, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default, rename_all = "camelCase")]

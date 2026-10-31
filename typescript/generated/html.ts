@@ -122,7 +122,7 @@ export interface MathOptions {
   ignoreAttributes?: string[]
 }
 
-/** `html.linkify`: bare URLs and email addresses in text into links, as GitHub's literal autolinks do: a URL with `://` as it is, a `www.` one under `https://`, an email under `mailto:`. */
+/** `html.linkify`: bare URLs and email addresses in text into links, as GitHub's literal autolinks do: an `http`, `https` or `ftp` URL as it is, a `www.` one under `https://`, an email under `mailto:`; any other scheme stays text. */
 export interface LinkifyOptions {
   /** Elements, by tag name, whose text is left alone; links, code, scripts, form text, `math` and `svg` when left out. */
   ignore?: string[] | null

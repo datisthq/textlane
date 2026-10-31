@@ -332,7 +332,7 @@ file.value
 
 ## html.linkify
 
-Turns bare URLs and email addresses in text into links, as GitHub's literal autolinks do: a URL with `://` as written, a `www.` one under `https://`, an email under `mailto:`. A bare domain, such as `index.html`, stays text. Links, code, scripts, form text, `math` and `svg` are left alone, or the elements `ignore` names, and any element with an attribute `ignoreAttributes` names.
+Turns bare URLs and email addresses in text into links, as GitHub's literal autolinks do: an `http`, `https` or `ftp` URL as written, a `www.` one under `https://`, an email under `mailto:`. Any other scheme, such as `javascript:`, and a bare domain, such as `index.html`, stay text. Links, code, scripts, form text, `math` and `svg` are left alone, or the elements `ignore` names, and any element with an attribute `ignoreAttributes` names.
 
 ```js
 import { textlane } from "textlane"
