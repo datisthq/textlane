@@ -276,6 +276,36 @@ fn formats_markdown() -> Result<(), Error> {
 }
 
 #[test]
+fn links_many_sibling_headings_in_linear_time() -> Result<(), Error> {
+    let options = textlane_html::AutolinkOptions {
+        behavior: textlane_html::AutolinkBehavior::After,
+        ..Default::default()
+    };
+    let processor = Processor::new()
+        .with(textlane_md::Parse::default())
+        .with(textlane_md::ToHtml::default())
+        .with(textlane_html::Slug {
+            autolink: Some(textlane_html::Autolink::Options(Box::new(options))),
+            ..Default::default()
+        })
+        .with(textlane_html::Stringify::default())
+        .freeze()?;
+    let input = "## a\n\n".repeat(100_000);
+    let started = std::time::Instant::now();
+    let output = processor.process(&input)?.value;
+    assert!(
+        started.elapsed().as_secs() < LIMIT_SECS,
+        "took {:?}",
+        started.elapsed()
+    );
+    assert!(
+        output
+            .ends_with("<a href=\"#a-99999\"><span class=\"icon icon-link\"></span></a>")
+    );
+    Ok(())
+}
+
+#[test]
 fn formats_deep_nesting_in_linear_time() -> Result<(), Error> {
     for input in [
         "*".repeat(100_000) + "a" + &"*".repeat(100_000),

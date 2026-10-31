@@ -38,8 +38,9 @@ pub(crate) fn link_headings<'a>(
         AutolinkBehavior::Before | AutolinkBehavior::After
     );
     while let Some(children) = stack.pop() {
-        // What `around` inserted is skipped, as upstream's visitor returns past it
-        let mut inserted = Vec::new();
+        // What `around` inserted is skipped, as upstream's visitor returns past it; one flag
+        // per child, as a list of indexes searched per child is quadratic in siblings
+        let mut inserted: Vec<bool> = Vec::new();
         if around
             && children
                 .iter()
@@ -53,7 +54,8 @@ pub(crate) fn link_headings<'a>(
                         linker.set_heading_properties(&mut element);
                         let first = children.len();
                         linker.link_around(children, element)?;
-                        inserted.extend(first..children.len());
+                        inserted.resize(first, false);
+                        inserted.resize(children.len(), true);
                     }
                     child => children.push(child),
                 }
@@ -63,7 +65,7 @@ pub(crate) fn link_headings<'a>(
             let Node::Element(element) = child else {
                 continue;
             };
-            if inserted.contains(&index) {
+            if inserted.get(index).copied().unwrap_or(false) {
                 continue;
             }
             if !linker.matches(element) {
