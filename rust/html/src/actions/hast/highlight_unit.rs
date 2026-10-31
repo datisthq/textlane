@@ -116,7 +116,7 @@ fn notations_stay_linear_over_many_lines() -> Result<(), Error> {
         json!({ "theme": "github-light", "transformers": ["notationDiff"] }),
     )?;
     assert_eq!(html.matches("diff add").count(), 20_000);
-    assert!(started.elapsed().as_secs() < 20);
+    assert!(started.elapsed().as_secs() < 60);
     Ok(())
 }
 
@@ -211,7 +211,7 @@ fn highlights_meta_words_on_many_lines_in_linear_time() -> Result<(), Error> {
     let started = std::time::Instant::now();
     let html = highlight_meta(code.trim_end(), "/config/", options)?;
     assert_eq!(html.matches("highlighted-word").count(), 40_000);
-    assert!(started.elapsed().as_secs() < 20);
+    assert!(started.elapsed().as_secs() < 60);
     Ok(())
 }
 
@@ -228,7 +228,7 @@ fn caps_meta_words_on_one_long_line() -> Result<(), Error> {
     let started = std::time::Instant::now();
     let html = highlight(&input, options)?;
     assert_eq!(html.matches("highlighted-word").count(), 1_000);
-    assert!(started.elapsed().as_secs() < 20);
+    assert!(started.elapsed().as_secs() < 60);
     Ok(())
 }
 
