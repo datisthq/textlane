@@ -20,6 +20,31 @@ tree as the unified ecosystem defines it:
 produces, and `run` and `stringify` take it back. Every node has a `type`; parents have
 `children`; literals have a `value`. Keys keep their JavaScript names, such as `tagName`.
 
+## Types
+
+The parser types the tree: after `md.parse()`, `html.parse()` or `nl.parse()`, `parse`
+returns the `Root` of `textlane.mdast`, `textlane.hast` or `textlane.nlcst`, `TypedDict`s
+named node for node as [`@types/mdast`](https://www.npmjs.com/package/@types/mdast),
+`@types/hast` and `@types/nlcst` name them, with `Point` and `Position` in `textlane.unist`.
+They include the nodes textlane's syntax extensions add (`ContainerDirective`, `Math`,
+`DefListNode`, `MdxJsxFlowElement`, `MdxjsEsm`, …), and MDX's `data.estree` is typed by
+`textlane.estree`. Narrow a union by comparing `type`, and read an optional key, such as
+`position` or `lang`, with `get`:
+
+````python
+from textlane import md, mdast, textlane
+
+tree: mdast.Root = textlane().use(md.parse()).parse("```py\nx = 1\n```")
+for node in tree["children"]:
+    if node["type"] == "code":
+        position = node.get("position")
+        print(node.get("lang"), node["value"], position and position["start"]["line"])
+# py x = 1 1
+````
+
+Before a parser is used, and for a tree `run` returns, the tree is a plain dict. `run` and
+`stringify` take any mapping, so a typed tree goes back without a cast.
+
 ```python
 from textlane import md, textlane
 

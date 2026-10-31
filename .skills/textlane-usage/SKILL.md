@@ -91,7 +91,11 @@ file["value"]  # "<h1>hi</h1>"
 Functions are snake_case (`md.to_html`, `nl.indefinite_article`); their options stay the
 camelCase keys the plugin takes, typed as `TypedDict`s. `process(text)` and `run(tree)`
 return directly; `await processor.aprocess(text)` and `await processor.arun(tree)` are their
-coroutines. A file and a tree are dicts. Without Python plugins, `process` releases the GIL:
+coroutines. A file and a tree are dicts: after `use(md.parse())`, `html.parse()` or
+`nl.parse()`, `parse` is typed as the `Root` of `textlane.mdast`, `textlane.hast` or
+`textlane.nlcst`, `TypedDict`s named as `@types/mdast`, `hast` and `nlcst` name them (MDX's
+`data.estree` as `textlane.estree.Program`); narrow by comparing `node["type"]`, since a
+checker does not narrow on `"key" in node`. Without Python plugins, `process` releases the GIL:
 process many documents through one frozen processor from a thread pool, or `asyncio.gather`
 their `aprocess` calls.
 

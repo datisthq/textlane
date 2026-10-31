@@ -4,10 +4,12 @@
 from typing import Any, Dict, List, Literal, Optional, TypedDict, Union
 
 from ._models import Plugin, describe_plugin
+from .mdast import Root
 
 __all__ = [
     "parse",
     "ParseOptions",
+    "Parser",
     "directive",
     "DirectiveOptions",
     "gfm",
@@ -505,9 +507,18 @@ class ToNaturalLanguageOptions(TypedDict, total=False):
     source: List[str]
 
 
-def parse(options: Optional[ParseOptions] = None) -> Plugin:
+class Parser(Plugin, total=False):
+    """`md.parse`'s descriptor: once used, `Processor.parse` returns the mdast `Root`."""
+
+    # never present: the tree this parser makes, for the type checker only
+    parsed: Root
+
+
+def parse(options: Optional[ParseOptions] = None) -> Parser:
     """The `md.parse` plugin."""
-    return describe_plugin("md.parse", options)
+    if options is None:
+        return {"name": "md.parse"}
+    return {"name": "md.parse", "options": options}
 
 
 def directive(options: Optional[DirectiveOptions] = None) -> Plugin:

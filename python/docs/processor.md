@@ -78,7 +78,8 @@ processor.data("site")
 
 `process` runs all three stages; each also runs on its own:
 
-- `parse(text)` returns the tree the parser reads, as a dict
+- `parse(text)` returns the tree the parser reads, as a dict typed by the parser: `md.parse()`
+  makes it a `textlane.mdast.Root` ([Syntax trees](/python/syntax-trees/))
 - `run(tree, file=None)` runs the transforms over a tree and returns the new tree;
   `await arun(tree, file=None)` is its coroutine. Pass the text the tree came from as `file` to keep
   positions

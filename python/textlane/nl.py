@@ -4,10 +4,12 @@
 from typing import Any, Dict, List, Literal, Optional, TypedDict, Union
 
 from ._models import Plugin, describe_plugin
+from .nlcst import Root
 
 __all__ = [
     "parse",
     "ParseOptions",
+    "Parser",
     "equality",
     "EqualityOptions",
     "passive",
@@ -139,9 +141,18 @@ class ContractionsOptions(TypedDict, total=False):
     straight: Optional[bool]
 
 
-def parse(options: Optional[ParseOptions] = None) -> Plugin:
+class Parser(Plugin, total=False):
+    """`nl.parse`'s descriptor: once used, `Processor.parse` returns the nlcst `Root`."""
+
+    # never present: the tree this parser makes, for the type checker only
+    parsed: Root
+
+
+def parse(options: Optional[ParseOptions] = None) -> Parser:
     """The `nl.parse` plugin."""
-    return describe_plugin("nl.parse", options)
+    if options is None:
+        return {"name": "nl.parse"}
+    return {"name": "nl.parse", "options": options}
 
 
 def equality(options: Optional[EqualityOptions] = None) -> Plugin:

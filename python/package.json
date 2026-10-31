@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "bash scripts/copy-skills.sh && RUSTUP_TOOLCHAIN=stable uvx maturin@1.15.0 build --release --out build",
+    "check:types": "uvx ty@0.0.95 check",
     "release": "uv publish build/*",
     "test": "pnpm test:unit",
     "test:unit": "bash scripts/test.sh"

@@ -4,10 +4,12 @@
 from typing import Any, Dict, List, Literal, Optional, TypedDict, Union
 
 from ._models import Plugin, describe_plugin
+from .hast import Root
 
 __all__ = [
     "parse",
     "ParseOptions",
+    "Parser",
     "raw",
     "RawOptions",
     "format",
@@ -372,9 +374,18 @@ class StringifyOptions(TypedDict, total=False):
     voids: Optional[List[str]]
 
 
-def parse(options: Optional[ParseOptions] = None) -> Plugin:
+class Parser(Plugin, total=False):
+    """`html.parse`'s descriptor: once used, `Processor.parse` returns the hast `Root`."""
+
+    # never present: the tree this parser makes, for the type checker only
+    parsed: Root
+
+
+def parse(options: Optional[ParseOptions] = None) -> Parser:
     """The `html.parse` plugin."""
-    return describe_plugin("html.parse", options)
+    if options is None:
+        return {"name": "html.parse"}
+    return {"name": "html.parse", "options": options}
 
 
 def raw(options: Optional[RawOptions] = None) -> Plugin:

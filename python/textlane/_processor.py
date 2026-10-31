@@ -4,17 +4,31 @@ Python plugins run here when a run pauses before them."""
 import asyncio
 import json
 import threading
-from typing import Any, Callable, Dict, List, Optional, Union, cast, overload
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    List,
+    Mapping,
+    Optional,
+    TypeVar,
+    Union,
+    overload,
+)
 
-from . import _native
+from . import _native, hast, html, mdast, md, nl, nlcst
 from ._host import Host, HostFile, finish, finish_sync, merge_options
 from ._models import Compatible, VFile
 
 _UNSET: Any = object()
 
+Tree = TypeVar("Tree")
 
-class Processor:
-    """A pipeline: add plugins with `use`, then `process` text."""
+
+class Processor(Generic[Tree]):
+    """A pipeline: add plugins with `use`, then `process` text; `Tree` is what `parse`
+    returns, set by the parser `use` adds."""
 
     def __init__(self) -> None:
         self._native = _native.Pipeline()
@@ -24,11 +38,20 @@ class Processor:
         self._frozen = False
         self._lock = threading.Lock()
 
-    def use(self, value: Any, *options: Any) -> "Processor":
+    @overload
+    def use(self, value: md.Parser, *options: Any) -> "Processor[mdast.Root]": ...
+    @overload
+    def use(self, value: html.Parser, *options: Any) -> "Processor[hast.Root]": ...
+    @overload
+    def use(self, value: nl.Parser, *options: Any) -> "Processor[nlcst.Root]": ...
+    @overload
+    def use(self, value: Any, *options: Any) -> "Processor[Tree]": ...
+    def use(self, value: Any, *options: Any) -> Any:
         """Add a plugin, a list of them or a preset; a plugin used again is reconfigured.
 
         A Python plugin is an attacher, called with the processor and its options at freeze:
-        it returns a transformer taking the tree and the file.
+        it returns a transformer taking the tree and the file. A parser, such as `md.parse()`,
+        types the tree `parse` returns.
         """
         if callable(value):
             self._native.use(json.dumps([self._register(value, list(options))]))
@@ -42,9 +65,9 @@ class Processor:
     @overload
     def data(self, key: str) -> Any: ...
     @overload
-    def data(self, key: str, value: Any) -> "Processor": ...
+    def data(self, key: str, value: Any) -> "Processor[Tree]": ...
     @overload
-    def data(self, key: Dict[str, Any]) -> "Processor": ...
+    def data(self, key: Dict[str, Any]) -> "Processor[Tree]": ...
     def data(self, key: Optional[Union[str, Dict[str, Any]]] = None, value: Any = _UNSET) -> Any:
         """All data or the value under `key`; with a value, set it; with a dict, replace all."""
         if isinstance(key, dict):
@@ -55,18 +78,18 @@ class Processor:
             return self
         return json.loads(self._native.data(key))
 
-    def freeze(self) -> "Processor":
+    def freeze(self) -> "Processor[Tree]":
         """Attach every plugin; later `use` and `data` setters fail."""
         self._attach()
         self._freeze_native()
         return self
 
-    def parse(self, document: Compatible) -> Dict[str, Any]:
+    def parse(self, document: Compatible) -> Tree:
         """Parse a document into a tree."""
         self._attach()
         return json.loads(self._native.parse(_read_value(document) or ""))
 
-    async def arun(self, tree: Dict[str, Any], file: Compatible = None) -> Dict[str, Any]:
+    async def arun(self, tree: Mapping[str, Any], file: Compatible = None) -> Dict[str, Any]:
         """Run the transforms, finishing asynchronous stages.
 
         `file`, the text `tree` was parsed from, lets bridges read it and keeps positions in
@@ -79,7 +102,7 @@ class Processor:
         await finish(run, self._hosts, HostFile(value, _read_path(file)))
         return json.loads(run.result())
 
-    def run(self, tree: Dict[str, Any], file: Compatible = None) -> Dict[str, Any]:
+    def run(self, tree: Mapping[str, Any], file: Compatible = None) -> Dict[str, Any]:
         """Run the transforms; fails with `async-in-sync` on an asynchronous stage."""
         value = _read_value(file)
         if not self._attach():
@@ -88,7 +111,7 @@ class Processor:
         finish_sync(run, self._hosts, HostFile(value, _read_path(file)), "run")
         return json.loads(run.result())
 
-    def stringify(self, tree: Dict[str, Any]) -> str:
+    def stringify(self, tree: Mapping[str, Any]) -> str:
         """Compile a tree, running no transform."""
         self._attach()
         return self._native.stringify(json.dumps(tree))
@@ -181,33 +204,45 @@ class Processor:
         return len(self._native.hosts()) > 0
 
 
-def textlane() -> Processor:
-    """A new processor."""
+def textlane() -> Processor[Dict[str, Any]]:
+    """A new processor; `parse` returns a plain dict until a parser is used."""
     return Processor()
 
 
 def _read_value(file: Compatible) -> Optional[str]:
-    if isinstance(file, dict):
-        return file["value"]
-    return file
+    if file is None or isinstance(file, str):
+        return file
+    return file["value"]
 
 
 def _read_path(file: Compatible) -> Optional[str]:
-    if isinstance(file, dict):
-        return file.get("path")
-    return None
+    if file is None or isinstance(file, str):
+        return None
+    return file.get("path")
 
 
 # Native stages' data first, then what Python plugins stored over it
 def _merge_data(result: VFile, data: Dict[str, Any]) -> VFile:
-    return {**result, "data": {**result["data"], **data}}
+    return _make_file(result["value"], result, {**result["data"], **data})
 
 
 # The extension hands back the text apart from the file's messages and data
 def _read_file(value: str, rest: str) -> VFile:
-    return cast(VFile, {"value": value, **json.loads(rest)})
+    parsed = json.loads(rest)
+    return _make_file(value, parsed, parsed["data"])
 
 
 def _with_path(file: VFile, document: Compatible) -> VFile:
     path = _read_path(document)
-    return file if path is None else {**file, "path": path}
+    if path is None:
+        return file
+    copied = _make_file(file["value"], file, file["data"])
+    copied["path"] = path
+    return copied
+
+
+def _make_file(value: str, file: Mapping[str, Any], data: Dict[str, Any]) -> VFile:
+    made: VFile = {"value": value, "messages": file["messages"], "data": data}
+    if "path" in file:
+        made["path"] = file["path"]
+    return made

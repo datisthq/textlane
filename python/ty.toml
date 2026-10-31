@@ -1,0 +1,6 @@
+[environment]
+python-version = "3.9"
+
+# The package and the test that walks its typed trees; the others need pytest installed
+[src]
+include = ["textlane", "-test/trees_unit.py"]

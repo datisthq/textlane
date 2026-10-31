@@ -37,6 +37,9 @@ importers:
       '@tanstack/react-start':
         specifier: 1.168.61
         version: 1.168.61(@voidzero-dev/vite-plus-core@1.0.0(@types/node@24.2.0)(esbuild@0.27.3)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1))(esbuild@0.27.3)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@10.2.2)
+      '@types/estree':
+        specifier: 1.0.9
+        version: 1.0.9
       '@types/node':
         specifier: 24.2.0
         version: 24.2.0
@@ -64,6 +67,18 @@ importers:
       lucide-react:
         specifier: 0.577.0
         version: 0.577.0(react@19.3.0)
+      mdast-util-definition-list:
+        specifier: 2.0.1
+        version: 2.0.1(supports-color@10.2.2)
+      mdast-util-directive:
+        specifier: 3.1.1
+        version: 3.1.1(supports-color@10.2.2)
+      mdast-util-math:
+        specifier: 3.0.0
+        version: 3.0.0(supports-color@10.2.2)
+      mdast-util-mdx:
+        specifier: 3.0.0
+        version: 3.0.0(supports-color@10.2.2)
       npm-check-updates:
         specifier: 23.1.0
         version: 23.1.0
@@ -76,6 +91,9 @@ importers:
       tempy:
         specifier: 3.2.0
         version: 3.2.0
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
       vite:
         specifier: 'catalog:'
         version: '@voidzero-dev/vite-plus-core@1.0.0(@types/node@24.2.0)(esbuild@0.27.3)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1)'

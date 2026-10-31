@@ -43,6 +43,20 @@ One workspace, three registries, one version. Nothing here may change what the c
   `use(md.parse())` with no cast. A plugin lacking the key infers `unknown` and keeps the tree;
   making the key required breaks every generated `return { name }`. `@types/unist`, `mdast`,
   `hast` and `nlcst` are runtime `dependencies` with caret ranges, so consumers dedupe them.
+- Python's trees mirror them: the same run renders `python/textlane/{unist,mdast,hast,nlcst,estree}.py`
+  (`.scripts/render-trees.ts`) with the TypeScript checker over the `@types` that `typescript/`
+  resolves, plus the root's `mdast-util-{directive,math,definition-list,mdx}` for the nodes
+  their `declare module` adds and `@types/estree` for `data.estree`. Each interface becomes a
+  flattened `TypedDict` (optional keys in a `total=False` subclass, since 3.9 has no
+  `NotRequired`), each alias a module-level `Union` at the end, cross-module names
+  `TYPE_CHECKING`-only (mdast and hast name each other). Keys class syntax cannot hold
+  (`async`, `update`) use the functional form with quoted values. `md.parse()` returns
+  `md.Parser`, a `Plugin` with a never-set `parsed: Root` key that `Processor.use`'s
+  overloads match, making `Processor[mdast.Root]`; a plain `Plugin` lacks the key, so it
+  falls through to `Processor[Tree]`. ty narrows these unions on `node["type"] == …` but not
+  on `"key" in node` or `type in (…)`. `pnpm -C python check:types` runs ty over the package
+  and `-test/trees_unit.py`, whose runtime test asserts every parsed node's keys fit its
+  `TypedDict`.
 - `resolveAddon` takes `TEXTLANE_ADDON` first (a cargo build, an unsupported platform), else
   resolves `@textlane/<platform>-<arch>/textlane.node` from the installed packages, with a
   `-musl` suffix when `detectLibc` finds no glibc in `process.report`'s header, the check npm
