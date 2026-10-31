@@ -249,7 +249,11 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   expression goes through oxc's own ESTree serializer, which writes acorn's shapes (`raw`,
   one `MemberExpression`, `Property`), into `models/estree.rs`, a flat store of ESTree
   objects (type plus ordered fields) the ports walk exactly as upstream walks JSON-like
-  trees; field order is walk order. JSX strings are decoded as acorn-jsx does
+  trees; field order is walk order. An MDX node carrying `data.estree` is read from it
+  instead (`actions/estree/load.rs`, its offsets moved into a range of their own), as
+  hast-util-to-estree reads nothing else: JavaScript plugins (remark-mdx-frontmatter) build
+  ESM that way with `value` empty; native `md.mdx` stores none, so `value` is parsed
+  otherwise. JSX strings are decoded as acorn-jsx does
   (`helpers/entity.rs`); each snippet gets disjoint virtual offsets so comment attachment
   compares within it and `duplicate-layout` maps back to lines (`helpers/place.rs`). Walks
   (`helpers/walk.rs`, estree-walker's enter/leave/skip/replace) and patterns keep explicit

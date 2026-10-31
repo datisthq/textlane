@@ -59,7 +59,7 @@ const file = await textlane()
   .use(html.stringify({ allowDangerousHtml: true }))
   .process("# hi")
 file.value // "<h1>hi</h1>"
-file.messages // [{ reason, ruleId, source, place }]
+file.messages // vfile-messages: reason, ruleId, source, place, line, column, fatal
 ```
 
 A domain function returns a descriptor, `{ name: "md.toHtml", options }`, typed from the

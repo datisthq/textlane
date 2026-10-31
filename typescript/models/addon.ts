@@ -1,4 +1,4 @@
-import type { Message, VFile } from "./file.ts"
+import type { Message } from "./file.ts"
 
 /** The crate's pipeline as the addon exposes it: values cross as JSON, trees as JSON text. */
 export interface NativePipeline {
@@ -12,7 +12,7 @@ export interface NativePipeline {
   runSync(tree: string, value?: string): string
   stringify(tree: string): string
   process(text: string, path?: string): Promise<ProcessOutcome>
-  processSync(text: string, path?: string): VFile
+  processSync(text: string, path?: string): NativeFile
   hosts(): number[]
   startRun(tree: string, value: string | undefined, sync: boolean): NativeRun
   startProcess(text: string, sync: boolean, path?: string): NativeRun
@@ -20,8 +20,15 @@ export interface NativePipeline {
 
 /** What an async `process` settles with: the file, or the error the crate raised. */
 export interface ProcessOutcome {
-  file?: VFile
+  file?: NativeFile
   error?: { code: string; message: string }
+}
+
+/** The file a native `process` gives back, its messages as the crate holds them. */
+export interface NativeFile {
+  value: string
+  messages: Message[]
+  data: Record<string, unknown>
 }
 
 /** A run paused before host plugins until `resume`, then finished with `result`, as JSON

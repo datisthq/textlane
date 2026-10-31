@@ -114,9 +114,12 @@ describe("Processor", () => {
       .use(nl.parse())
       .use(nl.repeatedWords())
       .use(nl.stringify())
-    expect(processor.processSync("the the").messages).toEqual([
+    expect(processor.processSync("the the").messages).toMatchObject([
       {
         reason: "Unexpected repeated `the`, remove one occurrence",
+        line: 1,
+        column: 1,
+        name: "1:1-1:8",
         ruleId: "the",
         source: "retext-repeated-words",
         place: {
@@ -300,7 +303,7 @@ describe("Processor", () => {
         .use([md.parse(), warn, md.stringify()])
         .process("a")
       expect(file.data).toEqual({ seen: true })
-      expect(file.messages).toEqual([
+      expect(file.messages).toMatchObject([
         {
           reason: "look",
           ruleId: "rule",
@@ -392,6 +395,32 @@ describe("Processor", () => {
       const file = processor.processSync("a")
       expect(counts).toEqual([1])
       expect(file.messages.map(message => message.reason)).toEqual(["native", "from js"])
+    })
+
+    it("gives back every message as a vfile-message", async () => {
+      const warn = () => (_tree: Node, file: HostFile) => {
+        const message = file.message("from js", { line: 1, column: 2 }, "js:rule")
+        message.url = "https://example.com/rule"
+      }
+      const hosted = await entry
+        .textlane()
+        .use([md.parse(), warn, ["test.message", { reason: "native" }], md.stringify()])
+        .process({ value: "abc", path: "a.md" })
+      expect(hosted.messages).toMatchObject([
+        { reason: "from js", line: 1, column: 2, fatal: false, name: "1:2" },
+        { reason: "native", fatal: false, file: "a.md" },
+      ])
+      expect(hosted.messages[0]).toBeInstanceOf(Error)
+      expect(hosted.messages[0]?.url).toBe("https://example.com/rule")
+      const plain = entry
+        .textlane()
+        .use([md.parse(), ["test.message", { reason: "native" }], md.stringify()])
+        .processSync("a")
+      expect(plain.messages[0]).toMatchObject({
+        reason: "native",
+        fatal: false,
+        name: "1:1",
+      })
     })
 
     it("merges the data native stages and plugins store in the file", () => {

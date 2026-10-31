@@ -1,0 +1,331 @@
+[
+  {
+    "description": "hast-util-to-estree MDX nodes with data.estree",
+    "source": {
+      "repository": "https://github.com/syntax-tree/hast-util-to-estree",
+      "version": "3.1.3",
+      "license": "MIT"
+    },
+    "pipeline": [["mdx.compile"]],
+    "tests": [
+      {
+        "description": "ESM built as estree only, as remark-mdx-frontmatter builds it",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "mdxjsEsm",
+              "value": "",
+              "data": {
+                "estree": {
+                  "type": "Program",
+                  "body": [
+                    {
+                      "type": "ExportNamedDeclaration",
+                      "declaration": {
+                        "type": "VariableDeclaration",
+                        "declarations": [
+                          {
+                            "type": "VariableDeclarator",
+                            "id": {
+                              "type": "Identifier",
+                              "name": "frontmatter"
+                            },
+                            "init": {
+                              "type": "ObjectExpression",
+                              "properties": [
+                                {
+                                  "type": "Property",
+                                  "method": false,
+                                  "shorthand": false,
+                                  "computed": false,
+                                  "key": {
+                                    "type": "Literal",
+                                    "value": "title",
+                                    "raw": "\"title\""
+                                  },
+                                  "value": {
+                                    "type": "Literal",
+                                    "value": "Hi",
+                                    "raw": "\"Hi\""
+                                  },
+                                  "kind": "init"
+                                }
+                              ]
+                            }
+                          }
+                        ],
+                        "kind": "const"
+                      },
+                      "specifiers": [],
+                      "source": null,
+                      "attributes": []
+                    }
+                  ],
+                  "sourceType": "module",
+                  "comments": []
+                }
+              }
+            }
+          ]
+        },
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx} from \"react/jsx-runtime\";\nexport const frontmatter = {\n  \"title\": \"Hi\"\n};\nfunction _createMdxContent(props) {\n  return _jsx(_Fragment, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "ESM whose estree differs from its value",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "mdxjsEsm",
+              "value": "export const a = 1",
+              "data": {
+                "estree": {
+                  "type": "Program",
+                  "body": [
+                    {
+                      "type": "ExportNamedDeclaration",
+                      "declaration": {
+                        "type": "VariableDeclaration",
+                        "declarations": [
+                          {
+                            "type": "VariableDeclarator",
+                            "id": {
+                              "type": "Identifier",
+                              "name": "b"
+                            },
+                            "init": {
+                              "type": "Literal",
+                              "value": 2,
+                              "raw": "2"
+                            }
+                          }
+                        ],
+                        "kind": "const"
+                      },
+                      "specifiers": [],
+                      "source": null,
+                      "attributes": []
+                    }
+                  ],
+                  "sourceType": "module",
+                  "comments": []
+                }
+              }
+            }
+          ]
+        },
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx} from \"react/jsx-runtime\";\nexport const b = 2;\nfunction _createMdxContent(props) {\n  return _jsx(_Fragment, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "ESM estree with positions and comments",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "mdxjsEsm",
+              "value": "",
+              "data": {
+                "estree": {
+                  "type": "Program",
+                  "start": 0,
+                  "end": 38,
+                  "body": [
+                    {
+                      "type": "ExportNamedDeclaration",
+                      "start": 8,
+                      "end": 26,
+                      "declaration": {
+                        "type": "VariableDeclaration",
+                        "start": 15,
+                        "end": 26,
+                        "declarations": [
+                          {
+                            "type": "VariableDeclarator",
+                            "start": 21,
+                            "end": 26,
+                            "id": {
+                              "type": "Identifier",
+                              "start": 21,
+                              "end": 22,
+                              "name": "a"
+                            },
+                            "init": {
+                              "type": "Literal",
+                              "start": 25,
+                              "end": 26,
+                              "value": 1,
+                              "raw": "1"
+                            }
+                          }
+                        ],
+                        "kind": "const"
+                      },
+                      "specifiers": [],
+                      "source": null,
+                      "attributes": []
+                    }
+                  ],
+                  "sourceType": "module",
+                  "comments": [
+                    {
+                      "type": "Line",
+                      "value": " lead",
+                      "start": 0,
+                      "end": 7
+                    },
+                    {
+                      "type": "Block",
+                      "value": " trail ",
+                      "start": 27,
+                      "end": 38
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "x"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "js": "// lead\n/*trail*/\nimport {jsx as _jsx} from \"react/jsx-runtime\";\nexport const a = 1;\nfunction _createMdxContent(props) {\n  const _components = {\n    p: \"p\",\n    ...props.components\n  };\n  return _jsx(_components.p, {\n    children: \"x\"\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "flow expression built as estree only",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "mdxFlowExpression",
+              "value": "",
+              "data": {
+                "estree": {
+                  "type": "Program",
+                  "body": [
+                    {
+                      "type": "ExpressionStatement",
+                      "expression": {
+                        "type": "BinaryExpression",
+                        "left": {
+                          "type": "Literal",
+                          "value": 1,
+                          "raw": "1"
+                        },
+                        "operator": "+",
+                        "right": {
+                          "type": "Literal",
+                          "value": 1,
+                          "raw": "1"
+                        }
+                      }
+                    }
+                  ],
+                  "sourceType": "module",
+                  "comments": []
+                }
+              }
+            }
+          ]
+        },
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  return _jsx(_Fragment, {\n    children: 1 + 1\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
+        "description": "attribute value and spread built as estree only",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "mdxJsxFlowElement",
+              "name": "Card",
+              "attributes": [
+                {
+                  "type": "mdxJsxAttribute",
+                  "name": "count",
+                  "value": {
+                    "type": "mdxJsxAttributeValueExpression",
+                    "value": "",
+                    "data": {
+                      "estree": {
+                        "type": "Program",
+                        "body": [
+                          {
+                            "type": "ExpressionStatement",
+                            "expression": {
+                              "type": "BinaryExpression",
+                              "left": {
+                                "type": "Literal",
+                                "value": 2,
+                                "raw": "2"
+                              },
+                              "operator": "*",
+                              "right": {
+                                "type": "Literal",
+                                "value": 3,
+                                "raw": "3"
+                              }
+                            }
+                          }
+                        ],
+                        "sourceType": "module",
+                        "comments": []
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "mdxJsxExpressionAttribute",
+                  "value": "",
+                  "data": {
+                    "estree": {
+                      "type": "Program",
+                      "body": [
+                        {
+                          "type": "ExpressionStatement",
+                          "expression": {
+                            "type": "ObjectExpression",
+                            "properties": [
+                              {
+                                "type": "SpreadElement",
+                                "argument": {
+                                  "type": "Identifier",
+                                  "name": "props"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ],
+                      "sourceType": "module",
+                      "comments": []
+                    }
+                  }
+                }
+              ],
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "js": "import {jsx as _jsx} from \"react/jsx-runtime\";\nfunction _createMdxContent(props) {\n  const {Card} = props.components || ({});\n  if (!Card) _missingMdxReference(\"Card\", true);\n  return _jsx(Card, {\n    count: 2 * 3,\n    ...props\n  });\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\nfunction _missingMdxReference(id, component) {\n  throw new Error(\"Expected \" + (component ? \"component\" : \"object\") + \" `\" + id + \"` to be defined: you likely forgot to import, pass, or provide it.\");\n}\n"
+        }
+      }
+    ]
+  }
+]

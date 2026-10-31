@@ -1,9 +1,10 @@
 use textlane_core::hast::{
     Element, MdxJsxAttribute, MdxJsxAttributeValue, Node, PropertyItem, PropertyValue,
 };
-use textlane_core::{Error, Lines, Position, UnistPoint};
+use textlane_core::{Data, Error, Lines, Position, UnistPoint};
 
 use crate::actions::comment::attach::attach_comments;
+use crate::actions::estree::load::load_estree;
 use crate::actions::expression::read::read_expression;
 use crate::actions::script::parse::parse_script;
 use crate::helpers::identifier::is_identifier_name;
@@ -29,8 +30,8 @@ pub(crate) struct Snippet {
 pub(crate) enum JsxAttribute<'a> {
     Boolean(&'a str),
     Literal(&'a str, &'a str),
-    Expression(&'a str, &'a str),
-    Spread(&'a str),
+    Expression(&'a str, &'a str, Option<&'a Data<'a>>),
+    Spread(&'a str, Option<&'a Data<'a>>),
 }
 
 /// hast-util-to-estree 3.1.3's state: the store the program is built in, the comments and
@@ -105,12 +106,12 @@ impl Convert<'_, '_> {
                             Some(MdxJsxAttributeValue::Literal(value)) => {
                                 JsxAttribute::Literal(name, value)
                             }
-                            Some(MdxJsxAttributeValue::Expression { value, .. }) => {
-                                JsxAttribute::Expression(name, value)
+                            Some(MdxJsxAttributeValue::Expression { value, data }) => {
+                                JsxAttribute::Expression(name, value, *data)
                             }
                         },
-                        MdxJsxAttribute::Expression { value, .. } => {
-                            JsxAttribute::Spread(value)
+                        MdxJsxAttribute::Expression { value, data, .. } => {
+                            JsxAttribute::Spread(value, *data)
                         }
                     })
                     .collect();
@@ -118,10 +119,11 @@ impl Convert<'_, '_> {
                     .map(Some)
             }
             Node::MdxFlowExpression(expression) | Node::MdxTextExpression(expression) => {
-                self.mdx_expression(expression.value).map(Some)
+                self.mdx_expression(expression.value, expression.data)
+                    .map(Some)
             }
             Node::MdxjsEsm(esm) => self
-                .mdx_esm(esm.value, esm.position.as_ref())
+                .mdx_esm(esm.value, esm.position.as_ref(), esm.data)
                 .map(|()| None),
         })
     }
@@ -459,8 +461,8 @@ impl Convert<'_, '_> {
                         [(Key::NAME, name.into()), (Key::VALUE, value.into())],
                     )
                 }
-                JsxAttribute::Expression(name, source) => {
-                    let expression = self.expression(source, false)?;
+                JsxAttribute::Expression(name, source, data) => {
+                    let expression = self.expression(source, false, *data)?;
                     let value = self.store.add(
                         Kind::JSX_EXPRESSION_CONTAINER,
                         [(Key::EXPRESSION, expression.into())],
@@ -471,8 +473,8 @@ impl Convert<'_, '_> {
                         [(Key::NAME, name.into()), (Key::VALUE, value.into())],
                     )
                 }
-                JsxAttribute::Spread(source) => {
-                    let argument = match self.parse_expression(source, true)? {
+                JsxAttribute::Spread(source, data) => {
+                    let argument = match self.parse_expression(source, true, *data)? {
                         Some(argument) => argument,
                         None => self.store.object(Vec::new()),
                     };
@@ -493,9 +495,13 @@ impl Convert<'_, '_> {
 
     /// `mdxFlowExpression` and `mdxTextExpression`: the expression in a container, or an
     /// empty one when the source holds only comments.
-    pub(crate) fn mdx_expression(&mut self, source: &str) -> Result<Id, Error> {
+    pub(crate) fn mdx_expression(
+        &mut self,
+        source: &str,
+        data: Option<&Data<'_>>,
+    ) -> Result<Id, Error> {
         let first = self.store.len();
-        let expression = self.expression(source, false)?;
+        let expression = self.expression(source, false, data)?;
         self.mark_explicit(first);
         Ok(self.store.add(
             Kind::JSX_EXPRESSION_CONTAINER,
@@ -508,10 +514,16 @@ impl Convert<'_, '_> {
         &mut self,
         source: &str,
         position: Option<&Position<'_>>,
+        data: Option<&Data<'_>>,
     ) -> Result<(), Error> {
-        let base = self.reserve(source, position);
         let first = self.store.len();
-        let (program, comments) = parse_script(&mut self.store, source, base)?;
+        let (program, comments) = match self.load(data) {
+            Some(loaded) => loaded,
+            None => {
+                let base = self.reserve(source, position);
+                parse_script(&mut self.store, source, base)?
+            }
+        };
         self.mark_explicit(first);
         self.comments.extend(comments.iter().copied());
         attach_comments(&mut self.store, program, &comments);
@@ -529,8 +541,13 @@ impl Convert<'_, '_> {
         }
     }
 
-    fn expression(&mut self, source: &str, spread: bool) -> Result<Id, Error> {
-        match self.parse_expression(source, spread)? {
+    fn expression(
+        &mut self,
+        source: &str,
+        spread: bool,
+        data: Option<&Data<'_>>,
+    ) -> Result<Id, Error> {
+        match self.parse_expression(source, spread, data)? {
             Some(expression) => Ok(expression),
             None => Ok(self.store.add(Kind::JSX_EMPTY_EXPRESSION, [])),
         }
@@ -542,7 +559,23 @@ impl Convert<'_, '_> {
         &mut self,
         source: &str,
         spread: bool,
+        data: Option<&Data<'_>>,
     ) -> Result<Option<Id>, Error> {
+        if let Some((program, comments)) = self.load(data) {
+            self.comments.extend(comments.iter().copied());
+            attach_comments(&mut self.store, program, &comments);
+            let expression = self
+                .store
+                .children(program, Key::BODY)
+                .first()
+                .copied()
+                .filter(|statement| self.store.is(*statement, Kind::EXPRESSION_STATEMENT))
+                .and_then(|statement| self.store.child(statement, Key::EXPRESSION));
+            return Ok(match expression {
+                Some(expression) if spread => self.spread_argument(expression),
+                expression => expression,
+            });
+        }
         let base = self.reserve(source, None);
         let (expression, comments) =
             read_expression(&mut self.store, source, base, spread)?;
@@ -572,13 +605,25 @@ impl Convert<'_, '_> {
         if !spread {
             return Ok(Some(expression));
         }
-        Ok(self
-            .store
+        Ok(self.spread_argument(expression))
+    }
+
+    // `{...a}` reads as the object `{...a}`, whose one spread holds the argument
+    fn spread_argument(&self, expression: Id) -> Option<Id> {
+        self.store
             .children(expression, Key::PROPERTIES)
             .first()
             .copied()
             .filter(|property| self.store.is(*property, Kind::SPREAD_ELEMENT))
-            .and_then(|property| self.store.child(property, Key::ARGUMENT)))
+            .and_then(|property| self.store.child(property, Key::ARGUMENT))
+    }
+
+    // hast-util-to-estree reads only `data.estree`; textlane's own `md.mdx` stores none,
+    // so a node without it is parsed from its `value`
+    fn load(&mut self, data: Option<&Data<'_>>) -> Option<(Id, Vec<Id>)> {
+        let loaded = load_estree(&mut self.store, data, self.next_base)?;
+        self.next_base += loaded.span + 4;
+        Some((loaded.program, loaded.comments))
     }
 
     fn reserve(&mut self, source: &str, position: Option<&Position<'_>>) -> usize {

@@ -23,6 +23,7 @@
     "import:html5lib": "node sources/html5lib.ts && vp fmt tests",
     "import:katex": "node sources/katex.ts && vp fmt tests",
     "import:math": "node sources/math.ts && vp fmt tests",
+    "import:estree": "node sources/estree.ts && vp fmt tests",
     "import:mdx": "node sources/mdx.ts && vp fmt tests",
     "import:micromark": "node sources/micromark.ts && vp fmt tests",
     "import:nl-parse": "node sources/nl-parse.ts && vp fmt tests",

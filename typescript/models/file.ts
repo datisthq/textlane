@@ -1,3 +1,5 @@
+import type { HostMessage } from "./vfile.ts"
+
 /** A unist node as JSON: what `parse` returns and `run` and `stringify` take. */
 export interface Node {
   type: string
@@ -11,7 +13,7 @@ export interface Point {
   offset: number | null
 }
 
-/** A diagnostic a plugin reported, as vfile-message has it. */
+/** A diagnostic as it crosses the addon: what a `HostMessage` is read from. */
 export interface Message {
   reason: string
   ruleId: string | null
@@ -22,7 +24,7 @@ export interface Message {
 /** What `process` gives back, as a vfile: the output, the messages and the file's data. */
 export interface VFile {
   value: string
-  messages: Message[]
+  messages: HostMessage[]
   data: Record<string, unknown>
   path?: string
 }

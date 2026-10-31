@@ -4,11 +4,11 @@ import { type HostEntry, mapPluggable } from "../actions/pluggable/map.ts"
 import { finishRun } from "../actions/run/finish.ts"
 import { isTransformer } from "../actions/transformer/check.ts"
 import type { Node as UnistNode } from "unist"
-import type { NativePipeline } from "./addon.ts"
+import type { NativeFile, NativePipeline } from "./addon.ts"
 import type { Compatible, Node, VFile } from "./file.ts"
 import type { Host } from "./host.ts"
 import type { Attacher, Parser, Pluggable, PluggableList, Preset } from "./plugin.ts"
-import { HostFile } from "./vfile.ts"
+import { HostFile, HostMessage } from "./vfile.ts"
 
 /**
  * unified's processor over the native pipeline; every call is the crate's, except that
@@ -121,23 +121,23 @@ export class Processor<Tree extends UnistNode = Node> {
         throw Object.assign(new Error(outcome.error.message), outcome.error)
       if (!outcome.file)
         throw new Error("process settled with neither a file nor an error")
-      return withPath(outcome.file, document)
+      return readResult(outcome.file, document)
     }
     const run = this.#native.startProcess(text, false, readPath(document))
     const file = new HostFile({ value: run.value() ?? text, path: readPath(document) })
     await finishRun({ run, hosts: this.#hosts, file, sync: false, call: "process" })
-    return withPath(mergeData(readFile(run.result()), file.data), document)
+    return readResult(readFile(run.result()), document, file)
   }
 
   /** Parse, run and compile a document; fails with `async-in-sync` on an asynchronous stage. */
   processSync(document: Compatible): VFile {
     const text = readValue(document) ?? ""
     if (!this.#attach())
-      return withPath(this.#native.processSync(text, readPath(document)), document)
+      return readResult(this.#native.processSync(text, readPath(document)), document)
     const run = this.#native.startProcess(text, true, readPath(document))
     const file = new HostFile({ value: run.value() ?? text, path: readPath(document) })
     void finishRun({ run, hosts: this.#hosts, file, sync: true, call: "process" })
-    return withPath(mergeData(readFile(run.result()), file.data), document)
+    return readResult(readFile(run.result()), document, file)
   }
 
   // Once only: `freeze` borrows the native pipeline mutably, which napi refuses while an
@@ -200,7 +200,7 @@ function readNode(text: string) {
 }
 
 function readFile(text: string) {
-  const file: VFile = JSON.parse(text)
+  const file: NativeFile = JSON.parse(text)
   return file
 }
 
@@ -212,12 +212,18 @@ function readPath(file: Compatible | undefined) {
   return typeof file === "string" ? undefined : file?.path
 }
 
-// Native stages' data first, then what JavaScript plugins stored over it
-function mergeData(result: VFile, data: Record<string, unknown>): VFile {
-  return { ...result, data: { ...result.data, ...data } }
-}
-
-function withPath(file: VFile, document: Compatible) {
+// The crate's messages start with the host file's, in order: the plugins' own objects
+// stay, so `fatal`, `url` and `note` survive; native data first, plugins' data over it
+function readResult(native: NativeFile, document: Compatible, host?: HostFile): VFile {
   const path = readPath(document)
+  const known = host?.messages ?? []
+  const reported = native.messages
+    .slice(known.length)
+    .map(message => HostMessage.fromMessage(message, path))
+  const file: VFile = {
+    value: native.value,
+    messages: [...known, ...reported],
+    data: { ...native.data, ...host?.data },
+  }
   return path === undefined ? file : { ...file, path }
 }

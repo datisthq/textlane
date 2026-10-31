@@ -21,6 +21,9 @@ mod actions {
     pub(crate) mod comment {
         pub(crate) mod attach;
     }
+    pub(crate) mod estree {
+        pub(crate) mod load;
+    }
     pub(crate) mod expression {
         pub(crate) mod parse;
         pub(crate) mod read;

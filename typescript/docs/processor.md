@@ -108,8 +108,10 @@ The sync forms fail with `async-in-sync` when a stage has asynchronous work to f
 `process` gives back a file shaped as a vfile:
 
 - `value` — the output text
-- `messages` — what plugins reported: each has a `reason`, a `ruleId`, the `source` plugin
-  and a `place` with the `start` and `end` points
+- `messages` — what plugins reported, as vfile-messages: each has a `reason`, a `ruleId`,
+  the `source` plugin, a `place` with the `start` and `end` points, its `line`, `column` and
+  `name` (`1:1-1:4`), `fatal` and the `file` path; a JavaScript plugin's own message comes
+  back as the object it made, `url` and `note` included
 - `data` — what plugins stored on the file
 
 ## Package exports
