@@ -202,9 +202,9 @@ function HeroCarousel(props: { slides: Slide[] }) {
       <figure className="overflow-hidden rounded-card border border-border bg-card shadow-xl">
         <div className="flex items-center gap-5 border-b border-border bg-muted/50 px-4 py-2">
           <span aria-hidden className="hidden gap-1.5 sm:flex">
-            <span className="size-2.5 rounded-full bg-border" />
-            <span className="size-2.5 rounded-full bg-border" />
-            <span className="size-2.5 rounded-full bg-border" />
+            <span className="size-2.5 rounded-full bg-red-400/60" />
+            <span className="size-2.5 rounded-full bg-yellow-400/60" />
+            <span className="size-2.5 rounded-full bg-green-400/60" />
           </span>
           <div
             role="tablist"
