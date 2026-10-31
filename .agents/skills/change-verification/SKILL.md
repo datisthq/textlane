@@ -31,6 +31,9 @@ gate belongs to the lefthook pre-push hook and CI; a commit runs the **commit ga
 | `vp test .scripts/-test/docs.unit.ts`                   | paths, scripts and skill tables in docs                                                                      |
 | `pnpm build:docs`                                       | the real build over every docs page                                                                          |
 
+From `typescript/`, name a file under `-test/` as `./-test/<name>.unit.ts`: without the `./`,
+vitest's parser reads `-test` as `-t est` and fails on a repeated `--testNamePattern`.
+
 The first clippy or test run after a dependency change compiles for a minute; later ones take
 seconds. The changed files come from `git diff --name-only main...` plus `git status --short`.
 

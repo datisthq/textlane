@@ -68,7 +68,10 @@ crate. The processor follows unified: `use(plugin | [plugin, options] | preset |
 `runSync(tree, file?)`, `stringify(tree)`, `process(text)` (Promise) and `processSync(text)`.
 Trees are plain unist JSON objects: after `use(md.parse())`, `html.parse()` or `nl.parse()`,
 `parse` is typed as `@types/mdast`, `hast` or `nlcst`'s `Root`, and `run` and `stringify` take
-any unist node, so no cast is needed between them and unified utilities. Without
+any unist node, so no cast is needed between them and unified utilities. Name node types
+through `import type { mdast, hast, nlcst, unist, estree } from "textlane"` rather than
+installing `@types/*`: `mdast.RootContent` there already includes MDX, directive, math,
+definition-list and TOML nodes. Without
 JavaScript plugins, `process` runs off the main thread: process many documents with
 `Promise.all` over one frozen processor, not one by one.
 

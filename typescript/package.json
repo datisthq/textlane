@@ -41,6 +41,7 @@
     "test:unit": "vp test"
   },
   "dependencies": {
+    "@types/estree-jsx": "^1.0.5",
     "@types/hast": "^3.0.5",
     "@types/mdast": "^4.0.4",
     "@types/nlcst": "^2.0.3",

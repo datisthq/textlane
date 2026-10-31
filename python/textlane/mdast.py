@@ -745,6 +745,18 @@ class MdxjsEsm(_MdxjsEsmRequired, total=False):
     position: _unist.Position
 
 
+class _TomlRequired(typing.TypedDict):
+    type: typing.Literal["toml"]
+    value: str
+
+
+class Toml(_TomlRequired, total=False):
+    """TOML frontmatter, as remark-frontmatter parses it."""
+
+    data: TomlData
+    position: _unist.Position
+
+
 class _MdxTextExpressionRequired(typing.TypedDict):
     type: typing.Literal["mdxTextExpression"]
     value: str
@@ -872,6 +884,14 @@ class MdxjsEsmData(typing.TypedDict, total=False):
     hProperties: _hast.Properties
 
 
+class TomlData(typing.TypedDict, total=False):
+    """Info associated with mdast TOML nodes by the ecosystem."""
+
+    hChildren: typing.List[_hast.ElementContent]
+    hName: str
+    hProperties: _hast.Properties
+
+
 class MdxTextExpressionData(typing.TypedDict, total=False):
     """Info associated with mdast MDX expression (text) nodes by the ecosystem."""
 
@@ -939,16 +959,16 @@ AlignType = typing.Optional[typing.Literal["center", "left", "right"]]
 ReferenceType = typing.Literal["shortcut", "collapsed", "full"]
 BlockContent = typing.Union[MdxFlowExpression, MdxJsxFlowElement, Blockquote, Code, Heading, Html, List, Paragraph, Table, ThematicBreak, DefListNode, DefListTermNode, DefListDescriptionNode, ContainerDirective, LeafDirective, Math]
 DefinitionContent = typing.Union[Definition, FootnoteDefinition]
-FrontmatterContent = typing.Union[Yaml, MdxjsEsm]
+FrontmatterContent = typing.Union[Yaml, MdxjsEsm, Toml]
 ListContent = ListItem
 PhrasingContent = typing.Union[Html, DefListTermNode, Text, MdxTextExpression, MdxJsxTextElement, Break, Delete, Emphasis, FootnoteReference, Image, ImageReference, InlineCode, Link, LinkReference, Strong, TextDirective, InlineMath]
-RootContent = typing.Union[MdxFlowExpression, MdxJsxFlowElement, Blockquote, Code, Heading, Html, List, Paragraph, Table, ThematicBreak, DefListNode, DefListTermNode, DefListDescriptionNode, ContainerDirective, LeafDirective, Math, Definition, FootnoteDefinition, Yaml, MdxjsEsm, ListItem, Text, MdxTextExpression, MdxJsxTextElement, Break, Delete, Emphasis, FootnoteReference, Image, ImageReference, InlineCode, Link, LinkReference, Strong, TextDirective, InlineMath, TableCell, TableRow]
+RootContent = typing.Union[MdxFlowExpression, MdxJsxFlowElement, Blockquote, Code, Heading, Html, List, Paragraph, Table, ThematicBreak, DefListNode, DefListTermNode, DefListDescriptionNode, ContainerDirective, LeafDirective, Math, Definition, FootnoteDefinition, Yaml, MdxjsEsm, Toml, ListItem, Text, MdxTextExpression, MdxJsxTextElement, Break, Delete, Emphasis, FootnoteReference, Image, ImageReference, InlineCode, Link, LinkReference, Strong, TextDirective, InlineMath, TableCell, TableRow]
 RowContent = TableCell
 TableContent = TableRow
 Content = RootContent
-Literals = typing.Union[MdxFlowExpression, Code, Html, Math, Yaml, MdxjsEsm, Text, MdxTextExpression, InlineCode, InlineMath]
-Nodes = typing.Union[MdxFlowExpression, MdxJsxFlowElement, Blockquote, Code, Heading, Html, List, Paragraph, Table, ThematicBreak, DefListNode, DefListTermNode, DefListDescriptionNode, ContainerDirective, LeafDirective, Math, Definition, FootnoteDefinition, Yaml, MdxjsEsm, ListItem, Text, MdxTextExpression, MdxJsxTextElement, Break, Delete, Emphasis, FootnoteReference, Image, ImageReference, InlineCode, Link, LinkReference, Strong, TextDirective, InlineMath, TableCell, TableRow, Root]
+Literals = typing.Union[MdxFlowExpression, Code, Html, Math, Yaml, MdxjsEsm, Toml, Text, MdxTextExpression, InlineCode, InlineMath]
+Nodes = typing.Union[MdxFlowExpression, MdxJsxFlowElement, Blockquote, Code, Heading, Html, List, Paragraph, Table, ThematicBreak, DefListNode, DefListTermNode, DefListDescriptionNode, ContainerDirective, LeafDirective, Math, Definition, FootnoteDefinition, Yaml, MdxjsEsm, Toml, ListItem, Text, MdxTextExpression, MdxJsxTextElement, Break, Delete, Emphasis, FootnoteReference, Image, ImageReference, InlineCode, Link, LinkReference, Strong, TextDirective, InlineMath, TableCell, TableRow, Root]
 Parents = typing.Union[MdxJsxFlowElement, Blockquote, Heading, List, Paragraph, Table, DefListNode, DefListTermNode, DefListDescriptionNode, ContainerDirective, LeafDirective, FootnoteDefinition, ListItem, MdxJsxTextElement, Delete, Emphasis, Link, LinkReference, Strong, TextDirective, TableCell, TableRow, Root]
-TopLevelContent = typing.Union[MdxFlowExpression, MdxJsxFlowElement, Blockquote, Code, Heading, Html, List, Paragraph, Table, ThematicBreak, DefListNode, DefListTermNode, DefListDescriptionNode, ContainerDirective, LeafDirective, Math, Definition, FootnoteDefinition, Yaml, MdxjsEsm]
+TopLevelContent = typing.Union[MdxFlowExpression, MdxJsxFlowElement, Blockquote, Code, Heading, Html, List, Paragraph, Table, ThematicBreak, DefListNode, DefListTermNode, DefListDescriptionNode, ContainerDirective, LeafDirective, Math, Definition, FootnoteDefinition, Yaml, MdxjsEsm, Toml]
 HTML = Html
 YAML = Yaml

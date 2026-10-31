@@ -42,11 +42,20 @@ One workspace, three registries, one version. Nothing here may change what the c
   nlcst), a phantom optional key `use()`'s conditional return reads, so `parse` is typed after
   `use(md.parse())` with no cast. A plugin lacking the key infers `unknown` and keeps the tree;
   making the key required breaks every generated `return { name }`. `@types/unist`, `mdast`,
-  `hast` and `nlcst` are runtime `dependencies` with caret ranges, so consumers dedupe them.
+  `hast`, `nlcst` and `estree-jsx` are runtime `dependencies` with caret ranges, so consumers
+  dedupe them; `index.ts` re-exports them as type namespaces from `generated/trees/<tree>.ts`.
+- The extension nodes reach npm without the utilities' code: `.scripts/render-extensions.ts`
+  copies the `declare module "mdast" | "hast"` blocks and node interfaces of
+  `mdast-util-{definition-list,directive,math,mdx-*,mdxjs-esm,to-hast}` (resolved through the
+  root's devDependencies) into `typescript/generated/extensions/`, plus a hand-written `toml`,
+  which no package declares. The copies must stay identical to the utilities': a drifted
+  property makes TS2717 for anyone installing both. A new syntax extension whose utility
+  augments mdast needs an `EXTENSIONS` entry, or its nodes are missing in both languages.
 - Python's trees mirror them: the same run renders `python/textlane/{unist,mdast,hast,nlcst,estree}.py`
   (`.scripts/render-trees.ts`) with the TypeScript checker over the `@types` that `typescript/`
-  resolves, plus the root's `mdast-util-{directive,math,definition-list,mdx}` for the nodes
-  their `declare module` adds and `@types/estree` for `data.estree`. Each interface becomes a
+  resolves plus those copies, served from memory, so module resolution needs their directory
+  faked too (`directoryExists`), or a clean run silently drops every extension node; each
+  namespace re-exports the copies' names the renderer filed under that tree. Each interface becomes a
   flattened `TypedDict` (optional keys in a `total=False` subclass, since 3.9 has no
   `NotRequired`), each alias a module-level `Union` at the end, cross-module names
   `TYPE_CHECKING`-only (mdast and hast name each other). Keys class syntax cannot hold

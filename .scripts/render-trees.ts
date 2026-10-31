@@ -1,23 +1,30 @@
 import { join } from "node:path"
 import ts from "typescript"
 
-// Renders the syntax trees `parse` returns as Python TypedDicts, from the same declarations
-// the npm package types them with: @types/unist, mdast, hast and nlcst as typescript/
-// depends on them, the mdast utilities that add the nodes textlane's syntax extensions make,
-// and estree for MDX's `data.estree`.
+// Renders the syntax trees `parse` returns as Python TypedDicts and as the npm package's tree
+// namespaces, from the same declarations: @types/unist, mdast, hast and nlcst as typescript/
+// depends on them, the copied extensions that add the nodes textlane's syntax extensions
+// make, and estree for MDX's `data.estree`.
 
 /** The Python modules written, each from the package of its name. */
 export const TREE_MODULES = ["unist", "mdast", "hast", "nlcst", "estree"] as const
 
 export type TreeModule = (typeof TREE_MODULES)[number]
 
-// Imported for their `declare module` additions to mdast's and hast's content
-const EXTENSIONS = [
-  "mdast-util-definition-list",
-  "mdast-util-directive",
-  "mdast-util-math",
-  "mdast-util-mdx",
-]
+/** Where the copied extensions live, relative to the repo root. */
+export const EXTENSIONS_DIR = "typescript/generated/extensions"
+
+/** Where the tree namespaces live, relative to the repo root. */
+export const TREES_DIR = "typescript/generated/trees"
+
+// The package each namespace re-exports: estree-jsx is estree with JSX's nodes added
+const PACKAGES: Record<TreeModule, string> = {
+  unist: "unist",
+  mdast: "mdast",
+  hast: "hast",
+  nlcst: "nlcst",
+  estree: "estree-jsx",
+}
 
 const OWNERS: [TreeModule, RegExp][] = [
   ["unist", /\/@types\/unist\//],
@@ -43,27 +50,50 @@ interface Declaration {
   symbol: ts.Symbol
 }
 
-/** Each tree module's Python source, keyed by module name. */
-export function renderTrees(props: { root: string; header: string }) {
+/**
+ * Each tree module's Python source and TypeScript namespace, keyed by module name, from the
+ * extension copies `renderExtensions` makes, which may not be written yet.
+ */
+export function renderTrees(props: {
+  root: string
+  header: string
+  extensions: Map<string, string>
+}) {
   // TypeScript asks for files with forward slashes, so a Windows `join` would never match
-  const entry = join(props.root, "typescript", "trees.generated.ts").replaceAll("\\", "/")
-  const source = [
-    ...TREE_MODULES.map(name => `export type * as ${name} from "${name}"`),
-    ...EXTENSIONS.map(name => `import type {} from "${name}"`),
-  ].join("\n")
+  const slash = (path: string) => path.replaceAll("\\", "/")
+  const entry = slash(join(props.root, "typescript", "trees.generated.ts"))
+  const virtual = new Map([[entry, ""]])
+  const imports: string[] = []
+  for (const [name, text] of props.extensions) {
+    virtual.set(slash(join(props.root, EXTENSIONS_DIR, `${name}.ts`)), text)
+    imports.push(`import type {} from "./generated/extensions/${name}.ts"`)
+  }
+  virtual.set(
+    entry,
+    [
+      ...TREE_MODULES.map(name => `export type * as ${name} from "${PACKAGES[name]}"`),
+      ...imports,
+    ].join("\n"),
+  )
   const options: ts.CompilerOptions = {
     strict: true,
     noEmit: true,
     module: ts.ModuleKind.NodeNext,
     moduleResolution: ts.ModuleResolutionKind.NodeNext,
     target: ts.ScriptTarget.ES2022,
+    allowImportingTsExtensions: true,
     types: [],
   }
   const host = ts.createCompilerHost(options)
   const readFile = host.readFile
-  host.readFile = name => (name === entry ? source : readFile(name))
+  host.readFile = name => virtual.get(name) ?? readFile(name)
   const fileExists = host.fileExists
-  host.fileExists = name => name === entry || fileExists(name)
+  host.fileExists = name => virtual.has(name) || fileExists(name)
+  // resolution asks for the directory first, which the copies' may not be on disk yet
+  const directoryExists = host.directoryExists?.bind(host)
+  const directory = slash(join(props.root, EXTENSIONS_DIR))
+  host.directoryExists = name =>
+    directory.startsWith(slash(name)) || (directoryExists?.(name) ?? true)
   const program = ts.createProgram([entry], options, host)
   const checker = program.getTypeChecker()
   const renderer = new Renderer(checker)
@@ -85,10 +115,16 @@ export function renderTrees(props: { root: string; header: string }) {
   }
   for (const module of TREE_MODULES) renderer.drain(module)
 
-  const files = new Map<TreeModule, string>()
-  for (const module of TREE_MODULES)
-    files.set(module, renderer.write(module, props.header))
-  return files
+  const python = new Map<TreeModule, string>()
+  const typescript = new Map<TreeModule, string>()
+  for (const module of TREE_MODULES) {
+    python.set(module, renderer.write(module, props.header))
+    typescript.set(
+      module,
+      writeNamespace(module, renderer.extensions(module), props.header),
+    )
+  }
+  return { python, typescript }
 }
 
 class Renderer {
@@ -131,6 +167,19 @@ class Renderer {
       this.#module = module
       this.#render(declaration)
     }
+  }
+
+  /** The extension copies' exported names this module holds, keyed by copy. */
+  extensions(module: TreeModule) {
+    const byFile = new Map<string, string[]>()
+    for (const declaration of this.#declarations.values()) {
+      if (declaration.module !== module) continue
+      const file = declaration.symbol.declarations?.[0]?.getSourceFile().fileName ?? ""
+      const copy = /\/generated\/extensions\/([^/]+)\.ts$/.exec(file)?.[1]
+      if (!copy) continue
+      byFile.set(copy, [...(byFile.get(copy) ?? []), declaration.name])
+    }
+    return byFile
   }
 
   write(module: TreeModule, header: string) {
@@ -316,6 +365,19 @@ function isOwn(symbol: ts.Symbol) {
   if (file.hasNoDefaultLib || /\/typescript\/lib\//.test(file.fileName)) return false
   if (ts.getCombinedModifierFlags(declaration) & ts.ModifierFlags.Export) return true
   return ts.isModuleBlock(declaration.parent)
+}
+
+function writeNamespace(
+  module: TreeModule,
+  extensions: Map<string, string[]>,
+  header: string,
+) {
+  const lines = [`// ${header}`, "", `export type * from "${PACKAGES[module]}"`]
+  for (const [copy, names] of [...extensions].sort(([a], [b]) => a.localeCompare(b)))
+    lines.push(
+      `export type { ${names.sort().join(", ")} } from "../extensions/${copy}.ts"`,
+    )
+  return `${lines.join("\n")}\n`
 }
 
 function writeClass(props: {

@@ -23,6 +23,14 @@ literals have a `value`. The parser types it: after `md.parse()`, `html.parse()`
 `@types/hast` or `@types/nlcst`, which textlane depends on, and `run` and `stringify` take any
 unist node, so trees pass to and from unified utilities without a cast.
 
+textlane exports those types as the `unist`, `mdast`, `hast`, `nlcst` and `estree` type
+namespaces, so `import type { mdast } from "textlane"` names `mdast.Heading` without adding
+`@types/mdast` yourself. They also hold the nodes textlane's syntax extensions make, added to
+the content unions as the extensions' unified utilities add them: `mdast.MdxJsxFlowElement`,
+`mdast.ContainerDirective`, `mdast.InlineMath`, `mdast.DefListNode`, `mdast.Toml` and their
+hast counterparts, `hast.Raw` and `data.hName`. The declarations are those utilities' own, so
+installing `mdast-util-mdx` or `mdast-util-directive` beside textlane does not conflict.
+
 ```js
 import { textlane } from "textlane"
 import * as md from "textlane/md"

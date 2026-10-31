@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process"
-import { readFileSync, writeFileSync } from "node:fs"
-import { join, relative, resolve } from "node:path"
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs"
+import { dirname, join, relative, resolve } from "node:path"
 import { parseArgs } from "node:util"
 import {
   listRefs,
@@ -14,13 +14,15 @@ import {
   writeTypedDict,
 } from "./render-options.ts"
 import type { DescribedPlugin, Language, Schema } from "./render-options.ts"
-import { renderTrees } from "./render-trees.ts"
+import { renderExtensions } from "./render-extensions.ts"
+import { EXTENSIONS_DIR, renderTrees, TREES_DIR } from "./render-trees.ts"
 
 // Writes each domain's module for both bindings from the crate's plugin list and option
 // schemas (`cargo run --example schema`): the TypeScript one under typescript/generated/, the
 // Python one under python/textlane/, and each plugin's options into the docs pages
-// `<language>/docs/plugins-<domain>.md`; then python/textlane/<tree>.py, the syntax trees as
-// the npm package's @types declare them. `--check` writes nothing and fails on drift.
+// `<language>/docs/plugins-<domain>.md`; then the syntax trees as the npm package's @types and
+// the copied extensions declare them: typescript/generated/{extensions,trees}/ and
+// python/textlane/<tree>.py. `--check` writes nothing and fails on drift.
 
 interface Domain {
   plugins: DescribedPlugin[]
@@ -55,8 +57,14 @@ for (const [name, domain] of Object.entries(domains)) {
   files.set(join(ROOT, "python", "textlane", `${name}.py`), writePython(name, domain))
 }
 
-for (const [module, text] of renderTrees({ root: ROOT, header: TREES_HEADER }))
+const extensions = renderExtensions({ root: ROOT, header: TREES_HEADER })
+for (const [name, text] of extensions)
+  files.set(join(ROOT, EXTENSIONS_DIR, `${name}.ts`), text)
+const trees = renderTrees({ root: ROOT, header: TREES_HEADER, extensions })
+for (const [module, text] of trees.python)
   files.set(join(ROOT, "python", "textlane", `${module}.py`), text)
+for (const [module, text] of trees.typescript)
+  files.set(join(ROOT, TREES_DIR, `${module}.ts`), text)
 
 const LANGUAGES: Record<Language, string> = {
   typescript: "typescript/docs",
@@ -103,7 +111,9 @@ for (const [path, text] of files) {
   } catch {}
   if (current === text) continue
   drifted.push(relative(ROOT, path))
-  if (!values.check) writeFileSync(path, text)
+  if (values.check) continue
+  mkdirSync(dirname(path), { recursive: true })
+  writeFileSync(path, text)
 }
 if (values.check && drifted.length > 0) {
   console.error(`out of date, run \`pnpm generate:bindings\`:\n  ${drifted.join("\n  ")}`)
@@ -116,7 +126,7 @@ function writeTypescript(domain: string, described: Domain) {
   const lines = [
     `// ${HEADER}`,
     "",
-    ...(tree ? [`import type { Root } from "${tree}"`] : []),
+    ...(tree ? [`import type { Root } from "./trees/${tree}.ts"`] : []),
     `import type { ${tree ? "Parser, " : ""}Plugin } from "../models/plugin.ts"`,
     "",
   ]

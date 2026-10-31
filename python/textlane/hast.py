@@ -134,18 +134,6 @@ class TextData(typing.TypedDict, total=False):
     """Info associated with hast texts by the ecosystem."""
 
 
-class _RawRequired(typing.TypedDict):
-    type: typing.Literal["raw"]
-    value: str
-
-
-class Raw(_RawRequired, total=False):
-    """Raw string of HTML embedded into HTML AST."""
-
-    data: RawData
-    position: _unist.Position
-
-
 class _MdxFlowExpressionHastRequired(typing.TypedDict):
     type: typing.Literal["mdxFlowExpression"]
     value: str
@@ -198,6 +186,18 @@ class MdxJsxFlowElementHast(_MdxJsxFlowElementHastRequired, total=False):
     position: _unist.Position
 
 
+class _RawRequired(typing.TypedDict):
+    type: typing.Literal["raw"]
+    value: str
+
+
+class Raw(_RawRequired, total=False):
+    """Raw string of HTML embedded into HTML AST."""
+
+    data: RawData
+    position: _unist.Position
+
+
 class _MdxjsEsmHastRequired(typing.TypedDict):
     type: typing.Literal["mdxjsEsm"]
     value: str
@@ -208,10 +208,6 @@ class MdxjsEsmHast(_MdxjsEsmHastRequired, total=False):
 
     data: MdxjsEsmHastData
     position: _unist.Position
-
-
-class RawData(typing.TypedDict, total=False):
-    """Info associated with hast raw nodes by the ecosystem."""
 
 
 class MdxFlowExpressionHastData(typing.TypedDict, total=False):
@@ -234,16 +230,20 @@ class MdxJsxFlowElementHastData(typing.TypedDict, total=False):
     """Info associated with hast MDX JSX element (flow) nodes by the ecosystem."""
 
 
+class RawData(typing.TypedDict, total=False):
+    """Info associated with hast raw nodes by the ecosystem."""
+
+
 class MdxjsEsmHastData(typing.TypedDict, total=False):
     """Info associated with hast MDX.js ESM nodes by the ecosystem."""
 
     estree: typing.Optional[_estree.Program]
 
 
-ElementContent = typing.Union[Comment, Element, Text, Raw, MdxFlowExpressionHast, MdxTextExpressionHast, MdxJsxTextElementHast, MdxJsxFlowElementHast]
+ElementContent = typing.Union[Comment, Element, Text, MdxFlowExpressionHast, MdxTextExpressionHast, MdxJsxTextElementHast, MdxJsxFlowElementHast, Raw]
 Properties = typing.Dict[str, typing.Optional[typing.Union[bool, str, float, typing.List[typing.Union[str, float]]]]]
-RootContent = typing.Union[Comment, Element, Text, Raw, MdxFlowExpressionHast, MdxTextExpressionHast, MdxJsxTextElementHast, MdxJsxFlowElementHast, MdxjsEsmHast, Doctype]
+RootContent = typing.Union[Comment, Element, Text, MdxFlowExpressionHast, MdxTextExpressionHast, MdxJsxTextElementHast, MdxJsxFlowElementHast, Raw, MdxjsEsmHast, Doctype]
 Content = RootContent
-Literals = typing.Union[Comment, Text, Raw, MdxFlowExpressionHast, MdxTextExpressionHast, MdxjsEsmHast]
-Nodes = typing.Union[Comment, Element, Text, Raw, MdxFlowExpressionHast, MdxTextExpressionHast, MdxJsxTextElementHast, MdxJsxFlowElementHast, MdxjsEsmHast, Doctype, Root]
+Literals = typing.Union[Comment, Text, MdxFlowExpressionHast, MdxTextExpressionHast, Raw, MdxjsEsmHast]
+Nodes = typing.Union[Comment, Element, Text, MdxFlowExpressionHast, MdxTextExpressionHast, MdxJsxTextElementHast, MdxJsxFlowElementHast, Raw, MdxjsEsmHast, Doctype, Root]
 Parents = typing.Union[Element, MdxJsxTextElementHast, MdxJsxFlowElementHast, Root]

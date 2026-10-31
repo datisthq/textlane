@@ -23,6 +23,16 @@ export type {
   Transformer,
 } from "./models/plugin.ts"
 export type { HostFile, HostMessage } from "./models/vfile.ts"
+/** The unist node, position and data types every syntax tree shares. */
+export type * as unist from "./generated/trees/unist.ts"
+/** The Markdown tree `md.parse` makes, with the nodes of textlane's syntax extensions. */
+export type * as mdast from "./generated/trees/mdast.ts"
+/** The HTML tree `html.parse` and `md.toHtml` make, with MDX's and raw nodes. */
+export type * as hast from "./generated/trees/hast.ts"
+/** The natural-language tree `nl.parse` makes. */
+export type * as nlcst from "./generated/trees/nlcst.ts"
+/** The JavaScript tree MDX's nodes carry in `data.estree`, JSX included. */
+export type * as estree from "./generated/trees/estree.ts"
 export { Processor } from "./models/processor.ts"
 
 const require = createRequire(import.meta.url)
