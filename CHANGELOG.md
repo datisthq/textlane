@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.4.0](https://github.com/datisthq/textlane/compare/v0.3.0...v0.4.0) (2026-10-31)
+
+
+### Features
+
+* ship musl Linux addons and musllinux wheels ([28c17f0](https://github.com/datisthq/textlane/commit/28c17f0c17652031daff2e4173b61ef7549c679f))
+
+
+### Bug Fixes
+
+* compile MDX nodes from data.estree and return vfile-messages from process ([0a1d937](https://github.com/datisthq/textlane/commit/0a1d937d129249e0373808e86685eecb702c8b2f))
+* **mdx:** saturate the offsets a plugin's estree claims ([4bcc0de](https://github.com/datisthq/textlane/commit/4bcc0de40973e0e1f6e7d0ca496b587bb689be75))
+* move large and deeply nested trees across the Node and Python bindings ([3e891a8](https://github.com/datisthq/textlane/commit/3e891a8627855184ae5af5ed25ea7c446cfc9ecc))
+
+
+### Performance Improvements
+
+* **typescript:** hand ASCII HTML to V8 as Latin-1, which it copies without decoding ([8546460](https://github.com/datisthq/textlane/commit/8546460ef7fddd272d39c7956779d08a8f77854f))
+
 ## [0.3.0](https://github.com/datisthq/textlane/compare/v0.2.1...v0.3.0) (2026-10-31)
 
 
