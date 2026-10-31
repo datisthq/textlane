@@ -10,7 +10,7 @@ order: 5
 
 ## Markdown to HTML, as GitHub renders it
 
-GFM syntax, ids on headings and colored code:
+GFM syntax with its alerts, headings that link to themselves and colored code:
 
 ````js
 import { textlane } from "textlane"
@@ -19,14 +19,16 @@ import * as md from "textlane/md"
 
 const file = textlane()
   .use(md.parse())
-  .use(md.gfm())
+  .use(md.gfm({ alerts: true }))
   .use(md.toHtml())
-  .use(html.slug())
+  .use(html.slug({ autolink: { behavior: "wrap" } }))
   .use(html.highlight({ theme: "github-dark" }))
   .use(html.stringify())
-  .processSync("## Install\n\n```sh\nnpm install textlane\n```")
+  .processSync("## Install\n\n> [!TIP]\n> Use pnpm.\n\n```sh\nnpm install textlane\n```")
 file.value
-// <h2 id="install">Install</h2>
+// <h2 id="install"><a href="#install">Install</a></h2>
+// <div class="markdown-alert markdown-alert-tip" dir="auto">
+// …
 // <pre class="shiki github-dark" style="background-color:#24292e;color:#e1e4e8" …
 // …
 ````

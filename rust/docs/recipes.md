@@ -10,22 +10,30 @@ order: 5
 
 ## Markdown to HTML, as GitHub renders it
 
-GFM syntax, ids on headings and colored code:
+GFM syntax with its alerts, headings that link to themselves and colored code:
 
 ````rust
 use textlane::{Processor, html, md};
 
 let output = Processor::new()
     .with(md::Parse::default())
-    .with(md::Gfm::default())
+    .with(md::Gfm { alerts: Some(md::Alerts::Enabled(true)), ..Default::default() })
     .with(md::ToHtml::default())
-    .with(html::Slug::default())
+    .with(html::Slug {
+        autolink: Some(html::Autolink::Options(Box::new(html::AutolinkOptions {
+            behavior: html::AutolinkBehavior::Wrap,
+            ..Default::default()
+        }))),
+        ..Default::default()
+    })
     .with(html::Highlight { theme: Some("github-dark".into()), ..Default::default() })
     .with(html::Stringify::default())
     .freeze()?
-    .process("## Install\n\n```sh\nnpm install textlane\n```")?;
+    .process("## Install\n\n> [!TIP]\n> Use pnpm.\n\n```sh\nnpm install textlane\n```")?;
 output.value
-// <h2 id="install">Install</h2>
+// <h2 id="install"><a href="#install">Install</a></h2>
+// <div class="markdown-alert markdown-alert-tip" dir="auto">
+// …
 // <pre class="shiki github-dark" style="background-color:#24292e;color:#e1e4e8" …
 // …
 ````

@@ -244,6 +244,52 @@
     <p><strong>Rejected.</strong> A general extension registry before any user of it.</p>
   </dd>
   <dt>
+    <htmlpress-badge type="success">decided</htmlpress-badge> A small upstream plugin
+    becomes an option of the textlane plugin closest to it
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> One plugin with an option reads better than a pair of names:
+      remark-breaks is <code>md.toHtml({ breaks })</code>, rehype-autolink-headings
+      <code>html.slug({ autolink })</code>, rehype-minify-whitespace
+      <code>html.format({ minify })</code>, remark-github-blockquote-alert
+      <code>md.gfm({ alerts })</code> and remark-emoji <code>md.gemoji</code>'s options. A
+      syntax extension or a stage of its own (<code>md.cjkFriendly</code>,
+      <code>md.smartypants</code>) stays a plugin.
+    </p>
+    <p><strong>Rejected.</strong> One textlane plugin per upstream package.</p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge>
+    <code>md.smartypants</code> reaches <code>nl.smartypants</code>'s engine through a
+    <code>Typographer</code> in <code>core</code>, whose option types move there
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> A domain crate never depends on another, and a transform takes
+      one kind of tree, so the md stage asks core's slot as the bridges ask for the
+      natural-language parser; <code>Backticks</code>, <code>Dashes</code>,
+      <code>Ellipses</code> and <code>QuoteCharacters</code> live in core, re-exported by
+      <code>nl</code>, so core gains <code>serde</code>.
+    </p>
+    <p>
+      <strong>Rejected.</strong> <code>nl.smartypants</code> taking mdast too; the md
+      plugin living in the <code>nl</code> crate; the option types copied into md.
+    </p>
+  </dd>
+  <dt>
+    <htmlpress-badge type="warning">my call</htmlpress-badge> <code>md.gemoji</code>'s
+    remark-emoji options keep gemoji's names
+  </dt>
+  <dd>
+    <p>
+      <strong>Why.</strong> One name table for <code>md.gemoji</code>, with or without the
+      options; node-emoji names a few emoji differently, and none of remark-emoji's own
+      cases meet one.
+    </p>
+    <p><strong>Rejected.</strong> A second table from node-emoji behind the options.</p>
+  </dd>
+  <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge>
     <code>html.toMarkdown</code> bounds what tables can add: <code>colspan</code> at
     1,000, <code>rowspan</code> at 65,534, and at most 2<sup>19</sup> empty cells a table
@@ -1036,6 +1082,18 @@
 
 <h2>Open</h2>
 <dl>
+  <dt>
+    <htmlpress-badge type="danger">open</htmlpress-badge> <code>md.stringify</code> does
+    not escape emphasis the CJK-friendly way
+  </dt>
+  <dd>
+    <p>
+      <code>md.cjkFriendly</code> parses as remark-cjk-friendly does, but
+      mdast-util-to-markdown-cjk-friendly's search for the escapes that make emphasis
+      parse back is not ported, so Markdown written from such a tree may parse
+      differently; its 89 cases stay pending.
+    </p>
+  </dd>
   <dt>
     <htmlpress-badge type="danger">open</htmlpress-badge> giallo exposes no token scopes,
     so <code>html.highlight</code> cannot keep same-colored tokens apart as Shiki does

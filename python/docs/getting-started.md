@@ -45,7 +45,8 @@ coroutine form.
 ## Adding syntax
 
 Syntax extensions sit beside the parser. Add `md.gfm` for tables, task lists, strikethrough
-and autolinks, and `md.frontmatter` to read a YAML block at the top:
+and autolinks, `md.cjk_friendly` for emphasis next to Chinese, Japanese and Korean text, and
+`md.frontmatter` to read a YAML block at the top:
 
 ```python
 from textlane import html, md, textlane

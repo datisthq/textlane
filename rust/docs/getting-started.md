@@ -48,7 +48,8 @@ returns, and the frozen processor then handles any number of documents.
 ## Adding syntax
 
 Syntax extensions sit beside the parser. Add `md::Gfm` for tables, task lists, strikethrough
-and autolinks, and `md::Frontmatter` to read a YAML block at the top:
+and autolinks, `md::CjkFriendly` for emphasis next to Chinese, Japanese and Korean text, and
+`md::Frontmatter` to read a YAML block at the top:
 
 ```rust
 use textlane::{Processor, html, md};
