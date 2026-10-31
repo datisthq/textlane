@@ -236,8 +236,8 @@ mod plugins {
 pub use models::options::{
     AttributeDefinition, Classes, ColorReplacement, ConfiguredTransformer, ExternalLinks,
     ExtractToc, Format, Highlight, HighlightTransformer, Indent, InlineCode, Katex,
-    KatexOutput, KatexStrict, KatexStrictMode, Parse, Primitive, Raw, Sanitize, Slug,
-    Stringify, ToMarkdown, Tokens, TransformerName,
+    KatexOutput, KatexStrict, KatexStrictMode, Minify, MinifyOptions, Parse, Primitive,
+    Raw, Sanitize, Slug, Stringify, ToMarkdown, Tokens, TransformerName,
 };
 
 // actions

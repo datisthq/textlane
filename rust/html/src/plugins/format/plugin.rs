@@ -1,6 +1,7 @@
 use textlane_core::{Allocator, Attach, Error, File, Plugin, Transform, Tree, TreeKind};
 
 use crate::actions::hast::format::format_hast;
+use crate::actions::hast::minify::minify_hast;
 use crate::models::options::Format;
 
 impl Plugin for Format {
@@ -26,7 +27,13 @@ impl Transform for Format {
         alloc: &'a Allocator,
     ) -> Result<Tree<'a>, Error> {
         match tree {
-            Tree::Hast(node) => Ok(Tree::Hast(format_hast(node, self, alloc))),
+            Tree::Hast(mut node) => match self.minify_newlines() {
+                Some(newlines) => {
+                    minify_hast(&mut node, newlines, alloc);
+                    Ok(Tree::Hast(node))
+                }
+                None => Ok(Tree::Hast(format_hast(node, self, alloc))),
+            },
             _ => Err(Error::new("invalid-stage", "`html.format` takes hast")),
         }
     }

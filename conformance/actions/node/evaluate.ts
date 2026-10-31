@@ -91,8 +91,12 @@ function evaluateCall(
   const builder =
     node.callee.type === "Identifier" ? builders[node.callee.name] : undefined
   if (typeof builder === "function") {
+    // `h(undefined, …)` is how hastscript builds a root: a written `undefined` is a value
+    const written = (item: AnyNode) =>
+      item.type === "Identifier" && item.name === "undefined"
     const args = node.arguments.map(item => next(item))
-    if (args.includes(undefined)) return undefined
+    if (node.arguments.some((item, index) => args[index] === undefined && !written(item)))
+      return undefined
     // A builder's own node objects round-trip through JSON into plain data
     return JSON.parse(JSON.stringify(Reflect.apply(builder, undefined, args)))
   }

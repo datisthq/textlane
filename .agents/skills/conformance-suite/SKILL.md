@@ -91,6 +91,10 @@ a test's `comment` only where it means something different.
   test files statically with acorn.
 - Trees a test builds with `h()` / `s()` are evaluated by calling the pinned hastscript on
   statically evaluated arguments (`evaluateNode`'s `builders`); upstream test code never runs.
+  A written `undefined` argument passes through, as `h(undefined, …)` builds a root. A test
+  that mutates its tree (`minifyWhitespace(tree)`, then `assert.deepEqual(tree, …)`) is read
+  from the call statement and its expectation rendered through the pinned package
+  (`writeMinifyCases`).
 - A TypeScript test file is read through Node's `stripTypeScriptTypes` before acorn parses it.
 - An importer skips, and counts, what a pipeline case cannot express: options with no textlane
   equivalent yet (micromark's construct switches, `defaultLineEnding`), input that is not

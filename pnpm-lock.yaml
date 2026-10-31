@@ -232,6 +232,9 @@ importers:
       rehype-katex:
         specifier: 7.0.1
         version: 7.0.1
+      rehype-minify-whitespace:
+        specifier: 6.0.2
+        version: 6.0.2
       rehype-parse:
         specifier: 9.0.1
         version: 9.0.1

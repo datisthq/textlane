@@ -29,10 +29,21 @@ export interface FormatOptions {
   indent?: Indent | null
   /** Indent the first level, usually `<html>`'s `head` and `body`; `true` when left out. */
   indentInitial?: boolean | null
+  /** Only collapse whitespace, as rehype-minify-whitespace does, adding no line endings or indentation; `{ newlines: true }` collapses a run holding a line ending to it. */
+  minify?: Minify | null
 }
 
 /** One level of indentation. */
 export type Indent = number | string
+
+/** `html.format`'s `minify`: on, or on with rehype-minify-whitespace's options. */
+export type Minify = boolean | MinifyOptions
+
+/** rehype-minify-whitespace's options. */
+export interface MinifyOptions {
+  /** Collapse a run of whitespace holding a line ending to a line ending, not a space. @default false */
+  newlines?: boolean
+}
 
 /** `html.sanitize`: keep only what a schema allows; options: hast-util-sanitize's schema, where a field left out keeps the default schema's, which is GitHub's. */
 export interface SanitizeOptions {

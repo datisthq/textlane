@@ -814,6 +814,98 @@
         }
       },
       {
+        "description": "should support camelcased SVG elements",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "svg",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "circle",
+                  "properties": {},
+                  "children": []
+                },
+                {
+                  "type": "element",
+                  "tagName": "rect",
+                  "properties": {},
+                  "children": []
+                },
+                {
+                  "type": "element",
+                  "tagName": "linearGradient",
+                  "properties": {},
+                  "children": []
+                },
+                {
+                  "type": "element",
+                  "tagName": "path",
+                  "properties": {},
+                  "children": []
+                },
+                {
+                  "type": "element",
+                  "tagName": "g",
+                  "properties": {},
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "svg",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "circle",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "rect",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "linearGradient",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "path",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "g",
+                    "properties": {},
+                    "children": []
+                  }
+                ]
+              }
+            ],
+            "data": {
+              "quirksMode": false
+            }
+          }
+        }
+      },
+      {
         "description": "should discard broken HTML when a proper element node is found",
         "tree": {
           "type": "root",

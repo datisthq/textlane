@@ -92,21 +92,38 @@ file["value"]
 # </ul>
 ```
 
+`"minify": True` only collapses whitespace, as rehype-minify-whitespace does, adding no line endings or indentation; `"minify": {"newlines": True}` keeps a line ending where a collapsed run held one.
+
 <!-- generated:options html.format -->
 
 Follows [rehype-format](https://www.npmjs.com/package/rehype-format).
 
-| Option          | Type               | Default | Description                                                                                |
-| --------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------ |
-| `blanks`        | `List[str]`        | `[]`    | Tag names of elements to put a blank line between, when both are one.                      |
-| `indent`        | `Optional[Indent]` |         | One level of indentation: a number of spaces or the text itself; two spaces when left out. |
-| `indentInitial` | `Optional[bool]`   | `None`  | Indent the first level, usually `<html>`'s `head` and `body`; `true` when left out.        |
+| Option          | Type               | Default | Description                                                                                                                                                          |
+| --------------- | ------------------ | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `blanks`        | `List[str]`        | `[]`    | Tag names of elements to put a blank line between, when both are one.                                                                                                |
+| `indent`        | `Optional[Indent]` |         | One level of indentation: a number of spaces or the text itself; two spaces when left out.                                                                           |
+| `indentInitial` | `Optional[bool]`   | `None`  | Indent the first level, usually `<html>`'s `head` and `body`; `true` when left out.                                                                                  |
+| `minify`        | `Optional[Minify]` |         | Only collapse whitespace, as rehype-minify-whitespace does, adding no line endings or indentation; `{ newlines: true }` collapses a run holding a line ending to it. |
 
 **`Indent`**
 
 One level of indentation.
 
 Takes `Union[int, str]`.
+
+**`Minify`**
+
+`html.format`'s `minify`: on, or on with rehype-minify-whitespace's options.
+
+Takes `Union[bool, MinifyOptions]`.
+
+**`MinifyOptions`**
+
+rehype-minify-whitespace's options.
+
+| Option     | Type   | Default | Description                                                                       |
+| ---------- | ------ | ------- | --------------------------------------------------------------------------------- |
+| `newlines` | `bool` | `False` | Collapse a run of whitespace holding a line ending to a line ending, not a space. |
 
 <!-- /generated -->
 

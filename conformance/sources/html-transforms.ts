@@ -6,6 +6,7 @@ import { ancestor } from "acorn-walk"
 import { raw } from "hast-util-raw"
 import { defaultSchema, sanitize } from "hast-util-sanitize"
 import { h, s } from "hastscript"
+import rehypeMinifyWhitespace from "rehype-minify-whitespace"
 import rehypeParse from "rehype-parse"
 import rehypeSanitize from "rehype-sanitize"
 import rehypeSlug from "rehype-slug"
@@ -36,6 +37,10 @@ const REHYPE_SANITIZE = {
 const SLUG = {
   url: "https://github.com/rehypejs/rehype-slug",
   commit: "f90fc8f4b469b54b26c13ce4b754bd7e6da3e351",
+}
+const MINIFY = {
+  url: "https://github.com/rehypejs/rehype-minify",
+  commit: "79383ba769010ff52c547c57850d2dd3ecb815a9",
 }
 const SLUGGER = {
   url: "https://github.com/Flet/github-slugger",
@@ -100,6 +105,7 @@ function importTransforms() {
       ),
   })
   writeSluggerCases()
+  writeMinifyCases()
   console.log(`html transforms: ${written} cases`)
   for (const [reason, count] of skipped) console.log(`  skipped ${count}: ${reason}`)
 }
@@ -250,6 +256,56 @@ function writeChainCases(props: {
   writeGroups({
     path: join(OUTPUT, `${props.construct}.json`),
     repository: props.repository.url,
+    groups: [...groups.values()],
+  })
+}
+
+// hast-util-minify-whitespace's `minifyWhitespace(tree, options?)` minifies `tree` in place,
+// then asserts it; each tree renders through the pinned rehype-minify-whitespace, which
+// `html.format({ minify })` stands in for
+function writeMinifyCases() {
+  const path = "packages/hast-util-minify-whitespace/test.js"
+  const program = readProgram(MINIFY, path)
+  const groups = new Map<string, Group>()
+  ancestor(program, {
+    CallExpression(node, _state, ancestors) {
+      if (!isCallTo(node, "minifyWhitespace")) return
+      if (ancestors.at(-2)?.type !== "ExpressionStatement") return
+      const constants = resolveConstants({ program, ancestors })
+      const tree = evaluateNode(node.arguments[0], constants, 0, BUILDERS)
+      const options = node.arguments[1]
+        ? evaluateNode(node.arguments[1], constants, 0, BUILDERS)
+        : {}
+      if (!isObject(tree) || !isObject(options))
+        return countSkip("minify tree or options not statically evaluable")
+      const render = (input: never, settings: never) =>
+        unified().use(rehypeMinifyWhitespace, settings).runSync(input)
+      const expected = JSON.parse(
+        JSON.stringify(
+          Reflect.apply(render, undefined, [structuredClone(tree), options]),
+        ),
+      )
+      const newlines = "newlines" in options && options.newlines === true
+      const minify = newlines ? { newlines: true } : true
+      const key = JSON.stringify(minify)
+      const group = groups.get(key) ?? {
+        description: `hast-util-minify-whitespace${minify === true ? "" : ` ${key}`}`,
+        source: source(MINIFY, path),
+        pipeline: [["html.format", { minify }]],
+        tests: [],
+      }
+      group.tests.push({
+        description: findTestTitle(ancestors, constants) ?? "minifyWhitespace",
+        tree,
+        expected: { tree: expected },
+      })
+      groups.set(key, group)
+      written += 1
+    },
+  })
+  writeGroups({
+    path: join(OUTPUT, "format.json"),
+    repository: MINIFY.url,
     groups: [...groups.values()],
   })
 }

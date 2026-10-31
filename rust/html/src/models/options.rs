@@ -409,6 +409,38 @@ pub struct Format {
     pub indent: Option<Indent>,
     /// Indent the first level, usually `<html>`'s `head` and `body`; `true` when left out.
     pub indent_initial: Option<bool>,
+    /// Only collapse whitespace, as rehype-minify-whitespace does, adding no line endings or
+    /// indentation; `{ newlines: true }` collapses a run holding a line ending to it.
+    pub minify: Option<Minify>,
+}
+
+/// `html.format`'s `minify`: on, or on with rehype-minify-whitespace's options.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(untagged)]
+pub enum Minify {
+    Enabled(bool),
+    Options(MinifyOptions),
+}
+
+/// rehype-minify-whitespace's options.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+pub struct MinifyOptions {
+    /// Collapse a run of whitespace holding a line ending to a line ending, not a space.
+    pub newlines: bool,
+}
+
+impl Format {
+    /// Whether to only minify, and with `newlines`.
+    pub(crate) fn minify_newlines(&self) -> Option<bool> {
+        match &self.minify {
+            Some(Minify::Enabled(true)) => Some(false),
+            Some(Minify::Options(options)) => Some(options.newlines),
+            Some(Minify::Enabled(false)) | None => None,
+        }
+    }
 }
 
 /// One level of indentation.

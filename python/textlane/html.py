@@ -57,6 +57,16 @@ class RawOptions(TypedDict, total=False):
 Indent = Union[int, str]
 
 
+# rehype-minify-whitespace's options.
+class MinifyOptions(TypedDict, total=False):
+    # Collapse a run of whitespace holding a line ending to a line ending, not a space.
+    newlines: bool
+
+
+# `html.format`'s `minify`: on, or on with rehype-minify-whitespace's options.
+Minify = Union[bool, MinifyOptions]
+
+
 # `html.format`: indent and collapse whitespace for readable HTML; options named as
 # hast-util-format names them.
 class FormatOptions(TypedDict, total=False):
@@ -67,6 +77,9 @@ class FormatOptions(TypedDict, total=False):
     indent: Optional[Indent]
     # Indent the first level, usually `<html>`'s `head` and `body`; `true` when left out.
     indentInitial: Optional[bool]
+    # Only collapse whitespace, as rehype-minify-whitespace does, adding no line endings or
+    # indentation; `{ newlines: true }` collapses a run holding a line ending to it.
+    minify: Optional[Minify]
 
 
 # A primitive property value.

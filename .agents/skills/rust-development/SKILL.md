@@ -238,7 +238,8 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
 - `html.format` ports hast-util-format 1.1.0 (`actions/hast/format.rs`): `minify_hast` with
   `newlines`, then a preorder walk whose frames hold each children vector taken out of its
   parent and put back once walked. Output grows with depth times indent by nature, so deep
-  stress inputs use `indent: ""`. `html.parse`'s `verbose` builds `data.position` in
+  stress inputs use `indent: ""`. Its `minify` is rehype-minify-whitespace: `minify_hast`
+  alone, no walk, its cases hast-util-minify-whitespace's trees. `html.parse`'s `verbose` builds `data.position` in
   `convert_dom` from the start tag's span and the attribute spans inside it; attributes the
   tree builder adopted from a later tag have none, as in parse5
 - `mdx.compile` is a `Compiler` on hast with extension `js`, porting what @mdx-js/mdx 3.1.1

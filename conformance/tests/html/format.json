@@ -206,5 +206,4191 @@
         }
       }
     ]
+  },
+  {
+    "description": "hast-util-minify-whitespace",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-minify",
+      "commit": "79383ba769010ff52c547c57850d2dd3ecb815a9",
+      "path": "packages/hast-util-minify-whitespace/test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.format",
+        {
+          "minify": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should work",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "strong",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "foo"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "em",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "bar"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "meta",
+                  "properties": {
+                    "itemProp": true
+                  },
+                  "children": []
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "a",
+                  "properties": {
+                    "href": "example.com"
+                  },
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": " baz"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "em",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": " qux"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "strong",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "foo"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": " "
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "em",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "bar"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "meta",
+                    "properties": {
+                      "itemProp": true
+                    },
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "a",
+                    "properties": {
+                      "href": "example.com"
+                    },
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "baz"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": " "
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "em",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "qux"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should work on `head`",
+        "tree": {
+          "type": "element",
+          "tagName": "head",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "meta",
+              "properties": {
+                "itemProp": true
+              },
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "noscript",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "link",
+                  "properties": {
+                    "rel": ["stylesheet"],
+                    "href": "index.css"
+                  },
+                  "children": []
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "head",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "meta",
+                "properties": {
+                  "itemProp": true
+                },
+                "children": []
+              },
+              {
+                "type": "element",
+                "tagName": "noscript",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "link",
+                    "properties": {
+                      "rel": ["stylesheet"],
+                      "href": "index.css"
+                    },
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should trim whitespace around `<br>` elements",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "  a  "
+            },
+            {
+              "type": "element",
+              "tagName": "br",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": " c "
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "a"
+              },
+              {
+                "type": "element",
+                "tagName": "br",
+                "properties": {},
+                "children": []
+              },
+              {
+                "type": "text",
+                "value": "c"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should trim whitespace in `<form>`s",
+        "tree": {
+          "type": "element",
+          "tagName": "form",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "input",
+              "properties": {
+                "list": "a"
+              },
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "datalist",
+              "properties": {
+                "id": "a"
+              },
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "option",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "b"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "option",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "c"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "form",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "input",
+                "properties": {
+                  "list": "a"
+                },
+                "children": []
+              },
+              {
+                "type": "element",
+                "tagName": "datalist",
+                "properties": {
+                  "id": "a"
+                },
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "option",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "b"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "option",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "c"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should trim whitespace around `<object>` elements",
+        "tree": {
+          "type": "element",
+          "tagName": "section",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "  a  "
+            },
+            {
+              "type": "element",
+              "tagName": "object",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  b  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "p",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "  c  "
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "  d  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  e  "
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "section",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "a "
+              },
+              {
+                "type": "element",
+                "tagName": "object",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "b"
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "p",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "c"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": "d "
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": " e"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should work between phrasing elements (1)",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "strong",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "foo "
+                    }
+                  ]
+                },
+                {
+                  "type": "element",
+                  "tagName": "em",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "bar "
+                    }
+                  ]
+                },
+                {
+                  "type": "element",
+                  "tagName": "a",
+                  "properties": {
+                    "href": "example.com"
+                  },
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": " baz "
+                    }
+                  ]
+                },
+                {
+                  "type": "element",
+                  "tagName": "em",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": " qux "
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "strong",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "foo "
+                      }
+                    ]
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "em",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "bar "
+                      }
+                    ]
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "a",
+                    "properties": {
+                      "href": "example.com"
+                    },
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "baz "
+                      }
+                    ]
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "em",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "qux"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should work between phrasing elements (2)",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": " "
+                },
+                {
+                  "type": "element",
+                  "tagName": "span",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": " "
+                    },
+                    {
+                      "type": "element",
+                      "tagName": "strong",
+                      "properties": {},
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": " "
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "value": " "
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": " "
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "span",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "strong",
+                        "properties": {},
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should work between phrasing elements (3)",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "strong",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "element",
+              "tagName": "span",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "span",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": " "
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "b"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "strong",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a"
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "span",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "span",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": " "
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": "b"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should drop w/o content in flow elements (1)",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "  "
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should drop w/o content in flow elements (2)",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "\n "
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": []
+          }
+        }
+      },
+      {
+        "description": "should drop around flow elements (1)",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "  "
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": []
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": []
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should drop around flow elements (2)",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "div",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "text",
+                  "value": " foo "
+                },
+                {
+                  "type": "text",
+                  "value": " \n"
+                },
+                {
+                  "type": "text",
+                  "value": " bar "
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "div",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "foo "
+                  },
+                  {
+                    "type": "text",
+                    "value": "bar"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should drop deep at the end of phrasing (1)",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "i",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "span",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "foo "
+                    }
+                  ]
+                },
+                {
+                  "type": "element",
+                  "tagName": "a",
+                  "properties": {
+                    "href": "example.com"
+                  },
+                  "children": [
+                    {
+                      "type": "element",
+                      "tagName": "span",
+                      "properties": {},
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "bar "
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "i",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "span",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "foo "
+                      }
+                    ]
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "a",
+                    "properties": {
+                      "href": "example.com"
+                    },
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "span",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "bar"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should drop deep at the end of phrasing (2)",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "span",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "foo "
+                },
+                {
+                  "type": "element",
+                  "tagName": "a",
+                  "properties": {
+                    "href": "example.com"
+                  },
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "bar"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": " baz"
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "span",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "foo "
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "a",
+                    "properties": {
+                      "href": "example.com"
+                    },
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "bar"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": " baz"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should drop deep at the end of phrasing (2)",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "element",
+              "tagName": "i",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "span",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "foo "
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "element",
+              "tagName": "i",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "a",
+                  "properties": {
+                    "href": "example.com"
+                  },
+                  "children": [
+                    {
+                      "type": "element",
+                      "tagName": "span",
+                      "properties": {},
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "bar "
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": []
+              },
+              {
+                "type": "element",
+                "tagName": "i",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "span",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "foo "
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "i",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "a",
+                    "properties": {
+                      "href": "example.com"
+                    },
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "span",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "bar"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should drop a ton of complex whitespace",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "doctype"
+            },
+            {
+              "type": "text",
+              "value": "\n"
+            },
+            {
+              "type": "element",
+              "tagName": "html",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "\n  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "head",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "\n    "
+                    },
+                    {
+                      "type": "element",
+                      "tagName": "meta",
+                      "properties": {
+                        "charSet": "utf8"
+                      },
+                      "children": []
+                    },
+                    {
+                      "type": "text",
+                      "value": "\n    "
+                    },
+                    {
+                      "type": "element",
+                      "tagName": "title",
+                      "properties": {},
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": " a "
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "value": "\n    "
+                    },
+                    {
+                      "type": "element",
+                      "tagName": "link",
+                      "properties": {
+                        "rel": ["stylesheet"]
+                      },
+                      "children": []
+                    },
+                    {
+                      "type": "text",
+                      "value": "\n  "
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "\n  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "body",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "\n    "
+                    },
+                    {
+                      "type": "element",
+                      "tagName": "h1",
+                      "properties": {},
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "\n      bar  bar\n    "
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "value": "\n    "
+                    },
+                    {
+                      "type": "element",
+                      "tagName": "p",
+                      "properties": {},
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "\n      "
+                        },
+                        {
+                          "type": "element",
+                          "tagName": "strong",
+                          "properties": {},
+                          "children": [
+                            {
+                              "type": "text",
+                              "value": "\n        foo\n      "
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "value": "\n      bar\n      "
+                        },
+                        {
+                          "type": "element",
+                          "tagName": "em",
+                          "properties": {},
+                          "children": [
+                            {
+                              "type": "text",
+                              "value": "\n        baz\n      "
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "value": "\n    "
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "value": "\n  "
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "doctype"
+              },
+              {
+                "type": "element",
+                "tagName": "html",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "head",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "meta",
+                        "properties": {
+                          "charSet": "utf8"
+                        },
+                        "children": []
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "title",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "a"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "link",
+                        "properties": {
+                          "rel": ["stylesheet"]
+                        },
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "body",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "h1",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "bar bar"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "p",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "strong",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "foo "
+                              }
+                            ]
+                          },
+                          {
+                            "type": "text",
+                            "value": "bar "
+                          },
+                          {
+                            "type": "element",
+                            "tagName": "em",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "baz"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should prefer whitespace in earlier elements",
+        "tree": {
+          "type": "element",
+          "tagName": "p",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "label",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": " a "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": " "
+            },
+            {
+              "type": "element",
+              "tagName": "input",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "p",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "label",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a "
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "input",
+                "properties": {},
+                "children": []
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should allow whitespace before an input",
+        "tree": {
+          "type": "element",
+          "tagName": "p",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "label",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": " "
+            },
+            {
+              "type": "element",
+              "tagName": "input",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "p",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "label",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": " "
+              },
+              {
+                "type": "element",
+                "tagName": "input",
+                "properties": {},
+                "children": []
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should allow whitespace before an empty button",
+        "tree": {
+          "type": "element",
+          "tagName": "p",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "label",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": " "
+            },
+            {
+              "type": "element",
+              "tagName": "button",
+              "properties": {},
+              "children": []
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "p",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "label",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": " "
+              },
+              {
+                "type": "element",
+                "tagName": "button",
+                "properties": {},
+                "children": []
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should trim whitespace between blocks",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": " a "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": " b "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": " c "
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": "b"
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "c"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should trim whitespace in head",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "head",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "meta",
+                  "properties": {
+                    "charSet": "utf8"
+                  },
+                  "children": []
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "title",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "  a  "
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "link",
+                  "properties": {},
+                  "children": []
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "script",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "  b  "
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "meta",
+                  "properties": {},
+                  "children": []
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "script",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "  c  "
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "style",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "  d  "
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "head",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "meta",
+                    "properties": {
+                      "charSet": "utf8"
+                    },
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "title",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "a"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "link",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "script",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "  b  "
+                      }
+                    ]
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "meta",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "script",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "  c  "
+                      }
+                    ]
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "style",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "  d  "
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should trim whitespace in selects",
+        "tree": {
+          "type": "element",
+          "tagName": "p",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "  a  "
+            },
+            {
+              "type": "element",
+              "tagName": "select",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "optgroup",
+                  "properties": {
+                    "label": "b"
+                  },
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "  "
+                    },
+                    {
+                      "type": "element",
+                      "tagName": "option",
+                      "properties": {},
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "  c  "
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "value": "  "
+                    },
+                    {
+                      "type": "element",
+                      "tagName": "option",
+                      "properties": {},
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "  d  "
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "value": "  "
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  e  "
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "p",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "a "
+              },
+              {
+                "type": "element",
+                "tagName": "select",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "optgroup",
+                    "properties": {
+                      "label": "b"
+                    },
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "option",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "c"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "element",
+                        "tagName": "option",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "d"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": " e"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should trim whitespace around media",
+        "tree": {
+          "type": "element",
+          "tagName": "p",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "  a  "
+            },
+            {
+              "type": "element",
+              "tagName": "img",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "  b  "
+            },
+            {
+              "type": "element",
+              "tagName": "video",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "  c  "
+            },
+            {
+              "type": "element",
+              "tagName": "audio",
+              "properties": {},
+              "children": []
+            },
+            {
+              "type": "text",
+              "value": "  d  "
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "p",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "a "
+              },
+              {
+                "type": "element",
+                "tagName": "img",
+                "properties": {},
+                "children": []
+              },
+              {
+                "type": "text",
+                "value": " b "
+              },
+              {
+                "type": "element",
+                "tagName": "video",
+                "properties": {},
+                "children": []
+              },
+              {
+                "type": "text",
+                "value": " c "
+              },
+              {
+                "type": "element",
+                "tagName": "audio",
+                "properties": {},
+                "children": []
+              },
+              {
+                "type": "text",
+                "value": " d"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should trim whitespace inside media",
+        "tree": {
+          "type": "element",
+          "tagName": "p",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "  a  "
+            },
+            {
+              "type": "element",
+              "tagName": "video",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "track",
+                  "properties": {},
+                  "children": []
+                },
+                {
+                  "type": "text",
+                  "value": "  b  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "a",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "  c  "
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "  d  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  e  "
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "p",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "a "
+              },
+              {
+                "type": "element",
+                "tagName": "video",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "track",
+                    "properties": {},
+                    "children": []
+                  },
+                  {
+                    "type": "text",
+                    "value": "b "
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "a",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "c "
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": "d "
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": " e"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should trim whitespace around comments (#1)",
+        "tree": {
+          "type": "element",
+          "tagName": "p",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "  a  "
+            },
+            {
+              "type": "comment",
+              "value": "  b  "
+            },
+            {
+              "type": "text",
+              "value": "  c  "
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "p",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "a "
+              },
+              {
+                "type": "comment",
+                "value": "  b  "
+              },
+              {
+                "type": "text",
+                "value": "c"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should trim whitespace around comments (#2)",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  a  "
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "value": "  b  "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  c  "
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a"
+                  }
+                ]
+              },
+              {
+                "type": "comment",
+                "value": "  b  "
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "c"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should trim whitespace around hidden elements",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  a  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "x",
+              "properties": {
+                "hidden": true
+              },
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  b  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  c  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  d  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "x",
+                  "properties": {
+                    "hidden": true
+                  },
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "  e  "
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "  f  "
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a"
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "x",
+                "properties": {
+                  "hidden": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "b"
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "c"
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "d "
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "x",
+                    "properties": {
+                      "hidden": true
+                    },
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "e "
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": "f"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should not trim whitespace around unknown nodes",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  a  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "x"
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  c  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  d  "
+                },
+                {
+                  "type": "x"
+                },
+                {
+                  "type": "text",
+                  "value": "  f  "
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a"
+                  }
+                ]
+              },
+              {
+                "type": "x"
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "c"
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "d "
+                  },
+                  {
+                    "type": "x"
+                  },
+                  {
+                    "type": "text",
+                    "value": " f"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should not trim whitespace around unknown nodes",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  a  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "x"
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  c  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  d  "
+                },
+                {
+                  "type": "x"
+                },
+                {
+                  "type": "text",
+                  "value": "  f  "
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a"
+                  }
+                ]
+              },
+              {
+                "type": "x"
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "c"
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "d "
+                  },
+                  {
+                    "type": "x"
+                  },
+                  {
+                    "type": "text",
+                    "value": " f"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should not trim whitespace in `xmp`",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  a  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "xmp",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  1 < 3  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  b  "
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a"
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "xmp",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "  1 < 3  "
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "b"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should not trim whitespace in `listing`",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  a  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "listing",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  1 < 3  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  b  "
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a"
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "listing",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "  1 < 3  "
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "b"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should trim whitespace in a fragment",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  a  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  b  "
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a"
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "b"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should not trim whitespace in `plaintext`",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  a  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "plaintext",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  1 < 3  "
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a"
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "plaintext",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "  1 < 3  "
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should not trim whitespace in `listing`",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "main",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "p",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "  a  "
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "listing",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "  1 < 3  "
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "p",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "  b  "
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "main",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "p",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "a"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "listing",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "  1 < 3  "
+                      }
+                    ]
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "p",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "b"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should not trim whitespace in `listing`",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "element",
+              "tagName": "main",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "p",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "  a  "
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "listing",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "  1 < 3  "
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "p",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "  b  "
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "root",
+            "children": [
+              {
+                "type": "element",
+                "tagName": "main",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "p",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "a"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "listing",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "  1 < 3  "
+                      }
+                    ]
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "p",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "b"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should collapse but not trim whitespace in `nobr`",
+        "tree": {
+          "type": "element",
+          "tagName": "p",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "nobr",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  Long   line   with   no   breaks  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "p",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "nobr",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": " Long line with no breaks "
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should not collapse or trim whitespace in `textarea`",
+        "tree": {
+          "type": "element",
+          "tagName": "p",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "  a  "
+            },
+            {
+              "type": "element",
+              "tagName": "textarea",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  b  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  c  "
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "p",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": "a "
+              },
+              {
+                "type": "element",
+                "tagName": "textarea",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "  b  "
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": " c"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should not collapse or trim whitespace in `pre`",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  a  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "pre",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "code",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "  1 < 3  "
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  b  "
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a"
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "pre",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "code",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "  1 < 3  "
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "b"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should not collapse or trim whitespace in `pre[wrap]`",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  a  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "pre",
+              "properties": {
+                "wrap": true
+              },
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "code",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "  1 < 3  "
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  b  "
+                }
+              ]
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a"
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "pre",
+                "properties": {
+                  "wrap": true
+                },
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "code",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "  1 < 3  "
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "b"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should collapse and trim whitespace in tables",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  a  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "table",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "thead",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "  "
+                    },
+                    {
+                      "type": "element",
+                      "tagName": "tr",
+                      "properties": {},
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "  "
+                        },
+                        {
+                          "type": "element",
+                          "tagName": "th",
+                          "properties": {
+                            "noWrap": true
+                          },
+                          "children": [
+                            {
+                              "type": "text",
+                              "value": "  b  "
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "value": "  "
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "value": "  "
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "tbody",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "  "
+                    },
+                    {
+                      "type": "element",
+                      "tagName": "tr",
+                      "properties": {},
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "  "
+                        },
+                        {
+                          "type": "element",
+                          "tagName": "td",
+                          "properties": {},
+                          "children": [
+                            {
+                              "type": "text",
+                              "value": "  c  "
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "value": "  "
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "value": "  "
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  d  "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a"
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "table",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "thead",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "tr",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "th",
+                            "properties": {
+                              "noWrap": true
+                            },
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": " b "
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "tbody",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "element",
+                        "tagName": "tr",
+                        "properties": {},
+                        "children": [
+                          {
+                            "type": "element",
+                            "tagName": "td",
+                            "properties": {},
+                            "children": [
+                              {
+                                "type": "text",
+                                "value": "c"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "d"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should collapse and trim whitespace in tables",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "   "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "  a   "
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "   "
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": " "
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "a  "
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "value": " "
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "should not collapse whitespace in scripts",
+        "tree": {
+          "type": "element",
+          "tagName": "script",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": " // a \n b "
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "script",
+            "properties": {},
+            "children": [
+              {
+                "type": "text",
+                "value": " // a \n b "
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "hast-util-minify-whitespace {\"newlines\":true}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-minify",
+      "commit": "79383ba769010ff52c547c57850d2dd3ecb815a9",
+      "path": "packages/hast-util-minify-whitespace/test.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.format",
+        {
+          "minify": {
+            "newlines": true
+          }
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "should support `newlines`",
+        "tree": {
+          "type": "element",
+          "tagName": "main",
+          "properties": {},
+          "children": [
+            {
+              "type": "text",
+              "value": "  "
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "text",
+                  "value": "\n "
+                },
+                {
+                  "type": "element",
+                  "tagName": "strong",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "foo"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": " \n"
+                },
+                {
+                  "type": "element",
+                  "tagName": "em",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "bar"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": " \n"
+                },
+                {
+                  "type": "element",
+                  "tagName": "meta",
+                  "properties": {
+                    "itemProp": true
+                  },
+                  "children": []
+                },
+                {
+                  "type": "text",
+                  "value": " \n"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": " \n"
+            },
+            {
+              "type": "element",
+              "tagName": "p",
+              "properties": {},
+              "children": [
+                {
+                  "type": "element",
+                  "tagName": "a",
+                  "properties": {
+                    "href": "example.com"
+                  },
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": " baz"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": "  "
+                },
+                {
+                  "type": "element",
+                  "tagName": "em",
+                  "properties": {},
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": " qux"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "  "
+            }
+          ]
+        },
+        "expected": {
+          "tree": {
+            "type": "element",
+            "tagName": "main",
+            "properties": {},
+            "children": [
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "strong",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "foo"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": "\n"
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "em",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "bar"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "meta",
+                    "properties": {
+                      "itemProp": true
+                    },
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "type": "element",
+                "tagName": "p",
+                "properties": {},
+                "children": [
+                  {
+                    "type": "element",
+                    "tagName": "a",
+                    "properties": {
+                      "href": "example.com"
+                    },
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "baz"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "value": " "
+                  },
+                  {
+                    "type": "element",
+                    "tagName": "em",
+                    "properties": {},
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "qux"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
   }
 ]
