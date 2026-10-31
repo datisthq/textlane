@@ -193,6 +193,8 @@ mod actions {
 mod helpers {
     pub(crate) mod attribute;
     pub(crate) mod character;
+    pub(crate) mod cjk;
+    pub(crate) mod cjk_table;
     pub(crate) mod command;
     pub(crate) mod command_table;
     pub(crate) mod decode;
@@ -210,6 +212,9 @@ mod helpers {
     pub(crate) mod uri;
 }
 mod plugins {
+    pub(crate) mod cjk_friendly {
+        pub(crate) mod plugin;
+    }
     pub(crate) mod component {
         pub(crate) mod actions {
             pub(crate) mod alert {
@@ -398,11 +403,11 @@ mod plugins {
 
 // models
 pub use models::options::{
-    AlertRule, Alerts, AlertsOptions, AttributeRule, CargoManager, CodeGroupRule,
-    CodeRule, Component, DefinitionListSlot, Directive, DirectiveKind, DirectiveRule,
-    DirectiveSlot, Ecosystems, Frontmatter, FrontmatterSlot, Gemoji, Gfm, GfmSlot,
-    GroupRule, HeadingId, MarkdownLinks, MarkerValue, Math, MathSlot, Matter, Mdx,
-    MdxSlot, Names, NpmManager, PackageCommand, ParentCheck, ParentTest, Parse,
+    AlertRule, Alerts, AlertsOptions, AttributeRule, CargoManager, CjkFriendlySlot,
+    CodeGroupRule, CodeRule, Component, DefinitionListSlot, Directive, DirectiveKind,
+    DirectiveRule, DirectiveSlot, Ecosystems, Frontmatter, FrontmatterSlot, Gemoji, Gfm,
+    GfmSlot, GroupRule, HeadingId, MarkdownLinks, MarkerValue, Math, MathSlot, Matter,
+    Mdx, MdxSlot, Names, NpmManager, PackageCommand, ParentCheck, ParentTest, Parse,
     PathRewrite, PipManager, ShiftHeading, Smartypants, Stringify, Strip, TaskListLabels,
     ToHtml, ToNaturalLanguage, Toc, UnknownDirectives, UnsafePattern, UrlNode,
 };
@@ -415,4 +420,5 @@ pub use actions::mdast::convert::convert_mdast;
 pub use actions::mdast::write::write_html;
 
 // plugins
+pub use plugins::cjk_friendly::plugin::CjkFriendly;
 pub use plugins::definition_list::plugin::DefinitionList;

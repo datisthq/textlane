@@ -11,6 +11,7 @@ use textlane_core::{Allocator, ArenaVec, Error, Point, Position};
 use crate::helpers::character::{
     CharacterKind, classify_character_unit, find_character_after, find_character_before,
 };
+use crate::helpers::cjk::{find_attention_sides, find_strikethrough_sides};
 use crate::helpers::decode::decode_string;
 use crate::helpers::identifier::normalize_identifier;
 use crate::helpers::literal::is_atext;
@@ -100,6 +101,7 @@ pub(crate) struct Inline<'a, 'd> {
     directive: bool,
     keep_trailing: bool,
     math: Option<&'d Math>,
+    cjk: bool,
     items: Vec<Item<'a>>,
     brackets: Vec<Bracket>,
     delims: Vec<usize>,
@@ -111,6 +113,8 @@ pub(crate) struct InlineContext<'d> {
     pub(crate) longest_identifier: usize,
     pub(crate) gfm: Option<&'d Gfm>,
     pub(crate) math: Option<&'d Math>,
+    /// markdown-cjk-friendly's rules for `*`, `_` and `~`.
+    pub(crate) cjk: bool,
     /// GFM footnote labels, normalized as micromark compares them.
     pub(crate) footnotes: &'d HashSet<String>,
     /// Whether a task list check may open the text: a list item's first content.
@@ -186,6 +190,7 @@ pub(crate) fn parse_inline<'a>(
         directive: context.directive,
         keep_trailing: context.keep_trailing,
         math: context.math,
+        cjk: context.cjk,
         mdx: context.mdx,
         leaf: context.leaf,
         items: Vec::new(),
@@ -482,22 +487,37 @@ impl<'a> Inline<'a, '_> {
                             value: None,
                         });
                     } else {
-                        let before =
-                            classify_character_unit(find_character_before(bytes, pos));
-                        let after =
-                            classify_character_unit(find_character_after(bytes, end));
+                        let (open, close) = if self.cjk {
+                            let previous = find_character_before(bytes, pos);
+                            let sides = find_strikethrough_sides(
+                                previous,
+                                || find_two_before(bytes, pos, previous),
+                                find_character_after(bytes, end),
+                            );
+                            (sides.open, sides.close)
+                        } else {
+                            let before = classify_character_unit(find_character_before(
+                                bytes, pos,
+                            ));
+                            let after =
+                                classify_character_unit(find_character_after(bytes, end));
+                            (
+                                after == CharacterKind::Other
+                                    || (after == CharacterKind::Punctuation
+                                        && before != CharacterKind::Other),
+                                before == CharacterKind::Other
+                                    || (before == CharacterKind::Punctuation
+                                        && after != CharacterKind::Other),
+                            )
+                        };
                         self.delims.push(self.items.len());
                         self.items.push(Item::Delim(Delim {
                             marker: b'~',
                             start: pos,
                             size,
                             left: size,
-                            open: after == CharacterKind::Other
-                                || (after == CharacterKind::Punctuation
-                                    && before != CharacterKind::Other),
-                            close: before == CharacterKind::Other
-                                || (before == CharacterKind::Punctuation
-                                    && after != CharacterKind::Other),
+                            open,
+                            close,
                             closes: Vec::new(),
                             opens: Vec::new(),
                         }));
@@ -524,6 +544,15 @@ impl<'a> Inline<'a, '_> {
                     }
                     let before_char = find_character_before(bytes, pos);
                     let after_char = find_character_after(bytes, end);
+                    let cjk = self.cjk.then(|| {
+                        find_attention_sides(
+                            marker,
+                            before_char,
+                            || find_two_before(bytes, pos, before_char),
+                            after_char,
+                            self.gfm.is_some(),
+                        )
+                    });
                     let before = classify_character_unit(before_char);
                     let after = classify_character_unit(after_char);
                     // micromark lets a sequence open before and close after GFM's `~`
@@ -544,6 +573,8 @@ impl<'a> Inline<'a, '_> {
                     } else {
                         (open, close)
                     };
+                    let (open, close) =
+                        cjk.map_or((open, close), |sides| (sides.open, sides.close));
                     self.delims.push(self.items.len());
                     self.items.push(Item::Delim(Delim {
                         marker,
@@ -676,6 +707,7 @@ impl<'a> Inline<'a, '_> {
             longest_identifier: self.longest_identifier,
             gfm: self.gfm,
             math: self.math,
+            cjk: self.cjk,
             footnotes: self.footnotes,
             task: false,
             in_table: self.in_table,
@@ -1871,4 +1903,10 @@ pub(crate) fn strip_padding(value: &str) -> &str {
         (Some(start), Some(end)) => &value[start..value.len() - end],
         _ => value,
     }
+}
+
+// The character before the one ending at `index`, which a variation selector there varies
+fn find_two_before(bytes: &[u8], index: usize, previous: Option<char>) -> Option<char> {
+    let previous = previous?;
+    find_character_before(bytes, index - previous.len_utf8())
 }

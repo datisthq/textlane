@@ -474,6 +474,11 @@ export function frontmatter(options?: FrontmatterOptions): Plugin<"md.frontmatte
   return { name: "md.frontmatter", options }
 }
 
+/** The `md.cjkFriendly` plugin. */
+export function cjkFriendly(): Plugin<"md.cjkFriendly"> {
+  return { name: "md.cjkFriendly" }
+}
+
 /** The `md.gemoji` plugin. */
 export function gemoji(options?: GemojiOptions): Plugin<"md.gemoji", GemojiOptions> {
   if (options === undefined) return { name: "md.gemoji" }

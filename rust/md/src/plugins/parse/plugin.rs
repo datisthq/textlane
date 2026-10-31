@@ -5,8 +5,8 @@ use textlane_core::{
 use crate::actions::markdown::parse::ParseSettings;
 use crate::models::mdx::MdxScript;
 use crate::models::options::{
-    DefinitionListSlot, DirectiveSlot, FrontmatterSlot, Gfm, GfmSlot, Math, MathSlot,
-    Matter, MdxSlot, Parse,
+    CjkFriendlySlot, DefinitionListSlot, DirectiveSlot, FrontmatterSlot, Gfm, GfmSlot,
+    Math, MathSlot, Matter, MdxSlot, Parse,
 };
 use crate::utils::onepass::build::parse_onepass_source;
 
@@ -24,6 +24,7 @@ impl Plugin for Parse {
                 .unwrap_or_default();
             let definition_list =
                 slots.get::<DefinitionListSlot>().is_some_and(|slot| slot.0);
+            let cjk = slots.get::<CjkFriendlySlot>().is_some_and(|slot| slot.0);
             let mdx = slots
                 .get::<MdxSlot>()
                 .and_then(|slot| slot.0.as_ref())
@@ -41,6 +42,7 @@ impl Plugin for Parse {
                 frontmatter,
                 definition_list,
                 mdx,
+                cjk,
             }))
         });
         Ok(())
@@ -54,6 +56,7 @@ struct MarkdownParser {
     frontmatter: Vec<Matter>,
     definition_list: bool,
     mdx: Option<MdxScript>,
+    cjk: bool,
 }
 
 impl Parser for MarkdownParser {
@@ -79,6 +82,7 @@ impl Parser for MarkdownParser {
             frontmatter: &self.frontmatter,
             definition_list: self.definition_list,
             mdx: self.mdx.as_ref(),
+            cjk: self.cjk,
         };
         parse_onepass_source(input, &settings, alloc).map(Tree::Mdast)
     }

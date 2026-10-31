@@ -21,6 +21,7 @@ __all__ = [
     "MdxOptions",
     "frontmatter",
     "FrontmatterOptions",
+    "cjk_friendly",
     "gemoji",
     "GemojiOptions",
     "smartypants",
@@ -617,6 +618,11 @@ def mdx(options: Optional[MdxOptions] = None) -> Plugin:
 def frontmatter(options: Optional[FrontmatterOptions] = None) -> Plugin:
     """The `md.frontmatter` plugin."""
     return describe_plugin("md.frontmatter", options)
+
+
+def cjk_friendly() -> Plugin:
+    """The `md.cjkFriendly` plugin."""
+    return describe_plugin("md.cjkFriendly")
 
 
 def gemoji(options: Optional[GemojiOptions] = None) -> Plugin:

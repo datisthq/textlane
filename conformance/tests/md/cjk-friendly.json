@@ -1,0 +1,3244 @@
+[
+  {
+    "description": "strong.md",
+    "source": {
+      "repository": "https://github.com/tats-u/markdown-cjk-friendly",
+      "commit": "71d6b25d406a31d0303b102d582bd675067ed73f",
+      "path": "testcases/strong.md",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.cjkFriendly"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "\"これは**私のやりたかったこと。**だからするの。\"",
+        "input": "これは**私のやりたかったこと。**だからするの。",
+        "expected": {
+          "html": "<p>これは<strong>私のやりたかったこと。</strong>だからするの。</p>"
+        }
+      },
+      {
+        "description": "\"**[製品ほげ](./product-foo)**と**[製品ふが](./product-bar)**をお試しください\"",
+        "input": "**[製品ほげ](./product-foo)**と**[製品ふが](./product-bar)**をお試しください",
+        "expected": {
+          "html": "<p><strong><a href=\"./product-foo\">製品ほげ</a></strong>と<strong><a href=\"./product-bar\">製品ふが</a></strong>をお試しください</p>"
+        }
+      },
+      {
+        "description": "\"単語と**[単語と](word-and)**単語\"",
+        "input": "単語と**[単語と](word-and)**単語",
+        "expected": {
+          "html": "<p>単語と<strong><a href=\"word-and\">単語と</a></strong>単語</p>"
+        }
+      },
+      {
+        "description": "\"**これは太字になりません。**ご注意ください。\"",
+        "input": "**これは太字になりません。**ご注意ください。",
+        "expected": {
+          "html": "<p><strong>これは太字になりません。</strong>ご注意ください。</p>"
+        }
+      },
+      {
+        "description": "\"カッコに注意**（太字にならない）**文が続く場合に要警戒。\"",
+        "input": "カッコに注意**（太字にならない）**文が続く場合に要警戒。",
+        "expected": {
+          "html": "<p>カッコに注意<strong>（太字にならない）</strong>文が続く場合に要警戒。</p>"
+        }
+      },
+      {
+        "description": "\"**[リンク](https://example.com)**も注意。（画像も同様）\"",
+        "input": "**[リンク](https://example.com)**も注意。（画像も同様）",
+        "expected": {
+          "html": "<p><strong><a href=\"https://example.com\">リンク</a></strong>も注意。（画像も同様）</p>"
+        }
+      },
+      {
+        "description": "\"先頭の**\\\\`コード\\\\`も注意。**\"",
+        "input": "先頭の**\\`コード\\`も注意。**",
+        "expected": {
+          "html": "<p>先頭の<strong>`コード`も注意。</strong></p>"
+        }
+      },
+      {
+        "description": "\"**末尾の\\\\`コード\\\\`**も注意。\"",
+        "input": "**末尾の\\`コード\\`**も注意。",
+        "expected": {
+          "html": "<p><strong>末尾の`コード`</strong>も注意。</p>"
+        }
+      },
+      {
+        "description": "\"税込**¥10,000**で入手できます。\"",
+        "input": "税込**¥10,000**で入手できます。",
+        "expected": {
+          "html": "<p>税込<strong>¥10,000</strong>で入手できます。</p>"
+        }
+      },
+      {
+        "description": "\"正解は**④**です。\"",
+        "input": "正解は**④**です。",
+        "expected": {
+          "html": "<p>正解は<strong>④</strong>です。</p>"
+        }
+      },
+      {
+        "description": "\"太郎は**「こんにちわ」**といった\"",
+        "input": "太郎は**「こんにちわ」**といった",
+        "expected": {
+          "html": "<p>太郎は<strong>「こんにちわ」</strong>といった</p>"
+        }
+      },
+      {
+        "description": "\"太郎は**\\\"こんにちわ\\\"**といった\"",
+        "input": "太郎は**\"こんにちわ\"**といった",
+        "expected": {
+          "html": "<p>太郎は<strong>\"こんにちわ\"</strong>といった</p>"
+        }
+      },
+      {
+        "description": "\"太郎は**こんにちわ**といった\"",
+        "input": "太郎は**こんにちわ**といった",
+        "expected": {
+          "html": "<p>太郎は<strong>こんにちわ</strong>といった</p>"
+        }
+      },
+      {
+        "description": "\"太郎は**「Hello」**といった\"",
+        "input": "太郎は**「Hello」**といった",
+        "expected": {
+          "html": "<p>太郎は<strong>「Hello」</strong>といった</p>"
+        }
+      },
+      {
+        "description": "\"太郎は**\\\"Hello\\\"**といった\"",
+        "input": "太郎は**\"Hello\"**といった",
+        "expected": {
+          "html": "<p>太郎は<strong>\"Hello\"</strong>といった</p>"
+        }
+      },
+      {
+        "description": "\"太郎は**Hello**といった\"",
+        "input": "太郎は**Hello**といった",
+        "expected": {
+          "html": "<p>太郎は<strong>Hello</strong>といった</p>"
+        }
+      },
+      {
+        "description": "\"太郎は**「Oh my god」**といった\"",
+        "input": "太郎は**「Oh my god」**といった",
+        "expected": {
+          "html": "<p>太郎は<strong>「Oh my god」</strong>といった</p>"
+        }
+      },
+      {
+        "description": "\"太郎は**\\\"Oh my god\\\"**といった\"",
+        "input": "太郎は**\"Oh my god\"**といった",
+        "expected": {
+          "html": "<p>太郎は<strong>\"Oh my god\"</strong>といった</p>"
+        }
+      },
+      {
+        "description": "\"太郎は**Oh my god**といった\"",
+        "input": "太郎は**Oh my god**といった",
+        "expected": {
+          "html": "<p>太郎は<strong>Oh my god</strong>といった</p>"
+        }
+      },
+      {
+        "description": "\"**C#**や**F#**は**「.NET」**というプラットフォーム上で動作します。\"",
+        "input": "**C#**や**F#**は**「.NET」**というプラットフォーム上で動作します。",
+        "expected": {
+          "html": "<p><strong>C#</strong>や<strong>F#</strong>は<strong>「.NET」</strong>というプラットフォーム上で動作します。</p>"
+        }
+      },
+      {
+        "description": "\"IDが**001号**になります。\"",
+        "input": "IDが**001号**になります。",
+        "expected": {
+          "html": "<p>IDが<strong>001号</strong>になります。</p>"
+        }
+      },
+      {
+        "description": "\"IDが**００１号**になります。\"",
+        "input": "IDが**００１号**になります。",
+        "expected": {
+          "html": "<p>IDが<strong>００１号</strong>になります。</p>"
+        }
+      },
+      {
+        "description": "\"Go**「初心者」**を対象とした記事です。\"",
+        "input": "Go**「初心者」**を対象とした記事です。",
+        "expected": {
+          "html": "<p>Go<strong>「初心者」</strong>を対象とした記事です。</p>"
+        }
+      },
+      {
+        "description": "\"**[リンク](https://example.com)**も注意。\"",
+        "input": "**[リンク](https://example.com)**も注意。",
+        "expected": {
+          "html": "<p><strong><a href=\"https://example.com\">リンク</a></strong>も注意。</p>"
+        }
+      },
+      {
+        "description": "\"**⻲田太郎**と申します\"",
+        "input": "**⻲田太郎**と申します",
+        "expected": {
+          "html": "<p><strong>⻲田太郎</strong>と申します</p>"
+        }
+      },
+      {
+        "description": "\"・**㋐**:選択肢１つ目\"",
+        "input": "・**㋐**:選択肢１つ目",
+        "expected": {
+          "html": "<p>・<strong>㋐</strong>:選択肢１つ目</p>"
+        }
+      },
+      {
+        "description": "\"**真，**她\"",
+        "input": "**真，**她",
+        "expected": {
+          "html": "<p><strong>真，</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真。**她\"",
+        "input": "**真。**她",
+        "expected": {
+          "html": "<p><strong>真。</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真、**她\"",
+        "input": "**真、**她",
+        "expected": {
+          "html": "<p><strong>真、</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真；**她\"",
+        "input": "**真；**她",
+        "expected": {
+          "html": "<p><strong>真；</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真：**她\"",
+        "input": "**真：**她",
+        "expected": {
+          "html": "<p><strong>真：</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真？**她\"",
+        "input": "**真？**她",
+        "expected": {
+          "html": "<p><strong>真？</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真！**她\"",
+        "input": "**真！**她",
+        "expected": {
+          "html": "<p><strong>真！</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真“**她\"",
+        "input": "**真“**她",
+        "expected": {
+          "html": "<p><strong>真“</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真”**她\"",
+        "input": "**真”**她",
+        "expected": {
+          "html": "<p><strong>真”</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真‘**她\"",
+        "input": "**真‘**她",
+        "expected": {
+          "html": "<p><strong>真‘</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真’**她\"",
+        "input": "**真’**她",
+        "expected": {
+          "html": "<p><strong>真’</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真（**她\"",
+        "input": "**真（**她",
+        "expected": {
+          "html": "<p><strong>真（</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"真**（她**\"",
+        "input": "真**（她**",
+        "expected": {
+          "html": "<p>真<strong>（她</strong></p>"
+        }
+      },
+      {
+        "description": "\"**真）**她\"",
+        "input": "**真）**她",
+        "expected": {
+          "html": "<p><strong>真）</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真【**她\"",
+        "input": "**真【**她",
+        "expected": {
+          "html": "<p><strong>真【</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"真**【她**\"",
+        "input": "真**【她**",
+        "expected": {
+          "html": "<p>真<strong>【她</strong></p>"
+        }
+      },
+      {
+        "description": "\"**真】**她\"",
+        "input": "**真】**她",
+        "expected": {
+          "html": "<p><strong>真】</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真《**她\"",
+        "input": "**真《**她",
+        "expected": {
+          "html": "<p><strong>真《</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"真**《她**\"",
+        "input": "真**《她**",
+        "expected": {
+          "html": "<p>真<strong>《她</strong></p>"
+        }
+      },
+      {
+        "description": "\"**真》**她\"",
+        "input": "**真》**她",
+        "expected": {
+          "html": "<p><strong>真》</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真—**她\"",
+        "input": "**真—**她",
+        "expected": {
+          "html": "<p><strong>真—</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真～**她\"",
+        "input": "**真～**她",
+        "expected": {
+          "html": "<p><strong>真～</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真…**她\"",
+        "input": "**真…**她",
+        "expected": {
+          "html": "<p><strong>真…</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真·**她\"",
+        "input": "**真·**她",
+        "expected": {
+          "html": "<p><strong>真·</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真〃**她\"",
+        "input": "**真〃**她",
+        "expected": {
+          "html": "<p><strong>真〃</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真-**她\"",
+        "input": "**真-**她",
+        "expected": {
+          "html": "<p><strong>真-</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真々**她\"",
+        "input": "**真々**她",
+        "expected": {
+          "html": "<p><strong>真々</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真**她\"",
+        "input": "**真**她",
+        "expected": {
+          "html": "<p><strong>真</strong>她</p>"
+        }
+      },
+      {
+        "description": "\"**真，** 她\"",
+        "input": "**真，** 她",
+        "expected": {
+          "html": "<p><strong>真，</strong> 她</p>"
+        }
+      },
+      {
+        "description": "\"**真**，她\"",
+        "input": "**真**，她",
+        "expected": {
+          "html": "<p><strong>真</strong>，她</p>"
+        }
+      },
+      {
+        "description": "\"**真，**&ZeroWidthSpace;她\"",
+        "input": "**真，**&ZeroWidthSpace;她",
+        "expected": {
+          "html": "<p><strong>真，</strong>​她</p>"
+        }
+      },
+      {
+        "description": "\"私は**⻲田太郎**と申します\"",
+        "input": "私は**⻲田太郎**と申します",
+        "expected": {
+          "html": "<p>私は<strong>⻲田太郎</strong>と申します</p>"
+        }
+      },
+      {
+        "description": "\"選択肢**㋐**: 1つ目の選択肢\"",
+        "input": "選択肢**㋐**: 1つ目の選択肢",
+        "expected": {
+          "html": "<p>選択肢<strong>㋐</strong>: 1つ目の選択肢</p>"
+        }
+      },
+      {
+        "description": "\"**さようなら︙**と太郎はいった。\"",
+        "input": "**さようなら︙**と太郎はいった。",
+        "expected": {
+          "html": "<p><strong>さようなら︙</strong>と太郎はいった。</p>"
+        }
+      },
+      {
+        "description": "\".NET**（.NET Frameworkは不可）**では、\"",
+        "input": ".NET**（.NET Frameworkは不可）**では、",
+        "expected": {
+          "html": "<p>.NET<strong>（.NET Frameworkは不可）</strong>では、</p>"
+        }
+      },
+      {
+        "description": "\"「禰󠄀」の偏は示ではなく**礻**です。\"",
+        "input": "「禰󠄀」の偏は示ではなく**礻**です。",
+        "expected": {
+          "html": "<p>「禰󠄀」の偏は示ではなく<strong>礻</strong>です。</p>"
+        }
+      },
+      {
+        "description": "\"Git**（注：不是GitHub）**\"",
+        "input": "Git**（注：不是GitHub）**",
+        "expected": {
+          "html": "<p>Git<strong>（注：不是GitHub）</strong></p>"
+        }
+      },
+      {
+        "description": "\"太郎は**「こんにちわ」**といった。\"",
+        "input": "太郎は**「こんにちわ」**といった。",
+        "expected": {
+          "html": "<p>太郎は<strong>「こんにちわ」</strong>といった。</p>"
+        }
+      },
+      {
+        "description": "\"𰻞𰻞**（ビャンビャン）**麺\"",
+        "input": "𰻞𰻞**（ビャンビャン）**麺",
+        "expected": {
+          "html": "<p>𰻞𰻞<strong>（ビャンビャン）</strong>麺</p>"
+        }
+      },
+      {
+        "description": "\"𰻞𰻞**(ビャンビャン)**麺\"",
+        "input": "𰻞𰻞**(ビャンビャン)**麺",
+        "expected": {
+          "html": "<p>𰻞𰻞<strong>(ビャンビャン)</strong>麺</p>"
+        }
+      },
+      {
+        "description": "\"ハイパーテキストコーヒーポット制御プロトコル**(HTCPCP)**\"",
+        "input": "ハイパーテキストコーヒーポット制御プロトコル**(HTCPCP)**",
+        "expected": {
+          "html": "<p>ハイパーテキストコーヒーポット制御プロトコル<strong>(HTCPCP)</strong></p>"
+        }
+      },
+      {
+        "description": "\"﨑**(崎)**\"",
+        "input": "﨑**(崎)**",
+        "expected": {
+          "html": "<p>﨑<strong>(崎)</strong></p>"
+        }
+      },
+      {
+        "description": "\"国際規格**[ECMA-262](https://tc39.es/ecma262/)**\"",
+        "input": "国際規格**[ECMA-262](https://tc39.es/ecma262/)**",
+        "expected": {
+          "html": "<p>国際規格<strong><a href=\"https://tc39.es/ecma262/\">ECMA-262</a></strong></p>"
+        }
+      },
+      {
+        "description": "\"㐧**(第の俗字)**\"",
+        "input": "㐧**(第の俗字)**",
+        "expected": {
+          "html": "<p>㐧<strong>(第の俗字)</strong></p>"
+        }
+      },
+      {
+        "description": "\"𠮟**(こちらが正式表記)**\"",
+        "input": "𠮟**(こちらが正式表記)**",
+        "expected": {
+          "html": "<p>𠮟<strong>(こちらが正式表記)</strong></p>"
+        }
+      },
+      {
+        "description": "\"𪜈**(トモの合略仮名)**\"",
+        "input": "𪜈**(トモの合略仮名)**",
+        "expected": {
+          "html": "<p>𪜈<strong>(トモの合略仮名)</strong></p>"
+        }
+      },
+      {
+        "description": "\"𫠉**(馬の俗字)**\"",
+        "input": "𫠉**(馬の俗字)**",
+        "expected": {
+          "html": "<p>𫠉<strong>(馬の俗字)</strong></p>"
+        }
+      },
+      {
+        "description": "\"谺𬤲**(こだま)**石神社\"",
+        "input": "谺𬤲**(こだま)**石神社",
+        "expected": {
+          "html": "<p>谺𬤲<strong>(こだま)</strong>石神社</p>"
+        }
+      },
+      {
+        "description": "\"石𮧟**(いしただら)**\"",
+        "input": "石𮧟**(いしただら)**",
+        "expected": {
+          "html": "<p>石𮧟<strong>(いしただら)</strong></p>"
+        }
+      },
+      {
+        "description": "\"**推荐几个框架：**React、Vue等前端框架。\"",
+        "input": "**推荐几个框架：**React、Vue等前端框架。",
+        "expected": {
+          "html": "<p><strong>推荐几个框架：</strong>React、Vue等前端框架。</p>"
+        }
+      },
+      {
+        "description": "\"葛󠄀**(こちらが正式表記)**城市\"",
+        "input": "葛󠄀**(こちらが正式表記)**城市",
+        "expected": {
+          "html": "<p>葛󠄀<strong>(こちらが正式表記)</strong>城市</p>"
+        }
+      },
+      {
+        "description": "\"禰󠄀**(こちらが正式表記)**豆子\"",
+        "input": "禰󠄀**(こちらが正式表記)**豆子",
+        "expected": {
+          "html": "<p>禰󠄀<strong>(こちらが正式表記)</strong>豆子</p>"
+        }
+      },
+      {
+        "description": "\"𱟛**(U+317DB)**\"",
+        "input": "𱟛**(U+317DB)**",
+        "expected": {
+          "html": "<p>𱟛<strong>(U+317DB)</strong></p>"
+        }
+      },
+      {
+        "description": "\"阿寒湖アイヌシアターイコㇿ**(Akanko Ainu Theater Ikor)**\"",
+        "input": "阿寒湖アイヌシアターイコㇿ**(Akanko Ainu Theater Ikor)**",
+        "expected": {
+          "html": "<p>阿寒湖アイヌシアターイコㇿ<strong>(Akanko Ainu Theater Ikor)</strong></p>"
+        }
+      },
+      {
+        "description": "\"あ𛀙**(か)**よろし\"",
+        "input": "あ𛀙**(か)**よろし",
+        "expected": {
+          "html": "<p>あ𛀙<strong>(か)</strong>よろし</p>"
+        }
+      },
+      {
+        "description": "\"𮹝**(simplified form of 龘 in China)**\"",
+        "input": "𮹝**(simplified form of 龘 in China)**",
+        "expected": {
+          "html": "<p>𮹝<strong>(simplified form of 龘 in China)</strong></p>"
+        }
+      },
+      {
+        "description": "\"大塚︀**(U+585A U+FE00)** 大塚**(U+FA10)**\"",
+        "input": "大塚︀**(U+585A U+FE00)** 大塚**(U+FA10)**",
+        "expected": {
+          "html": "<p>大塚︀<strong>(U+585A U+FE00)</strong> 大塚<strong>(U+FA10)</strong></p>"
+        }
+      },
+      {
+        "description": "\"〽︎**(庵点)**は、\"",
+        "input": "〽︎**(庵点)**は、",
+        "expected": {
+          "html": "<p>〽︎<strong>(庵点)</strong>は、</p>"
+        }
+      },
+      {
+        "description": "\"**“︁Git”︁**Hub\"",
+        "input": "**“︁Git”︁**Hub",
+        "expected": {
+          "html": "<p><strong>“︁Git”︁</strong>Hub</p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "strong.md (md.stringify)",
+    "source": {
+      "repository": "https://github.com/tats-u/markdown-cjk-friendly",
+      "commit": "71d6b25d406a31d0303b102d582bd675067ed73f",
+      "path": "testcases/strong.md",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.cjkFriendly"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "\"これは**私のやりたかったこと。**だからするの。\"",
+        "input": "これは**私のやりたかったこと。**だからするの。",
+        "expected": {
+          "md": "これは**私のやりたかったこと。**だからするの。\n"
+        }
+      },
+      {
+        "description": "\"**[製品ほげ](./product-foo)**と**[製品ふが](./product-bar)**をお試しください\"",
+        "input": "**[製品ほげ](./product-foo)**と**[製品ふが](./product-bar)**をお試しください",
+        "expected": {
+          "md": "**[製品ほげ](./product-foo)**と**[製品ふが](./product-bar)**をお試しください\n"
+        }
+      },
+      {
+        "description": "\"単語と**[単語と](word-and)**単語\"",
+        "input": "単語と**[単語と](word-and)**単語",
+        "expected": {
+          "md": "単語と**[単語と](word-and)**単語\n"
+        }
+      },
+      {
+        "description": "\"**これは太字になりません。**ご注意ください。\"",
+        "input": "**これは太字になりません。**ご注意ください。",
+        "expected": {
+          "md": "**これは太字になりません。**ご注意ください。\n"
+        }
+      },
+      {
+        "description": "\"カッコに注意**（太字にならない）**文が続く場合に要警戒。\"",
+        "input": "カッコに注意**（太字にならない）**文が続く場合に要警戒。",
+        "expected": {
+          "md": "カッコに注意**（太字にならない）**文が続く場合に要警戒。\n"
+        }
+      },
+      {
+        "description": "\"**[リンク](https://example.com)**も注意。（画像も同様）\"",
+        "input": "**[リンク](https://example.com)**も注意。（画像も同様）",
+        "expected": {
+          "md": "**[リンク](https://example.com)**も注意。（画像も同様）\n"
+        }
+      },
+      {
+        "description": "\"先頭の**\\\\`コード\\\\`も注意。**\"",
+        "input": "先頭の**\\`コード\\`も注意。**",
+        "expected": {
+          "md": "先頭の**\\`コード\\`も注意。**\n"
+        }
+      },
+      {
+        "description": "\"**末尾の\\\\`コード\\\\`**も注意。\"",
+        "input": "**末尾の\\`コード\\`**も注意。",
+        "expected": {
+          "md": "**末尾の\\`コード\\`**も注意。\n"
+        }
+      },
+      {
+        "description": "\"税込**¥10,000**で入手できます。\"",
+        "input": "税込**¥10,000**で入手できます。",
+        "expected": {
+          "md": "税込**¥10,000**で入手できます。\n"
+        }
+      },
+      {
+        "description": "\"正解は**④**です。\"",
+        "input": "正解は**④**です。",
+        "expected": {
+          "md": "正解は**④**です。\n"
+        }
+      },
+      {
+        "description": "\"太郎は**「こんにちわ」**といった\"",
+        "input": "太郎は**「こんにちわ」**といった",
+        "expected": {
+          "md": "太郎は**「こんにちわ」**といった\n"
+        }
+      },
+      {
+        "description": "\"太郎は**\\\"こんにちわ\\\"**といった\"",
+        "input": "太郎は**\"こんにちわ\"**といった",
+        "expected": {
+          "md": "太郎は**\"こんにちわ\"**といった\n"
+        }
+      },
+      {
+        "description": "\"太郎は**こんにちわ**といった\"",
+        "input": "太郎は**こんにちわ**といった",
+        "expected": {
+          "md": "太郎は**こんにちわ**といった\n"
+        }
+      },
+      {
+        "description": "\"太郎は**「Hello」**といった\"",
+        "input": "太郎は**「Hello」**といった",
+        "expected": {
+          "md": "太郎は**「Hello」**といった\n"
+        }
+      },
+      {
+        "description": "\"太郎は**\\\"Hello\\\"**といった\"",
+        "input": "太郎は**\"Hello\"**といった",
+        "expected": {
+          "md": "太郎は**\"Hello\"**といった\n"
+        }
+      },
+      {
+        "description": "\"太郎は**Hello**といった\"",
+        "input": "太郎は**Hello**といった",
+        "expected": {
+          "md": "太郎は**Hello**といった\n"
+        }
+      },
+      {
+        "description": "\"太郎は**「Oh my god」**といった\"",
+        "input": "太郎は**「Oh my god」**といった",
+        "expected": {
+          "md": "太郎は**「Oh my god」**といった\n"
+        }
+      },
+      {
+        "description": "\"太郎は**\\\"Oh my god\\\"**といった\"",
+        "input": "太郎は**\"Oh my god\"**といった",
+        "expected": {
+          "md": "太郎は**\"Oh my god\"**といった\n"
+        }
+      },
+      {
+        "description": "\"太郎は**Oh my god**といった\"",
+        "input": "太郎は**Oh my god**といった",
+        "expected": {
+          "md": "太郎は**Oh my god**といった\n"
+        }
+      },
+      {
+        "description": "\"**C#**や**F#**は**「.NET」**というプラットフォーム上で動作します。\"",
+        "input": "**C#**や**F#**は**「.NET」**というプラットフォーム上で動作します。",
+        "expected": {
+          "md": "**C#**や**F#**は**「.NET」**というプラットフォーム上で動作します。\n"
+        }
+      },
+      {
+        "description": "\"IDが**001号**になります。\"",
+        "input": "IDが**001号**になります。",
+        "expected": {
+          "md": "IDが**001号**になります。\n"
+        }
+      },
+      {
+        "description": "\"IDが**００１号**になります。\"",
+        "input": "IDが**００１号**になります。",
+        "expected": {
+          "md": "IDが**００１号**になります。\n"
+        }
+      },
+      {
+        "description": "\"Go**「初心者」**を対象とした記事です。\"",
+        "input": "Go**「初心者」**を対象とした記事です。",
+        "expected": {
+          "md": "Go**「初心者」**を対象とした記事です。\n"
+        }
+      },
+      {
+        "description": "\"**[リンク](https://example.com)**も注意。\"",
+        "input": "**[リンク](https://example.com)**も注意。",
+        "expected": {
+          "md": "**[リンク](https://example.com)**も注意。\n"
+        }
+      },
+      {
+        "description": "\"**⻲田太郎**と申します\"",
+        "input": "**⻲田太郎**と申します",
+        "expected": {
+          "md": "**⻲田太郎**と申します\n"
+        }
+      },
+      {
+        "description": "\"・**㋐**:選択肢１つ目\"",
+        "input": "・**㋐**:選択肢１つ目",
+        "expected": {
+          "md": "・**㋐**:選択肢１つ目\n"
+        }
+      },
+      {
+        "description": "\"**真，**她\"",
+        "input": "**真，**她",
+        "expected": {
+          "md": "**真，**她\n"
+        }
+      },
+      {
+        "description": "\"**真。**她\"",
+        "input": "**真。**她",
+        "expected": {
+          "md": "**真。**她\n"
+        }
+      },
+      {
+        "description": "\"**真、**她\"",
+        "input": "**真、**她",
+        "expected": {
+          "md": "**真、**她\n"
+        }
+      },
+      {
+        "description": "\"**真；**她\"",
+        "input": "**真；**她",
+        "expected": {
+          "md": "**真；**她\n"
+        }
+      },
+      {
+        "description": "\"**真：**她\"",
+        "input": "**真：**她",
+        "expected": {
+          "md": "**真：**她\n"
+        }
+      },
+      {
+        "description": "\"**真？**她\"",
+        "input": "**真？**她",
+        "expected": {
+          "md": "**真？**她\n"
+        }
+      },
+      {
+        "description": "\"**真！**她\"",
+        "input": "**真！**她",
+        "expected": {
+          "md": "**真！**她\n"
+        }
+      },
+      {
+        "description": "\"**真“**她\"",
+        "input": "**真“**她",
+        "expected": {
+          "md": "**真“**她\n"
+        }
+      },
+      {
+        "description": "\"**真”**她\"",
+        "input": "**真”**她",
+        "expected": {
+          "md": "**真”**她\n"
+        }
+      },
+      {
+        "description": "\"**真‘**她\"",
+        "input": "**真‘**她",
+        "expected": {
+          "md": "**真‘**她\n"
+        }
+      },
+      {
+        "description": "\"**真’**她\"",
+        "input": "**真’**她",
+        "expected": {
+          "md": "**真’**她\n"
+        }
+      },
+      {
+        "description": "\"**真（**她\"",
+        "input": "**真（**她",
+        "expected": {
+          "md": "**真（**她\n"
+        }
+      },
+      {
+        "description": "\"真**（她**\"",
+        "input": "真**（她**",
+        "expected": {
+          "md": "真**（她**\n"
+        }
+      },
+      {
+        "description": "\"**真）**她\"",
+        "input": "**真）**她",
+        "expected": {
+          "md": "**真）**她\n"
+        }
+      },
+      {
+        "description": "\"**真【**她\"",
+        "input": "**真【**她",
+        "expected": {
+          "md": "**真【**她\n"
+        }
+      },
+      {
+        "description": "\"真**【她**\"",
+        "input": "真**【她**",
+        "expected": {
+          "md": "真**【她**\n"
+        }
+      },
+      {
+        "description": "\"**真】**她\"",
+        "input": "**真】**她",
+        "expected": {
+          "md": "**真】**她\n"
+        }
+      },
+      {
+        "description": "\"**真《**她\"",
+        "input": "**真《**她",
+        "expected": {
+          "md": "**真《**她\n"
+        }
+      },
+      {
+        "description": "\"真**《她**\"",
+        "input": "真**《她**",
+        "expected": {
+          "md": "真**《她**\n"
+        }
+      },
+      {
+        "description": "\"**真》**她\"",
+        "input": "**真》**她",
+        "expected": {
+          "md": "**真》**她\n"
+        }
+      },
+      {
+        "description": "\"**真—**她\"",
+        "input": "**真—**她",
+        "expected": {
+          "md": "**真—**她\n"
+        }
+      },
+      {
+        "description": "\"**真～**她\"",
+        "input": "**真～**她",
+        "expected": {
+          "md": "**真～**她\n"
+        }
+      },
+      {
+        "description": "\"**真…**她\"",
+        "input": "**真…**她",
+        "expected": {
+          "md": "**真…**她\n"
+        }
+      },
+      {
+        "description": "\"**真·**她\"",
+        "input": "**真·**她",
+        "expected": {
+          "md": "**真·**她\n"
+        }
+      },
+      {
+        "description": "\"**真〃**她\"",
+        "input": "**真〃**她",
+        "expected": {
+          "md": "**真〃**她\n"
+        }
+      },
+      {
+        "description": "\"**真-**她\"",
+        "input": "**真-**她",
+        "expected": {
+          "md": "**真-**她\n"
+        }
+      },
+      {
+        "description": "\"**真々**她\"",
+        "input": "**真々**她",
+        "expected": {
+          "md": "**真々**她\n"
+        }
+      },
+      {
+        "description": "\"**真**她\"",
+        "input": "**真**她",
+        "expected": {
+          "md": "**真**她\n"
+        }
+      },
+      {
+        "description": "\"**真，** 她\"",
+        "input": "**真，** 她",
+        "expected": {
+          "md": "**真，** 她\n"
+        }
+      },
+      {
+        "description": "\"**真**，她\"",
+        "input": "**真**，她",
+        "expected": {
+          "md": "**真**，她\n"
+        }
+      },
+      {
+        "description": "\"**真，**&ZeroWidthSpace;她\"",
+        "input": "**真，**&ZeroWidthSpace;她",
+        "expected": {
+          "md": "**真，**​她\n"
+        }
+      },
+      {
+        "description": "\"私は**⻲田太郎**と申します\"",
+        "input": "私は**⻲田太郎**と申します",
+        "expected": {
+          "md": "私は**⻲田太郎**と申します\n"
+        }
+      },
+      {
+        "description": "\"選択肢**㋐**: 1つ目の選択肢\"",
+        "input": "選択肢**㋐**: 1つ目の選択肢",
+        "expected": {
+          "md": "選択肢**㋐**: 1つ目の選択肢\n"
+        }
+      },
+      {
+        "description": "\"**さようなら︙**と太郎はいった。\"",
+        "input": "**さようなら︙**と太郎はいった。",
+        "expected": {
+          "md": "**さようなら︙**と太郎はいった。\n"
+        }
+      },
+      {
+        "description": "\".NET**（.NET Frameworkは不可）**では、\"",
+        "input": ".NET**（.NET Frameworkは不可）**では、",
+        "expected": {
+          "md": ".NET**（.NET Frameworkは不可）**では、\n"
+        }
+      },
+      {
+        "description": "\"「禰󠄀」の偏は示ではなく**礻**です。\"",
+        "input": "「禰󠄀」の偏は示ではなく**礻**です。",
+        "expected": {
+          "md": "「禰󠄀」の偏は示ではなく**礻**です。\n"
+        }
+      },
+      {
+        "description": "\"Git**（注：不是GitHub）**\"",
+        "input": "Git**（注：不是GitHub）**",
+        "expected": {
+          "md": "Git**（注：不是GitHub）**\n"
+        }
+      },
+      {
+        "description": "\"太郎は**「こんにちわ」**といった。\"",
+        "input": "太郎は**「こんにちわ」**といった。",
+        "expected": {
+          "md": "太郎は**「こんにちわ」**といった。\n"
+        }
+      },
+      {
+        "description": "\"𰻞𰻞**（ビャンビャン）**麺\"",
+        "input": "𰻞𰻞**（ビャンビャン）**麺",
+        "expected": {
+          "md": "𰻞𰻞**（ビャンビャン）**麺\n"
+        }
+      },
+      {
+        "description": "\"𰻞𰻞**(ビャンビャン)**麺\"",
+        "input": "𰻞𰻞**(ビャンビャン)**麺",
+        "expected": {
+          "md": "𰻞𰻞**(ビャンビャン)**麺\n"
+        }
+      },
+      {
+        "description": "\"ハイパーテキストコーヒーポット制御プロトコル**(HTCPCP)**\"",
+        "input": "ハイパーテキストコーヒーポット制御プロトコル**(HTCPCP)**",
+        "expected": {
+          "md": "ハイパーテキストコーヒーポット制御プロトコル**(HTCPCP)**\n"
+        }
+      },
+      {
+        "description": "\"﨑**(崎)**\"",
+        "input": "﨑**(崎)**",
+        "expected": {
+          "md": "﨑**(崎)**\n"
+        }
+      },
+      {
+        "description": "\"国際規格**[ECMA-262](https://tc39.es/ecma262/)**\"",
+        "input": "国際規格**[ECMA-262](https://tc39.es/ecma262/)**",
+        "expected": {
+          "md": "国際規格**[ECMA-262](https://tc39.es/ecma262/)**\n"
+        }
+      },
+      {
+        "description": "\"㐧**(第の俗字)**\"",
+        "input": "㐧**(第の俗字)**",
+        "expected": {
+          "md": "㐧**(第の俗字)**\n"
+        }
+      },
+      {
+        "description": "\"𠮟**(こちらが正式表記)**\"",
+        "input": "𠮟**(こちらが正式表記)**",
+        "expected": {
+          "md": "𠮟**(こちらが正式表記)**\n"
+        }
+      },
+      {
+        "description": "\"𪜈**(トモの合略仮名)**\"",
+        "input": "𪜈**(トモの合略仮名)**",
+        "expected": {
+          "md": "𪜈**(トモの合略仮名)**\n"
+        }
+      },
+      {
+        "description": "\"𫠉**(馬の俗字)**\"",
+        "input": "𫠉**(馬の俗字)**",
+        "expected": {
+          "md": "𫠉**(馬の俗字)**\n"
+        }
+      },
+      {
+        "description": "\"谺𬤲**(こだま)**石神社\"",
+        "input": "谺𬤲**(こだま)**石神社",
+        "expected": {
+          "md": "谺𬤲**(こだま)**石神社\n"
+        }
+      },
+      {
+        "description": "\"石𮧟**(いしただら)**\"",
+        "input": "石𮧟**(いしただら)**",
+        "expected": {
+          "md": "石𮧟**(いしただら)**\n"
+        }
+      },
+      {
+        "description": "\"**推荐几个框架：**React、Vue等前端框架。\"",
+        "input": "**推荐几个框架：**React、Vue等前端框架。",
+        "expected": {
+          "md": "**推荐几个框架：**React、Vue等前端框架。\n"
+        }
+      },
+      {
+        "description": "\"葛󠄀**(こちらが正式表記)**城市\"",
+        "input": "葛󠄀**(こちらが正式表記)**城市",
+        "expected": {
+          "md": "葛󠄀**(こちらが正式表記)**城市\n"
+        }
+      },
+      {
+        "description": "\"禰󠄀**(こちらが正式表記)**豆子\"",
+        "input": "禰󠄀**(こちらが正式表記)**豆子",
+        "expected": {
+          "md": "禰󠄀**(こちらが正式表記)**豆子\n"
+        }
+      },
+      {
+        "description": "\"𱟛**(U+317DB)**\"",
+        "input": "𱟛**(U+317DB)**",
+        "expected": {
+          "md": "𱟛**(U+317DB)**\n"
+        }
+      },
+      {
+        "description": "\"阿寒湖アイヌシアターイコㇿ**(Akanko Ainu Theater Ikor)**\"",
+        "input": "阿寒湖アイヌシアターイコㇿ**(Akanko Ainu Theater Ikor)**",
+        "expected": {
+          "md": "阿寒湖アイヌシアターイコㇿ**(Akanko Ainu Theater Ikor)**\n"
+        }
+      },
+      {
+        "description": "\"あ𛀙**(か)**よろし\"",
+        "input": "あ𛀙**(か)**よろし",
+        "expected": {
+          "md": "あ𛀙**(か)**よろし\n"
+        }
+      },
+      {
+        "description": "\"𮹝**(simplified form of 龘 in China)**\"",
+        "input": "𮹝**(simplified form of 龘 in China)**",
+        "expected": {
+          "md": "𮹝**(simplified form of 龘 in China)**\n"
+        }
+      },
+      {
+        "description": "\"大塚︀**(U+585A U+FE00)** 大塚**(U+FA10)**\"",
+        "input": "大塚︀**(U+585A U+FE00)** 大塚**(U+FA10)**",
+        "expected": {
+          "md": "大塚︀**(U+585A U+FE00)** 大塚**(U+FA10)**\n"
+        }
+      },
+      {
+        "description": "\"〽︎**(庵点)**は、\"",
+        "input": "〽︎**(庵点)**は、",
+        "expected": {
+          "md": "〽︎**(庵点)**は、\n"
+        }
+      },
+      {
+        "description": "\"**“︁Git”︁**Hub\"",
+        "input": "**“︁Git”︁**Hub",
+        "expected": {
+          "md": "**“︁Git”︁**Hub\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "korean.md",
+    "source": {
+      "repository": "https://github.com/tats-u/markdown-cjk-friendly",
+      "commit": "71d6b25d406a31d0303b102d582bd675067ed73f",
+      "path": "testcases/korean.md",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.cjkFriendly"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "\"**이 [링크](https://example.kr/)**만을 강조하고 싶다.\"",
+        "input": "**이 [링크](https://example.kr/)**만을 강조하고 싶다.",
+        "expected": {
+          "html": "<p><strong>이 <a href=\"https://example.kr/\">링크</a></strong>만을 강조하고 싶다.</p>"
+        }
+      },
+      {
+        "description": "\"**스크립트(script)**라고\"",
+        "input": "**스크립트(script)**라고",
+        "expected": {
+          "html": "<p><strong>스크립트(script)</strong>라고</p>"
+        }
+      },
+      {
+        "description": "\"패키지를 발행하려면 **`npm publish`**를 실행하십시오.\"",
+        "input": "패키지를 발행하려면 **`npm publish`**를 실행하십시오.",
+        "expected": {
+          "html": "<p>패키지를 발행하려면 <strong><code>npm publish</code></strong>를 실행하십시오.</p>"
+        }
+      },
+      {
+        "description": "\"**안녕(hello)**하세요.\"",
+        "input": "**안녕(hello)**하세요.",
+        "expected": {
+          "html": "<p><strong>안녕(hello)</strong>하세요.</p>"
+        }
+      },
+      {
+        "description": "\"ᅡ**(a)**\"",
+        "input": "ᅡ**(a)**",
+        "expected": {
+          "html": "<p>ᅡ<strong>(a)</strong></p>"
+        }
+      },
+      {
+        "description": "\"**(k)**ᄏ\"",
+        "input": "**(k)**ᄏ",
+        "expected": {
+          "html": "<p><strong>(k)</strong>ᄏ</p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "korean.md (md.stringify)",
+    "source": {
+      "repository": "https://github.com/tats-u/markdown-cjk-friendly",
+      "commit": "71d6b25d406a31d0303b102d582bd675067ed73f",
+      "path": "testcases/korean.md",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.cjkFriendly"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "\"**이 [링크](https://example.kr/)**만을 강조하고 싶다.\"",
+        "input": "**이 [링크](https://example.kr/)**만을 강조하고 싶다.",
+        "expected": {
+          "md": "**이 [링크](https://example.kr/)**만을 강조하고 싶다.\n"
+        }
+      },
+      {
+        "description": "\"**스크립트(script)**라고\"",
+        "input": "**스크립트(script)**라고",
+        "expected": {
+          "md": "**스크립트(script)**라고\n"
+        }
+      },
+      {
+        "description": "\"패키지를 발행하려면 **`npm publish`**를 실행하십시오.\"",
+        "input": "패키지를 발행하려면 **`npm publish`**를 실행하십시오.",
+        "expected": {
+          "md": "패키지를 발행하려면 **`npm publish`**를 실행하십시오.\n"
+        }
+      },
+      {
+        "description": "\"**안녕(hello)**하세요.\"",
+        "input": "**안녕(hello)**하세요.",
+        "expected": {
+          "md": "**안녕(hello)**하세요.\n"
+        }
+      },
+      {
+        "description": "\"ᅡ**(a)**\"",
+        "input": "ᅡ**(a)**",
+        "expected": {
+          "md": "ᅡ**(a)**\n"
+        }
+      },
+      {
+        "description": "\"**(k)**ᄏ\"",
+        "input": "**(k)**ᄏ",
+        "expected": {
+          "md": "**(k)**ᄏ\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "non-bmp.md",
+    "source": {
+      "repository": "https://github.com/tats-u/markdown-cjk-friendly",
+      "commit": "71d6b25d406a31d0303b102d582bd675067ed73f",
+      "path": "testcases/non-bmp.md",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.cjkFriendly"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "\"a**a«**a\"",
+        "input": "a**a«**a",
+        "expected": {
+          "html": "<p>a**a«**a</p>"
+        }
+      },
+      {
+        "description": "\"a**»a**a\"",
+        "input": "a**»a**a",
+        "expected": {
+          "html": "<p>a**»a**a</p>"
+        }
+      },
+      {
+        "description": "\"a**a∇**a\"",
+        "input": "a**a∇**a",
+        "expected": {
+          "html": "<p>a**a∇**a</p>"
+        }
+      },
+      {
+        "description": "\"a**∇a**a\"",
+        "input": "a**∇a**a",
+        "expected": {
+          "html": "<p>a**∇a**a</p>"
+        }
+      },
+      {
+        "description": "\"a**a𝜵**a\"",
+        "input": "a**a𝜵**a",
+        "expected": {
+          "html": "<p>a**a𝜵**a</p>"
+        }
+      },
+      {
+        "description": "\"a**𝜵a**a\"",
+        "input": "a**𝜵a**a",
+        "expected": {
+          "html": "<p>a**𝜵a**a</p>"
+        }
+      },
+      {
+        "description": "\"a**𐬻a**a\"",
+        "input": "a**𐬻a**a",
+        "expected": {
+          "html": "<p>a**𐬻a**a</p>"
+        }
+      },
+      {
+        "description": "\"a**a𐬻**a\"",
+        "input": "a**a𐬻**a",
+        "expected": {
+          "html": "<p>a**a𐬻**a</p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "non-bmp.md (md.stringify)",
+    "source": {
+      "repository": "https://github.com/tats-u/markdown-cjk-friendly",
+      "commit": "71d6b25d406a31d0303b102d582bd675067ed73f",
+      "path": "testcases/non-bmp.md",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.cjkFriendly"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "\"a**a«**a\"",
+        "input": "a**a«**a",
+        "expected": {
+          "md": "a\\*\\*a«\\*\\*a\n"
+        }
+      },
+      {
+        "description": "\"a**»a**a\"",
+        "input": "a**»a**a",
+        "expected": {
+          "md": "a\\*\\*»a\\*\\*a\n"
+        }
+      },
+      {
+        "description": "\"a**a∇**a\"",
+        "input": "a**a∇**a",
+        "expected": {
+          "md": "a\\*\\*a∇\\*\\*a\n"
+        }
+      },
+      {
+        "description": "\"a**∇a**a\"",
+        "input": "a**∇a**a",
+        "expected": {
+          "md": "a\\*\\*∇a\\*\\*a\n"
+        }
+      },
+      {
+        "description": "\"a**a𝜵**a\"",
+        "input": "a**a𝜵**a",
+        "expected": {
+          "md": "a\\*\\*a𝜵\\*\\*a\n"
+        }
+      },
+      {
+        "description": "\"a**𝜵a**a\"",
+        "input": "a**𝜵a**a",
+        "expected": {
+          "md": "a\\*\\*𝜵a\\*\\*a\n"
+        }
+      },
+      {
+        "description": "\"a**𐬻a**a\"",
+        "input": "a**𐬻a**a",
+        "expected": {
+          "md": "a\\*\\*𐬻a\\*\\*a\n"
+        }
+      },
+      {
+        "description": "\"a**a𐬻**a\"",
+        "input": "a**a𐬻**a",
+        "expected": {
+          "md": "a\\*\\*a𐬻\\*\\*a\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "pseudo-emoji.md",
+    "source": {
+      "repository": "https://github.com/tats-u/markdown-cjk-friendly",
+      "commit": "71d6b25d406a31d0303b102d582bd675067ed73f",
+      "path": "testcases/pseudo-emoji.md",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.cjkFriendly"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "\"a**〰**a\"",
+        "input": "a**〰**a",
+        "expected": {
+          "html": "<p>a<strong>〰</strong>a</p>"
+        }
+      },
+      {
+        "description": "\"a**〽**a\"",
+        "input": "a**〽**a",
+        "expected": {
+          "html": "<p>a<strong>〽</strong>a</p>"
+        }
+      },
+      {
+        "description": "\"a**🈂**a\"",
+        "input": "a**🈂**a",
+        "expected": {
+          "html": "<p>a<strong>🈂</strong>a</p>"
+        }
+      },
+      {
+        "description": "\"a**🈷**a\"",
+        "input": "a**🈷**a",
+        "expected": {
+          "html": "<p>a<strong>🈷</strong>a</p>"
+        }
+      },
+      {
+        "description": "\"a**㊗**a\"",
+        "input": "a**㊗**a",
+        "expected": {
+          "html": "<p>a<strong>㊗</strong>a</p>"
+        }
+      },
+      {
+        "description": "\"a**㊙**a\"",
+        "input": "a**㊙**a",
+        "expected": {
+          "html": "<p>a<strong>㊙</strong>a</p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "pseudo-emoji.md (md.stringify)",
+    "source": {
+      "repository": "https://github.com/tats-u/markdown-cjk-friendly",
+      "commit": "71d6b25d406a31d0303b102d582bd675067ed73f",
+      "path": "testcases/pseudo-emoji.md",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.cjkFriendly"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "\"a**〰**a\"",
+        "input": "a**〰**a",
+        "expected": {
+          "md": "a**〰**a\n"
+        }
+      },
+      {
+        "description": "\"a**〽**a\"",
+        "input": "a**〽**a",
+        "expected": {
+          "md": "a**〽**a\n"
+        }
+      },
+      {
+        "description": "\"a**🈂**a\"",
+        "input": "a**🈂**a",
+        "expected": {
+          "md": "a**🈂**a\n"
+        }
+      },
+      {
+        "description": "\"a**🈷**a\"",
+        "input": "a**🈷**a",
+        "expected": {
+          "md": "a**🈷**a\n"
+        }
+      },
+      {
+        "description": "\"a**㊗**a\"",
+        "input": "a**㊗**a",
+        "expected": {
+          "md": "a**㊗**a\n"
+        }
+      },
+      {
+        "description": "\"a**㊙**a\"",
+        "input": "a**㊙**a",
+        "expected": {
+          "md": "a**㊙**a\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "underscore-cjk-punct.md",
+    "source": {
+      "repository": "https://github.com/tats-u/markdown-cjk-friendly",
+      "commit": "71d6b25d406a31d0303b102d582bd675067ed73f",
+      "path": "testcases/underscore-cjk-punct.md",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.cjkFriendly"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "\"__注意__：注意事項\"",
+        "input": "__注意__：注意事項",
+        "expected": {
+          "html": "<p><strong>注意</strong>：注意事項</p>"
+        }
+      },
+      {
+        "description": "\"注意：__注意事項__\"",
+        "input": "注意：__注意事項__",
+        "expected": {
+          "html": "<p>注意：<strong>注意事項</strong></p>"
+        }
+      },
+      {
+        "description": "\"正體字。︁_Traditional._\"",
+        "input": "正體字。︁_Traditional._",
+        "expected": {
+          "html": "<p>正體字。︁<em>Traditional.</em></p>"
+        }
+      },
+      {
+        "description": "\"正體字。︁__Hong Kong and Taiwan.__\"",
+        "input": "正體字。︁__Hong Kong and Taiwan.__",
+        "expected": {
+          "html": "<p>正體字。︁<strong>Hong Kong and Taiwan.</strong></p>"
+        }
+      },
+      {
+        "description": "\"简体字 / 新字体。︀_Simplified._\"",
+        "input": "简体字 / 新字体。︀_Simplified._",
+        "expected": {
+          "html": "<p>简体字 / 新字体。︀<em>Simplified.</em></p>"
+        }
+      },
+      {
+        "description": "\"简体字 / 新字体。︀__Mainland China or Japan.__\"",
+        "input": "简体字 / 新字体。︀__Mainland China or Japan.__",
+        "expected": {
+          "html": "<p>简体字 / 新字体。︀<strong>Mainland China or Japan.</strong></p>"
+        }
+      },
+      {
+        "description": "\"“︁Git”︁__Hub__\"",
+        "input": "“︁Git”︁__Hub__",
+        "expected": {
+          "html": "<p>“︁Git”︁<strong>Hub</strong></p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "underscore-cjk-punct.md (md.stringify)",
+    "source": {
+      "repository": "https://github.com/tats-u/markdown-cjk-friendly",
+      "commit": "71d6b25d406a31d0303b102d582bd675067ed73f",
+      "path": "testcases/underscore-cjk-punct.md",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.cjkFriendly"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "\"__注意__：注意事項\"",
+        "input": "__注意__：注意事項",
+        "expected": {
+          "md": "**注意**：注意事項\n"
+        }
+      },
+      {
+        "description": "\"注意：__注意事項__\"",
+        "input": "注意：__注意事項__",
+        "expected": {
+          "md": "注意：**注意事項**\n"
+        }
+      },
+      {
+        "description": "\"正體字。︁_Traditional._\"",
+        "input": "正體字。︁_Traditional._",
+        "expected": {
+          "md": "正體字。︁*Traditional.*\n"
+        }
+      },
+      {
+        "description": "\"正體字。︁__Hong Kong and Taiwan.__\"",
+        "input": "正體字。︁__Hong Kong and Taiwan.__",
+        "expected": {
+          "md": "正體字。︁**Hong Kong and Taiwan.**\n"
+        }
+      },
+      {
+        "description": "\"简体字 / 新字体。︀_Simplified._\"",
+        "input": "简体字 / 新字体。︀_Simplified._",
+        "expected": {
+          "md": "简体字 / 新字体。︀*Simplified.*\n"
+        }
+      },
+      {
+        "description": "\"简体字 / 新字体。︀__Mainland China or Japan.__\"",
+        "input": "简体字 / 新字体。︀__Mainland China or Japan.__",
+        "expected": {
+          "md": "简体字 / 新字体。︀**Mainland China or Japan.**\n"
+        }
+      },
+      {
+        "description": "\"“︁Git”︁__Hub__\"",
+        "input": "“︁Git”︁__Hub__",
+        "expected": {
+          "md": "“︁Git”︁**Hub**\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "gfm-strikethrough.md",
+    "source": {
+      "repository": "https://github.com/tats-u/markdown-cjk-friendly",
+      "commit": "71d6b25d406a31d0303b102d582bd675067ed73f",
+      "path": "testcases/gfm-strikethrough.md",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      ["md.cjkFriendly"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "\"a~~a()~~あ\"",
+        "input": "a~~a()~~あ",
+        "expected": {
+          "html": "<p>a<del>a()</del>あ</p>"
+        }
+      },
+      {
+        "description": "\"あ~~()a~~a\"",
+        "input": "あ~~()a~~a",
+        "expected": {
+          "html": "<p>あ<del>()a</del>a</p>"
+        }
+      },
+      {
+        "description": "\"𩸽~~()a~~a\"",
+        "input": "𩸽~~()a~~a",
+        "expected": {
+          "html": "<p>𩸽<del>()a</del>a</p>"
+        }
+      },
+      {
+        "description": "\"a~~a()~~𩸽\"",
+        "input": "a~~a()~~𩸽",
+        "expected": {
+          "html": "<p>a<del>a()</del>𩸽</p>"
+        }
+      },
+      {
+        "description": "\"葛󠄀~~()a~~a\"",
+        "input": "葛󠄀~~()a~~a",
+        "expected": {
+          "html": "<p>葛󠄀<del>()a</del>a</p>"
+        }
+      },
+      {
+        "description": "\"羽︀~~()a~~a\"",
+        "input": "羽︀~~()a~~a",
+        "expected": {
+          "html": "<p>羽︀<del>()a</del>a</p>"
+        }
+      },
+      {
+        "description": "\"a~~「a~~」\"",
+        "input": "a~~「a~~」",
+        "expected": {
+          "html": "<p>a<del>「a</del>」</p>"
+        }
+      },
+      {
+        "description": "\"「~~a」~~a\"",
+        "input": "「~~a」~~a",
+        "expected": {
+          "html": "<p>「<del>a」</del>a</p>"
+        }
+      },
+      {
+        "description": "\"~~a~~：~~a~~\"",
+        "input": "~~a~~：~~a~~",
+        "expected": {
+          "html": "<p><del>a</del>：<del>a</del></p>"
+        }
+      },
+      {
+        "description": "\"~~日本語。︀~~English.\"",
+        "input": "~~日本語。︀~~English.",
+        "expected": {
+          "html": "<p><del>日本語。︀</del>English.</p>"
+        }
+      },
+      {
+        "description": "\"~~“︁a”︁~~a\"",
+        "input": "~~“︁a”︁~~a",
+        "expected": {
+          "html": "<p><del>“︁a”︁</del>a</p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "gfm-strikethrough.md (md.stringify)",
+    "source": {
+      "repository": "https://github.com/tats-u/markdown-cjk-friendly",
+      "commit": "71d6b25d406a31d0303b102d582bd675067ed73f",
+      "path": "testcases/gfm-strikethrough.md",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.cjkFriendly"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "\"a~~a()~~あ\"",
+        "input": "a~~a()~~あ",
+        "expected": {
+          "md": "a~~a()~~あ\n"
+        }
+      },
+      {
+        "description": "\"あ~~()a~~a\"",
+        "input": "あ~~()a~~a",
+        "expected": {
+          "md": "あ~~()a~~a\n"
+        }
+      },
+      {
+        "description": "\"𩸽~~()a~~a\"",
+        "input": "𩸽~~()a~~a",
+        "expected": {
+          "md": "𩸽~~()a~~a\n"
+        }
+      },
+      {
+        "description": "\"a~~a()~~𩸽\"",
+        "input": "a~~a()~~𩸽",
+        "expected": {
+          "md": "a~~a()~~𩸽\n"
+        }
+      },
+      {
+        "description": "\"葛󠄀~~()a~~a\"",
+        "input": "葛󠄀~~()a~~a",
+        "expected": {
+          "md": "葛󠄀~~()a~~a\n"
+        }
+      },
+      {
+        "description": "\"羽︀~~()a~~a\"",
+        "input": "羽︀~~()a~~a",
+        "expected": {
+          "md": "羽︀~~()a~~a\n"
+        }
+      },
+      {
+        "description": "\"a~~「a~~」\"",
+        "input": "a~~「a~~」",
+        "expected": {
+          "md": "a~~「a~~」\n"
+        }
+      },
+      {
+        "description": "\"「~~a」~~a\"",
+        "input": "「~~a」~~a",
+        "expected": {
+          "md": "「~~a」~~a\n"
+        }
+      },
+      {
+        "description": "\"~~a~~：~~a~~\"",
+        "input": "~~a~~：~~a~~",
+        "expected": {
+          "md": "~~a~~：~~a~~\n"
+        }
+      },
+      {
+        "description": "\"~~日本語。︀~~English.\"",
+        "input": "~~日本語。︀~~English.",
+        "expected": {
+          "md": "~~日本語。︀~~English.\n"
+        }
+      },
+      {
+        "description": "\"~~“︁a”︁~~a\"",
+        "input": "~~“︁a”︁~~a",
+        "expected": {
+          "md": "~~“︁a”︁~~a\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "gfm-non-cjk.md",
+    "source": {
+      "repository": "https://github.com/tats-u/markdown-cjk-friendly",
+      "commit": "71d6b25d406a31d0303b102d582bd675067ed73f",
+      "path": "testcases/gfm-non-cjk.md",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      ["md.cjkFriendly"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "\"~~Hi~~ Hello, ~there~ world!\"",
+        "input": "~~Hi~~ Hello, ~there~ world!",
+        "expected": {
+          "html": "<p><del>Hi</del> Hello, <del>there</del> world!</p>"
+        }
+      },
+      {
+        "description": "\"This ~~has a\"",
+        "input": "This ~~has a",
+        "expected": {
+          "html": "<p>This ~~has a</p>"
+        }
+      },
+      {
+        "description": "\"new paragraph~~.\"",
+        "input": "new paragraph~~.",
+        "expected": {
+          "html": "<p>new paragraph~~.</p>"
+        }
+      },
+      {
+        "description": "\"This will ~~~not~~~ strike.\"",
+        "input": "This will ~~~not~~~ strike.",
+        "expected": {
+          "html": "<p>This will ~~~not~~~ strike.</p>"
+        }
+      },
+      {
+        "description": "\"A proper ~strikethrough~.\"",
+        "input": "A proper ~strikethrough~.",
+        "expected": {
+          "html": "<p>A proper <del>strikethrough</del>.</p>"
+        }
+      },
+      {
+        "description": "\"These are ~not strikethroughs.\"",
+        "input": "These are ~not strikethroughs.",
+        "expected": {
+          "html": "<p>These are ~not strikethroughs.</p>"
+        }
+      },
+      {
+        "description": "\"No, they are not~\"",
+        "input": "No, they are not~",
+        "expected": {
+          "html": "<p>No, they are not~</p>"
+        }
+      },
+      {
+        "description": "\"This ~is ~ legit~ isn't ~ legit.\"",
+        "input": "This ~is ~ legit~ isn't ~ legit.",
+        "expected": {
+          "html": "<p>This <del>is ~ legit</del> isn't ~ legit.</p>"
+        }
+      },
+      {
+        "description": "\"This is not ~~~~~one~~~~~ huge strikethrough.\"",
+        "input": "This is not ~~~~~one~~~~~ huge strikethrough.",
+        "expected": {
+          "html": "<p>This is not ~~~~~one~~~~~ huge strikethrough.</p>"
+        }
+      },
+      {
+        "description": "\"~one~ ~~two~~ ~~~three~~~\"",
+        "input": "~one~ ~~two~~ ~~~three~~~",
+        "expected": {
+          "html": "<p><del>one</del> <del>two</del> ~~~three~~~</p>"
+        }
+      },
+      {
+        "description": "\"No ~mismatch~~\"",
+        "input": "No ~mismatch~~",
+        "expected": {
+          "html": "<p>No ~mismatch~~</p>"
+        }
+      },
+      {
+        "description": "\"~~**_`this`_**~~  \\n~~***`this`***~~  \\n~~___`this`___~~\"",
+        "input": "~~**_`this`_**~~  \n~~***`this`***~~  \n~~___`this`___~~",
+        "expected": {
+          "html": "<p><del><strong><em><code>this</code></em></strong></del><br>\n<del><em><strong><code>this</code></strong></em></del><br>\n<del><em><strong><code>this</code></strong></em></del></p>"
+        }
+      },
+      {
+        "description": "\"~~**_this_**~~  \\n~~***this***~~  \\n~~___this___~~\"",
+        "input": "~~**_this_**~~  \n~~***this***~~  \n~~___this___~~",
+        "expected": {
+          "html": "<p><del><strong><em>this</em></strong></del><br>\n<del><em><strong>this</strong></em></del><br>\n<del><em><strong>this</strong></em></del></p>"
+        }
+      },
+      {
+        "description": "\"~Hi~ Hello, world!\"",
+        "input": "~Hi~ Hello, world!",
+        "expected": {
+          "html": "<p><del>Hi</del> Hello, world!</p>"
+        }
+      },
+      {
+        "description": "\"This ~text~ ~~is~~ ~~~curious~~~.\"",
+        "input": "This ~text~ ~~is~~ ~~~curious~~~.",
+        "expected": {
+          "html": "<p>This <del>text</del> <del>is</del> ~~~curious~~~.</p>"
+        }
+      },
+      {
+        "description": "\"[^~~is~~1]\"",
+        "input": "[^~~is~~1]",
+        "expected": {
+          "html": "<p>[^<del>is</del>1]</p>"
+        }
+      },
+      {
+        "description": "\"a~~()a~~a\"",
+        "input": "a~~()a~~a",
+        "expected": {
+          "html": "<p>a~~()a~~a</p>"
+        }
+      },
+      {
+        "description": "\"a~~a()~~a\"",
+        "input": "a~~a()~~a",
+        "expected": {
+          "html": "<p>a~~a()~~a</p>"
+        }
+      },
+      {
+        "description": "\"~~()~~\"",
+        "input": "~~()~~",
+        "expected": {
+          "html": "<p><del>()</del></p>"
+        }
+      },
+      {
+        "description": "\"(~~()~~)\"",
+        "input": "(~~()~~)",
+        "expected": {
+          "html": "<p>(<del>()</del>)</p>"
+        }
+      },
+      {
+        "description": "\"| A |\\n| - |\\n| https://example.com/ |\"",
+        "input": "| A |\n| - |\n| https://example.com/ |",
+        "expected": {
+          "html": "<table>\n<thead>\n<tr>\n<th>A</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><a href=\"https://example.com/\">https://example.com/</a></td>\n</tr>\n</tbody>\n</table>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "gfm-non-cjk.md (md.stringify)",
+    "source": {
+      "repository": "https://github.com/tats-u/markdown-cjk-friendly",
+      "commit": "71d6b25d406a31d0303b102d582bd675067ed73f",
+      "path": "testcases/gfm-non-cjk.md",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.cjkFriendly"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "\"~~Hi~~ Hello, ~there~ world!\"",
+        "input": "~~Hi~~ Hello, ~there~ world!",
+        "expected": {
+          "md": "~~Hi~~ Hello, ~~there~~ world!\n"
+        }
+      },
+      {
+        "description": "\"This ~~has a\"",
+        "input": "This ~~has a",
+        "expected": {
+          "md": "This \\~\\~has a\n"
+        }
+      },
+      {
+        "description": "\"new paragraph~~.\"",
+        "input": "new paragraph~~.",
+        "expected": {
+          "md": "new paragraph\\~\\~.\n"
+        }
+      },
+      {
+        "description": "\"This will ~~~not~~~ strike.\"",
+        "input": "This will ~~~not~~~ strike.",
+        "expected": {
+          "md": "This will \\~\\~\\~not\\~\\~\\~ strike.\n"
+        }
+      },
+      {
+        "description": "\"A proper ~strikethrough~.\"",
+        "input": "A proper ~strikethrough~.",
+        "expected": {
+          "md": "A proper ~~strikethrough~~.\n"
+        }
+      },
+      {
+        "description": "\"These are ~not strikethroughs.\"",
+        "input": "These are ~not strikethroughs.",
+        "expected": {
+          "md": "These are \\~not strikethroughs.\n"
+        }
+      },
+      {
+        "description": "\"No, they are not~\"",
+        "input": "No, they are not~",
+        "expected": {
+          "md": "No, they are not\\~\n"
+        }
+      },
+      {
+        "description": "\"This ~is ~ legit~ isn't ~ legit.\"",
+        "input": "This ~is ~ legit~ isn't ~ legit.",
+        "expected": {
+          "md": "This ~~is \\~ legit~~ isn't \\~ legit.\n"
+        }
+      },
+      {
+        "description": "\"This is not ~~~~~one~~~~~ huge strikethrough.\"",
+        "input": "This is not ~~~~~one~~~~~ huge strikethrough.",
+        "expected": {
+          "md": "This is not \\~\\~\\~\\~\\~one\\~\\~\\~\\~\\~ huge strikethrough.\n"
+        }
+      },
+      {
+        "description": "\"~one~ ~~two~~ ~~~three~~~\"",
+        "input": "~one~ ~~two~~ ~~~three~~~",
+        "expected": {
+          "md": "~~one~~ ~~two~~ \\~\\~\\~three\\~\\~\\~\n"
+        }
+      },
+      {
+        "description": "\"No ~mismatch~~\"",
+        "input": "No ~mismatch~~",
+        "expected": {
+          "md": "No \\~mismatch\\~\\~\n"
+        }
+      },
+      {
+        "description": "\"~~**_`this`_**~~  \\n~~***`this`***~~  \\n~~___`this`___~~\"",
+        "input": "~~**_`this`_**~~  \n~~***`this`***~~  \n~~___`this`___~~",
+        "expected": {
+          "md": "~~**_`this`_**~~\\\n~~***`this`***~~\\\n~~***`this`***~~\n"
+        }
+      },
+      {
+        "description": "\"~~**_this_**~~  \\n~~***this***~~  \\n~~___this___~~\"",
+        "input": "~~**_this_**~~  \n~~***this***~~  \n~~___this___~~",
+        "expected": {
+          "md": "~~**_this_**~~\\\n~~***this***~~\\\n~~***this***~~\n"
+        }
+      },
+      {
+        "description": "\"~Hi~ Hello, world!\"",
+        "input": "~Hi~ Hello, world!",
+        "expected": {
+          "md": "~~Hi~~ Hello, world!\n"
+        }
+      },
+      {
+        "description": "\"This ~text~ ~~is~~ ~~~curious~~~.\"",
+        "input": "This ~text~ ~~is~~ ~~~curious~~~.",
+        "expected": {
+          "md": "This ~~text~~ ~~is~~ \\~\\~\\~curious\\~\\~\\~.\n"
+        }
+      },
+      {
+        "description": "\"[^~~is~~1]\"",
+        "input": "[^~~is~~1]",
+        "expected": {
+          "md": "\\[^~~is~~1]\n"
+        }
+      },
+      {
+        "description": "\"a~~()a~~a\"",
+        "input": "a~~()a~~a",
+        "expected": {
+          "md": "a\\~\\~()a\\~\\~a\n"
+        }
+      },
+      {
+        "description": "\"a~~a()~~a\"",
+        "input": "a~~a()~~a",
+        "expected": {
+          "md": "a\\~\\~a()\\~\\~a\n"
+        }
+      },
+      {
+        "description": "\"~~()~~\"",
+        "input": "~~()~~",
+        "expected": {
+          "md": "~~()~~\n"
+        }
+      },
+      {
+        "description": "\"(~~()~~)\"",
+        "input": "(~~()~~)",
+        "expected": {
+          "md": "(~~()~~)\n"
+        }
+      },
+      {
+        "description": "\"| A |\\n| - |\\n| https://example.com/ |\"",
+        "input": "| A |\n| - |\n| https://example.com/ |",
+        "expected": {
+          "md": "| A                      |\n| ---------------------- |\n| <https://example.com/> |\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "commonmark.json, emphasis and strong emphasis",
+    "source": {
+      "repository": "https://github.com/tats-u/markdown-cjk-friendly",
+      "commit": "71d6b25d406a31d0303b102d582bd675067ed73f",
+      "path": "testcases/commonmark.json",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.cjkFriendly"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      [
+        "html.stringify",
+        {
+          "allowDangerousHtml": true
+        }
+      ]
+    ],
+    "tests": [
+      {
+        "description": "\"*foo bar*\\n\"",
+        "input": "*foo bar*\n",
+        "expected": {
+          "html": "<p><em>foo bar</em></p>"
+        }
+      },
+      {
+        "description": "\"a * foo bar*\\n\"",
+        "input": "a * foo bar*\n",
+        "expected": {
+          "html": "<p>a * foo bar*</p>"
+        }
+      },
+      {
+        "description": "\"a*\\\"foo\\\"*\\n\"",
+        "input": "a*\"foo\"*\n",
+        "expected": {
+          "html": "<p>a*\"foo\"*</p>"
+        }
+      },
+      {
+        "description": "\"* a *\\n\"",
+        "input": "* a *\n",
+        "expected": {
+          "html": "<p>* a *</p>"
+        }
+      },
+      {
+        "description": "\"*$*alpha.\\n\\n*£*bravo.\\n\\n*€*charlie.\\n\"",
+        "input": "*$*alpha.\n\n*£*bravo.\n\n*€*charlie.\n",
+        "expected": {
+          "html": "<p>*$*alpha.</p>\n<p>*£*bravo.</p>\n<p>*€*charlie.</p>"
+        }
+      },
+      {
+        "description": "\"foo*bar*\\n\"",
+        "input": "foo*bar*\n",
+        "expected": {
+          "html": "<p>foo<em>bar</em></p>"
+        }
+      },
+      {
+        "description": "\"5*6*78\\n\"",
+        "input": "5*6*78\n",
+        "expected": {
+          "html": "<p>5<em>6</em>78</p>"
+        }
+      },
+      {
+        "description": "\"_foo bar_\\n\"",
+        "input": "_foo bar_\n",
+        "expected": {
+          "html": "<p><em>foo bar</em></p>"
+        }
+      },
+      {
+        "description": "\"_ foo bar_\\n\"",
+        "input": "_ foo bar_\n",
+        "expected": {
+          "html": "<p>_ foo bar_</p>"
+        }
+      },
+      {
+        "description": "\"a_\\\"foo\\\"_\\n\"",
+        "input": "a_\"foo\"_\n",
+        "expected": {
+          "html": "<p>a_\"foo\"_</p>"
+        }
+      },
+      {
+        "description": "\"foo_bar_\\n\"",
+        "input": "foo_bar_\n",
+        "expected": {
+          "html": "<p>foo_bar_</p>"
+        }
+      },
+      {
+        "description": "\"5_6_78\\n\"",
+        "input": "5_6_78\n",
+        "expected": {
+          "html": "<p>5_6_78</p>"
+        }
+      },
+      {
+        "description": "\"пристаням_стремятся_\\n\"",
+        "input": "пристаням_стремятся_\n",
+        "expected": {
+          "html": "<p>пристаням_стремятся_</p>"
+        }
+      },
+      {
+        "description": "\"aa_\\\"bb\\\"_cc\\n\"",
+        "input": "aa_\"bb\"_cc\n",
+        "expected": {
+          "html": "<p>aa_\"bb\"_cc</p>"
+        }
+      },
+      {
+        "description": "\"foo-_(bar)_\\n\"",
+        "input": "foo-_(bar)_\n",
+        "expected": {
+          "html": "<p>foo-<em>(bar)</em></p>"
+        }
+      },
+      {
+        "description": "\"_foo*\\n\"",
+        "input": "_foo*\n",
+        "expected": {
+          "html": "<p>_foo*</p>"
+        }
+      },
+      {
+        "description": "\"*foo bar *\\n\"",
+        "input": "*foo bar *\n",
+        "expected": {
+          "html": "<p>*foo bar *</p>"
+        }
+      },
+      {
+        "description": "\"*foo bar\\n*\\n\"",
+        "input": "*foo bar\n*\n",
+        "expected": {
+          "html": "<p>*foo bar\n*</p>"
+        }
+      },
+      {
+        "description": "\"*(*foo)\\n\"",
+        "input": "*(*foo)\n",
+        "expected": {
+          "html": "<p>*(*foo)</p>"
+        }
+      },
+      {
+        "description": "\"*(*foo*)*\\n\"",
+        "input": "*(*foo*)*\n",
+        "expected": {
+          "html": "<p><em>(<em>foo</em>)</em></p>"
+        }
+      },
+      {
+        "description": "\"*foo*bar\\n\"",
+        "input": "*foo*bar\n",
+        "expected": {
+          "html": "<p><em>foo</em>bar</p>"
+        }
+      },
+      {
+        "description": "\"_foo bar _\\n\"",
+        "input": "_foo bar _\n",
+        "expected": {
+          "html": "<p>_foo bar _</p>"
+        }
+      },
+      {
+        "description": "\"_(_foo)\\n\"",
+        "input": "_(_foo)\n",
+        "expected": {
+          "html": "<p>_(_foo)</p>"
+        }
+      },
+      {
+        "description": "\"_(_foo_)_\\n\"",
+        "input": "_(_foo_)_\n",
+        "expected": {
+          "html": "<p><em>(<em>foo</em>)</em></p>"
+        }
+      },
+      {
+        "description": "\"_foo_bar\\n\"",
+        "input": "_foo_bar\n",
+        "expected": {
+          "html": "<p>_foo_bar</p>"
+        }
+      },
+      {
+        "description": "\"_пристаням_стремятся\\n\"",
+        "input": "_пристаням_стремятся\n",
+        "expected": {
+          "html": "<p>_пристаням_стремятся</p>"
+        }
+      },
+      {
+        "description": "\"_foo_bar_baz_\\n\"",
+        "input": "_foo_bar_baz_\n",
+        "expected": {
+          "html": "<p><em>foo_bar_baz</em></p>"
+        }
+      },
+      {
+        "description": "\"_(bar)_.\\n\"",
+        "input": "_(bar)_.\n",
+        "expected": {
+          "html": "<p><em>(bar)</em>.</p>"
+        }
+      },
+      {
+        "description": "\"**foo bar**\\n\"",
+        "input": "**foo bar**\n",
+        "expected": {
+          "html": "<p><strong>foo bar</strong></p>"
+        }
+      },
+      {
+        "description": "\"** foo bar**\\n\"",
+        "input": "** foo bar**\n",
+        "expected": {
+          "html": "<p>** foo bar**</p>"
+        }
+      },
+      {
+        "description": "\"a**\\\"foo\\\"**\\n\"",
+        "input": "a**\"foo\"**\n",
+        "expected": {
+          "html": "<p>a**\"foo\"**</p>"
+        }
+      },
+      {
+        "description": "\"foo**bar**\\n\"",
+        "input": "foo**bar**\n",
+        "expected": {
+          "html": "<p>foo<strong>bar</strong></p>"
+        }
+      },
+      {
+        "description": "\"__foo bar__\\n\"",
+        "input": "__foo bar__\n",
+        "expected": {
+          "html": "<p><strong>foo bar</strong></p>"
+        }
+      },
+      {
+        "description": "\"__ foo bar__\\n\"",
+        "input": "__ foo bar__\n",
+        "expected": {
+          "html": "<p>__ foo bar__</p>"
+        }
+      },
+      {
+        "description": "\"__\\nfoo bar__\\n\"",
+        "input": "__\nfoo bar__\n",
+        "expected": {
+          "html": "<p>__\nfoo bar__</p>"
+        }
+      },
+      {
+        "description": "\"a__\\\"foo\\\"__\\n\"",
+        "input": "a__\"foo\"__\n",
+        "expected": {
+          "html": "<p>a__\"foo\"__</p>"
+        }
+      },
+      {
+        "description": "\"foo__bar__\\n\"",
+        "input": "foo__bar__\n",
+        "expected": {
+          "html": "<p>foo__bar__</p>"
+        }
+      },
+      {
+        "description": "\"5__6__78\\n\"",
+        "input": "5__6__78\n",
+        "expected": {
+          "html": "<p>5__6__78</p>"
+        }
+      },
+      {
+        "description": "\"пристаням__стремятся__\\n\"",
+        "input": "пристаням__стремятся__\n",
+        "expected": {
+          "html": "<p>пристаням__стремятся__</p>"
+        }
+      },
+      {
+        "description": "\"__foo, __bar__, baz__\\n\"",
+        "input": "__foo, __bar__, baz__\n",
+        "expected": {
+          "html": "<p><strong>foo, <strong>bar</strong>, baz</strong></p>"
+        }
+      },
+      {
+        "description": "\"foo-__(bar)__\\n\"",
+        "input": "foo-__(bar)__\n",
+        "expected": {
+          "html": "<p>foo-<strong>(bar)</strong></p>"
+        }
+      },
+      {
+        "description": "\"**foo bar **\\n\"",
+        "input": "**foo bar **\n",
+        "expected": {
+          "html": "<p>**foo bar **</p>"
+        }
+      },
+      {
+        "description": "\"**(**foo)\\n\"",
+        "input": "**(**foo)\n",
+        "expected": {
+          "html": "<p>**(**foo)</p>"
+        }
+      },
+      {
+        "description": "\"*(**foo**)*\\n\"",
+        "input": "*(**foo**)*\n",
+        "expected": {
+          "html": "<p><em>(<strong>foo</strong>)</em></p>"
+        }
+      },
+      {
+        "description": "\"**Gomphocarpus (*Gomphocarpus physocarpus*, syn.\\n*Asclepias physocarpa*)**\\n\"",
+        "input": "**Gomphocarpus (*Gomphocarpus physocarpus*, syn.\n*Asclepias physocarpa*)**\n",
+        "expected": {
+          "html": "<p><strong>Gomphocarpus (<em>Gomphocarpus physocarpus</em>, syn.\n<em>Asclepias physocarpa</em>)</strong></p>"
+        }
+      },
+      {
+        "description": "\"**foo \\\"*bar*\\\" foo**\\n\"",
+        "input": "**foo \"*bar*\" foo**\n",
+        "expected": {
+          "html": "<p><strong>foo \"<em>bar</em>\" foo</strong></p>"
+        }
+      },
+      {
+        "description": "\"**foo**bar\\n\"",
+        "input": "**foo**bar\n",
+        "expected": {
+          "html": "<p><strong>foo</strong>bar</p>"
+        }
+      },
+      {
+        "description": "\"__foo bar __\\n\"",
+        "input": "__foo bar __\n",
+        "expected": {
+          "html": "<p>__foo bar __</p>"
+        }
+      },
+      {
+        "description": "\"__(__foo)\\n\"",
+        "input": "__(__foo)\n",
+        "expected": {
+          "html": "<p>__(__foo)</p>"
+        }
+      },
+      {
+        "description": "\"_(__foo__)_\\n\"",
+        "input": "_(__foo__)_\n",
+        "expected": {
+          "html": "<p><em>(<strong>foo</strong>)</em></p>"
+        }
+      },
+      {
+        "description": "\"__foo__bar\\n\"",
+        "input": "__foo__bar\n",
+        "expected": {
+          "html": "<p>__foo__bar</p>"
+        }
+      },
+      {
+        "description": "\"__пристаням__стремятся\\n\"",
+        "input": "__пристаням__стремятся\n",
+        "expected": {
+          "html": "<p>__пристаням__стремятся</p>"
+        }
+      },
+      {
+        "description": "\"__foo__bar__baz__\\n\"",
+        "input": "__foo__bar__baz__\n",
+        "expected": {
+          "html": "<p><strong>foo__bar__baz</strong></p>"
+        }
+      },
+      {
+        "description": "\"__(bar)__.\\n\"",
+        "input": "__(bar)__.\n",
+        "expected": {
+          "html": "<p><strong>(bar)</strong>.</p>"
+        }
+      },
+      {
+        "description": "\"*foo [bar](/url)*\\n\"",
+        "input": "*foo [bar](/url)*\n",
+        "expected": {
+          "html": "<p><em>foo <a href=\"/url\">bar</a></em></p>"
+        }
+      },
+      {
+        "description": "\"*foo\\nbar*\\n\"",
+        "input": "*foo\nbar*\n",
+        "expected": {
+          "html": "<p><em>foo\nbar</em></p>"
+        }
+      },
+      {
+        "description": "\"_foo __bar__ baz_\\n\"",
+        "input": "_foo __bar__ baz_\n",
+        "expected": {
+          "html": "<p><em>foo <strong>bar</strong> baz</em></p>"
+        }
+      },
+      {
+        "description": "\"_foo _bar_ baz_\\n\"",
+        "input": "_foo _bar_ baz_\n",
+        "expected": {
+          "html": "<p><em>foo <em>bar</em> baz</em></p>"
+        }
+      },
+      {
+        "description": "\"__foo_ bar_\\n\"",
+        "input": "__foo_ bar_\n",
+        "expected": {
+          "html": "<p><em><em>foo</em> bar</em></p>"
+        }
+      },
+      {
+        "description": "\"*foo *bar**\\n\"",
+        "input": "*foo *bar**\n",
+        "expected": {
+          "html": "<p><em>foo <em>bar</em></em></p>"
+        }
+      },
+      {
+        "description": "\"*foo **bar** baz*\\n\"",
+        "input": "*foo **bar** baz*\n",
+        "expected": {
+          "html": "<p><em>foo <strong>bar</strong> baz</em></p>"
+        }
+      },
+      {
+        "description": "\"*foo**bar**baz*\\n\"",
+        "input": "*foo**bar**baz*\n",
+        "expected": {
+          "html": "<p><em>foo<strong>bar</strong>baz</em></p>"
+        }
+      },
+      {
+        "description": "\"*foo**bar*\\n\"",
+        "input": "*foo**bar*\n",
+        "expected": {
+          "html": "<p><em>foo**bar</em></p>"
+        }
+      },
+      {
+        "description": "\"***foo** bar*\\n\"",
+        "input": "***foo** bar*\n",
+        "expected": {
+          "html": "<p><em><strong>foo</strong> bar</em></p>"
+        }
+      },
+      {
+        "description": "\"*foo **bar***\\n\"",
+        "input": "*foo **bar***\n",
+        "expected": {
+          "html": "<p><em>foo <strong>bar</strong></em></p>"
+        }
+      },
+      {
+        "description": "\"*foo**bar***\\n\"",
+        "input": "*foo**bar***\n",
+        "expected": {
+          "html": "<p><em>foo<strong>bar</strong></em></p>"
+        }
+      },
+      {
+        "description": "\"foo***bar***baz\\n\"",
+        "input": "foo***bar***baz\n",
+        "expected": {
+          "html": "<p>foo<em><strong>bar</strong></em>baz</p>"
+        }
+      },
+      {
+        "description": "\"foo******bar*********baz\\n\"",
+        "input": "foo******bar*********baz\n",
+        "expected": {
+          "html": "<p>foo<strong><strong><strong>bar</strong></strong></strong>***baz</p>"
+        }
+      },
+      {
+        "description": "\"*foo **bar *baz* bim** bop*\\n\"",
+        "input": "*foo **bar *baz* bim** bop*\n",
+        "expected": {
+          "html": "<p><em>foo <strong>bar <em>baz</em> bim</strong> bop</em></p>"
+        }
+      },
+      {
+        "description": "\"*foo [*bar*](/url)*\\n\"",
+        "input": "*foo [*bar*](/url)*\n",
+        "expected": {
+          "html": "<p><em>foo <a href=\"/url\"><em>bar</em></a></em></p>"
+        }
+      },
+      {
+        "description": "\"** is not an empty emphasis\\n\"",
+        "input": "** is not an empty emphasis\n",
+        "expected": {
+          "html": "<p>** is not an empty emphasis</p>"
+        }
+      },
+      {
+        "description": "\"**** is not an empty strong emphasis\\n\"",
+        "input": "**** is not an empty strong emphasis\n",
+        "expected": {
+          "html": "<p>**** is not an empty strong emphasis</p>"
+        }
+      },
+      {
+        "description": "\"**foo [bar](/url)**\\n\"",
+        "input": "**foo [bar](/url)**\n",
+        "expected": {
+          "html": "<p><strong>foo <a href=\"/url\">bar</a></strong></p>"
+        }
+      },
+      {
+        "description": "\"**foo\\nbar**\\n\"",
+        "input": "**foo\nbar**\n",
+        "expected": {
+          "html": "<p><strong>foo\nbar</strong></p>"
+        }
+      },
+      {
+        "description": "\"__foo _bar_ baz__\\n\"",
+        "input": "__foo _bar_ baz__\n",
+        "expected": {
+          "html": "<p><strong>foo <em>bar</em> baz</strong></p>"
+        }
+      },
+      {
+        "description": "\"__foo __bar__ baz__\\n\"",
+        "input": "__foo __bar__ baz__\n",
+        "expected": {
+          "html": "<p><strong>foo <strong>bar</strong> baz</strong></p>"
+        }
+      },
+      {
+        "description": "\"____foo__ bar__\\n\"",
+        "input": "____foo__ bar__\n",
+        "expected": {
+          "html": "<p><strong><strong>foo</strong> bar</strong></p>"
+        }
+      },
+      {
+        "description": "\"**foo **bar****\\n\"",
+        "input": "**foo **bar****\n",
+        "expected": {
+          "html": "<p><strong>foo <strong>bar</strong></strong></p>"
+        }
+      },
+      {
+        "description": "\"**foo *bar* baz**\\n\"",
+        "input": "**foo *bar* baz**\n",
+        "expected": {
+          "html": "<p><strong>foo <em>bar</em> baz</strong></p>"
+        }
+      },
+      {
+        "description": "\"**foo*bar*baz**\\n\"",
+        "input": "**foo*bar*baz**\n",
+        "expected": {
+          "html": "<p><strong>foo<em>bar</em>baz</strong></p>"
+        }
+      },
+      {
+        "description": "\"***foo* bar**\\n\"",
+        "input": "***foo* bar**\n",
+        "expected": {
+          "html": "<p><strong><em>foo</em> bar</strong></p>"
+        }
+      },
+      {
+        "description": "\"**foo *bar***\\n\"",
+        "input": "**foo *bar***\n",
+        "expected": {
+          "html": "<p><strong>foo <em>bar</em></strong></p>"
+        }
+      },
+      {
+        "description": "\"**foo *bar **baz**\\nbim* bop**\\n\"",
+        "input": "**foo *bar **baz**\nbim* bop**\n",
+        "expected": {
+          "html": "<p><strong>foo <em>bar <strong>baz</strong>\nbim</em> bop</strong></p>"
+        }
+      },
+      {
+        "description": "\"**foo [*bar*](/url)**\\n\"",
+        "input": "**foo [*bar*](/url)**\n",
+        "expected": {
+          "html": "<p><strong>foo <a href=\"/url\"><em>bar</em></a></strong></p>"
+        }
+      },
+      {
+        "description": "\"__ is not an empty emphasis\\n\"",
+        "input": "__ is not an empty emphasis\n",
+        "expected": {
+          "html": "<p>__ is not an empty emphasis</p>"
+        }
+      },
+      {
+        "description": "\"____ is not an empty strong emphasis\\n\"",
+        "input": "____ is not an empty strong emphasis\n",
+        "expected": {
+          "html": "<p>____ is not an empty strong emphasis</p>"
+        }
+      },
+      {
+        "description": "\"foo ***\\n\"",
+        "input": "foo ***\n",
+        "expected": {
+          "html": "<p>foo ***</p>"
+        }
+      },
+      {
+        "description": "\"foo *\\\\**\\n\"",
+        "input": "foo *\\**\n",
+        "expected": {
+          "html": "<p>foo <em>*</em></p>"
+        }
+      },
+      {
+        "description": "\"foo *_*\\n\"",
+        "input": "foo *_*\n",
+        "expected": {
+          "html": "<p>foo <em>_</em></p>"
+        }
+      },
+      {
+        "description": "\"foo *****\\n\"",
+        "input": "foo *****\n",
+        "expected": {
+          "html": "<p>foo *****</p>"
+        }
+      },
+      {
+        "description": "\"foo **\\\\***\\n\"",
+        "input": "foo **\\***\n",
+        "expected": {
+          "html": "<p>foo <strong>*</strong></p>"
+        }
+      },
+      {
+        "description": "\"foo **_**\\n\"",
+        "input": "foo **_**\n",
+        "expected": {
+          "html": "<p>foo <strong>_</strong></p>"
+        }
+      },
+      {
+        "description": "\"**foo*\\n\"",
+        "input": "**foo*\n",
+        "expected": {
+          "html": "<p>*<em>foo</em></p>"
+        }
+      },
+      {
+        "description": "\"*foo**\\n\"",
+        "input": "*foo**\n",
+        "expected": {
+          "html": "<p><em>foo</em>*</p>"
+        }
+      },
+      {
+        "description": "\"***foo**\\n\"",
+        "input": "***foo**\n",
+        "expected": {
+          "html": "<p>*<strong>foo</strong></p>"
+        }
+      },
+      {
+        "description": "\"****foo*\\n\"",
+        "input": "****foo*\n",
+        "expected": {
+          "html": "<p>***<em>foo</em></p>"
+        }
+      },
+      {
+        "description": "\"**foo***\\n\"",
+        "input": "**foo***\n",
+        "expected": {
+          "html": "<p><strong>foo</strong>*</p>"
+        }
+      },
+      {
+        "description": "\"*foo****\\n\"",
+        "input": "*foo****\n",
+        "expected": {
+          "html": "<p><em>foo</em>***</p>"
+        }
+      },
+      {
+        "description": "\"foo ___\\n\"",
+        "input": "foo ___\n",
+        "expected": {
+          "html": "<p>foo ___</p>"
+        }
+      },
+      {
+        "description": "\"foo _\\\\__\\n\"",
+        "input": "foo _\\__\n",
+        "expected": {
+          "html": "<p>foo <em>_</em></p>"
+        }
+      },
+      {
+        "description": "\"foo _*_\\n\"",
+        "input": "foo _*_\n",
+        "expected": {
+          "html": "<p>foo <em>*</em></p>"
+        }
+      },
+      {
+        "description": "\"foo _____\\n\"",
+        "input": "foo _____\n",
+        "expected": {
+          "html": "<p>foo _____</p>"
+        }
+      },
+      {
+        "description": "\"foo __\\\\___\\n\"",
+        "input": "foo __\\___\n",
+        "expected": {
+          "html": "<p>foo <strong>_</strong></p>"
+        }
+      },
+      {
+        "description": "\"foo __*__\\n\"",
+        "input": "foo __*__\n",
+        "expected": {
+          "html": "<p>foo <strong>*</strong></p>"
+        }
+      },
+      {
+        "description": "\"__foo_\\n\"",
+        "input": "__foo_\n",
+        "expected": {
+          "html": "<p>_<em>foo</em></p>"
+        }
+      },
+      {
+        "description": "\"_foo__\\n\"",
+        "input": "_foo__\n",
+        "expected": {
+          "html": "<p><em>foo</em>_</p>"
+        }
+      },
+      {
+        "description": "\"___foo__\\n\"",
+        "input": "___foo__\n",
+        "expected": {
+          "html": "<p>_<strong>foo</strong></p>"
+        }
+      },
+      {
+        "description": "\"____foo_\\n\"",
+        "input": "____foo_\n",
+        "expected": {
+          "html": "<p>___<em>foo</em></p>"
+        }
+      },
+      {
+        "description": "\"__foo___\\n\"",
+        "input": "__foo___\n",
+        "expected": {
+          "html": "<p><strong>foo</strong>_</p>"
+        }
+      },
+      {
+        "description": "\"_foo____\\n\"",
+        "input": "_foo____\n",
+        "expected": {
+          "html": "<p><em>foo</em>___</p>"
+        }
+      },
+      {
+        "description": "\"**foo**\\n\"",
+        "input": "**foo**\n",
+        "expected": {
+          "html": "<p><strong>foo</strong></p>"
+        }
+      },
+      {
+        "description": "\"*_foo_*\\n\"",
+        "input": "*_foo_*\n",
+        "expected": {
+          "html": "<p><em><em>foo</em></em></p>"
+        }
+      },
+      {
+        "description": "\"__foo__\\n\"",
+        "input": "__foo__\n",
+        "expected": {
+          "html": "<p><strong>foo</strong></p>"
+        }
+      },
+      {
+        "description": "\"_*foo*_\\n\"",
+        "input": "_*foo*_\n",
+        "expected": {
+          "html": "<p><em><em>foo</em></em></p>"
+        }
+      },
+      {
+        "description": "\"****foo****\\n\"",
+        "input": "****foo****\n",
+        "expected": {
+          "html": "<p><strong><strong>foo</strong></strong></p>"
+        }
+      },
+      {
+        "description": "\"____foo____\\n\"",
+        "input": "____foo____\n",
+        "expected": {
+          "html": "<p><strong><strong>foo</strong></strong></p>"
+        }
+      },
+      {
+        "description": "\"******foo******\\n\"",
+        "input": "******foo******\n",
+        "expected": {
+          "html": "<p><strong><strong><strong>foo</strong></strong></strong></p>"
+        }
+      },
+      {
+        "description": "\"***foo***\\n\"",
+        "input": "***foo***\n",
+        "expected": {
+          "html": "<p><em><strong>foo</strong></em></p>"
+        }
+      },
+      {
+        "description": "\"_____foo_____\\n\"",
+        "input": "_____foo_____\n",
+        "expected": {
+          "html": "<p><em><strong><strong>foo</strong></strong></em></p>"
+        }
+      },
+      {
+        "description": "\"*foo _bar* baz_\\n\"",
+        "input": "*foo _bar* baz_\n",
+        "expected": {
+          "html": "<p><em>foo _bar</em> baz_</p>"
+        }
+      },
+      {
+        "description": "\"*foo __bar *baz bim__ bam*\\n\"",
+        "input": "*foo __bar *baz bim__ bam*\n",
+        "expected": {
+          "html": "<p><em>foo <strong>bar *baz bim</strong> bam</em></p>"
+        }
+      },
+      {
+        "description": "\"**foo **bar baz**\\n\"",
+        "input": "**foo **bar baz**\n",
+        "expected": {
+          "html": "<p>**foo <strong>bar baz</strong></p>"
+        }
+      },
+      {
+        "description": "\"*foo *bar baz*\\n\"",
+        "input": "*foo *bar baz*\n",
+        "expected": {
+          "html": "<p>*foo <em>bar baz</em></p>"
+        }
+      },
+      {
+        "description": "\"*[bar*](/url)\\n\"",
+        "input": "*[bar*](/url)\n",
+        "expected": {
+          "html": "<p>*<a href=\"/url\">bar*</a></p>"
+        }
+      },
+      {
+        "description": "\"_foo [bar_](/url)\\n\"",
+        "input": "_foo [bar_](/url)\n",
+        "expected": {
+          "html": "<p>_foo <a href=\"/url\">bar_</a></p>"
+        }
+      },
+      {
+        "description": "\"*<img src=\\\"foo\\\" title=\\\"*\\\"/>\\n\"",
+        "input": "*<img src=\"foo\" title=\"*\"/>\n",
+        "expected": {
+          "html": "<p>*<img src=\"foo\" title=\"*\"/></p>"
+        }
+      },
+      {
+        "description": "\"**<a href=\\\"**\\\">\\n\"",
+        "input": "**<a href=\"**\">\n",
+        "expected": {
+          "html": "<p>**<a href=\"**\"></p>"
+        }
+      },
+      {
+        "description": "\"__<a href=\\\"__\\\">\\n\"",
+        "input": "__<a href=\"__\">\n",
+        "expected": {
+          "html": "<p>__<a href=\"__\"></p>"
+        }
+      },
+      {
+        "description": "\"*a `*`*\\n\"",
+        "input": "*a `*`*\n",
+        "expected": {
+          "html": "<p><em>a <code>*</code></em></p>"
+        }
+      },
+      {
+        "description": "\"_a `_`_\\n\"",
+        "input": "_a `_`_\n",
+        "expected": {
+          "html": "<p><em>a <code>_</code></em></p>"
+        }
+      },
+      {
+        "description": "\"**a<https://foo.bar/?q=**>\\n\"",
+        "input": "**a<https://foo.bar/?q=**>\n",
+        "expected": {
+          "html": "<p>**a<a href=\"https://foo.bar/?q=**\">https://foo.bar/?q=**</a></p>"
+        }
+      },
+      {
+        "description": "\"__a<https://foo.bar/?q=__>\\n\"",
+        "input": "__a<https://foo.bar/?q=__>\n",
+        "expected": {
+          "html": "<p>__a<a href=\"https://foo.bar/?q=__\">https://foo.bar/?q=__</a></p>"
+        }
+      }
+    ]
+  }
+]

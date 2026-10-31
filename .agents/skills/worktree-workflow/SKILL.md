@@ -62,6 +62,12 @@ refreshes only the landed paths in the root. It refuses:
 - a subject marked breaking, or one that is not a Conventional Commit;
 - a landed path that someone has dirty in the root.
 
+Landing one branch several times (a squash per feature) leaves `main` holding squashes of
+commits the branch also has, so each later `git merge main` reconciles a block both sides
+added and can keep it twice (a plugin table entry doubled once). Run the unit slice after
+every such merge and squash only once it passes; never chain `pnpm squash` after a step
+whose failure the chain ignores.
+
 Never run `git merge --squash` in the root: its commit takes everything any session has staged.
 Never fast-forward or merge-commit a branch into `main` either, because both carry its WIP commits.
 

@@ -20,4 +20,6 @@ pub(crate) struct ParseSettings<'s> {
     pub(crate) frontmatter: &'s [Matter],
     pub(crate) definition_list: bool,
     pub(crate) mdx: Option<&'s MdxScript>,
+    /// markdown-cjk-friendly's rules for `*`, `_` and `~`, from `md.cjkFriendly`.
+    pub(crate) cjk: bool,
 }

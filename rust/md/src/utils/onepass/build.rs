@@ -537,6 +537,7 @@ fn context<'d>(
         longest_identifier: blocks.longest_identifier,
         gfm: blocks.settings.gfm,
         math: blocks.settings.math,
+        cjk: blocks.settings.cjk,
         footnotes: &blocks.footnotes,
         task,
         in_table,

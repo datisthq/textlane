@@ -293,6 +293,33 @@ Different opening and closing fences.
 
 <!-- /generated -->
 
+## md.cjkFriendly
+
+Lets `*`, `_` and, with `md.gfm`, `~` emphasize text next to Chinese, Japanese and Korean characters and punctuation, as remark-cjk-friendly and remark-cjk-friendly-gfm-strikethrough parse it: `**これは強調。**です` is strong, where CommonMark leaves the asterisks. Text without CJK parses as before. `md.stringify` does not yet escape emphasis the CJK-friendly way, so Markdown written back may not parse to the same tree.
+
+```js
+import { textlane } from "textlane"
+import * as html from "textlane/html"
+import * as md from "textlane/md"
+
+const file = textlane()
+  .use(md.parse())
+  .use(md.cjkFriendly())
+  .use(md.toHtml())
+  .use(html.stringify())
+  .processSync("**これは強調。**です")
+file.value
+// <p><strong>これは強調。</strong>です</p>
+```
+
+<!-- generated:options md.cjkFriendly -->
+
+Follows [remark-cjk-friendly](https://www.npmjs.com/package/remark-cjk-friendly).
+
+No options.
+
+<!-- /generated -->
+
 ## md.gemoji
 
 Turns gemoji shortcodes such as `:tada:` into the emoji they name.

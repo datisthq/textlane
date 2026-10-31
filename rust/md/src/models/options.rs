@@ -1100,3 +1100,7 @@ pub struct Gemoji {
     /// Put a space after each emoji.
     pub pad_space_after: bool,
 }
+
+/// What `md::CjkFriendly` shares with the parser: `true` once it is used.
+#[derive(Clone, Debug, Default)]
+pub struct CjkFriendlySlot(pub bool);
