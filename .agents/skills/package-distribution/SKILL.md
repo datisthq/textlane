@@ -77,7 +77,7 @@ build has it; `_processor.py` is the processor, crossing the boundary as JSON te
 `process` gets the HTML back as a `str` of its own beside the file's messages and data:
 inside the JSON, encoding and parsing it cost Python 28% of a 1 MB README;
 `_native.pyi` and `py.typed` type it. `scripts/test.sh` runs every `-test/*_unit.py` against
-the installed wheel, never the source folder, which lacks the extension.
+the installed wheel, a release build, since a debug one overflows Windows' stack on deep trees, never the source folder, which lacks the extension.
 `dynamic = ["version"]` gives the wheel the crate's version. PyO3's `abi3-py39` makes one
 wheel per platform serve every CPython from 3.9. A wheel holds the skills under
 `.data/data/share/textlane/skills/`, installed to `<venv>/share/textlane/skills`. maturin reads

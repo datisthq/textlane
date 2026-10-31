@@ -5,6 +5,7 @@ cd "$(dirname "$0")/.."
 bash scripts/copy-skills.sh
 rm -rf build/test
 # Outside rust/, its rust-toolchain.toml does not apply: pin the same channel
-RUSTUP_TOOLCHAIN=stable uvx maturin@1.15.0 build --features python,testing --out build/test
+# A debug build's deep-tree recursion overflows the 2 MB stack python.exe has on Windows
+RUSTUP_TOOLCHAIN=stable uvx maturin@1.15.0 build --release --features python,testing --out build/test
 wheel=$(ls build/test/*.whl)
 uv run --no-project --with "$wheel" --with pytest==8.4.2 pytest -q -o "python_files=*_unit.py" ./-test/
