@@ -360,6 +360,62 @@ pub struct ExtractToc {
 pub struct Slug {
     /// Put before each id.
     pub prefix: String,
+    /// Link each heading with an `id` to itself, as rehype-autolink-headings does: `true`, or
+    /// its options.
+    pub autolink: Option<Autolink>,
+}
+
+/// `html.slug`'s `autolink`: on, or on with rehype-autolink-headings' options.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(untagged)]
+pub enum Autolink {
+    Enabled(bool),
+    Options(Box<AutolinkOptions>),
+}
+
+/// rehype-autolink-headings' options, JSON values only.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+pub struct AutolinkOptions {
+    /// Where the link goes: in the heading first or last, around its content, or before or
+    /// after it.
+    pub behavior: AutolinkBehavior,
+    /// The link's properties, as hast names them; `ariaHidden` and `tabIndex: -1` for
+    /// `prepend` and `append` when left out.
+    pub properties: Option<serde_json::Map<String, serde_json::Value>>,
+    /// hast content of the link, one node or a list; `<span class="icon icon-link">` when
+    /// left out, except for `wrap`, which appends it to the heading's content.
+    pub content: Option<serde_json::Value>,
+    /// A hast element wrapping the heading and its link, for `before` and `after`.
+    pub group: Option<serde_json::Value>,
+    /// Properties set on each linked heading.
+    pub heading_properties: Option<serde_json::Map<String, serde_json::Value>>,
+    /// The tag names of the headings to link; every heading when left out.
+    pub test: Option<TagNames>,
+}
+
+/// Where `autolink` puts each heading's link.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(rename_all = "lowercase")]
+pub enum AutolinkBehavior {
+    #[default]
+    Prepend,
+    Append,
+    Wrap,
+    Before,
+    After,
+}
+
+/// One tag name or several.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(untagged)]
+pub enum TagNames {
+    One(String),
+    Many(Vec<String>),
 }
 
 /// `html.toMarkdown`: hast into mdast; options named as hast-util-to-mdast names them.

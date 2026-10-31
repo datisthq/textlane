@@ -166,7 +166,9 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   `html` and `svg` schemas, generated and sorted for a binary search. `html.stringify` ports
   hast-util-to-html 9.0.5 whole, omission rules in `helpers/omission.rs`; serde_json keeps
   `preserve_order`, since hast writes properties in the order a tree lists them
-  `html.sanitize` and `html.slug` port hast-util-sanitize and rehype-slug; the sanitizer
+  `html.sanitize` and `html.slug` port hast-util-sanitize and rehype-slug (its `autolink`,
+  rehype-autolink-headings 7.1.0, a second pass after slugging in `actions/hast/autolink.rs`,
+  skipping what `before`/`after` spliced in as upstream's visitor does); the sanitizer
   walks with its own stack and counts open ancestors instead of searching them. The slugger
   is github-slugger in core (`textlane_core::Slugger`, `core/src/helpers/slug.rs`), shared by
   `html.slug` and `md.toc`, since md cannot depend on html; `helpers/slug_table.rs` beside it

@@ -4,6 +4,7 @@ use textlane_core::hast::{
 };
 use textlane_core::{Allocator, ArenaVec, Error};
 
+use crate::helpers::value::{read_json_value, set_property};
 use crate::models::options::{ExternalLinks, Tokens};
 
 /// Mark each link to another site as rehype-external-links does: its properties, `rel`,
@@ -43,7 +44,11 @@ fn mark_link<'a>(
 ) -> Result<(), Error> {
     if let Some(properties) = &options.properties {
         for (name, value) in properties {
-            set_property(element, alloc.alloc_str(name), read_value(value, alloc));
+            set_property(
+                element,
+                alloc.alloc_str(name),
+                read_json_value(value, alloc),
+            );
         }
     }
     if !rel.is_empty() {
@@ -79,7 +84,7 @@ fn mark_link<'a>(
         for (name, value) in options.content_properties.iter().flatten() {
             properties.push(Property {
                 name: alloc.alloc_str(name),
-                value: read_value(value, alloc),
+                value: read_json_value(value, alloc),
             });
         }
         element.children.push(Node::Element(Element {
@@ -143,44 +148,5 @@ fn read_rel(options: &ExternalLinks) -> Vec<String> {
         Some(Tokens::One(text)) if !text.is_empty() => tokens(text),
         Some(Tokens::Many(list)) => list.clone(),
         _ => vec!["nofollow".to_owned()],
-    }
-}
-
-fn set_property<'a>(element: &mut Element<'a>, name: &'a str, value: PropertyValue<'a>) {
-    match element
-        .properties
-        .iter_mut()
-        .find(|property| property.name == name)
-    {
-        Some(property) => property.value = value,
-        None => element.properties.push(Property { name, value }),
-    }
-}
-
-fn read_value<'a>(value: &Value, alloc: &'a Allocator) -> PropertyValue<'a> {
-    match value {
-        Value::Bool(value) => PropertyValue::Boolean(*value),
-        Value::Number(number) => {
-            PropertyValue::Number(number.as_f64().unwrap_or_default())
-        }
-        Value::String(text) => PropertyValue::String(alloc.alloc_str(text)),
-        Value::Array(items) => {
-            let mut list = ArenaVec::with_capacity_in(items.len(), alloc);
-            for item in items {
-                match item {
-                    Value::Number(number) => {
-                        list.push(PropertyItem::Number(
-                            number.as_f64().unwrap_or_default(),
-                        ));
-                    }
-                    Value::String(text) => {
-                        list.push(PropertyItem::String(alloc.alloc_str(text)))
-                    }
-                    _ => {}
-                }
-            }
-            PropertyValue::List(list)
-        }
-        Value::Null | Value::Object(_) => PropertyValue::Null,
     }
 }

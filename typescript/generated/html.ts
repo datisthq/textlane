@@ -79,7 +79,34 @@ export type Primitive = boolean | number | string
 export interface SlugOptions {
   /** Put before each id. @default "" */
   prefix?: string
+  /** Link each heading with an `id` to itself, as rehype-autolink-headings does: `true`, or its options. */
+  autolink?: Autolink | null
 }
+
+/** `html.slug`'s `autolink`: on, or on with rehype-autolink-headings' options. */
+export type Autolink = boolean | AutolinkOptions
+
+/** rehype-autolink-headings' options, JSON values only. */
+export interface AutolinkOptions {
+  /** Where the link goes: in the heading first or last, around its content, or before or after it. */
+  behavior?: AutolinkBehavior
+  /** The link's properties, as hast names them; `ariaHidden` and `tabIndex: -1` for `prepend` and `append` when left out. */
+  properties?: Record<string, unknown> | null
+  /** hast content of the link, one node or a list; `<span class="icon icon-link">` when left out, except for `wrap`, which appends it to the heading's content. */
+  content?: unknown
+  /** A hast element wrapping the heading and its link, for `before` and `after`. */
+  group?: unknown
+  /** Properties set on each linked heading. */
+  headingProperties?: Record<string, unknown> | null
+  /** The tag names of the headings to link; every heading when left out. */
+  test?: TagNames | null
+}
+
+/** Where `autolink` puts each heading's link. */
+export type AutolinkBehavior = "prepend" | "append" | "wrap" | "before" | "after"
+
+/** One tag name or several. */
+export type TagNames = string | string[]
 
 /** `html.externalLinks`: `rel`, `target` and more on links to other sites, as rehype-external-links adds them; options named as it names them, JSON values only. */
 export interface ExternalLinksOptions {

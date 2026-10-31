@@ -577,5 +577,691 @@
         }
       }
     ]
+  },
+  {
+    "description": "rehype-autolink-headings fixtures {\"behavior\":\"after\"}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-autolink-headings",
+      "commit": "a2a9d5b4589379108c4daa4b21639e2ede20292a",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.slug",
+        {
+          "autolink": {
+            "behavior": "after"
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture behavior-after",
+        "input": "<h1 id=\"foo\">Bar</h1>\n",
+        "expected": {
+          "html": "<h1 id=\"foo\">Bar</h1><a href=\"#foo\"><span class=\"icon icon-link\"></span></a>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-autolink-headings fixtures {\"behavior\":\"append\"}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-autolink-headings",
+      "commit": "a2a9d5b4589379108c4daa4b21639e2ede20292a",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.slug",
+        {
+          "autolink": {
+            "behavior": "append"
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture behavior-append",
+        "input": "<h1 id=\"foo\">Bar</h1>\n",
+        "expected": {
+          "html": "<h1 id=\"foo\">Bar<a aria-hidden=\"true\" tabindex=\"-1\" href=\"#foo\"><span class=\"icon icon-link\"></span></a></h1>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-autolink-headings fixtures {\"behavior\":\"before\"}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-autolink-headings",
+      "commit": "a2a9d5b4589379108c4daa4b21639e2ede20292a",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.slug",
+        {
+          "autolink": {
+            "behavior": "before"
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture behavior-before",
+        "input": "<h1 id=\"foo\">Bar</h1>\n",
+        "expected": {
+          "html": "<a href=\"#foo\"><span class=\"icon icon-link\"></span></a><h1 id=\"foo\">Bar</h1>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-autolink-headings fixtures",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-autolink-headings",
+      "commit": "a2a9d5b4589379108c4daa4b21639e2ede20292a",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.slug",
+        {
+          "autolink": true
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture behavior-prepend",
+        "input": "<h1 id=\"foo\">Bar</h1>\n",
+        "expected": {
+          "html": "<h1 id=\"foo\"><a aria-hidden=\"true\" tabindex=\"-1\" href=\"#foo\"><span class=\"icon icon-link\"></span></a>Bar</h1>\n"
+        }
+      },
+      {
+        "description": "fixture default",
+        "input": "<p>Alpha</p>\n<h1 id=\"bravo\">Charlie</h1>\n<p>Delta</p>\n",
+        "expected": {
+          "html": "<p>Alpha</p>\n<h1 id=\"bravo\"><a aria-hidden=\"true\" tabindex=\"-1\" href=\"#bravo\"><span class=\"icon icon-link\"></span></a>Charlie</h1>\n<p>Delta</p>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-autolink-headings fixtures {\"behavior\":\"wrap\"}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-autolink-headings",
+      "commit": "a2a9d5b4589379108c4daa4b21639e2ede20292a",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.slug",
+        {
+          "autolink": {
+            "behavior": "wrap"
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture behavior-wrap",
+        "input": "<h1 id=\"foo\">Bar</h1>\n",
+        "expected": {
+          "html": "<h1 id=\"foo\"><a href=\"#foo\">Bar</a></h1>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-autolink-headings fixtures {\"behavior\":\"wrap\",\"content\":[{\"type\":\"element\",\"tagName\":\"span\",\"properties\":{\"className\":[\"icon\",\"icon-link\"]},\"children\":[]}]}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-autolink-headings",
+      "commit": "a2a9d5b4589379108c4daa4b21639e2ede20292a",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.slug",
+        {
+          "autolink": {
+            "behavior": "wrap",
+            "content": [
+              {
+                "type": "element",
+                "tagName": "span",
+                "properties": {
+                  "className": ["icon", "icon-link"]
+                },
+                "children": []
+              }
+            ]
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture behavior-wrap-content-multiple",
+        "input": "<h1 id=\"foo\">Bar</h1>\n",
+        "expected": {
+          "html": "<h1 id=\"foo\"><a href=\"#foo\">Bar<span class=\"icon icon-link\"></span></a></h1>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-autolink-headings fixtures {\"behavior\":\"wrap\",\"content\":{\"type\":\"element\",\"tagName\":\"span\",\"properties\":{\"className\":[\"icon\",\"icon-link\"]},\"children\":[]}}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-autolink-headings",
+      "commit": "a2a9d5b4589379108c4daa4b21639e2ede20292a",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.slug",
+        {
+          "autolink": {
+            "behavior": "wrap",
+            "content": {
+              "type": "element",
+              "tagName": "span",
+              "properties": {
+                "className": ["icon", "icon-link"]
+              },
+              "children": []
+            }
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture behavior-wrap-content-one",
+        "input": "<h1 id=\"foo\">Bar</h1>\n",
+        "expected": {
+          "html": "<h1 id=\"foo\"><a href=\"#foo\">Bar<span class=\"icon icon-link\"></span></a></h1>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-autolink-headings fixtures {\"content\":[{\"type\":\"comment\",\"value\":\"Foo \"},{\"type\":\"text\",\"value\":\"bar\"},{\"type\":\"comment\",\"value\":\" baz\"}]}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-autolink-headings",
+      "commit": "a2a9d5b4589379108c4daa4b21639e2ede20292a",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.slug",
+        {
+          "autolink": {
+            "content": [
+              {
+                "type": "comment",
+                "value": "Foo "
+              },
+              {
+                "type": "text",
+                "value": "bar"
+              },
+              {
+                "type": "comment",
+                "value": " baz"
+              }
+            ]
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture content-multiple",
+        "input": "<h1 id=\"foo\">Bar</h1>\n",
+        "expected": {
+          "html": "<h1 id=\"foo\"><a aria-hidden=\"true\" tabindex=\"-1\" href=\"#foo\"><!--Foo -->bar<!-- baz--></a>Bar</h1>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-autolink-headings fixtures {\"content\":{\"type\":\"comment\",\"value\":\"Tada!\"}}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-autolink-headings",
+      "commit": "a2a9d5b4589379108c4daa4b21639e2ede20292a",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.slug",
+        {
+          "autolink": {
+            "content": {
+              "type": "comment",
+              "value": "Tada!"
+            }
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture content-one",
+        "input": "<h1 id=\"foo\">Bar</h1>\n",
+        "expected": {
+          "html": "<h1 id=\"foo\"><a aria-hidden=\"true\" tabindex=\"-1\" href=\"#foo\"><!--Tada!--></a>Bar</h1>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-autolink-headings fixtures {\"behavior\":\"before\",\"group\":{\"type\":\"element\",\"tagName\":\"div\",\"properties\":{\"className\":[\"heading-group\"]}}}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-autolink-headings",
+      "commit": "a2a9d5b4589379108c4daa4b21639e2ede20292a",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.slug",
+        {
+          "autolink": {
+            "behavior": "before",
+            "group": {
+              "type": "element",
+              "tagName": "div",
+              "properties": {
+                "className": ["heading-group"]
+              }
+            }
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture group",
+        "input": "<h1 id=\"foo\">Bar</h1>\n",
+        "expected": {
+          "html": "<div class=\"heading-group\"><a href=\"#foo\"><span class=\"icon icon-link\"></span></a><h1 id=\"foo\">Bar</h1></div>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-autolink-headings fixtures {\"headingProperties\":{\"className\":[\"foo\",\"bar\",\"baz\"],\"dataQux\":\"quux\"}}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-autolink-headings",
+      "commit": "a2a9d5b4589379108c4daa4b21639e2ede20292a",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.slug",
+        {
+          "autolink": {
+            "headingProperties": {
+              "className": ["foo", "bar", "baz"],
+              "dataQux": "quux"
+            }
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture heading-properties",
+        "input": "<h1 id=\"foo\">Bar</h1>\n",
+        "expected": {
+          "html": "<h1 id=\"foo\" class=\"foo bar baz\" data-qux=\"quux\"><a aria-hidden=\"true\" tabindex=\"-1\" href=\"#foo\"><span class=\"icon icon-link\"></span></a>Bar</h1>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-autolink-headings fixtures {\"properties\":{\"className\":[\"foo\",\"bar\",\"baz\"],\"dataQux\":\"quux\"}}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-autolink-headings",
+      "commit": "a2a9d5b4589379108c4daa4b21639e2ede20292a",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.slug",
+        {
+          "autolink": {
+            "properties": {
+              "className": ["foo", "bar", "baz"],
+              "dataQux": "quux"
+            }
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture properties",
+        "input": "<h1 id=\"foo\">Bar</h1>\n",
+        "expected": {
+          "html": "<h1 id=\"foo\"><a class=\"foo bar baz\" data-qux=\"quux\" href=\"#foo\"><span class=\"icon icon-link\"></span></a>Bar</h1>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-autolink-headings fixtures {\"test\":[\"h1\",\"h2\"]}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-autolink-headings",
+      "commit": "a2a9d5b4589379108c4daa4b21639e2ede20292a",
+      "path": "test/fixtures",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.slug",
+        {
+          "autolink": {
+            "test": ["h1", "h2"]
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "fixture test",
+        "input": "<h1 id=\"alpha\">Alpha</h1>\n<h2 id=\"bravo\">Bravo</h2>\n<h3 id=\"charlie\">Charlie</h3>\n<h4 id=\"delta\">Delta</h4>\n<h5 id=\"echo\">Echo</h5>\n<h6 id=\"foxtrot\">Foxtrot</h6>\n",
+        "expected": {
+          "html": "<h1 id=\"alpha\"><a aria-hidden=\"true\" tabindex=\"-1\" href=\"#alpha\"><span class=\"icon icon-link\"></span></a>Alpha</h1>\n<h2 id=\"bravo\"><a aria-hidden=\"true\" tabindex=\"-1\" href=\"#bravo\"><span class=\"icon icon-link\"></span></a>Bravo</h2>\n<h3 id=\"charlie\">Charlie</h3>\n<h4 id=\"delta\">Delta</h4>\n<h5 id=\"echo\">Echo</h5>\n<h6 id=\"foxtrot\">Foxtrot</h6>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-autolink-headings on textlane's inputs true",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-autolink-headings",
+      "commit": "a2a9d5b4589379108c4daa4b21639e2ede20292a",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.slug",
+        {
+          "autolink": true
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "<h1>One</h1><h2>One</h2><p>x</p>",
+        "input": "<h1>One</h1><h2>One</h2><p>x</p>",
+        "expected": {
+          "html": "<h1 id=\"one\"><a aria-hidden=\"true\" tabindex=\"-1\" href=\"#one\"><span class=\"icon icon-link\"></span></a>One</h1><h2 id=\"one-1\"><a aria-hidden=\"true\" tabindex=\"-1\" href=\"#one-1\"><span class=\"icon icon-link\"></span></a>One</h2><p>x</p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-autolink-headings on textlane's inputs {\"behavior\":\"before\"}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-autolink-headings",
+      "commit": "a2a9d5b4589379108c4daa4b21639e2ede20292a",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.slug",
+        {
+          "autolink": {
+            "behavior": "before"
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "<blockquote><h2 id=a>A</h2><div><h3>B</h3></div></blockquote>",
+        "input": "<blockquote><h2 id=a>A</h2><div><h3>B</h3></div></blockquote>",
+        "expected": {
+          "html": "<blockquote><a href=\"#a\"><span class=\"icon icon-link\"></span></a><h2 id=\"a\">A</h2><div><a href=\"#b\"><span class=\"icon icon-link\"></span></a><h3 id=\"b\">B</h3></div></blockquote>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-autolink-headings on textlane's inputs {\"behavior\":\"after\",\"group\":{\"type\":\"element\",\"tagName\":\"div\",\"properties\":{},\"children\":[]}}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-autolink-headings",
+      "commit": "a2a9d5b4589379108c4daa4b21639e2ede20292a",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.slug",
+        {
+          "autolink": {
+            "behavior": "after",
+            "group": {
+              "type": "element",
+              "tagName": "div",
+              "properties": {},
+              "children": []
+            }
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "<section><h2>A</h2><h2>B</h2></section>",
+        "input": "<section><h2>A</h2><h2>B</h2></section>",
+        "expected": {
+          "html": "<section><div><h2 id=\"a\">A</h2><a href=\"#a\"><span class=\"icon icon-link\"></span></a></div><div><h2 id=\"b\">B</h2><a href=\"#b\"><span class=\"icon icon-link\"></span></a></div></section>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-autolink-headings on textlane's inputs {\"behavior\":\"wrap\"}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-autolink-headings",
+      "commit": "a2a9d5b4589379108c4daa4b21639e2ede20292a",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.slug",
+        {
+          "autolink": {
+            "behavior": "wrap"
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "<h2>A <a href=#x>link</a></h2>",
+        "input": "<h2>A <a href=#x>link</a></h2>",
+        "expected": {
+          "html": "<h2 id=\"a-link\"><a href=\"#a-link\">A <a href=\"#x\">link</a></a></h2>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "rehype-autolink-headings on textlane's inputs {\"behavior\":\"append\"}",
+    "source": {
+      "repository": "https://github.com/rehypejs/rehype-autolink-headings",
+      "commit": "a2a9d5b4589379108c4daa4b21639e2ede20292a",
+      "path": "lib/index.js",
+      "license": "MIT"
+    },
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.slug",
+        {
+          "autolink": {
+            "behavior": "append"
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "<h1 id=0>zero</h1><h7 id=b>no rank</h7>",
+        "input": "<h1 id=0>zero</h1><h7 id=b>no rank</h7>",
+        "expected": {
+          "html": "<h1 id=\"0\">zero<a aria-hidden=\"true\" tabindex=\"-1\" href=\"#0\"><span class=\"icon icon-link\"></span></a></h1><h7 id=\"b\">no rank</h7>"
+        }
+      }
+    ]
   }
 ]

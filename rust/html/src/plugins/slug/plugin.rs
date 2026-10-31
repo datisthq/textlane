@@ -1,7 +1,8 @@
 use textlane_core::{Allocator, Attach, Error, File, Plugin, Transform, Tree, TreeKind};
 
+use crate::actions::hast::autolink::link_headings;
 use crate::actions::hast::slug::slug_hast;
-use crate::models::options::Slug;
+use crate::models::options::{Autolink, AutolinkOptions, Slug};
 
 impl Plugin for Slug {
     fn attach(&self, context: &mut Attach) -> Result<(), Error> {
@@ -28,6 +29,15 @@ impl Transform for Slug {
         match tree {
             Tree::Hast(mut node) => {
                 slug_hast(&mut node, self, alloc);
+                match &self.autolink {
+                    Some(Autolink::Enabled(true)) => {
+                        link_headings(&mut node, &AutolinkOptions::default(), alloc)?;
+                    }
+                    Some(Autolink::Options(options)) => {
+                        link_headings(&mut node, options, alloc)?
+                    }
+                    Some(Autolink::Enabled(false)) | None => {}
+                }
                 Ok(Tree::Hast(node))
             }
             _ => Err(Error::new("invalid-stage", "`html.slug` takes hast")),

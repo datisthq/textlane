@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs"
+import { existsSync, readdirSync, readFileSync } from "node:fs"
 import { join, resolve } from "node:path"
 import { parse } from "acorn"
 import type { AnyNode, CallExpression } from "acorn"
@@ -6,6 +6,7 @@ import { ancestor } from "acorn-walk"
 import { raw } from "hast-util-raw"
 import { defaultSchema, sanitize } from "hast-util-sanitize"
 import { h, s } from "hastscript"
+import rehypeAutolinkHeadings from "rehype-autolink-headings"
 import rehypeMinifyWhitespace from "rehype-minify-whitespace"
 import rehypeParse from "rehype-parse"
 import rehypeSanitize from "rehype-sanitize"
@@ -37,6 +38,10 @@ const REHYPE_SANITIZE = {
 const SLUG = {
   url: "https://github.com/rehypejs/rehype-slug",
   commit: "f90fc8f4b469b54b26c13ce4b754bd7e6da3e351",
+}
+const AUTOLINK = {
+  url: "https://github.com/rehypejs/rehype-autolink-headings",
+  commit: "a2a9d5b4589379108c4daa4b21639e2ede20292a",
 }
 const MINIFY = {
   url: "https://github.com/rehypejs/rehype-minify",
@@ -106,6 +111,7 @@ function importTransforms() {
   })
   writeSluggerCases()
   writeMinifyCases()
+  writeAutolinkCases()
   console.log(`html transforms: ${written} cases`)
   for (const [reason, count] of skipped) console.log(`  skipped ${count}: ${reason}`)
 }
@@ -306,6 +312,101 @@ function writeMinifyCases() {
   writeGroups({
     path: join(OUTPUT, "format.json"),
     repository: MINIFY.url,
+    groups: [...groups.values()],
+  })
+}
+
+// rehype-autolink-headings' fixtures: input.html, output.html and options in config.json,
+// parsed as a fragment; `html.slug({ autolink })` slugs first, so the reference is rehype-slug
+// then rehype-autolink-headings, upstream's snapshot kept where it differs
+function writeAutolinkCases() {
+  const root = join(
+    fetchSource({ repository: AUTOLINK.url, commit: AUTOLINK.commit }),
+    "test",
+    "fixtures",
+  )
+  const groups = new Map<string, Group>()
+  for (const name of readdirSync(root).sort()) {
+    const configPath = join(root, name, "config.json")
+    const config: Record<string, unknown> = existsSync(configPath)
+      ? JSON.parse(readFileSync(configPath, "utf8"))
+      : {}
+    const input = readFileSync(join(root, name, "input.html"), "utf8")
+    const html = String(
+      unified()
+        .use(rehypeParse, { fragment: true })
+        .use(rehypeSlug)
+        .use(rehypeAutolinkHeadings, config)
+        .use(rehypeStringify)
+        .processSync(input),
+    )
+    const snapshot = readFileSync(join(root, name, "output.html"), "utf8")
+    const autolink = Object.keys(config).length > 0 ? config : true
+    const key = JSON.stringify(autolink)
+    const group = groups.get(key) ?? {
+      description: `rehype-autolink-headings fixtures${autolink === true ? "" : ` ${key}`}`,
+      source: source(AUTOLINK, "test/fixtures"),
+      pipeline: [
+        ["html.parse", { fragment: true }],
+        ["html.slug", { autolink }],
+        ["html.stringify"],
+      ],
+      tests: [],
+    }
+    group.tests.push({
+      description: `fixture ${name}`,
+      ...(html === snapshot
+        ? {}
+        : { comment: `rehype-autolink-headings' snapshot: ${snapshot}` }),
+      input,
+      expected: { html },
+    })
+    groups.set(key, group)
+    written += 1
+  }
+  // textlane's own inputs, through the same reference: headings slugged first, nested ones
+  // around which `before` and `group` splice, and headings holding links already
+  const own: [string, Record<string, unknown>][] = [
+    ["<h1>One</h1><h2>One</h2><p>x</p>", {}],
+    [
+      "<blockquote><h2 id=a>A</h2><div><h3>B</h3></div></blockquote>",
+      { behavior: "before" },
+    ],
+    [
+      "<section><h2>A</h2><h2>B</h2></section>",
+      {
+        behavior: "after",
+        group: { type: "element", tagName: "div", properties: {}, children: [] },
+      },
+    ],
+    ["<h2>A <a href=#x>link</a></h2>", { behavior: "wrap" }],
+    ["<h1 id=0>zero</h1><h7 id=b>no rank</h7>", { behavior: "append" }],
+  ]
+  for (const [input, config] of own) {
+    const html = String(
+      unified()
+        .use(rehypeParse, { fragment: true })
+        .use(rehypeSlug)
+        .use(rehypeAutolinkHeadings, config)
+        .use(rehypeStringify)
+        .processSync(input),
+    )
+    const autolink = Object.keys(config).length > 0 ? config : true
+    groups.set(`own ${JSON.stringify(autolink)}`, {
+      description: `rehype-autolink-headings on textlane's inputs ${JSON.stringify(autolink)}`,
+      source: { ...source(AUTOLINK, "lib/index.js") },
+      pipeline: [
+        ["html.parse", { fragment: true }],
+        ["html.slug", { autolink }],
+        ["html.stringify"],
+      ],
+      tests: [{ description: input, input, expected: { html } }],
+    })
+    written += 1
+  }
+  writeGroups({
+    path: join(OUTPUT, "slug.json"),
+    repository: AUTOLINK.url,
     groups: [...groups.values()],
   })
 }

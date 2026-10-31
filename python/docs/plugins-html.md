@@ -195,13 +195,47 @@ file["value"]
 # <h2 id="getting-started">Getting started</h2>
 ```
 
+`"autolink": True` also links each heading to itself, as rehype-autolink-headings does after rehype-slug: an `<a href="#id">` prepended by default, or placed by `behavior` (`append`, `wrap`, `before`, `after`). Its options take JSON values only: `content` and `group` are hast nodes, not functions.
+
 <!-- generated:options html.slug -->
 
 Follows [rehype-slug](https://www.npmjs.com/package/rehype-slug).
 
-| Option   | Type  | Default | Description         |
-| -------- | ----- | ------- | ------------------- |
-| `prefix` | `str` | `""`    | Put before each id. |
+| Option     | Type                 | Default | Description                                                                                         |
+| ---------- | -------------------- | ------- | --------------------------------------------------------------------------------------------------- |
+| `prefix`   | `str`                | `""`    | Put before each id.                                                                                 |
+| `autolink` | `Optional[Autolink]` |         | Link each heading with an `id` to itself, as rehype-autolink-headings does: `true`, or its options. |
+
+**`Autolink`**
+
+`html.slug`'s `autolink`: on, or on with rehype-autolink-headings' options.
+
+Takes `Union[bool, AutolinkOptions]`.
+
+**`AutolinkOptions`**
+
+rehype-autolink-headings' options, JSON values only.
+
+| Option              | Type                       | Default | Description                                                                                                                                                |
+| ------------------- | -------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `behavior`          | `AutolinkBehavior`         |         | Where the link goes: in the heading first or last, around its content, or before or after it.                                                              |
+| `properties`        | `Optional[Dict[str, Any]]` | `None`  | The link's properties, as hast names them; `ariaHidden` and `tabIndex: -1` for `prepend` and `append` when left out.                                       |
+| `content`           | `Any`                      | `None`  | hast content of the link, one node or a list; `<span class="icon icon-link">` when left out, except for `wrap`, which appends it to the heading's content. |
+| `group`             | `Any`                      | `None`  | A hast element wrapping the heading and its link, for `before` and `after`.                                                                                |
+| `headingProperties` | `Optional[Dict[str, Any]]` | `None`  | Properties set on each linked heading.                                                                                                                     |
+| `test`              | `Optional[TagNames]`       |         | The tag names of the headings to link; every heading when left out.                                                                                        |
+
+**`AutolinkBehavior`**
+
+Where `autolink` puts each heading's link.
+
+Takes `Literal["prepend", "append", "wrap", "before", "after"]`.
+
+**`TagNames`**
+
+One tag name or several.
+
+Takes `Union[str, List[str]]`.
 
 <!-- /generated -->
 

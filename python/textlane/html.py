@@ -118,11 +118,45 @@ class SanitizeOptions(TypedDict, total=False):
     tagNames: Optional[List[str]]
 
 
+# Where `autolink` puts each heading's link.
+AutolinkBehavior = Literal["prepend", "append", "wrap", "before", "after"]
+
+
+# One tag name or several.
+TagNames = Union[str, List[str]]
+
+
+# rehype-autolink-headings' options, JSON values only.
+class AutolinkOptions(TypedDict, total=False):
+    # Where the link goes: in the heading first or last, around its content, or before or
+    # after it.
+    behavior: AutolinkBehavior
+    # The link's properties, as hast names them; `ariaHidden` and `tabIndex: -1` for
+    # `prepend` and `append` when left out.
+    properties: Optional[Dict[str, Any]]
+    # hast content of the link, one node or a list; `<span class="icon icon-link">` when
+    # left out, except for `wrap`, which appends it to the heading's content.
+    content: Any
+    # A hast element wrapping the heading and its link, for `before` and `after`.
+    group: Any
+    # Properties set on each linked heading.
+    headingProperties: Optional[Dict[str, Any]]
+    # The tag names of the headings to link; every heading when left out.
+    test: Optional[TagNames]
+
+
+# `html.slug`'s `autolink`: on, or on with rehype-autolink-headings' options.
+Autolink = Union[bool, AutolinkOptions]
+
+
 # `html.slug`: ids on headings, from their text; options named as rehype-slug names
 # them.
 class SlugOptions(TypedDict, total=False):
     # Put before each id.
     prefix: str
+    # Link each heading with an `id` to itself, as rehype-autolink-headings does: `true`, or
+    # its options.
+    autolink: Optional[Autolink]
 
 
 # Tokens: a list, or one string of them separated by white space.

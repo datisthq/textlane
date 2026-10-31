@@ -1,6 +1,8 @@
 use std::borrow::Cow;
 
-use textlane_core::hast::{Element, PropertyItem, PropertyValue};
+use serde_json::Value;
+use textlane_core::hast::{Element, Property, PropertyItem, PropertyValue};
+use textlane_core::{Allocator, ArenaVec};
 
 use crate::actions::hast::stringify::write_js_number;
 
@@ -86,4 +88,52 @@ pub(crate) fn parse_int(value: &str) -> Option<f64> {
         number = Some(number.unwrap_or(0.0) * 10.0 + digit);
     }
     number.map(|number| if negative { -number } else { number })
+}
+
+/// Set a property, replacing one of that name.
+pub(crate) fn set_property<'a>(
+    element: &mut Element<'a>,
+    name: &'a str,
+    value: PropertyValue<'a>,
+) {
+    match element
+        .properties
+        .iter_mut()
+        .find(|property| property.name == name)
+    {
+        Some(property) => property.value = value,
+        None => element.properties.push(Property { name, value }),
+    }
+}
+
+/// A JSON option's value as a hast property holds it; objects and `null` are `null`.
+pub(crate) fn read_json_value<'a>(
+    value: &Value,
+    alloc: &'a Allocator,
+) -> PropertyValue<'a> {
+    match value {
+        Value::Bool(value) => PropertyValue::Boolean(*value),
+        Value::Number(number) => {
+            PropertyValue::Number(number.as_f64().unwrap_or_default())
+        }
+        Value::String(text) => PropertyValue::String(alloc.alloc_str(text)),
+        Value::Array(items) => {
+            let mut list = ArenaVec::with_capacity_in(items.len(), alloc);
+            for item in items {
+                match item {
+                    Value::Number(number) => {
+                        list.push(PropertyItem::Number(
+                            number.as_f64().unwrap_or_default(),
+                        ));
+                    }
+                    Value::String(text) => {
+                        list.push(PropertyItem::String(alloc.alloc_str(text)))
+                    }
+                    _ => {}
+                }
+            }
+            PropertyValue::List(list)
+        }
+        Value::Null | Value::Object(_) => PropertyValue::Null,
+    }
 }

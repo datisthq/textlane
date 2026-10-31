@@ -79,6 +79,7 @@ mod actions {
         pub(crate) mod convert;
     }
     pub(crate) mod hast {
+        pub(crate) mod autolink;
         pub(crate) mod bridge;
         pub(crate) mod convert;
         pub(crate) mod external;
@@ -234,10 +235,11 @@ mod plugins {
 
 // models
 pub use models::options::{
-    AttributeDefinition, Classes, ColorReplacement, ConfiguredTransformer, ExternalLinks,
-    ExtractToc, Format, Highlight, HighlightTransformer, Indent, InlineCode, Katex,
-    KatexOutput, KatexStrict, KatexStrictMode, Minify, MinifyOptions, Parse, Primitive,
-    Raw, Sanitize, Slug, Stringify, ToMarkdown, Tokens, TransformerName,
+    AttributeDefinition, Autolink, AutolinkBehavior, AutolinkOptions, Classes,
+    ColorReplacement, ConfiguredTransformer, ExternalLinks, ExtractToc, Format,
+    Highlight, HighlightTransformer, Indent, InlineCode, Katex, KatexOutput, KatexStrict,
+    KatexStrictMode, Minify, MinifyOptions, Parse, Primitive, Raw, Sanitize, Slug,
+    Stringify, TagNames, ToMarkdown, Tokens, TransformerName,
 };
 
 // actions
