@@ -622,7 +622,8 @@ impl Convert<'_, '_> {
     // so a node without it is parsed from its `value`
     fn load(&mut self, data: Option<&Data<'_>>) -> Option<(Id, Vec<Id>)> {
         let loaded = load_estree(&mut self.store, data, self.next_base)?;
-        self.next_base += loaded.span + 4;
+        // a plugin's offsets are any JSON number, which `as usize` saturates
+        self.next_base = self.next_base.saturating_add(loaded.span).saturating_add(4);
         Some((loaded.program, loaded.comments))
     }
 

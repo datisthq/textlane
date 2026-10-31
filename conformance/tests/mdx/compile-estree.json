@@ -206,6 +206,56 @@
         }
       },
       {
+        "description": "ESM estree with offsets past any document",
+        "tree": {
+          "type": "root",
+          "children": [
+            {
+              "type": "mdxjsEsm",
+              "value": "",
+              "data": {
+                "estree": {
+                  "type": "Program",
+                  "body": [
+                    {
+                      "type": "ExportNamedDeclaration",
+                      "declaration": {
+                        "type": "VariableDeclaration",
+                        "declarations": [
+                          {
+                            "type": "VariableDeclarator",
+                            "id": {
+                              "type": "Identifier",
+                              "name": "a"
+                            },
+                            "init": {
+                              "type": "Literal",
+                              "value": 1,
+                              "raw": "1"
+                            }
+                          }
+                        ],
+                        "kind": "const"
+                      },
+                      "specifiers": [],
+                      "source": null,
+                      "attributes": []
+                    }
+                  ],
+                  "sourceType": "module",
+                  "comments": [],
+                  "start": 0,
+                  "end": 1e300
+                }
+              }
+            }
+          ]
+        },
+        "expected": {
+          "js": "import {Fragment as _Fragment, jsx as _jsx} from \"react/jsx-runtime\";\nexport const a = 1;\nfunction _createMdxContent(props) {\n  return _jsx(_Fragment, {});\n}\nexport default function MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = props.components || ({});\n  return MDXLayout ? _jsx(MDXLayout, {\n    ...props,\n    children: _jsx(_createMdxContent, {\n      ...props\n    })\n  }) : _createMdxContent(props);\n}\n"
+        }
+      },
+      {
         "description": "flow expression built as estree only",
         "tree": {
           "type": "root",

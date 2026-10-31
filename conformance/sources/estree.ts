@@ -26,6 +26,12 @@ const CASES: { description: string; tree: object }[] = [
     ]),
   },
   {
+    description: "ESM estree with offsets past any document",
+    tree: root([
+      esm("", { ...program("export const a = 1", false), start: 0, end: 1e300 }),
+    ]),
+  },
+  {
     description: "flow expression built as estree only",
     tree: root([
       { type: "mdxFlowExpression", value: "", data: { estree: program("1 + 1", false) } },
