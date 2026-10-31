@@ -1,5 +1,6 @@
 import { createRequire } from "node:module"
 import { resolveAddon } from "./actions/addon/resolve.ts"
+import { detectLibc } from "./actions/libc/detect.ts"
 import type { Addon } from "./models/addon.ts"
 import { Processor } from "./models/processor.ts"
 
@@ -30,6 +31,10 @@ const addon: Addon = require(
   resolveAddon({
     platform: process.platform,
     arch: process.arch,
+    libc: detectLibc({
+      platform: process.platform,
+      report: () => process.report.getReport(),
+    }),
     env: process.env,
     resolvePackage: specifier => require.resolve(specifier),
   }),

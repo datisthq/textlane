@@ -47,6 +47,7 @@ beforeAll(async () => {
     resolveAddon({
       platform: process.platform,
       arch: process.arch,
+      libc: undefined,
       env: { [ADDON_ENV]: addonPath },
       resolvePackage: specifier => require.resolve(specifier),
     }),

@@ -14,8 +14,9 @@ order: 3
 pip install textlane
 ```
 
-The wheel carries a prebuilt extension for your platform, so no Rust toolchain is needed. It
-supports Python 3.9 or later.
+The wheel carries a prebuilt extension for your platform, so no Rust toolchain is needed.
+Wheels cover Linux on glibc (manylinux) and musl (musllinux, Alpine), macOS and Windows,
+each on x64 and arm64, for Python 3.9 or later.
 
 ## A first pipeline
 

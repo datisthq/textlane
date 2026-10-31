@@ -15,7 +15,8 @@ npm install textlane
 ```
 
 The package brings a prebuilt addon for your platform as an optional dependency, so never
-install with `--omit=optional`. Node.js 20 or later loads it as an ES module.
+install with `--omit=optional`. Addons cover Linux on glibc and musl (Alpine), macOS and
+Windows, each on x64 and arm64. Node.js 20 or later loads it as an ES module.
 
 ## A first pipeline
 

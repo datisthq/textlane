@@ -44,7 +44,10 @@ One workspace, three registries, one version. Nothing here may change what the c
   making the key required breaks every generated `return { name }`. `@types/unist`, `mdast`,
   `hast` and `nlcst` are runtime `dependencies` with caret ranges, so consumers dedupe them.
 - `resolveAddon` takes `TEXTLANE_ADDON` first (a cargo build, an unsupported platform), else
-  resolves `@textlane/<platform>-<arch>/textlane.node` from the installed packages.
+  resolves `@textlane/<platform>-<arch>/textlane.node` from the installed packages, with a
+  `-musl` suffix when `detectLibc` finds no glibc in `process.report`'s header, the check npm
+  itself makes for a package's `libc` field. Every Linux platform package carries `libc`
+  (`glibc` or `musl`), so Alpine installs only its own addon.
 - `PLATFORMS` in `typescript/settings.ts` is the single list. `scripts/pack.ts` reads it to lay
   out `compile/` in `typescript/`: one platform package per entry (`os`, `cpu`, the addon)
   and the main package with `optionalDependencies` pinned to its own version. Those pins are
@@ -81,8 +84,9 @@ wheel per platform serve every CPython from 3.9. A wheel holds the skills under
 them from the `textlane.data` folder beside `pyproject.toml` (its `data` key), which
 `python/scripts/copy-skills.sh` stages and git ignores: the local build and the release
 workflow's Stage Skills step both run it, and a wheel built without it ships no skills. CI builds
-one wheel per target with `PyO3/maturin-action`; no sdist is published, since the crate sits
-outside `python/`. Check locally: `pnpm -C python build`, then
+one wheel per target with `PyO3/maturin-action`, manylinux and musllinux for Linux. No sdist
+is published: building it needs Rust and a C compiler (oniguruma), which a `pip install` on
+an unlisted platform rarely has, so a clear "no wheel" error beats a failed compile. Check locally: `pnpm -C python build`, then
 `uv run --with python/build/<wheel> --no-project python -I -c 'import textlane; print(textlane.version())'`;
 `-I` keeps a `textlane/` source folder in the working directory from shadowing the wheel.
 maturin runs from `python/`, outside `rust/`, so `rust/rust-toolchain.toml` does not
@@ -100,11 +104,14 @@ fail for `cargo add`.
 ## The release workflow
 
 `.github/workflows/release.yaml`: release-please → an `addons` matrix (one job per platform:
-`cargo build --release --target <t> --features node`, the library collected as
+`cargo build --release --target <t> --features node`, or for a musl row the same in a
+`rust:1-alpine` container with `-C target-feature=-crt-static`, since rustc drops a cdylib
+against static musl; the musl wheel takes `manylinux: musllinux_1_2`; the library collected as
 `addons/<platform>/textlane.node`, the skills staged, the wheel built; both uploaded as
 artifacts) → `npm`, `pypi` and `crates` jobs. Adding a platform means two edits in one commit: a
 `PLATFORMS` entry and a matrix row with the same key and target. The pack script refuses to run
-while any platform's addon is missing.
+while any platform's addon is missing. Its new `@textlane/<key>` package also needs the first
+publish below before that release runs, or the tokenless `npm` job fails on it.
 
 A run that failed after release-please tagged cannot be fixed by a re-run: it reuses the old
 workflow file and `release_created` stays false on later pushes. Delete the GitHub release and

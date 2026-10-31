@@ -44,6 +44,7 @@ for (const [key, platform] of Object.entries(PLATFORMS)) {
     repository: manifest.repository,
     os: [os],
     cpu: [cpu],
+    ...(platform.libc && { libc: [platform.libc] }),
     main: platform.addon,
     files: [platform.addon],
   })

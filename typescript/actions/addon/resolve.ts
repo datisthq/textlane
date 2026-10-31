@@ -4,13 +4,15 @@ import { ADDON_ENV, PACKAGE_NAME, PLATFORMS } from "../../settings.ts"
 export function resolveAddon(props: {
   platform: string
   arch: string
+  libc: string | undefined
   env: Record<string, string | undefined>
   resolvePackage: (specifier: string) => string
 }) {
   const override = props.env[ADDON_ENV]
   if (override) return override
 
-  const key = `${props.platform}-${props.arch}`
+  const suffix = props.libc === "musl" ? "-musl" : ""
+  const key = `${props.platform}-${props.arch}${suffix}`
   const platform = PLATFORMS[key]
   if (!platform) {
     const supported = Object.keys(PLATFORMS).join(", ")
