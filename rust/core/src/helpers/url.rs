@@ -10,18 +10,22 @@ pub struct ResolvedUrl<'u> {
 }
 
 /// Resolve `url`, written in the file at `path`, to the file it names inside `root`; `None`
-/// for a URL with a scheme, protocol-relative, holding a backslash or a fragment alone, or
-/// a relative one without a file to resolve it against or resolving outside `root`.
+/// for a URL with a scheme, protocol-relative, holding a backslash, a control character or
+/// surrounding space, or a fragment alone, or a relative one without a file to resolve it
+/// against or resolving outside `root`.
 pub fn resolve_url<'u>(
     url: &'u str,
     path: Option<&str>,
     root: Option<&str>,
 ) -> Option<ResolvedUrl<'u>> {
-    // Browsers read `\` as `/`, so `\\evil.dev` and `/\evil.dev` name another host
+    // Browsers read `\` as `/`, drop tabs and line endings and trim spaces, so
+    // `\\evil.dev`, `/\evil.dev` and `/\t/evil.dev` all name another host
     if url.is_empty()
         || url.starts_with('#')
         || url.starts_with("//")
         || url.contains('\\')
+        || url.chars().any(char::is_control)
+        || url.trim() != url
         || has_scheme(url)
     {
         return None;

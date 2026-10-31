@@ -18,7 +18,7 @@ fn resolves_relative_and_root_relative_urls() {
 }
 
 #[test]
-fn leaves_other_hosts_and_backslashes_alone() {
+fn leaves_urls_a_browser_reads_otherwise_alone() {
     for url in [
         "https://x.dev",
         "//x.dev",
@@ -26,6 +26,10 @@ fn leaves_other_hosts_and_backslashes_alone() {
         "\\\\evil.dev",
         "/\\evil.dev",
         "a\\b",
+        "/\t/evil.dev",
+        "/\n/evil.dev",
+        " //evil.dev",
+        "/a\u{0}",
     ] {
         assert_eq!(resolve_url(url, Some("index.html"), None), None, "{url}");
     }
