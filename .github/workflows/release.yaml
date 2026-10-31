@@ -82,8 +82,12 @@ jobs:
             os: windows-latest
 
     steps:
+      # The tag, not the pushed commit: a Release PR merged mid-run gets tagged here while
+      # the pushed commit still carries the previous version.
       - name: Checkout Repo
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ needs.release.outputs.tag }}
       - name: Add Target
         if: ${{ !endsWith(matrix.target, '-musl') }}
         working-directory: rust
@@ -134,7 +138,7 @@ jobs:
           path: python/build/*.whl
 
   npm:
-    needs: [addons]
+    needs: [release, addons]
     environment: release
     runs-on: ubuntu-latest
 
@@ -145,6 +149,8 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ needs.release.outputs.tag }}
       - name: Setup Pnpm
         uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
       - name: Setup Node
@@ -169,7 +175,7 @@ jobs:
         run: pnpm -C typescript release
 
   pypi:
-    needs: [addons]
+    needs: [release, addons]
     environment: release
     runs-on: ubuntu-latest
 
@@ -189,7 +195,7 @@ jobs:
         run: uv publish build/*.whl
 
   crates:
-    needs: [addons]
+    needs: [release, addons]
     environment: release
     runs-on: ubuntu-latest
 
@@ -200,6 +206,8 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ needs.release.outputs.tag }}
       - name: Authenticate Crates
         uses: rust-lang/crates-io-auth-action@c6f97d42243bad5fab37ca0427f495c86d5b1a18 # v1.0.5
         id: auth
