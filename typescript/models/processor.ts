@@ -15,13 +15,13 @@ import { HostFile } from "./vfile.ts"
  * JavaScript plugins run here when a run pauses before them.
  */
 export class Processor<Tree extends UnistNode = Node> {
-  #native: NativePipeline<Tree>
+  #native: NativePipeline
   #ids = new Map<Attacher, number>()
   #hosts = new Map<number, Host>()
   #attached = false
   #frozen = false
 
-  constructor(native: NativePipeline<Tree>) {
+  constructor(native: NativePipeline) {
     this.#native = native
   }
 
@@ -77,7 +77,8 @@ export class Processor<Tree extends UnistNode = Node> {
   /** Parse a document into a tree. */
   parse(document: Compatible) {
     this.#attach()
-    return this.#native.parse(readValue(document) ?? "")
+    const tree: Tree = JSON.parse(this.#native.parse(readValue(document) ?? ""))
+    return tree
   }
 
   /**
@@ -86,27 +87,28 @@ export class Processor<Tree extends UnistNode = Node> {
    */
   async run(tree: UnistNode, file?: Compatible) {
     const value = readValue(file)
-    if (!this.#attach()) return this.#native.run(tree, value)
-    const run = this.#native.startRun(tree, value, false)
+    if (!this.#attach()) return readNode(this.#native.run(JSON.stringify(tree), value))
+    const run = this.#native.startRun(JSON.stringify(tree), value, false)
     const host = new HostFile({ value, path: readPath(file) })
     await finishRun({ run, hosts: this.#hosts, file: host, sync: false, call: "run" })
-    return run.result()
+    return readNode(run.result())
   }
 
   /** Run the transforms; fails with `async-in-sync` on an asynchronous stage. */
   runSync(tree: UnistNode, file?: Compatible) {
     const value = readValue(file)
-    if (!this.#attach()) return this.#native.runSync(tree, value)
-    const run = this.#native.startRun(tree, value, true)
+    if (!this.#attach())
+      return readNode(this.#native.runSync(JSON.stringify(tree), value))
+    const run = this.#native.startRun(JSON.stringify(tree), value, true)
     const host = new HostFile({ value, path: readPath(file) })
     void finishRun({ run, hosts: this.#hosts, file: host, sync: true, call: "run" })
-    return run.result()
+    return readNode(run.result())
   }
 
   /** Compile a tree, running no transform. */
   stringify(tree: UnistNode) {
     this.#attach()
-    return this.#native.stringify(tree)
+    return this.#native.stringify(JSON.stringify(tree))
   }
 
   /** Parse, run and compile a document, finishing asynchronous stages. */
@@ -124,7 +126,7 @@ export class Processor<Tree extends UnistNode = Node> {
     const run = this.#native.startProcess(text, false, readPath(document))
     const file = new HostFile({ value: run.value() ?? text, path: readPath(document) })
     await finishRun({ run, hosts: this.#hosts, file, sync: false, call: "process" })
-    return withPath(mergeData(run.result(), file.data), document)
+    return withPath(mergeData(readFile(run.result()), file.data), document)
   }
 
   /** Parse, run and compile a document; fails with `async-in-sync` on an asynchronous stage. */
@@ -135,7 +137,7 @@ export class Processor<Tree extends UnistNode = Node> {
     const run = this.#native.startProcess(text, true, readPath(document))
     const file = new HostFile({ value: run.value() ?? text, path: readPath(document) })
     void finishRun({ run, hosts: this.#hosts, file, sync: true, call: "process" })
-    return withPath(mergeData(run.result(), file.data), document)
+    return withPath(mergeData(readFile(run.result()), file.data), document)
   }
 
   // Once only: `freeze` borrows the native pipeline mutably, which napi refuses while an
@@ -191,6 +193,16 @@ type ParsedTree<Value, Current> =
       ? Parsed
       : Current
     : Current
+
+function readNode(text: string) {
+  const node: Node = JSON.parse(text)
+  return node
+}
+
+function readFile(text: string) {
+  const file: VFile = JSON.parse(text)
+  return file
+}
 
 function readValue(file: Compatible | undefined) {
   return typeof file === "string" ? file : file?.value

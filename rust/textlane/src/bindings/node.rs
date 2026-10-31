@@ -4,6 +4,7 @@ use napi_derive::napi;
 use serde_json::Value;
 use textlane_core::File;
 
+use crate::actions::json::read::read_json;
 use crate::{Api, Outcome, Progress};
 
 /// The package version.
@@ -48,7 +49,8 @@ pub fn run_case(case: String) -> napi::Result<String> {
 
 type Result<T> = napi::Result<T, String>;
 
-/// The crate's `Pipeline`: plugins, data and trees cross as JSON values.
+/// The crate's `Pipeline`: plugins and data cross as JSON values, trees as JSON text, since
+/// napi refuses a value past a million nodes or 128 levels deep.
 #[napi]
 pub struct Pipeline {
     inner: crate::Pipeline,
@@ -89,22 +91,24 @@ impl Pipeline {
     }
 
     #[napi]
-    pub fn parse(&mut self, text: String) -> Result<Value> {
-        self.inner.parse(&text, &mut File::new()).map_err(throw)
+    pub fn parse(&mut self, text: String) -> Result<String> {
+        let tree = self.inner.parse(&text, &mut File::new()).map_err(throw)?;
+        Ok(tree.to_string())
     }
 
     #[napi]
-    pub fn run(&mut self, tree: Value, value: Option<String>) -> Result<Value> {
+    pub fn run(&mut self, tree: String, value: Option<String>) -> Result<String> {
         self.run_with(&tree, value, Api::Async)
     }
 
     #[napi]
-    pub fn run_sync(&mut self, tree: Value, value: Option<String>) -> Result<Value> {
+    pub fn run_sync(&mut self, tree: String, value: Option<String>) -> Result<String> {
         self.run_with(&tree, value, Api::Sync)
     }
 
     #[napi]
-    pub fn stringify(&mut self, tree: Value) -> Result<String> {
+    pub fn stringify(&mut self, tree: String) -> Result<String> {
+        let tree = read_json(&tree).map_err(throw)?;
         self.inner.stringify(&tree, &mut File::new()).map_err(throw)
     }
 
@@ -117,10 +121,11 @@ impl Pipeline {
     #[napi]
     pub fn start_run(
         &mut self,
-        tree: Value,
+        tree: String,
         value: Option<String>,
         sync: bool,
     ) -> Result<Run> {
+        let tree = read_json(&tree).map_err(throw)?;
         let file = File {
             value,
             ..File::new()
@@ -168,15 +173,17 @@ impl Pipeline {
 
     fn run_with(
         &mut self,
-        tree: &Value,
+        tree: &str,
         value: Option<String>,
         api: Api,
-    ) -> Result<Value> {
+    ) -> Result<String> {
+        let tree = read_json(tree).map_err(throw)?;
         let mut file = File {
             value,
             ..File::new()
         };
-        self.inner.run(tree, &mut file, api).map_err(throw)
+        let tree = self.inner.run(&tree, &mut file, api).map_err(throw)?;
+        Ok(tree.to_string())
     }
 
     fn process_with(
@@ -294,10 +301,10 @@ impl Run {
 
     /// The tree the next host plugin takes.
     #[napi]
-    pub fn tree(&self) -> Value {
+    pub fn tree(&self) -> String {
         match &self.progress {
-            Some(Progress::Paused(pause)) => pause.tree().clone(),
-            _ => Value::Null,
+            Some(Progress::Paused(pause)) => pause.tree().to_string(),
+            _ => Value::Null.to_string(),
         }
     }
 
@@ -323,7 +330,8 @@ impl Run {
 
     /// Continue with the tree the host plugins returned and the messages they reported.
     #[napi]
-    pub fn resume(&mut self, tree: Value, messages: Value) -> Result<()> {
+    pub fn resume(&mut self, tree: String, messages: Value) -> Result<()> {
+        let tree = read_json(&tree).map_err(throw)?;
         let Some(Progress::Paused(mut pause)) = self.progress.take() else {
             return Err(napi::Error::new(
                 "finished-run".to_string(),
@@ -338,13 +346,15 @@ impl Run {
 
     /// What the finished run produced: a vfile for a process, a tree for a run.
     #[napi]
-    pub fn result(&self) -> Value {
+    pub fn result(&self) -> String {
         match &self.progress {
             Some(Progress::Finished(finished)) => match &finished.output {
-                Outcome::Text(text) => crate::write_file(&finished.file, text),
-                Outcome::Tree(tree) => tree.clone(),
+                Outcome::Text(text) => {
+                    crate::write_file(&finished.file, text).to_string()
+                }
+                Outcome::Tree(tree) => tree.to_string(),
             },
-            _ => Value::Null,
+            _ => Value::Null.to_string(),
         }
     }
 }

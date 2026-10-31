@@ -323,9 +323,7 @@ mod native {
     }
 
     fn read_json(py: Python<'_>, text: &str) -> PyResult<Value> {
-        serde_json::from_str(text).map_err(|error| {
-            throw(py, crate::Error::new("invalid-json", error.to_string()))
-        })
+        crate::actions::json::read::read_json(text).map_err(|error| throw(py, error))
     }
 
     // The crate's code rides on the exception as `code`, as Node's errors carry it

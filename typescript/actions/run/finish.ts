@@ -7,7 +7,7 @@ import { callHost, isThenable } from "../host/call.ts"
 /** Run the host plugins a native run pauses at until it finishes; under `sync`, a plugin
  * finishing later fails with `async-in-sync`, as an asynchronous native stage does. */
 export function finishRun(props: {
-  run: NativeRun<unknown>
+  run: NativeRun
   hosts: Map<number, Host>
   file: HostFile
   sync: boolean
@@ -16,7 +16,7 @@ export function finishRun(props: {
   let sent = props.file.messages.length
   while (props.run.hosts().length > 0) {
     mirrorMessages()
-    const tree = runHosts(props, props.run.hosts(), props.run.tree())
+    const tree = runHosts(props, props.run.hosts(), readTree(props.run.tree()))
     if (isThenable(tree)) {
       if (props.sync) throw asyncError(props.call)
       return Promise.resolve(tree).then(tree => {
@@ -38,7 +38,7 @@ export function finishRun(props: {
 
   function resume(tree: Node) {
     props.run.resume(
-      tree,
+      JSON.stringify(tree),
       props.file.messages.slice(sent).map(message => message.toJSON()),
     )
     sent = props.file.messages.length
@@ -60,6 +60,11 @@ function runHosts(
     }
     tree = result
   }
+  return tree
+}
+
+function readTree(text: string) {
+  const tree: Node = JSON.parse(text)
   return tree
 }
 

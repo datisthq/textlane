@@ -421,7 +421,13 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   language: `version()`, `plugin_names()` and a `Pipeline` class over `models/pipeline.rs`
   whose methods are its calls (`run`/`runSync`, `process`/`processSync` pick `Api::Async` or
   `Api::Sync`), plus `run_case` under `testing`; behaviour never lives there. Node crosses
-  values as `serde_json::Value`, Python as JSON text; both turn a crate `Error` into a thrown
+  options and data as `serde_json::Value` and trees as JSON text, since napi refuses a
+  `Value` past 1M nodes or 128 levels (`MAX_JSON_NODES`, private, no opt-out); Python crosses
+  all as JSON text. Both read it with `read_json` (`actions/json/read.rs`), which lifts
+  serde_json's 128-level limit (~60 nested nodes) through `serde_stacker` but refuses past
+  2048 levels with `tree-too-deep`: core's 1000-node cap, two levels a node, since a deeper
+  `Value` overflows the stack on drop. A debug addon already overflows ~700 nodes deep in
+  `serialize_mdast`; check depth in a release build. Both turn a crate `Error` into a thrown
   error whose `code` is the crate's (napi's status, an attribute on `TextlaneError`).
   `Pipeline::use_value` reads the bindings' descriptors (`{name, options?}`) as plugins, alone
   or first in a tuple, and `write_file` (`actions/file/write.rs`) shapes `process`'s vfile

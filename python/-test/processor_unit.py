@@ -101,6 +101,14 @@ def test_parses_runs_and_stringifies():
     assert processor.stringify(tree) == "*a*\n"
 
 
+def test_moves_trees_a_hundred_levels_deep():
+    processor = textlane.textlane().use(md.parse()).use(md.stringify())
+    text = "> " * 200 + "a\n"
+    tree = processor.parse(text)
+    assert processor.run(tree) == tree
+    assert processor.stringify(tree) == processor.process(text)["value"]
+
+
 def test_reports_messages():
     processor = textlane.textlane().use(nl.parse()).use(nl.repeated_words()).use(nl.stringify())
     assert processor.process("the the")["messages"] == [

@@ -18,6 +18,10 @@ mod actions {
     pub(crate) mod file {
         pub(crate) mod write;
     }
+    #[cfg(any(feature = "node", feature = "python", test))]
+    pub(crate) mod json {
+        pub(crate) mod read;
+    }
     pub(crate) mod memory {
         pub(crate) mod read;
         pub(crate) mod set;

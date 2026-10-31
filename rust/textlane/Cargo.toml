@@ -59,6 +59,7 @@ napi = { version = "3.14.2", default-features = false, features = [
 napi-derive = { version = "3.6.12", optional = true }
 serde_json.workspace = true
 serde.workspace = true
+serde_stacker.workspace = true
 schemars = { workspace = true, optional = true }
 pyo3 = { version = "0.30.1", features = [
   "extension-module",

@@ -386,8 +386,8 @@
   </dd>
   <dt>
     <htmlpress-badge type="warning">my call</htmlpress-badge> Values cross as JSON: napi's
-    <code>serde-json</code> in Node, JSON text in Python; a processor class on each host
-    only chains and awaits
+    <code>serde-json</code> in Node, trees and every value in Python as JSON text; a
+    processor class on each host only chains and awaits
   </dt>
   <dd>
     <p>
@@ -397,7 +397,9 @@
       and needs no extra crate. A file is <code>{value, messages, data}</code>, shaped by
       the crate's <code>write_file</code>; errors carry the crate's <code>code</code>.
       <code>run(tree, file?)</code> takes the source text, as unified's file, so bridges
-      can read it.
+      can read it. Trees go as text in Node too: napi refuses a value past a million nodes
+      or 128 levels, which a 400 KB document or 61 nested blockquotes reach (#5), and
+      <code>JSON.parse</code> builds the tree faster than napi does, node by node.
     </p>
     <p><strong>Rejected.</strong> <code>pythonize</code>; host-side vfile classes.</p>
   </dd>

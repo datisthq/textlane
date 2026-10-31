@@ -12,8 +12,10 @@ One workspace, three registries, one version. Nothing here may change what the c
 - `typescript/index.ts` loads the napi addon that `resolveAddon`
   (`typescript/actions/addon/resolve.ts`) finds and exports `textlane()`, a `Processor`
   (`typescript/models/processor.ts`) over the addon's `Pipeline` class: chaining, Promises
-  and `data`'s overloads only; values cross napi as JSON (`serde-json`), so a JavaScript
-  function in `use` fails in napi rather than vanishing. `process` returns a `#[napi(object)]`
+  and `data`'s overloads only; options and data cross napi as JSON (`serde-json`), so a
+  JavaScript function in `use` fails in napi rather than vanishing; trees cross as JSON text,
+  which `JSON.parse` reads faster than napi builds objects, and napi caps a `Value` at 1M
+  nodes. `process` returns a `#[napi(object)]`
   `ProcessedFile` rather than a `Value`, which would copy the HTML once more, its ASCII
   `value` as a `Latin1String`, which V8 copies without decoding UTF-8 (1–2%); taking
   `Uint8Array` input instead of a string measured no faster, the string copy being cheap.

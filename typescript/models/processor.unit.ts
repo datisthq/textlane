@@ -98,6 +98,16 @@ describe("Processor", () => {
     expect(processor.stringify(tree)).toBe("*a*\n")
   })
 
+  it("moves trees past a million values and a hundred levels deep", () => {
+    const keep = () => (tree: Node) => tree
+    const processor = entry.textlane().use([md.parse(), keep, md.stringify()])
+    for (const text of ["- *a*\n".repeat(30_000), "> ".repeat(200) + "a\n"]) {
+      const tree = processor.parse(text)
+      expect(processor.runSync(tree)).toEqual(tree)
+      expect(processor.stringify(tree)).toBe(processor.processSync(text).value)
+    }
+  })
+
   it("reports messages", () => {
     const processor = entry
       .textlane()
