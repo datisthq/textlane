@@ -49,13 +49,17 @@ generated lives in its `.cache/` (gitignored repo-wide).
 
 ## The adapter contract
 
-An adapter takes `<document> <repeat> <flavor>`, imports its library and reads the document untimed,
-then converts `repeat` times and prints `{"elapsedMs", "outputBytes"}` last. The harness picks
+An adapter takes `<document> <repeat> <flavor>`, imports its library, reads the document and
+converts it once untimed, then converts `repeat` times and prints `{"elapsedMs", "outputBytes"}` last. The harness picks
 `repeat` so a run converts at least 8MB, and divides. Every library gets the same job, raw HTML
 passed through (`allowDangerousHtml`, `unsafe`, `html: true`), in the case's `flavor`:
 `commonmark` with no extension, or `gfm` (the `gfm` case), with tables, task lists,
 strikethrough, autolink literals and footnotes, through a plugin where the library has none
 built in. A GFM piece a library cannot do goes in its `caveats`
+
+Without that warm-up conversion a fresh process's first one, faulting in memory and code,
+weighed on the 80 repeats of a 100 KB run unevenly: textlane's Python adapter came out ahead
+of its Rust one, which is 5% faster warm.
 
 ## Adding a library
 

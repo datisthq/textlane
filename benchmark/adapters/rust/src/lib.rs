@@ -7,7 +7,8 @@ pub fn is_gfm() -> bool {
     env::args().nth(3).as_deref() == Some("gfm")
 }
 
-/// Converts `<input> <repeat>` times and prints `{elapsedMs, outputBytes}`; setup is untimed.
+/// Converts `<input> <repeat>` times and prints `{elapsedMs, outputBytes}`; setup and one
+/// warm-up conversion are untimed.
 pub fn run_adapter(
     mut convert: impl FnMut(&str) -> Result<String, Box<dyn Error>>,
 ) -> Result<(), Box<dyn Error>> {
@@ -15,7 +16,9 @@ pub fn run_adapter(
     let path = args.get(1).ok_or("usage: <input> <repeat>")?;
     let repeat: usize = args.get(2).map_or(Ok(1), |value| value.parse())?;
     let markdown = fs::read_to_string(path)?;
-    let mut html = String::new();
+    // A fresh process's first conversion faults in its memory and code, which costs some
+    // libraries more than others and would weigh on short runs
+    let mut html = convert(&markdown)?;
     let started = Instant::now();
     for _ in 0..repeat {
         html = convert(&markdown)?;
