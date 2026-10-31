@@ -45,7 +45,8 @@ interface Declaration {
 
 /** Each tree module's Python source, keyed by module name. */
 export function renderTrees(props: { root: string; header: string }) {
-  const entry = join(props.root, "typescript", "trees.generated.ts")
+  // TypeScript asks for files with forward slashes, so a Windows `join` would never match
+  const entry = join(props.root, "typescript", "trees.generated.ts").replaceAll("\\", "/")
   const source = [
     ...TREE_MODULES.map(name => `export type * as ${name} from "${name}"`),
     ...EXTENSIONS.map(name => `import type {} from "${name}"`),

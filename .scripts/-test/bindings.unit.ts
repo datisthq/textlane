@@ -10,7 +10,7 @@ describe("the generated bindings", () => {
     () => {
       const result = spawnSync("node", [SCRIPT, "--check"], { encoding: "utf8" })
       expect(result.stderr).not.toContain("out of date")
-      expect(result.status).toBe(0)
+      expect(result.status, result.stderr).toBe(0)
     },
     10 * 60 * 1000,
   )

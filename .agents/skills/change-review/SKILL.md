@@ -15,7 +15,8 @@ in it.
 **Correctness**
 
 - Logic that is wrong for an input the change makes reachable: empty input, non-ASCII text,
-  Windows path separators.
+  Windows path separators — a `join` path compared with one a tool hands back fails there
+  only, since TypeScript's compiler host and many tools always use `/`.
 - Error handling that swallows a failure or reports success on a partial result.
 - A binding that panics across the FFI boundary instead of returning the crate's error as a
   JavaScript exception or Python exception.
