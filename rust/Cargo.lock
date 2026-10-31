@@ -1560,6 +1560,8 @@ name = "textlane-core"
 version = "0.4.0"
 dependencies = [
  "bumpalo",
+ "schemars",
+ "serde",
  "serde_json",
 ]
 

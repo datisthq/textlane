@@ -36,6 +36,7 @@
     "import:to-hast": "node sources/to-hast.ts && vp fmt tests",
     "import:to-html": "node sources/to-html.ts && vp fmt tests",
     "import:to-markdown": "node sources/to-markdown.ts && vp fmt tests",
+    "import:smartypants": "node sources/smartypants.ts && vp fmt tests",
     "import:toc": "node sources/toc.ts && vp fmt tests",
     "import:unified": "node sources/unified.ts && vp fmt tests",
     "import:wpt": "node sources/wpt.ts && vp fmt tests"
@@ -90,6 +91,7 @@
     "remark-mdx": "3.1.1",
     "remark-parse": "11.0.0",
     "remark-rehype": "11.1.2",
+    "remark-smartypants": "3.0.3",
     "remark-stringify": "11.0.0",
     "remark-toc": "9.0.0",
     "retext-contractions": "6.0.0",

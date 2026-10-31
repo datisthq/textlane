@@ -318,6 +318,10 @@ fn seed_slots(context: &mut Attach) {
             .slots_mut()
             .get_or_default::<textlane_core::NaturalLanguageParserSlot>()
             .parser = Some(std::sync::Arc::new(parser));
+        context
+            .slots_mut()
+            .get_or_default::<textlane_core::TypographerSlot>()
+            .typographer = Some(std::sync::Arc::new(textlane_nl::SmartypantsTypographer));
     }
     #[cfg(feature = "mdx")]
     {

@@ -1,0 +1,630 @@
+[
+  {
+    "description": "remark-smartypants md md",
+    "source": {
+      "repository": "https://github.com/silvenon/remark-smartypants",
+      "commit": "a7a30398af761cafce6b1b2372f7eaf428db3908",
+      "path": "plugin.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.smartypants"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "\"# \\\"Hello World!\\\"\"",
+        "input": "# \"Hello World!\"",
+        "expected": {
+          "md": "# “Hello World!”\n"
+        }
+      },
+      {
+        "description": "\"\\\"wow\\\". go to '[single](/foo)' today \\\"[double](/bar)\\\". . .\"",
+        "input": "\"wow\". go to '[single](/foo)' today \"[double](/bar)\". . .",
+        "expected": {
+          "md": "“wow”. go to ‘[single](/foo)’ today “[double](/bar)”…\n"
+        }
+      },
+      {
+        "description": "\"foo '**Bolded -- ``part** of --- this quote' bar\"",
+        "input": "foo '**Bolded -- ``part** of --- this quote' bar",
+        "expected": {
+          "md": "foo ‘**Bolded — “part** of --- this quote’ bar\n"
+        }
+      },
+      {
+        "description": "\"\\\"`code`\\\"\"",
+        "input": "\"`code`\"",
+        "expected": {
+          "md": "“`code`”\n"
+        }
+      },
+      {
+        "description": "\"\\\"`single 'quote'. . .` baz\\\"\"",
+        "input": "\"`single 'quote'. . .` baz\"",
+        "expected": {
+          "md": "“`single 'quote'. . .` baz”\n"
+        }
+      },
+      {
+        "description": "\"'`singles'`'\"",
+        "input": "'`singles'`'",
+        "expected": {
+          "md": "‘`singles'`’\n"
+        }
+      },
+      {
+        "description": "\"\\\"`double\\\"`\\\"\"",
+        "input": "\"`double\"`\"",
+        "expected": {
+          "md": "“`double\"`”\n"
+        }
+      },
+      {
+        "description": "\"paragraph\\n\\n\\\"after paragraph\\\"\"",
+        "input": "paragraph\n\n\"after paragraph\"",
+        "expected": {
+          "md": "paragraph\n\n“after paragraph”\n"
+        }
+      },
+      {
+        "description": "\"> blockquote\\n\\n\\\"after blockquote\\\"\"",
+        "input": "> blockquote\n\n\"after blockquote\"",
+        "expected": {
+          "md": "> blockquote\n\n“after blockquote”\n"
+        }
+      },
+      {
+        "description": "\"> blockquote\\n>\\n> \\\"within blockquote\\\"\"",
+        "input": "> blockquote\n>\n> \"within blockquote\"",
+        "expected": {
+          "md": "> blockquote\n>\n> “within blockquote”\n"
+        }
+      },
+      {
+        "description": "\"\\\"before paragraph\\\"\\n\\nparagraph\"",
+        "input": "\"before paragraph\"\n\nparagraph",
+        "expected": {
+          "md": "“before paragraph”\n\nparagraph\n"
+        }
+      },
+      {
+        "description": "\"\\\"before blockquote\\\"\\n\\n> blockquote\"",
+        "input": "\"before blockquote\"\n\n> blockquote",
+        "expected": {
+          "md": "“before blockquote”\n\n> blockquote\n"
+        }
+      },
+      {
+        "description": "\"paragraph.\\n\\n## \\\"after paragraph\\\"\"",
+        "input": "paragraph.\n\n## \"after paragraph\"",
+        "expected": {
+          "md": "paragraph.\n\n## “after paragraph”\n"
+        }
+      },
+      {
+        "description": "\"# heading\\n\\n## \\\"after heading\\\"\"",
+        "input": "# heading\n\n## \"after heading\"",
+        "expected": {
+          "md": "# heading\n\n## “after heading”\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-smartypants md html",
+    "source": {
+      "repository": "https://github.com/silvenon/remark-smartypants",
+      "commit": "a7a30398af761cafce6b1b2372f7eaf428db3908",
+      "path": "plugin.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.smartypants"], ["md.toHtml"], ["html.stringify"]],
+    "tests": [
+      {
+        "description": "\"# \\\"Hello World!\\\"\"",
+        "input": "# \"Hello World!\"",
+        "expected": {
+          "html": "<h1>“Hello World!”</h1>"
+        }
+      },
+      {
+        "description": "\"\\\"wow\\\". go to '[single](/foo)' today \\\"[double](/bar)\\\". . .\"",
+        "input": "\"wow\". go to '[single](/foo)' today \"[double](/bar)\". . .",
+        "expected": {
+          "html": "<p>“wow”. go to ‘<a href=\"/foo\">single</a>’ today “<a href=\"/bar\">double</a>”…</p>"
+        }
+      },
+      {
+        "description": "\"foo '**Bolded -- ``part** of --- this quote' bar\"",
+        "input": "foo '**Bolded -- ``part** of --- this quote' bar",
+        "expected": {
+          "html": "<p>foo ‘<strong>Bolded — “part</strong> of --- this quote’ bar</p>"
+        }
+      },
+      {
+        "description": "\"\\\"`code`\\\"\"",
+        "input": "\"`code`\"",
+        "expected": {
+          "html": "<p>“<code>code</code>”</p>"
+        }
+      },
+      {
+        "description": "\"\\\"`single 'quote'. . .` baz\\\"\"",
+        "input": "\"`single 'quote'. . .` baz\"",
+        "expected": {
+          "html": "<p>“<code>single 'quote'. . .</code> baz”</p>"
+        }
+      },
+      {
+        "description": "\"'`singles'`'\"",
+        "input": "'`singles'`'",
+        "expected": {
+          "html": "<p>‘<code>singles'</code>’</p>"
+        }
+      },
+      {
+        "description": "\"\\\"`double\\\"`\\\"\"",
+        "input": "\"`double\"`\"",
+        "expected": {
+          "html": "<p>“<code>double\"</code>”</p>"
+        }
+      },
+      {
+        "description": "\"paragraph\\n\\n\\\"after paragraph\\\"\"",
+        "input": "paragraph\n\n\"after paragraph\"",
+        "expected": {
+          "html": "<p>paragraph</p>\n<p>“after paragraph”</p>"
+        }
+      },
+      {
+        "description": "\"> blockquote\\n\\n\\\"after blockquote\\\"\"",
+        "input": "> blockquote\n\n\"after blockquote\"",
+        "expected": {
+          "html": "<blockquote>\n<p>blockquote</p>\n</blockquote>\n<p>“after blockquote”</p>"
+        }
+      },
+      {
+        "description": "\"> blockquote\\n>\\n> \\\"within blockquote\\\"\"",
+        "input": "> blockquote\n>\n> \"within blockquote\"",
+        "expected": {
+          "html": "<blockquote>\n<p>blockquote</p>\n<p>“within blockquote”</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "\"\\\"before paragraph\\\"\\n\\nparagraph\"",
+        "input": "\"before paragraph\"\n\nparagraph",
+        "expected": {
+          "html": "<p>“before paragraph”</p>\n<p>paragraph</p>"
+        }
+      },
+      {
+        "description": "\"\\\"before blockquote\\\"\\n\\n> blockquote\"",
+        "input": "\"before blockquote\"\n\n> blockquote",
+        "expected": {
+          "html": "<p>“before blockquote”</p>\n<blockquote>\n<p>blockquote</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "\"paragraph.\\n\\n## \\\"after paragraph\\\"\"",
+        "input": "paragraph.\n\n## \"after paragraph\"",
+        "expected": {
+          "html": "<p>paragraph.</p>\n<h2>“after paragraph”</h2>"
+        }
+      },
+      {
+        "description": "\"# heading\\n\\n## \\\"after heading\\\"\"",
+        "input": "# heading\n\n## \"after heading\"",
+        "expected": {
+          "html": "<h1>heading</h1>\n<h2>“after heading”</h2>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-smartypants gfm md",
+    "source": {
+      "repository": "https://github.com/silvenon/remark-smartypants",
+      "commit": "a7a30398af761cafce6b1b2372f7eaf428db3908",
+      "path": "plugin.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.gfm"], ["md.smartypants"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "\"paragraph.\\n\\n| a | b |\\n| - | - |\\n| \\\"x\\\" | \\\"y\\\" |\"",
+        "input": "paragraph.\n\n| a | b |\n| - | - |\n| \"x\" | \"y\" |",
+        "expected": {
+          "md": "paragraph.\n\n| a   | b   |\n| --- | --- |\n| “x” | “y” |\n"
+        }
+      },
+      {
+        "description": "\"😀 \\\"emoji\\\" -- then... done\"",
+        "input": "😀 \"emoji\" -- then... done",
+        "expected": {
+          "md": "😀 “emoji” — then… done\n"
+        }
+      },
+      {
+        "description": "\"`😀` \\\"after code\\\" and `x`\"",
+        "input": "`😀` \"after code\" and `x`",
+        "expected": {
+          "md": "`😀` “after code” and `x`\n"
+        }
+      },
+      {
+        "description": "\"「引用」 \\\"中文\\\" — '混合'\"",
+        "input": "「引用」 \"中文\" — '混合'",
+        "expected": {
+          "md": "「引用」 “中文” — ‘混合’\n"
+        }
+      },
+      {
+        "description": "\"\\\"*emphasis* inside\\\" and '**strong** too'\"",
+        "input": "\"*emphasis* inside\" and '**strong** too'",
+        "expected": {
+          "md": "“*emphasis* inside” and ‘**strong** too’\n"
+        }
+      },
+      {
+        "description": "\"- \\\"item\\\" one\\n- 'item' two\\n\\n> \\\"quote\\\"\"",
+        "input": "- \"item\" one\n- 'item' two\n\n> \"quote\"",
+        "expected": {
+          "md": "* “item” one\n* ‘item’ two\n\n> “quote”\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-smartypants gfm html",
+    "source": {
+      "repository": "https://github.com/silvenon/remark-smartypants",
+      "commit": "a7a30398af761cafce6b1b2372f7eaf428db3908",
+      "path": "plugin.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      ["md.smartypants"],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\"paragraph.\\n\\n| a | b |\\n| - | - |\\n| \\\"x\\\" | \\\"y\\\" |\"",
+        "input": "paragraph.\n\n| a | b |\n| - | - |\n| \"x\" | \"y\" |",
+        "expected": {
+          "html": "<p>paragraph.</p>\n<table>\n<thead>\n<tr>\n<th>a</th>\n<th>b</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>“x”</td>\n<td>“y”</td>\n</tr>\n</tbody>\n</table>"
+        }
+      },
+      {
+        "description": "\"😀 \\\"emoji\\\" -- then... done\"",
+        "input": "😀 \"emoji\" -- then... done",
+        "expected": {
+          "html": "<p>😀 “emoji” — then… done</p>"
+        }
+      },
+      {
+        "description": "\"`😀` \\\"after code\\\" and `x`\"",
+        "input": "`😀` \"after code\" and `x`",
+        "expected": {
+          "html": "<p><code>😀</code> “after code” and <code>x</code></p>"
+        }
+      },
+      {
+        "description": "\"「引用」 \\\"中文\\\" — '混合'\"",
+        "input": "「引用」 \"中文\" — '混合'",
+        "expected": {
+          "html": "<p>「引用」 “中文” — ‘混合’</p>"
+        }
+      },
+      {
+        "description": "\"\\\"*emphasis* inside\\\" and '**strong** too'\"",
+        "input": "\"*emphasis* inside\" and '**strong** too'",
+        "expected": {
+          "html": "<p>“<em>emphasis</em> inside” and ‘<strong>strong</strong> too’</p>"
+        }
+      },
+      {
+        "description": "\"- \\\"item\\\" one\\n- 'item' two\\n\\n> \\\"quote\\\"\"",
+        "input": "- \"item\" one\n- 'item' two\n\n> \"quote\"",
+        "expected": {
+          "html": "<ul>\n<li>“item” one</li>\n<li>‘item’ two</li>\n</ul>\n<blockquote>\n<p>“quote”</p>\n</blockquote>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-smartypants mdx md",
+    "source": {
+      "repository": "https://github.com/silvenon/remark-smartypants",
+      "commit": "a7a30398af761cafce6b1b2372f7eaf428db3908",
+      "path": "plugin.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [["md.parse"], ["md.mdx"], ["md.smartypants"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "\"<style>html:after \\\\{ content: '\\\"\\\"' }</style>\"",
+        "input": "<style>html:after \\{ content: '\"\"' }</style>",
+        "expected": {
+          "md": "<style>html:after \\{ content: '\"\"' }</style>\n"
+        }
+      },
+      {
+        "description": "\"<script>console.log(\\\"foo\\\")</script>\"",
+        "input": "<script>console.log(\"foo\")</script>",
+        "expected": {
+          "md": "<script>console.log(\"foo\")</script>\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-smartypants gfm md {\"dashes\":\"oldschool\",\"ellipses\":\"spaced\"}",
+    "source": {
+      "repository": "https://github.com/silvenon/remark-smartypants",
+      "commit": "a7a30398af761cafce6b1b2372f7eaf428db3908",
+      "path": "plugin.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.smartypants",
+        {
+          "dashes": "oldschool",
+          "ellipses": "spaced"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\"Wait... what.... -- --- ``this''\"",
+        "input": "Wait... what.... -- --- ``this''",
+        "expected": {
+          "md": "Wait... what.... – — “this”\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-smartypants gfm html {\"dashes\":\"oldschool\",\"ellipses\":\"spaced\"}",
+    "source": {
+      "repository": "https://github.com/silvenon/remark-smartypants",
+      "commit": "a7a30398af761cafce6b1b2372f7eaf428db3908",
+      "path": "plugin.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.smartypants",
+        {
+          "dashes": "oldschool",
+          "ellipses": "spaced"
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\"Wait... what.... -- --- ``this''\"",
+        "input": "Wait... what.... -- --- ``this''",
+        "expected": {
+          "html": "<p>Wait... what.... – — “this”</p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-smartypants gfm md {\"backticks\":\"all\",\"quotes\":false}",
+    "source": {
+      "repository": "https://github.com/silvenon/remark-smartypants",
+      "commit": "a7a30398af761cafce6b1b2372f7eaf428db3908",
+      "path": "plugin.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.smartypants",
+        {
+          "backticks": "all",
+          "quotes": false
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\"`single' and \\\"double\\\"\"",
+        "input": "`single' and \"double\"",
+        "expected": {
+          "md": "‘single’ and \"double\"\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-smartypants gfm html {\"backticks\":\"all\",\"quotes\":false}",
+    "source": {
+      "repository": "https://github.com/silvenon/remark-smartypants",
+      "commit": "a7a30398af761cafce6b1b2372f7eaf428db3908",
+      "path": "plugin.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.smartypants",
+        {
+          "backticks": "all",
+          "quotes": false
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\"`single' and \\\"double\\\"\"",
+        "input": "`single' and \"double\"",
+        "expected": {
+          "html": "<p>‘single’ and \"double\"</p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-smartypants gfm md {\"openingQuotes\":{\"double\":\"«\",\"single\":\"‹\"},\"closingQuotes\":{\"double\":\"»\",\"single\":\"›\"}}",
+    "source": {
+      "repository": "https://github.com/silvenon/remark-smartypants",
+      "commit": "a7a30398af761cafce6b1b2372f7eaf428db3908",
+      "path": "plugin.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.smartypants",
+        {
+          "openingQuotes": {
+            "double": "«",
+            "single": "‹"
+          },
+          "closingQuotes": {
+            "double": "»",
+            "single": "›"
+          }
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\"\\\"quoted\\\" 'single'\"",
+        "input": "\"quoted\" 'single'",
+        "expected": {
+          "md": "«quoted» ‹single›\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-smartypants gfm html {\"openingQuotes\":{\"double\":\"«\",\"single\":\"‹\"},\"closingQuotes\":{\"double\":\"»\",\"single\":\"›\"}}",
+    "source": {
+      "repository": "https://github.com/silvenon/remark-smartypants",
+      "commit": "a7a30398af761cafce6b1b2372f7eaf428db3908",
+      "path": "plugin.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.smartypants",
+        {
+          "openingQuotes": {
+            "double": "«",
+            "single": "‹"
+          },
+          "closingQuotes": {
+            "double": "»",
+            "single": "›"
+          }
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\"\\\"quoted\\\" 'single'\"",
+        "input": "\"quoted\" 'single'",
+        "expected": {
+          "html": "<p>«quoted» ‹single›</p>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-smartypants gfm md {\"openingQuotes\":{\"double\":\"<<\",\"single\":\"<\"},\"closingQuotes\":{\"double\":\">>\",\"single\":\">\"}}",
+    "source": {
+      "repository": "https://github.com/silvenon/remark-smartypants",
+      "commit": "a7a30398af761cafce6b1b2372f7eaf428db3908",
+      "path": "plugin.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.smartypants",
+        {
+          "openingQuotes": {
+            "double": "<<",
+            "single": "<"
+          },
+          "closingQuotes": {
+            "double": ">>",
+            "single": ">"
+          }
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\"\\\"quoted\\\" and more \\\"words\\\"\"",
+        "input": "\"quoted\" and more \"words\"",
+        "expected": {
+          "md": "<\\<quoted>> and more <\\<wor\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-smartypants gfm html {\"openingQuotes\":{\"double\":\"<<\",\"single\":\"<\"},\"closingQuotes\":{\"double\":\">>\",\"single\":\">\"}}",
+    "source": {
+      "repository": "https://github.com/silvenon/remark-smartypants",
+      "commit": "a7a30398af761cafce6b1b2372f7eaf428db3908",
+      "path": "plugin.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      ["md.gfm"],
+      [
+        "md.smartypants",
+        {
+          "openingQuotes": {
+            "double": "<<",
+            "single": "<"
+          },
+          "closingQuotes": {
+            "double": ">>",
+            "single": ">"
+          }
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\"\\\"quoted\\\" and more \\\"words\\\"\"",
+        "input": "\"quoted\" and more \"words\"",
+        "expected": {
+          "html": "<p>&#x3C;&#x3C;quoted>> and more &#x3C;&#x3C;wor</p>"
+        }
+      }
+    ]
+  }
+]

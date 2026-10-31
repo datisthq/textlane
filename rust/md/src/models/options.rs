@@ -1048,3 +1048,40 @@ impl schemars::JsonSchema for Matter {
 /// What `md::Frontmatter` shares with the parser and serializer: its matters, in order.
 #[derive(Clone, Debug, Default)]
 pub struct FrontmatterSlot(pub Vec<Matter>);
+
+/// `md.smartypants`: straight quotes, dashes, dots and backticks in Markdown text into
+/// typographic ones, as remark-smartypants does; options as retext-smartypants takes them.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", schemars(rename = "SmartypantsOptions"))]
+pub struct Smartypants {
+    /// Turn double backticks and double straight single quotes into double quotes; `all`
+    /// turns single ones into single quotes too.
+    pub backticks: textlane_core::Backticks,
+    /// The closing quotes to use: `”` and `’` by default.
+    pub closing_quotes: Option<textlane_core::QuoteCharacters>,
+    /// Turn two dashes into an em dash; `oldschool` and `inverted` treat three too.
+    pub dashes: textlane_core::Dashes,
+    /// Turn three dots into an ellipsis, with spaces between them or without.
+    pub ellipses: textlane_core::Ellipses,
+    /// The opening quotes to use: `“` and `‘` by default.
+    pub opening_quotes: Option<textlane_core::QuoteCharacters>,
+    /// Turn straight quotes into smart ones.
+    #[serde(deserialize_with = "textlane_core::read_switch")]
+    #[cfg_attr(feature = "schema", schemars(with = "Option<bool>"))]
+    pub quotes: bool,
+}
+
+impl Default for Smartypants {
+    fn default() -> Self {
+        Self {
+            backticks: textlane_core::Backticks::On,
+            closing_quotes: None,
+            dashes: textlane_core::Dashes::On,
+            ellipses: textlane_core::Ellipses::On,
+            opening_quotes: None,
+            quotes: true,
+        }
+    }
+}

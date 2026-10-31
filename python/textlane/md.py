@@ -22,6 +22,8 @@ __all__ = [
     "frontmatter",
     "FrontmatterOptions",
     "gemoji",
+    "smartypants",
+    "SmartypantsOptions",
     "component",
     "ComponentOptions",
     "package_command",
@@ -153,6 +155,43 @@ class FrontmatterSettings(TypedDict, total=False):
 
 # The kinds of matter to recognize, as remark-frontmatter takes them (a preset, a matter, or a list of them; `yaml` when unset), or textlane's options object.
 FrontmatterOptions = Union[Literal["yaml", "toml"], Matter, List[Union[Literal["yaml", "toml"], Matter]], FrontmatterSettings]
+
+
+Backticks = Union[bool, Literal["all"]]
+
+
+class _QuoteCharactersRequired(TypedDict):
+    double: str
+    single: str
+
+
+# The quote characters to use for double and single quotes.
+class QuoteCharacters(_QuoteCharactersRequired, total=False):
+    pass
+
+
+Dashes = Union[bool, Literal["oldschool", "inverted"]]
+
+
+Ellipses = Union[bool, Literal["spaced", "unspaced"]]
+
+
+# `md.smartypants`: straight quotes, dashes, dots and backticks in Markdown text into
+# typographic ones, as remark-smartypants does; options as retext-smartypants takes them.
+class SmartypantsOptions(TypedDict, total=False):
+    # Turn double backticks and double straight single quotes into double quotes; `all`
+    # turns single ones into single quotes too.
+    backticks: Backticks
+    # The closing quotes to use: `”` and `’` by default.
+    closingQuotes: Optional[QuoteCharacters]
+    # Turn two dashes into an em dash; `oldschool` and `inverted` treat three too.
+    dashes: Dashes
+    # Turn three dots into an ellipsis, with spaces between them or without.
+    ellipses: Ellipses
+    # The opening quotes to use: `“` and `‘` by default.
+    openingQuotes: Optional[QuoteCharacters]
+    # Turn straight quotes into smart ones.
+    quotes: Optional[bool]
 
 
 # One name or several.
@@ -571,6 +610,11 @@ def frontmatter(options: Optional[FrontmatterOptions] = None) -> Plugin:
 def gemoji() -> Plugin:
     """The `md.gemoji` plugin."""
     return describe_plugin("md.gemoji")
+
+
+def smartypants(options: Optional[SmartypantsOptions] = None) -> Plugin:
+    """The `md.smartypants` plugin."""
+    return describe_plugin("md.smartypants", options)
 
 
 def component(options: Optional[ComponentOptions] = None) -> Plugin:

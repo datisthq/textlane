@@ -66,6 +66,12 @@ pub(crate) const PLUGINS: &[PluginEntry] = &[
     #[cfg(feature = "md")]
     plugin!("md.gemoji", textlane_md::Gemoji, "remark-gemoji", unit),
     #[cfg(feature = "md")]
+    plugin!(
+        "md.smartypants",
+        textlane_md::Smartypants,
+        "remark-smartypants"
+    ),
+    #[cfg(feature = "md")]
     plugin!("md.component", textlane_md::Component, ""),
     #[cfg(feature = "md")]
     plugin!(

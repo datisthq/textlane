@@ -26,6 +26,7 @@ mod models {
     pub(crate) mod quotes;
     pub(crate) mod report;
     pub(crate) mod smartypants;
+    pub(crate) mod typographer;
 }
 mod utils {
     pub(crate) mod parser {
@@ -130,6 +131,7 @@ pub use models::quotes::{QuoteStyle, Quotes};
 pub use models::smartypants::{
     Backticks, Dashes, Ellipses, QuoteCharacters, Smartypants,
 };
+pub use models::typographer::SmartypantsTypographer;
 pub use plugins::indefinite_article::plugin::IndefiniteArticle;
 pub use plugins::repeated_words::plugin::RepeatedWords;
 pub use plugins::stringify::plugin::Stringify;

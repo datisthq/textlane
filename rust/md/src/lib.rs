@@ -343,6 +343,14 @@ mod plugins {
     pub(crate) mod stringify {
         pub(crate) mod plugin;
     }
+    pub(crate) mod smartypants {
+        pub(crate) mod actions {
+            pub(crate) mod text {
+                pub(crate) mod smarten;
+            }
+        }
+        pub(crate) mod plugin;
+    }
     pub(crate) mod strip {
         pub(crate) mod actions {
             pub(crate) mod list {
@@ -394,8 +402,8 @@ pub use models::options::{
     DirectiveSlot, Ecosystems, Frontmatter, FrontmatterSlot, Gfm, GfmSlot, GroupRule,
     HeadingId, MarkdownLinks, MarkerValue, Math, MathSlot, Matter, Mdx, MdxSlot, Names,
     NpmManager, PackageCommand, ParentCheck, ParentTest, Parse, PathRewrite, PipManager,
-    ShiftHeading, Stringify, Strip, TaskListLabels, ToHtml, ToNaturalLanguage, Toc,
-    UnknownDirectives, UnsafePattern, UrlNode,
+    ShiftHeading, Smartypants, Stringify, Strip, TaskListLabels, ToHtml,
+    ToNaturalLanguage, Toc, UnknownDirectives, UnsafePattern, UrlNode,
 };
 
 // actions

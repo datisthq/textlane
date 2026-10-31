@@ -6,6 +6,7 @@ use crate::models::error::Error;
 use crate::models::file::File;
 use crate::models::nlcst::Node;
 use crate::models::position::Position;
+use crate::models::smartypants::Typography;
 use crate::models::tree::{Tree, TreeKind};
 use crate::{Allocator, ArenaVec};
 
@@ -135,6 +136,20 @@ pub trait NaturalLanguageParser: Send + Sync {
 #[derive(Clone, Default)]
 pub struct NaturalLanguageParserSlot {
     pub parser: Option<Arc<dyn NaturalLanguageParser>>,
+}
+
+/// Typographic punctuation for text, as retext-smartypants gives it: what `md.smartypants`
+/// asks the natural-language plugins for.
+pub trait Typographer: Send + Sync {
+    /// `text` parsed as natural language, its punctuation replaced, written back.
+    fn smarten(&self, text: &str, typography: &Typography) -> String;
+}
+
+/// The slot holding the typographer `md.smartypants` uses; the textlane processor seeds it
+/// when built with `nl`.
+#[derive(Clone, Default)]
+pub struct TypographerSlot {
+    pub typographer: Option<Arc<dyn Typographer>>,
 }
 
 /// A JavaScript parser, as acorn is to micromark's MDX extensions: `md.mdx` asks it where

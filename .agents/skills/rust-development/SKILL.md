@@ -417,6 +417,12 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   Both walk with explicit stacks: md one frame per parent, remembering the previous
   child's end for the line endings between; html a task stack of `find` and `add`, with
   `implicit` grouping phrasing runs up front and `flattenAll` and `toString` iterative
+- `md.smartypants` ports remark-smartypants 3.0.3 in md over core's `Typographer`
+  (`TypographerSlot`, seeded with `nl`'s `SmartypantsTypographer` like the parser slot): one
+  quotes-only pass over all text joined (inline code as `A`s, a space per paragraph, heading
+  and cell), spliced back by UTF-16 offsets, then the other replacements per text node. Its
+  option enums (`Backticks`, `Dashes`, `Ellipses`, `QuoteCharacters`) live in core so md and
+  nl share them; core has serde, and `schema` turns on its schemars
 - Natural-language checks (`nl.quotes`, `nl.contractions`, `nl.indefiniteArticle`) collect
   `Report`s with span positions and hand them to `place_messages`, which turns them into
   unist places in one sorted pass over `File::value` (the text the parser read, set by

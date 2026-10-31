@@ -95,6 +95,34 @@ export interface FrontmatterSettings {
   strip?: boolean
 }
 
+/** `md.smartypants`: straight quotes, dashes, dots and backticks in Markdown text into typographic ones, as remark-smartypants does; options as retext-smartypants takes them. */
+export interface SmartypantsOptions {
+  /** Turn double backticks and double straight single quotes into double quotes; `all` turns single ones into single quotes too. */
+  backticks?: Backticks
+  /** The closing quotes to use: `”` and `’` by default. */
+  closingQuotes?: QuoteCharacters | null
+  /** Turn two dashes into an em dash; `oldschool` and `inverted` treat three too. */
+  dashes?: Dashes
+  /** Turn three dots into an ellipsis, with spaces between them or without. */
+  ellipses?: Ellipses
+  /** The opening quotes to use: `“` and `‘` by default. */
+  openingQuotes?: QuoteCharacters | null
+  /** Turn straight quotes into smart ones. @default true */
+  quotes?: boolean | null
+}
+
+export type Backticks = boolean | "all"
+
+/** The quote characters to use for double and single quotes. */
+export interface QuoteCharacters {
+  double: string
+  single: string
+}
+
+export type Dashes = boolean | "oldschool" | "inverted"
+
+export type Ellipses = boolean | "spaced" | "unspaced"
+
 /** `md.component`: directives, GitHub alerts and other nodes into MDX JSX elements, the components an MDX runtime renders, by declarative rules. */
 export interface ComponentOptions {
   /** Rules for directives; the first that matches a directive converts it. */
@@ -439,6 +467,12 @@ export function frontmatter(options?: FrontmatterOptions): Plugin<"md.frontmatte
 /** The `md.gemoji` plugin. */
 export function gemoji(): Plugin<"md.gemoji"> {
   return { name: "md.gemoji" }
+}
+
+/** The `md.smartypants` plugin. */
+export function smartypants(options?: SmartypantsOptions): Plugin<"md.smartypants", SmartypantsOptions> {
+  if (options === undefined) return { name: "md.smartypants" }
+  return { name: "md.smartypants", options }
 }
 
 /** The `md.component` plugin. */

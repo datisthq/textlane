@@ -19,6 +19,7 @@ mod models {
     pub(crate) mod mdx;
     pub(crate) mod nlcst;
     pub(crate) mod position;
+    pub(crate) mod smartypants;
     pub(crate) mod tree;
 }
 #[cfg(feature = "json")]
@@ -85,11 +86,15 @@ pub use models::file::{File, Message};
 pub use models::lines::Lines;
 pub use models::location::Location;
 pub use models::position::{Point, Position, UnistPoint, UnistPosition};
+pub use models::smartypants::{
+    Backticks, Dashes, Ellipses, QuoteCharacters, Typography, read_switch,
+};
 pub use models::tree::{Tree, TreeKind};
 pub use plugin::{
     Attach, Compiler, HtmlTarget, HtmlWriter, Job, NaturalLanguageParser,
     NaturalLanguageParserSlot, Parser, Plugin, ScriptError, ScriptExpression,
-    ScriptParser, ScriptParserSlot, ScriptStatement, Slots, Step, Transform,
+    ScriptParser, ScriptParserSlot, ScriptStatement, Slots, Step, Transform, Typographer,
+    TypographerSlot,
 };
 
 /// The arena every node of one document is allocated in.
