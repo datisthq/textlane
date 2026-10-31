@@ -16,6 +16,7 @@ export type {
   Attacher,
   Pluggable,
   PluggableList,
+  Parser,
   Plugin,
   Preset,
   Transformer,

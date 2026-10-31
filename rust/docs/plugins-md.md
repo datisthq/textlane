@@ -583,6 +583,37 @@ Takes `"keep" | "directory" | "html"`.
 
 <!-- /generated -->
 
+## md.shiftHeading
+
+Moves every heading's depth by `shift`, kept within 1 to 6, as rehype-shift-heading does for hast: `-1` makes each h2 an h1. `dropTitle` first drops the document's first node when it is an h1, looking past frontmatter and ESM, which suits a page whose title is rendered on its own; dropping before shifting keeps a document that opens on an h2.
+
+```rust
+use textlane::{Processor, md};
+
+let shift = md::ShiftHeading { shift: -1, drop_title: true };
+let output = Processor::new()
+    .with(md::Parse::default())
+    .with(shift)
+    .with(md::Stringify::default())
+    .freeze()?
+    .process("# 0.2.0\n\n### Features\n\n- a")?;
+output.value
+// ## Features
+//
+// * a
+```
+
+<!-- generated:options md.shiftHeading -->
+
+Follows [rehype-shift-heading](https://www.npmjs.com/package/rehype-shift-heading).
+
+| Option      | Type      | Default | Description                                                                        |
+| ----------- | --------- | ------- | ---------------------------------------------------------------------------------- |
+| `shift`     | `number`  | `0`     | The levels added to each heading's depth: `-1` makes an h2 an h1, `1` an h1 an h2. |
+| `dropTitle` | `boolean` | `false` | Drop the document's first node when it is an h1, looking past frontmatter and ESM. |
+
+<!-- /generated -->
+
 ## md.strip
 
 Strips mdast down to its text, as strip-markdown does: code, HTML, tables and definitions go, headings become paragraphs and formatting gives way to its content, which suits search indexes and plain-text summaries. `keep` leaves node types as they are and `remove` drops more.

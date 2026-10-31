@@ -35,6 +35,11 @@ One workspace, three registries, one version. Nothing here may change what the c
   A plugin struct is its own options (`md::Gfm`), so schemars would name the binding type
   `Gfm`: each carries `schemars(rename = "GfmOptions")`, and a hand-written `schema_name`
   returns the `…Options` name too, or the generated types silently lose their suffix.
+- The generator marks each `<domain>.parse` with `Parser<Root>` (`PARSED_TREES`: mdast, hast,
+  nlcst), a phantom optional key `use()`'s conditional return reads, so `parse` is typed after
+  `use(md.parse())` with no cast. A plugin lacking the key infers `unknown` and keeps the tree;
+  making the key required breaks every generated `return { name }`. `@types/unist`, `mdast`,
+  `hast` and `nlcst` are runtime `dependencies` with caret ranges, so consumers dedupe them.
 - `resolveAddon` takes `TEXTLANE_ADDON` first (a cargo build, an unsupported platform), else
   resolves `@textlane/<platform>-<arch>/textlane.node` from the installed packages.
 - `PLATFORMS` in `typescript/settings.ts` is the single list. `scripts/pack.ts` reads it to lay

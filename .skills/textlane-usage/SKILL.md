@@ -66,8 +66,11 @@ A domain function returns a descriptor, `{ name: "md.toHtml", options }`, typed 
 crate. The processor follows unified: `use(plugin | [plugin, options] | preset | list)`,
 `data(key?, value?)`, `freeze()`, `parse(text)`, `run(tree, file?)` (Promise),
 `runSync(tree, file?)`, `stringify(tree)`, `process(text)` (Promise) and `processSync(text)`.
-Trees are plain unist JSON objects. Without JavaScript plugins, `process` runs off the main
-thread: process many documents with `Promise.all` over one frozen processor, not one by one.
+Trees are plain unist JSON objects: after `use(md.parse())`, `html.parse()` or `nl.parse()`,
+`parse` is typed as `@types/mdast`, `hast` or `nlcst`'s `Root`, and `run` and `stringify` take
+any unist node, so no cast is needed between them and unified utilities. Without
+JavaScript plugins, `process` runs off the main thread: process many documents with
+`Promise.all` over one frozen processor, not one by one.
 
 ## Python
 
@@ -144,6 +147,9 @@ the case: `unknown-plugin`, `invalid-options`, `missing-parser`, `missing-compil
   `md.toc`: `heading` and `skip` are regex source strings, `parents` a JSON unist-util-is
   test, never a function; JavaScript lookaround and back references fail with
   `invalid-options`.
+- Shifting heading levels (remark/rehype-shift-heading) is `md.shiftHeading({ shift: -1 })`,
+  clamped to 1–6; `dropTitle: true` first drops a leading h1 (past frontmatter and ESM), as a
+  page whose title renders separately needs.
 - Asset and page URLs relative to a Markdown file are `md.pathRewrite({ root, base, pages,
 markdownLinks })`; pass the document as `{ value, path }` so it knows where the file lives.
 - remark-stringify reads `settings` from processor data; textlane's `md.stringify` takes its

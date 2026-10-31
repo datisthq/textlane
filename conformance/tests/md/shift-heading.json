@@ -1,0 +1,238 @@
+[
+  {
+    "description": "shift moves every heading and clamps to 1 to 6",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.shiftHeading",
+        {
+          "shift": -1
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "each level moves up one, an h1 stays",
+        "input": "# a\n\n## b\n\n### c\n\n###### d",
+        "expected": {
+          "md": "# a\n\n# b\n\n## c\n\n##### d\n"
+        }
+      },
+      {
+        "description": "headings inside containers move too",
+        "input": "> ## a\n\n- ### b",
+        "expected": {
+          "md": "> # a\n\n* ## b\n"
+        }
+      },
+      {
+        "description": "setext headings move as their depth",
+        "input": "a\n-",
+        "expected": {
+          "md": "# a\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "a positive shift clamps at 6",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.shiftHeading",
+        {
+          "shift": 2
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "an h1 becomes an h3, an h5 an h6",
+        "input": "# a\n\n##### b\n\n###### c",
+        "expected": {
+          "md": "### a\n\n###### b\n\n###### c\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "a shift past the range clamps",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.shiftHeading",
+        {
+          "shift": 100
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "an h1 becomes an h6",
+        "input": "# a",
+        "expected": {
+          "md": "###### a\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "a negative shift past the range clamps",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.shiftHeading",
+        {
+          "shift": -100
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "an h6 becomes an h1",
+        "input": "###### a",
+        "expected": {
+          "md": "# a\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "no options change nothing",
+    "pipeline": [["md.parse"], ["md.shiftHeading"], ["md.stringify"]],
+    "tests": [
+      {
+        "description": "headings keep their depth",
+        "input": "# a\n\n## b",
+        "expected": {
+          "md": "# a\n\n## b\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "dropTitle drops a leading h1 before the shift",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.shiftHeading",
+        {
+          "shift": -1,
+          "dropTitle": true
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a leading h1 goes, the rest move up",
+        "input": "# 0.7.2 (2026-04-25)\n\n### Features\n\n* a",
+        "expected": {
+          "md": "## Features\n\n* a\n"
+        }
+      },
+      {
+        "description": "a leading h2 is no title and stays as an h1",
+        "input": "## Features\n\n* a",
+        "expected": {
+          "md": "# Features\n\n* a\n"
+        }
+      },
+      {
+        "description": "an h1 after other content stays",
+        "input": "a\n\n# b",
+        "expected": {
+          "md": "a\n\n# b\n"
+        }
+      },
+      {
+        "description": "only the first h1 goes",
+        "input": "# a\n\n# b",
+        "expected": {
+          "md": "# b\n"
+        }
+      },
+      {
+        "description": "an empty document stays empty",
+        "input": "",
+        "expected": {
+          "md": ""
+        }
+      }
+    ]
+  },
+  {
+    "description": "dropTitle looks past frontmatter",
+    "pipeline": [
+      ["md.parse"],
+      ["md.frontmatter"],
+      [
+        "md.shiftHeading",
+        {
+          "dropTitle": true
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "the h1 after YAML goes, the YAML stays",
+        "input": "---\ntitle: a\n---\n\n# a\n\nb",
+        "expected": {
+          "md": "---\ntitle: a\n---\n\nb\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "dropTitle looks past ESM",
+    "pipeline": [
+      ["md.parse"],
+      ["md.mdx"],
+      [
+        "md.shiftHeading",
+        {
+          "dropTitle": true
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "the h1 after an import goes, the import stays",
+        "input": "import a from 'a'\n\n# a\n\nb",
+        "expected": {
+          "md": "import a from 'a'\n\nb\n"
+        }
+      }
+    ]
+  },
+  {
+    "description": "invalid options fail",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.shiftHeading",
+        {
+          "shift": "1"
+        }
+      ],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a shift that is no number",
+        "input": "# a",
+        "expected": {
+          "error": {
+            "code": "invalid-options"
+          }
+        }
+      }
+    ]
+  }
+]

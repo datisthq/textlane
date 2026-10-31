@@ -334,6 +334,9 @@ mod plugins {
         }
         pub(crate) mod plugin;
     }
+    pub(crate) mod shift_heading {
+        pub(crate) mod plugin;
+    }
     pub(crate) mod stringify {
         pub(crate) mod plugin;
     }
@@ -382,9 +385,9 @@ pub use models::options::{
     DefinitionListSlot, Directive, DirectiveKind, DirectiveRule, DirectiveSlot,
     Ecosystems, Frontmatter, FrontmatterSlot, Gfm, GfmSlot, GroupRule, HeadingId,
     MarkdownLinks, MarkerValue, Math, MathSlot, Matter, Mdx, MdxSlot, Names, NpmManager,
-    PackageCommand, ParentCheck, ParentTest, Parse, PathRewrite, PipManager, Stringify,
-    Strip, TaskListLabels, ToHtml, ToNaturalLanguage, Toc, UnknownDirectives,
-    UnsafePattern, UrlNode,
+    PackageCommand, ParentCheck, ParentTest, Parse, PathRewrite, PipManager,
+    ShiftHeading, Stringify, Strip, TaskListLabels, ToHtml, ToNaturalLanguage, Toc,
+    UnknownDirectives, UnsafePattern, UrlNode,
 };
 
 // actions

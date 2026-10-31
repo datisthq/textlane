@@ -28,6 +28,8 @@ __all__ = [
     "HeadingIdOptions",
     "path_rewrite",
     "PathRewriteOptions",
+    "shift_heading",
+    "ShiftHeadingOptions",
     "strip",
     "StripOptions",
     "toc",
@@ -340,6 +342,15 @@ class PathRewriteOptions(TypedDict, total=False):
     markdownLinks: MarkdownLinks
 
 
+# `md.shiftHeading`: every heading's depth moved by `shift` and kept within 1 to 6, as
+# rehype-shift-heading moves hast's, after the document's title is dropped when asked.
+class ShiftHeadingOptions(TypedDict, total=False):
+    # The levels added to each heading's depth: `-1` makes an h2 an h1, `1` an h1 an h2.
+    shift: int
+    # Drop the document's first node when it is an h1, looking past frontmatter and ESM.
+    dropTitle: bool
+
+
 # `md.strip`: mdast down to its text, as strip-markdown does: code, HTML, tables and
 # the like dropped, headings made paragraphs, formatting unwrapped.
 class StripOptions(TypedDict, total=False):
@@ -550,6 +561,11 @@ def heading_id(options: Optional[HeadingIdOptions] = None) -> Plugin:
 def path_rewrite(options: Optional[PathRewriteOptions] = None) -> Plugin:
     """The `md.pathRewrite` plugin."""
     return describe_plugin("md.pathRewrite", options)
+
+
+def shift_heading(options: Optional[ShiftHeadingOptions] = None) -> Plugin:
+    """The `md.shiftHeading` plugin."""
+    return describe_plugin("md.shiftHeading", options)
 
 
 def strip(options: Optional[StripOptions] = None) -> Plugin:

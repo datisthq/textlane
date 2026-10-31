@@ -1,7 +1,10 @@
 import { mkdtempSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { afterAll, beforeAll, describe, expect, it } from "vite-plus/test"
+import type { Root as HastRoot } from "hast"
+import type { Root as MdastRoot } from "mdast"
+import type { Root as NlcstRoot } from "nlcst"
+import { afterAll, beforeAll, describe, expect, expectTypeOf, it } from "vite-plus/test"
 import { buildAddon, removeAddon } from "../-test/addon.ts"
 import * as html from "../generated/html.ts"
 import * as md from "../generated/md.ts"
@@ -180,6 +183,20 @@ describe("Processor", () => {
       processor().runSync(tree, { value: "a b" }).position,
     )
     expect(withText).not.toEqual(processor().runSync(tree))
+  })
+
+  it("types the tree its parser parses, through later plugins", () => {
+    const tree = entry.textlane().use(md.parse()).use(md.gfm()).parse("# a")
+    expectTypeOf(tree).toEqualTypeOf<MdastRoot>()
+    expect(tree.children[0]?.type).toBe("heading")
+    expectTypeOf(entry.textlane().use(html.parse()).parse("")).toEqualTypeOf<HastRoot>()
+    expectTypeOf(entry.textlane().use(nl.parse()).parse("")).toEqualTypeOf<NlcstRoot>()
+    expectTypeOf(entry.textlane().parse).returns.toEqualTypeOf<Node>()
+  })
+
+  it("compiles a typed tree as given", () => {
+    const root: MdastRoot = { type: "root", children: [{ type: "thematicBreak" }] }
+    expect(entry.textlane().use(md.stringify()).stringify(root)).toBe("***\n")
   })
 
   it("reports the version", () => {

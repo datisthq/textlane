@@ -3,35 +3,42 @@ import { isPlainObject, mergeOptions } from "../actions/options/merge.ts"
 import { type HostEntry, mapPluggable } from "../actions/pluggable/map.ts"
 import { finishRun } from "../actions/run/finish.ts"
 import { isTransformer } from "../actions/transformer/check.ts"
+import type { Node as UnistNode } from "unist"
 import type { NativePipeline } from "./addon.ts"
 import type { Compatible, Node, VFile } from "./file.ts"
 import type { Host } from "./host.ts"
-import type { Attacher, Pluggable, PluggableList, Preset } from "./plugin.ts"
+import type { Attacher, Parser, Pluggable, PluggableList, Preset } from "./plugin.ts"
 import { HostFile } from "./vfile.ts"
 
 /**
  * unified's processor over the native pipeline; every call is the crate's, except that
  * JavaScript plugins run here when a run pauses before them.
  */
-export class Processor {
-  #native: NativePipeline
+export class Processor<Tree extends UnistNode = Node> {
+  #native: NativePipeline<Tree>
   #ids = new Map<Attacher, number>()
   #hosts = new Map<number, Host>()
   #attached = false
   #frozen = false
 
-  constructor(native: NativePipeline) {
+  constructor(native: NativePipeline<Tree>) {
     this.#native = native
   }
 
   /**
    * Add a plugin, a list of them or a preset; a plugin used again is reconfigured. A
    * JavaScript plugin is an attacher, called with the processor and its options at freeze.
+   * A parser, such as `md.parse()`, types the tree `parse` returns.
    */
+  use<Value extends Pluggable | PluggableList | Preset | null | undefined>(
+    value: Value,
+    ...options: unknown[]
+  ): Processor<ParsedTree<Value, Tree>>
+  // a parser retypes this same processor: the tree it parses lives in the type alone
   use(
     value: Pluggable | PluggableList | Preset | null | undefined,
     ...options: unknown[]
-  ) {
+  ): Processor<UnistNode> {
     if (isAttacher(value)) {
       this.#native.use([this.#register(value, options)])
       return this
@@ -77,7 +84,7 @@ export class Processor {
    * Run the transforms, finishing asynchronous stages; `file`, the text `tree` was parsed
    * from, lets bridges read it and keeps positions in the result.
    */
-  async run(tree: Node, file?: Compatible) {
+  async run(tree: UnistNode, file?: Compatible) {
     const value = readValue(file)
     if (!this.#attach()) return this.#native.run(tree, value)
     const run = this.#native.startRun(tree, value, false)
@@ -87,7 +94,7 @@ export class Processor {
   }
 
   /** Run the transforms; fails with `async-in-sync` on an asynchronous stage. */
-  runSync(tree: Node, file?: Compatible) {
+  runSync(tree: UnistNode, file?: Compatible) {
     const value = readValue(file)
     if (!this.#attach()) return this.#native.runSync(tree, value)
     const run = this.#native.startRun(tree, value, true)
@@ -97,7 +104,7 @@ export class Processor {
   }
 
   /** Compile a tree, running no transform. */
-  stringify(tree: Node) {
+  stringify(tree: UnistNode) {
     this.#attach()
     return this.#native.stringify(tree)
   }
@@ -176,6 +183,14 @@ export class Processor {
     return this.#native.hosts().length > 0
   }
 }
+
+// A plugin without the marker infers `unknown` from the optional key, keeping the tree
+type ParsedTree<Value, Current> =
+  Value extends Parser<infer Parsed>
+    ? Parsed extends UnistNode
+      ? Parsed
+      : Current
+    : Current
 
 function readValue(file: Compatible | undefined) {
   return typeof file === "string" ? file : file?.value

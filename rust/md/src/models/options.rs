@@ -262,6 +262,19 @@ pub enum MarkerValue {
     Text(String),
 }
 
+/// `md.shiftHeading`: every heading's depth moved by `shift` and kept within 1 to 6, as
+/// rehype-shift-heading moves hast's, after the document's title is dropped when asked.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", schemars(rename = "ShiftHeadingOptions"))]
+pub struct ShiftHeading {
+    /// The levels added to each heading's depth: `-1` makes an h2 an h1, `1` an h1 an h2.
+    pub shift: i32,
+    /// Drop the document's first node when it is an h1, looking past frontmatter and ESM.
+    pub drop_title: bool,
+}
+
 /// `md.pathRewrite`: the URLs of images, links and definitions as a site serves them:
 /// relative ones resolved against the file's path and made root-relative, every root-relative
 /// one under `base`, and links to Markdown files turned into page URLs.

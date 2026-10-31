@@ -1,3 +1,4 @@
+import type { Node as UnistNode } from "unist"
 import type { Node } from "./file.ts"
 import type { HostFile } from "./vfile.ts"
 
@@ -5,6 +6,13 @@ import type { HostFile } from "./vfile.ts"
 export interface Plugin<Name extends string = string, Options = unknown> {
   name: Name
   options?: Options
+}
+
+declare const parsed: unique symbol
+
+/** A parser plugin, carrying the tree `parse` returns once it is used; nothing at runtime. */
+export interface Parser<Tree extends UnistNode = UnistNode> {
+  readonly [parsed]?: Tree
 }
 
 /** Plugins and the settings they share, as unified's presets. */

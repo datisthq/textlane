@@ -577,6 +577,37 @@ Takes `Union[Literal["keep"], Literal["directory"], Literal["html"]]`.
 
 <!-- /generated -->
 
+## md.shiftHeading
+
+Moves every heading's depth by `shift`, kept within 1 to 6, as rehype-shift-heading does for hast: `-1` makes each h2 an h1. `dropTitle` first drops the document's first node when it is an h1, looking past frontmatter and ESM, which suits a page whose title is rendered on its own; dropping before shifting keeps a document that opens on an h2.
+
+```python
+from textlane import md, textlane
+
+file = (
+    textlane()
+    .use(md.parse())
+    .use(md.shift_heading({"shift": -1, "dropTitle": True}))
+    .use(md.stringify())
+    .process("# 0.2.0\n\n### Features\n\n- a")
+)
+file["value"]
+# ## Features
+#
+# * a
+```
+
+<!-- generated:options md.shiftHeading -->
+
+Follows [rehype-shift-heading](https://www.npmjs.com/package/rehype-shift-heading).
+
+| Option      | Type   | Default | Description                                                                        |
+| ----------- | ------ | ------- | ---------------------------------------------------------------------------------- |
+| `shift`     | `int`  | `0`     | The levels added to each heading's depth: `-1` makes an h2 an h1, `1` an h1 an h2. |
+| `dropTitle` | `bool` | `False` | Drop the document's first node when it is an h1, looking past frontmatter and ESM. |
+
+<!-- /generated -->
+
 ## md.strip
 
 Strips mdast down to its text, as strip-markdown does: code, HTML, tables and definitions go, headings become paragraphs and formatting gives way to its content, which suits search indexes and plain-text summaries. `keep` leaves node types as they are and `remove` drops more.

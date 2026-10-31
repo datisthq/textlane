@@ -18,7 +18,10 @@ tree as the unified ecosystem defines it:
 
 `parse` returns the tree as plain JSON, node for node what the unified ecosystem produces,
 and `run` and `stringify` take it back. Every node has a `type`; parents have `children`;
-literals have a `value`.
+literals have a `value`. The parser types it: after `md.parse()`, `html.parse()` or
+`nl.parse()`, `parse` returns the `Root` of [`@types/mdast`](https://www.npmjs.com/package/@types/mdast),
+`@types/hast` or `@types/nlcst`, which textlane depends on, and `run` and `stringify` take any
+unist node, so trees pass to and from unified utilities without a cast.
 
 ```js
 import { textlane } from "textlane"

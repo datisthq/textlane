@@ -1,20 +1,21 @@
+import type { Node as UnistNode } from "unist"
 import type { Message, Node, VFile } from "./file.ts"
 
 /** The crate's pipeline as the addon exposes it: values cross as JSON. */
-export interface NativePipeline {
+export interface NativePipeline<Tree extends UnistNode = Node> {
   use(value: unknown, options?: unknown): void
   data(key?: string): unknown
   setData(key: string, value: unknown): void
   replaceData(data: Record<string, unknown>): void
   freeze(): void
-  parse(text: string): Node
-  run(tree: Node, value?: string): Node
-  runSync(tree: Node, value?: string): Node
-  stringify(tree: Node): string
+  parse(text: string): Tree
+  run(tree: UnistNode, value?: string): Node
+  runSync(tree: UnistNode, value?: string): Node
+  stringify(tree: UnistNode): string
   process(text: string, path?: string): Promise<ProcessOutcome>
   processSync(text: string, path?: string): VFile
   hosts(): number[]
-  startRun(tree: Node, value: string | undefined, sync: boolean): NativeRun<Node>
+  startRun(tree: UnistNode, value: string | undefined, sync: boolean): NativeRun<Node>
   startProcess(text: string, sync: boolean, path?: string): NativeRun<VFile>
 }
 
@@ -30,7 +31,7 @@ export interface NativeRun<Result> {
   tree(): Node
   value(): string | null
   messages(): Message[]
-  resume(tree: Node, messages: Message[]): void
+  resume(tree: UnistNode, messages: Message[]): void
   result(): Result
 }
 
