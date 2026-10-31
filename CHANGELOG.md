@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1](https://github.com/datisthq/textlane/compare/v0.6.0...v0.6.1) (2026-10-31)
+
+
+### Bug Fixes
+
+* **html:** mark words on numbered lines, counting offsets without the numbers ([fab2d8e](https://github.com/datisthq/textlane/commit/fab2d8ed929911444d3544e483f6bb2af9e90e18))
+
 ## [0.6.0](https://github.com/datisthq/textlane/compare/v0.5.0...v0.6.0) (2026-10-31)
 
 
