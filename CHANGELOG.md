@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.5.0](https://github.com/datisthq/textlane/compare/v0.4.0...v0.5.0) (2026-10-31)
+
+
+### Features
+
+* **html:** collapse whitespace only with html.format's minify, as rehype-minify-whitespace ([67924b0](https://github.com/datisthq/textlane/commit/67924b04f99b3b39e80e8eb7527f04b5ccdb3567))
+* **html:** link headings to themselves with html.slug's autolink, as rehype-autolink-headings ([00cb076](https://github.com/datisthq/textlane/commit/00cb0766f6e5fa316883be0f93ef52e1c2859dad))
+* **md:** add md.cjkFriendly, CJK-friendly emphasis and strikethrough as remark-cjk-friendly parses them ([284a851](https://github.com/datisthq/textlane/commit/284a851b01fc8edc9f953c61237f5c8654782722))
+* **md:** add md.smartypants, typographic punctuation in Markdown text as remark-smartypants ([4af8ed8](https://github.com/datisthq/textlane/commit/4af8ed84f67fa2ce5e65ae92c6b78ecdfb6d29a9))
+* **md:** add remark-emoji's emoticon, accessible and padSpaceAfter options to md.gemoji ([b8f68ac](https://github.com/datisthq/textlane/commit/b8f68ac48bca2481a25fc3c54a2956f64228ae06))
+* **md:** render GitHub alerts with md.gfm's alerts, as remark-github-blockquote-alert ([328825f](https://github.com/datisthq/textlane/commit/328825f116e8ce7c81725e18354f6008e76e948a))
+* **md:** turn line endings into breaks with md.toHtml's breaks, as remark-breaks ([04ee8d0](https://github.com/datisthq/textlane/commit/04ee8d0320e452d3878a932dd1054c578af562e9))
+* **python:** type parsed trees as mdast, hast and nlcst TypedDicts ([33c0fa1](https://github.com/datisthq/textlane/commit/33c0fa1c7a38b2ac31bb5e760147885387b0ccb5))
+
+
+### Bug Fixes
+
+* **html:** skip what html.slug's autolink inserted in linear time ([20fa724](https://github.com/datisthq/textlane/commit/20fa72448783a1596b40621c0975d4bd97f660e6))
+* list md.smartypants once, where a merge doubled its plugin entry ([220a877](https://github.com/datisthq/textlane/commit/220a8778b6b23e06ebc7168b5191000f0189a144))
+
 ## [0.4.0](https://github.com/datisthq/textlane/compare/v0.3.0...v0.4.0) (2026-10-31)
 
 
