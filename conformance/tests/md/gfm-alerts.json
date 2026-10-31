@@ -1,0 +1,385 @@
+[
+  {
+    "description": "remark-github-blockquote-alert",
+    "source": {
+      "repository": "https://github.com/jaywcjlove/remark-github-blockquote-alert",
+      "commit": "19c51161a3a9ff8f6d4ec649439a2e475f0e8170",
+      "path": "test/index.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gfm",
+        {
+          "alerts": true
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\"> [!NOTE]  \\n> Useful information that users should know, even when skimming content.\"",
+        "input": "> [!NOTE]  \n> Useful information that users should know, even when skimming content.",
+        "expected": {
+          "html": "<div class=\"markdown-alert markdown-alert-note\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z\"></path></svg>NOTE</p>\n<p>Useful information that users should know, even when skimming content.</p>\n</div>"
+        }
+      },
+      {
+        "description": "\"> [!TIP]  \\n> Helpful advice for doing things better or more easily.\"",
+        "input": "> [!TIP]  \n> Helpful advice for doing things better or more easily.",
+        "expected": {
+          "html": "<div class=\"markdown-alert markdown-alert-tip\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z\"></path></svg>TIP</p>\n<p>Helpful advice for doing things better or more easily.</p>\n</div>"
+        }
+      },
+      {
+        "description": "\"> [!IMPORTANT]  \\n> Key information users need to know to achieve their goal.\"",
+        "input": "> [!IMPORTANT]  \n> Key information users need to know to achieve their goal.",
+        "expected": {
+          "html": "<div class=\"markdown-alert markdown-alert-important\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z\"></path></svg>IMPORTANT</p>\n<p>Key information users need to know to achieve their goal.</p>\n</div>"
+        }
+      },
+      {
+        "description": "\"> [!WARNING]  \\n> Urgent info that needs immediate user attention to avoid problems.\"",
+        "input": "> [!WARNING]  \n> Urgent info that needs immediate user attention to avoid problems.",
+        "expected": {
+          "html": "<div class=\"markdown-alert markdown-alert-warning\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z\"></path></svg>WARNING</p>\n<p>Urgent info that needs immediate user attention to avoid problems.</p>\n</div>"
+        }
+      },
+      {
+        "description": "\"> [!CAUTION]  \\n> Urgent info that needs immediate user attention to avoid problems.\"",
+        "input": "> [!CAUTION]  \n> Urgent info that needs immediate user attention to avoid problems.",
+        "expected": {
+          "html": "<div class=\"markdown-alert markdown-alert-caution\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z\"></path></svg>CAUTION</p>\n<p>Urgent info that needs immediate user attention to avoid problems.</p>\n</div>"
+        }
+      },
+      {
+        "description": "\"> [!CAUTION] \\n> Urgent info that needs immediate user attention to avoid problems.\"",
+        "input": "> [!CAUTION] \n> Urgent info that needs immediate user attention to avoid problems.",
+        "expected": {
+          "html": "<div class=\"markdown-alert markdown-alert-caution\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z\"></path></svg>CAUTION</p>\n<p>Urgent info that needs immediate user attention to avoid problems.</p>\n</div>"
+        }
+      },
+      {
+        "description": "\"> [!CAUTION/警告] \\n> Urgent info that needs immediate user attention to avoid problems.\"",
+        "input": "> [!CAUTION/警告] \n> Urgent info that needs immediate user attention to avoid problems.",
+        "expected": {
+          "html": "<blockquote>\n<p>[!CAUTION/警告]\nUrgent info that needs immediate user attention to avoid problems.</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "\"> # Heading\\n> [!tip]\\n> Advice.\"",
+        "input": "> # Heading\n> [!tip]\n> Advice.",
+        "expected": {
+          "html": "<div class=\"markdown-alert markdown-alert-tip\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z\"></path></svg>TIP</p>\n<h1>Heading</h1>\n<p>Advice.</p>\n</div>"
+        }
+      },
+      {
+        "description": "\"> [!NOTE] Extra words\\n> Body.\"",
+        "input": "> [!NOTE] Extra words\n> Body.",
+        "expected": {
+          "html": "<div class=\"markdown-alert markdown-alert-note\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z\"></path></svg>NOTE</p>\n<p> Extra words\nBody.</p>\n</div>"
+        }
+      },
+      {
+        "description": "\"> [!NOTE] Extra words\"",
+        "input": "> [!NOTE] Extra words",
+        "expected": {
+          "html": "<div class=\"markdown-alert markdown-alert-note\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z\"></path></svg>NOTE</p>\n<p></p>\n</div>"
+        }
+      },
+      {
+        "description": "\"> [!UNKNOWN]\\n> Body.\"",
+        "input": "> [!UNKNOWN]\n> Body.",
+        "expected": {
+          "html": "<blockquote>\n<p>[!UNKNOWN]\nBody.</p>\n</blockquote>"
+        }
+      },
+      {
+        "description": "\"> [!WARNING]\\n> > [!CAUTION]\\n> > Nested.\"",
+        "input": "> [!WARNING]\n> > [!CAUTION]\n> > Nested.",
+        "expected": {
+          "html": "<div class=\"markdown-alert markdown-alert-warning\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z\"></path></svg>WARNING</p>\n<p></p>\n<div class=\"markdown-alert markdown-alert-caution\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z\"></path></svg>CAUTION</p>\n<p>Nested.</p>\n</div>\n</div>"
+        }
+      },
+      {
+        "description": "\"> Text\\n>\\n> [!IMPORTANT]\\n> Later paragraph.\"",
+        "input": "> Text\n>\n> [!IMPORTANT]\n> Later paragraph.",
+        "expected": {
+          "html": "<div class=\"markdown-alert markdown-alert-important\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z\"></path></svg>IMPORTANT</p>\n<p>Text</p>\n<p>Later paragraph.</p>\n</div>"
+        }
+      },
+      {
+        "description": "\"- > [!NOTE]\\n  > In a list.\"",
+        "input": "- > [!NOTE]\n  > In a list.",
+        "expected": {
+          "html": "<ul>\n<li>\n<div class=\"markdown-alert markdown-alert-note\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z\"></path></svg>NOTE</p>\n<p>In a list.</p>\n</div>\n</li>\n</ul>"
+        }
+      },
+      {
+        "description": "\"> [!NOTE]\\n> See https://example.com and ~~this~~.\"",
+        "input": "> [!NOTE]\n> See https://example.com and ~~this~~.",
+        "expected": {
+          "html": "<div class=\"markdown-alert markdown-alert-note\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z\"></path></svg>NOTE</p>\n<p>See <a href=\"https://example.com\">https://example.com</a> and <del>this</del>.</p>\n</div>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-github-blockquote-alert {\"legacyTitle\":true}",
+    "source": {
+      "repository": "https://github.com/jaywcjlove/remark-github-blockquote-alert",
+      "commit": "19c51161a3a9ff8f6d4ec649439a2e475f0e8170",
+      "path": "test/index.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gfm",
+        {
+          "alerts": {
+            "legacyTitle": true
+          }
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\"> [!CAUTION/警告] \\n> Urgent info that needs immediate user attention to avoid problems.\"",
+        "input": "> [!CAUTION/警告] \n> Urgent info that needs immediate user attention to avoid problems.",
+        "expected": {
+          "html": "<div class=\"markdown-alert markdown-alert-caution\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z\"></path></svg>警告</p>\n<p>Urgent info that needs immediate user attention to avoid problems.</p>\n</div>"
+        }
+      },
+      {
+        "description": "\"> [!CAUTION警告] \\n> Urgent info that needs immediate user attention to avoid problems.\"",
+        "input": "> [!CAUTION警告] \n> Urgent info that needs immediate user attention to avoid problems.",
+        "expected": {
+          "html": "<blockquote>\n<p>[!CAUTION警告]\nUrgent info that needs immediate user attention to avoid problems.</p>\n</blockquote>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-github-blockquote-alert {\"legacyTitle\":false}",
+    "source": {
+      "repository": "https://github.com/jaywcjlove/remark-github-blockquote-alert",
+      "commit": "19c51161a3a9ff8f6d4ec649439a2e475f0e8170",
+      "path": "test/index.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gfm",
+        {
+          "alerts": {
+            "legacyTitle": false
+          }
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\"> [!CAUTION警告] \\n> Urgent info that needs immediate user attention to avoid problems.\"",
+        "input": "> [!CAUTION警告] \n> Urgent info that needs immediate user attention to avoid problems.",
+        "expected": {
+          "html": "<blockquote>\n<p>[!CAUTION警告]\nUrgent info that needs immediate user attention to avoid problems.</p>\n</blockquote>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-github-blockquote-alert {\"tagName\":\"blockquote\"}",
+    "source": {
+      "repository": "https://github.com/jaywcjlove/remark-github-blockquote-alert",
+      "commit": "19c51161a3a9ff8f6d4ec649439a2e475f0e8170",
+      "path": "test/index.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gfm",
+        {
+          "alerts": {
+            "tagName": "blockquote"
+          }
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\"> [!CAUTION] \\n> Hello World\"",
+        "input": "> [!CAUTION] \n> Hello World",
+        "expected": {
+          "html": "<blockquote class=\"markdown-alert markdown-alert-caution\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z\"></path></svg>CAUTION</p>\n<p>Hello World</p>\n</blockquote>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-github-blockquote-alert {\"classNames\":\"custom-alert\"}",
+    "source": {
+      "repository": "https://github.com/jaywcjlove/remark-github-blockquote-alert",
+      "commit": "19c51161a3a9ff8f6d4ec649439a2e475f0e8170",
+      "path": "test/index.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gfm",
+        {
+          "alerts": {
+            "classNames": "custom-alert"
+          }
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\"> [!NOTE] \\n> This is a note with custom class.\"",
+        "input": "> [!NOTE] \n> This is a note with custom class.",
+        "expected": {
+          "html": "<div class=\"markdown-alert markdown-alert-note custom-alert\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z\"></path></svg>NOTE</p>\n<p>This is a note with custom class.</p>\n</div>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-github-blockquote-alert {\"classNames\":\"my-class another-class\"}",
+    "source": {
+      "repository": "https://github.com/jaywcjlove/remark-github-blockquote-alert",
+      "commit": "19c51161a3a9ff8f6d4ec649439a2e475f0e8170",
+      "path": "test/index.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gfm",
+        {
+          "alerts": {
+            "classNames": "my-class another-class"
+          }
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\"> [!TIP] \\n> This is a tip with multiple custom classes.\"",
+        "input": "> [!TIP] \n> This is a tip with multiple custom classes.",
+        "expected": {
+          "html": "<div class=\"markdown-alert markdown-alert-tip my-class another-class\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z\"></path></svg>TIP</p>\n<p>This is a tip with multiple custom classes.</p>\n</div>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-github-blockquote-alert {\"classNames\":\"\"}",
+    "source": {
+      "repository": "https://github.com/jaywcjlove/remark-github-blockquote-alert",
+      "commit": "19c51161a3a9ff8f6d4ec649439a2e475f0e8170",
+      "path": "test/index.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gfm",
+        {
+          "alerts": {
+            "classNames": ""
+          }
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\"> [!WARNING] \\n> This is a warning with empty classNames.\"",
+        "input": "> [!WARNING] \n> This is a warning with empty classNames.",
+        "expected": {
+          "html": "<div class=\"markdown-alert markdown-alert-warning\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z\"></path></svg>WARNING</p>\n<p>This is a warning with empty classNames.</p>\n</div>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-github-blockquote-alert {\"classNames\":\"spaced-class  test   \"}",
+    "source": {
+      "repository": "https://github.com/jaywcjlove/remark-github-blockquote-alert",
+      "commit": "19c51161a3a9ff8f6d4ec649439a2e475f0e8170",
+      "path": "test/index.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gfm",
+        {
+          "alerts": {
+            "classNames": "spaced-class  test   "
+          }
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\"> [!IMPORTANT] \\n> This is important with extra spaces in classNames.\"",
+        "input": "> [!IMPORTANT] \n> This is important with extra spaces in classNames.",
+        "expected": {
+          "html": "<div class=\"markdown-alert markdown-alert-important spaced-class test\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z\"></path></svg>IMPORTANT</p>\n<p>This is important with extra spaces in classNames.</p>\n</div>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "remark-github-blockquote-alert {\"tagName\":\"blockquote\",\"classNames\":\"custom-blockquote danger\"}",
+    "source": {
+      "repository": "https://github.com/jaywcjlove/remark-github-blockquote-alert",
+      "commit": "19c51161a3a9ff8f6d4ec649439a2e475f0e8170",
+      "path": "test/index.test.ts",
+      "license": "MIT"
+    },
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.gfm",
+        {
+          "alerts": {
+            "tagName": "blockquote",
+            "classNames": "custom-blockquote danger"
+          }
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "\"> [!CAUTION] \\n> This is caution with custom tagName and classNames.\"",
+        "input": "> [!CAUTION] \n> This is caution with custom tagName and classNames.",
+        "expected": {
+          "html": "<blockquote class=\"markdown-alert markdown-alert-caution custom-blockquote danger\" dir=\"auto\">\n<p class=\"markdown-alert-title\" dir=\"auto\"><svg class=\"octicon\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z\"></path></svg>CAUTION</p>\n<p>This is caution with custom tagName and classNames.</p>\n</blockquote>"
+        }
+      }
+    ]
+  }
+]

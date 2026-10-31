@@ -282,6 +282,11 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   on only with it. A GFM table is tried after each first byte's own flow constructs, as
   micromark tries constructs keyed on `null`, and a row's indent sits before the row token.
   At `[`, text tries the footnote call, then the task list check, then a link
+- `md.gfm`'s `alerts` adds an mdast transform where `md.gfm` stands, as `md.frontmatter`'s
+  `data` does: remark-github-blockquote-alert 2.1.0 (`plugins/gfm/actions/blockquote/alert.rs`),
+  its quirks kept (the first matching paragraph anywhere in the quote; a marker without a line
+  ending drops its whole text), output through `data.hName`/`hProperties`, so `md.toHtml`'s
+  hast path writes it
 - `md.frontmatter` appends its matters to `FrontmatterSlot` the same way. Each flow line tries
   them before any built-in construct, as micromark puts extensions first; an unclosed matter
   scans to the end with the lines `concrete` and then rewinds, so `---\n- a` is a break and a

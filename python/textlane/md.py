@@ -65,6 +65,20 @@ class DirectiveOptions(TypedDict, total=False):
     quoteSmart: bool
 
 
+# remark-github-blockquote-alert's options.
+class AlertsOptions(TypedDict, total=False):
+    # Read a title after the type, `[!NOTE/Read this]`, in place of the type's name.
+    legacyTitle: bool
+    # The tag name of the alert's element.
+    tagName: str
+    # More classes for the alert's element, separated by spaces.
+    classNames: str
+
+
+# `md.gfm`'s `alerts`: on, or on with remark-github-blockquote-alert's options.
+Alerts = Union[bool, AlertsOptions]
+
+
 # `md.gfm`: GitHub Flavored Markdown's syntax, read by `md.parse` and written by
 # `md.stringify`; options named as remark-gfm names them.
 class GfmOptions(TypedDict, total=False):
@@ -76,6 +90,9 @@ class GfmOptions(TypedDict, total=False):
     tablePipeAlign: bool
     # Write a footnote definition's first line blank when it holds flow content.
     firstLineBlank: bool
+    # Render GitHub alerts, a block quote opening with `[!NOTE]`, as GitHub does, as
+    # remark-github-blockquote-alert does: `true`, or its options.
+    alerts: Optional[Alerts]
 
 
 # `md.math`: math syntax, `$$` blocks and `$` text, read by `md.parse` and written by

@@ -276,6 +276,9 @@ mod plugins {
     }
     pub(crate) mod gfm {
         pub(crate) mod actions {
+            pub(crate) mod blockquote {
+                pub(crate) mod alert;
+            }
             pub(crate) mod text {
                 pub(crate) mod autolink;
             }
@@ -386,11 +389,11 @@ mod plugins {
 
 // models
 pub use models::options::{
-    AlertRule, AttributeRule, CargoManager, CodeGroupRule, CodeRule, Component,
-    DefinitionListSlot, Directive, DirectiveKind, DirectiveRule, DirectiveSlot,
-    Ecosystems, Frontmatter, FrontmatterSlot, Gfm, GfmSlot, GroupRule, HeadingId,
-    MarkdownLinks, MarkerValue, Math, MathSlot, Matter, Mdx, MdxSlot, Names, NpmManager,
-    PackageCommand, ParentCheck, ParentTest, Parse, PathRewrite, PipManager,
+    AlertRule, Alerts, AlertsOptions, AttributeRule, CargoManager, CodeGroupRule,
+    CodeRule, Component, DefinitionListSlot, Directive, DirectiveKind, DirectiveRule,
+    DirectiveSlot, Ecosystems, Frontmatter, FrontmatterSlot, Gfm, GfmSlot, GroupRule,
+    HeadingId, MarkdownLinks, MarkerValue, Math, MathSlot, Matter, Mdx, MdxSlot, Names,
+    NpmManager, PackageCommand, ParentCheck, ParentTest, Parse, PathRewrite, PipManager,
     ShiftHeading, Stringify, Strip, TaskListLabels, ToHtml, ToNaturalLanguage, Toc,
     UnknownDirectives, UnsafePattern, UrlNode,
 };

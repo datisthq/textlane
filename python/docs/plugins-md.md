@@ -89,16 +89,35 @@ file["value"]
 # <p><del>old</del> <a href="http://www.example.com">www.example.com</a></p>
 ```
 
+`"alerts": True` also renders GitHub alerts, a block quote opening with `[!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]` or `[!CAUTION]`, as GitHub does: a `<div class="markdown-alert markdown-alert-note">` with a title and its Octicon, as remark-github-blockquote-alert writes it. For an MDX component instead, use `md.component`'s `alerts`.
+
 <!-- generated:options md.gfm -->
 
 Follows [remark-gfm](https://www.npmjs.com/package/remark-gfm).
 
-| Option             | Type   | Default | Description                                                                |
-| ------------------ | ------ | ------- | -------------------------------------------------------------------------- |
-| `singleTilde`      | `bool` | `True`  | Let one tilde, `~a~`, form strikethrough, as well as two.                  |
-| `tableCellPadding` | `bool` | `True`  | Pad table cells with a space on each side when writing Markdown.           |
-| `tablePipeAlign`   | `bool` | `True`  | Line up table pipes when writing Markdown.                                 |
-| `firstLineBlank`   | `bool` | `False` | Write a footnote definition's first line blank when it holds flow content. |
+| Option             | Type               | Default | Description                                                                                                                                 |
+| ------------------ | ------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `singleTilde`      | `bool`             | `True`  | Let one tilde, `~a~`, form strikethrough, as well as two.                                                                                   |
+| `tableCellPadding` | `bool`             | `True`  | Pad table cells with a space on each side when writing Markdown.                                                                            |
+| `tablePipeAlign`   | `bool`             | `True`  | Line up table pipes when writing Markdown.                                                                                                  |
+| `firstLineBlank`   | `bool`             | `False` | Write a footnote definition's first line blank when it holds flow content.                                                                  |
+| `alerts`           | `Optional[Alerts]` |         | Render GitHub alerts, a block quote opening with `[!NOTE]`, as GitHub does, as remark-github-blockquote-alert does: `true`, or its options. |
+
+**`Alerts`**
+
+`md.gfm`'s `alerts`: on, or on with remark-github-blockquote-alert's options.
+
+Takes `Union[bool, AlertsOptions]`.
+
+**`AlertsOptions`**
+
+remark-github-blockquote-alert's options.
+
+| Option        | Type   | Default | Description                                                                    |
+| ------------- | ------ | ------- | ------------------------------------------------------------------------------ |
+| `legacyTitle` | `bool` | `False` | Read a title after the type, `[!NOTE/Read this]`, in place of the type's name. |
+| `tagName`     | `str`  | `"div"` | The tag name of the alert's element.                                           |
+| `classNames`  | `str`  | `""`    | More classes for the alert's element, separated by spaces.                     |
 
 <!-- /generated -->
 

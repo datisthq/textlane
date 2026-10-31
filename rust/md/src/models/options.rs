@@ -201,6 +201,41 @@ pub struct Gfm {
     pub table_pipe_align: bool,
     /// Write a footnote definition's first line blank when it holds flow content.
     pub first_line_blank: bool,
+    /// Render GitHub alerts, a block quote opening with `[!NOTE]`, as GitHub does, as
+    /// remark-github-blockquote-alert does: `true`, or its options.
+    pub alerts: Option<Alerts>,
+}
+
+/// `md.gfm`'s `alerts`: on, or on with remark-github-blockquote-alert's options.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(untagged)]
+pub enum Alerts {
+    Enabled(bool),
+    Options(AlertsOptions),
+}
+
+/// remark-github-blockquote-alert's options.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+pub struct AlertsOptions {
+    /// Read a title after the type, `[!NOTE/Read this]`, in place of the type's name.
+    pub legacy_title: bool,
+    /// The tag name of the alert's element.
+    pub tag_name: String,
+    /// More classes for the alert's element, separated by spaces.
+    pub class_names: String,
+}
+
+impl Default for AlertsOptions {
+    fn default() -> Self {
+        AlertsOptions {
+            legacy_title: false,
+            tag_name: "div".to_string(),
+            class_names: String::new(),
+        }
+    }
 }
 
 impl Default for Gfm {
@@ -210,6 +245,7 @@ impl Default for Gfm {
             table_cell_padding: true,
             table_pipe_align: true,
             first_line_blank: false,
+            alerts: None,
         }
     }
 }

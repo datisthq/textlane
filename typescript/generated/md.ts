@@ -30,6 +30,21 @@ export interface GfmOptions {
   tablePipeAlign?: boolean
   /** Write a footnote definition's first line blank when it holds flow content. @default false */
   firstLineBlank?: boolean
+  /** Render GitHub alerts, a block quote opening with `[!NOTE]`, as GitHub does, as remark-github-blockquote-alert does: `true`, or its options. */
+  alerts?: Alerts | null
+}
+
+/** `md.gfm`'s `alerts`: on, or on with remark-github-blockquote-alert's options. */
+export type Alerts = boolean | AlertsOptions
+
+/** remark-github-blockquote-alert's options. */
+export interface AlertsOptions {
+  /** Read a title after the type, `[!NOTE/Read this]`, in place of the type's name. @default false */
+  legacyTitle?: boolean
+  /** The tag name of the alert's element. @default "div" */
+  tagName?: string
+  /** More classes for the alert's element, separated by spaces. @default "" */
+  classNames?: string
 }
 
 /** `md.math`: math syntax, `$$` blocks and `$` text, read by `md.parse` and written by `md.stringify`; options named as remark-math names them. */
