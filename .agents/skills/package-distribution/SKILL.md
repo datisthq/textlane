@@ -118,6 +118,11 @@ workflow file and `release_created` stays false on later pushes. Delete the GitH
 tag, relabel the merged Release PR `autorelease: pending`, then push the fix to `main`;
 release-please re-creates the release and the fixed workflow publishes it.
 
+Every checkout after `release` takes `ref: needs.release.outputs.tag`. release-please reads
+`main` live, so a run for an earlier push tags a Release PR merged while its tests ran, and a
+checkout of the pushed commit then builds the previous version: npm skips it as already
+published, crates.io and PyPI refuse it, and the new tag ships nothing.
+
 ## Versions
 
 One release-please component at `.`; `rust/Cargo.toml` (`workspace.package.version` and each
