@@ -88,6 +88,9 @@ importers:
       react-dom:
         specifier: 19.3.0
         version: 19.3.0(react@19.3.0)
+      rehype-autolink-headings:
+        specifier: 7.1.0
+        version: 7.1.0
       tempy:
         specifier: 3.2.0
         version: 3.2.0

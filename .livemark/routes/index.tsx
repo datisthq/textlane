@@ -1,5 +1,6 @@
 import { Link, createFileRoute } from "@tanstack/react-router"
 import {
+  ArrowLeftRight,
   ArrowRight,
   BookOpen,
   CircleCheck,
@@ -8,13 +9,17 @@ import {
   Braces,
   Gauge,
   Github,
+  ListChecks,
+  Puzzle,
   Rocket,
   ShieldCheck,
+  WandSparkles,
   Workflow,
   Zap,
 } from "lucide-react"
 import {
   type ComponentType,
+  type KeyboardEvent,
   type ReactNode,
   type SVGProps,
   useRef,
@@ -26,6 +31,7 @@ import { Header } from "livemark/components/Header"
 import { buttonVariants } from "livemark/elements/button"
 import { useInView } from "livemark/hooks/in-view"
 import { cn } from "cn"
+import { type Lang, type Slide, type Stage, slides } from "../components/hero-slides.ts"
 
 export const Route = createFileRoute("/")({
   component: Landing,
@@ -150,77 +156,40 @@ function InstallCard(props: { className?: string }) {
   )
 }
 
-interface Slide {
-  id: string
-  title: string
-  stages: string[]
-  ports: string[]
-  input: { label: string; text: string }
-  output: { label: string; text: string }
+const slideIcons: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
+  convert: ArrowLeftRight,
+  transform: WandSparkles,
+  lint: ListChecks,
+  plugins: Puzzle,
 }
-
-// Outputs are what the pipeline returns for these inputs, as its conformance cases expect
-const slides: Slide[] = [
-  {
-    id: "md-html",
-    title: "MD → HTML",
-    stages: ["md.parse", "md.gfm", "md.toHtml", "html.slug", "html.stringify"],
-    ports: [
-      "remark-parse",
-      "remark-gfm",
-      "remark-rehype",
-      "rehype-slug",
-      "rehype-stringify",
-    ],
-    input: {
-      label: "input.md",
-      text: "# Hello, *lane*\n\n- [x] parse\n- [ ] ~~rewrite~~",
-    },
-    output: {
-      label: "output.html",
-      text: '<h1 id="hello-lane">Hello, <em>lane</em></h1>\n<ul class="contains-task-list">\n<li class="task-list-item"><input type="checkbox" checked disabled> parse</li>\n<li class="task-list-item"><input type="checkbox" disabled> <del>rewrite</del></li>\n</ul>',
-    },
-  },
-  {
-    id: "html-md",
-    title: "HTML → MD",
-    stages: ["html.parse", "html.toMarkdown", "md.stringify"],
-    ports: ["rehype-parse", "rehype-remark", "remark-stringify"],
-    input: {
-      label: "input.html",
-      text: '<h2>Notes</h2>\n<p>Read <a href="https://unifiedjs.com">unified</a> <em>first</em>.</p>',
-    },
-    output: {
-      label: "output.md",
-      text: "## Notes\n\nRead [unified](https://unifiedjs.com) *first*.",
-    },
-  },
-  {
-    id: "smartypants",
-    title: "Typography",
-    stages: ["nl.parse", "nl.smartypants", "nl.stringify"],
-    ports: ["retext-english", "retext-smartypants", "retext-stringify"],
-    input: { label: "input.txt", text: "Alfred \"bertrand\" 'cees'." },
-    output: { label: "output.txt", text: "Alfred “bertrand” ‘cees’." },
-  },
-  {
-    id: "lint",
-    title: "Lint",
-    stages: ["nl.parse", "nl.repeatedWords", "nl.stringify"],
-    ports: ["retext-english", "retext-repeated-words", "retext-stringify"],
-    input: { label: "input.txt", text: "Well, it it doesn’t have to be." },
-    output: {
-      label: "messages.json",
-      text: '[\n  {\n    "ruleId": "it",\n    "source": "retext-repeated-words",\n    "place": {\n      "start": { "line": 1, "column": 7 },\n      "end": { "line": 1, "column": 12 }\n    }\n  }\n]',
-    },
-  },
-]
 
 function HeroCarousel(props: { slides: Slide[] }) {
   const [active, setActive] = useState(0)
   const [paused, setPaused] = useState(false)
   const [stopped, setStopped] = useState(false)
   const stoppedRef = useRef(false)
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
+
+  const selectSlide = (index: number) => {
+    stoppedRef.current = true
+    setActive(index)
+    setStopped(true)
+  }
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const count = props.slides.length
+    const targets: Record<string, number> = {
+      ArrowRight: (active + 1) % count,
+      ArrowLeft: (active - 1 + count) % count,
+      Home: 0,
+      End: count - 1,
+    }
+    const next = targets[event.key]
+    if (next === undefined) return
+    event.preventDefault()
+    selectSlide(next)
+    tabRefs.current[next]?.focus()
+  }
 
   return (
     <div
@@ -237,51 +206,62 @@ function HeroCarousel(props: { slides: Slide[] }) {
             <span className="size-2.5 rounded-full bg-border" />
             <span className="size-2.5 rounded-full bg-border" />
           </span>
-          <div role="tablist" className="flex min-w-0 gap-1 overflow-x-auto">
-            {props.slides.map((slide, index) => (
-              <button
-                key={slide.id}
-                type="button"
-                role="tab"
-                aria-selected={index === active}
-                aria-controls={`hero-slide-${slide.id}`}
-                onClick={() => {
-                  stoppedRef.current = true
-                  setActive(index)
-                  setStopped(true)
-                }}
-                className={cn(
-                  "relative flex cursor-pointer items-center gap-2 overflow-hidden rounded-control px-3 py-1.5 text-sm whitespace-nowrap transition-colors",
-                  index === active
-                    ? "bg-card font-medium text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                <span
-                  className={cn("font-mono text-xs", index === active && "text-primary")}
+          <div
+            role="tablist"
+            aria-label="Example pipelines"
+            onKeyDown={handleKeyDown}
+            className="flex min-w-0 gap-1 overflow-x-auto"
+          >
+            {props.slides.map((slide, index) => {
+              const Icon = slideIcons[slide.id] ?? Workflow
+              return (
+                <button
+                  key={slide.id}
+                  ref={element => {
+                    tabRefs.current[index] = element
+                  }}
+                  id={`hero-tab-${slide.id}`}
+                  type="button"
+                  role="tab"
+                  tabIndex={index === active ? 0 : -1}
+                  aria-selected={index === active}
+                  aria-controls={`hero-slide-${slide.id}`}
+                  title={slide.title}
+                  onClick={() => selectSlide(index)}
+                  className={cn(
+                    "relative flex cursor-pointer items-center gap-2 overflow-hidden rounded-control px-3 py-1.5 text-sm whitespace-nowrap transition-colors",
+                    index === active
+                      ? "bg-card font-medium text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
                 >
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <span className={index === active ? undefined : "hidden md:inline"}>
-                  {slide.title}
-                </span>
-                {index === active ? (
-                  <span
-                    key={stopped ? "stopped" : active}
+                  <Icon
                     aria-hidden
-                    className={cn(
-                      "absolute inset-x-3 bottom-0.5 h-0.5 rounded-full bg-primary/70",
-                      !stopped && "hero-carousel-progress",
-                    )}
-                    style={{ animationPlayState: paused ? "paused" : "running" }}
-                    onAnimationEnd={() => {
-                      if (stoppedRef.current) return
-                      setActive(current => (current + 1) % props.slides.length)
-                    }}
+                    className={cn("size-4 shrink-0", index === active && "text-primary")}
                   />
-                ) : null}
-              </button>
-            ))}
+                  <span
+                    className={index === active ? undefined : "sr-only sm:not-sr-only"}
+                  >
+                    {slide.title}
+                  </span>
+                  {index === active ? (
+                    <span
+                      key={stopped ? "stopped" : active}
+                      aria-hidden
+                      className={cn(
+                        "absolute inset-x-3 bottom-0.5 h-0.5 rounded-full bg-primary/70",
+                        !stopped && "hero-carousel-progress",
+                      )}
+                      style={{ animationPlayState: paused ? "paused" : "running" }}
+                      onAnimationEnd={() => {
+                        if (stoppedRef.current) return
+                        setActive(current => (current + 1) % props.slides.length)
+                      }}
+                    />
+                  ) : null}
+                </button>
+              )
+            })}
           </div>
         </div>
         <div className="grid">
@@ -290,6 +270,7 @@ function HeroCarousel(props: { slides: Slide[] }) {
               key={slide.id}
               id={`hero-slide-${slide.id}`}
               role="tabpanel"
+              aria-labelledby={`hero-tab-${slide.id}`}
               aria-hidden={index !== active}
               inert={index !== active}
               className={cn(
@@ -311,38 +292,102 @@ function HeroCarousel(props: { slides: Slide[] }) {
 
 function SlideBody(props: { slide: Slide }) {
   return (
-    <div className="flex h-full flex-col gap-4 p-4 sm:p-5 lg:pb-36">
+    // The xl frame bleeds past the viewport's right edge; cap the body to its visible part
+    <div className="flex h-full flex-col gap-4 p-4 sm:p-5 lg:pb-36 xl:max-w-[calc(50vw+2.5rem)]">
       <ol className="flex flex-wrap items-center gap-1.5">
         {props.slide.stages.map((stage, index) => (
-          <li key={stage} className="flex items-center gap-1.5">
+          <li key={stage.name} className="flex items-center gap-1.5">
             {index > 0 && (
               <ArrowRight aria-hidden className="size-3.5 text-muted-foreground/60" />
             )}
-            <code className="rounded-md border border-primary/25 bg-primary/10 px-2 py-0.5 font-mono text-xs text-primary">
-              {stage}
-            </code>
+            {stage.host ? (
+              <code className="flex items-center gap-1.5 rounded-md border border-dashed border-foreground/30 bg-muted px-2 py-0.5 font-mono text-xs text-foreground">
+                <span className="rounded-sm bg-[#f7df1e] px-1 text-[0.625rem] font-bold text-black">
+                  JS
+                </span>
+                {stage.name}
+              </code>
+            ) : (
+              <code className="rounded-md border border-primary/25 bg-primary/10 px-2 py-0.5 font-mono text-xs text-primary">
+                {formatStage(stage)}
+              </code>
+            )}
           </li>
         ))}
       </ol>
-      <div className="grid flex-1 grid-cols-1 gap-3">
-        <Pane label={props.slide.input.label} text={props.slide.input.text} />
-        <Pane label={props.slide.output.label} text={props.slide.output.text} />
+      <div className="grid flex-1 grid-cols-1 gap-3 xl:grid-cols-2">
+        <Pane
+          label={props.slide.input.label}
+          lang={props.slide.input.lang}
+          text={props.slide.code ?? props.slide.document}
+        />
+        <Pane
+          label={props.slide.output.label}
+          lang={props.slide.output.lang}
+          text={props.slide.output.text}
+        />
       </div>
     </div>
   )
 }
 
-function Pane(props: { label: string; text: string }) {
+function formatStage(stage: Stage) {
+  if (!stage.options) return stage.name
+  const options = Object.entries(stage.options)
+    .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
+    .join(", ")
+  return `${stage.name}({ ${options} })`
+}
+
+function Pane(props: { label: string; lang: Lang; text: string }) {
   return (
     <div className="flex min-w-0 flex-col overflow-hidden rounded-lg border border-border bg-muted/40">
       <p className="border-b border-border px-3 py-1.5 font-mono text-xs text-muted-foreground">
         {props.label}
       </p>
-      <pre className="flex-1 overflow-x-auto p-3 font-mono text-xs leading-relaxed">
-        <code className={tk.body}>{props.text}</code>
+      <pre className="flex-1 p-3 font-mono text-xs leading-relaxed whitespace-pre-wrap break-words">
+        <code className={tk.body}>{highlightPane(props.lang, props.text)}</code>
       </pre>
     </div>
   )
+}
+
+const JS_KEYWORDS = new Set([
+  "import",
+  "from",
+  "const",
+  "await",
+  "function",
+  "return",
+  "export",
+  "default",
+])
+
+// Each named group is a key of `tk`, the class its match gets; `text` stays unstyled
+const PANE_TOKENS: Partial<Record<Lang, RegExp>> = {
+  html: /(?<punct><\/?|\/?>)|(?<keyword>(?<=<\/?)[\w-]+)|(?<type>[\w-]+(?==))|(?<string>"[^"]*")|(?<text>[^<>"=]+|[\s\S])/g,
+  md: /(?<keyword>^#{1,6}(?= )|^[-*+](?= )|\[[ x]\](?= ))|(?<punct>\*|~~|`|\]\(|[[\]()])|(?<string>:\w+:|https?:\/\/[^)\s]+)|(?<type>\{[^}\n]*\})|(?<text>[^#*~`[\]():{}\n-]+|[\s\S])/gm,
+  report:
+    /(?<func>^\S.*$)|(?<dim>\d+:\d+-\d+:\d+)|(?<type>warning|⚠)|(?<string>`[^`]*`)|(?<comment>retext-[\w-]+)|(?<text>[^\dw⚠`r\n]+|[\s\S])/gm,
+}
+
+const TOKEN_CLASSES: Record<string, string> = tk
+
+function highlightPane(lang: Lang, text: string) {
+  if (lang === "js" || lang === "ts") return highlightCode(text, JS_KEYWORDS)
+  const pattern = PANE_TOKENS[lang]
+  if (!pattern) return text
+  return [...text.matchAll(pattern)].map(match => {
+    const group = Object.entries(match.groups ?? {}).find(entry => entry[1] !== undefined)
+    const className = group ? TOKEN_CLASSES[group[0]] : undefined
+    return className ? (
+      <span key={match.index} className={className}>
+        {match[0]}
+      </span>
+    ) : (
+      match[0]
+    )
+  })
 }
 
 function PortsCard(props: { slides: Slide[]; active: number }) {

@@ -43,6 +43,7 @@
     "npm-check-updates": "23.1.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "rehype-autolink-headings": "7.1.0",
     "tempy": "3.2.0",
     "typescript": "6.0.3",
     "vite": "catalog:",
