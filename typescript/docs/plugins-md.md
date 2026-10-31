@@ -506,7 +506,7 @@ How `md.component` turns matching directives into one component.
 | `name`         | `Names`                   |         | The directive's name, or several.                                                                                                                                     |
 | `kind`         | `DirectiveKind \| null`   |         | The kind of directive: `text`, `leaf` or `container`; any when left out.                                                                                              |
 | `where`        | `Record<string, string>`  | `{}`    | Attribute values the directive must have.                                                                                                                             |
-| `component`    | `string`                  |         | The component: a text element for a text directive, else a flow element.                                                                                              |
+| `component`    | `string`                  |         | The component: a text element for a text directive, else a flow element; `{name}` in it stands for the directive's name, so one rule can cover a family of them.      |
 | `nameAs`       | `string \| null`          | `null`  | The attribute that gets the directive's name.                                                                                                                         |
 | `labelAs`      | `string \| null`          | `null`  | The attribute that gets the label's text: a container's label paragraph or a text or leaf directive's content, which is then dropped.                                 |
 | `labelDefault` | `string \| null`          | `null`  | The label's text when there is none.                                                                                                                                  |
@@ -529,7 +529,7 @@ How `md.component` turns GitHub alerts, a block quote opening with `[!TYPE]`, in
 
 What `md.component` does with a directive no rule converts.
 
-Takes `"keep" | "source"`.
+Takes `"keep" | "source" | "error"`.
 
 **`CodeRule`**
 
@@ -940,17 +940,18 @@ file.value
 
 Follows [remark-rehype](https://www.npmjs.com/package/remark-rehype).
 
-| Option                 | Type                     | Default | Description                                                                                                               |
-| ---------------------- | ------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `allowDangerousHtml`   | `boolean`                | `false` | Keep raw HTML in the tree instead of dropping it.                                                                         |
-| `breaks`               | `boolean`                | `false` | Turn each line ending in text into a `<br>`, as remark-breaks does.                                                       |
-| `clobberPrefix`        | `string \| null`         | `null`  | What footnote `id`s start with, so they cannot clobber the page's; `user-content-` when unset.                            |
-| `footnoteBackContent`  | `string \| null`         | `null`  | The text of each footnote's back reference; `↩`, numbered from the second, when unset.                                    |
-| `footnoteBackLabel`    | `string \| null`         | `null`  | The `aria-label` of each footnote's back reference; `Back to reference 1` and so on when unset.                           |
-| `footnoteLabel`        | `string \| null`         | `null`  | The heading of the footnotes section; `Footnotes` when unset.                                                             |
-| `footnoteLabelTagName` | `string \| null`         | `null`  | The tag name of the footnotes section's heading; `h2` when unset.                                                         |
-| `passThrough`          | `string[]`               | `[]`    | Node types without a handler to copy into hast as they are, their children converted.                                     |
-| `taskListLabels`       | `TaskListLabels \| null` |         | An `aria-label` for each task-list checkbox, so screen readers name it; none when left out, as remark-rehype writes none. |
+| Option                 | Type                     | Default | Description                                                                                                                                                                                    |
+| ---------------------- | ------------------------ | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `allowDangerousHtml`   | `boolean`                | `false` | Keep raw HTML in the tree instead of dropping it.                                                                                                                                              |
+| `breaks`               | `boolean`                | `false` | Turn each line ending in text into a `<br>`, as remark-breaks does.                                                                                                                            |
+| `clobberPrefix`        | `string \| null`         | `null`  | What footnote `id`s start with, so they cannot clobber the page's; `user-content-` when unset.                                                                                                 |
+| `footnoteBackContent`  | `string \| null`         | `null`  | The text of each footnote's back reference; `↩`, numbered from the second, when unset.                                                                                                         |
+| `footnoteBackLabel`    | `string \| null`         | `null`  | The `aria-label` of each footnote's back reference; `Back to reference 1` and so on when unset.                                                                                                |
+| `footnoteLabel`        | `string \| null`         | `null`  | The heading of the footnotes section; `Footnotes` when unset.                                                                                                                                  |
+| `footnoteLabelTagName` | `string \| null`         | `null`  | The tag name of the footnotes section's heading; `h2` when unset.                                                                                                                              |
+| `passThrough`          | `string[]`               | `[]`    | Node types without a handler to copy into hast as they are, their children converted.                                                                                                          |
+| `taskListLabels`       | `TaskListLabels \| null` |         | An `aria-label` for each task-list checkbox, so screen readers name it; none when left out, as remark-rehype writes none.                                                                      |
+| `jsxElements`          | `boolean`                | `false` | Turn MDX JSX elements, such as `md.component` and `md.packageCommand` make, into the plain HTML elements they name, literal attributes kept, for a pipeline that ends in HTML rather than MDX. |
 
 **`TaskListLabels`**
 

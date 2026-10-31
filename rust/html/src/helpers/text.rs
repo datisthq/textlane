@@ -23,7 +23,7 @@ enum Piece<'n> {
 }
 
 /// The text an element renders, as hast-util-to-text's `toText` reads it.
-pub(crate) fn read_text(element: &Element<'_>) -> String {
+pub fn read_text(element: &Element<'_>) -> String {
     collect_text_as(element, Whitespace::Normal)
 }
 

@@ -512,7 +512,7 @@ How `md.component` turns matching directives into one component.
 | `name`         | `Names`                         |         | The directive's name, or several.                                                                                                                                     |
 | `kind`         | `Optional[DirectiveKind]`       |         | The kind of directive: `text`, `leaf` or `container`; any when left out.                                                                                              |
 | `where`        | `Dict[str, str]`                | `{}`    | Attribute values the directive must have.                                                                                                                             |
-| `component`    | `str`                           |         | The component: a text element for a text directive, else a flow element.                                                                                              |
+| `component`    | `str`                           |         | The component: a text element for a text directive, else a flow element; `{name}` in it stands for the directive's name, so one rule can cover a family of them.      |
 | `nameAs`       | `Optional[str]`                 | `None`  | The attribute that gets the directive's name.                                                                                                                         |
 | `labelAs`      | `Optional[str]`                 | `None`  | The attribute that gets the label's text: a container's label paragraph or a text or leaf directive's content, which is then dropped.                                 |
 | `labelDefault` | `Optional[str]`                 | `None`  | The label's text when there is none.                                                                                                                                  |
@@ -535,7 +535,7 @@ How `md.component` turns GitHub alerts, a block quote opening with `[!TYPE]`, in
 
 What `md.component` does with a directive no rule converts.
 
-Takes `Union[Literal["keep"], Literal["source"]]`.
+Takes `Union[Literal["keep"], Literal["source"], Literal["error"]]`.
 
 **`CodeRule`**
 
@@ -951,17 +951,18 @@ file["value"]
 
 Follows [remark-rehype](https://www.npmjs.com/package/remark-rehype).
 
-| Option                 | Type                       | Default | Description                                                                                                               |
-| ---------------------- | -------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `allowDangerousHtml`   | `bool`                     | `False` | Keep raw HTML in the tree instead of dropping it.                                                                         |
-| `breaks`               | `bool`                     | `False` | Turn each line ending in text into a `<br>`, as remark-breaks does.                                                       |
-| `clobberPrefix`        | `Optional[str]`            | `None`  | What footnote `id`s start with, so they cannot clobber the page's; `user-content-` when unset.                            |
-| `footnoteBackContent`  | `Optional[str]`            | `None`  | The text of each footnote's back reference; `↩`, numbered from the second, when unset.                                    |
-| `footnoteBackLabel`    | `Optional[str]`            | `None`  | The `aria-label` of each footnote's back reference; `Back to reference 1` and so on when unset.                           |
-| `footnoteLabel`        | `Optional[str]`            | `None`  | The heading of the footnotes section; `Footnotes` when unset.                                                             |
-| `footnoteLabelTagName` | `Optional[str]`            | `None`  | The tag name of the footnotes section's heading; `h2` when unset.                                                         |
-| `passThrough`          | `List[str]`                | `[]`    | Node types without a handler to copy into hast as they are, their children converted.                                     |
-| `taskListLabels`       | `Optional[TaskListLabels]` |         | An `aria-label` for each task-list checkbox, so screen readers name it; none when left out, as remark-rehype writes none. |
+| Option                 | Type                       | Default | Description                                                                                                                                                                                    |
+| ---------------------- | -------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `allowDangerousHtml`   | `bool`                     | `False` | Keep raw HTML in the tree instead of dropping it.                                                                                                                                              |
+| `breaks`               | `bool`                     | `False` | Turn each line ending in text into a `<br>`, as remark-breaks does.                                                                                                                            |
+| `clobberPrefix`        | `Optional[str]`            | `None`  | What footnote `id`s start with, so they cannot clobber the page's; `user-content-` when unset.                                                                                                 |
+| `footnoteBackContent`  | `Optional[str]`            | `None`  | The text of each footnote's back reference; `↩`, numbered from the second, when unset.                                                                                                         |
+| `footnoteBackLabel`    | `Optional[str]`            | `None`  | The `aria-label` of each footnote's back reference; `Back to reference 1` and so on when unset.                                                                                                |
+| `footnoteLabel`        | `Optional[str]`            | `None`  | The heading of the footnotes section; `Footnotes` when unset.                                                                                                                                  |
+| `footnoteLabelTagName` | `Optional[str]`            | `None`  | The tag name of the footnotes section's heading; `h2` when unset.                                                                                                                              |
+| `passThrough`          | `List[str]`                | `[]`    | Node types without a handler to copy into hast as they are, their children converted.                                                                                                          |
+| `taskListLabels`       | `Optional[TaskListLabels]` |         | An `aria-label` for each task-list checkbox, so screen readers name it; none when left out, as remark-rehype writes none.                                                                      |
+| `jsxElements`          | `bool`                     | `False` | Turn MDX JSX elements, such as `md.component` and `md.packageCommand` make, into the plain HTML elements they name, literal attributes kept, for a pipeline that ends in HTML rather than MDX. |
 
 **`TaskListLabels`**
 

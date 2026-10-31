@@ -9,6 +9,11 @@ pub struct Slugger {
 }
 
 impl Slugger {
+    /// Count `value` as taken, as if a slug had produced it.
+    pub fn reserve(&mut self, value: &str) {
+        self.occurrences.entry(value.to_owned()).or_insert(0);
+    }
+
     /// A unique slug for `value`: `a`, then `a-1`, `a-2`.
     pub fn slug(&mut self, value: &str) -> String {
         let original = create_slug(value);

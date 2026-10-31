@@ -2238,5 +2238,67 @@
         }
       }
     ]
+  },
+  {
+    "description": "directives into HTML elements, named from the directive",
+    "pipeline": [
+      ["md.parse"],
+      ["md.directive"],
+      [
+        "md.component",
+        {
+          "directives": [
+            {
+              "name": ["note", "badge"],
+              "component": "x-{name}"
+            }
+          ],
+          "unknownDirectives": "error"
+        }
+      ],
+      [
+        "md.toHtml",
+        {
+          "jsxElements": true
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "a container and a text directive",
+        "input": ":::note{type=\"warning\" open}\nHi **there**\n:::\n\nNew :badge[beta]{tone=info}",
+        "expected": {
+          "html": "<x-note type=\"warning\" open><p>Hi <strong>there</strong></p></x-note>\n<p>New <x-badge tone=\"info\">beta</x-badge></p>"
+        }
+      },
+      {
+        "description": "an unknown text directive stays text",
+        "input": "see note:important at 10:30",
+        "expected": {
+          "html": "<p>see note:important at 10:30</p>"
+        }
+      },
+      {
+        "description": "an unknown container directive fails",
+        "input": ":::nope\nx\n:::",
+        "expected": {
+          "error": {
+            "code": "unknown-directive",
+            "message": ":::nope"
+          }
+        }
+      },
+      {
+        "description": "an unknown leaf directive fails",
+        "input": "::nope",
+        "expected": {
+          "error": {
+            "code": "unknown-directive",
+            "message": "::nope"
+          }
+        }
+      }
+    ]
   }
 ]

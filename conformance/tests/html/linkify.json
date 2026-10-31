@@ -1,0 +1,29 @@
+[
+  {
+    "description": "literal links",
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.linkify",
+        {
+          "ignoreAttributes": ["data-literal"]
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "URLs, www and emails, not bare domains or literal text",
+        "input": "<p>https://a.dev www.b.dev c@d.dev e.html</p><p data-literal>https://x.dev</p>",
+        "expected": {
+          "html": "<p><a href=\"https://a.dev\">https://a.dev</a> <a href=\"https://www.b.dev\">www.b.dev</a> <a href=\"mailto:c@d.dev\">c@d.dev</a> e.html</p><p data-literal=\"\">https://x.dev</p>"
+        }
+      }
+    ]
+  }
+]

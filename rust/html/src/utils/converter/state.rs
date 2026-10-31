@@ -6,6 +6,7 @@ use textlane_core::hast::{Element, Node};
 use url::Url;
 
 use crate::actions::a::convert::convert_a;
+use crate::actions::attribute::read::read_attribute;
 use crate::actions::base::convert::convert_base;
 use crate::actions::blockquote::convert::convert_blockquote;
 use crate::actions::br::convert::convert_br;
@@ -22,6 +23,7 @@ use crate::actions::inline_code::convert::convert_inline_code;
 use crate::actions::input::convert::convert_input;
 use crate::actions::li::convert::convert_li;
 use crate::actions::list::convert::convert_list;
+use crate::actions::math::convert::convert_math;
 use crate::actions::media::convert::convert_media;
 use crate::actions::p::convert::convert_p;
 use crate::actions::q::convert::convert_q;
@@ -179,6 +181,18 @@ impl<'a, 'n> Converter<'a, 'n, '_> {
     }
 
     fn element(&mut self, element: &'n Element<'a>) -> Converted {
+        if self.options.math {
+            if element.tag_name == "math" {
+                return convert_math(self, element);
+            }
+            let classes = read_attribute(element, "class").unwrap_or_default();
+            if classes
+                .split_ascii_whitespace()
+                .any(|class| class == "katex-html")
+            {
+                return Converted::Nothing;
+            }
+        }
         match element.tag_name {
             "applet" | "area" | "basefont" | "bgsound" | "caption" | "col"
             | "colgroup" | "command" | "content" | "datalist" | "dialog" | "element"

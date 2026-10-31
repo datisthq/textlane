@@ -1263,5 +1263,68 @@
         }
       }
     ]
+  },
+  {
+    "description": "reserveExisting and ranks",
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.slug",
+        {
+          "reserveExisting": true,
+          "ranks": [2, 3]
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "an id already in the document is never generated again",
+        "input": "<p id=\"intro\">x</p><h2>Intro</h2><h2>Intro</h2>",
+        "expected": {
+          "html": "<p id=\"intro\">x</p><h2 id=\"intro-1\">Intro</h2><h2 id=\"intro-2\">Intro</h2>"
+        }
+      },
+      {
+        "description": "headings outside the ranks get no id",
+        "input": "<h1>Title</h1><h2>A</h2><h3>B</h3><h4>C</h4>",
+        "expected": {
+          "html": "<h1>Title</h1><h2 id=\"a\">A</h2><h3 id=\"b\">B</h3><h4>C</h4>"
+        }
+      }
+    ]
+  },
+  {
+    "description": "reserveExisting with a prefix",
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.slug",
+        {
+          "reserveExisting": true,
+          "prefix": "user-"
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "only ids carrying the prefix are reserved",
+        "input": "<p id=\"user-a\"></p><p id=\"b\"></p><h2>A</h2><h2>B</h2>",
+        "expected": {
+          "html": "<p id=\"user-a\"></p><p id=\"b\"></p><h2 id=\"user-a-1\">A</h2><h2 id=\"user-b\">B</h2>"
+        }
+      }
+    ]
   }
 ]

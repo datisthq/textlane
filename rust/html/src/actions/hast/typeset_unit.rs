@@ -181,3 +181,18 @@ fn reports_math_nested_too_deep_as_katex_js_overflows() -> Result<(), Error> {
     assert_eq!(file.messages[0].rule.as_deref(), Some("rangeerror"));
     Ok(())
 }
+
+#[test]
+fn renders_elements_named_in_tag_names() -> Result<(), Error> {
+    let options = json!({"tagNames": ["my-math"], "output": "mathml"});
+    let (html, file) = typeset(
+        "<p>a <my-math>x_1</my-math> <my-math display>y</my-math> <my-math display=\"inline\">z</my-math></p>",
+        options,
+    )?;
+    assert!(!html.contains("<my-math"));
+    assert_eq!(html.matches("display=\"block\"").count(), 1);
+    assert_eq!(html.matches("<math").count(), 3);
+    assert!(html.contains("<annotation encoding=\"application/x-tex\">x_1</annotation>"));
+    assert!(file.messages.is_empty());
+    Ok(())
+}

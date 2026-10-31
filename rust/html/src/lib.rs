@@ -7,6 +7,7 @@ mod models {
     pub(crate) mod options;
     pub(crate) mod parse_error;
     pub(crate) mod token;
+    pub(crate) mod visit;
 }
 mod utils {
     #[cfg(feature = "highlight")]
@@ -41,6 +42,11 @@ mod utils {
 mod actions {
     pub(crate) mod a {
         pub(crate) mod convert;
+    }
+    pub(crate) mod attribute {
+        pub(crate) mod read;
+        pub(crate) mod remove;
+        pub(crate) mod write;
     }
     #[cfg(feature = "highlight")]
     pub(crate) mod ansi {
@@ -84,9 +90,13 @@ mod actions {
         pub(crate) mod convert;
         pub(crate) mod external;
         pub(crate) mod format;
+        pub(crate) mod gemoji;
         #[cfg(feature = "highlight")]
         pub(crate) mod highlight;
+        pub(crate) mod linkify;
+        pub(crate) mod math;
         pub(crate) mod minify;
+        pub(crate) mod path;
         pub(crate) mod raw;
         pub(crate) mod sanitize;
         pub(crate) mod slug;
@@ -95,6 +105,7 @@ mod actions {
         #[cfg(feature = "katex")]
         pub(crate) mod typeset;
         pub(crate) mod unwrap;
+        pub(crate) mod visit;
     }
     pub(crate) mod heading {
         pub(crate) mod convert;
@@ -123,8 +134,9 @@ mod actions {
     pub(crate) mod list {
         pub(crate) mod convert;
     }
-    #[cfg(feature = "katex")]
     pub(crate) mod math {
+        pub(crate) mod convert;
+        #[cfg(feature = "katex")]
         pub(crate) mod typeset;
     }
     pub(crate) mod media {
@@ -178,6 +190,7 @@ mod helpers {
     pub(crate) mod omission;
     pub(crate) mod phrasing;
     pub(crate) mod property;
+    pub(crate) mod prose;
     pub(crate) mod reason;
     #[cfg(feature = "highlight")]
     pub(crate) mod registry;
@@ -199,6 +212,15 @@ mod plugins {
     pub(crate) mod format {
         pub(crate) mod plugin;
     }
+    pub(crate) mod gemoji {
+        pub(crate) mod plugin;
+    }
+    pub(crate) mod linkify {
+        pub(crate) mod plugin;
+    }
+    pub(crate) mod math {
+        pub(crate) mod plugin;
+    }
     #[cfg(feature = "highlight")]
     pub(crate) mod highlight {
         pub(crate) mod plugin;
@@ -208,6 +230,9 @@ mod plugins {
         pub(crate) mod plugin;
     }
     pub(crate) mod parse {
+        pub(crate) mod plugin;
+    }
+    pub(crate) mod path_rewrite {
         pub(crate) mod plugin;
     }
     pub(crate) mod raw {
@@ -236,19 +261,27 @@ mod plugins {
 // models
 pub use models::options::{
     AttributeDefinition, Autolink, AutolinkBehavior, AutolinkOptions, Classes,
-    ColorReplacement, ConfiguredTransformer, ExternalLinks, ExtractToc, Format,
+    ColorReplacement, ConfiguredTransformer, ExternalLinks, ExtractToc, Format, Gemoji,
     Highlight, HighlightTransformer, Indent, InlineCode, Katex, KatexOutput, KatexStrict,
-    KatexStrictMode, Minify, MinifyOptions, Parse, Primitive, Raw, Sanitize, Slug,
-    Stringify, TagNames, ToMarkdown, Tokens, TransformerName,
+    KatexStrictMode, LineMark, Linkify, Math, Minify, MinifyOptions, PROSE_IGNORE, Parse,
+    PathRewrite, Primitive, Raw, Sanitize, Slug, Stringify, TagNames, ToMarkdown, Tokens,
+    TransformerName,
 };
 
 // actions
+pub use actions::attribute::read::read_attribute;
+pub use actions::attribute::remove::remove_attribute;
+pub use actions::attribute::write::write_attribute;
 pub use actions::hast::bridge::bridge_hast;
 pub use actions::hast::convert::convert_hast;
 pub use actions::hast::external::mark_external_links;
 pub use actions::hast::format::format_hast;
+pub use actions::hast::gemoji::replace_shortcodes;
 #[cfg(feature = "highlight")]
 pub use actions::hast::highlight::highlight_hast;
+pub use actions::hast::linkify::link_urls;
+pub use actions::hast::math::mark_math;
+pub use actions::hast::path::rewrite_paths;
 pub use actions::hast::raw::raw_hast;
 pub use actions::hast::sanitize::sanitize_hast;
 pub use actions::hast::slug::slug_hast;
@@ -257,7 +290,10 @@ pub use actions::hast::toc::extract_toc;
 #[cfg(feature = "katex")]
 pub use actions::hast::typeset::typeset_hast;
 pub use actions::hast::unwrap::unwrap_images;
+pub use actions::hast::visit::visit_elements;
 pub use actions::html::parse::parse_html;
+pub use helpers::text::read_text;
+pub use models::visit::Visit;
 
 // plugins
 pub use plugins::to_natural_language::plugin::ToNaturalLanguage;

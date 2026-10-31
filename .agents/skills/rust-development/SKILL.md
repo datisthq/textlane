@@ -303,6 +303,13 @@ clippy and rustfmt, so rustup installs the right toolchain on first use, locally
   `JSON.stringify` wrote them, array-index keys first, `maxAliasCount` 100 with
   `getAliasCount`, duplicate keys by resolved value. Depth stops at 512 (Python 3.9's `json`
   fails near 1000); every failure is `invalid-frontmatter`
+- Logic both domains need lives in core, never in one domain for the other to copy:
+  gemoji's table and shortcode finder (`find_gemoji_shortcodes`) and site URL resolution
+  (`resolve_url`, `prefix_base`, behind `md.pathRewrite` and `html.pathRewrite`). In
+  `html`, read and write attributes by their HTML name (`read_attribute`,
+  `write_attribute`), never by matching hast property names (`dataTitle`) by hand, and
+  walk prose with `helpers/prose.rs`, which skips the ignored elements once for every
+  text plugin
 - `File::data` is vfile's `data`, a JSON map native plugins store results in
   (`html.extractToc` puts `toc`); `write_file` hands it back, and the loaders lay what their
   host plugins stored over it. `md.headingId`, `md.strip`, `html.unwrapImages`,

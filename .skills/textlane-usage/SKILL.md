@@ -159,5 +159,14 @@ the case: `unknown-plugin`, `invalid-options`, `missing-parser`, `missing-compil
   page whose title renders separately needs.
 - Asset and page URLs relative to a Markdown file are `md.pathRewrite({ root, base, pages,
 markdownLinks })`; pass the document as `{ value, path }` so it knows where the file lives.
+  `html.pathRewrite({ root, base, pages, attributes })` does the same for HTML attributes
+  (`href`, `src`, `srcset`, `poster`).
+- For a site that ends in HTML, not MDX: `md.component` rules may name `component: "x-{name}"`
+  (one rule per family of directives) and `unknownDirectives: "error"` fails on a mistyped
+  `:::name` while prose like `a:b` stays text; `md.toHtml({ jsxElements: true })` then writes
+  the elements `md.component` and `md.packageCommand` make as plain HTML.
+- HTML written by hand gets what Markdown syntax gives: `html.math` (`$…$` in text, for
+  `html.katex`), `html.linkify` (bare URLs and emails) and `html.gemoji` (`:rocket:`), each
+  leaving links, code and the elements `ignore` names alone.
 - remark-stringify reads `settings` from processor data; textlane's `md.stringify` takes its
   options directly.

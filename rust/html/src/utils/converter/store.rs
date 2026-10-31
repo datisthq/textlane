@@ -40,9 +40,12 @@ pub(crate) enum Kind<'a> {
     Break,
     Code {
         lang: Option<&'a str>,
+        meta: Option<&'a str>,
         value: &'a str,
     },
     InlineCode(&'a str),
+    Math(&'a str),
+    InlineMath(&'a str),
     Blockquote,
     List {
         ordered: bool,
@@ -136,6 +139,7 @@ impl<'a> Kind<'a> {
                 | Kind::Emphasis
                 | Kind::Image { .. }
                 | Kind::InlineCode(_)
+                | Kind::InlineMath(_)
                 | Kind::Link { .. }
                 | Kind::Strong
                 | Kind::Text(_)
@@ -151,6 +155,8 @@ impl<'a> Kind<'a> {
                 | Kind::Break
                 | Kind::Code { .. }
                 | Kind::InlineCode(_)
+                | Kind::Math(_)
+                | Kind::InlineMath(_)
                 | Kind::Image { .. }
                 | Kind::Html(_)
         )
@@ -261,7 +267,11 @@ impl<'a> Store<'a> {
         let item = &self.items[id];
         match &item.kind {
             Kind::Text(text) => text.write(output),
-            Kind::Code { value, .. } | Kind::InlineCode(value) | Kind::Html(value) => {
+            Kind::Code { value, .. }
+            | Kind::InlineCode(value)
+            | Kind::Math(value)
+            | Kind::InlineMath(value)
+            | Kind::Html(value) => {
                 output.push_str(value);
             }
             Kind::Image { alt, .. } if !alt.is_empty() => output.push_str(alt),
@@ -332,9 +342,20 @@ impl<'a> Store<'a> {
                 position,
                 data: None,
             }),
-            Kind::Code { lang, value } => mdast::Node::Code(mdast::Code {
+            Kind::Code { lang, meta, value } => mdast::Node::Code(mdast::Code {
                 lang: *lang,
+                meta: *meta,
+                value,
+                position,
+                data: None,
+            }),
+            Kind::Math(value) => mdast::Node::Math(mdast::Math {
                 meta: None,
+                value,
+                position,
+                data: None,
+            }),
+            Kind::InlineMath(value) => mdast::Node::InlineMath(mdast::InlineMath {
                 value,
                 position,
                 data: None,

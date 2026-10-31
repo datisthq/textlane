@@ -3,7 +3,7 @@ use textlane_core::{
     Allocator, ArenaVec, Attach, Error, File, Plugin, Transform, Tree, TreeKind,
 };
 
-use crate::models::options::{Component, UnknownDirectives};
+use crate::models::options::{Component, DirectiveKind, UnknownDirectives};
 use crate::plugins::component::actions::alert::convert::convert_alert;
 use crate::plugins::component::actions::children::group::{
     Mark, group_children, read_group,
@@ -41,16 +41,27 @@ impl Transform for Component {
             return Err(Error::new("invalid-stage", "`md.component` takes mdast"));
         };
         let source = file.value.as_deref();
+        let mut unknown = Vec::new();
         // Parents convert before their children, so a sibling list groups once all of its
         // own items are converted, and nesting never recurses
         let mut stack = root.children_mut().into_iter().collect::<Vec<_>>();
         while let Some(children) = stack.pop() {
-            self.convert_children(children, source, alloc);
+            self.convert_children(children, source, &mut unknown, alloc);
             for child in children.iter_mut() {
                 if let Some(children) = child.children_mut() {
                     stack.push(children);
                 }
             }
+        }
+        if let Some((name, kind)) = unknown.first() {
+            let colons = match kind {
+                DirectiveKind::Container => ":::",
+                _ => "::",
+            };
+            return Err(Error::new(
+                "unknown-directive",
+                format!("no component for the directive `{colons}{name}`"),
+            ));
         }
         Ok(Tree::Mdast(root))
     }
@@ -61,12 +72,13 @@ impl Component {
         &self,
         children: &mut ArenaVec<'a, Node<'a>>,
         source: Option<&str>,
+        unknown: &mut Vec<(String, DirectiveKind)>,
         alloc: &'a Allocator,
     ) {
         let mut marks = Vec::with_capacity(children.len());
         for child in children.iter_mut() {
             let node = std::mem::replace(child, placeholder());
-            let (node, mark) = self.convert_child(node, source, alloc);
+            let (node, mark) = self.convert_child(node, source, unknown, alloc);
             *child = node;
             marks.push(mark);
         }
@@ -84,6 +96,7 @@ impl Component {
         &self,
         node: Node<'a>,
         source: Option<&str>,
+        unknown: &mut Vec<(String, DirectiveKind)>,
         alloc: &'a Allocator,
     ) -> (Node<'a>, Option<Mark>) {
         let node = match node {
@@ -103,6 +116,13 @@ impl Component {
         match self.unknown_directives {
             UnknownDirectives::Keep => (parts.into_node(), None),
             UnknownDirectives::Source => (restore_directive(parts, source, alloc), None),
+            UnknownDirectives::Error if parts.kind == DirectiveKind::Text => {
+                (restore_directive(parts, source, alloc), None)
+            }
+            UnknownDirectives::Error => {
+                unknown.push((parts.name.to_owned(), parts.kind));
+                (parts.into_node(), None)
+            }
         }
     }
 

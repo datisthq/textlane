@@ -4,8 +4,11 @@
 
 mod plugin;
 mod helpers {
+    pub(crate) mod gemoji;
+    pub(crate) mod gemoji_table;
     pub(crate) mod slug;
     pub(crate) mod slug_table;
+    pub(crate) mod url;
 }
 mod models {
     pub(crate) mod arena;
@@ -76,7 +79,9 @@ pub mod nlcst {
 }
 
 // helpers
+pub use helpers::gemoji::{find_gemoji_shortcodes, read_gemoji_label};
 pub use helpers::slug::{Slugger, create_slug};
+pub use helpers::url::{ResolvedUrl, prefix_base, resolve_url};
 
 // models
 pub use models::arena::ArenaVec;

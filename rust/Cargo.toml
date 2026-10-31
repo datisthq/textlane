@@ -34,6 +34,7 @@ giallo = { version = "0.5.2", features = ["dump"] }
 # Exact: html.katex works around this version's attribute order
 katex-rs = "=0.3.0"
 url = "2.5.4"
+linkify = "0.11.0"
 unicode-id-start = "1.5.0"
 yaml-rust2 = { version = "0.13.0", default-features = false }
 oxc_allocator = "0.155.0"

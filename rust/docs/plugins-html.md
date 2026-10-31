@@ -199,10 +199,12 @@ output.value
 
 Follows [rehype-slug](https://www.npmjs.com/package/rehype-slug).
 
-| Option     | Type               | Default | Description                                                                                         |
-| ---------- | ------------------ | ------- | --------------------------------------------------------------------------------------------------- |
-| `prefix`   | `string`           | `""`    | Put before each id.                                                                                 |
-| `autolink` | `Autolink \| null` |         | Link each heading with an `id` to itself, as rehype-autolink-headings does: `true`, or its options. |
+| Option            | Type               | Default | Description                                                                                              |
+| ----------------- | ------------------ | ------- | -------------------------------------------------------------------------------------------------------- |
+| `prefix`          | `string`           | `""`    | Put before each id.                                                                                      |
+| `reserveExisting` | `boolean`          | `false` | Count the ids already in the document as taken, so a generated id never repeats one a link may point at. |
+| `ranks`           | `number[] \| null` | `null`  | The heading ranks, 1 to 6, that get ids; every heading when left out.                                    |
+| `autolink`        | `Autolink \| null` |         | Link each heading with an `id` to itself, as rehype-autolink-headings does: `true`, or its options.      |
 
 **`Autolink`**
 
@@ -306,6 +308,114 @@ No options.
 
 <!-- /generated -->
 
+## html.math
+
+Turns `$…$` and `$$…$$` in text into the `<code class="language-math math-inline">` and `math-display` elements `md.math` makes, for `html.katex` to render. It reads dollars by pandoc's rule, so prices stay text: an opening `$` is followed by a non-space, a closing one follows a non-space and is not followed by a digit; `\$` is a dollar sign. Links, code, scripts, form text, `math` and `svg` are left alone, or the elements `ignore` names.
+
+```rust
+use textlane::{Processor, html};
+
+let output = Processor::new()
+    .with(html::Parse { fragment: true, ..Default::default() })
+    .with(html::Math::default())
+    .with(html::Stringify::default())
+    .freeze()?
+    .process(r#"<p>Area $\pi r^2$, price $5</p>"#)?;
+output.value
+// <p>Area <code class="language-math math-inline">\pi r^2</code>, price $5</p>
+```
+
+<!-- generated:options html.math -->
+
+| Option                 | Type               | Default | Description                                                                                                       |
+| ---------------------- | ------------------ | ------- | ----------------------------------------------------------------------------------------------------------------- |
+| `singleDollarTextMath` | `boolean`          | `true`  | Let one dollar, `$a$`, form math, as well as two.                                                                 |
+| `ignore`               | `string[] \| null` | `null`  | Elements, by tag name, whose text is left alone; links, code, scripts, form text, `math` and `svg` when left out. |
+| `ignoreAttributes`     | `string[]`         | `[]`    | Attributes, such as `data-literal`, whose elements' text is left alone.                                           |
+
+<!-- /generated -->
+
+## html.linkify
+
+Turns bare URLs and email addresses in text into links, as GitHub's literal autolinks do: a URL with `://` as written, a `www.` one under `https://`, an email under `mailto:`. A bare domain, such as `index.html`, stays text. Links, code, scripts, form text, `math` and `svg` are left alone, or the elements `ignore` names, and any element with an attribute `ignoreAttributes` names.
+
+```rust
+use textlane::{Processor, html};
+
+let output = Processor::new()
+    .with(html::Parse { fragment: true, ..Default::default() })
+    .with(html::Linkify::default())
+    .with(html::Stringify::default())
+    .freeze()?
+    .process(r#"<p>See www.example.com or a@example.com</p>"#)?;
+output.value
+// <p>See <a href="https://www.example.com">www.example.com</a> or <a href="mailto:a@example.com">a@example.com</a></p>
+```
+
+<!-- generated:options html.linkify -->
+
+| Option             | Type               | Default | Description                                                                                                       |
+| ------------------ | ------------------ | ------- | ----------------------------------------------------------------------------------------------------------------- |
+| `ignore`           | `string[] \| null` | `null`  | Elements, by tag name, whose text is left alone; links, code, scripts, form text, `math` and `svg` when left out. |
+| `ignoreAttributes` | `string[]`         | `[]`    | Attributes, such as `data-literal`, whose elements' text is left alone.                                           |
+
+<!-- /generated -->
+
+## html.gemoji
+
+Turns gemoji shortcodes in text, `:rocket:`, into their emoji, as `md.gemoji` does in Markdown; with `accessible`, each sits in a `<span role="img">` labelled with its name. Text that only looks like one, `10:30:00`, stays as written.
+
+```rust
+use textlane::{Processor, html};
+
+let output = Processor::new()
+    .with(html::Parse { fragment: true, ..Default::default() })
+    .with(html::Gemoji::default())
+    .with(html::Stringify::default())
+    .freeze()?
+    .process(r#"<p>Ship it :rocket:</p>"#)?;
+output.value
+// <p>Ship it 🚀</p>
+```
+
+<!-- generated:options html.gemoji -->
+
+| Option             | Type               | Default | Description                                                                                                       |
+| ------------------ | ------------------ | ------- | ----------------------------------------------------------------------------------------------------------------- |
+| `accessible`       | `boolean`          | `false` | Wrap each emoji in `<span role="img" aria-label="…">`, labelled with its name.                                    |
+| `ignore`           | `string[] \| null` | `null`  | Elements, by tag name, whose text is left alone; links, code, scripts, form text, `math` and `svg` when left out. |
+| `ignoreAttributes` | `string[]`         | `[]`    | Attributes, such as `data-literal`, whose elements' text is left alone.                                           |
+
+<!-- /generated -->
+
+## html.pathRewrite
+
+Rewrites the URLs in `href`, `src`, `srcset` and `poster`, or the attributes `attributes` names, as a site serves them, as `md.pathRewrite` does for Markdown: a relative URL is resolved against the file's path and made root-relative, every root-relative one goes under `base` once, and an `href` naming a file in `pages` takes that page's URL.
+
+```rust
+use textlane::{Processor, html};
+
+let output = Processor::new()
+    .with(html::Parse { fragment: true, ..Default::default() })
+    .with(html::PathRewrite { base: Some("/docs".into()), ..Default::default() })
+    .with(html::Stringify::default())
+    .freeze()?
+    .process(r#"<a href="/guide.html">Guide</a>"#)?;
+output.value
+// <a href="/docs/guide.html">Guide</a>
+```
+
+<!-- generated:options html.pathRewrite -->
+
+| Option       | Type                     | Default | Description                                                                                                              |
+| ------------ | ------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `root`       | `string \| null`         | `null`  | The directory URLs count from, as the file's path spells it; the path's own starting point when left out.                |
+| `base`       | `string \| null`         | `null`  | The URL the site is served at, such as `/docs`, put before every root-relative URL once.                                 |
+| `pages`      | `Record<string, string>` | `{}`    | Files, relative to `root`, to the URL of their page, such as `{"guide.html": "/guide/"}`; an `href` naming one takes it. |
+| `attributes` | `string[] \| null`       | `null`  | The attributes whose URLs are rewritten; `href`, `src`, `srcset` and `poster` when left out.                             |
+
+<!-- /generated -->
+
 ## html.extractToc
 
 Stores the headings, nested by rank, as the file's `data.toc`, as @stefanprobst/rehype-extract-toc does: each `{ depth, value, id?, children? }`. Run it after `html.slug` so headings carry their ids.
@@ -331,9 +441,12 @@ output.file.data["toc"]
 
 Follows [@stefanprobst/rehype-extract-toc](https://www.npmjs.com/package/@stefanprobst/rehype-extract-toc).
 
-| Option | Type       | Default | Description                                                                                                                                       |
-| ------ | ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `skip` | `string[]` | `[]`    | Attributes, such as `data-toc-hidden`, that keep a heading out of the table of contents; what would nest under it nests under the heading before. |
+| Option       | Type             | Default | Description                                                                                                                                                                                                       |
+| ------------ | ---------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `skip`       | `string[]`       | `[]`    | Attributes, such as `data-toc-hidden`, that keep a heading out of the table of contents, or `name=value`, such as `data-toc=false`, for one value of it; what would nest under it nests under the heading before. |
+| `skipInside` | `string[]`       | `[]`    | Elements, by tag name, whose headings stay out, such as a card's title.                                                                                                                                           |
+| `minDepth`   | `number \| null` | `null`  | The shallowest heading rank listed, 1 to 6.                                                                                                                                                                       |
+| `maxDepth`   | `number \| null` | `null`  | The deepest heading rank listed, 1 to 6.                                                                                                                                                                          |
 
 <!-- /generated -->
 
@@ -391,6 +504,11 @@ Follows [@shikijs/rehype](https://www.npmjs.com/package/@shikijs/rehype).
 | `metaProperty`          | `string \| null`                   | `null`  | The `<pre>` property that gets a block's meta, the text after its language; the JSON stand-in for `parseMetaString: meta => ({ [name]: meta })`.                                                                                     |
 | `transformers`          | `HighlightTransformer[]`           |         | The transformers of @shikijs/transformers to run, in order, by name or with options.                                                                                                                                                 |
 | `tokenizeMaxLineLength` | `number \| null`                   | `null`  | Lines at least this long, in UTF-16 units, are left one plain token as Shiki's own option leaves them; 2,000 when left out, where Shiki has no limit, since a grammar's time grows with the square of a line's length. `0` lifts it. |
+| `lineAttributes`        | `Record<string, LineMark>`         |         | Attributes of a block's `<code>` or `<pre>` listing lines, `2,4-5`, each to the classes those lines get, or to `{line, pre}`, the second for the `<pre>`: `{"data-focus": {"line": "focused", "pre": "has-focused"}}`.               |
+| `wordAttribute`         | `string \| null`                   | `null`  | The attribute of a block's `<code>` or `<pre>` listing words, separated by commas, marked at every place as `metaWordHighlight` marks a meta's `/word/`.                                                                             |
+| `lineNumberAttribute`   | `string \| null`                   | `null`  | The attribute of a block's `<code>` or `<pre>` that numbers its lines as `renderLineNumber` does, from its value, or 1 when it is empty.                                                                                             |
+| `skipElements`          | `boolean`                          | `false` | Leave a block alone when its code holds elements, such as `<mark>`, which highlighting would flatten into text.                                                                                                                      |
+| `keepProperties`        | `boolean`                          | `false` | Keep the properties of a block's `<pre>` and `<code>`, such as `data-title`, on the ones Shiki makes, merging classes; Shiki's own win where both set one.                                                                           |
 
 **`ColorReplacement`**
 
@@ -402,13 +520,19 @@ Takes `string | Record<string, string>`.
 
 How inline code names its language.
 
-Takes `"tailing-curly-colon"`.
+Takes `"tailing-curly-colon" | "class"`.
 
 **`HighlightTransformer`**
 
 A transformer of @shikijs/transformers: its name alone, or its name and options.
 
 Takes `TransformerName | ConfiguredTransformer`.
+
+**`LineMark`**
+
+The classes the lines a `lineAttributes` attribute lists get, and maybe its `<pre>`.
+
+Takes `Classes | { line: Classes; pre?: Classes | null }`.
 
 **`TransformerName`**
 
@@ -453,20 +577,21 @@ output.value
 
 Follows [rehype-katex](https://www.npmjs.com/package/rehype-katex).
 
-| Option             | Type                     | Default | Description                                                                                                                                        |
-| ------------------ | ------------------------ | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `output`           | `KatexOutput \| null`    |         | The markup to write, both HTML and MathML by default.                                                                                              |
-| `leqno`            | `boolean`                | `false` | Put equation numbers on the left.                                                                                                                  |
-| `fleqn`            | `boolean`                | `false` | Align display math to the left instead of centering it.                                                                                            |
-| `errorColor`       | `string \| null`         | `null`  | The color of math that fails to render, `#cc0000` by default.                                                                                      |
-| `macros`           | `Record<string, string>` | `{}`    | Macros by name, each to the TeX it expands to, as `{"\\RR": "\\mathbb{R}"}`.                                                                       |
-| `minRuleThickness` | `number \| null`         | `null`  | The thinnest a rule, such as a fraction line, is drawn, in ems.                                                                                    |
-| `colorIsTextColor` | `boolean`                | `false` | Let `\color` color the text after it, as LaTeX does.                                                                                               |
-| `strict`           | `KatexStrict \| null`    |         | What to do with input LaTeX would reject: `true` or `"error"` fails it, `"warn"` prints a warning, `false` or `"ignore"` (the default) accepts it. |
-| `trust`            | `boolean`                | `false` | Allow commands that can run untrusted input, such as `\href` and `\includegraphics`.                                                               |
-| `maxSize`          | `number \| null`         | `null`  | The largest a user-given size may be, in ems.                                                                                                      |
-| `maxExpand`        | `number \| null`         | `null`  | How many macro expansions one formula may take, 1000 by default.                                                                                   |
-| `globalGroup`      | `boolean`                | `false` | Let definitions such as `\def` last past the formula they are in.                                                                                  |
+| Option             | Type                     | Default | Description                                                                                                                                                   |
+| ------------------ | ------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `output`           | `KatexOutput \| null`    |         | The markup to write, both HTML and MathML by default.                                                                                                         |
+| `leqno`            | `boolean`                | `false` | Put equation numbers on the left.                                                                                                                             |
+| `fleqn`            | `boolean`                | `false` | Align display math to the left instead of centering it.                                                                                                       |
+| `errorColor`       | `string \| null`         | `null`  | The color of math that fails to render, `#cc0000` by default.                                                                                                 |
+| `macros`           | `Record<string, string>` | `{}`    | Macros by name, each to the TeX it expands to, as `{"\\RR": "\\mathbb{R}"}`.                                                                                  |
+| `minRuleThickness` | `number \| null`         | `null`  | The thinnest a rule, such as a fraction line, is drawn, in ems.                                                                                               |
+| `colorIsTextColor` | `boolean`                | `false` | Let `\color` color the text after it, as LaTeX does.                                                                                                          |
+| `strict`           | `KatexStrict \| null`    |         | What to do with input LaTeX would reject: `true` or `"error"` fails it, `"warn"` prints a warning, `false` or `"ignore"` (the default) accepts it.            |
+| `trust`            | `boolean`                | `false` | Allow commands that can run untrusted input, such as `\href` and `\includegraphics`.                                                                          |
+| `maxSize`          | `number \| null`         | `null`  | The largest a user-given size may be, in ems.                                                                                                                 |
+| `maxExpand`        | `number \| null`         | `null`  | How many macro expansions one formula may take, 1000 by default.                                                                                              |
+| `globalGroup`      | `boolean`                | `false` | Let definitions such as `\def` last past the formula they are in.                                                                                             |
+| `tagNames`         | `string[]`               | `[]`    | Elements, by tag name, that hold math besides the classed ones, such as `my-math`; one is display math when it has a `display` attribute other than `inline`. |
 
 **`KatexOutput`**
 
@@ -511,13 +636,15 @@ output.value
 
 Follows [rehype-remark](https://www.npmjs.com/package/rehype-remark).
 
-| Option      | Type               | Default | Description                                                                                                     |
-| ----------- | ------------------ | ------- | --------------------------------------------------------------------------------------------------------------- |
-| `document`  | `boolean`          | `false` | Wrap all phrasing content of the root in paragraphs, as for a whole document.                                   |
-| `newlines`  | `boolean`          | `false` | Collapse whitespace holding a line ending to that line ending instead of a space.                               |
-| `checked`   | `string \| null`   | `null`  | The text of a checked checkbox or radio, `[x]` by default.                                                      |
-| `unchecked` | `string \| null`   | `null`  | The text of an unchecked checkbox or radio, `[ ]` by default.                                                   |
-| `quotes`    | `string[] \| null` | `null`  | The quotes `<q>` uses, an opening and closing character each, alternating by how deep it nests; `"` by default. |
+| Option      | Type                     | Default | Description                                                                                                                                                                                                 |
+| ----------- | ------------------------ | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `document`  | `boolean`                | `false` | Wrap all phrasing content of the root in paragraphs, as for a whole document.                                                                                                                               |
+| `newlines`  | `boolean`                | `false` | Collapse whitespace holding a line ending to that line ending instead of a space.                                                                                                                           |
+| `checked`   | `string \| null`         | `null`  | The text of a checked checkbox or radio, `[x]` by default.                                                                                                                                                  |
+| `unchecked` | `string \| null`         | `null`  | The text of an unchecked checkbox or radio, `[ ]` by default.                                                                                                                                               |
+| `quotes`    | `string[] \| null`       | `null`  | The quotes `<q>` uses, an opening and closing character each, alternating by how deep it nests; `"` by default.                                                                                             |
+| `math`      | `boolean`                | `false` | Turn MathML `<math>` holding a TeX annotation, as `html.katex` writes it, into math nodes, `$…$` once `md.math` writes them, display math for `display="block"`, and drop KaTeX's visual `katex-html` copy. |
+| `codeMeta`  | `Record<string, string>` | `{}`    | Attributes of a code block's `<pre>` or `<code>` written into its meta, each to the key it takes there: `{"data-title": "title"}` makes `title="a.js"`.                                                     |
 
 <!-- /generated -->
 

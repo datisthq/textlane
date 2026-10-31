@@ -54,7 +54,7 @@ pub(crate) fn convert_directive<'a>(
     }
     let text = parts.kind == DirectiveKind::Text;
     Ok(create_element(
-        alloc.alloc_str(&rule.component),
+        alloc.alloc_str(&rule.component.replace("{name}", parts.name)),
         attributes,
         parts.children,
         parts.position,

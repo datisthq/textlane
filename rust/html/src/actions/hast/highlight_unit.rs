@@ -246,3 +246,57 @@ fn leaves_a_long_line_plain_and_keeps_the_rest_colored() -> Result<(), Error> {
     assert_eq!(html.matches("color:#D73A49\">let</span>").count(), 2);
     Ok(())
 }
+
+#[test]
+fn marks_lines_words_and_numbers_from_attributes() -> Result<(), Error> {
+    let input = "<pre data-title=\"a.js\"><code class=\"language-js\" data-lines=\"2\" \
+                 data-focus=\"1,3-3\" data-words=\"b\" data-line-numbers=\"7\">let a\n\
+                 let b\nlet c\n</code></pre>";
+    let options = json!({
+        "theme": "github-light",
+        "lineAttributes": {
+            "data-lines": "highlighted",
+            "data-focus": { "line": "focused", "pre": "has-focused" }
+        },
+        "wordAttribute": "data-words",
+        "lineNumberAttribute": "data-line-numbers",
+        "keepProperties": true
+    });
+    let html = highlight(input, options)?;
+    assert!(html.starts_with("<pre class=\"shiki github-light has-focused\""));
+    assert!(html.contains("data-title=\"a.js\""));
+    assert!(html.contains("<code class=\"language-js\" data-lines=\"2\""));
+    assert_eq!(html.matches("class=\"line focused\"").count(), 2);
+    assert_eq!(html.matches("class=\"line highlighted\"").count(), 1);
+    assert!(html.contains("<span class=\"line-number\">7</span>"));
+    assert!(html.contains("<span class=\"line-number\">9</span>"));
+    assert_eq!(html.matches("highlighted-word").count(), 1);
+    Ok(())
+}
+
+#[test]
+fn fails_on_lines_it_cannot_read() {
+    let input = "<pre><code class=\"language-js\" data-lines=\"2-1\">a\n</code></pre>";
+    let options =
+        json!({ "theme": "github-light", "lineAttributes": { "data-lines": "x" } });
+    let error = highlight(input, options).err().map(|error| error.code);
+    assert_eq!(error.as_deref(), Some("invalid-lines"));
+}
+
+#[test]
+fn colors_inline_code_named_by_class_only_outside_blocks() -> Result<(), Error> {
+    let input = "<p><code class=\"language-js\">let a</code></p>\
+                 <pre><code class=\"language-nope\">x</code></pre>";
+    let html = highlight(input, json!({ "theme": "github-light", "inline": "class" }))?;
+    assert!(html.starts_with("<p><span class=\"shiki github-light\""));
+    assert!(html.ends_with("<pre><code class=\"language-nope\">x</code></pre>"));
+    Ok(())
+}
+
+#[test]
+fn leaves_blocks_with_elements_alone_when_asked() -> Result<(), Error> {
+    let input = "<pre><code class=\"language-js\">let <mark>a</mark></code></pre>";
+    let options = json!({ "theme": "github-light", "skipElements": true });
+    assert_eq!(highlight(input, options)?, input);
+    Ok(())
+}

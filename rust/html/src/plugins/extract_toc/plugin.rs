@@ -27,8 +27,7 @@ impl Transform for ExtractToc {
     ) -> Result<Tree<'a>, Error> {
         match tree {
             Tree::Hast(node) => {
-                file.data
-                    .insert("toc".into(), extract_toc(&node, &self.skip));
+                file.data.insert("toc".into(), extract_toc(&node, self));
                 Ok(Tree::Hast(node))
             }
             _ => Err(Error::new("invalid-stage", "`html.extractToc` takes hast")),

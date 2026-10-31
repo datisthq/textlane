@@ -1,0 +1,24 @@
+[
+  {
+    "description": "dollar math in text",
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      ["html.math"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "inline, display, prices and code",
+        "input": "<p>$a$ and $$b$$ cost $20,000 and $30,000</p><code>$c$</code>",
+        "expected": {
+          "html": "<p><code class=\"language-math math-inline\">a</code> and <code class=\"language-math math-display\">b</code> cost $20,000 and $30,000</p><code>$c$</code>"
+        }
+      }
+    ]
+  }
+]

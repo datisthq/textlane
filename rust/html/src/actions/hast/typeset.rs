@@ -2,6 +2,7 @@ use katex::KatexContext;
 use textlane_core::hast::{Element, Node, PropertyItem, PropertyValue};
 use textlane_core::{Allocator, ArenaVec, File, Lines, Position, UnistPosition};
 
+use crate::actions::attribute::read::read_attribute;
 use crate::actions::math::typeset::{create_settings, typeset_math};
 use crate::helpers::text::read_preformatted_text;
 use crate::models::options::Katex;
@@ -23,14 +24,17 @@ pub fn typeset_hast<'a>(
             Node::Element(element) => &mut element.children,
             _ => continue,
         };
-        if !children.iter().any(|child| read_math(child).is_some()) {
+        if !children
+            .iter()
+            .any(|child| read_math(child, options).is_some())
+        {
             stack.extend(children.iter_mut());
             continue;
         }
         let old = std::mem::replace(children, ArenaVec::new_in(alloc));
         let mut rendered = Vec::new();
         for child in old {
-            let Some(math) = read_math(&child) else {
+            let Some(math) = read_math(&child, options) else {
                 children.push(child);
                 continue;
             };
@@ -63,10 +67,20 @@ struct Math<'n, 'a> {
     display: bool,
 }
 
-fn read_math<'n, 'a>(node: &'n Node<'a>) -> Option<Math<'n, 'a>> {
+fn read_math<'n, 'a>(node: &'n Node<'a>, options: &Katex) -> Option<Math<'n, 'a>> {
     let Node::Element(element) = node else {
         return None;
     };
+    if (options.tag_names.iter()).any(|name| name.eq_ignore_ascii_case(element.tag_name))
+    {
+        let display = read_attribute(element, "display")
+            .is_some_and(|value| !value.eq_ignore_ascii_case("inline"));
+        return Some(Math {
+            scope: element,
+            marked: element,
+            display,
+        });
+    }
     let classes = read_classes(element);
     let display = classes.contains(&"math-display");
     if display || classes.contains(&"language-math") || classes.contains(&"math-inline") {

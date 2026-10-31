@@ -141,6 +141,37 @@ pub struct Highlight {
     /// option leaves them; 2,000 when left out, where Shiki has no limit, since a grammar's
     /// time grows with the square of a line's length. `0` lifts it.
     pub tokenize_max_line_length: Option<usize>,
+    /// Attributes of a block's `<code>` or `<pre>` listing lines, `2,4-5`, each to the
+    /// classes those lines get, or to `{line, pre}`, the second for the `<pre>`:
+    /// `{"data-focus": {"line": "focused", "pre": "has-focused"}}`.
+    pub line_attributes: BTreeMap<String, LineMark>,
+    /// The attribute of a block's `<code>` or `<pre>` listing words, separated by commas,
+    /// marked at every place as `metaWordHighlight` marks a meta's `/word/`.
+    pub word_attribute: Option<String>,
+    /// The attribute of a block's `<code>` or `<pre>` that numbers its lines as
+    /// `renderLineNumber` does, from its value, or 1 when it is empty.
+    pub line_number_attribute: Option<String>,
+    /// Leave a block alone when its code holds elements, such as `<mark>`, which
+    /// highlighting would flatten into text.
+    pub skip_elements: bool,
+    /// Keep the properties of a block's `<pre>` and `<code>`, such as `data-title`, on the
+    /// ones Shiki makes, merging classes; Shiki's own win where both set one.
+    pub keep_properties: bool,
+}
+
+/// The classes the lines a `lineAttributes` attribute lists get, and maybe its `<pre>`.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(untagged)]
+pub enum LineMark {
+    /// Classes for each line listed.
+    Line(Classes),
+    /// Classes for each line listed and for the `<pre>` of a block listing any.
+    Both {
+        line: Classes,
+        #[serde(default)]
+        pre: Option<Classes>,
+    },
 }
 
 /// A replacement color, or a theme's own replacements.
@@ -158,6 +189,9 @@ pub enum ColorReplacement {
 pub enum InlineCode {
     #[serde(rename = "tailing-curly-colon")]
     TailingCurlyColon,
+    /// Inline `<code>` naming its language by class, `language-js`, as blocks do.
+    #[serde(rename = "class")]
+    Class,
 }
 
 /// A transformer of @shikijs/transformers: its name alone, or its name and options.
@@ -308,6 +342,10 @@ pub struct Katex {
     pub max_expand: Option<usize>,
     /// Let definitions such as `\def` last past the formula they are in.
     pub global_group: bool,
+    /// Elements, by tag name, that hold math besides the classed ones, such as
+    /// `my-math`; one is display math when it has a `display` attribute other than
+    /// `inline`.
+    pub tag_names: Vec<String>,
 }
 
 /// The markup KaTeX writes.
@@ -347,8 +385,15 @@ pub enum KatexStrictMode {
 #[cfg_attr(feature = "schema", schemars(rename = "ExtractTocOptions"))]
 pub struct ExtractToc {
     /// Attributes, such as `data-toc-hidden`, that keep a heading out of the table of
-    /// contents; what would nest under it nests under the heading before.
+    /// contents, or `name=value`, such as `data-toc=false`, for one value of it; what would
+    /// nest under it nests under the heading before.
     pub skip: Vec<String>,
+    /// Elements, by tag name, whose headings stay out, such as a card's title.
+    pub skip_inside: Vec<String>,
+    /// The shallowest heading rank listed, 1 to 6.
+    pub min_depth: Option<u8>,
+    /// The deepest heading rank listed, 1 to 6.
+    pub max_depth: Option<u8>,
 }
 
 /// `html.slug`: ids on headings, from their text; options named as rehype-slug names
@@ -360,6 +405,11 @@ pub struct ExtractToc {
 pub struct Slug {
     /// Put before each id.
     pub prefix: String,
+    /// Count the ids already in the document as taken, so a generated id never repeats one
+    /// a link may point at.
+    pub reserve_existing: bool,
+    /// The heading ranks, 1 to 6, that get ids; every heading when left out.
+    pub ranks: Option<Vec<u8>>,
     /// Link each heading with an `id` to itself, as rehype-autolink-headings does: `true`, or
     /// its options.
     pub autolink: Option<Autolink>,
@@ -435,6 +485,13 @@ pub struct ToMarkdown {
     /// The quotes `<q>` uses, an opening and closing character each, alternating by how
     /// deep it nests; `"` by default.
     pub quotes: Option<Vec<String>>,
+    /// Turn MathML `<math>` holding a TeX annotation, as `html.katex` writes it, into math
+    /// nodes, `$…$` once `md.math` writes them, display math for `display="block"`, and
+    /// drop KaTeX's visual `katex-html` copy.
+    pub math: bool,
+    /// Attributes of a code block's `<pre>` or `<code>` written into its meta, each to the
+    /// key it takes there: `{"data-title": "title"}` makes `title="a.js"`.
+    pub code_meta: BTreeMap<String, String>,
 }
 
 /// `html.raw`: reparse raw HTML and fix nesting through the HTML parser; options named as
@@ -506,4 +563,92 @@ impl Format {
 pub enum Indent {
     Spaces(usize),
     Text(String),
+}
+
+/// The elements prose plugins leave alone when `ignore` is left out: links, code, scripts,
+/// form text and foreign content.
+pub const PROSE_IGNORE: &[&str] = &[
+    "a", "code", "pre", "kbd", "samp", "script", "style", "textarea", "title", "math",
+    "svg",
+];
+
+/// `html.math`: `$…$` and `$$…$$` in text into the elements `html.katex` renders, read by
+/// pandoc's rule so prices stay text: an opening `$` is followed by a non-space, a closing
+/// one follows a non-space and is not followed by a digit; `\$` is a dollar sign.
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", schemars(rename = "MathOptions"))]
+pub struct Math {
+    /// Let one dollar, `$a$`, form math, as well as two.
+    pub single_dollar_text_math: bool,
+    /// Elements, by tag name, whose text is left alone; links, code, scripts, form text,
+    /// `math` and `svg` when left out.
+    pub ignore: Option<Vec<String>>,
+    /// Attributes, such as `data-literal`, whose elements' text is left alone.
+    pub ignore_attributes: Vec<String>,
+}
+
+impl Default for Math {
+    fn default() -> Self {
+        Math {
+            single_dollar_text_math: true,
+            ignore: None,
+            ignore_attributes: Vec::new(),
+        }
+    }
+}
+
+/// `html.linkify`: bare URLs and email addresses in text into links, as GitHub's literal
+/// autolinks do: a URL with `://` as it is, a `www.` one under `https://`, an email under
+/// `mailto:`.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", schemars(rename = "LinkifyOptions"))]
+pub struct Linkify {
+    /// Elements, by tag name, whose text is left alone; links, code, scripts, form text,
+    /// `math` and `svg` when left out.
+    pub ignore: Option<Vec<String>>,
+    /// Attributes, such as `data-literal`, whose elements' text is left alone.
+    pub ignore_attributes: Vec<String>,
+}
+
+/// `html.gemoji`: gemoji shortcodes in text, `:smile:`, into emoji, as `md.gemoji` does in
+/// Markdown.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", schemars(rename = "GemojiOptions"))]
+pub struct Gemoji {
+    /// Wrap each emoji in `<span role="img" aria-label="…">`, labelled with its name.
+    pub accessible: bool,
+    /// Elements, by tag name, whose text is left alone; links, code, scripts, form text,
+    /// `math` and `svg` when left out.
+    pub ignore: Option<Vec<String>>,
+    /// Attributes, such as `data-literal`, whose elements' text is left alone.
+    pub ignore_attributes: Vec<String>,
+}
+
+/// `html.pathRewrite`: the URLs of a document's attributes as a site serves them, as
+/// `md.pathRewrite` does for Markdown: relative ones resolved against the file's path and
+/// made root-relative, every root-relative one under `base`, and links to a page's file
+/// turned into its URL.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(default, rename_all = "camelCase")]
+#[cfg_attr(feature = "schema", schemars(rename = "PathRewriteOptions"))]
+pub struct PathRewrite {
+    /// The directory URLs count from, as the file's path spells it; the path's own
+    /// starting point when left out.
+    pub root: Option<String>,
+    /// The URL the site is served at, such as `/docs`, put before every root-relative URL
+    /// once.
+    pub base: Option<String>,
+    /// Files, relative to `root`, to the URL of their page, such as
+    /// `{"guide.html": "/guide/"}`; an `href` naming one takes it.
+    pub pages: BTreeMap<String, String>,
+    /// The attributes whose URLs are rewritten; `href`, `src`, `srcset` and `poster` when
+    /// left out.
+    pub attributes: Option<Vec<String>>,
 }

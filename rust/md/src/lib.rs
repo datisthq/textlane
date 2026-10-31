@@ -152,6 +152,7 @@ mod actions {
     }
     pub(crate) mod mdx_jsx_element {
         pub(crate) mod convert;
+        pub(crate) mod lower;
         pub(crate) mod stringify;
     }
     pub(crate) mod mdxjs_esm {
@@ -277,7 +278,6 @@ mod plugins {
             }
         }
         pub(crate) mod emoticons;
-        pub(crate) mod names;
         pub(crate) mod plugin;
     }
     pub(crate) mod gfm {

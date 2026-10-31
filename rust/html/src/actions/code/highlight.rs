@@ -4,7 +4,9 @@ use textlane_core::{Allocator, ArenaVec, Error};
 use crate::actions::code::decorate::{apply_decorations, read_decorations, split_tokens};
 use crate::actions::code::tokenize::{replace_color, tokenize_code};
 use crate::actions::code::transform::transform_code;
-use crate::models::highlight::{CodeBlock, CodeLine, Themes, add_classes};
+use crate::models::highlight::{
+    BlockMarks, CodeBlock, CodeLine, CodeToken, Themes, add_classes,
+};
 use crate::models::options::Highlight;
 
 /// The `<pre>` Shiki's `codeToHast` makes of code: a `span.line` per line, a styled
@@ -13,6 +15,7 @@ pub(crate) fn highlight_code<'a>(
     code: &str,
     language: &str,
     meta: &str,
+    marks: &BlockMarks,
     themes: &Themes,
     options: &Highlight,
     alloc: &'a Allocator,
@@ -33,11 +36,13 @@ pub(crate) fn highlight_code<'a>(
         pre_classes: Vec::new(),
         code_classes: Vec::new(),
     };
-    let mut decorations = read_decorations(code, meta, &options.transformers)?;
+    let mut decorations =
+        read_decorations(code, meta, &options.transformers, &marks.words)?;
     if !decorations.is_empty() {
         split_tokens(&mut block, code, &decorations);
     }
     transform_code(&mut block, &options.transformers);
+    mark_lines(&mut block, marks);
     if options.add_language_class {
         add_classes(&mut block.code_classes, &[format!("language-{language}")]);
     }
@@ -107,6 +112,30 @@ pub(crate) fn highlight_code<'a>(
         properties.push(create_property(alloc.alloc_str(name), meta, alloc));
     }
     Ok(create_element("pre", properties, code_element))
+}
+
+// After the transformers, as a caller's own transformer would run
+fn mark_lines(block: &mut CodeBlock, marks: &BlockMarks) {
+    for (index, line) in block.lines.iter_mut().enumerate() {
+        let number = index + 1;
+        for (ranges, classes) in &marks.lines {
+            if ranges
+                .iter()
+                .any(|&(start, end)| start <= number && number <= end)
+            {
+                add_classes(&mut line.classes, classes);
+            }
+        }
+        if let Some(start) = marks.numbers {
+            let token = CodeToken {
+                text: (start + index).to_string(),
+                style: String::new(),
+                classes: vec!["line-number".to_owned()],
+            };
+            line.tokens.insert(0, Some(token));
+        }
+    }
+    add_classes(&mut block.pre_classes, &marks.pre);
 }
 
 // Shiki's `mapThemeColors` for the background, then the text

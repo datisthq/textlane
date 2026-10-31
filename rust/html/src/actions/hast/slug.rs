@@ -13,6 +13,9 @@ pub fn slug_hast<'a>(node: &mut Node<'a>, options: &Slug, alloc: &'a Allocator) 
     let mut budget = text.len() + SLACK;
     let mut ranges = ranges.into_iter();
     let mut slugger = Slugger::default();
+    if options.reserve_existing {
+        reserve_ids(node, &options.prefix, &mut slugger);
+    }
     let mut stack: Vec<&mut Node<'a>> = vec![node];
     while let Some(node) = stack.pop() {
         let children = match node {
@@ -20,7 +23,9 @@ pub fn slug_hast<'a>(node: &mut Node<'a>, options: &Slug, alloc: &'a Allocator) 
             Node::Element(element) => {
                 if is_heading(element.tag_name) {
                     let (start, end) = ranges.next().unwrap_or_default();
-                    if !has_id(&element.properties) {
+                    if !has_id(&element.properties)
+                        && is_ranked(element.tag_name, options)
+                    {
                         let mut end = end.min(start + budget);
                         while !text.is_char_boundary(end) {
                             end -= 1;
@@ -97,6 +102,38 @@ impl<'n, 'a> Collector<'n, 'a> {
         });
         self.frames.push((children, 0, index));
     }
+}
+
+// Only an id carrying the prefix can collide with a generated one
+fn reserve_ids(node: &Node, prefix: &str, slugger: &mut Slugger) {
+    let mut stack: Vec<&Node> = vec![node];
+    while let Some(node) = stack.pop() {
+        let children = match node {
+            Node::Root(root) => &root.children,
+            Node::Element(element) => {
+                let id = element.properties.iter().rev().find(|p| p.name == "id");
+                if let Some(Property {
+                    value: PropertyValue::String(id),
+                    ..
+                }) = id
+                    && let Some(rest) = id.strip_prefix(prefix)
+                {
+                    slugger.reserve(rest);
+                }
+                &element.children
+            }
+            _ => continue,
+        };
+        stack.extend(children.iter());
+    }
+}
+
+fn is_ranked(tag_name: &str, options: &Slug) -> bool {
+    let rank = tag_name.as_bytes().get(1).map_or(0, |digit| digit - b'0');
+    options
+        .ranks
+        .as_ref()
+        .is_none_or(|ranks| ranks.contains(&rank))
 }
 
 fn is_heading(tag_name: &str) -> bool {

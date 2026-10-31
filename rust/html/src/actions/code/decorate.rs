@@ -25,13 +25,23 @@ static META_WORD: LazyLock<Option<Regex>> =
 static ESCAPE: LazyLock<Option<Regex>> = LazyLock::new(|| Regex::new(r"\\(.)").ok());
 
 /// The decorations `metaWordHighlight` adds in its `preprocess`: each `/word/` of the meta
-/// at every place it occurs, failing as Shiki does on ones that cross.
+/// at every place it occurs, then each of `words`, failing as Shiki does on ones that cross.
 pub(crate) fn read_decorations(
     code: &str,
     meta: &str,
     transformers: &[HighlightTransformer],
+    words: &[String],
 ) -> Result<Vec<Decoration>, Error> {
     let mut decorations = Vec::new();
+    for word in words.iter().filter(|word| !word.is_empty()) {
+        for start in find_all(code, word) {
+            decorations.push(Decoration {
+                start,
+                end: start + word.encode_utf16().count(),
+                classes: vec!["highlighted-word".to_owned()],
+            });
+        }
+    }
     for transformer in transformers {
         let ConfiguredTransformer::MetaWordHighlight { class_name } =
             configure_transformer(transformer)

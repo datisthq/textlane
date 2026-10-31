@@ -18,6 +18,14 @@ __all__ = [
     "SanitizeOptions",
     "slug",
     "SlugOptions",
+    "math",
+    "MathOptions",
+    "linkify",
+    "LinkifyOptions",
+    "gemoji",
+    "GemojiOptions",
+    "path_rewrite",
+    "PathRewriteOptions",
     "external_links",
     "ExternalLinksOptions",
     "unwrap_images",
@@ -154,9 +162,69 @@ Autolink = Union[bool, AutolinkOptions]
 class SlugOptions(TypedDict, total=False):
     # Put before each id.
     prefix: str
+    # Count the ids already in the document as taken, so a generated id never repeats one
+    # a link may point at.
+    reserveExisting: bool
+    # The heading ranks, 1 to 6, that get ids; every heading when left out.
+    ranks: Optional[List[int]]
     # Link each heading with an `id` to itself, as rehype-autolink-headings does: `true`, or
     # its options.
     autolink: Optional[Autolink]
+
+
+# `html.math`: `$…$` and `$$…$$` in text into the elements `html.katex` renders, read by
+# pandoc's rule so prices stay text: an opening `$` is followed by a non-space, a closing
+# one follows a non-space and is not followed by a digit; `\$` is a dollar sign.
+class MathOptions(TypedDict, total=False):
+    # Let one dollar, `$a$`, form math, as well as two.
+    singleDollarTextMath: bool
+    # Elements, by tag name, whose text is left alone; links, code, scripts, form text,
+    # `math` and `svg` when left out.
+    ignore: Optional[List[str]]
+    # Attributes, such as `data-literal`, whose elements' text is left alone.
+    ignoreAttributes: List[str]
+
+
+# `html.linkify`: bare URLs and email addresses in text into links, as GitHub's literal
+# autolinks do: a URL with `://` as it is, a `www.` one under `https://`, an email under
+# `mailto:`.
+class LinkifyOptions(TypedDict, total=False):
+    # Elements, by tag name, whose text is left alone; links, code, scripts, form text,
+    # `math` and `svg` when left out.
+    ignore: Optional[List[str]]
+    # Attributes, such as `data-literal`, whose elements' text is left alone.
+    ignoreAttributes: List[str]
+
+
+# `html.gemoji`: gemoji shortcodes in text, `:smile:`, into emoji, as `md.gemoji` does in
+# Markdown.
+class GemojiOptions(TypedDict, total=False):
+    # Wrap each emoji in `<span role="img" aria-label="…">`, labelled with its name.
+    accessible: bool
+    # Elements, by tag name, whose text is left alone; links, code, scripts, form text,
+    # `math` and `svg` when left out.
+    ignore: Optional[List[str]]
+    # Attributes, such as `data-literal`, whose elements' text is left alone.
+    ignoreAttributes: List[str]
+
+
+# `html.pathRewrite`: the URLs of a document's attributes as a site serves them, as
+# `md.pathRewrite` does for Markdown: relative ones resolved against the file's path and
+# made root-relative, every root-relative one under `base`, and links to a page's file
+# turned into its URL.
+class PathRewriteOptions(TypedDict, total=False):
+    # The directory URLs count from, as the file's path spells it; the path's own
+    # starting point when left out.
+    root: Optional[str]
+    # The URL the site is served at, such as `/docs`, put before every root-relative URL
+    # once.
+    base: Optional[str]
+    # Files, relative to `root`, to the URL of their page, such as
+    # `{"guide.html": "/guide/"}`; an `href` naming one takes it.
+    pages: Dict[str, str]
+    # The attributes whose URLs are rewritten; `href`, `src`, `srcset` and `poster` when
+    # left out.
+    attributes: Optional[List[str]]
 
 
 # Tokens: a list, or one string of them separated by white space.
@@ -186,8 +254,15 @@ class ExternalLinksOptions(TypedDict, total=False):
 # @stefanprobst/rehype-extract-toc stores them.
 class ExtractTocOptions(TypedDict, total=False):
     # Attributes, such as `data-toc-hidden`, that keep a heading out of the table of
-    # contents; what would nest under it nests under the heading before.
+    # contents, or `name=value`, such as `data-toc=false`, for one value of it; what would
+    # nest under it nests under the heading before.
     skip: List[str]
+    # Elements, by tag name, whose headings stay out, such as a card's title.
+    skipInside: List[str]
+    # The shallowest heading rank listed, 1 to 6.
+    minDepth: Optional[int]
+    # The deepest heading rank listed, 1 to 6.
+    maxDepth: Optional[int]
 
 
 # A replacement color, or a theme's own replacements.
@@ -195,7 +270,7 @@ ColorReplacement = Union[str, Dict[str, str]]
 
 
 # How inline code names its language.
-InlineCode = Literal["tailing-curly-colon"]
+InlineCode = Union[Literal["tailing-curly-colon"], Literal["class"]]
 
 
 # The transformers `html.highlight` runs natively.
@@ -281,6 +356,18 @@ ConfiguredTransformer = Union[ConfiguredTransformer0, ConfiguredTransformer1, Co
 HighlightTransformer = Union[TransformerName, ConfiguredTransformer]
 
 
+class _LineMark1Required(TypedDict):
+    line: Classes
+
+
+class LineMark1(_LineMark1Required, total=False):
+    pre: Optional[Classes]
+
+
+# The classes the lines a `lineAttributes` attribute lists get, and maybe its `<pre>`.
+LineMark = Union[Classes, LineMark1]
+
+
 # `html.highlight`: code blocks colored as Shiki colors them, natively by giallo;
 # options named as @shikijs/rehype names them.
 class HighlightOptions(TypedDict, total=False):
@@ -309,6 +396,22 @@ class HighlightOptions(TypedDict, total=False):
     # option leaves them; 2,000 when left out, where Shiki has no limit, since a grammar's
     # time grows with the square of a line's length. `0` lifts it.
     tokenizeMaxLineLength: Optional[int]
+    # Attributes of a block's `<code>` or `<pre>` listing lines, `2,4-5`, each to the
+    # classes those lines get, or to `{line, pre}`, the second for the `<pre>`:
+    # `{"data-focus": {"line": "focused", "pre": "has-focused"}}`.
+    lineAttributes: Dict[str, LineMark]
+    # The attribute of a block's `<code>` or `<pre>` listing words, separated by commas,
+    # marked at every place as `metaWordHighlight` marks a meta's `/word/`.
+    wordAttribute: Optional[str]
+    # The attribute of a block's `<code>` or `<pre>` that numbers its lines as
+    # `renderLineNumber` does, from its value, or 1 when it is empty.
+    lineNumberAttribute: Optional[str]
+    # Leave a block alone when its code holds elements, such as `<mark>`, which
+    # highlighting would flatten into text.
+    skipElements: bool
+    # Keep the properties of a block's `<pre>` and `<code>`, such as `data-title`, on the
+    # ones Shiki makes, merging classes; Shiki's own win where both set one.
+    keepProperties: bool
 
 
 # The markup KaTeX writes.
@@ -351,6 +454,10 @@ class KatexOptions(TypedDict, total=False):
     maxExpand: Optional[int]
     # Let definitions such as `\def` last past the formula they are in.
     globalGroup: bool
+    # Elements, by tag name, that hold math besides the classed ones, such as
+    # `my-math`; one is display math when it has a `display` attribute other than
+    # `inline`.
+    tagNames: List[str]
 
 
 # `html.toMarkdown`: hast into mdast; options named as hast-util-to-mdast names them.
@@ -366,6 +473,13 @@ class ToMarkdownOptions(TypedDict, total=False):
     # The quotes `<q>` uses, an opening and closing character each, alternating by how
     # deep it nests; `"` by default.
     quotes: Optional[List[str]]
+    # Turn MathML `<math>` holding a TeX annotation, as `html.katex` writes it, into math
+    # nodes, `$…$` once `md.math` writes them, display math for `display="block"`, and
+    # drop KaTeX's visual `katex-html` copy.
+    math: bool
+    # Attributes of a code block's `<pre>` or `<code>` written into its meta, each to the
+    # key it takes there: `{"data-title": "title"}` makes `title="a.js"`.
+    codeMeta: Dict[str, str]
 
 
 # `html.stringify`: hast into HTML; options named as hast-util-to-html names them.
@@ -440,6 +554,26 @@ def sanitize(options: Optional[SanitizeOptions] = None) -> Plugin:
 def slug(options: Optional[SlugOptions] = None) -> Plugin:
     """The `html.slug` plugin."""
     return describe_plugin("html.slug", options)
+
+
+def math(options: Optional[MathOptions] = None) -> Plugin:
+    """The `html.math` plugin."""
+    return describe_plugin("html.math", options)
+
+
+def linkify(options: Optional[LinkifyOptions] = None) -> Plugin:
+    """The `html.linkify` plugin."""
+    return describe_plugin("html.linkify", options)
+
+
+def gemoji(options: Optional[GemojiOptions] = None) -> Plugin:
+    """The `html.gemoji` plugin."""
+    return describe_plugin("html.gemoji", options)
+
+
+def path_rewrite(options: Optional[PathRewriteOptions] = None) -> Plugin:
+    """The `html.pathRewrite` plugin."""
+    return describe_plugin("html.pathRewrite", options)
 
 
 def external_links(options: Optional[ExternalLinksOptions] = None) -> Plugin:

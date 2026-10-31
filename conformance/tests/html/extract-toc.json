@@ -330,5 +330,82 @@
         }
       }
     ]
+  },
+  {
+    "description": "depth range, skip by value and skipInside",
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.extractToc",
+        {
+          "minDepth": 2,
+          "maxDepth": 3,
+          "skip": ["data-toc=false"],
+          "skipInside": ["aside"]
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "only h2 and h3 are listed",
+        "input": "<h1>T</h1><h2>A</h2><h3>B</h3><h4>C</h4>",
+        "expected": {
+          "fileData": {
+            "toc": [
+              {
+                "depth": 2,
+                "value": "A",
+                "children": [
+                  {
+                    "depth": 3,
+                    "value": "B"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "a heading with the skipped value stays out, another value stays in",
+        "input": "<h2 data-toc=\"false\">A</h2><h2 data-toc=\"only\">B</h2>",
+        "expected": {
+          "fileData": {
+            "toc": [
+              {
+                "depth": 2,
+                "value": "B"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "description": "headings inside a skipped element stay out",
+        "input": "<h2>A</h2><aside><div><h3>B</h3></div></aside><h3>C</h3>",
+        "expected": {
+          "fileData": {
+            "toc": [
+              {
+                "depth": 2,
+                "value": "A",
+                "children": [
+                  {
+                    "depth": 3,
+                    "value": "C"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
   }
 ]

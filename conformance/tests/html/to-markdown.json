@@ -9257,5 +9257,43 @@
         }
       }
     ]
+  },
+  {
+    "description": "math and code meta",
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.toMarkdown",
+        {
+          "math": true,
+          "codeMeta": {
+            "data-title": "title"
+          }
+        }
+      ],
+      ["md.math"],
+      ["md.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "MathML with a TeX annotation, inline and display, KaTeX's visual copy dropped",
+        "input": "<p>a <span class=\"katex\"><span class=\"katex-mathml\"><math><semantics><mi>x</mi><annotation encoding=\"application/x-tex\">x_1</annotation></semantics></math></span><span class=\"katex-html\" aria-hidden=\"true\">x1</span></span> b</p><math display=\"block\"><semantics><mi>y</mi><annotation encoding=\"application/x-tex\">\\frac{a}{b}</annotation></semantics></math>",
+        "expected": {
+          "md": "a $x_1$ b\n\n$$\n\\frac{a}{b}\n$$\n"
+        }
+      },
+      {
+        "description": "a code block's title from its pre",
+        "input": "<pre data-title=\"a.js\"><code class=\"language-js\">let a\n</code></pre>",
+        "expected": {
+          "md": "```js title=\"a.js\"\nlet a\n```\n"
+        }
+      }
+    ]
   }
 ]

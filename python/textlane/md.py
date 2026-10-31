@@ -244,7 +244,8 @@ class GroupRule(_GroupRuleRequired, total=False):
 class _DirectiveRuleRequired(TypedDict):
     # The directive's name, or several.
     name: Names
-    # The component: a text element for a text directive, else a flow element.
+    # The component: a text element for a text directive, else a flow element; `{name}`
+    # in it stands for the directive's name, so one rule can cover a family of them.
     component: str
 
 
@@ -288,7 +289,7 @@ class AlertRule(_AlertRuleRequired, total=False):
 
 
 # What `md.component` does with a directive no rule converts.
-UnknownDirectives = Union[Literal["keep"], Literal["source"]]
+UnknownDirectives = Union[Literal["keep"], Literal["source"], Literal["error"]]
 
 
 class _CodeGroupRuleRequired(TypedDict):
@@ -565,6 +566,10 @@ class ToHtmlOptions(TypedDict, total=False):
     # An `aria-label` for each task-list checkbox, so screen readers name it; none when
     # left out, as remark-rehype writes none.
     taskListLabels: Optional[TaskListLabels]
+    # Turn MDX JSX elements, such as `md.component` and `md.packageCommand` make, into
+    # the plain HTML elements they name, literal attributes kept, for a pipeline that ends
+    # in HTML rather than MDX.
+    jsxElements: bool
 
 
 # `md.toNaturalLanguage`: mdast into nlcst, tokenized by the processor's natural-language parser; options

@@ -39,6 +39,10 @@ pub struct ToHtml {
     /// An `aria-label` for each task-list checkbox, so screen readers name it; none when
     /// left out, as remark-rehype writes none.
     pub task_list_labels: Option<TaskListLabels>,
+    /// Turn MDX JSX elements, such as `md.component` and `md.packageCommand` make, into
+    /// the plain HTML elements they name, literal attributes kept, for a pipeline that ends
+    /// in HTML rather than MDX.
+    pub jsx_elements: bool,
 }
 
 /// The labels of task-list checkboxes.
@@ -496,7 +500,8 @@ pub struct DirectiveRule {
     /// Attribute values the directive must have.
     #[serde(default, rename = "where")]
     pub condition: BTreeMap<String, String>,
-    /// The component: a text element for a text directive, else a flow element.
+    /// The component: a text element for a text directive, else a flow element; `{name}`
+    /// in it stands for the directive's name, so one rule can cover a family of them.
     pub component: String,
     /// The attribute that gets the directive's name.
     #[serde(default)]
@@ -588,6 +593,9 @@ pub enum UnknownDirectives {
     /// Put a text or leaf directive back as the text it was written as, such as the `:1` of
     /// `3:1`; container directives stay.
     Source,
+    /// Fail on a leaf or container directive, `unknown-directive`, as most are a typo of a
+    /// component's name; a text directive is put back as `source` puts it.
+    Error,
 }
 
 /// `md.packageCommand`: a fenced block of package-manager commands, its language naming

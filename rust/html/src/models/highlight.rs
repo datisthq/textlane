@@ -71,3 +71,16 @@ pub(crate) fn add_classes(list: &mut Vec<String>, names: &[String]) {
         }
     }
 }
+
+// What a block's own attributes ask for, beside its meta: `lineAttributes`,
+// `wordAttribute` and `lineNumberAttribute`
+#[derive(Default)]
+pub(crate) struct BlockMarks {
+    pub(crate) lines: Vec<LineMarks>,
+    pub(crate) pre: Vec<String>,
+    pub(crate) words: Vec<String>,
+    pub(crate) numbers: Option<usize>,
+}
+
+// Inclusive line ranges, 1-based, and the classes those lines get
+pub(crate) type LineMarks = (Vec<(usize, usize)>, Vec<String>);

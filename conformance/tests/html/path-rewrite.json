@@ -1,0 +1,32 @@
+[
+  {
+    "description": "base and pages",
+    "pipeline": [
+      [
+        "html.parse",
+        {
+          "fragment": true
+        }
+      ],
+      [
+        "html.pathRewrite",
+        {
+          "base": "/repo",
+          "pages": {
+            "guide.html": "/guide/"
+          }
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "root-relative URLs under base, a page's file to its URL",
+        "input": "<a href=\"/guide.html#a\">a</a><img src=\"/a.png\" srcset=\"/a.png 1x, /b.png 2x\"><a href=\"https://x.dev\">b</a>",
+        "expected": {
+          "html": "<a href=\"/repo/guide/#a\">a</a><img src=\"/repo/a.png\" srcset=\"/repo/a.png 1x, /repo/b.png 2x\"><a href=\"https://x.dev\">b</a>"
+        }
+      }
+    ]
+  }
+]

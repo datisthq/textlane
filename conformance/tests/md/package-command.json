@@ -15723,5 +15723,36 @@
         }
       }
     ]
+  },
+  {
+    "description": "as an HTML element",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.packageCommand",
+        {
+          "component": "x-tabs",
+          "ecosystems": {
+            "npm": ["npm", "pnpm"]
+          }
+        }
+      ],
+      [
+        "md.toHtml",
+        {
+          "jsxElements": true
+        }
+      ],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "npm install",
+        "input": "```npm\nnpm install a\n```",
+        "expected": {
+          "html": "<x-tabs npm=\"npm install a\" pnpm=\"pnpm add a\"></x-tabs>"
+        }
+      }
+    ]
   }
 ]

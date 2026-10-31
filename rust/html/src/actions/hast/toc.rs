@@ -3,24 +3,44 @@ use textlane_core::hast::{Node, PropertyValue};
 
 use crate::helpers::property::find_property;
 use crate::helpers::schema::HTML;
+use crate::helpers::value::write_value;
+use crate::models::options::ExtractToc;
 
 /// The headings of a tree as @stefanprobst/rehype-extract-toc nests them: each
 /// `{depth, value, id?, children?}`, under the closest heading of a lower rank before it.
-pub fn extract_toc(node: &Node<'_>, skip: &[String]) -> Value {
-    let skipped: Vec<String> = skip.iter().map(|name| read_attribute(name)).collect();
+pub fn extract_toc(node: &Node<'_>, options: &ExtractToc) -> Value {
+    let skipped: Vec<(String, Option<&str>)> = (options.skip.iter())
+        .map(|rule| match rule.split_once('=') {
+            Some((name, value)) => (read_attribute(name), Some(value)),
+            None => (read_attribute(rule), None),
+        })
+        .collect();
+    let min = options.min_depth.unwrap_or(1);
+    let max = options.max_depth.unwrap_or(6);
     let mut headings = Vec::new();
-    let mut stack: Vec<&Node<'_>> = vec![node];
-    while let Some(node) = stack.pop() {
-        let children = match node {
-            Node::Root(root) => &root.children,
+    let mut stack: Vec<(&Node<'_>, bool)> = vec![(node, false)];
+    while let Some((node, inside)) = stack.pop() {
+        let (children, inside) = match node {
+            Node::Root(root) => (&root.children, inside),
             Node::Element(element) => {
-                let left_out = element.properties.iter().any(|property| {
-                    !matches!(
-                        property.value,
-                        PropertyValue::Null | PropertyValue::Boolean(false)
-                    ) && skipped.contains(&read_attribute(property.name))
-                });
-                if let Some(depth) = read_rank(element.tag_name).filter(|_| !left_out) {
+                let left_out = inside
+                    || element.properties.iter().any(|property| {
+                        let attribute = read_attribute(property.name);
+                        skipped.iter().any(|(name, value)| {
+                            *name == attribute
+                                && match value {
+                                    Some(value) => write_value(&property.value) == *value,
+                                    None => !matches!(
+                                        property.value,
+                                        PropertyValue::Null
+                                            | PropertyValue::Boolean(false)
+                                    ),
+                                }
+                        })
+                    });
+                let depth = read_rank(element.tag_name)
+                    .filter(|depth| !left_out && (min..=max).contains(depth));
+                if let Some(depth) = depth {
                     let mut heading = Map::new();
                     heading.insert("depth".into(), json!(depth));
                     heading.insert("value".into(), json!(read_text(node)));
@@ -29,11 +49,14 @@ pub fn extract_toc(node: &Node<'_>, skip: &[String]) -> Value {
                     }
                     headings.push((depth, heading));
                 }
-                &element.children
+                let inside = inside
+                    || (options.skip_inside.iter())
+                        .any(|name| name.eq_ignore_ascii_case(element.tag_name));
+                (&element.children, inside)
             }
             _ => continue,
         };
-        stack.extend(children.iter().rev());
+        stack.extend(children.iter().rev().map(|child| (child, inside)));
     }
     nest_headings(headings)
 }

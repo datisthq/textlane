@@ -155,7 +155,7 @@ export interface DirectiveRule {
   kind?: DirectiveKind | null
   /** Attribute values the directive must have. @default {} */
   where?: Record<string, string>
-  /** The component: a text element for a text directive, else a flow element. */
+  /** The component: a text element for a text directive, else a flow element; `{name}` in it stands for the directive's name, so one rule can cover a family of them. */
   component: string
   /** The attribute that gets the directive's name. */
   nameAs?: string | null
@@ -203,7 +203,7 @@ export interface AlertRule {
 }
 
 /** What `md.component` does with a directive no rule converts. */
-export type UnknownDirectives = "keep" | "source"
+export type UnknownDirectives = "keep" | "source" | "error"
 
 /** How `md.component` turns matching code blocks into a component, or groups them. */
 export interface CodeRule {
@@ -415,6 +415,8 @@ export interface ToHtmlOptions {
   passThrough?: string[]
   /** An `aria-label` for each task-list checkbox, so screen readers name it; none when left out, as remark-rehype writes none. */
   taskListLabels?: TaskListLabels | null
+  /** Turn MDX JSX elements, such as `md.component` and `md.packageCommand` make, into the plain HTML elements they name, literal attributes kept, for a pipeline that ends in HTML rather than MDX. @default false */
+  jsxElements?: boolean
 }
 
 /** The labels of task-list checkboxes. */

@@ -121,6 +121,14 @@ pub(crate) const PLUGINS: &[PluginEntry] = &[
     #[cfg(feature = "html")]
     plugin!("html.slug", textlane_html::Slug, "rehype-slug"),
     #[cfg(feature = "html")]
+    plugin!("html.math", textlane_html::Math, ""),
+    #[cfg(feature = "html")]
+    plugin!("html.linkify", textlane_html::Linkify, ""),
+    #[cfg(feature = "html")]
+    plugin!("html.gemoji", textlane_html::Gemoji, ""),
+    #[cfg(feature = "html")]
+    plugin!("html.pathRewrite", textlane_html::PathRewrite, ""),
+    #[cfg(feature = "html")]
     plugin!(
         "html.externalLinks",
         textlane_html::ExternalLinks,

@@ -26,6 +26,7 @@ use crate::actions::list_item::convert::{convert_list_item, is_list_loose};
 use crate::actions::mdast::convert::find_definitions;
 use crate::actions::mdx_expression::convert::convert_mdx_expression;
 use crate::actions::mdx_jsx_element::convert::convert_mdx_jsx_element;
+use crate::actions::mdx_jsx_element::lower::lower_mdx_jsx_element;
 use crate::actions::paragraph::convert::convert_paragraph;
 use crate::actions::root::convert::convert_root;
 use crate::actions::strong::convert::convert_strong;
@@ -258,7 +259,12 @@ impl<'a> Converter<'a, '_> {
                 return;
             }
             mdast::Node::MdxJsxFlowElement(_) | mdast::Node::MdxJsxTextElement(_) => {
-                results.extend(convert_mdx_jsx_element(node, children));
+                match self.options.jsx_elements {
+                    true => {
+                        results.extend(lower_mdx_jsx_element(node, children, self.alloc))
+                    }
+                    false => results.extend(convert_mdx_jsx_element(node, children)),
+                }
                 return;
             }
             mdast::Node::ContainerDirective(_)
