@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.3.0](https://github.com/datisthq/textlane/compare/v0.2.1...v0.3.0) (2026-10-31)
+
+
+### Features
+
+* **md:** add md.shiftHeading and type the npm package's parsed trees ([3cdb1a9](https://github.com/datisthq/textlane/commit/3cdb1a910b22b37096ae241e9fce09d53ff6083e))
+
+
+### Performance Improvements
+
+* **md:** join a leaf's lines by slicing the source into the arena, and scan it for NUL once ([4b02d10](https://github.com/datisthq/textlane/commit/4b02d1000774c2847fb833606093c8746ebf7e5c))
+* **python:** release the GIL while process runs, and run aprocess on a thread ([250ca06](https://github.com/datisthq/textlane/commit/250ca067360fbbc8ffebf9225632b24a9b996aa7))
+* **typescript:** hand process's result to Node.js as a typed object, not a JSON value ([17b1321](https://github.com/datisthq/textlane/commit/17b1321dab9584f7dc976f2a3370e4a475f353e7))
+* **typescript:** run process on worker threads, with Oniguruma compiling regexes in parallel ([5355947](https://github.com/datisthq/textlane/commit/53559474e369b8327650baa8979841fad4f32ba9))
+
 ## [0.2.1](https://github.com/datisthq/textlane/compare/v0.2.0...v0.2.1) (2026-10-30)
 
 

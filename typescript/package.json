@@ -1,6 +1,6 @@
 {
   "name": "textlane",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Rust-native text processing pipeline — a unified replacement with native and JavaScript plugins",
   "keywords": [
     "ast",
