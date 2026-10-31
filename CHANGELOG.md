@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.6.0](https://github.com/datisthq/textlane/compare/v0.5.0...v0.6.0) (2026-10-31)
+
+
+### Features
+
+* **html:** add the plugins and options htmlpress needs ([1b6f5c4](https://github.com/datisthq/textlane/commit/1b6f5c490e29bba6f8ac703b857ebd8db76392ef))
+* **typescript:** export the syntax trees as type namespaces with textlane's extension nodes ([08f44f4](https://github.com/datisthq/textlane/commit/08f44f487d6dfca7e2174d5c73eaa51721acff7d))
+
+
+### Bug Fixes
+
+* **core:** leave URLs holding a backslash unrewritten, as browsers read it as a slash ([b53ffd1](https://github.com/datisthq/textlane/commit/b53ffd11cf63e6db82bf9d0176283d6831b01ccb))
+* **core:** leave URLs with control characters or surrounding space unrewritten ([f679338](https://github.com/datisthq/textlane/commit/f67933887062fe4f2a63cfb51b34231c00f916e8))
+* **html:** link only http, https and ftp URLs in html.linkify ([d7d8e65](https://github.com/datisthq/textlane/commit/d7d8e65f7b97fee9bcdf86a4de577877e6dae9c9))
+
 ## [0.5.0](https://github.com/datisthq/textlane/compare/v0.4.0...v0.5.0) (2026-10-31)
 
 
