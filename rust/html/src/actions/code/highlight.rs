@@ -29,6 +29,7 @@ pub(crate) fn highlight_code<'a>(
                 classes: vec!["line".to_owned()],
                 tokens: tokens.into_iter().map(Some).collect(),
                 removed: false,
+                number: None,
             })
             .collect(),
         language: language.to_owned(),
@@ -56,16 +57,7 @@ pub(crate) fn highlight_code<'a>(
         let tokens = line.tokens.iter().flatten();
         let mut spans = ArenaVec::with_capacity_in(line.tokens.len(), alloc);
         for token in tokens {
-            let mut properties = ArenaVec::new_in(alloc);
-            if !token.style.is_empty() {
-                properties.push(create_property("style", &token.style, alloc));
-            }
-            if !token.classes.is_empty() {
-                properties.push(create_class(&token.classes, alloc));
-            }
-            let mut text = ArenaVec::with_capacity_in(1, alloc);
-            text.push(create_text(&token.text, alloc));
-            spans.push(create_element("span", properties, text));
+            spans.push(create_token(token, alloc));
         }
         let mut properties = ArenaVec::with_capacity_in(1, alloc);
         properties.push(create_class(&line.classes, alloc));
@@ -81,6 +73,20 @@ pub(crate) fn highlight_code<'a>(
     // Shiki's own decorations transformer runs after every one a caller adds
     if !decorations.is_empty() {
         apply_decorations(&mut children, code, &mut decorations, alloc)?;
+    }
+    let numbers = block
+        .lines
+        .iter()
+        .filter(|line| !line.removed)
+        .map(|line| &line.number);
+    let lines = children.iter_mut().filter_map(|child| match child {
+        Node::Element(line) => Some(line),
+        _ => None,
+    });
+    for (line, number) in lines.zip(numbers) {
+        if let Some(number) = number {
+            line.children.insert(0, create_token(number, alloc));
+        }
     }
     let mut code_element = ArenaVec::with_capacity_in(1, alloc);
     code_element.push(create_element("code", code_properties, children));
@@ -132,7 +138,7 @@ fn mark_lines(block: &mut CodeBlock, marks: &BlockMarks) {
                 style: String::new(),
                 classes: vec!["line-number".to_owned()],
             };
-            line.tokens.insert(0, Some(token));
+            line.number = Some(token);
         }
     }
     add_classes(&mut block.pre_classes, &marks.pre);
@@ -158,6 +164,19 @@ fn stringify_root_style(themes: &Themes) -> String {
         }
     }
     style
+}
+
+fn create_token<'a>(token: &CodeToken, alloc: &'a Allocator) -> Node<'a> {
+    let mut properties = ArenaVec::new_in(alloc);
+    if !token.style.is_empty() {
+        properties.push(create_property("style", &token.style, alloc));
+    }
+    if !token.classes.is_empty() {
+        properties.push(create_class(&token.classes, alloc));
+    }
+    let mut text = ArenaVec::with_capacity_in(1, alloc);
+    text.push(create_text(&token.text, alloc));
+    create_element("span", properties, text)
 }
 
 fn create_element<'a>(

@@ -43,6 +43,9 @@ pub(crate) struct CodeLine {
     pub(crate) classes: Vec<String>,
     pub(crate) tokens: Vec<Option<CodeToken>>,
     pub(crate) removed: bool,
+    // Kept out of `tokens`: a decoration counts offsets in the code's own text, which a
+    // number before the line would shift
+    pub(crate) number: Option<CodeToken>,
 }
 
 // A block between tokenizing and hast: Shiki's transformer hooks run over it

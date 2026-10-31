@@ -41,6 +41,8 @@ pub(crate) fn parse_comments(block: &mut CodeBlock, jsx: bool) -> Vec<Comment> {
         split_comments(&mut block.lines[line].tokens);
         let tokens = &block.lines[line].tokens;
         let length = tokens.len();
+        // Shiki's numbers are tokens of the line, so a numbered line is never comment-only
+        let numbered = usize::from(block.lines[line].number.is_some());
         let start = match jsx {
             true => length.saturating_sub(2),
             false => length.saturating_sub(1),
@@ -65,7 +67,7 @@ pub(crate) fn parse_comments(block: &mut CodeBlock, jsx: bool) -> Vec<Comment> {
                     info,
                     line,
                     token: index - 1,
-                    line_comment_only: length == 2,
+                    line_comment_only: length + numbered == 2,
                     jsx_style: false,
                     additional: vec![index],
                 });
@@ -79,7 +81,7 @@ pub(crate) fn parse_comments(block: &mut CodeBlock, jsx: bool) -> Vec<Comment> {
                     info,
                     line,
                     token: index,
-                    line_comment_only: length == 3,
+                    line_comment_only: length + numbered == 3,
                     jsx_style,
                     additional: Vec::new(),
                 });
@@ -88,7 +90,7 @@ pub(crate) fn parse_comments(block: &mut CodeBlock, jsx: bool) -> Vec<Comment> {
                     info,
                     line,
                     token: index,
-                    line_comment_only: length == 1,
+                    line_comment_only: length + numbered == 1,
                     jsx_style: false,
                     additional: Vec::new(),
                 });

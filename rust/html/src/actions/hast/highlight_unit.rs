@@ -300,3 +300,39 @@ fn leaves_blocks_with_elements_alone_when_asked() -> Result<(), Error> {
     assert_eq!(highlight(input, options)?, input);
     Ok(())
 }
+
+#[test]
+fn marks_words_on_numbered_lines() -> Result<(), Error> {
+    let input = "<pre><code class=\"language-js\" data-words=\"b\" data-line-numbers=\"10\">\
+                 let a\nlet b\n</code></pre>";
+    let options = json!({
+        "theme": "github-light",
+        "wordAttribute": "data-words",
+        "lineNumberAttribute": "data-line-numbers"
+    });
+    let html = highlight(input, options)?;
+    assert!(
+        html.contains("<span class=\"line-number\">11</span>"),
+        "{html}"
+    );
+    assert_eq!(html.matches("highlighted-word").count(), 1, "{html}");
+    Ok(())
+}
+
+#[test]
+fn marks_meta_words_with_render_line_number() -> Result<(), Error> {
+    let options = json!({
+        "theme": "github-light",
+        "transformers": ["metaWordHighlight", { "name": "renderLineNumber", "start": 10 }]
+    });
+    let html = highlight(
+        "<pre><code class=\"language-js\" metastring=\"/b/\">let a\nlet b\n</code></pre>",
+        options,
+    )?;
+    assert!(
+        html.contains("<span class=\"line-number\">11</span>"),
+        "{html}"
+    );
+    assert_eq!(html.matches("highlighted-word").count(), 1, "{html}");
+    Ok(())
+}

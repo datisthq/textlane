@@ -51,7 +51,7 @@ pub(crate) fn transform_code(
                         style: String::new(),
                         classes: read_classes(class_line_number, "line-number"),
                     };
-                    line.tokens.insert(0, Some(token));
+                    line.number = Some(token);
                 }
                 _ => {}
             }
