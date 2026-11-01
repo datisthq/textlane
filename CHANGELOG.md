@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/datisthq/textlane/compare/v0.6.1...v0.7.0) (2026-11-01)
+
+
+### Features
+
+* add native plugins to Pipeline with use_native ([a30f5d3](https://github.com/datisthq/textlane/commit/a30f5d34bbe04aa1348d86983db72a563e9aea7d))
+
 ## [0.6.1](https://github.com/datisthq/textlane/compare/v0.6.0...v0.6.1) (2026-10-31)
 
 
