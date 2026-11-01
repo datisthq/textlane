@@ -1,7 +1,8 @@
+use std::collections::HashMap;
 use std::sync::Arc;
 
 use serde_json::{Map, Value};
-use textlane_core::{Allocator, Error, File, Lines, Tree, TreeKind};
+use textlane_core::{Allocator, Attach, Error, File, Lines, Plugin, Tree, TreeKind};
 
 use crate::actions::allocator::reuse::with_allocator;
 use crate::actions::plugin::find::find_plugin;
@@ -19,20 +20,32 @@ pub enum Api {
 }
 
 /// A processor built from plugin names and JSON options, with unified's `use`, `data` and
-/// `freeze` semantics: what the bindings drive.
+/// `freeze` semantics: what the bindings drive, and Rust code mixing its own plugins in.
 #[derive(Default)]
 pub struct Pipeline {
     // Each plugin once, in first-use order, with its latest options; `false` turns it off
     entries: Vec<(Key, Option<Value>)>,
+    natives: HashMap<String, Arc<dyn Plugin>>,
     data: Map<String, Value>,
     frozen: Option<Arc<FrozenProcessor>>,
 }
 
-// A host plugin is known by the id its binding gave it; its options stay in the binding
+// A host plugin is known by the id its binding gave it, a native one by the id its caller
+// gave it; the options of both stay with them, not in the entry
 #[derive(Clone, Debug, PartialEq, Eq)]
 enum Key {
     Name(String),
     Host(u32),
+    Native(String),
+}
+
+// One instance shared by every processor the pipeline freezes into
+struct Native(Arc<dyn Plugin>);
+
+impl Plugin for Native {
+    fn attach(&self, context: &mut Attach) -> Result<(), Error> {
+        self.0.attach(context)
+    }
 }
 
 /// A frozen pipeline's `process`, independent of the `Pipeline` it came from.
@@ -94,6 +107,25 @@ impl Pipeline {
                 format!("Expected usable value, not `{other}`"),
             )),
         }
+    }
+
+    /// Add a Rust plugin under `id`, the way a binding adds a host function: in first-use
+    /// order beside the named plugins; used again with the same `id`, the new instance
+    /// takes the earlier one's place.
+    pub fn use_native(
+        &mut self,
+        id: &str,
+        plugin: impl Plugin + 'static,
+    ) -> Result<(), Error> {
+        self.check_unfrozen("use")?;
+        if self
+            .natives
+            .insert(id.to_owned(), Arc::new(plugin))
+            .is_none()
+        {
+            self.entries.push((Key::Native(id.to_owned()), None));
+        }
+        Ok(())
     }
 
     /// Set one data value; fails once the pipeline is frozen.
@@ -163,6 +195,13 @@ impl Pipeline {
                     Key::Name(name) => name,
                     Key::Host(id) => {
                         processor = processor.with_boxed(Box::new(Host { id: *id }));
+                        continue;
+                    }
+                    Key::Native(id) => {
+                        if let Some(plugin) = self.natives.get(id) {
+                            let plugin = Native(Arc::clone(plugin));
+                            processor = processor.with_boxed(Box::new(plugin));
+                        }
                         continue;
                     }
                 };
@@ -512,3 +551,7 @@ pub(crate) fn write_tree(
         Tree::Nlcst(node) => textlane_core::nlcst::serialize_nlcst(node, lines),
     }
 }
+
+#[cfg(all(test, feature = "md", feature = "html"))]
+#[path = "pipeline_unit.rs"]
+mod unit;

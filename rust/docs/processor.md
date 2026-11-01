@@ -100,6 +100,17 @@ pipeline.process("[a](b)", &mut File::new(), Api::Sync)?
 // <p><a href='b'>a</a></p>
 ```
 
+`use_native(id, plugin)` adds a Rust plugin, your own or a typed instance of a built-in one,
+the way the Node.js and Python packages add a host function: in first-use order beside the
+named plugins, and replaced in its place when used again with the same `id`. A named plugin
+used again still merges its options, so configuration can extend a pipeline written in code.
+
+```rust
+use textlane::md::ShiftHeading;
+
+pipeline.use_native("shift", ShiftHeading { shift: 1, ..ShiftHeading::default() })?;
+```
+
 ## Crate functions
 
 - `textlane::read_version()` — the crate's version
