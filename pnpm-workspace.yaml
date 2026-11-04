@@ -21,6 +21,8 @@ minimumReleaseAgeExclude:
   - gethtmlpress
   - "@htmlpress/*"
   - livemark
+  - textlane
+  - "@textlane/*"
 
 allowBuilds:
   esbuild: true
