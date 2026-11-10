@@ -57,11 +57,15 @@ matching shipped `.skills/` skill in the same commit.
 ```
 fix: report the crate version from the Python binding
 
-Problem: <issue URL> — <one line of the evidence>
-Root cause: <file:line and why>
-Fix: <what changed>
-Tests: <the test that failed first, and the gate run>
+<issue URL>: <one line of the evidence>.
+
+<the root cause, its file:line and why>. <what changed>.
+
+<the test that failed first, and the gate run>.
 ```
+
+Write the body as plain prose: release-please reads a `Word:` line as a footer, and code or
+parentheses after one make the whole commit unparsable, so it is skipped and no Release PR opens.
 
 Typed by what an installer gets (`AGENTS.md`, "Releases"), never marked breaking. Stage only your
 own paths. Report the worktree path, branch and SHA so the caller can land it with
