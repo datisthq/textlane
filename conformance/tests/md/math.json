@@ -4881,5 +4881,50 @@
         }
       }
     ]
+  },
+  {
+    "description": "md.math {\"pandocTextMath\":true}",
+    "comment": "Pandoc's tex_math_dollars rule for one-dollar text math; two or more dollars read as remark-math reads them",
+    "pipeline": [
+      ["md.parse"],
+      [
+        "md.math",
+        {
+          "pandocTextMath": true
+        }
+      ],
+      ["md.toHtml"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "should keep prices text",
+        "input": "it costs $5 and $10",
+        "expected": {
+          "html": "<p>it costs $5 and $10</p>"
+        }
+      },
+      {
+        "description": "should keep a dollar before a space from opening math",
+        "input": "pay $ 5 and $x$",
+        "expected": {
+          "html": "<p>pay $ 5 and <code class=\"language-math math-inline\">x</code></p>"
+        }
+      },
+      {
+        "description": "should skip a closing dollar after a space or before a digit",
+        "input": "$a $b$ and $c$1",
+        "expected": {
+          "html": "<p><code class=\"language-math math-inline\">a $b</code> and $c$1</p>"
+        }
+      },
+      {
+        "description": "should still read math",
+        "input": "Math $\\alpha$ and $$\\beta$$",
+        "expected": {
+          "html": "<p>Math <code class=\"language-math math-inline\">\\alpha</code> and <code class=\"language-math math-inline\">\\beta</code></p>"
+        }
+      }
+    ]
   }
 ]

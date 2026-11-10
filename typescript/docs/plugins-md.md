@@ -174,9 +174,10 @@ file.value
 
 Follows [remark-math](https://www.npmjs.com/package/remark-math).
 
-| Option                 | Type      | Default | Description                                               |
-| ---------------------- | --------- | ------- | --------------------------------------------------------- |
-| `singleDollarTextMath` | `boolean` | `true`  | Let one dollar, `$a$`, form math in text, as well as two. |
+| Option                 | Type      | Default | Description                                                                                                                                                           |
+| ---------------------- | --------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `singleDollarTextMath` | `boolean` | `true`  | Let one dollar, `$a$`, form math in text, as well as two.                                                                                                             |
+| `pandocTextMath`       | `boolean` | `false` | Read one-dollar text math as Pandoc does: the opening `$` followed by a non-space, the closing one after a non-space and before no digit, so `$5 and $10` stays text. |
 
 <!-- /generated -->
 

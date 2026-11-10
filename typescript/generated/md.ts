@@ -51,6 +51,8 @@ export interface AlertsOptions {
 export interface MathOptions {
   /** Let one dollar, `$a$`, form math in text, as well as two. @default true */
   singleDollarTextMath?: boolean
+  /** Read one-dollar text math as Pandoc does: the opening `$` followed by a non-space, the closing one after a non-space and before no digit, so `$5 and $10` stays text. @default false */
+  pandocTextMath?: boolean
 }
 
 /** `md.mdx`: MDX syntax, JSX, expressions and ESM, read by `md.parse` and written by `md.stringify`; it turns off indented code, autolinks and raw HTML; options named as remark-mdx and mdast-util-mdx-jsx's serializer name them. */

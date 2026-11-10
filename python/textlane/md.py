@@ -104,6 +104,9 @@ class GfmOptions(TypedDict, total=False):
 class MathOptions(TypedDict, total=False):
     # Let one dollar, `$a$`, form math in text, as well as two.
     singleDollarTextMath: bool
+    # Read one-dollar text math as Pandoc does: the opening `$` followed by a non-space,
+    # the closing one after a non-space and before no digit, so `$5 and $10` stays text.
+    pandocTextMath: bool
 
 
 # `md.mdx`: MDX syntax, JSX, expressions and ESM, read by `md.parse` and written by

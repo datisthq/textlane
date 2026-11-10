@@ -270,12 +270,16 @@ pub struct DefinitionListSlot(pub bool);
 pub struct Math {
     /// Let one dollar, `$a$`, form math in text, as well as two.
     pub single_dollar_text_math: bool,
+    /// Read one-dollar text math as Pandoc does: the opening `$` followed by a non-space,
+    /// the closing one after a non-space and before no digit, so `$5 and $10` stays text.
+    pub pandoc_text_math: bool,
 }
 
 impl Default for Math {
     fn default() -> Self {
         Math {
             single_dollar_text_math: true,
+            pandoc_text_math: false,
         }
     }
 }

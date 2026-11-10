@@ -334,8 +334,12 @@ impl<'a> Inline<'a, '_> {
                     let size = run_end - pos;
                     let single =
                         self.math.is_some_and(|math| math.single_dollar_text_math);
+                    let pandoc =
+                        size == 1 && self.math.is_some_and(|math| math.pandoc_text_math);
                     let close = if size < 2 && !single {
                         None
+                    } else if pandoc {
+                        self.find_pandoc_close(run_end)
                     } else {
                         self.find_run_close(b'$', run_end, size)
                     };
@@ -1418,6 +1422,24 @@ fn after_line_ending(bytes: &[u8], at: usize) -> usize {
 impl Inline<'_, '_> {
     // A run of `size` markers closing a code span or math; a failed search is
     // remembered, so later runs of that size give up at once
+    // Pandoc's rule: math opens before a non-space and closes after one, never before a
+    // digit, so a price's dollar neither opens nor closes it
+    fn find_pandoc_close(&mut self, from: usize) -> Option<usize> {
+        let bytes = self.bytes;
+        if bytes.get(from).is_none_or(u8::is_ascii_whitespace) {
+            return None;
+        }
+        let mut start = from;
+        loop {
+            let close = self.find_run_close(b'$', start, 1)?;
+            let after = bytes.get(close + 1).is_some_and(u8::is_ascii_digit);
+            if close > from && !bytes[close - 1].is_ascii_whitespace() && !after {
+                return Some(close);
+            }
+            start = close + 1;
+        }
+    }
+
     fn find_run_close(&mut self, marker: u8, from: usize, size: usize) -> Option<usize> {
         let key = (marker, size);
         if let Some((_, failed)) = self.code_memo.iter().find(|(memo, _)| *memo == key)
