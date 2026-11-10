@@ -96,6 +96,8 @@ pub(crate) struct Inline<'a, 'd> {
     email_window: Option<EmailWindow>,
     html_memo: HtmlMemo,
     code_memo: Vec<((u8, usize), usize)>,
+    // The earliest start a Pandoc closer search failed from: every later one fails too
+    pandoc_memo: Option<usize>,
     mdx: Option<&'d MdxBuild<'d>>,
     leaf: &'static str,
     directive: bool,
@@ -187,6 +189,7 @@ pub(crate) fn parse_inline<'a>(
         email_window: None,
         html_memo: HtmlMemo::default(),
         code_memo: Vec::new(),
+        pandoc_memo: None,
         directive: context.directive,
         keep_trailing: context.keep_trailing,
         math: context.math,
@@ -1429,9 +1432,16 @@ impl Inline<'_, '_> {
         if bytes.get(from).is_none_or(u8::is_ascii_whitespace) {
             return None;
         }
+        if self.pandoc_memo.is_some_and(|failed| from >= failed) {
+            return None;
+        }
         let mut start = from;
         loop {
-            let close = self.find_run_close(b'$', start, 1)?;
+            let Some(close) = self.find_run_close(b'$', start, 1) else {
+                self.pandoc_memo =
+                    Some(self.pandoc_memo.map_or(from, |old| old.min(from)));
+                return None;
+            };
             let after = bytes.get(close + 1).is_some_and(u8::is_ascii_digit);
             if close > from && !bytes[close - 1].is_ascii_whitespace() && !after {
                 return Some(close);
