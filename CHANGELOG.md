@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.8.0](https://github.com/datisthq/textlane/compare/v0.7.0...v0.8.0) (2026-11-10)
+
+
+### Features
+
+* **md:** add md.math's pandocTextMath option, so prices stay text ([94c1c0f](https://github.com/datisthq/textlane/commit/94c1c0f60fadc844e8cc7b0dc24f5233df84fd36))
+
+
+### Bug Fixes
+
+* **md:** keep pandocTextMath's closer search linear on many unmatched dollars ([cdd3a55](https://github.com/datisthq/textlane/commit/cdd3a5562fce6bbf3fa6af9c30ef1eaabe1219b6))
+
 ## [0.7.0](https://github.com/datisthq/textlane/compare/v0.6.1...v0.7.0) (2026-11-01)
 
 
