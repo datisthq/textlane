@@ -30,11 +30,13 @@ impl<'a> Lines<'a> {
             true => vec![],
             false => {
                 let mut total = 0;
-                let mut checkpoints = Vec::with_capacity(bytes.len() / BLOCK + 1);
+                let mut checkpoints = Vec::with_capacity(bytes.len() / BLOCK + 2);
                 for block in bytes.chunks(BLOCK) {
                     checkpoints.push(total);
                     total += count_byte_units(block);
                 }
+                // The end of a source filling whole blocks needs the checkpoint past them
+                checkpoints.push(total);
                 checkpoints
             }
         };
@@ -78,9 +80,14 @@ impl<'a> Lines<'a> {
             return to;
         }
         let block = to / BLOCK;
-        let before = self.checkpoints.get(block).copied().unwrap_or_default();
         let bytes = self.source.as_bytes();
-        before + count_byte_units(bytes.get(block * BLOCK..to).unwrap_or_default())
+        match self.checkpoints.get(block) {
+            Some(before) => {
+                before
+                    + count_byte_units(bytes.get(block * BLOCK..to).unwrap_or_default())
+            }
+            None => count_byte_units(bytes.get(..to).unwrap_or(bytes)),
+        }
     }
 }
 

@@ -22,6 +22,16 @@ pub(crate) fn run_host(
         "readValue" => {
             append_child(&mut tree, paragraph(file.value.as_deref().unwrap_or("")))
         }
+        "readEnd" => {
+            let end = &tree["children"][0]["position"]["end"];
+            let text = match (end["line"].as_u64(), end["column"].as_u64()) {
+                (Some(line), Some(column)) => {
+                    format!(" {line}:{column}:{}", end["offset"])
+                }
+                _ => " none".to_string(),
+            };
+            append_child(&mut tree, json!({ "type": "text", "value": text }))
+        }
         "fail" | "returnError" => {
             return Err(Error::new("plugin-failed", text("message")));
         }

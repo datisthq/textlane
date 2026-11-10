@@ -64,7 +64,8 @@ runner implements them in its language, the Rust one through `start_process` and
 Node and Python ones as JavaScript and Python functions through the public API, processing
 asynchronously. `appendNode` (`node`, `mode`), `replaceTree` (`tree`), `message` (`reason`,
 `ruleId`, `source`, `place`), `countMessages` and `readValue` (a paragraph of the message count
-or the document), `fail` and `returnError` (an error coded `plugin-failed`) and
+or the document), `readEnd` (a text node ` line:column:offset` of the first child's end,
+or ` none`), `fail` and `returnError` (an error coded `plugin-failed`) and
 `recordOptions` (its attacher appends its options to the data's `recorded`).
 
 ## Runners

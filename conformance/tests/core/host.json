@@ -408,5 +408,79 @@
         }
       }
     ]
+  },
+  {
+    "description": "a host plugin gets valid points at the end of a non-ASCII document",
+    "comment": "`host:readEnd` appends ` line:column:offset`, the first child's end; a non-ASCII source filling whole 256-byte blocks once placed its end at offset 0, a column past 2^64",
+    "pipeline": [
+      ["md.parse"],
+      ["host:readEnd:mdast"],
+      ["md.toHtml"],
+      ["host:readEnd:hast"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "two-byte characters filling the last 256-byte block",
+        "input": "a\nééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé",
+        "expected": {
+          "html": "<p>a\nééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé</p>\n 2:128:129 2:128:129"
+        }
+      },
+      {
+        "description": "three-byte characters filling the last 256-byte block",
+        "input": "a\nbc’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’",
+        "expected": {
+          "html": "<p>a\nbc’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’</p>\n 2:87:88 2:87:88"
+        }
+      },
+      {
+        "description": "four-byte characters filling the last 256-byte block",
+        "input": "a\nbc😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "expected": {
+          "html": "<p>a\nbc😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀</p>\n 2:129:130 2:129:130"
+        }
+      }
+    ]
+  },
+  {
+    "description": "a host plugin gets valid points at the end of a non-ASCII document, with html.raw",
+    "comment": "`host:readEnd` appends ` line:column:offset`, the first child's end; a non-ASCII source filling whole 256-byte blocks once placed its end at offset 0, a column past 2^64",
+    "pipeline": [
+      ["md.parse"],
+      ["host:readEnd:mdast"],
+      [
+        "md.toHtml",
+        {
+          "allowDangerousHtml": true
+        }
+      ],
+      ["host:readEnd:hast"],
+      ["html.raw"],
+      ["html.stringify"]
+    ],
+    "tests": [
+      {
+        "description": "two-byte characters filling the last 256-byte block",
+        "input": "a\nééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé",
+        "expected": {
+          "html": "<p>a\nééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé</p>\n 2:128:129 2:128:129"
+        }
+      },
+      {
+        "description": "three-byte characters filling the last 256-byte block",
+        "input": "a\nbc’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’",
+        "expected": {
+          "html": "<p>a\nbc’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’’</p>\n 2:87:88 2:87:88"
+        }
+      },
+      {
+        "description": "four-byte characters filling the last 256-byte block",
+        "input": "a\nbc😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "expected": {
+          "html": "<p>a\nbc😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀</p>\n 2:129:130 2:129:130"
+        }
+      }
+    ]
   }
 ]

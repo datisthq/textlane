@@ -45,6 +45,29 @@ fn counts_utf16_offsets_across_checkpoints() {
 }
 
 #[test]
+fn places_the_end_of_a_source_filling_whole_checkpoint_blocks() {
+    // 256 bytes each, of two-, three- and four-byte characters
+    let blocks = [
+        "a\n".to_string() + &"é".repeat(127),
+        "a\nbc".to_string() + &"’".repeat(84),
+        "a\nbc".to_string() + &"😀".repeat(63),
+    ];
+    for block in blocks {
+        for count in [1, 2] {
+            let source = block.repeat(count);
+            let line_start = source.rfind('\n').map_or(0, |at| at + 1);
+            let point = Lines::new(&source).to_unist_point(Point::new(source.len(), 0));
+            let expected = UnistPoint {
+                line: source.matches('\n').count() + 1,
+                column: source[line_start..].encode_utf16().count() + 1,
+                offset: Some(source.encode_utf16().count()),
+            };
+            assert_eq!(point, expected, "{count} blocks of {block}");
+        }
+    }
+}
+
+#[test]
 fn places_many_points_on_one_long_line_in_linear_time() {
     let source = "é ".repeat(500_000);
     let lines = Lines::new(&source);

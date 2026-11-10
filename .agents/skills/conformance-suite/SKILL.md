@@ -48,6 +48,9 @@ otherwise.
   those groups through the public `textlane()` instead of `runCase`, and the API samplers skip
   them. A new behaviour lands in all three files and the README's list at once, or two
   runners fail the case.
+- A native-only `process` never turns spans into unist points; only a tree crossing to a host
+  stage (or a tree outcome) does. Cover a position change with a `host:readEnd` case, and test
+  `Lines` at `source.len()` too, which `char_indices` never yields.
 - A case with `operations` calls the pipeline once per entry (`use`, `data`, `freeze`,
   `parse`, `run`, `stringify`, `process`); the last call's output is the case's, beside
   `data`, `messages` and the labels `test.trace:<label>` recorded (`trace`).

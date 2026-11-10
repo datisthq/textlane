@@ -57,6 +57,9 @@ function runHost(behaviour: string, options: Options, tree: Node, file: HostFile
     case "readValue":
       children.push(paragraph(file.value ?? ""))
       return tree
+    case "readEnd":
+      children.push({ type: "text", value: readEnd(children[0]) })
+      return tree
     case "fail":
       throw failure(options)
     case "returnError":
@@ -68,6 +71,17 @@ function runHost(behaviour: string, options: Options, tree: Node, file: HostFile
 
 function failure(options: Options) {
   return Object.assign(new Error(String(options?.message)), { code: "plugin-failed" })
+}
+
+function readEnd(node: unknown) {
+  const position = isRecord(node) ? node.position : undefined
+  const end = isRecord(position) ? position.end : undefined
+  if (!isRecord(end)) return " none"
+  return ` ${String(end.line)}:${String(end.column)}:${String(end.offset)}`
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null
 }
 
 function readPlace(place: unknown) {

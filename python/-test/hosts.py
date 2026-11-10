@@ -50,6 +50,8 @@ def run_host(behaviour, options, tree, file):
         children.append(paragraph(str(len(file.messages))))
     elif behaviour == "readValue":
         children.append(paragraph(file.value or ""))
+    elif behaviour == "readEnd":
+        children.append({"type": "text", "value": read_end(tree)})
     elif behaviour == "fail":
         raise failure(options)
     elif behaviour == "returnError":
@@ -65,6 +67,13 @@ class PluginFailed(Exception):
 
 def failure(options):
     return PluginFailed(options.get("message", ""))
+
+
+def read_end(tree):
+    end = ((tree.get("children") or [{}])[0].get("position") or {}).get("end")
+    if not end:
+        return " none"
+    return f" {end['line']}:{end['column']}:{end.get('offset')}"
 
 
 def paragraph(value):
