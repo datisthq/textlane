@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.1](https://github.com/datisthq/textlane/compare/v0.8.0...v0.8.1) (2026-11-10)
+
+
+### Bug Fixes
+
+* **core:** place the end of a non-ASCII source filling whole 256-byte blocks ([98e7cc8](https://github.com/datisthq/textlane/commit/98e7cc85ee4a3eb9263f3debfe4d0aa824a09bb7))
+
 ## [0.8.0](https://github.com/datisthq/textlane/compare/v0.7.0...v0.8.0) (2026-11-10)
 
 
