@@ -2,6 +2,15 @@ import { defineConfig } from "livemark"
 
 export default defineConfig({
   site: "https://textlane.dev",
+  head: {
+    scripts: [
+      {
+        src: "https://counter.datist.io/api/script.js",
+        "data-site-id": "9",
+        defer: "true",
+      },
+    ],
+  },
   title: "Textlane",
   description: "Fast text processing",
   logo: "/logo.svg",
